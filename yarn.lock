@@ -1042,11 +1042,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@podin/server@workspace:apps/server":
+"@poderate/server@workspace:apps/server":
   version: 0.0.0-use.local
-  resolution: "@podin/server@workspace:apps/server"
+  resolution: "@poderate/server@workspace:apps/server"
   dependencies:
-    "@podin/shared": "workspace:*"
+    "@poderate/shared": "workspace:*"
     "@types/node": ^22.13.10
     dotenv: ^16.4.7
     drizzle-kit: ^0.30.5
@@ -1059,20 +1059,20 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@podin/shared@workspace:*, @podin/shared@workspace:packages/shared":
+"@poderate/shared@workspace:*, @poderate/shared@workspace:packages/shared":
   version: 0.0.0-use.local
-  resolution: "@podin/shared@workspace:packages/shared"
+  resolution: "@poderate/shared@workspace:packages/shared"
   dependencies:
     typescript: ^5.8.2
     vitest: ^3.0.8
   languageName: unknown
   linkType: soft
 
-"@podin/web@workspace:apps/web":
+"@poderate/web@workspace:apps/web":
   version: 0.0.0-use.local
-  resolution: "@podin/web@workspace:apps/web"
+  resolution: "@poderate/web@workspace:apps/web"
   dependencies:
-    "@podin/shared": "workspace:*"
+    "@poderate/shared": "workspace:*"
     "@types/react": ^19.0.10
     "@types/react-dom": ^19.0.4
     "@vitejs/plugin-react": ^4.3.4
@@ -2570,9 +2570,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"podin@workspace:.":
+"poderate@workspace:.":
   version: 0.0.0-use.local
-  resolution: "podin@workspace:."
+  resolution: "poderate@workspace:."
   languageName: unknown
   linkType: soft
 

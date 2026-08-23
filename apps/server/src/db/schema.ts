@@ -8,7 +8,7 @@ import {
 } from 'drizzle-orm/pg-core';
 
 /**
- * Enum values must stay aligned with @podin/shared.
+ * Enum values must stay aligned with @poderate/shared.
  * Drizzle Kit loads this file via CJS, so we keep literal unions here
  * instead of importing the shared package.
  */

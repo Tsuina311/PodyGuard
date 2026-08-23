@@ -1,4 +1,4 @@
-# Podin
+# Poderate
 
 Live matchmaking for casual multiplayer tabletop events (first game: Magic: The Gathering Commander).
 

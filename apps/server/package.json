@@ -1,5 +1,5 @@
 {
-  "name": "@podin/server",
+  "name": "@poderate/server",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -14,7 +14,7 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@podin/shared": "workspace:*",
+    "@poderate/shared": "workspace:*",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.40.0",
     "fastify": "^5.2.1",

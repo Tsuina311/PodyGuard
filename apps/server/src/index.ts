@@ -22,7 +22,7 @@ async function main(): Promise<void> {
 
   await app.listen({ host: config.host, port: config.port });
   app.log.info(
-    `Podin server listening on ${config.host}:${config.port} (database via DATABASE_URL)`,
+    `Poderate server listening on ${config.host}:${config.port} (database via DATABASE_URL)`,
   );
 }
 

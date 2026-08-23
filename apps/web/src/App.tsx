@@ -1,11 +1,11 @@
-import { EventStatus } from '@podin/shared';
+import { EventStatus } from '@poderate/shared';
 import { Link, Route, Routes } from 'react-router-dom';
 
 export function App() {
   return (
     <div className="app">
       <header className="hero">
-        <p className="brand">Podin</p>
+        <p className="brand">Poderate</p>
         <h1>Casual multiplayer matchmaking</h1>
         <p className="lede">
           Live queue for physical tabletop events. Foundation build — Phase 0.

@@ -1,5 +1,5 @@
 {
-  "name": "@podin/web",
+  "name": "@poderate/web",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -11,7 +11,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@podin/shared": "workspace:*",
+    "@poderate/shared": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.3.0"

@@ -16,7 +16,7 @@ describe('health endpoint', () => {
       database: string;
       ok: boolean;
     };
-    expect(body.service).toBe('podin-server');
+    expect(body.service).toBe('poderate-server');
     expect(['up', 'down']).toContain(body.database);
 
     await app.close();

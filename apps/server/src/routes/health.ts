@@ -7,7 +7,7 @@ export const healthRoutes: FastifyPluginAsync = async (app) => {
 
     return {
       ok: databaseOk,
-      service: 'podin-server',
+      service: 'poderate-server',
       database: databaseOk ? 'up' : 'down',
       timestamp: new Date().toISOString(),
     };

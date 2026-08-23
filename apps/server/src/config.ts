@@ -7,7 +7,7 @@ loadEnv({ path: resolve(serverRoot, '.env') });
 
 const SETUP_MESSAGE = `DATABASE_URL is not set.
 
-Podin uses a remote managed PostgreSQL database.
+Poderate uses a remote managed PostgreSQL database.
 
 Setup:
   1. Create a development database with your managed Postgres provider
