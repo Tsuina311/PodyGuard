@@ -1,0 +1,18 @@
+{
+  "name": "podin",
+  "private": true,
+  "packageManager": "yarn@3.8.1",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "yarn workspace @podin/web dev",
+    "dev:server": "yarn workspace @podin/server dev",
+    "build": "yarn workspace @podin/shared build && yarn workspace @podin/server build && yarn workspace @podin/web build",
+    "typecheck": "yarn workspace @podin/shared typecheck && yarn workspace @podin/server typecheck && yarn workspace @podin/web typecheck",
+    "test": "yarn workspace @podin/shared test && yarn workspace @podin/server test && yarn workspace @podin/web test",
+    "db:generate": "yarn workspace @podin/server db:generate",
+    "db:migrate": "yarn workspace @podin/server db:migrate"
+  }
+}

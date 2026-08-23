@@ -1,0 +1,21 @@
+node_modules
+dist
+build
+.turbo
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+coverage
+.vite
+*.tsbuildinfo
+
+# Yarn
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
