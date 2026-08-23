@@ -1,10 +1,15 @@
 import { config } from './config.js';
 import { buildApp } from './app.js';
 import { closeDatabase } from './db/client.js';
+import { createIdentityBoundary } from './identity/index.js';
 
 async function main(): Promise<void> {
   // Accessing config validates DATABASE_URL before listen.
-  const app = await buildApp();
+  const app = await buildApp({
+    identity: createIdentityBoundary({
+      participantSessionSecret: config.participantSessionSecret,
+    }),
+  });
 
   const shutdown = async (signal: string) => {
     app.log.info(`Received ${signal}, shutting down`);

@@ -51,6 +51,7 @@ export const events = pgTable('events', {
   publicJoinCode: text('public_join_code').notNull().unique(),
   name: text('name').notNull(),
   status: eventStatusEnum('status').notNull().default('open'),
+  /** Event-local host PIN hash. Not a Neon Auth account. */
   hostCredentialHash: text('host_credential_hash').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true })
     .defaultNow()

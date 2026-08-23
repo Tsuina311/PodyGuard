@@ -18,6 +18,9 @@ describe('health endpoint', () => {
     };
     expect(body.service).toBe('poderate-server');
     expect(['up', 'down']).toContain(body.database);
+    expect(app.identity.hostAuth).toBeDefined();
+    expect(app.identity.participantSessions).toBeDefined();
+    expect(app.identity.authorization).toBeDefined();
 
     await app.close();
   });

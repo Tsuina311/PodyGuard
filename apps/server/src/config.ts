@@ -36,4 +36,6 @@ export const config = {
   port: Number(process.env.PORT ?? 3001),
   databaseUrl: requireEnv('DATABASE_URL'),
   isDev: nodeEnv !== 'production',
+  /** HMAC key for QR/guest participant tokens. Not Neon Auth. Optional until join exists. */
+  participantSessionSecret: process.env.PARTICIPANT_SESSION_SECRET,
 } as const;
