@@ -17,6 +17,7 @@ import {
   Play,
   Plus,
   Radiation,
+  RotateCw,
   Shield,
   Skull,
   SlidersHorizontal,
@@ -50,6 +51,7 @@ import {
 } from './engine';
 import { DUNGEON_COUNT } from './dungeons';
 import { DungeonTracker } from './DungeonTracker';
+import { useLandscape, useLandscapeLock } from './orientation';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { DungeonIcon } from '../ui/DungeonIcon';
@@ -61,6 +63,12 @@ type Props = {
   players: TrackerSeed[];
   /** When false, ignore stored snapshots so a reload is always a new game. */
   persist?: boolean;
+  /**
+   * Hands the screen back once the pod is done with it. A game that has been
+   * called freezes the board, so without this the tracker would be a room with
+   * no door.
+   */
+  onFinish: () => void;
 };
 
 /*
@@ -69,7 +77,7 @@ type Props = {
   the orientation a phone sits in on the table.
 */
 const screenClass =
-  'bg-deep-space fixed inset-x-0 top-0 z-40 flex h-[100dvh] flex-col overflow-hidden pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))]';
+  'bg-deep-space fixed inset-x-0 top-0 z-40 flex h-[100dvh] touch-manipulation flex-col overflow-hidden pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))]';
 
 /*
   Every control sits on top of commander art, so it needs its own plate. A
@@ -171,6 +179,7 @@ export function TrackerView({
   storageKey,
   players,
   persist = true,
+  onFinish,
 }: Props) {
   const initial = useMemo<TrackerHistory>(
     () => ({ present: restore(storageKey, players, persist), past: [] }),
@@ -186,8 +195,37 @@ export function TrackerView({
   );
   const [counterPlayerId, setCounterPlayerId] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [resultHidden, setResultHidden] = useState(false);
+  const landscape = useLandscape();
+  useLandscapeLock();
   usePreloadedEliminatedArt();
   const elapsed = useMatchClock(state);
+  const winner = state.players.find((row) => row.id === state.winnerId) ?? null;
+
+  /*
+    Calling the game closes whatever sheet called it, so the result lands on the
+    board it describes rather than behind a menu.
+  */
+  useEffect(() => {
+    if (!state.winnerId) {
+      setResultHidden(false);
+      return;
+    }
+    setMenuOpen(false);
+    setCommanderPlayerId(null);
+    setCounterPlayerId(null);
+    setDungeonPlayerId(null);
+  }, [state.winnerId]);
+
+  /*
+    The snapshot is dropped on the way out: the next game at this table is a new
+    one, and a finished board restored from storage would be frozen from its
+    first frame.
+  */
+  function finish() {
+    sessionStorage.removeItem(storageKey);
+    onFinish();
+  }
 
   useEffect(() => {
     if (!persist) {
@@ -539,6 +577,18 @@ export function TrackerView({
         )}
       </button>
       {/*
+        Where the browser lets go of the orientation the board turns itself, so
+        this only ever shows on a phone that refused — every iPhone, which has
+        neither the lock nor the manifest's orientation. It cannot be tapped, so
+        it never costs a life total, and it leaves the moment the phone turns.
+      */}
+      {landscape ? null : (
+        <p className="text-muted bg-void/70 pointer-events-none absolute inset-x-0 bottom-1 z-30 mx-auto flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.65rem]">
+          <RotateCw size={12} aria-hidden />
+          Turn your phone for the full board
+        </p>
+      )}
+      {/*
         A sheet leaves out the seat it belongs to, so one shared sheet had to
         drop a column and grow another whenever it changed player, and the art
         of the column that came back was decoded again. Every seat keeps its
@@ -622,6 +672,7 @@ export function TrackerView({
                 onUndo={() => {
                   dispatch({ type: 'undo' });
                 }}
+                onFinish={finish}
                 onClose={() => setMenuOpen(false)}
               />
             </div>,
@@ -652,6 +703,61 @@ export function TrackerView({
                 dispatch={(action) => dispatch({ type: 'action', action })}
                 onClose={() => setDungeonPlayerId(null)}
               />
+            </div>,
+            document.body,
+          )
+        : null}
+      {/*
+        A called game answers every control with nothing, so the result is the
+        one thing on screen that still does something: leave, or take the call
+        back. The board stays visible around the card, because the pod usually
+        wants a last look at the totals before the seats are cleared.
+      */}
+      {winner && !resultHidden
+        ? createPortal(
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label="Match result"
+              className="bg-void/70 fixed inset-x-0 top-0 z-[60] flex h-[100dvh] items-center justify-center p-3 backdrop-blur-sm"
+            >
+              <section className="border-warning/40 bg-hull/95 w-full max-w-xs rounded-2xl border p-4 text-center shadow-[0_18px_50px_-24px_var(--color-void)]">
+                <Trophy
+                  size={26}
+                  aria-hidden
+                  className="text-warning fill-warning/30 mx-auto mb-2"
+                />
+                <h2 className="font-display truncate text-lg leading-tight font-bold">
+                  {winner.name} wins
+                </h2>
+                <p className="text-muted mb-3 font-mono text-sm tabular-nums">
+                  {formatClock(elapsed)}
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <Button variant="neon" size="sm" onClick={finish}>
+                    Done
+                  </Button>
+                  {past.length > 0 ? (
+                    <Button
+                      variant="glass"
+                      size="sm"
+                      onClick={() => {
+                        dispatch({ type: 'undo' });
+                      }}
+                    >
+                      <Undo2 size={14} aria-hidden />
+                      Undo
+                    </Button>
+                  ) : null}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setResultHidden(true)}
+                  >
+                    Review board
+                  </Button>
+                </div>
+              </section>
             </div>,
             document.body,
           )
@@ -712,6 +818,7 @@ function MatchMenu({
   canUndo,
   dispatch,
   onUndo,
+  onFinish,
   onClose,
 }: {
   state: TrackerState;
@@ -719,6 +826,7 @@ function MatchMenu({
   canUndo: boolean;
   dispatch: (action: TrackerAction) => void;
   onUndo: () => void;
+  onFinish: () => void;
   onClose: () => void;
 }) {
   const paused = Boolean(state.pausedAt);
@@ -842,6 +950,12 @@ function MatchMenu({
               {seat.name}
             </Button>
           ))}
+          {/* The way out, for a pod that dismissed the result to read the board. */}
+          {decided ? (
+            <Button size="sm" variant="neon" onClick={onFinish}>
+              Done
+            </Button>
+          ) : null}
         </div>
       </div>
     </section>

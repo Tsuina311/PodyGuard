@@ -254,6 +254,12 @@ export function JoinPage() {
             name: row.displayName,
             commanders: row.assignedCommanders ?? [],
           }))}
+        /*
+          A called game returns the player to the table card, which is where
+          they wait for the host to close the pod. Only the host can do that,
+          so the seat stays in the playing state.
+        */
+        onFinish={() => setShowTracker(false)}
       />
     );
   }

@@ -16,3 +16,14 @@ createRoot(rootElement).render(
     </HashRouter>
   </StrictMode>,
 );
+
+/*
+  Registered only in a build: the worker answers navigations from cache when the
+  network is gone, which is what makes the app installable, and in dev that same
+  behaviour would serve a stale shell over the Vite server.
+*/
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    void navigator.serviceWorker.register('/sw.js');
+  });
+}

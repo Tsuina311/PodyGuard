@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!--
+    The home-screen mark, drawn from the two pieces the app already uses: the
+    hull gradient behind every screen and the cyan pulse in the wordmark. The
+    glyph stays inside the middle 60% so the same square works as a maskable
+    icon, where a launcher may crop it to a circle.
+  -->
+  <defs>
+    <linearGradient id="hull" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0" stop-color="#0b1a30" />
+      <stop offset="0.65" stop-color="#03060e" />
+    </linearGradient>
+    <filter id="pulse" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="16" />
+    </filter>
+  </defs>
+  <rect width="512" height="512" fill="url(#hull)" />
+  <circle cx="256" cy="252" r="52" fill="#22d3ee" opacity="0.45" filter="url(#pulse)" />
+  <g
+    transform="translate(102 102) scale(12.83)"
+    fill="none"
+    stroke="#22d3ee"
+    stroke-width="1.7"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path
+      d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+    />
+  </g>
+  <circle cx="256" cy="252" r="30" fill="#22d3ee" />
+</svg>

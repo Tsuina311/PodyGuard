@@ -2,8 +2,30 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      viewport-fit=cover hands the app the space under a notch, which the
+      tracker needs: it is fixed to the dynamic viewport and pads itself with
+      the safe-area insets, and those read as zero without this.
+    -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
     <meta name="theme-color" content="#03060e" />
+    <!--
+      Installed to a home screen the app runs without browser chrome, which is
+      what the tracker wants: no URL bar eating a phone's short side, and no tab
+      to lose a match behind. The Apple meta tags are the same request for a
+      WebKit that predates the manifest.
+    -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="PodyGuard" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="icon" href="/icons/favicon.png" sizes="32x32" />
+    <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
     <script>
       (() => {
         const saved = localStorage.getItem('podyguard-theme');

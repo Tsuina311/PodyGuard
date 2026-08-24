@@ -89,6 +89,22 @@ Required production variables:
 - `PARTICIPANT_SESSION_SECRET`: a long random value, stable across deploys.
 - `NODE_ENV=production`.
 
+## Install on a phone
+
+The web app ships a manifest, icons, and a service worker, so a deployed release
+installs to a home screen and runs without browser chrome — no URL bar stealing
+the short side of a phone, and no tab to lose a match behind.
+
+- **iPhone:** Safari, Share, *Add to Home Screen*.
+- **Android:** Chrome, menu, *Install app*.
+
+Both require HTTPS, which the deployed URL has and a LAN dev address does not, so
+install from the deployed site rather than from `yarn dev`.
+
+While the game tracker is open it asks the browser for landscape and fullscreen.
+Chrome grants both; WebKit implements neither the orientation lock nor the
+manifest's `orientation`, so an iPhone shows a hint to turn the phone instead.
+
 ## Workspace scripts
 
 | Script | Description |

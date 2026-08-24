@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { Flag, Undo2, X } from 'lucide-react';
 import {
   DUNGEONS,
@@ -7,6 +7,7 @@ import {
   type DungeonRoom,
 } from './dungeons';
 import type { TrackerAction, TrackerState } from './engine';
+import { useLandscape } from './orientation';
 import { cx } from '../ui/cx';
 
 type Props = {
@@ -26,30 +27,7 @@ const CARD_H = 680;
   viewport can only be as wide as the viewport is tall, which on a phone leaves
   the map about half the size it could be. Turning the card on its side trades
   the wasted margins for roughly double the map.
-
-  This cannot be a `landscape:` class: the viewBox and the rotation are geometry,
-  not styling, so the orientation has to be known here.
 */
-function useLandscape(): boolean {
-  const [landscape, setLandscape] = useState(
-    () => window.matchMedia('(orientation: landscape)').matches,
-  );
-
-  useEffect(() => {
-    const query = window.matchMedia('(orientation: landscape)');
-    function update(event: MediaQueryListEvent) {
-      setLandscape(event.matches);
-    }
-    setLandscape(query.matches);
-    query.addEventListener('change', update);
-    return () => {
-      query.removeEventListener('change', update);
-    };
-  }, []);
-
-  return landscape;
-}
-
 export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
   const landscape = useLandscape();
   const progress = state.dungeons[playerId];

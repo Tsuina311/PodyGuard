@@ -1,5 +1,4 @@
 import { useEffect, useId, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { Search, X } from 'lucide-react';
 import { ApiError, listCommanderArtwork, searchCommanders } from './api';
 import type {
@@ -196,53 +195,53 @@ export function CommanderPicker({
         </div>
       ) : null}
 
-      {artCard
-        ? createPortal(
-            <div className="bg-void/95 fixed inset-0 z-[70] flex h-[100dvh] flex-col p-3 backdrop-blur-sm">
-              <header className="mb-3 flex shrink-0 items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <h3 className="font-display truncate text-lg font-bold">
-                    Choose artwork
-                  </h3>
-                  <p className="text-muted truncate text-xs">{artCard.name}</p>
-                </div>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setArtCard(null)}
+      {/*
+        Picking art is one step of filling in a deck, not a place of its own, so
+        it stays in the column the form already occupies. It used to take the
+        whole viewport, which hid the event and the other decks behind it. The
+        grid scrolls inside its own box so a card with a dozen printings cannot
+        push the rest of the form off the screen.
+      */}
+      {artCard ? (
+        <div className="border-muted/20 bg-void/70 mt-2 rounded-xl border p-2">
+          <header className="mb-2 flex items-center justify-between gap-2">
+            <p className="text-muted min-w-0 truncate text-xs">
+              Artwork for{' '}
+              <span className="text-ink font-medium">{artCard.name}</span>
+            </p>
+            <Button size="sm" variant="ghost" onClick={() => setArtCard(null)}>
+              Cancel
+            </Button>
+          </header>
+          {loadingArt ? (
+            <p className="text-muted px-1 py-6 text-center text-xs">
+              Loading artwork…
+            </p>
+          ) : (
+            <div className="grid max-h-72 grid-cols-2 gap-2 overflow-y-auto sm:grid-cols-3">
+              {artwork.map((art) => (
+                <button
+                  key={art.cardId}
+                  type="button"
+                  className="border-muted/20 hover:border-neon/70 relative aspect-[626/457] overflow-hidden rounded-lg border"
+                  onClick={() => chooseArt(artCard, art)}
                 >
-                  Cancel
-                </Button>
-              </header>
-              {loadingArt ? (
-                <p className="text-muted m-auto text-sm">Loading artwork…</p>
-              ) : (
-                <div className="grid min-h-0 flex-1 grid-cols-2 gap-2 overflow-y-auto landscape:grid-cols-4">
-                  {artwork.map((art) => (
-                    <button
-                      key={art.cardId}
-                      type="button"
-                      className="border-muted/20 hover:border-neon/70 relative min-h-36 overflow-hidden rounded-xl border"
-                      onClick={() => chooseArt(artCard, art)}
-                    >
-                      <img
-                        src={art.artCropUri}
-                        alt={`${artCard.name}${art.setName ? ` — ${art.setName}` : ''}`}
-                        className="h-full w-full object-[center_15%] object-cover"
-                      />
-                      {art.setName ? (
-                        <span className="bg-void/80 absolute right-1 bottom-1 left-1 truncate rounded px-1.5 py-1 text-[0.65rem]">
-                          {art.setName}
-                        </span>
-                      ) : null}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>,
-            document.body,
-          )
-        : null}
+                  <img
+                    src={art.artCropUri}
+                    alt={`${artCard.name}${art.setName ? ` — ${art.setName}` : ''}`}
+                    className="size-full object-[center_15%] object-cover"
+                  />
+                  {art.setName ? (
+                    <span className="bg-void/80 absolute right-1 bottom-1 left-1 truncate rounded px-1.5 py-0.5 text-[0.6rem]">
+                      {art.setName}
+                    </span>
+                  ) : null}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : null}
     </div>
   );
 }

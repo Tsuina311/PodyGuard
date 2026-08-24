@@ -41,6 +41,7 @@ export function MatchSandboxPage() {
         storageKey={trackerStorageKey(config)}
         players={players}
         persist={false}
+        onFinish={() => setShowTracker(false)}
       />
     );
   }

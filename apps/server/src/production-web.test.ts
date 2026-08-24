@@ -22,6 +22,11 @@ async function buildProductionApp() {
     join(webRoot, 'index.html'),
     '<!doctype html><title>PodyGuard test shell</title>',
   );
+  await writeFile(
+    join(webRoot, 'manifest.webmanifest'),
+    '{"name":"PodyGuard","display":"standalone"}',
+  );
+  await writeFile(join(webRoot, 'sw.js'), '/* test worker */');
   const identity = createIdentityBoundary({
     participantSessionSecret: 'test-secret',
   });
@@ -73,6 +78,27 @@ describe('production web service', () => {
     expect(missing.json()).toEqual({
       error: { code: 'NOT_FOUND', message: 'Route not found.' },
     });
+    await app.close();
+  });
+
+  /*
+    Installing the app to a home screen only works if these two arrive as
+    themselves. The SPA fallback answers anything it does not recognise with the
+    shell, so a wrong static route would hand a browser HTML for its manifest
+    and its worker, and the phone would quietly go on showing a URL bar.
+  */
+  it('serves the manifest and the service worker rather than the shell', async () => {
+    const app = await buildProductionApp();
+
+    const manifest = await app.inject({ url: '/manifest.webmanifest' });
+    expect(manifest.statusCode).toBe(200);
+    expect(manifest.json()).toMatchObject({ display: 'standalone' });
+
+    const worker = await app.inject({ url: '/sw.js' });
+    expect(worker.statusCode).toBe(200);
+    expect(worker.body).toContain('test worker');
+    expect(worker.headers['content-type']).toContain('javascript');
+
     await app.close();
   });
 });
