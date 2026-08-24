@@ -1,4 +1,4 @@
-import { ActorKind, type HostIdentity } from '@poderate/shared';
+import { ActorKind, type HostIdentity } from '@podyguard/shared';
 
 /**
  * Neon Auth → HostIdentity adapter.

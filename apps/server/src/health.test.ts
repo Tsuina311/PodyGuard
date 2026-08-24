@@ -16,10 +16,11 @@ describe('health endpoint', () => {
       database: string;
       ok: boolean;
     };
-    expect(body.service).toBe('poderate-server');
+    expect(body.service).toBe('podyguard-server');
     expect(['up', 'down']).toContain(body.database);
     expect(app.identity.hostAuth).toBeDefined();
     expect(app.identity.participantSessions).toBeDefined();
+    expect(app.identity.hostEventSessions).toBeDefined();
     expect(app.identity.authorization).toBeDefined();
 
     await app.close();

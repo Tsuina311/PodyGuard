@@ -10,6 +10,6 @@ export default defineConfig({
   out: './drizzle',
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_URL ?? 'postgresql://127.0.0.1/poderate_schema_placeholder',
+    url: process.env.DATABASE_URL ?? 'postgresql://127.0.0.1/podyguard_schema_placeholder',
   },
 });

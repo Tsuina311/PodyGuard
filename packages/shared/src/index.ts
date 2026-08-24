@@ -31,3 +31,24 @@ export type {
   OrganiserRole as OrganiserRoleType,
   SubscriptionTier as SubscriptionTierType,
 } from './entitlements';
+
+export {
+  JOIN_CODE_ALPHABET,
+  JOIN_CODE_LENGTH,
+  isJoinCodeFormat,
+  normalizeJoinCode,
+} from './join-code';
+
+export { COMMANDER_POOLS, OPEN_POOL_ID, poolLabel, poolShortLabel } from './pools';
+
+export type { CommanderPoolId } from './pools';
+
+export type {
+  CommanderSelection,
+  EventSnapshot,
+  PublicDeck,
+  PublicEvent,
+  PublicParticipant,
+  PublicPod,
+  PublicTable,
+} from './event-api';

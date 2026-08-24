@@ -1,5 +1,5 @@
 {
-  "name": "poderate",
+  "name": "podyguard",
   "private": true,
   "packageManager": "yarn@3.8.1",
   "workspaces": [
@@ -7,12 +7,15 @@
     "packages/*"
   ],
   "scripts": {
-    "dev:web": "yarn workspace @poderate/web dev",
-    "dev:server": "yarn workspace @poderate/server dev",
-    "build": "yarn workspace @poderate/shared build && yarn workspace @poderate/server build && yarn workspace @poderate/web build",
-    "typecheck": "yarn workspace @poderate/shared typecheck && yarn workspace @poderate/server typecheck && yarn workspace @poderate/web typecheck",
-    "test": "yarn workspace @poderate/shared test && yarn workspace @poderate/server test && yarn workspace @poderate/web test",
-    "db:generate": "yarn workspace @poderate/server db:generate",
-    "db:migrate": "yarn workspace @poderate/server db:migrate"
+    "dev:web": "yarn workspace @podyguard/web dev",
+    "dev:server": "yarn workspace @podyguard/server dev",
+    "build": "yarn workspace @podyguard/shared build && yarn workspace @podyguard/matching build && yarn workspace @podyguard/server build && yarn workspace @podyguard/web build",
+    "typecheck": "yarn workspace @podyguard/shared typecheck && yarn workspace @podyguard/matching typecheck && yarn workspace @podyguard/server typecheck && yarn workspace @podyguard/web typecheck",
+    "test": "yarn workspace @podyguard/shared test && yarn workspace @podyguard/matching test && yarn workspace @podyguard/server test && yarn workspace @podyguard/web test",
+    "test:matching": "yarn workspace @podyguard/matching test",
+    "simulate:matching": "yarn workspace @podyguard/matching simulate",
+    "benchmark:matching": "yarn workspace @podyguard/matching benchmark",
+    "db:generate": "yarn workspace @podyguard/server db:generate",
+    "db:migrate": "yarn workspace @podyguard/server db:migrate"
   }
 }

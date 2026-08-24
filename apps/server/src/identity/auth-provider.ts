@@ -1,4 +1,4 @@
-import type { HostIdentity } from '@poderate/shared';
+import type { HostIdentity } from '@podyguard/shared';
 
 /**
  * Authenticates persistent organisers only.

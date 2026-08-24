@@ -1,35 +1,42 @@
-import { EventStatus } from '@poderate/shared';
-import { Link, Route, Routes } from 'react-router-dom';
+import { Link, Route, Routes, useMatch } from 'react-router-dom';
+import { HomePage } from './HomePage';
+import { HostPage } from './HostPage';
+import { JoinPage } from './JoinPage';
+import { MatchConfigPage } from './MatchConfigPage';
+import { MatchSandboxPage } from './MatchSandboxPage';
+import { cx } from './ui/cx';
 
 export function App() {
+  // `/match` deliberately shares the player layout so it matches a real phone.
+  const wide = Boolean(useMatch('/host/:joinCode'));
   return (
-    <div className="app">
-      <header className="hero">
-        <p className="brand">Poderate</p>
-        <h1>Casual multiplayer matchmaking</h1>
-        <p className="lede">
-          Live queue for physical tabletop events. Foundation build — Phase 0.
-        </p>
-        <p className="meta">
-          Shared event status sample: <code>{EventStatus.Open}</code>
-        </p>
-        <nav>
-          <Link to="/">Home</Link>
-        </nav>
-      </header>
-      <Routes>
-        <Route path="/" element={null} />
-        <Route path="/e/:joinCode" element={<JoinPlaceholder />} />
-      </Routes>
+    <div className="bg-deep-space relative min-h-screen overflow-hidden">
+      <div aria-hidden className="bg-grid pointer-events-none absolute inset-0" />
+      <main
+        className={cx(
+          'relative mx-auto flex min-h-screen w-full flex-col gap-5 px-5 py-14',
+          wide ? 'max-w-4xl justify-start' : 'max-w-2xl justify-center',
+        )}
+      >
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/e/:joinCode" element={<JoinPage />} />
+          <Route path="/host/:joinCode" element={<HostPage />} />
+          <Route path="/match" element={<MatchSandboxPage />} />
+          <Route path="/match-config" element={<MatchConfigPage />} />
+          <Route
+            path="*"
+            element={
+              <p className="text-muted text-sm">
+                Not found.{' '}
+                <Link className="text-neon hover:underline" to="/">
+                  Home
+                </Link>
+              </p>
+            }
+          />
+        </Routes>
+      </main>
     </div>
-  );
-}
-
-function JoinPlaceholder() {
-  return (
-    <p className="note">
-      Event join flow arrives in Phase 1. QR codes will target{' '}
-      <code>#/e/JOINCODE</code>.
-    </p>
   );
 }

@@ -2,6 +2,7 @@ export type { AuthProvider, HostAuthCredentials } from './auth-provider.js';
 export { DeferredHostAuthProvider } from './deferred-host-auth-provider.js';
 export {
   HostAuthDeferredError,
+  InvalidHostEventSessionError,
   InvalidParticipantSessionError,
   ParticipantSessionSecretMissingError,
 } from './errors.js';
@@ -24,3 +25,8 @@ export type {
   ParticipantSession,
   ParticipantSessionService,
 } from './participant-session-service.js';
+export { HmacHostEventSessionService } from './host-event-session-service.js';
+export type {
+  HostEventSession,
+  HostEventSessionService,
+} from './host-event-session-service.js';

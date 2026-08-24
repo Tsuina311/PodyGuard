@@ -3,6 +3,10 @@ import type { AuthorizationService } from '../authorization/authorization-servic
 import type { AuthProvider } from './auth-provider.js';
 import { DeferredHostAuthProvider } from './deferred-host-auth-provider.js';
 import {
+  HmacHostEventSessionService,
+  type HostEventSessionService,
+} from './host-event-session-service.js';
+import {
   HmacParticipantSessionService,
   type ParticipantSessionService,
 } from './participant-session-service.js';
@@ -10,6 +14,7 @@ import {
 export type IdentityBoundary = {
   hostAuth: AuthProvider;
   participantSessions: ParticipantSessionService;
+  hostEventSessions: HostEventSessionService;
   authorization: AuthorizationService;
 };
 
@@ -27,6 +32,9 @@ export function createIdentityBoundary(
   return {
     hostAuth: new DeferredHostAuthProvider(),
     participantSessions: new HmacParticipantSessionService(
+      options.participantSessionSecret ?? process.env.PARTICIPANT_SESSION_SECRET,
+    ),
+    hostEventSessions: new HmacHostEventSessionService(
       options.participantSessionSecret ?? process.env.PARTICIPANT_SESSION_SECRET,
     ),
     authorization: new BackendAuthorizationService(),

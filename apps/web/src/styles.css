@@ -1,72 +1,147 @@
-:root {
-  color-scheme: light;
-  --bg-top: #1a3a2f;
-  --bg-bottom: #0d1f1a;
-  --ink: #f3f0e8;
-  --muted: #b7c4bc;
-  --accent: #d4a017;
-  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-  --font-body: "Avenir Next", "Segoe UI", sans-serif;
+@import 'tailwindcss';
+
+@theme {
+  --font-display: 'Space Grotesk', 'Avenir Next', 'Segoe UI', sans-serif;
+  --font-sans: 'Space Grotesk', 'Avenir Next', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+
+  --color-void: #03060e;
+  --color-abyss: #060f20;
+  --color-hull: #0b1a30;
+  --color-ink: #e9f3ff;
+  --color-muted: #8ba6c9;
+  --color-beam: #38bdf8;
+  --color-neon: #22d3ee;
+  --color-plasma: #6366f1;
+  --color-danger: #fda4af;
+  --color-warning: #fcd34d;
 }
 
-* {
-  box-sizing: border-box;
+@layer base {
+  html {
+    color-scheme: dark;
+    background: var(--color-void);
+  }
+
+  html[data-theme='light'] {
+    color-scheme: light;
+    --color-void: #f7f9fc;
+    --color-abyss: #edf3fa;
+    --color-hull: #ffffff;
+    --color-ink: #12233d;
+    --color-muted: #58708f;
+    --color-beam: #0284c7;
+    --color-neon: #0891b2;
+    --color-plasma: #4f46e5;
+    --color-danger: #e11d48;
+    --color-warning: #b45309;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    background-color: var(--color-void);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body,
+  button,
+  input {
+    transition:
+      color 200ms ease,
+      background-color 200ms ease,
+      border-color 200ms ease;
+  }
+
+  code {
+    font-family: var(--font-mono);
+  }
 }
 
-body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: var(--font-body);
-  color: var(--ink);
-  background:
-    radial-gradient(ellipse 80% 50% at 20% 0%, rgba(212, 160, 23, 0.18), transparent),
-    linear-gradient(165deg, var(--bg-top), var(--bg-bottom));
+/* Ambient backdrop: scanning grid plus two nebula glows. */
+@utility bg-deep-space {
+  background-image:
+    radial-gradient(
+      ellipse 70% 45% at 15% -5%,
+      color-mix(in oklab, var(--color-beam) 22%, transparent),
+      transparent
+    ),
+    radial-gradient(
+      ellipse 55% 45% at 95% 10%,
+      color-mix(in oklab, var(--color-plasma) 20%, transparent),
+      transparent
+    ),
+    linear-gradient(170deg, var(--color-abyss), var(--color-void) 65%);
 }
 
-.app {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  padding: 2rem;
+@utility bg-grid {
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in oklab, var(--color-beam) 9%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--color-beam) 9%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 3rem 3rem;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 20%, transparent 75%);
 }
 
-.hero {
-  width: min(40rem, 100%);
-  text-align: left;
-}
+@layer components {
+  .theme-toggle {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    width: 4.25rem;
+    height: 2.25rem;
+    padding: 0.25rem;
+    border: 1px solid color-mix(in oklab, var(--color-muted) 24%, transparent);
+    border-radius: 999px;
+    color: var(--color-muted);
+    background: color-mix(in oklab, var(--color-hull) 82%, transparent);
+    box-shadow:
+      0 8px 24px color-mix(in oklab, var(--color-void) 38%, transparent),
+      inset 0 1px color-mix(in oklab, var(--color-ink) 9%, transparent);
+    backdrop-filter: blur(16px);
+    cursor: pointer;
+  }
 
-.brand {
-  margin: 0 0 0.75rem;
-  font-family: var(--font-display);
-  font-size: clamp(2.75rem, 8vw, 4.5rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 0.95;
-  color: var(--accent);
-}
+  .theme-toggle:hover {
+    border-color: color-mix(in oklab, var(--color-neon) 55%, transparent);
+  }
 
-h1 {
-  margin: 0 0 0.75rem;
-  font-family: var(--font-display);
-  font-size: clamp(1.35rem, 3vw, 1.85rem);
-  font-weight: 600;
-  line-height: 1.2;
-}
+  .theme-toggle:focus-visible {
+    outline: 2px solid var(--color-neon);
+    outline-offset: 3px;
+  }
 
-.lede,
-.meta,
-.note {
-  margin: 0 0 1rem;
-  color: var(--muted);
-  max-width: 34rem;
-  line-height: 1.5;
-}
+  .theme-toggle__icon {
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    font-size: 0.9rem;
+    line-height: 1;
+  }
 
-nav a {
-  color: var(--ink);
-}
+  .theme-toggle__thumb {
+    position: absolute;
+    top: 0.25rem;
+    left: 0.25rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--color-beam), var(--color-neon));
+    box-shadow: 0 0 16px color-mix(in oklab, var(--color-neon) 50%, transparent);
+    transition: transform 250ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
 
-code {
-  font-size: 0.9em;
-  color: var(--accent);
+  html[data-theme='light'] .theme-toggle__thumb {
+    transform: translateX(2rem);
+  }
 }

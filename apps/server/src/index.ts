@@ -27,7 +27,7 @@ async function main(): Promise<void> {
 
   await app.listen({ host: config.host, port: config.port });
   app.log.info(
-    `Poderate server listening on ${config.host}:${config.port} (database via DATABASE_URL)`,
+    `PodyGuard server listening on ${config.host}:${config.port} (database via DATABASE_URL)`,
   );
 }
 

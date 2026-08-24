@@ -28,3 +28,12 @@ export class InvalidParticipantSessionError extends Error {
     this.name = 'InvalidParticipantSessionError';
   }
 }
+
+export class InvalidHostEventSessionError extends Error {
+  readonly code = 'INVALID_HOST_EVENT_SESSION';
+
+  constructor() {
+    super('Host event session token is invalid.');
+    this.name = 'InvalidHostEventSessionError';
+  }
+}

@@ -1,4 +1,4 @@
-import type { HostIdentity } from '@poderate/shared';
+import type { HostIdentity } from '@podyguard/shared';
 import type { AuthProvider, HostAuthCredentials } from './auth-provider.js';
 import { HostAuthDeferredError } from './errors.js';
 

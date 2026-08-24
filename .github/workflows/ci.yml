@@ -12,7 +12,7 @@ jobs:
     env:
       # Placeholder so config loads; unit tests do not require a live database.
       # Integration/migration checks against a real DB are out of band.
-      DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/poderate_ci
+      DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/podyguard_ci
 
     steps:
       - uses: actions/checkout@v4

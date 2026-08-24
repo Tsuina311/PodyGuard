@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
-import { ActorKind, type ParticipantIdentity } from '@poderate/shared';
+import { ActorKind, type ParticipantIdentity } from '@podyguard/shared';
 import {
   InvalidParticipantSessionError,
   ParticipantSessionSecretMissingError,

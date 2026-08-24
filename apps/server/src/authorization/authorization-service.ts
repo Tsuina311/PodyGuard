@@ -2,8 +2,8 @@ import type {
   CommercialEntitlements,
   HostIdentity,
   OrganiserRole,
-} from '@poderate/shared';
-import { ungatedEntitlements } from '@poderate/shared';
+} from '@podyguard/shared';
+import { ungatedEntitlements } from '@podyguard/shared';
 
 /**
  * Application authorization. Inputs are HostIdentity (our type), never Neon Auth SDK types.

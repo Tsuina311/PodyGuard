@@ -1,4 +1,4 @@
-import { ActorKind, OrganiserRole, SubscriptionTier } from '@poderate/shared';
+import { ActorKind, OrganiserRole, SubscriptionTier } from '@podyguard/shared';
 import { describe, expect, it } from 'vitest';
 import { EventManagementForbiddenError } from '../authorization/index.js';
 import { createIdentityBoundary } from './create-identity-boundary.js';

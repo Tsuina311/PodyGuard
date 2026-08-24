@@ -1,4 +1,4 @@
-# Poderate
+# PodyGuard
 
 Live matchmaking for casual multiplayer tabletop events (first game: Magic: The Gathering Commander).
 
@@ -55,6 +55,9 @@ If `DATABASE_URL` is missing, the server exits with a setup message. It will not
 |--------|-------------|
 | `yarn typecheck` | Typecheck all packages |
 | `yarn test` | Run tests in all packages |
+| `yarn test:matching` | Matching engine unit, property, and oracle tests |
+| `yarn simulate:matching` | Seeded snapshot + event-loop simulation report |
+| `yarn benchmark:matching` | Matcher timing report |
 | `yarn db:generate` | Generate Drizzle migrations from schema (committed to repo) |
 | `yarn db:migrate` | Apply migrations to the database in `DATABASE_URL` |
 
@@ -64,4 +67,5 @@ If `DATABASE_URL` is missing, the server exits with a setup message. It will not
 apps/web          Player + organiser UI
 apps/server       Fastify API + persistence
 packages/shared   Shared types and enums
+packages/matching Matchmaking engine + test laboratory
 ```

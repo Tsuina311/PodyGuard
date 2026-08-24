@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { EventStatus } from '@poderate/shared';
+import { EventStatus } from '@podyguard/shared';
 
 describe('web foundation', () => {
   it('imports shared package enums', () => {

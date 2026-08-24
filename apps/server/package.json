@@ -1,5 +1,5 @@
 {
-  "name": "@poderate/server",
+  "name": "@podyguard/server",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -14,15 +14,19 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@poderate/shared": "workspace:*",
+    "@neondatabase/serverless": "^1.1.0",
+    "@podyguard/matching": "workspace:*",
+    "@podyguard/shared": "workspace:*",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.40.0",
     "fastify": "^5.2.1",
-    "postgres": "^3.4.5"
+    "postgres": "^3.4.5",
+    "socket.io": "^4.8.3"
   },
   "devDependencies": {
     "@types/node": "^22.13.10",
     "drizzle-kit": "^0.30.5",
+    "socket.io-client": "^4.8.3",
     "tsx": "^4.19.3",
     "typescript": "^5.8.2",
     "vitest": "^3.0.8"
