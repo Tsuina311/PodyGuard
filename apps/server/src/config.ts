@@ -20,8 +20,8 @@ Setup:
 Never commit .env files. Credentials stay in local environment variables only.
 Do not use local PostgreSQL or Docker for this project.`;
 
-function requireEnv(name: string): string {
-  const value = process.env[name]?.trim();
+function requireDatabaseUrl(): string {
+  const value = process.env.DATABASE_URL?.trim();
   if (!value) {
     throw new Error(SETUP_MESSAGE);
   }
@@ -29,13 +29,20 @@ function requireEnv(name: string): string {
 }
 
 const nodeEnv = process.env.NODE_ENV ?? 'development';
+const participantSessionSecret = process.env.PARTICIPANT_SESSION_SECRET?.trim();
+
+if (nodeEnv === 'production' && !participantSessionSecret) {
+  throw new Error(
+    'PARTICIPANT_SESSION_SECRET is required in production. Generate a long random value and keep it stable between deploys.',
+  );
+}
 
 export const config = {
   nodeEnv,
   host: process.env.HOST ?? '0.0.0.0',
   port: Number(process.env.PORT ?? 3001),
-  databaseUrl: requireEnv('DATABASE_URL'),
+  databaseUrl: requireDatabaseUrl(),
   isDev: nodeEnv !== 'production',
-  /** HMAC key for QR/guest participant tokens. Not Neon Auth. Optional until join exists. */
-  participantSessionSecret: process.env.PARTICIPANT_SESSION_SECRET,
+  /** HMAC key for event-scoped host and participant tokens. */
+  participantSessionSecret,
 } as const;

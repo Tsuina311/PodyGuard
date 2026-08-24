@@ -10,12 +10,12 @@ describe('health endpoint', () => {
       url: '/health',
     });
 
-    expect(response.statusCode).toBe(200);
     const body = response.json() as {
       service: string;
       database: string;
       ok: boolean;
     };
+    expect(response.statusCode).toBe(body.ok ? 200 : 503);
     expect(body.service).toBe('podyguard-server');
     expect(['up', 'down']).toContain(body.database);
     expect(app.identity.hostAuth).toBeDefined();

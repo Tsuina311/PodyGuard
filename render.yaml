@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: podyguard
+    runtime: node
+    region: frankfurt
+    plan: free
+    buildCommand: corepack enable && yarn install --immutable && yarn build
+    startCommand: yarn db:migrate && yarn workspace @podyguard/server start
+    healthCheckPath: /health
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: PARTICIPANT_SESSION_SECRET
+        generateValue: true
