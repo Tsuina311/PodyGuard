@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   COMMANDER_DAMAGE_LIMIT,
+  HIT_LIMIT,
   POISON_LIMIT,
+  STARTING_LIFE,
   applyTrackerAction,
   createTracker,
   elapsedMs,
@@ -214,6 +216,92 @@ describe('commander tracker', () => {
     expect(state.players[0]?.commanderTax).toBe(0);
   });
 
+  it('tracks secondary counters and caps progressive designations at four', () => {
+    let state = createTracker([{ id: 'a', name: 'Ada' }]);
+    state = applyTrackerAction(state, {
+      type: 'counter',
+      playerId: 'a',
+      counter: 'energy',
+      delta: 6,
+    });
+    state = applyTrackerAction(state, {
+      type: 'counter',
+      playerId: 'a',
+      counter: 'ring',
+      delta: 9,
+    });
+    state = applyTrackerAction(state, {
+      type: 'counter',
+      playerId: 'a',
+      counter: 'speed',
+      delta: 4,
+    });
+    state = applyTrackerAction(state, {
+      type: 'counter',
+      playerId: 'a',
+      counter: 'ring',
+      delta: -2,
+    });
+
+    expect(state.players[0]?.counters).toEqual({
+      acorn: 0,
+      energy: 6,
+      experience: 0,
+      hit: 0,
+      rad: 0,
+      ring: 2,
+      speed: 4,
+      ticket: 0,
+    });
+  });
+
+  it('prompts at three Etrata hits and clears the prompt when undone', () => {
+    let state = createTracker([
+      { id: 'a', name: 'Ada' },
+      { id: 'b', name: 'Bea' },
+    ]);
+    state = applyTrackerAction(state, {
+      type: 'counter',
+      playerId: 'a',
+      counter: 'hit',
+      delta: HIT_LIMIT,
+    });
+    expect(state.players[0]?.counters.hit).toBe(HIT_LIMIT);
+    expect(state.players[0]?.pendingLoss).toEqual({ type: 'hit' });
+
+    state = applyTrackerAction(state, {
+      type: 'counter',
+      playerId: 'a',
+      counter: 'hit',
+      delta: -1,
+    });
+    expect(state.players[0]?.pendingLoss).toBeNull();
+  });
+
+  it('tracks enduring story and city blessing independently per player', () => {
+    let state = createTracker([
+      { id: 'a', name: 'Ada' },
+      { id: 'b', name: 'Bea' },
+    ]);
+    state = applyTrackerAction(state, {
+      type: 'designation',
+      playerId: 'a',
+      designation: 'enduringStory',
+      value: true,
+    });
+    state = applyTrackerAction(state, {
+      type: 'designation',
+      playerId: 'b',
+      designation: 'cityBlessing',
+      value: true,
+    });
+
+    expect(state.players[0]?.enduringStory).toBe(true);
+    expect(state.players[0]?.cityBlessing).toBe(false);
+    expect(state.players[1]?.enduringStory).toBe(false);
+    expect(state.players[1]?.cityBlessing).toBe(true);
+  });
+
   it('keeps the monarch until another player takes it', () => {
     let state = createTracker([
       { id: 'a', name: 'Ada' },
@@ -234,6 +322,22 @@ describe('commander tracker', () => {
     // It leaves the game with its holder.
     state = applyTrackerAction(state, { type: 'eliminate', playerId: 'b' });
     expect(state.monarchId).toBeNull();
+  });
+
+  it('knocks a seat out that lost to something the board cannot see', () => {
+    let state = createTracker([
+      { id: 'a', name: 'Ada' },
+      { id: 'b', name: 'Bea' },
+      { id: 'c', name: 'Cam' },
+    ]);
+    state = applyTrackerAction(state, { type: 'eliminate', playerId: 'a' });
+    expect(state.players[0]?.eliminated).toBe(true);
+    expect(state.players[0]?.life).toBe(STARTING_LIFE);
+    expect(state.winnerId).toBeNull();
+
+    state = applyTrackerAction(state, { type: 'eliminate', playerId: 'b' });
+    expect(state.players[1]?.eliminated).toBe(true);
+    expect(state.winnerId).toBe('c');
   });
 
   it('picks a random first player from the living', () => {

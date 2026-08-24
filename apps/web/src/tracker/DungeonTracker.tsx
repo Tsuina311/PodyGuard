@@ -66,7 +66,13 @@ export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
   if (!progress || progress.completed) {
     return (
       <Shell initiative={initiative} onClose={onClose} onStepBack={stepBack}>
-        <div className="grid min-h-0 flex-1 grid-cols-2 gap-3 landscape:grid-cols-4">
+        {/*
+          Laid flat the cards sit in one row. Width is the scarce axis either
+          way, so a second row would only halve the height the cards already
+          have to spare and shrink them. The gap and the frame stay hairline
+          because every pixel taken from them is width the cards get back.
+        */}
+        <div className="grid min-h-0 flex-1 grid-cols-2 place-items-center gap-1 landscape:grid-cols-4">
           {DUNGEONS.map((dungeon) => (
             <button
               key={dungeon.id}
@@ -79,8 +85,14 @@ export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
                     ? `${dungeon.name} (completed)`
                     : `Venture into ${dungeon.name}`
               }
+              /*
+                The button carries the card's own proportions, so it ends where
+                the art ends instead of framing it in an empty panel. The cells
+                are always narrower than they are tall, so width is what is
+                pinned and the height follows.
+              */
               className={cx(
-                'border-muted/20 relative flex min-h-0 items-center justify-center overflow-hidden rounded-xl border p-1 transition',
+                'border-muted/20 relative aspect-[488/680] h-auto max-h-full w-full max-w-full min-h-0 overflow-hidden rounded-lg border transition',
                 dungeon.initiativeOnly
                   ? 'cursor-not-allowed opacity-40'
                   : 'hover:border-neon/60 hover:shadow-[0_0_22px_-8px_var(--color-neon)]',
@@ -94,11 +106,12 @@ export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
                 })
               }
             >
+              {/* The button already matches the scan, so this fills it exactly. */}
               <img
                 src={dungeon.image}
                 alt={dungeon.name}
                 loading="lazy"
-                className="max-h-full max-w-full rounded-lg object-contain"
+                className="size-full object-cover"
               />
               {completedIds.has(dungeon.id) ? (
                 <span className="absolute top-1.5 right-1.5 rounded-full bg-amber-400/90 px-1.5 py-0.5 font-mono text-[0.6rem] font-bold text-void">

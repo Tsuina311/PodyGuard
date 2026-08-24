@@ -9,6 +9,19 @@ import type { CommanderSelection } from '../scryfall';
 export const STARTING_LIFE = 40;
 export const POISON_LIMIT = 10;
 export const COMMANDER_DAMAGE_LIMIT = 21;
+export const HIT_LIMIT = 3;
+
+export type SecondaryCounter =
+  | 'acorn'
+  | 'energy'
+  | 'experience'
+  | 'hit'
+  | 'rad'
+  | 'ring'
+  | 'speed'
+  | 'ticket';
+
+export type SecondaryCounters = Record<SecondaryCounter, number>;
 
 /**
  * Why the rules would normally end a player's game. Cards like Platinum Angel
@@ -17,6 +30,7 @@ export const COMMANDER_DAMAGE_LIMIT = 21;
 export type LossCause =
   | { type: 'life' }
   | { type: 'poison' }
+  | { type: 'hit' }
   | { type: 'commander'; commanderId: string };
 
 export type Commander = {
@@ -43,6 +57,11 @@ export type TrackerPlayer = {
   poison: number;
   /** Extra mana owed on the next recast, so it moves two at a time. */
   commanderTax: number;
+  /** Less common player counters, kept off the life-first match surface. */
+  counters: SecondaryCounters;
+  /** Sticky player designations granted by storied and ascend. */
+  enduringStory: boolean;
+  cityBlessing: boolean;
   /** Each player may have one commander or a partner pair. */
   commanders: Commander[];
   /** Damage taken, keyed by the dealing commander's id. */
@@ -73,6 +92,18 @@ export type TrackerAction =
   | { type: 'life'; playerId: string; delta: number }
   | { type: 'poison'; playerId: string; delta: number }
   | { type: 'tax'; playerId: string; delta: number }
+  | {
+      type: 'counter';
+      playerId: string;
+      counter: SecondaryCounter;
+      delta: number;
+    }
+  | {
+      type: 'designation';
+      playerId: string;
+      designation: 'enduringStory' | 'cityBlessing';
+      value: boolean;
+    }
   | { type: 'commander'; commanderId: string; toId: string; delta: number }
   | { type: 'dayNight'; value: 'day' | 'night' }
   | {
@@ -103,6 +134,9 @@ export function createTracker(
       life: STARTING_LIFE,
       poison: 0,
       commanderTax: 0,
+      counters: emptySecondaryCounters(),
+      enduringStory: false,
+      cityBlessing: false,
       commanders: seedCommanders(row),
       commanderDamage: {},
       eliminated: false,
@@ -158,6 +192,26 @@ export function applyTrackerAction(
     case 'tax': {
       const player = playerById(next, action.playerId);
       player.commanderTax = Math.max(0, player.commanderTax + action.delta);
+      break;
+    }
+    case 'counter': {
+      const player = playerById(next, action.playerId);
+      player.counters ??= emptySecondaryCounters();
+      const maximum =
+        action.counter === 'hit'
+          ? HIT_LIMIT
+          : action.counter === 'ring' || action.counter === 'speed'
+            ? 4
+            : Number.POSITIVE_INFINITY;
+      player.counters[action.counter] = Math.min(
+        maximum,
+        Math.max(0, (player.counters[action.counter] ?? 0) + action.delta),
+      );
+      break;
+    }
+    case 'designation': {
+      const player = playerById(next, action.playerId);
+      player[action.designation] = action.value;
       break;
     }
     case 'commander': {
@@ -320,9 +374,10 @@ export function applyTrackerAction(
 }
 
 /**
- * Zero life, ten poison and 21 commander damage usually end a game, but they
- * are all replaceable, so each newly met cause raises a prompt instead of
- * removing the player. A declined cause stays quiet until it lifts and recurs.
+ * Zero life, ten poison, three Etrata hits and 21 commander damage usually end
+ * a game, but they are all replaceable, so each newly met cause raises a prompt
+ * instead of removing the player. A declined cause stays quiet until it lifts
+ * and recurs.
  */
 function raiseLossPrompts(state: TrackerState): void {
   for (const player of state.players) {
@@ -361,6 +416,9 @@ function activeLossCauses(player: TrackerPlayer): LossCause[] {
   }
   if (player.poison >= POISON_LIMIT) {
     causes.push({ type: 'poison' });
+  }
+  if ((player.counters?.hit ?? 0) >= HIT_LIMIT) {
+    causes.push({ type: 'hit' });
   }
   for (const [commanderId, damage] of Object.entries(player.commanderDamage)) {
     if (damage >= COMMANDER_DAMAGE_LIMIT) {
@@ -455,6 +513,19 @@ export function uniqueCompletedDungeonCount(
   completions: DungeonId[] | undefined,
 ): number {
   return new Set(completions ?? []).size;
+}
+
+export function emptySecondaryCounters(): SecondaryCounters {
+  return {
+    acorn: 0,
+    energy: 0,
+    experience: 0,
+    hit: 0,
+    rad: 0,
+    ring: 0,
+    speed: 0,
+    ticket: 0,
+  };
 }
 
 function recordDungeonCompletion(

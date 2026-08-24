@@ -1,11 +1,42 @@
 import { useEffect, useMemo, useReducer, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Coins, Crown, Flag, Minus, Plus, Shield, Skull, X } from 'lucide-react';
+import {
+  Award,
+  BookOpen,
+  Building2,
+  Coins,
+  Crosshair,
+  Crown,
+  Flag,
+  Gauge,
+  Minus,
+  Moon,
+  MoreHorizontal,
+  Nut,
+  Pause,
+  Play,
+  Plus,
+  Radiation,
+  Shield,
+  Skull,
+  SlidersHorizontal,
+  Sun,
+  Ticket,
+  Trophy,
+  Undo2,
+  UserX,
+  X,
+  Zap,
+} from 'lucide-react';
 import {
   applyTrackerAction,
   commanderById,
   createTracker,
   defaultCommanders,
+  elapsedMs,
+  emptySecondaryCounters,
+  HIT_LIMIT,
+  POISON_LIMIT,
   pickFirstPlayer,
   primaryCommanderId,
   uniqueCompletedDungeonCount,
@@ -15,12 +46,14 @@ import {
   type TrackerAction,
   type TrackerPlayer,
   type TrackerState,
+  type SecondaryCounter,
 } from './engine';
 import { DUNGEON_COUNT } from './dungeons';
 import { DungeonTracker } from './DungeonTracker';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { DungeonIcon } from '../ui/DungeonIcon';
+import { RingIcon } from '../ui/RingIcon';
 import { cx } from '../ui/cx';
 
 type Props = {
@@ -47,6 +80,17 @@ const screenClass =
 const plate = 'bg-void/85';
 const plateAccent =
   'bg-[color-mix(in_oklab,var(--color-neon)_18%,var(--color-void))]';
+
+/*
+  A designation a seat is holding is worth more than an accent: the icon fills
+  with gold rather than only changing colour, which reads as lit up from across
+  the table. It also frees the top line of the card, since a crown that glows
+  under the thumb says the same thing a monarch badge did.
+*/
+const plateGold =
+  'bg-[color-mix(in_oklab,var(--color-warning)_18%,var(--color-void))]';
+const gilded =
+  'border-warning/60 text-warning [&>svg]:fill-warning/35 shadow-[0_0_14px_-4px_var(--color-warning)]';
 
 /* Art shows through more than text can survive on its own. */
 const onArt = '[text-shadow:0_2px_14px_var(--color-void)]';
@@ -76,6 +120,33 @@ function seatGridClass(count: number): string {
   return 'grid-cols-2 landscape:grid-cols-3';
 }
 
+/**
+ * Clearance for the chrome row that runs into the match clock.
+ *
+ * Four seats laid flat form a two by two board, so the middle of the screen is
+ * the inner corner of every card and the dial covers whatever sits there. Each
+ * seat pushes the row that owns that corner clear of it. Held upright the seats
+ * stack into one column and the corner is nowhere near the middle, so the
+ * clearance is landscape-only.
+ */
+function clockClearance(
+  count: number,
+  index: number,
+  row: 'top' | 'bottom',
+): string {
+  if (count !== 4) {
+    return '';
+  }
+  // The two seats along the top of the board meet the dial with their bottom
+  // corners, the two along the bottom with their top ones.
+  const meets = index < 2 ? 'bottom' : 'top';
+  if (row !== meets) {
+    return '';
+  }
+  // Left-hand seats meet it on their right, right-hand seats on their left.
+  return index % 2 === 0 ? 'landscape:pr-7' : 'landscape:pl-7';
+}
+
 /*
   The skull has no element until a seat is actually knocked out, so it is
   fetched up front and the swap never waits on the network. The reference
@@ -101,16 +172,22 @@ export function TrackerView({
   players,
   persist = true,
 }: Props) {
-  const initial = useMemo(
-    () => restore(storageKey, players, persist),
+  const initial = useMemo<TrackerHistory>(
+    () => ({ present: restore(storageKey, players, persist), past: [] }),
     [storageKey, players, persist],
   );
-  const [state, dispatch] = useReducer(reduce, initial);
+  const [{ present: state, past }, dispatch] = useReducer(
+    reduceHistory,
+    initial,
+  );
   const [dungeonPlayerId, setDungeonPlayerId] = useState<string | null>(null);
   const [commanderPlayerId, setCommanderPlayerId] = useState<string | null>(
     null,
   );
+  const [counterPlayerId, setCounterPlayerId] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   usePreloadedEliminatedArt();
+  const elapsed = useMatchClock(state);
 
   useEffect(() => {
     if (!persist) {
@@ -123,22 +200,26 @@ export function TrackerView({
     state.players.find((row) => row.id === dungeonPlayerId) ?? null;
   const commanderPlayer =
     state.players.find((row) => row.id === commanderPlayerId) ?? null;
+  const counterPlayer =
+    state.players.find((row) => row.id === counterPlayerId) ?? null;
 
   useEffect(() => {
-    if (!dungeonPlayer && !commanderPlayer) {
+    if (!dungeonPlayer && !commanderPlayer && !counterPlayer && !menuOpen) {
       return;
     }
     function onKey(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         setDungeonPlayerId(null);
         setCommanderPlayerId(null);
+        setCounterPlayerId(null);
+        setMenuOpen(false);
       }
     }
     window.addEventListener('keydown', onKey);
     return () => {
       window.removeEventListener('keydown', onKey);
     };
-  }, [commanderPlayer, dungeonPlayer]);
+  }, [commanderPlayer, counterPlayer, dungeonPlayer, menuOpen]);
 
   if (!state.firstPlayerId) {
     return (
@@ -168,7 +249,7 @@ export function TrackerView({
           seatGridClass(state.players.length),
         )}
       >
-        {state.players.map((player) => (
+        {state.players.map((player, index) => (
           <article
             key={player.id}
             className={cx(
@@ -180,18 +261,29 @@ export function TrackerView({
               commanders={player.commanders}
               eliminated={player.eliminated}
             />
-            <div className="relative z-10 flex shrink-0 items-start justify-between gap-2">
-              <h3 className={cx('font-display truncate text-sm font-semibold', onArt)}>
-                {player.name}
-              </h3>
-              <span className="flex flex-wrap justify-end gap-1">
+            <div
+              className={cx(
+                'relative z-10 flex shrink-0 items-start justify-between gap-2',
+                clockClearance(state.players.length, index, 'top'),
+              )}
+            >
+              {/*
+                The counters take the top line, where the name used to sit. The
+                commander art already says whose seat this is, and this is the
+                first place the eye lands. It scrolls sideways rather than
+                wrapping, so a hoard of counters can never push into the life
+                total below.
+              */}
+              <span className="flex min-w-0 flex-1 gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <CounterBadges
+                  player={player}
+                  disabled={Boolean(state.winnerId)}
+                  onOpen={() => setCounterPlayerId(player.id)}
+                />
+              </span>
+              <span className="flex shrink-0 flex-wrap justify-end gap-1">
                 {player.id === state.firstPlayerId ? (
                   <Badge tone="idle">1st</Badge>
-                ) : null}
-                {player.id === state.monarchId ? (
-                  <Badge tone="crown">
-                    <Crown size={12} aria-hidden />
-                  </Badge>
                 ) : null}
                 {player.id === state.initiativeId ? (
                   <Badge tone="dev">
@@ -204,8 +296,13 @@ export function TrackerView({
               </span>
             </div>
 
-            {/* Life owns the card: it takes every pixel the rest leaves over. */}
-            <div className="relative z-10 flex min-h-0 flex-1 items-stretch gap-1.5 py-1">
+            {/*
+              Life owns the card: it takes every pixel the rest leaves over.
+              The buttons grow with the row up to their cap, and centring keeps
+              them on the row's midline once the cap is reached instead of
+              leaving them hanging from the top.
+            */}
+            <div className="relative z-10 flex min-h-0 flex-1 items-center gap-1.5 py-1">
               {[-5, -1].map((delta) => (
                 <LifeButton
                   key={`life-${String(delta)}`}
@@ -221,7 +318,7 @@ export function TrackerView({
               ))}
               <p
                 className={cx(
-                  'font-display text-neon flex min-w-0 flex-1 items-center justify-center text-center text-[clamp(1.75rem,6.5vh,3.25rem)] leading-none font-bold tabular-nums landscape:text-[clamp(1.75rem,11vh,3.25rem)]',
+                  'font-display text-neon flex min-w-0 flex-1 items-center justify-center self-stretch text-center text-[clamp(1.75rem,6.5vh,3.25rem)] leading-none font-bold tabular-nums landscape:text-[clamp(1.75rem,11vh,3.25rem)]',
                   onArt,
                 )}
               >
@@ -246,35 +343,20 @@ export function TrackerView({
               Laid flat there is width to spare and no height to waste, so the
               counters and the icon strip share a single row.
             */}
-            <div className="relative z-10 flex shrink-0 flex-col landscape:flex-row landscape:items-center landscape:gap-2">
+            <div
+              className={cx(
+                'relative z-10 flex shrink-0 flex-col landscape:flex-row landscape:items-center landscape:gap-2',
+                clockClearance(state.players.length, index, 'bottom'),
+              )}
+            >
               <div className="flex min-w-0 shrink-0 gap-1 overflow-x-auto [scrollbar-width:none] landscape:flex-1 [&::-webkit-scrollbar]:hidden">
-                <Counter
-                  label={`poison on ${player.name}`}
-                  value={player.poison}
+                <IconButton
+                  title={`Open counters for ${player.name}`}
                   disabled={Boolean(state.winnerId)}
-                  onChange={(delta) =>
-                    dispatch({
-                      type: 'action',
-                      action: { type: 'poison', playerId: player.id, delta },
-                    })
-                  }
+                  onClick={() => setCounterPlayerId(player.id)}
                 >
-                  <Skull size={14} aria-hidden />
-                </Counter>
-                <Counter
-                  label={`commander tax for ${player.name}`}
-                  value={player.commanderTax}
-                  step={COMMANDER_TAX_STEP}
-                  disabled={Boolean(state.winnerId)}
-                  onChange={(delta) =>
-                    dispatch({
-                      type: 'action',
-                      action: { type: 'tax', playerId: player.id, delta },
-                    })
-                  }
-                >
-                  <Coins size={14} aria-hidden />
-                </Counter>
+                  <SlidersHorizontal size={18} aria-hidden />
+                </IconButton>
                 <CommanderDamageChip
                   state={state}
                   player={player}
@@ -317,6 +399,42 @@ export function TrackerView({
                   disabled={Boolean(state.winnerId)}
                   onClick={() => setDungeonPlayerId(player.id)}
                 />
+                <IconButton
+                  title={`${player.name} ${player.enduringStory ? 'has' : 'does not have'} an enduring story`}
+                  active={player.enduringStory}
+                  disabled={Boolean(state.winnerId)}
+                  onClick={() =>
+                    dispatch({
+                      type: 'action',
+                      action: {
+                        type: 'designation',
+                        playerId: player.id,
+                        designation: 'enduringStory',
+                        value: !player.enduringStory,
+                      },
+                    })
+                  }
+                >
+                  <BookOpen size={18} aria-hidden />
+                </IconButton>
+                <IconButton
+                  title={`${player.name} ${player.cityBlessing ? 'has' : 'does not have'} the city's blessing`}
+                  active={player.cityBlessing}
+                  disabled={Boolean(state.winnerId)}
+                  onClick={() =>
+                    dispatch({
+                      type: 'action',
+                      action: {
+                        type: 'designation',
+                        playerId: player.id,
+                        designation: 'cityBlessing',
+                        value: !player.cityBlessing,
+                      },
+                    })
+                  }
+                >
+                  <Building2 size={18} aria-hidden />
+                </IconButton>
               </div>
             </div>
             {player.pendingLoss ? (
@@ -324,7 +442,7 @@ export function TrackerView({
                 role="dialog"
                 aria-modal="true"
                 aria-label={`Did ${player.name} lose the game?`}
-                className="bg-void/90 absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 overflow-auto rounded-xl p-4 text-center backdrop-blur-sm"
+                className="bg-void/90 absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 overflow-auto rounded-xl p-4 text-center backdrop-blur-sm"
               >
                 <p className="font-display text-base font-semibold">
                   {lossPrompt(player, state)}
@@ -365,6 +483,62 @@ export function TrackerView({
         ))}
       </div>
       {/*
+        The clock rides the seam between the seats, which is the one piece of
+        the board no seat owns and the one place every player can reach. It is
+        also the only match-wide control left on this screen, so it doubles as
+        the way into the menu behind it.
+      */}
+      <button
+        type="button"
+        title="Match menu"
+        aria-label={`Match menu. ${formatClock(elapsed)} elapsed${state.pausedAt ? ', paused' : ''}${state.dayNight ? `, it is ${state.dayNight}` : ''}`}
+        onClick={() => {
+          setMenuOpen(true);
+        }}
+        className={cx(
+          plate,
+          'hover:border-neon/50 absolute top-1/2 left-1/2 z-20 flex size-16 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-full border font-mono shadow-[0_10px_30px_-8px_var(--color-void)] transition',
+          state.pausedAt ? 'text-warning border-warning/50' : 'text-ink',
+          state.pausedAt ? '' : dayNightRing(state.dayNight),
+        )}
+      >
+        {/*
+          Day and night are table-wide but had nowhere to show, since the menu
+          that sets them is shut most of the game. The dial carries it instead:
+          a sun or a moon washed in behind the digits, dim enough to read the
+          time straight through. A negative layer keeps it above the plate and
+          below the numbers.
+        */}
+        {state.dayNight ? (
+          <span
+            aria-hidden
+            className="absolute inset-0 -z-10 flex items-center justify-center"
+          >
+            {state.dayNight === 'day' ? (
+              <Sun
+                size={46}
+                className="text-warning/45 fill-warning/25"
+                strokeWidth={1.5}
+              />
+            ) : (
+              <Moon
+                size={42}
+                className="text-beam/50 fill-beam/30"
+                strokeWidth={1.5}
+              />
+            )}
+          </span>
+        ) : null}
+        <span className="text-sm leading-none font-bold tabular-nums">
+          {formatClock(elapsed)}
+        </span>
+        {state.pausedAt ? (
+          <Pause size={11} aria-hidden />
+        ) : (
+          <MoreHorizontal size={12} className="text-muted" aria-hidden />
+        )}
+      </button>
+      {/*
         A sheet leaves out the seat it belongs to, so one shared sheet had to
         drop a column and grow another whenever it changed player, and the art
         of the column that came back was decoded again. Every seat keeps its
@@ -404,13 +578,68 @@ export function TrackerView({
           seat.id,
         );
       })}
+      {counterPlayer
+        ? createPortal(
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label={`Counters for ${counterPlayer.name}`}
+              className="bg-void/95 fixed inset-x-0 top-0 z-50 flex h-[100dvh] p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm"
+              onClick={(event) => {
+                if (event.target === event.currentTarget) {
+                  setCounterPlayerId(null);
+                }
+              }}
+            >
+              <CounterSheet
+                player={counterPlayer}
+                disabled={Boolean(state.winnerId)}
+                dispatch={(action) => dispatch({ type: 'action', action })}
+                onClose={() => setCounterPlayerId(null)}
+              />
+            </div>,
+            document.body,
+          )
+        : null}
+      {menuOpen
+        ? createPortal(
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label="Match menu"
+              className="bg-void/95 fixed inset-x-0 top-0 z-50 flex h-[100dvh] p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm"
+              onClick={(event) => {
+                if (event.target === event.currentTarget) {
+                  setMenuOpen(false);
+                }
+              }}
+            >
+              <MatchMenu
+                state={state}
+                elapsed={elapsed}
+                canUndo={past.length > 0}
+                dispatch={(action) => dispatch({ type: 'action', action })}
+                onUndo={() => {
+                  dispatch({ type: 'undo' });
+                }}
+                onClose={() => setMenuOpen(false)}
+              />
+            </div>,
+            document.body,
+          )
+        : null}
       {dungeonPlayer
         ? createPortal(
             <div
               role="dialog"
               aria-modal="true"
               aria-label={`Dungeon for ${dungeonPlayer.name}`}
-              className="bg-void/95 fixed inset-x-0 top-0 z-50 flex h-[100dvh] p-3 backdrop-blur-sm"
+              /*
+                Height is what a dungeon card is short of, so the frame keeps
+                only a hairline top and bottom. Width it has to spare, so the
+                sides stay clear of a landscape notch.
+              */
+              className="bg-void/95 fixed inset-x-0 top-0 z-50 flex h-[100dvh] pt-1 pb-[max(0.25rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm"
               onClick={(event) => {
                 if (event.target === event.currentTarget) {
                   setDungeonPlayerId(null);
@@ -427,6 +656,194 @@ export function TrackerView({
             document.body,
           )
         : null}
+    </section>
+  );
+}
+
+/*
+  Minutes are left to run past sixty rather than rolled into hours: a pod cares
+  how long the game has gone, and "94:12" says that in the width the button has.
+*/
+export function formatClock(ms: number): string {
+  const total = Math.floor(ms / 1000);
+  const minutes = Math.floor(total / 60);
+  const seconds = total % 60;
+  return `${String(minutes)}:${String(seconds).padStart(2, '0')}`;
+}
+
+/** Warms the dial's rim to match whatever the sky behind it is doing. */
+function dayNightRing(dayNight: TrackerState['dayNight']): string {
+  if (dayNight === 'day') {
+    return 'border-warning/50';
+  }
+  if (dayNight === 'night') {
+    return 'border-beam/50';
+  }
+  return 'border-muted/25';
+}
+
+/** Ticks only while the clock is actually running, so a pause costs nothing. */
+function useMatchClock(state: TrackerState): number {
+  const [now, setNow] = useState(() => Date.now());
+  const running = Boolean(state.firstPlayerId) && !state.pausedAt;
+  useEffect(() => {
+    if (!running) {
+      return;
+    }
+    const id = setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+    return () => {
+      clearInterval(id);
+    };
+  }, [running]);
+  return elapsedMs(state, running ? now : Date.now());
+}
+
+/*
+  Everything here belongs to the table rather than to a seat: the clock, the
+  turn cycle's day and night, the walk-back, and calling the game. Anything that
+  belongs to one player stays on that player's card, within their reach, which
+  is why no counter or designation appears in here.
+*/
+function MatchMenu({
+  state,
+  elapsed,
+  canUndo,
+  dispatch,
+  onUndo,
+  onClose,
+}: {
+  state: TrackerState;
+  elapsed: number;
+  canUndo: boolean;
+  dispatch: (action: TrackerAction) => void;
+  onUndo: () => void;
+  onClose: () => void;
+}) {
+  const paused = Boolean(state.pausedAt);
+  const decided = Boolean(state.winnerId);
+  const winner = state.players.find((row) => row.id === state.winnerId) ?? null;
+  return (
+    <section className="flex h-full w-full flex-col">
+      <header className="mb-1 flex shrink-0 items-center justify-between gap-3">
+        <h4 className="font-display truncate text-sm leading-tight font-bold">
+          Match
+        </h4>
+        <button
+          type="button"
+          aria-label="Close match menu"
+          onClick={onClose}
+          className="border-muted/25 text-muted hover:text-ink hover:border-muted/50 flex size-8 shrink-0 items-center justify-center rounded-full border transition"
+        >
+          <X size={18} aria-hidden />
+        </button>
+      </header>
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 overflow-y-auto">
+        <p
+          className={cx(
+            'font-display text-[clamp(2rem,13vh,4rem)] leading-none font-bold tabular-nums',
+            paused ? 'text-warning' : 'text-neon',
+          )}
+        >
+          {formatClock(elapsed)}
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <Button
+            size="sm"
+            variant={paused ? 'neon' : 'glass'}
+            onClick={() => {
+              dispatch({ type: 'pause' });
+            }}
+          >
+            {paused ? (
+              <Play size={14} aria-hidden />
+            ) : (
+              <Pause size={14} aria-hidden />
+            )}
+            {paused ? 'Resume' : 'Pause'}
+          </Button>
+          <Button size="sm" variant="glass" disabled={!canUndo} onClick={onUndo}>
+            <Undo2 size={14} aria-hidden />
+            Undo
+          </Button>
+          {/*
+            Day and night exist only once a card has set them, and no card ever
+            takes the table back to neither, so this is a two-way switch.
+          */}
+          <Button
+            size="sm"
+            variant={state.dayNight === 'day' ? 'neon' : 'glass'}
+            disabled={decided}
+            onClick={() => {
+              dispatch({ type: 'dayNight', value: 'day' });
+            }}
+          >
+            <Sun size={14} aria-hidden />
+            Day
+          </Button>
+          <Button
+            size="sm"
+            variant={state.dayNight === 'night' ? 'neon' : 'glass'}
+            disabled={decided}
+            onClick={() => {
+              dispatch({ type: 'dayNight', value: 'night' });
+            }}
+          >
+            <Moon size={14} aria-hidden />
+            Night
+          </Button>
+        </div>
+        {/*
+          Life, poison, commander damage and Etrata hits raise a prompt on the
+          card. Everything else that ends a seat — a mill-out, a concession, a
+          card that says "you lose" — has to be named from here, because the
+          board has no way to see it.
+        */}
+        <div className="flex flex-wrap items-center justify-center gap-2 border-t border-muted/15 pt-3">
+          <span className="text-muted font-mono text-[0.68rem] tracking-wide uppercase">
+            Player lost
+          </span>
+          {state.players.map((seat) => (
+            <Button
+              key={seat.id}
+              size="sm"
+              variant="glass"
+              disabled={decided || seat.eliminated}
+              onClick={() => {
+                dispatch({ type: 'eliminate', playerId: seat.id });
+              }}
+            >
+              <UserX size={14} aria-hidden />
+              {seat.name}
+            </Button>
+          ))}
+        </div>
+        {/*
+          A pod usually ends by concession rather than by the last blow, and the
+          board can only name a winner on its own once every other seat is out.
+          Calling it freezes the clock and the board, which undo can lift.
+        */}
+        <div className="flex flex-wrap items-center justify-center gap-2 border-t border-muted/15 pt-3">
+          <span className="text-muted font-mono text-[0.68rem] tracking-wide uppercase">
+            {winner ? `${winner.name} won` : 'Game won by'}
+          </span>
+          {state.players.map((seat) => (
+            <Button
+              key={seat.id}
+              size="sm"
+              variant={seat.id === state.winnerId ? 'neon' : 'glass'}
+              disabled={decided || seat.eliminated}
+              onClick={() => {
+                dispatch({ type: 'winner', playerId: seat.id });
+              }}
+            >
+              <Trophy size={14} aria-hidden />
+              {seat.name}
+            </Button>
+          ))}
+        </div>
+      </div>
     </section>
   );
 }
@@ -479,7 +896,7 @@ function Chip({
       onClick={onClick}
       className={cx(
         plate,
-        'border-muted/25 hover:border-neon/50 flex items-center gap-1 rounded-lg border px-2 py-1 font-mono text-xs transition disabled:opacity-40',
+        'border-muted/25 hover:border-neon/50 flex shrink-0 items-center gap-1 rounded-lg border px-2 py-1 font-mono text-xs transition disabled:opacity-40',
       )}
     >
       {children}
@@ -500,6 +917,7 @@ function Counter({
   label,
   value,
   step = 1,
+  maximum,
   disabled,
   onChange,
   children,
@@ -507,6 +925,7 @@ function Counter({
   label: string;
   value: number;
   step?: number;
+  maximum?: number;
   disabled: boolean;
   onChange: (delta: number) => void;
   children: React.ReactNode;
@@ -538,12 +957,244 @@ function Counter({
         type="button"
         title={`Raise ${label}`}
         aria-label={`Raise ${label}`}
-        disabled={disabled}
+        disabled={disabled || (maximum !== undefined && value >= maximum)}
         onClick={() => onChange(step)}
         className="hover:text-neon flex items-center px-1.5 py-1 transition disabled:opacity-30"
       >
         <Plus size={12} aria-hidden />
       </button>
+    </div>
+  );
+}
+
+type CounterDefinition = {
+  id: 'poison' | 'tax' | SecondaryCounter;
+  label: string;
+  step?: number;
+  maximum?: number;
+  /** Counts that are closing on a loss, so a badge can say so in colour. */
+  danger?: { warn: number; alert: number };
+  icon: (size: number) => React.ReactNode;
+};
+
+/*
+  Poison and the commander tax have fields of their own, but on screen they are
+  counters like any other, so one table feeds both the sheet and the badges and
+  the two cannot drift apart.
+*/
+const PLAYER_COUNTERS: CounterDefinition[] = [
+  {
+    id: 'poison',
+    label: 'Poison',
+    danger: { warn: POISON_LIMIT - 3, alert: POISON_LIMIT },
+    icon: (size) => <Skull size={size} aria-hidden />,
+  },
+  {
+    id: 'tax',
+    label: 'Commander tax',
+    step: COMMANDER_TAX_STEP,
+    icon: (size) => <Coins size={size} aria-hidden />,
+  },
+  {
+    id: 'acorn',
+    label: 'Acorns',
+    icon: (size) => <Nut size={size} aria-hidden />,
+  },
+  {
+    id: 'energy',
+    label: 'Energy',
+    icon: (size) => <Zap size={size} aria-hidden />,
+  },
+  {
+    id: 'experience',
+    label: 'Experience',
+    icon: (size) => <Award size={size} aria-hidden />,
+  },
+  {
+    id: 'hit',
+    label: 'Etrata hits',
+    maximum: HIT_LIMIT,
+    danger: { warn: HIT_LIMIT - 1, alert: HIT_LIMIT },
+    icon: (size) => <Crosshair size={size} aria-hidden />,
+  },
+  {
+    id: 'rad',
+    label: 'Radiation',
+    icon: (size) => <Radiation size={size} aria-hidden />,
+  },
+  {
+    id: 'ring',
+    label: 'Ring temptation',
+    maximum: 4,
+    icon: (size) => <RingIcon size={size} />,
+  },
+  {
+    id: 'speed',
+    label: 'Speed',
+    maximum: 4,
+    icon: (size) => <Gauge size={size} aria-hidden />,
+  },
+  {
+    id: 'ticket',
+    label: 'Tickets',
+    icon: (size) => <Ticket size={size} aria-hidden />,
+  },
+];
+
+function counterValue(
+  player: TrackerPlayer,
+  id: CounterDefinition['id'],
+): number {
+  if (id === 'poison') {
+    return player.poison;
+  }
+  if (id === 'tax') {
+    return player.commanderTax;
+  }
+  return player.counters?.[id] ?? 0;
+}
+
+function counterAction(
+  playerId: string,
+  id: CounterDefinition['id'],
+  delta: number,
+): TrackerAction {
+  if (id === 'poison') {
+    return { type: 'poison', playerId, delta };
+  }
+  if (id === 'tax') {
+    return { type: 'tax', playerId, delta };
+  }
+  return { type: 'counter', playerId, counter: id, delta };
+}
+
+function counterTone(definition: CounterDefinition, value: number): string {
+  if (!definition.danger) {
+    return '';
+  }
+  if (value >= definition.danger.alert) {
+    return 'text-danger font-bold';
+  }
+  if (value >= definition.danger.warn) {
+    return 'text-warning font-bold';
+  }
+  return '';
+}
+
+/** The counters a seat actually holds, in the order the sheet lists them. */
+export function heldCounters(
+  player: TrackerPlayer,
+): { definition: CounterDefinition; value: number; tone: string }[] {
+  return PLAYER_COUNTERS.map((definition) => ({
+    definition,
+    value: counterValue(player, definition.id),
+  }))
+    .filter((row) => row.value > 0)
+    .map((row) => ({ ...row, tone: counterTone(row.definition, row.value) }));
+}
+
+/*
+  A seat carries badges only for the counters it actually holds, so most games
+  show none and the three poison next to the four energy still land in a single
+  glance. Each badge opens the sheet it came from, which is where the counter is
+  adjusted.
+*/
+function CounterBadges({
+  player,
+  disabled,
+  onOpen,
+}: {
+  player: TrackerPlayer;
+  disabled: boolean;
+  onOpen: () => void;
+}) {
+  return (
+    <>
+      {heldCounters(player).map(({ definition, value, tone }) => (
+        <button
+          key={definition.id}
+          type="button"
+          title={`${definition.label} on ${player.name}: ${String(value)}`}
+          aria-label={`${definition.label} on ${player.name}: ${String(value)}`}
+          disabled={disabled}
+          onClick={onOpen}
+          /*
+            Readouts rather than controls, so they are pill-shaped and a size
+            down from the buttons along the bottom. They still open the sheet,
+            which is the only place a counter changes.
+          */
+          className={cx(
+            plate,
+            'border-muted/20 hover:border-neon/50 flex shrink-0 items-center gap-0.5 rounded-full border px-1.5 py-0.5 font-mono text-[0.6rem] leading-none transition disabled:opacity-40',
+          )}
+        >
+          {definition.icon(11)}
+          <span className={cx('tabular-nums', tone)}>{value}</span>
+        </button>
+      ))}
+    </>
+  );
+}
+
+function CounterSheet({
+  player,
+  disabled,
+  dispatch,
+  onClose,
+}: {
+  player: TrackerPlayer;
+  disabled: boolean;
+  dispatch: (action: TrackerAction) => void;
+  onClose: () => void;
+}) {
+  return (
+    <section className="flex h-full w-full flex-col">
+      <header className="mb-2 flex shrink-0 items-center justify-between gap-3">
+        <h4 className="font-display truncate text-sm leading-tight font-bold">
+          Counters for {player.name}
+        </h4>
+        <button
+          type="button"
+          aria-label="Close counters"
+          onClick={onClose}
+          className="border-muted/25 text-muted hover:text-ink hover:border-muted/50 flex size-8 shrink-0 items-center justify-center rounded-full border transition"
+        >
+          <X size={18} aria-hidden />
+        </button>
+      </header>
+      <div className="grid min-h-0 flex-1 grid-cols-2 content-center gap-2 overflow-y-auto landscape:grid-cols-4">
+        {PLAYER_COUNTERS.map((counter) => (
+          <CounterCard key={counter.id} label={counter.label}>
+            <Counter
+              label={`${counter.label.toLowerCase()} for ${player.name}`}
+              value={counterValue(player, counter.id)}
+              step={counter.step}
+              maximum={counter.maximum}
+              disabled={disabled}
+              onChange={(delta) =>
+                dispatch(counterAction(player.id, counter.id, delta))
+              }
+            >
+              {counter.icon(18)}
+            </Counter>
+          </CounterCard>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function CounterCard({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="border-muted/20 bg-hull/75 flex min-h-20 flex-col items-center justify-center gap-2 rounded-xl border p-2">
+      <span className="text-muted text-center text-xs font-semibold">{label}</span>
+      {children}
     </div>
   );
 }
@@ -620,7 +1271,7 @@ function IconButton({
       className={cx(
         'flex size-9 items-center justify-center rounded-lg border text-sm transition disabled:opacity-40',
         active
-          ? cx(plateAccent, 'border-neon/60 text-neon')
+          ? cx(plateGold, gilded)
           : cx(plate, 'border-muted/25 text-muted hover:border-muted/45 hover:text-ink'),
       )}
     >
@@ -636,7 +1287,8 @@ function IconButton({
 
   A seat is far wider than an art crop, so cover trims the top and bottom. The
   focal point sits above centre because card art almost always frames the
-  subject's head high, and an even crop decapitates it.
+  subject's head high, and an even crop decapitates it. The knocked-out skull is
+  framed near the centre, with a slight upward nudge of its own.
 */
 function CommanderArt({
   commanders,
@@ -646,21 +1298,29 @@ function CommanderArt({
   eliminated: boolean;
 }) {
   const art = eliminated
-    ? [{ id: 'eliminated', artCropUri: ELIMINATED_ART }]
-    : commanders.filter((commander) => commander.artCropUri);
+    ? [
+        {
+          id: 'eliminated',
+          artCropUri: ELIMINATED_ART,
+          focus: 'object-[center_55%]',
+        },
+      ]
+    : commanders
+        .filter((commander) => commander.artCropUri)
+        .map((commander) => ({ ...commander, focus: 'object-[center_15%]' }));
   if (art.length === 0) {
     return null;
   }
   return (
     <div className="absolute inset-0 z-0" aria-hidden>
       <div className="flex size-full gap-px">
-        {art.map((commander) => (
+        {art.map((entry) => (
           <img
-            key={commander.id}
-            src={commander.artCropUri}
+            key={entry.id}
+            src={entry.artCropUri}
             alt=""
             decoding="sync"
-            className="min-w-0 flex-1 object-[center_15%] object-cover"
+            className={cx('min-w-0 flex-1 object-cover', entry.focus)}
           />
         ))}
       </div>
@@ -719,6 +1379,9 @@ function lossPrompt(player: TrackerPlayer, state: TrackerState): string {
   const cause = player.pendingLoss;
   if (cause?.type === 'poison') {
     return `${player.name} has ${String(player.poison)} poison counters. Did they lose?`;
+  }
+  if (cause?.type === 'hit') {
+    return `${player.name} owns ${String(player.counters.hit)} exiled cards with hit counters. Did they lose?`;
   }
   if (cause?.type === 'commander') {
     const source = commanderById(state, cause.commanderId);
@@ -889,15 +1552,43 @@ function CommanderTile({
   );
 }
 
-type Msg =
+export type Msg =
   | { type: 'action'; action: TrackerAction }
-  | { type: 'first' };
+  | { type: 'first' }
+  | { type: 'undo' };
 
-function reduce(state: TrackerState, message: Msg): TrackerState {
-  if (message.type === 'first') {
-    return pickFirstPlayer(state);
+/*
+  A short history rather than a full one: undo is there to walk back the stray
+  tap that the match screen has no other way to fix, and a pod is never going to
+  reach thirty steps back to find it. It is deliberately not persisted, so a
+  reload starts the game from where it stands and not from its past.
+*/
+export const HISTORY_LIMIT = 30;
+
+export type TrackerHistory = { present: TrackerState; past: TrackerState[] };
+
+export function reduceHistory(
+  history: TrackerHistory,
+  message: Msg,
+): TrackerHistory {
+  if (message.type === 'undo') {
+    const previous = history.past.at(-1);
+    return previous
+      ? { present: previous, past: history.past.slice(0, -1) }
+      : history;
   }
-  return applyTrackerAction(state, message.action);
+  const present =
+    message.type === 'first'
+      ? pickFirstPlayer(history.present)
+      : applyTrackerAction(history.present, message.action);
+  // An action the engine refused changes nothing, so it earns no history entry.
+  if (present === history.present) {
+    return history;
+  }
+  return {
+    present,
+    past: [...history.past, history.present].slice(-HISTORY_LIMIT),
+  };
 }
 
 function restore(
@@ -957,6 +1648,14 @@ function normalizePlayer(
   }
   return {
     ...player,
+    poison: player.poison ?? 0,
+    commanderTax: player.commanderTax ?? 0,
+    counters: {
+      ...emptySecondaryCounters(),
+      ...(player.counters ?? {}),
+    },
+    enduringStory: player.enduringStory ?? false,
+    cityBlessing: player.cityBlessing ?? false,
     commanders,
     commanderDamage,
     pendingLoss: player.pendingLoss ?? null,
