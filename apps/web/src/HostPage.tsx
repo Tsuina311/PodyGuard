@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import type {
+  EventMetrics,
   PublicEvent,
   PublicParticipant,
   PublicTable,
@@ -10,6 +11,7 @@ import { countByStatus, queueByWait } from './match-view';
 import {
   ApiError,
   fillTablesWithBots,
+  getEventMetrics,
   listParticipants,
   listTables,
   loadHostToken,
@@ -38,6 +40,8 @@ import { Panel } from './ui/Panel';
 import { ThemeToggleCorner } from './ui/ThemeToggle';
 import { WaitTime } from './ui/WaitTime';
 import { useEventLive } from './useEventLive';
+import { ChallengePackEditor } from './ChallengePackEditor';
+import { HostMetrics } from './HostMetrics';
 
 export function HostPage() {
   const { joinCode = '' } = useParams();
@@ -50,6 +54,7 @@ export function HostPage() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [metrics, setMetrics] = useState<EventMetrics | null>(null);
 
   const refresh = useCallback(async () => {
     const [roster, tableList] = await Promise.all([
@@ -58,6 +63,15 @@ export function HostPage() {
     ]);
     setParticipants(roster.participants);
     setTables(tableList.tables);
+  }, [code]);
+
+  const refreshMetrics = useCallback(async (token: string) => {
+    try {
+      const result = await getEventMetrics(code, token);
+      setMetrics(result.metrics);
+    } catch {
+      /* host token may not be ready yet */
+    }
   }, [code]);
 
   const onSnapshot = useCallback(
@@ -85,6 +99,7 @@ export function HostPage() {
         setHostToken(token);
         setEvent(result.event);
         await refresh();
+        await refreshMetrics(token);
       })
       .catch(() => {
         /* show PIN form */
@@ -92,7 +107,7 @@ export function HostPage() {
     return () => {
       cancelled = true;
     };
-  }, [code, refresh]);
+  }, [code, refresh, refreshMetrics]);
 
   async function onUnlock(submit: FormEvent) {
     submit.preventDefault();
@@ -104,6 +119,7 @@ export function HostPage() {
       setHostToken(result.hostToken);
       setEvent(result.event);
       await refresh();
+      await refreshMetrics(result.hostToken);
     } catch (caught) {
       setError(
         caught instanceof ApiError ? caught.message : 'Could not unlock host.',
@@ -152,6 +168,7 @@ export function HostPage() {
     try {
       await finishTable(code, hostToken, table.id);
       await refresh();
+      await refreshMetrics(hostToken);
     } catch (caught) {
       setError(
         caught instanceof ApiError ? caught.message : 'Could not finish the table.',
@@ -200,6 +217,7 @@ export function HostPage() {
     try {
       await matchNow(code, hostToken);
       await refresh();
+      await refreshMetrics(hostToken);
     } catch (caught) {
       setError(
         caught instanceof ApiError ? caught.message : 'Could not match tables.',
@@ -343,6 +361,18 @@ export function HostPage() {
         </label>
       </Panel>
 
+      {metrics ? <HostMetrics metrics={metrics} /> : null}
+
+      {hostToken ? (
+        <ChallengePackEditor
+          joinCode={code}
+          hostToken={hostToken}
+          event={event}
+          onEvent={setEvent}
+          onError={setError}
+        />
+      ) : null}
+
       <Panel title="Join code" aside="share">
         <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
           <JoinQr value={joinUrl} />
@@ -379,6 +409,11 @@ export function HostPage() {
                   {row.flexCredits > 0 ? (
                     <Badge>flex {String(row.flexCredits)}</Badge>
                   ) : null}
+                  {(row.challengePoints ?? 0) > 0 ? (
+                    <Badge tone="live">
+                      {String(row.challengePoints)} challenge pts
+                    </Badge>
+                  ) : null}
                   {row.decks[0] ? (
                     <Badge>
                       {poolShortLabel(
@@ -403,6 +438,11 @@ export function HostPage() {
             {lobby.map((row) => (
               <li key={row.id} className="flex items-center gap-2 py-2.5 text-sm">
                 <span className="truncate">{row.displayName}</span>
+                {(row.challengePoints ?? 0) > 0 ? (
+                  <Badge tone="live">
+                    {String(row.challengePoints)} challenge pts
+                  </Badge>
+                ) : null}
                 {row.isBot ? <Badge tone="dev">bot</Badge> : null}
               </li>
             ))}
@@ -414,8 +454,16 @@ export function HostPage() {
         <Panel title="Paused" aside={String(pausedPlayers.length)}>
           <ul className="divide-y divide-white/5">
             {pausedPlayers.map((row) => (
-              <li key={row.id} className="py-2.5 text-sm">
-                {row.displayName}
+              <li
+                key={row.id}
+                className="flex items-center gap-2 py-2.5 text-sm"
+              >
+                <span>{row.displayName}</span>
+                {(row.challengePoints ?? 0) > 0 ? (
+                  <Badge tone="live">
+                    {String(row.challengePoints)} challenge pts
+                  </Badge>
+                ) : null}
               </li>
             ))}
           </ul>
@@ -435,6 +483,11 @@ export function HostPage() {
               >
                 <span className="truncate">{row.displayName}</span>
                 <span className="flex shrink-0 items-center gap-2">
+                  {(row.challengePoints ?? 0) > 0 ? (
+                    <Badge tone="live">
+                      {String(row.challengePoints)} pts
+                    </Badge>
+                  ) : null}
                   {row.assignedPoolId ? (
                     <Badge>{poolShortLabel(row.assignedPoolId)}</Badge>
                   ) : null}
@@ -474,6 +527,9 @@ export function HostPage() {
                       ? `${poolShortLabel(table.poolId)} · ${table.podStatus ?? table.status}`
                       : (table.podStatus ?? table.status)}
                   </Badge>
+                  {table.trackerUsed !== undefined ? (
+                    <Badge>{table.trackerUsed ? 'tracker' : 'no tracker'}</Badge>
+                  ) : null}
                 </div>
                 <p className="text-muted mb-3 text-xs">
                   {table.seatedNames.length > 0

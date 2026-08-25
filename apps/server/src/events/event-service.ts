@@ -1,12 +1,23 @@
 import {
+  challengeInPack,
+  cloneOfficialPack,
+  emptyPrivatePack,
+  OFFICIAL_COMMANDER_CHALLENGES,
+  parseChallengePack,
   EventStatus,
   ParticipantStatus,
   PhysicalTableStatus,
+  type ChallengePack,
+  type EventMetrics,
+  type PodRating,
+  type ProductEventName,
   type PublicEvent,
   type PublicParticipant,
   type PublicPod,
   type PublicTable,
+  type PublicChallengeCompletion,
 } from '@podyguard/shared';
+import { randomUUID } from 'node:crypto';
 import {
   InvalidParticipantSessionError,
   type IdentityBoundary,
@@ -26,6 +37,7 @@ import {
   PodNotFoundError,
   type EventStore,
   type StoredAssignment,
+  type StoredCompletedGame,
   type StoredDeck,
   type StoredEvent,
   type StoredParticipant,
@@ -43,6 +55,7 @@ import {
   verifyHostPin,
   type DeckDraft,
 } from './validation.js';
+import { computeEventMetrics } from './metrics.js';
 
 const JOIN_CODE_ATTEMPTS = 8;
 
@@ -131,20 +144,21 @@ export class EventService {
     }
 
     const { token } = this.identity.hostEventSessions.issue(stored.id);
-    return { event: toPublicEvent(stored), hostToken: token };
+    return { event: await this.presentEvent(stored), hostToken: token };
   }
 
   async getEvent(joinCode: string): Promise<PublicEvent> {
     const stored = await this.requireByJoinCode(joinCode);
-    return toPublicEvent(stored);
+    return this.presentEvent(stored);
   }
 
   async listParticipants(joinCode: string): Promise<PublicParticipant[]> {
     const stored = await this.requireByJoinCode(joinCode);
-    const [rows, assignments, decks] = await Promise.all([
+    const [rows, assignments, decks, completions] = await Promise.all([
       this.store.listParticipants(stored.id),
       this.store.listAssignments(stored.id),
       this.store.listDecks(stored.id),
+      this.store.listChallengeCompletions(stored.id),
     ]);
     const byParticipant = assignmentMap(assignments);
     const decksByParticipant = decksMap(decks);
@@ -153,6 +167,7 @@ export class EventService {
         row,
         byParticipant.get(row.id),
         decksByParticipant.get(row.id) ?? [],
+        completions.filter((completion) => completion.participantId === row.id),
       ),
     );
   }
@@ -185,8 +200,9 @@ export class EventService {
       eventId: stored.id,
       participantId: participant.id,
     });
+    await this.track(stored.id, 'joined_event');
     return {
-      event: toPublicEvent(stored),
+      event: await this.presentEvent(stored),
       participant: toPublicParticipant(participant, undefined, storedDecks),
       token: session.token,
     };
@@ -234,11 +250,12 @@ export class EventService {
       throw new InvalidHostPinError();
     }
     const { token } = this.identity.hostEventSessions.issue(stored.id);
-    return { event: toPublicEvent(stored), hostToken: token };
+    return { event: await this.presentEvent(stored), hostToken: token };
   }
 
-  verifyHostToken(joinCode: string, token: string): Promise<PublicEvent> {
-    return this.requireHostToken(joinCode, token);
+  async verifyHostToken(joinCode: string, token: string): Promise<PublicEvent> {
+    const stored = await this.requireHostToken(joinCode, token);
+    return this.presentEvent(stored);
   }
 
   async getMe(
@@ -253,7 +270,7 @@ export class EventService {
     const assignments = await this.store.listAssignments(stored.id);
     const seat = assignments.find((row) => row.participantId === participant.id);
     return {
-      event: toPublicEvent(stored),
+      event: await this.presentEvent(stored),
       participant: await this.present(participant, seat),
     };
   }
@@ -282,6 +299,7 @@ export class EventService {
         status: ParticipantStatus.Ready,
         readyAt: new Date(),
       });
+      await this.track(stored.id, 'became_ready');
       return this.present(updated);
     }
 
@@ -321,6 +339,7 @@ export class EventService {
         status: ParticipantStatus.Paused,
         readyAt: null,
       });
+      await this.track(stored.id, 'paused');
       return this.present(updated);
     }
 
@@ -374,6 +393,7 @@ export class EventService {
       status: ParticipantStatus.Left,
       readyAt: null,
     });
+    await this.track(stored.id, 'left_event');
     return this.present(updated);
   }
 
@@ -456,7 +476,173 @@ export class EventService {
       );
     }
     await this.store.startPod(pod.id);
+    await this.track(stored.id, 'match_confirmed');
     return this.snapshotTable(stored.id, tableId);
+  }
+
+  async chooseTracker(
+    joinCode: string,
+    participantToken: string,
+    trackerUsed: boolean,
+  ): Promise<PublicParticipant> {
+    const stored = await this.requireByJoinCode(joinCode);
+    const participant = await this.requireParticipant(
+      stored.id,
+      participantToken,
+    );
+    if (participant.status !== ParticipantStatus.Playing) {
+      return this.present(participant);
+    }
+    const assignments = await this.store.listAssignments(stored.id);
+    const seat = assignments.find(
+      (row) => row.participantId === participant.id,
+    );
+    if (!seat) {
+      return this.present(participant);
+    }
+    // Once any phone opens the tracker the pod used it, even if another phone
+    // reports "without tracker" a moment later.
+    const measuredUse = seat.trackerUsed === true || trackerUsed;
+    await this.store.setPodTrackerUsed(seat.podId, measuredUse);
+    await this.track(
+      stored.id,
+      measuredUse ? 'game_tracker_started' : 'game_tracker_skipped',
+    );
+    const updatedSeat = { ...seat, trackerUsed: measuredUse };
+    return this.present(participant, updatedSeat);
+  }
+
+  async completeChallenge(
+    joinCode: string,
+    participantToken: string,
+    input: {
+      challengeId: string;
+      targetParticipantId: string;
+      source: 'automatic' | 'confirmation' | 'manual';
+      confirmed?: boolean;
+    },
+  ): Promise<{
+    completion: PublicChallengeCompletion;
+    created: boolean;
+  }> {
+    const stored = await this.requireByJoinCode(joinCode);
+    const pack = await this.resolvePack(stored);
+    const reporter = await this.requireParticipant(stored.id, participantToken);
+    const challenge = challengeInPack(pack, input.challengeId);
+    if (!challenge || challenge.detectionMode !== input.source) {
+      throw new InvalidEventInputError('That challenge claim is not valid.');
+    }
+    if (challenge.detectionMode === 'confirmation' && input.confirmed !== true) {
+      throw new InvalidEventInputError(
+        'This challenge needs confirmation from the table.',
+      );
+    }
+    const [assignments, target, games] = await Promise.all([
+      this.store.listAssignments(stored.id),
+      this.store.findParticipantById(input.targetParticipantId),
+      this.store.listCompletedGames(stored.id),
+    ]);
+    const reporterSeat = assignments.find(
+      (row) => row.participantId === reporter.id,
+    );
+    const targetSeat = assignments.find(
+      (row) => row.participantId === input.targetParticipantId,
+    );
+    const activePodId =
+      reporterSeat &&
+      targetSeat &&
+      reporterSeat.podId === targetSeat.podId
+        ? reporterSeat.podId
+        : undefined;
+    const finishedPodId = latestSharedGame(
+      games,
+      reporter.id,
+      input.targetParticipantId,
+    )?.id;
+    const podId = activePodId ?? finishedPodId;
+    if (
+      !podId ||
+      !target ||
+      target.eventId !== stored.id ||
+      target.isBot
+    ) {
+      throw new InvalidEventInputError(
+        'Challenges can only be awarded to a player in this pod.',
+      );
+    }
+    const scopeKey =
+      challenge.repeatRule === 'once-per-event'
+        ? 'event'
+        : challenge.repeatRule === 'once-per-game'
+          ? podId
+          : `${podId}:${randomUUID()}`;
+    const result = await this.store.insertChallengeCompletion({
+      eventId: stored.id,
+      participantId: target.id,
+      podId,
+      challengeId: challenge.id,
+      scopeKey,
+      points: challenge.points,
+    });
+    if (result.created) {
+      await this.track(stored.id, 'challenge_completed');
+    }
+    return result;
+  }
+
+  async reportGameResult(
+    joinCode: string,
+    participantToken: string,
+    input: { winnerParticipantId: string; durationSeconds?: number },
+  ): Promise<PublicParticipant> {
+    const stored = await this.requireByJoinCode(joinCode);
+    const participant = await this.requireParticipant(
+      stored.id,
+      participantToken,
+    );
+    if (participant.status !== ParticipantStatus.Playing) {
+      return this.present(participant);
+    }
+    const assignments = await this.store.listAssignments(stored.id);
+    const seat = assignments.find(
+      (row) => row.participantId === participant.id,
+    );
+    if (!seat) {
+      return this.present(participant);
+    }
+    const pod = await this.store.findActivePodByTableId(
+      stored.id,
+      seat.tableId,
+    );
+    if (!pod) {
+      return this.present(participant);
+    }
+    if (!pod.memberIds.includes(input.winnerParticipantId)) {
+      throw new InvalidEventInputError(
+        'The winner must be a player in this pod.',
+      );
+    }
+    const durationSeconds =
+      input.durationSeconds === undefined
+        ? undefined
+        : Math.max(0, Math.min(24 * 60 * 60, Math.round(input.durationSeconds)));
+    try {
+      await this.store.completePod(pod.id, {
+        winnerParticipantId: input.winnerParticipantId,
+        durationSeconds,
+      });
+    } catch (error) {
+      if (!(error instanceof PodNotFoundError)) {
+        throw error;
+      }
+    }
+    await this.track(stored.id, 'game_finished');
+    await this.track(stored.id, 'requeued');
+    const updated = await this.store.findParticipantById(participant.id);
+    if (!updated) {
+      throw new InvalidParticipantSessionError();
+    }
+    return this.present(updated);
   }
 
   async finishTable(
@@ -471,6 +657,8 @@ export class EventService {
       throw new PodNotFoundError();
     }
     await this.store.completePod(pod.id);
+    await this.track(stored.id, 'game_finished');
+    await this.track(stored.id, 'requeued');
     return this.snapshotTable(stored.id, tableId);
   }
 
@@ -505,7 +693,93 @@ export class EventService {
           ? stored.allowFivePods
           : Boolean(patch.allowFivePods),
     });
-    return toPublicEvent(updated);
+    return this.presentEvent(updated);
+  }
+
+  async saveChallengePack(
+    joinCode: string,
+    hostToken: string,
+    input: { mode: 'copy-official' | 'from-scratch' | 'save'; pack?: unknown },
+  ): Promise<PublicEvent> {
+    const stored = await this.requireHostToken(joinCode, hostToken);
+    const packId = privatePackId(stored.id);
+    let pack: ChallengePack;
+    if (input.mode === 'copy-official') {
+      pack = cloneOfficialPack(packId);
+    } else if (input.mode === 'from-scratch') {
+      pack = emptyPrivatePack(packId);
+    } else {
+      let parsed: ChallengePack;
+      try {
+        parsed = parseChallengePack(input.pack);
+      } catch (error) {
+        throw new InvalidEventInputError(
+          error instanceof Error ? error.message : 'That pack cannot be saved.',
+        );
+      }
+      const nextId =
+        parsed.id === OFFICIAL_COMMANDER_CHALLENGES.id ? packId : parsed.id;
+      const nextVersion =
+        stored.challengePackId === nextId
+          ? stored.challengePackVersion + 1
+          : 1;
+      pack = {
+        ...parsed,
+        id: nextId,
+        version: nextVersion,
+        visibility: 'private',
+      };
+    }
+    await this.store.insertChallengePackVersion(stored.id, pack);
+    const updated = await this.store.updateEvent(stored.id, {
+      challengePackId: pack.id,
+      challengePackVersion: pack.version,
+    });
+    return this.presentEvent(updated);
+  }
+
+  async getMetrics(
+    joinCode: string,
+    hostToken: string,
+  ): Promise<EventMetrics> {
+    const stored = await this.requireHostToken(joinCode, hostToken);
+    const [people, tables, games, completions] = await Promise.all([
+      this.store.listParticipants(stored.id),
+      this.store.listTables(stored.id),
+      this.store.listCompletedGames(stored.id),
+      this.store.listChallengeCompletions(stored.id),
+    ]);
+    return computeEventMetrics({
+      participants: people,
+      tables,
+      games,
+      challengeCompletions: completions,
+    });
+  }
+
+  async rateLastPod(
+    joinCode: string,
+    participantToken: string,
+    rating: PodRating,
+  ): Promise<{ rating: PodRating; alreadyRecorded: boolean }> {
+    const stored = await this.requireByJoinCode(joinCode);
+    const participant = await this.requireParticipant(
+      stored.id,
+      participantToken,
+    );
+    const games = await this.store.listCompletedGames(stored.id);
+    const latest = games.find((game) =>
+      game.memberIds.includes(participant.id),
+    );
+    if (!latest) {
+      throw new PodNotFoundError();
+    }
+    if (latest.rating != null) {
+      return { rating: clampRating(latest.rating), alreadyRecorded: true };
+    }
+    await this.store.setPodRating(latest.id, rating);
+    await this.track(stored.id, 'pod_rated');
+    return { rating, alreadyRecorded: false };
   }
 
   async matchNow(joinCode: string, hostToken: string): Promise<MatchResult> {
@@ -644,6 +918,9 @@ export class EventService {
           readyAt: person.readyAt,
           flexCredits: boundedFlex((person.flexCredits ?? 0) + seat.flexDelta),
         });
+        if (seat.flexDelta !== 0) {
+          await this.track(eventId, 'flex_concession_used');
+        }
       }
       created.push({
         id: pod.id,
@@ -653,6 +930,9 @@ export class EventService {
         poolId: pod.poolId,
       });
     }
+    if (created.length > 0) {
+      await this.track(eventId, 'match_found');
+    }
     return created;
   }
 
@@ -660,22 +940,59 @@ export class EventService {
     participant: StoredParticipant,
     assignment?: StoredAssignment,
   ): Promise<PublicParticipant> {
-    const decks = (await this.store.listDecks(participant.eventId)).filter(
+    const [allDecks, allCompletions] = await Promise.all([
+      this.store.listDecks(participant.eventId),
+      this.store.listChallengeCompletions(participant.eventId),
+    ]);
+    const decks = allDecks.filter((row) => row.participantId === participant.id);
+    const completions = allCompletions.filter(
       (row) => row.participantId === participant.id,
     );
-    return toPublicParticipant(participant, assignment, decks);
+    return toPublicParticipant(participant, assignment, decks, completions);
+  }
+
+  private async presentEvent(event: StoredEvent): Promise<PublicEvent> {
+    return toPublicEvent(event, await this.resolvePack(event));
+  }
+
+  private async resolvePack(event: StoredEvent): Promise<ChallengePack> {
+    const custom = await this.store.findChallengePack(
+      event.id,
+      event.challengePackId,
+      event.challengePackVersion,
+    );
+    if (custom) {
+      return custom;
+    }
+    if (
+      event.challengePackId === OFFICIAL_COMMANDER_CHALLENGES.id &&
+      event.challengePackVersion === OFFICIAL_COMMANDER_CHALLENGES.version
+    ) {
+      return OFFICIAL_COMMANDER_CHALLENGES;
+    }
+    throw new InvalidEventInputError(
+      'This event uses a challenge pack version this server cannot score.',
+    );
+  }
+
+  private async track(eventId: string, name: ProductEventName): Promise<void> {
+    try {
+      await this.store.insertProductEvent(eventId, name);
+    } catch {
+      /* Telemetry must never block a game action. */
+    }
   }
 
   private async requireHostToken(
     joinCode: string,
     token: string,
-  ): Promise<PublicEvent> {
+  ): Promise<StoredEvent> {
     const stored = await this.requireByJoinCode(joinCode);
     const session = this.identity.hostEventSessions.verify(token);
     if (session.eventId !== stored.id) {
       throw new InvalidHostPinError();
     }
-    return toPublicEvent(stored);
+    return stored;
   }
 
   private async requireParticipant(
@@ -735,6 +1052,7 @@ export class EventService {
         seatedNamesForTable(row.id, assignments, people),
         podStatusForTable(row.id, assignments),
         poolIdForTable(row.id, assignments),
+        trackerUsedForTable(row.id, assignments),
       ),
     );
   }
@@ -748,7 +1066,10 @@ export class EventService {
   }
 }
 
-function toPublicEvent(event: StoredEvent): PublicEvent {
+function toPublicEvent(
+  event: StoredEvent,
+  pack: ChallengePack = OFFICIAL_COMMANDER_CHALLENGES,
+): PublicEvent {
   return {
     id: event.id,
     name: event.name,
@@ -756,6 +1077,9 @@ function toPublicEvent(event: StoredEvent): PublicEvent {
     status: event.status,
     allowThreePods: event.allowThreePods,
     allowFivePods: event.allowFivePods,
+    challengePackId: event.challengePackId,
+    challengePackVersion: event.challengePackVersion,
+    challengePack: pack,
   };
 }
 
@@ -763,6 +1087,7 @@ function toPublicParticipant(
   row: StoredParticipant,
   assignment?: StoredAssignment,
   decks: StoredDeck[] = [],
+  challengeCompletions: PublicChallengeCompletion[] = [],
 ): PublicParticipant {
   return {
     id: row.id,
@@ -781,7 +1106,13 @@ function toPublicParticipant(
     assignedPoolId: assignment?.poolId,
     assignedDeckName: assignment?.deckName,
     assignedCommanders: assignment?.commanders ?? [],
+    trackerUsed: assignment?.trackerUsed ?? undefined,
     flexCredits: row.flexCredits ?? 0,
+    challengePoints: challengeCompletions.reduce(
+      (sum, completion) => sum + completion.points,
+      0,
+    ),
+    challengeCompletions,
   };
 }
 
@@ -790,6 +1121,7 @@ function toPublicTable(
   seatedNames: string[],
   podStatus?: 'formed' | 'playing',
   poolId?: string,
+  trackerUsed?: boolean,
 ): PublicTable {
   return {
     id: row.id,
@@ -798,6 +1130,7 @@ function toPublicTable(
     status: row.status,
     seatedNames,
     podStatus,
+    trackerUsed,
     poolId,
   };
 }
@@ -830,6 +1163,13 @@ function poolIdForTable(
   assignments: StoredAssignment[],
 ): string | undefined {
   return assignments.find((row) => row.tableId === tableId)?.poolId;
+}
+
+function trackerUsedForTable(
+  tableId: string,
+  assignments: StoredAssignment[],
+): boolean | undefined {
+  return assignments.find((row) => row.tableId === tableId)?.trackerUsed ?? undefined;
 }
 
 function majorityPreferredPool(
@@ -890,4 +1230,32 @@ function resolveTableLabels(
     { length: count },
     (_, index) => `Table ${existingCount + index + 1}`,
   );
+}
+
+function privatePackId(eventId: string): string {
+  return `evt-${eventId.replaceAll('-', '').slice(0, 16)}`;
+}
+
+function latestSharedGame(
+  games: StoredCompletedGame[],
+  reporterId: string,
+  targetId: string,
+): StoredCompletedGame | undefined {
+  return games.find(
+    (game) =>
+      game.memberIds.includes(reporterId) && game.memberIds.includes(targetId),
+  );
+}
+
+function clampRating(value: number): PodRating {
+  if (value <= 1) {
+    return 1;
+  }
+  if (value === 2) {
+    return 2;
+  }
+  if (value === 3) {
+    return 3;
+  }
+  return 4;
 }

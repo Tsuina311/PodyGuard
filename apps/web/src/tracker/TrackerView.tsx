@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer, useState } from 'react';
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
   Award,
@@ -6,6 +6,7 @@ import {
   Building2,
   Coins,
   Crosshair,
+  Check,
   Crown,
   Flag,
   Gauge,
@@ -13,12 +14,14 @@ import {
   Moon,
   MoreHorizontal,
   Nut,
+  LogOut,
   Pause,
   Play,
   Plus,
   Radiation,
   RotateCw,
   Shield,
+  Sparkles,
   Skull,
   SlidersHorizontal,
   Sun,
@@ -29,6 +32,11 @@ import {
   X,
   Zap,
 } from 'lucide-react';
+import {
+  OFFICIAL_COMMANDER_CHALLENGES,
+  type ChallengeDetectionMode,
+  type ChallengePack,
+} from '@podyguard/shared';
 import {
   applyTrackerAction,
   commanderById,
@@ -52,6 +60,10 @@ import {
 import { DUNGEON_COUNT } from './dungeons';
 import { DungeonTracker } from './DungeonTracker';
 import { useLandscape, useLandscapeLock } from './orientation';
+import {
+  detectAutomaticChallenges,
+  detectedConfirmation,
+} from './challenges';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { DungeonIcon } from '../ui/DungeonIcon';
@@ -68,7 +80,20 @@ type Props = {
    * called freezes the board, so without this the tracker would be a room with
    * no door.
    */
-  onFinish: () => void;
+  onFinish: (winnerId: string, durationSeconds: number) => Promise<void>;
+  /** Leaves the screen without ending or clearing the current game. */
+  onQuit: () => void;
+  challengeProgress?: Record<
+    string,
+    { points: number; completedChallengeIds: string[] }
+  >;
+  onChallengeComplete?: (
+    challengeId: string,
+    participantId: string,
+    source: ChallengeDetectionMode,
+    confirmed?: boolean,
+  ) => Promise<boolean>;
+  challengePack?: ChallengePack;
 };
 
 /*
@@ -180,6 +205,10 @@ export function TrackerView({
   players,
   persist = true,
   onFinish,
+  onQuit,
+  challengeProgress = {},
+  onChallengeComplete,
+  challengePack = OFFICIAL_COMMANDER_CHALLENGES,
 }: Props) {
   const initial = useMemo<TrackerHistory>(
     () => ({ present: restore(storageKey, players, persist), past: [] }),
@@ -195,12 +224,66 @@ export function TrackerView({
   );
   const [counterPlayerId, setCounterPlayerId] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [challengesOpen, setChallengesOpen] = useState(false);
   const [resultHidden, setResultHidden] = useState(false);
+  const [finishing, setFinishing] = useState(false);
+  const [finishError, setFinishError] = useState<string | null>(null);
+  const [challengeNotice, setChallengeNotice] = useState<string | null>(null);
+  const [challengeError, setChallengeError] = useState<string | null>(null);
+  const [challengeSaving, setChallengeSaving] = useState(0);
+  const [confirmationDismissed, setConfirmationDismissed] = useState(false);
+  const attemptedChallenges = useRef(new Set<string>());
   const landscape = useLandscape();
   useLandscapeLock();
   usePreloadedEliminatedArt();
   const elapsed = useMatchClock(state);
   const winner = state.players.find((row) => row.id === state.winnerId) ?? null;
+  const confirmation = detectedConfirmation(state, challengePack);
+
+  useEffect(() => {
+    if (!onChallengeComplete) {
+      return;
+    }
+    for (const detected of detectAutomaticChallenges(state, challengePack)) {
+      const key = `${detected.participantId}:${detected.challenge.id}`;
+      const completed =
+        challengeProgress[
+          detected.participantId
+        ]?.completedChallengeIds.includes(detected.challenge.id) ?? false;
+      if (completed || attemptedChallenges.current.has(key)) {
+        continue;
+      }
+      attemptedChallenges.current.add(key);
+      setChallengeSaving((count) => count + 1);
+      void onChallengeComplete(
+        detected.challenge.id,
+        detected.participantId,
+        'automatic',
+      )
+        .then((created) => {
+          if (created) {
+            setChallengeNotice(`${detected.challenge.name} completed`);
+          }
+        })
+        .catch((caught: unknown) => {
+          attemptedChallenges.current.delete(key);
+          setChallengeError(
+            caught instanceof Error
+              ? caught.message
+              : 'Could not save challenge progress.',
+          );
+        })
+        .finally(() => setChallengeSaving((count) => Math.max(0, count - 1)));
+    }
+  }, [challengePack, challengeProgress, onChallengeComplete, state]);
+
+  useEffect(() => {
+    if (!challengeNotice) {
+      return;
+    }
+    const timer = window.setTimeout(() => setChallengeNotice(null), 3500);
+    return () => window.clearTimeout(timer);
+  }, [challengeNotice]);
 
   /*
     Calling the game closes whatever sheet called it, so the result lands on the
@@ -209,9 +292,11 @@ export function TrackerView({
   useEffect(() => {
     if (!state.winnerId) {
       setResultHidden(false);
+      setConfirmationDismissed(false);
       return;
     }
     setMenuOpen(false);
+    setChallengesOpen(false);
     setCommanderPlayerId(null);
     setCounterPlayerId(null);
     setDungeonPlayerId(null);
@@ -222,9 +307,21 @@ export function TrackerView({
     one, and a finished board restored from storage would be frozen from its
     first frame.
   */
-  function finish() {
-    sessionStorage.removeItem(storageKey);
-    onFinish();
+  async function finish() {
+    if (!state.winnerId || finishing) {
+      return;
+    }
+    setFinishing(true);
+    setFinishError(null);
+    try {
+      await onFinish(state.winnerId, Math.floor(elapsed / 1000));
+      sessionStorage.removeItem(storageKey);
+    } catch (caught) {
+      setFinishError(
+        caught instanceof Error ? caught.message : 'Could not submit the result.',
+      );
+      setFinishing(false);
+    }
   }
 
   useEffect(() => {
@@ -242,7 +339,13 @@ export function TrackerView({
     state.players.find((row) => row.id === counterPlayerId) ?? null;
 
   useEffect(() => {
-    if (!dungeonPlayer && !commanderPlayer && !counterPlayer && !menuOpen) {
+    if (
+      !dungeonPlayer &&
+      !commanderPlayer &&
+      !counterPlayer &&
+      !menuOpen &&
+      !challengesOpen
+    ) {
       return;
     }
     function onKey(event: KeyboardEvent) {
@@ -251,13 +354,20 @@ export function TrackerView({
         setCommanderPlayerId(null);
         setCounterPlayerId(null);
         setMenuOpen(false);
+        setChallengesOpen(false);
       }
     }
     window.addEventListener('keydown', onKey);
     return () => {
       window.removeEventListener('keydown', onKey);
     };
-  }, [commanderPlayer, counterPlayer, dungeonPlayer, menuOpen]);
+  }, [
+    challengesOpen,
+    commanderPlayer,
+    counterPlayer,
+    dungeonPlayer,
+    menuOpen,
+  ]);
 
   if (!state.firstPlayerId) {
     return (
@@ -673,7 +783,57 @@ export function TrackerView({
                   dispatch({ type: 'undo' });
                 }}
                 onFinish={finish}
+                onQuit={onQuit}
+                onChallenges={() => {
+                  setMenuOpen(false);
+                  setChallengesOpen(true);
+                }}
                 onClose={() => setMenuOpen(false)}
+              />
+            </div>,
+            document.body,
+          )
+        : null}
+      {challengesOpen
+        ? createPortal(
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label="Commander challenges"
+              className="bg-void/95 fixed inset-x-0 top-0 z-50 flex h-[100dvh] p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm"
+            >
+              <ChallengeSheet
+                pack={challengePack}
+                players={state.players}
+                progress={challengeProgress}
+                onClaim={async (challengeId, participantId) => {
+                  if (!onChallengeComplete) {
+                    return;
+                  }
+                  setChallengeError(null);
+                  try {
+                    const created = await onChallengeComplete(
+                      challengeId,
+                      participantId,
+                      'manual',
+                    );
+                    if (created) {
+                      const challenge = challengePack.challenges.find(
+                        (row) => row.id === challengeId,
+                      );
+                      setChallengeNotice(
+                        `${challenge?.name ?? 'Challenge'} completed`,
+                      );
+                    }
+                  } catch (caught) {
+                    setChallengeError(
+                      caught instanceof Error
+                        ? caught.message
+                        : 'Could not save challenge progress.',
+                    );
+                  }
+                }}
+                onClose={() => setChallengesOpen(false)}
               />
             </div>,
             document.body,
@@ -733,9 +893,86 @@ export function TrackerView({
                 <p className="text-muted mb-3 font-mono text-sm tabular-nums">
                   {formatClock(elapsed)}
                 </p>
+                {confirmation &&
+                !(challengeProgress[
+                  confirmation.participantId
+                ]?.completedChallengeIds.includes(
+                  confirmation.challenge.id,
+                ) ?? false) &&
+                !attemptedChallenges.current.has(
+                  `${confirmation.participantId}:${confirmation.challenge.id}`,
+                ) &&
+                !confirmationDismissed ? (
+                  <div className="border-warning/25 bg-warning/5 mb-3 rounded-xl border p-3">
+                    <p className="mb-2 text-xs">
+                      {confirmation.challenge.confirmationQuestion}
+                    </p>
+                    <div className="flex justify-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="neon"
+                        onClick={() => {
+                          const key = `${confirmation.participantId}:${confirmation.challenge.id}`;
+                          attemptedChallenges.current.add(key);
+                          setConfirmationDismissed(true);
+                          setChallengeSaving((count) => count + 1);
+                          void onChallengeComplete?.(
+                            confirmation.challenge.id,
+                            confirmation.participantId,
+                            'confirmation',
+                            true,
+                          )
+                            .then((created) => {
+                              if (created) {
+                                setChallengeNotice(
+                                  `${confirmation.challenge.name} completed`,
+                                );
+                              }
+                            })
+                            .catch((caught: unknown) => {
+                              attemptedChallenges.current.delete(key);
+                              setChallengeError(
+                                caught instanceof Error
+                                  ? caught.message
+                                  : 'Could not save challenge progress.',
+                              );
+                            })
+                            .finally(() =>
+                              setChallengeSaving((count) =>
+                                Math.max(0, count - 1),
+                              ),
+                            );
+                        }}
+                      >
+                        Yes
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          attemptedChallenges.current.add(
+                            `${confirmation.participantId}:${confirmation.challenge.id}`,
+                          );
+                          setConfirmationDismissed(true);
+                        }}
+                      >
+                        No
+                      </Button>
+                    </div>
+                  </div>
+                ) : null}
                 <div className="flex flex-wrap items-center justify-center gap-2">
-                  <Button variant="neon" size="sm" onClick={finish}>
-                    Done
+                  <Button
+                    variant="neon"
+                    size="sm"
+                    disabled={finishing || challengeSaving > 0}
+                    onClick={() => void finish()}
+                  >
+                    {finishing
+                      ? 'Submitting…'
+                      : challengeSaving > 0
+                        ? 'Saving challenges…'
+                        : 'Done & requeue'}
                   </Button>
                   {past.length > 0 ? (
                     <Button
@@ -757,11 +994,26 @@ export function TrackerView({
                     Review board
                   </Button>
                 </div>
+                {finishError ? (
+                  <p className="text-danger mt-3 text-xs">{finishError}</p>
+                ) : null}
+                {challengeError ? (
+                  <p className="text-danger mt-2 text-xs">{challengeError}</p>
+                ) : null}
               </section>
             </div>,
             document.body,
           )
         : null}
+      {challengeNotice ? (
+        <p
+          role="status"
+          className="border-neon/40 bg-void/95 text-neon fixed top-[max(0.75rem,env(safe-area-inset-top))] left-1/2 z-[70] flex -translate-x-1/2 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs shadow-lg"
+        >
+          <Sparkles size={13} aria-hidden />
+          {challengeNotice}
+        </p>
+      ) : null}
     </section>
   );
 }
@@ -819,6 +1071,8 @@ function MatchMenu({
   dispatch,
   onUndo,
   onFinish,
+  onQuit,
+  onChallenges,
   onClose,
 }: {
   state: TrackerState;
@@ -826,7 +1080,9 @@ function MatchMenu({
   canUndo: boolean;
   dispatch: (action: TrackerAction) => void;
   onUndo: () => void;
-  onFinish: () => void;
+  onFinish: () => Promise<void>;
+  onQuit: () => void;
+  onChallenges: () => void;
   onClose: () => void;
 }) {
   const paused = Boolean(state.pausedAt);
@@ -874,6 +1130,10 @@ function MatchMenu({
           <Button size="sm" variant="glass" disabled={!canUndo} onClick={onUndo}>
             <Undo2 size={14} aria-hidden />
             Undo
+          </Button>
+          <Button size="sm" variant="glass" onClick={onChallenges}>
+            <Sparkles size={14} aria-hidden />
+            Challenges
           </Button>
           {/*
             Day and night exist only once a card has set them, and no card ever
@@ -952,10 +1212,28 @@ function MatchMenu({
           ))}
           {/* The way out, for a pod that dismissed the result to read the board. */}
           {decided ? (
-            <Button size="sm" variant="neon" onClick={onFinish}>
-              Done
+            <Button
+              size="sm"
+              variant="neon"
+              onClick={() => void onFinish()}
+            >
+              Done & requeue
             </Button>
           ) : null}
+        </div>
+        {/*
+          Leaving is the one control here that abandons the screen rather than
+          changing the board, so it sits apart from the table controls and wears
+          the danger colour. The game itself survives, which the note says.
+        */}
+        <div className="border-danger/25 flex w-full flex-col items-center gap-1.5 border-t pt-3">
+          <Button size="sm" variant="danger" onClick={onQuit}>
+            <LogOut size={14} aria-hidden />
+            Quit to home
+          </Button>
+          <p className="text-muted text-center text-[0.65rem]">
+            The game is kept — reopen it from the home screen.
+          </p>
         </div>
       </div>
     </section>
@@ -1247,6 +1525,106 @@ function CounterBadges({
         </button>
       ))}
     </>
+  );
+}
+
+function ChallengeSheet({
+  pack,
+  players,
+  progress,
+  onClaim,
+  onClose,
+}: {
+  pack: ChallengePack;
+  players: TrackerPlayer[];
+  progress: Record<
+    string,
+    { points: number; completedChallengeIds: string[] }
+  >;
+  onClaim: (challengeId: string, participantId: string) => Promise<void>;
+  onClose: () => void;
+}) {
+  return (
+    <section className="flex h-full w-full flex-col">
+      <header className="mb-2 flex shrink-0 items-center justify-between gap-3">
+        <div className="min-w-0">
+          <h4 className="font-display truncate text-sm font-bold">
+            {pack.name}
+          </h4>
+          <p className="text-muted truncate text-[0.65rem]">
+            Same challenges for every player · points never affect matching
+          </p>
+        </div>
+        <button
+          type="button"
+          aria-label="Close challenges"
+          onClick={onClose}
+          className="border-muted/25 text-muted hover:text-ink flex size-8 shrink-0 items-center justify-center rounded-full border"
+        >
+          <X size={18} aria-hidden />
+        </button>
+      </header>
+      <div className="mb-2 flex shrink-0 flex-wrap gap-1.5">
+        {players.map((player) => (
+          <Badge key={player.id}>
+            {player.name} · {String(progress[player.id]?.points ?? 0)} pts
+          </Badge>
+        ))}
+      </div>
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 overflow-y-auto landscape:grid-cols-2">
+        {pack.challenges.map((challenge) => (
+          <article
+            key={challenge.id}
+            className="border-muted/20 bg-hull/70 rounded-xl border p-3"
+          >
+            <div className="mb-1 flex items-start justify-between gap-2">
+              <div>
+                <h5 className="text-sm font-semibold">{challenge.name}</h5>
+                <p className="text-muted text-xs">{challenge.description}</p>
+              </div>
+              <Badge tone={challenge.detectionMode === 'automatic' ? 'live' : undefined}>
+                +{String(challenge.points)}
+              </Badge>
+            </div>
+            <p className="text-muted mb-2 font-mono text-[0.6rem] tracking-wide uppercase">
+              {challenge.detectionMode}
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {players.map((player) => {
+                const completed =
+                  progress[player.id]?.completedChallengeIds.includes(
+                    challenge.id,
+                  ) ?? false;
+                if (completed) {
+                  return (
+                    <span
+                      key={player.id}
+                      className="text-neon flex items-center gap-1 text-xs"
+                    >
+                      <Check size={12} aria-hidden />
+                      {player.name}
+                    </span>
+                  );
+                }
+                if (challenge.detectionMode !== 'manual') {
+                  return null;
+                }
+                return (
+                  <Button
+                    key={player.id}
+                    size="sm"
+                    variant="glass"
+                    onClick={() => void onClaim(challenge.id, player.id)}
+                  >
+                    Claim for {player.name}
+                  </Button>
+                );
+              })}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -1726,6 +2104,7 @@ function restore(
           completedDungeons: normalizeCompletedDungeons(
             parsed.completedDungeons,
           ),
+          eliminations: parsed.eliminations ?? [],
           players: parsed.players.map((player) =>
             normalizePlayer(player, parsed.players),
           ),
@@ -1762,6 +2141,7 @@ function normalizePlayer(
   }
   return {
     ...player,
+    minimumLife: player.minimumLife ?? player.life,
     poison: player.poison ?? 0,
     commanderTax: player.commanderTax ?? 0,
     counters: {

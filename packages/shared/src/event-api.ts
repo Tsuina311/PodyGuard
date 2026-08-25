@@ -3,6 +3,7 @@ import type {
   ParticipantStatus,
   PhysicalTableStatus,
 } from './enums';
+import type { ChallengePack, PublicChallengeCompletion } from './challenges';
 
 export type PublicEvent = {
   id: string;
@@ -11,6 +12,9 @@ export type PublicEvent = {
   status: EventStatus;
   allowThreePods: boolean;
   allowFivePods: boolean;
+  challengePackId?: string;
+  challengePackVersion?: number;
+  challengePack?: ChallengePack;
 };
 
 export type CommanderSelection = {
@@ -42,7 +46,11 @@ export type PublicParticipant = {
   assignedPoolId?: string;
   assignedDeckName?: string;
   assignedCommanders: CommanderSelection[];
+  /** Present while seated once the pod has chosen whether to use the tracker. */
+  trackerUsed?: boolean;
   flexCredits: number;
+  challengePoints?: number;
+  challengeCompletions?: PublicChallengeCompletion[];
 };
 
 export type PublicTable = {
@@ -52,6 +60,7 @@ export type PublicTable = {
   status: PhysicalTableStatus;
   seatedNames: string[];
   podStatus?: 'formed' | 'playing';
+  trackerUsed?: boolean;
   poolId?: string;
 };
 
@@ -67,4 +76,39 @@ export type PublicPod = {
   playerNames: string[];
   status: 'formed' | 'playing' | 'completed' | 'cancelled';
   poolId?: string;
+};
+
+export type PodRating = 1 | 2 | 3 | 4;
+
+export type ProductEventName =
+  | 'joined_event'
+  | 'became_ready'
+  | 'match_found'
+  | 'match_confirmed'
+  | 'game_tracker_started'
+  | 'game_tracker_skipped'
+  | 'game_finished'
+  | 'requeued'
+  | 'paused'
+  | 'left_event'
+  | 'challenge_completed'
+  | 'flex_concession_used'
+  | 'pod_rated';
+
+export type EventMetrics = {
+  participants: number;
+  games: number;
+  waitSeconds: { average: number; p95: number; max: number } | null;
+  rematches: number;
+  poolAssignments: Record<string, number>;
+  flexEarned: number;
+  flexCompensation: number;
+  podSizes: Record<string, number>;
+  tableUtilisation: { occupied: number; total: number; occupancyRate: number };
+  gameDurationSeconds: { average: number; count: number } | null;
+  gamesPerPlayer: number;
+  trackerUsage: { used: number; skipped: number; unknown: number };
+  challengeCompletions: number;
+  challengePoints: number;
+  podRating: { average: number; count: number } | null;
 };

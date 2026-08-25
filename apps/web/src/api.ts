@@ -1,5 +1,8 @@
 import type {
+  EventMetrics,
+  PodRating,
   PublicEvent,
+  PublicChallengeCompletion,
   PublicParticipant,
   PublicPod,
   PublicTable,
@@ -191,6 +194,57 @@ export function leaveEvent(joinCode: string, token: string) {
   );
 }
 
+export function chooseGameTracker(
+  joinCode: string,
+  token: string,
+  trackerUsed: boolean,
+) {
+  return request<{ participant: PublicParticipant }>(
+    `/events/${joinCode}/tracker-choice`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ trackerUsed }),
+    },
+  );
+}
+
+export function reportGameResult(
+  joinCode: string,
+  token: string,
+  winnerParticipantId: string,
+  durationSeconds: number,
+) {
+  return request<{ participant: PublicParticipant }>(
+    `/events/${joinCode}/result`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ winnerParticipantId, durationSeconds }),
+    },
+  );
+}
+
+export function completeChallenge(
+  joinCode: string,
+  token: string,
+  challengeId: string,
+  input: {
+    targetParticipantId: string;
+    source: 'automatic' | 'confirmation' | 'manual';
+    confirmed?: boolean;
+  },
+) {
+  return request<{
+    completion: PublicChallengeCompletion;
+    created: boolean;
+  }>(`/events/${joinCode}/challenges/${challengeId}/complete`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify(input),
+  });
+}
+
 export function listTables(joinCode: string) {
   return request<{ tables: PublicTable[] }>(`/events/${joinCode}/tables`);
 }
@@ -283,6 +337,35 @@ export function updateMatchSettings(
     headers: { Authorization: `Bearer ${token}` },
     body: JSON.stringify(patch),
   });
+}
+
+export function saveChallengePack(
+  joinCode: string,
+  token: string,
+  body: { mode: 'copy-official' | 'from-scratch' | 'save'; pack?: unknown },
+) {
+  return request<{ event: PublicEvent }>(`/events/${joinCode}/pack`, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify(body),
+  });
+}
+
+export function getEventMetrics(joinCode: string, token: string) {
+  return request<{ metrics: EventMetrics }>(`/events/${joinCode}/metrics`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export function ratePod(joinCode: string, token: string, rating: PodRating) {
+  return request<{ rating: PodRating; alreadyRecorded: boolean }>(
+    `/events/${joinCode}/pod-rating`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ rating }),
+    },
+  );
 }
 
 const HOST_KEY = (joinCode: string) => `podyguard.host.${joinCode}`;

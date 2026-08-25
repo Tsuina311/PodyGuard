@@ -173,6 +173,92 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
     }
   });
 
+  app.post('/events/:joinCode/tracker-choice', async (request, reply) => {
+    const { joinCode } = request.params as { joinCode: string };
+    const body = (request.body ?? {}) as { trackerUsed?: unknown };
+    try {
+      const participant = await app.events.chooseTracker(
+        normalizeJoinCode(joinCode),
+        bearerToken(request.headers.authorization),
+        body.trackerUsed === true,
+      );
+      await app.live.publish(normalizeJoinCode(joinCode));
+      return { participant };
+    } catch (error) {
+      return sendEventError(reply, error);
+    }
+  });
+
+  app.post('/events/:joinCode/result', async (request, reply) => {
+    const { joinCode } = request.params as { joinCode: string };
+    const body = (request.body ?? {}) as {
+      winnerParticipantId?: unknown;
+      durationSeconds?: unknown;
+    };
+    try {
+      const participant = await app.events.reportGameResult(
+        normalizeJoinCode(joinCode),
+        bearerToken(request.headers.authorization),
+        {
+          winnerParticipantId:
+            typeof body.winnerParticipantId === 'string'
+              ? body.winnerParticipantId
+              : '',
+          durationSeconds:
+            typeof body.durationSeconds === 'number'
+              ? body.durationSeconds
+              : undefined,
+        },
+      );
+      await app.live.publish(normalizeJoinCode(joinCode));
+      return { participant };
+    } catch (error) {
+      return sendEventError(reply, error);
+    }
+  });
+
+  app.post(
+    '/events/:joinCode/challenges/:challengeId/complete',
+    async (request, reply) => {
+      const { joinCode, challengeId } = request.params as {
+        joinCode: string;
+        challengeId: string;
+      };
+      const body = (request.body ?? {}) as {
+        targetParticipantId?: unknown;
+        source?: unknown;
+        confirmed?: unknown;
+      };
+      try {
+        const source =
+          body.source === 'automatic' ||
+          body.source === 'confirmation' ||
+          body.source === 'manual'
+            ? body.source
+            : 'manual';
+        const result = await app.events.completeChallenge(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          {
+            challengeId,
+            targetParticipantId:
+              typeof body.targetParticipantId === 'string'
+                ? body.targetParticipantId
+                : '',
+            source,
+            confirmed: body.confirmed === true,
+          },
+        );
+        if (result.created) {
+          await app.live.publish(normalizeJoinCode(joinCode));
+        }
+        return result;
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
   app.get('/events/:joinCode/tables', async (request, reply) => {
     const { joinCode } = request.params as { joinCode: string };
     try {
@@ -356,6 +442,70 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
         bearerToken(request.headers.authorization),
       );
       return { event };
+    } catch (error) {
+      return sendEventError(reply, error);
+    }
+  });
+
+  app.put('/events/:joinCode/pack', async (request, reply) => {
+    const { joinCode } = request.params as { joinCode: string };
+    const body = (request.body ?? {}) as { mode?: unknown; pack?: unknown };
+    try {
+      const mode =
+        body.mode === 'copy-official' ||
+        body.mode === 'from-scratch' ||
+        body.mode === 'save'
+          ? body.mode
+          : undefined;
+      if (!mode) {
+        throw new InvalidEventInputError(
+          'Choose copy-official, from-scratch, or save.',
+        );
+      }
+      const event = await app.events.saveChallengePack(
+        normalizeJoinCode(joinCode),
+        bearerToken(request.headers.authorization),
+        { mode, pack: body.pack },
+      );
+      await app.live.publish(normalizeJoinCode(joinCode));
+      return { event };
+    } catch (error) {
+      return sendEventError(reply, error);
+    }
+  });
+
+  app.get('/events/:joinCode/metrics', async (request, reply) => {
+    const { joinCode } = request.params as { joinCode: string };
+    try {
+      const metrics = await app.events.getMetrics(
+        normalizeJoinCode(joinCode),
+        bearerToken(request.headers.authorization),
+      );
+      return { metrics };
+    } catch (error) {
+      return sendEventError(reply, error);
+    }
+  });
+
+  app.post('/events/:joinCode/pod-rating', async (request, reply) => {
+    const { joinCode } = request.params as { joinCode: string };
+    const body = (request.body ?? {}) as { rating?: unknown };
+    try {
+      const rating =
+        body.rating === 1 ||
+        body.rating === 2 ||
+        body.rating === 3 ||
+        body.rating === 4
+          ? body.rating
+          : undefined;
+      if (!rating) {
+        throw new InvalidEventInputError('Choose a pod rating from 1 to 4.');
+      }
+      return await app.events.rateLastPod(
+        normalizeJoinCode(joinCode),
+        bearerToken(request.headers.authorization),
+        rating,
+      );
     } catch (error) {
       return sendEventError(reply, error);
     }

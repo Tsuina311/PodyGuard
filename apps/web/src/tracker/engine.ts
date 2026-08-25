@@ -33,6 +33,12 @@ export type LossCause =
   | { type: 'hit' }
   | { type: 'commander'; commanderId: string };
 
+export type EliminationRecord = {
+  playerId: string;
+  cause: LossCause | null;
+  at: number;
+};
+
 export type Commander = {
   id: string;
   name: string;
@@ -54,6 +60,8 @@ export type TrackerPlayer = {
   id: string;
   name: string;
   life: number;
+  /** Lowest life observed this game, used by threshold-then-win challenges. */
+  minimumLife: number;
   poison: number;
   /** Extra mana owed on the next recast, so it moves two at a time. */
   commanderTax: number;
@@ -86,6 +94,8 @@ export type TrackerState = {
   startedAt: number;
   pausedAt: number | null;
   accumulatedPausedMs: number;
+  /** Confirmed eliminations retained for challenge detection and final recap. */
+  eliminations: EliminationRecord[];
 };
 
 export type TrackerAction =
@@ -132,6 +142,7 @@ export function createTracker(
       id: row.id,
       name: row.name,
       life: STARTING_LIFE,
+      minimumLife: STARTING_LIFE,
       poison: 0,
       commanderTax: 0,
       counters: emptySecondaryCounters(),
@@ -153,6 +164,7 @@ export function createTracker(
     startedAt: now,
     pausedAt: null,
     accumulatedPausedMs: 0,
+    eliminations: [],
   };
 }
 
@@ -178,10 +190,12 @@ export function applyTrackerAction(
   next.dayNight ??= null;
   next.dungeons ??= {};
   next.completedDungeons ??= {};
+  next.eliminations ??= [];
   switch (action.type) {
     case 'life': {
       const player = playerById(next, action.playerId);
       player.life += action.delta;
+      player.minimumLife = Math.min(player.minimumLife ?? player.life, player.life);
       break;
     }
     case 'poison': {
@@ -224,6 +238,10 @@ export function applyTrackerAction(
       const nextDamage = Math.max(0, current + action.delta);
       // Commander damage is combat damage, so life changes by the same amount.
       target.life -= nextDamage - current;
+      target.minimumLife = Math.min(
+        target.minimumLife ?? target.life,
+        target.life,
+      );
       target.commanderDamage[action.commanderId] = nextDamage;
       break;
     }
@@ -313,12 +331,26 @@ export function applyTrackerAction(
     }
     case 'eliminate': {
       const player = playerById(next, action.playerId);
+      if (!player.eliminated) {
+        next.eliminations.push({
+          playerId: player.id,
+          cause: null,
+          at: now,
+        });
+      }
       player.eliminated = true;
       player.pendingLoss = null;
       break;
     }
     case 'confirmLoss': {
       const player = playerById(next, action.playerId);
+      if (!player.eliminated) {
+        next.eliminations.push({
+          playerId: player.id,
+          cause: player.pendingLoss,
+          at: now,
+        });
+      }
       player.eliminated = true;
       player.pendingLoss = null;
       break;

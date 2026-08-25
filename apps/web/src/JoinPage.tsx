@@ -1,13 +1,18 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
+  OFFICIAL_COMMANDER_CHALLENGES,
   poolLabel,
+  type ChallengeDetectionMode,
   type EventSnapshot,
+  type PodRating,
   type PublicEvent,
   type PublicParticipant,
 } from '@podyguard/shared';
 import {
   ApiError,
+  chooseGameTracker,
+  completeChallenge,
   getEvent,
   getMe,
   joinEvent,
@@ -15,6 +20,8 @@ import {
   listTables,
   leaveEvent,
   loadPlayerSession,
+  ratePod,
+  reportGameResult,
   savePlayerSession,
   setDecks,
   setPaused,
@@ -31,9 +38,17 @@ import { WaitTime } from './ui/WaitTime';
 import { assignedDeckLine, tableForParticipant } from './match-view';
 import { TrackerView } from './tracker/TrackerView';
 import { useEventLive } from './useEventLive';
+import { forgetActiveMatch, rememberActiveMatch } from './active-match';
+import {
+  enqueuePending,
+  flushPending,
+  isOfflineError,
+  type PendingOp,
+} from './offline-queue';
 
 export function JoinPage() {
   const { joinCode = '' } = useParams();
+  const navigate = useNavigate();
   const [event, setEvent] = useState<PublicEvent | null>(null);
   const [displayName, setDisplayName] = useState('');
   const [decks, setDeckRows] = useState<DeckFormRow[]>(defaultDeckRows);
@@ -44,6 +59,7 @@ export function JoinPage() {
   const [snapshot, setSnapshot] = useState<EventSnapshot | null>(null);
   const [atTable, setAtTable] = useState(false);
   const [showTracker, setShowTracker] = useState(false);
+  const [askRating, setAskRating] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -83,6 +99,12 @@ export function JoinPage() {
               })),
             );
           }
+          if (
+            me.participant.status === 'playing' &&
+            me.participant.trackerUsed === true
+          ) {
+            setShowTracker(true);
+          }
         }
       })
       .catch((caught: unknown) => {
@@ -109,6 +131,56 @@ export function JoinPage() {
   }, []);
 
   useEventLive(event?.joinCode, Boolean(event && token), onSnapshot);
+
+  useEffect(() => {
+    if (!event || !participant) {
+      return;
+    }
+    const path = `/e/${event.joinCode}`;
+    if (participant.status === 'playing' && showTracker) {
+      rememberActiveMatch(path);
+    } else if (participant.status !== 'playing') {
+      forgetActiveMatch(path);
+    }
+  }, [event, participant, showTracker]);
+
+  useEffect(() => {
+    if (!event || !token) {
+      return;
+    }
+    const join = event.joinCode;
+    const auth = token;
+    async function send(op: PendingOp) {
+      if (op.type === 'result') {
+        await reportGameResult(
+          join,
+          auth,
+          op.winnerParticipantId,
+          op.durationSeconds,
+        );
+        return;
+      }
+      if (op.type === 'challenge') {
+        await completeChallenge(join, auth, op.challengeId, {
+          targetParticipantId: op.targetParticipantId,
+          source: op.source,
+          confirmed: op.confirmed,
+        });
+        return;
+      }
+      if (op.type === 'tracker-choice') {
+        await chooseGameTracker(join, auth, op.trackerUsed);
+        return;
+      }
+      await ratePod(join, auth, op.rating);
+    }
+    void flushPending(join, send);
+    const onOnline = () => {
+      void flushPending(join, send);
+    };
+    window.addEventListener('online', onOnline);
+    return () => window.removeEventListener('online', onOnline);
+  }, [event, token]);
 
   async function onJoin(submit: FormEvent) {
     submit.preventDefault();
@@ -224,6 +296,74 @@ export function JoinPage() {
     }
   }
 
+  async function onChooseTracker(trackerUsed: boolean) {
+    if (!event || !token) {
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      const result = await chooseGameTracker(
+        event.joinCode,
+        token,
+        trackerUsed,
+      );
+      setParticipant(result.participant);
+      if (trackerUsed) {
+        setShowTracker(true);
+      }
+    } catch (caught) {
+      if (isOfflineError(caught)) {
+        enqueuePending(event.joinCode, {
+          type: 'tracker-choice',
+          trackerUsed,
+        });
+        if (trackerUsed) {
+          setShowTracker(true);
+        }
+        setError('Saved on this phone. It will send when you are back online.');
+        return;
+      }
+      setError(
+        caught instanceof ApiError
+          ? caught.message
+          : 'Could not save the tracker choice.',
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onTrackerFinished(
+    winnerId: string,
+    durationSeconds: number,
+  ) {
+    if (!event || !token) {
+      throw new Error('Your event session is no longer available.');
+    }
+    try {
+      const result = await reportGameResult(
+        event.joinCode,
+        token,
+        winnerId,
+        durationSeconds,
+      );
+      setParticipant(result.participant);
+    } catch (caught) {
+      if (!isOfflineError(caught)) {
+        throw caught;
+      }
+      enqueuePending(event.joinCode, {
+        type: 'result',
+        winnerParticipantId: winnerId,
+        durationSeconds,
+      });
+    }
+    setShowTracker(false);
+    setAskRating(true);
+    forgetActiveMatch(`/e/${event.joinCode}`);
+  }
+
   const isReady = participant?.status === 'ready';
   const isPaused = participant?.status === 'paused';
   const hasLeft = participant?.status === 'left';
@@ -233,6 +373,48 @@ export function JoinPage() {
   const canJoin =
     Boolean(event) && displayName.trim().length > 0 && decksComplete;
   const matchTable = tableForParticipant(snapshot, participant);
+  const challengeProgress = Object.fromEntries(
+    (snapshot?.participants ?? []).map((row) => [
+      row.id,
+      {
+        points: row.challengePoints ?? 0,
+        completedChallengeIds: (row.challengeCompletions ?? []).map(
+          (completion) => completion.challengeId,
+        ),
+      },
+    ]),
+  );
+
+  async function onChallengeComplete(
+    challengeId: string,
+    targetParticipantId: string,
+    source: ChallengeDetectionMode,
+    confirmed?: boolean,
+  ): Promise<boolean> {
+    if (!event || !token) {
+      throw new Error('Your event session is no longer available.');
+    }
+    try {
+      const result = await completeChallenge(event.joinCode, token, challengeId, {
+        targetParticipantId,
+        source,
+        confirmed,
+      });
+      return result.created;
+    } catch (caught) {
+      if (!isOfflineError(caught)) {
+        throw caught;
+      }
+      enqueuePending(event.joinCode, {
+        type: 'challenge',
+        challengeId,
+        targetParticipantId,
+        source,
+        confirmed,
+      });
+      return true;
+    }
+  }
 
   useEffect(() => {
     setAtTable(false);
@@ -254,12 +436,11 @@ export function JoinPage() {
             name: row.displayName,
             commanders: row.assignedCommanders ?? [],
           }))}
-        /*
-          A called game returns the player to the table card, which is where
-          they wait for the host to close the pod. Only the host can do that,
-          so the seat stays in the playing state.
-        */
-        onFinish={() => setShowTracker(false)}
+        onFinish={onTrackerFinished}
+        onQuit={() => void navigate('/')}
+        challengeProgress={challengeProgress}
+        onChallengeComplete={onChallengeComplete}
+        challengePack={event?.challengePack ?? OFFICIAL_COMMANDER_CHALLENGES}
       />
     );
   }
@@ -328,16 +509,31 @@ export function JoinPage() {
               {participant.status === 'playing' ? (
                 <>
                   <p className="text-muted mb-3 text-center text-sm">
-                    Stay at the table until the host calls the game.
+                    {participant.trackerUsed === false
+                      ? 'Playing without the tracker. The host can finish the table.'
+                      : 'Choose how this pod will record its game.'}
                   </p>
-                  <Button
-                    variant="neon"
-                    size="lg"
-                    block
-                    onClick={() => setShowTracker(true)}
-                  >
-                    Use game tracker
-                  </Button>
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      variant="neon"
+                      size="lg"
+                      block
+                      disabled={busy}
+                      onClick={() => void onChooseTracker(true)}
+                    >
+                      Use game tracker
+                    </Button>
+                    {participant.trackerUsed === undefined ? (
+                      <Button
+                        variant="glass"
+                        block
+                        disabled={busy}
+                        onClick={() => void onChooseTracker(false)}
+                      >
+                        Play without tracker
+                      </Button>
+                    ) : null}
+                  </div>
                 </>
               ) : atTable ? (
                 <p className="text-muted text-center text-sm">
@@ -395,8 +591,58 @@ export function JoinPage() {
                 </p>
               </div>
               <p className="text-muted mb-4 text-sm">
-                Flex: {String(participant.flexCredits)}
+                Flex: {String(participant.flexCredits)} · Challenge Points:{' '}
+                {String(participant.challengePoints ?? 0)}
               </p>
+              {askRating ? (
+                <div className="mb-4">
+                  <p className="text-muted mb-2 text-sm">How was your pod?</p>
+                  <div className="flex flex-wrap gap-2">
+                    {(
+                      [
+                        [1, '😞'],
+                        [2, '😐'],
+                        [3, '🙂'],
+                        [4, '😄'],
+                      ] as Array<[PodRating, string]>
+                    ).map(([rating, label]) => (
+                      <Button
+                        key={rating}
+                        variant="glass"
+                        size="sm"
+                        disabled={busy}
+                        onClick={() => {
+                          void (async () => {
+                            if (!event || !token) {
+                              return;
+                            }
+                            try {
+                              await ratePod(event.joinCode, token, rating);
+                              setAskRating(false);
+                            } catch (caught) {
+                              if (isOfflineError(caught)) {
+                                enqueuePending(event.joinCode, {
+                                  type: 'pod-rating',
+                                  rating,
+                                });
+                                setAskRating(false);
+                                return;
+                              }
+                              setError(
+                                caught instanceof ApiError
+                                  ? caught.message
+                                  : 'Could not save that rating.',
+                              );
+                            }
+                          })();
+                        }}
+                      >
+                        {label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
               <div className="flex flex-col gap-2">
                 <Button
                   variant="glass"

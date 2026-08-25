@@ -1,28 +1,37 @@
-import { and, asc, eq, inArray } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray } from 'drizzle-orm';
 import { getDb } from '../db/client.js';
 import {
   events,
   deckOptions,
+  challengeCompletions,
+  challengePackVersions,
   matchHistory,
   matchHistoryMembers,
   participants,
   physicalTables,
   podMembers,
   pods,
+  productEvents,
 } from '../db/schema.js';
+import type { ChallengePack, ProductEventName } from '@podyguard/shared';
+import { parseChallengePack } from '@podyguard/shared';
 import {
   EventNotFoundError,
   JoinCodeConflictError,
   PodNotFoundError,
   TableNotFoundError,
   type EventStore,
+  type CompletePodInput,
   type NewStoredDeck,
+  type NewStoredChallengeCompletion,
   type NewStoredEvent,
   type NewStoredParticipant,
   type NewStoredPod,
   type NewStoredTable,
   type StoredAssignment,
+  type StoredCompletedGame,
   type StoredDeck,
+  type StoredChallengeCompletion,
   type StoredEvent,
   type StoredParticipant,
   type StoredPod,
@@ -207,6 +216,33 @@ export class PostgresEventStore implements EventStore {
         throw new TableNotFoundError();
       }
 
+      const participantIds = input.seats.map((seat) => seat.participantId);
+      if (participantIds.length > 0) {
+        const alreadySeated = await tx
+          .select({ participantId: podMembers.participantId })
+          .from(podMembers)
+          .innerJoin(pods, eq(podMembers.podId, pods.id))
+          .where(
+            and(
+              eq(pods.eventId, input.eventId),
+              inArray(pods.status, ['formed', 'playing']),
+              inArray(podMembers.participantId, participantIds),
+            ),
+          );
+        if (alreadySeated.length > 0) {
+          throw new Error('Participant is already seated in a pod.');
+        }
+      }
+      const people =
+        participantIds.length > 0
+          ? await tx
+              .select()
+              .from(participants)
+              .where(inArray(participants.id, participantIds))
+          : [];
+      const peopleById = new Map(people.map((row) => [row.id, row]));
+      const now = Date.now();
+
       const [pod] = await tx
         .insert(pods)
         .values({
@@ -219,7 +255,6 @@ export class PostgresEventStore implements EventStore {
         throw new Error('Pod insert returned no row.');
       }
 
-      const participantIds = input.seats.map((seat) => seat.participantId);
       const deckIds = input.seats
         .map((seat) => seat.deckId)
         .filter((id) => isUuid(id));
@@ -236,12 +271,17 @@ export class PostgresEventStore implements EventStore {
         await tx.insert(podMembers).values(
           input.seats.map((seat) => {
             const deck = decksById.get(seat.deckId);
+            const person = peopleById.get(seat.participantId);
+            const readyAt = person?.readyAt?.getTime();
             return {
               podId: pod.id,
               participantId: seat.participantId,
               assignedPoolId: seat.assignedPoolId,
               assignedDeckId: deck?.id ?? null,
               assignedDeckName: deck?.name ?? null,
+              waitSeconds: readyAt
+                ? Math.max(0, Math.round((now - readyAt) / 1000))
+                : 0,
             };
           }),
         );
@@ -262,21 +302,19 @@ export class PostgresEventStore implements EventStore {
         })
         .where(eq(physicalTables.id, input.tableId));
 
-      const members = await tx
-        .select()
-        .from(participants)
-        .where(inArray(participants.id, participantIds));
-      const byId = new Map(members.map((row) => [row.id, row.displayName]));
-
       return {
         id: pod.id,
         eventId: input.eventId,
         tableId: table.id,
         tableLabel: table.label,
-        playerNames: participantIds.map((id) => byId.get(id) ?? 'Unknown'),
+        playerNames: participantIds.map(
+          (id) => peopleById.get(id)?.displayName ?? 'Unknown',
+        ),
         status: 'formed',
         poolId: input.poolId,
         memberIds: participantIds,
+        trackerUsed: null,
+        createdAt: pod.createdAt,
       };
     });
   }
@@ -289,6 +327,7 @@ export class PostgresEventStore implements EventStore {
         tableId: physicalTables.id,
         tableLabel: physicalTables.label,
         podStatus: pods.status,
+        trackerUsed: pods.trackerUsed,
         poolId: podMembers.assignedPoolId,
         deckName: podMembers.assignedDeckName,
         commanders: deckOptions.commanders,
@@ -306,6 +345,7 @@ export class PostgresEventStore implements EventStore {
       tableId: row.tableId,
       tableLabel: row.tableLabel,
       podStatus: row.podStatus === 'playing' ? 'playing' : 'formed',
+      trackerUsed: row.trackerUsed,
       poolId: row.poolId ?? undefined,
       deckName: row.deckName ?? undefined,
       commanders: row.commanders ?? [],
@@ -396,6 +436,52 @@ export class PostgresEventStore implements EventStore {
     return groups.map((row) => byGroup.get(row.id) ?? []);
   }
 
+  async listChallengeCompletions(
+    eventId: string,
+  ): Promise<StoredChallengeCompletion[]> {
+    const rows = await getDb()
+      .select()
+      .from(challengeCompletions)
+      .where(eq(challengeCompletions.eventId, eventId))
+      .orderBy(asc(challengeCompletions.completedAt));
+    return rows.map(mapChallengeCompletion);
+  }
+
+  async insertChallengeCompletion(
+    input: NewStoredChallengeCompletion,
+  ): Promise<{ completion: StoredChallengeCompletion; created: boolean }> {
+    const [inserted] = await getDb()
+      .insert(challengeCompletions)
+      .values(input)
+      .onConflictDoNothing()
+      .returning();
+    if (inserted) {
+      return {
+        completion: mapChallengeCompletion(inserted),
+        created: true,
+      };
+    }
+    const [existing] = await getDb()
+      .select()
+      .from(challengeCompletions)
+      .where(
+        and(
+          eq(challengeCompletions.eventId, input.eventId),
+          eq(challengeCompletions.participantId, input.participantId),
+          eq(challengeCompletions.challengeId, input.challengeId),
+          eq(challengeCompletions.scopeKey, input.scopeKey),
+        ),
+      )
+      .limit(1);
+    if (!existing) {
+      throw new Error('Challenge completion conflict returned no row.');
+    }
+    return {
+      completion: mapChallengeCompletion(existing),
+      created: false,
+    };
+  }
+
   async findActivePodByTableId(
     eventId: string,
     tableId: string,
@@ -458,7 +544,27 @@ export class PostgresEventStore implements EventStore {
     return loadStoredPod(updated);
   }
 
-  async completePod(podId: string): Promise<StoredPod> {
+  async setPodTrackerUsed(
+    podId: string,
+    trackerUsed: boolean,
+  ): Promise<StoredPod> {
+    const [updated] = await getDb()
+      .update(pods)
+      .set({ trackerUsed, updatedAt: new Date() })
+      .where(
+        and(eq(pods.id, podId), inArray(pods.status, ['formed', 'playing'])),
+      )
+      .returning();
+    if (!updated) {
+      throw new PodNotFoundError();
+    }
+    return loadStoredPod(updated);
+  }
+
+  async completePod(
+    podId: string,
+    result: CompletePodInput = {},
+  ): Promise<StoredPod> {
     const db = getDb();
     return db.transaction(async (tx) => {
       const [pod] = await tx
@@ -477,8 +583,6 @@ export class PostgresEventStore implements EventStore {
         .from(podMembers)
         .innerJoin(participants, eq(podMembers.participantId, participants.id))
         .where(eq(podMembers.podId, pod.id));
-      const humans = members.filter((row) => !row.isBot).map((row) => row.id);
-      const bots = members.filter((row) => row.isBot).map((row) => row.id);
       const now = new Date();
       if (members.length > 0) {
         const [historyRow] = await tx
@@ -494,17 +598,7 @@ export class PostgresEventStore implements EventStore {
           );
         }
       }
-      if (humans.length > 0) {
-        await tx
-          .update(participants)
-          .set({
-            status: 'joined',
-            readyAt: null,
-            updatedAt: now,
-          })
-          .where(inArray(participants.id, humans));
-      }
-      if (bots.length > 0) {
+      if (members.length > 0) {
         await tx
           .update(participants)
           .set({
@@ -512,7 +606,12 @@ export class PostgresEventStore implements EventStore {
             readyAt: now,
             updatedAt: now,
           })
-          .where(inArray(participants.id, bots));
+          .where(
+            inArray(
+              participants.id,
+              members.map((row) => row.id),
+            ),
+          );
       }
       await tx
         .update(physicalTables)
@@ -521,11 +620,13 @@ export class PostgresEventStore implements EventStore {
           updatedAt: now,
         })
         .where(eq(physicalTables.id, pod.tableId));
-      await tx.delete(podMembers).where(eq(podMembers.podId, pod.id));
       const [updated] = await tx
         .update(pods)
         .set({
           status: 'completed',
+          winnerParticipantId: result.winnerParticipantId ?? null,
+          durationSeconds: result.durationSeconds ?? null,
+          completedAt: now,
           updatedAt: now,
         })
         .where(eq(pods.id, pod.id))
@@ -541,7 +642,13 @@ export class PostgresEventStore implements EventStore {
         playerNames: [],
         status: 'completed',
         poolId: updated.poolId,
-        memberIds: [],
+        memberIds: members.map((row) => row.id),
+        trackerUsed: updated.trackerUsed,
+        winnerParticipantId: updated.winnerParticipantId,
+        durationSeconds: updated.durationSeconds,
+        completedAt: updated.completedAt,
+        createdAt: updated.createdAt,
+        rating: updated.rating,
       };
     });
   }
@@ -598,13 +705,127 @@ export class PostgresEventStore implements EventStore {
         status: 'cancelled',
         poolId: updated.poolId,
         memberIds: [],
+        trackerUsed: updated.trackerUsed,
       };
     });
   }
 
+  async listCompletedGames(eventId: string): Promise<StoredCompletedGame[]> {
+    const rows = await getDb()
+      .select({
+        pod: pods,
+        participantId: podMembers.participantId,
+        waitSeconds: podMembers.waitSeconds,
+        assignedPoolId: podMembers.assignedPoolId,
+      })
+      .from(pods)
+      .leftJoin(podMembers, eq(podMembers.podId, pods.id))
+      .where(and(eq(pods.eventId, eventId), eq(pods.status, 'completed')))
+      .orderBy(desc(pods.completedAt), desc(pods.createdAt));
+    const byId = new Map<string, StoredCompletedGame>();
+    for (const row of rows) {
+      const current = byId.get(row.pod.id) ?? {
+        id: row.pod.id,
+        eventId: row.pod.eventId,
+        poolId: row.pod.poolId,
+        memberIds: [],
+        trackerUsed: row.pod.trackerUsed,
+        winnerParticipantId: row.pod.winnerParticipantId,
+        durationSeconds: row.pod.durationSeconds,
+        completedAt: row.pod.completedAt,
+        createdAt: row.pod.createdAt,
+        rating: row.pod.rating,
+        seats: [],
+      };
+      if (row.participantId) {
+        current.memberIds.push(row.participantId);
+        current.seats.push({
+          participantId: row.participantId,
+          waitSeconds: row.waitSeconds ?? 0,
+          assignedPoolId: row.assignedPoolId ?? row.pod.poolId,
+        });
+      }
+      byId.set(row.pod.id, current);
+    }
+    return [...byId.values()];
+  }
+
+  async setPodRating(
+    podId: string,
+    rating: number,
+  ): Promise<StoredCompletedGame> {
+    const [updated] = await getDb()
+      .update(pods)
+      .set({ rating, updatedAt: new Date() })
+      .where(
+        and(eq(pods.id, podId), eq(pods.status, 'completed')),
+      )
+      .returning();
+    if (!updated) {
+      throw new PodNotFoundError();
+    }
+    const games = await this.listCompletedGames(updated.eventId);
+    const game = games.find((row) => row.id === updated.id);
+    if (!game) {
+      throw new PodNotFoundError();
+    }
+    return game;
+  }
+
+  async findChallengePack(
+    eventId: string,
+    packId: string,
+    version: number,
+  ): Promise<ChallengePack | undefined> {
+    const [row] = await getDb()
+      .select()
+      .from(challengePackVersions)
+      .where(
+        and(
+          eq(challengePackVersions.eventId, eventId),
+          eq(challengePackVersions.packId, packId),
+          eq(challengePackVersions.version, version),
+        ),
+      )
+      .limit(1);
+    if (!row) {
+      return undefined;
+    }
+    try {
+      return parseChallengePack(row.pack);
+    } catch {
+      return undefined;
+    }
+  }
+
+  async insertChallengePackVersion(
+    eventId: string,
+    pack: ChallengePack,
+  ): Promise<ChallengePack> {
+    await getDb().insert(challengePackVersions).values({
+      eventId,
+      packId: pack.id,
+      version: pack.version,
+      pack,
+    });
+    return pack;
+  }
+
+  async insertProductEvent(
+    eventId: string,
+    name: ProductEventName,
+  ): Promise<void> {
+    await getDb().insert(productEvents).values({ eventId, name });
+  }
+
   async updateEvent(
     id: string,
-    patch: { allowThreePods?: boolean; allowFivePods?: boolean },
+    patch: {
+      allowThreePods?: boolean;
+      allowFivePods?: boolean;
+      challengePackId?: string;
+      challengePackVersion?: number;
+    },
   ): Promise<StoredEvent> {
     const [row] = await getDb()
       .update(events)
@@ -615,6 +836,12 @@ export class PostgresEventStore implements EventStore {
         ...(patch.allowFivePods === undefined
           ? {}
           : { allowFivePods: patch.allowFivePods }),
+        ...(patch.challengePackId === undefined
+          ? {}
+          : { challengePackId: patch.challengePackId }),
+        ...(patch.challengePackVersion === undefined
+          ? {}
+          : { challengePackVersion: patch.challengePackVersion }),
         updatedAt: new Date(),
       })
       .where(eq(events.id, id))
@@ -651,6 +878,7 @@ async function loadStoredPod(
     status: pod.status === 'playing' ? 'playing' : 'formed',
     poolId: pod.poolId,
     memberIds: members.map((row) => row.id),
+    trackerUsed: pod.trackerUsed,
   };
 }
 
@@ -669,6 +897,8 @@ function mapEvent(row: typeof events.$inferSelect): StoredEvent {
     hostCredentialHash: row.hostCredentialHash,
     allowThreePods: row.allowThreePods,
     allowFivePods: row.allowFivePods,
+    challengePackId: row.challengePackId,
+    challengePackVersion: row.challengePackVersion,
     createdAt: row.createdAt,
   };
 }
@@ -685,6 +915,21 @@ function mapParticipant(
     readyAt: row.readyAt ?? null,
     flexCredits: row.flexCredits,
     createdAt: row.createdAt,
+  };
+}
+
+function mapChallengeCompletion(
+  row: typeof challengeCompletions.$inferSelect,
+): StoredChallengeCompletion {
+  return {
+    id: row.id,
+    eventId: row.eventId,
+    participantId: row.participantId,
+    podId: row.podId,
+    challengeId: row.challengeId,
+    scopeKey: row.scopeKey,
+    points: row.points,
+    completedAt: row.completedAt.toISOString(),
   };
 }
 

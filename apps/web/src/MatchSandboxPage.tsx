@@ -1,6 +1,10 @@
-import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { poolLabel, type PublicParticipant } from '@podyguard/shared';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  challengeById,
+  poolLabel,
+  type PublicParticipant,
+} from '@podyguard/shared';
 import { loadMatchConfig, matchPlayers, trackerStorageKey } from './match-config';
 import { assignedDeckLine } from './match-view';
 import { TrackerView } from './tracker/TrackerView';
@@ -9,6 +13,7 @@ import { Brand } from './ui/Brand';
 import { Button } from './ui/Button';
 import { Panel } from './ui/Panel';
 import { ThemeToggleCorner } from './ui/ThemeToggle';
+import { forgetActiveMatch, rememberActiveMatch } from './active-match';
 
 /**
  * The seated-player screen with a fabricated pod behind it, so the real thing
@@ -17,9 +22,19 @@ import { ThemeToggleCorner } from './ui/ThemeToggle';
  * `/match-config` so nothing dev-only reaches this route.
  */
 export function MatchSandboxPage() {
+  const navigate = useNavigate();
   const config = useMemo(() => loadMatchConfig(), []);
   const players = matchPlayers(config);
   const [showTracker, setShowTracker] = useState(true);
+  const [challengeProgress, setChallengeProgress] = useState<
+    Record<string, { points: number; completedChallengeIds: string[] }>
+  >({});
+
+  useEffect(() => {
+    if (showTracker) {
+      rememberActiveMatch('/match');
+    }
+  }, [showTracker]);
 
   const participant: PublicParticipant = {
     id: players[0]?.id ?? 'sandbox-1',
@@ -32,6 +47,8 @@ export function MatchSandboxPage() {
     assignedDeckName: config.deckName.trim() || undefined,
     assignedCommanders: players[0]?.commanders ?? [],
     flexCredits: 0,
+    challengePoints: 0,
+    challengeCompletions: [],
   };
 
   // Mirrors JoinPage: a running game hands the whole screen to the tracker.
@@ -40,8 +57,33 @@ export function MatchSandboxPage() {
       <TrackerView
         storageKey={trackerStorageKey(config)}
         players={players}
-        persist={false}
-        onFinish={() => setShowTracker(false)}
+        onFinish={async () => {
+          forgetActiveMatch('/match');
+          setShowTracker(false);
+        }}
+        onQuit={() => void navigate('/')}
+        challengeProgress={challengeProgress}
+        onChallengeComplete={async (challengeId, participantId) => {
+          const challenge = challengeById(challengeId);
+          if (!challenge) {
+            return false;
+          }
+          const row = challengeProgress[participantId] ?? {
+            points: 0,
+            completedChallengeIds: [],
+          };
+          if (row.completedChallengeIds.includes(challengeId)) {
+            return false;
+          }
+          setChallengeProgress({
+            ...challengeProgress,
+            [participantId]: {
+              points: row.points + challenge.points,
+              completedChallengeIds: [...row.completedChallengeIds, challengeId],
+            },
+          });
+          return true;
+        }}
       />
     );
   }

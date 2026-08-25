@@ -36,6 +36,27 @@
       "when": 1787511600000,
       "tag": "0004_commander_metadata",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1787637600000,
+      "tag": "0005_game_results",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1787641200000,
+      "tag": "0006_official_challenges",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1787644800000,
+      "tag": "0007_pack_metrics",
+      "breakpoints": true
     }
   ]
 }

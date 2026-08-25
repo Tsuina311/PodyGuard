@@ -5,7 +5,13 @@ import { cx } from './cx';
  * Button variants follow the IndoUI Tailwind recipes (primary, neon glow,
  * outline, glass, ghost) retuned to the PodyGuard blue palette.
  */
-export type ButtonVariant = 'primary' | 'neon' | 'outline' | 'glass' | 'ghost';
+export type ButtonVariant =
+  | 'primary'
+  | 'neon'
+  | 'outline'
+  | 'glass'
+  | 'ghost'
+  | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 const base =
@@ -20,6 +26,8 @@ const variants: Record<ButtonVariant, string> = {
   glass:
     'border border-muted/20 bg-ink/5 text-ink backdrop-blur-md hover:border-muted/35 hover:bg-ink/10',
   ghost: 'text-muted hover:bg-ink/5 hover:text-ink',
+  danger:
+    'border border-danger/50 bg-danger/10 text-danger shadow-[0_0_18px_-8px_var(--color-danger)] hover:bg-danger/20 hover:border-danger/70',
 };
 
 const sizes: Record<ButtonSize, string> = {

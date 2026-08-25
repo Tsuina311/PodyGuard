@@ -1,9 +1,12 @@
 import type {
+  ChallengePack,
   CommanderSelection,
+  ProductEventName,
   PublicEvent,
   PublicParticipant,
   PublicPod,
   PublicTable,
+  PublicChallengeCompletion,
 } from '@podyguard/shared';
 
 export class EventNotFoundError extends Error {
@@ -86,6 +89,8 @@ export type StoredEvent = {
   hostCredentialHash: string;
   allowThreePods: boolean;
   allowFivePods: boolean;
+  challengePackId: string;
+  challengePackVersion: number;
   createdAt: Date;
 };
 
@@ -106,6 +111,7 @@ export type StoredAssignment = {
   tableId: string;
   tableLabel: string;
   podStatus: 'formed' | 'playing';
+  trackerUsed: boolean | null;
   poolId?: string;
   deckName?: string;
   commanders: CommanderSelection[];
@@ -124,6 +130,53 @@ export type StoredPod = PublicPod & {
   eventId: string;
   tableId: string;
   memberIds: string[];
+  trackerUsed: boolean | null;
+  winnerParticipantId?: string | null;
+  durationSeconds?: number | null;
+  completedAt?: Date | null;
+  createdAt?: Date;
+  rating?: number | null;
+  seats?: StoredCompletedSeat[];
+};
+
+export type StoredCompletedSeat = {
+  participantId: string;
+  waitSeconds: number;
+  assignedPoolId: string;
+};
+
+export type StoredCompletedGame = {
+  id: string;
+  eventId: string;
+  poolId: string;
+  memberIds: string[];
+  trackerUsed: boolean | null;
+  winnerParticipantId: string | null;
+  durationSeconds: number | null;
+  completedAt: Date | null;
+  createdAt: Date;
+  rating: number | null;
+  seats: StoredCompletedSeat[];
+};
+
+export type CompletePodInput = {
+  winnerParticipantId?: string;
+  durationSeconds?: number;
+};
+
+export type StoredChallengeCompletion = PublicChallengeCompletion & {
+  id: string;
+  eventId: string;
+  scopeKey: string;
+};
+
+export type NewStoredChallengeCompletion = {
+  eventId: string;
+  participantId: string;
+  podId: string;
+  challengeId: string;
+  scopeKey: string;
+  points: number;
 };
 
 export type NewStoredDeck = {
@@ -206,15 +259,42 @@ export interface EventStore {
     decks: NewStoredDeck[],
   ): Promise<StoredDeck[]>;
   listMatchHistory(eventId: string): Promise<string[][]>;
+  listChallengeCompletions(
+    eventId: string,
+  ): Promise<StoredChallengeCompletion[]>;
+  insertChallengeCompletion(
+    input: NewStoredChallengeCompletion,
+  ): Promise<{ completion: StoredChallengeCompletion; created: boolean }>;
   findActivePodByTableId(
     eventId: string,
     tableId: string,
   ): Promise<StoredPod | undefined>;
+  setPodTrackerUsed(podId: string, trackerUsed: boolean): Promise<StoredPod>;
   startPod(podId: string): Promise<StoredPod>;
-  completePod(podId: string): Promise<StoredPod>;
+  completePod(podId: string, result?: CompletePodInput): Promise<StoredPod>;
   cancelPod(podId: string): Promise<StoredPod>;
+  listCompletedGames(eventId: string): Promise<StoredCompletedGame[]>;
+  setPodRating(podId: string, rating: number): Promise<StoredCompletedGame>;
+  findChallengePack(
+    eventId: string,
+    packId: string,
+    version: number,
+  ): Promise<ChallengePack | undefined>;
+  insertChallengePackVersion(
+    eventId: string,
+    pack: ChallengePack,
+  ): Promise<ChallengePack>;
+  insertProductEvent(
+    eventId: string,
+    name: ProductEventName,
+  ): Promise<void>;
   updateEvent(
     id: string,
-    patch: { allowThreePods?: boolean; allowFivePods?: boolean },
+    patch: {
+      allowThreePods?: boolean;
+      allowFivePods?: boolean;
+      challengePackId?: string;
+      challengePackVersion?: number;
+    },
   ): Promise<StoredEvent>;
 }

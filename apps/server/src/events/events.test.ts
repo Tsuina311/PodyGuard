@@ -285,7 +285,7 @@ describe('event HTTP api', () => {
     await app.close();
   });
 
-  it('starts and finishes a table, then lets a player requeue', async () => {
+  it('records tracker use and lets a player finish and requeue the pod', async () => {
     const app = await buildTestApp();
     const created = await app.inject({
       method: 'POST',
@@ -304,7 +304,10 @@ describe('event HTTP api', () => {
       url: `/events/${joinCode}/join`,
       payload: { displayName: 'Alex' },
     });
-    const joinedBody = joined.json() as { token: string };
+    const joinedBody = joined.json() as {
+      token: string;
+      participant: { id: string };
+    };
     await app.inject({
       method: 'POST',
       url: `/events/${joinCode}/ready`,
@@ -349,14 +352,128 @@ describe('event HTTP api', () => {
       participant: { status: 'playing', tableLabel: 'Table 1' },
     });
 
-    const finished = await app.inject({
+    const choseTracker = await app.inject({
       method: 'POST',
-      url: `/events/${joinCode}/tables/${table?.id}/finish`,
-      headers: { authorization: `Bearer ${hostToken}` },
+      url: `/events/${joinCode}/tracker-choice`,
+      headers: { authorization: `Bearer ${joinedBody.token}` },
+      payload: { trackerUsed: true },
     });
-    expect(finished.statusCode).toBe(200);
-    expect(finished.json()).toMatchObject({
-      table: { status: 'free', seatedNames: [] },
+    expect(choseTracker.statusCode).toBe(200);
+    expect(choseTracker.json()).toMatchObject({
+      participant: { status: 'playing', trackerUsed: true },
+    });
+    const cannotEraseUse = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/tracker-choice`,
+      headers: { authorization: `Bearer ${joinedBody.token}` },
+      payload: { trackerUsed: false },
+    });
+    expect(cannotEraseUse.json()).toMatchObject({
+      participant: { trackerUsed: true },
+    });
+
+    const automaticChallenge = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/challenges/centurion/complete`,
+      headers: { authorization: `Bearer ${joinedBody.token}` },
+      payload: {
+        targetParticipantId: joinedBody.participant.id,
+        source: 'automatic',
+      },
+    });
+    expect(automaticChallenge.statusCode).toBe(200);
+    expect(automaticChallenge.json()).toMatchObject({
+      created: true,
+      completion: { challengeId: 'centurion', points: 5 },
+    });
+    const duplicateChallenge = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/challenges/centurion/complete`,
+      headers: { authorization: `Bearer ${joinedBody.token}` },
+      payload: {
+        targetParticipantId: joinedBody.participant.id,
+        source: 'automatic',
+      },
+    });
+    expect(duplicateChallenge.json()).toMatchObject({ created: false });
+
+    const unconfirmedChallenge = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/challenges/double-kill/complete`,
+      headers: { authorization: `Bearer ${joinedBody.token}` },
+      payload: {
+        targetParticipantId: joinedBody.participant.id,
+        source: 'confirmation',
+      },
+    });
+    expect(unconfirmedChallenge.statusCode).toBe(400);
+    const confirmedChallenge = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/challenges/double-kill/complete`,
+      headers: { authorization: `Bearer ${joinedBody.token}` },
+      payload: {
+        targetParticipantId: joinedBody.participant.id,
+        source: 'confirmation',
+        confirmed: true,
+      },
+    });
+    expect(confirmedChallenge.json()).toMatchObject({
+      created: true,
+      completion: { points: 5 },
+    });
+    const manualChallenge = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/challenges/alternate-destiny/complete`,
+      headers: { authorization: `Bearer ${joinedBody.token}` },
+      payload: {
+        targetParticipantId: joinedBody.participant.id,
+        source: 'manual',
+      },
+    });
+    expect(manualChallenge.json()).toMatchObject({
+      created: true,
+      completion: { points: 4 },
+    });
+    const challengeScore = await app.inject({
+      method: 'GET',
+      url: `/events/${joinCode}/me`,
+      headers: { authorization: `Bearer ${joinedBody.token}` },
+    });
+    expect(challengeScore.json()).toMatchObject({
+      participant: {
+        challengePoints: 14,
+        flexCredits: 0,
+        challengeCompletions: [
+          { challengeId: 'centurion' },
+          { challengeId: 'double-kill' },
+          { challengeId: 'alternate-destiny' },
+        ],
+      },
+    });
+
+    const invalidResult = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/result`,
+      headers: { authorization: `Bearer ${joinedBody.token}` },
+      payload: {
+        winnerParticipantId: '00000000-0000-0000-0000-000000000000',
+        durationSeconds: 4_321,
+      },
+    });
+    expect(invalidResult.statusCode).toBe(400);
+
+    const result = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/result`,
+      headers: { authorization: `Bearer ${joinedBody.token}` },
+      payload: {
+        winnerParticipantId: joinedBody.participant.id,
+        durationSeconds: 4_321,
+      },
+    });
+    expect(result.statusCode).toBe(200);
+    expect(result.json()).toMatchObject({
+      participant: { status: 'ready' },
     });
 
     const meAfter = await app.inject({
@@ -365,22 +482,19 @@ describe('event HTTP api', () => {
       headers: { authorization: `Bearer ${joinedBody.token}` },
     });
     expect(meAfter.json()).toMatchObject({
-      participant: { status: 'joined' },
+      participant: { status: 'ready' },
     });
     expect(
       (meAfter.json() as { participant: { tableLabel?: string } }).participant
         .tableLabel,
     ).toBeUndefined();
 
-    const readyAgain = await app.inject({
-      method: 'POST',
-      url: `/events/${joinCode}/ready`,
-      headers: { authorization: `Bearer ${joinedBody.token}` },
-      payload: { ready: true },
+    const freed = await app.inject({
+      method: 'GET',
+      url: `/events/${joinCode}/tables`,
     });
-    expect(readyAgain.statusCode).toBe(200);
-    expect(readyAgain.json()).toMatchObject({
-      participant: { status: 'ready' },
+    expect(freed.json()).toMatchObject({
+      tables: [{ status: 'free', seatedNames: [] }],
     });
 
     await app.close();
@@ -734,6 +848,152 @@ describe('event HTTP api', () => {
     });
     expect(me.json()).toMatchObject({
       participant: { status: 'ready' },
+    });
+
+    await app.close();
+  });
+
+  it('versions a private pack, syncs a repeated result, and never double-seats', async () => {
+    const app = await buildTestApp();
+    const created = await app.inject({
+      method: 'POST',
+      url: '/events',
+      payload: { name: 'Friday Commander', hostPin: '2468', tableCount: 1 },
+    });
+    const createdBody = created.json() as {
+      event: { joinCode: string };
+      hostToken: string;
+    };
+    const { joinCode } = createdBody.event;
+    const { hostToken } = createdBody;
+
+    const copied = await app.inject({
+      method: 'PUT',
+      url: `/events/${joinCode}/pack`,
+      headers: { authorization: `Bearer ${hostToken}` },
+      payload: { mode: 'copy-official' },
+    });
+    expect(copied.statusCode).toBe(200);
+    const copiedEvent = copied.json() as {
+      event: {
+        challengePackId: string;
+        challengePackVersion: number;
+        challengePack: { visibility: string; challenges: unknown[] };
+      };
+    };
+    expect(copiedEvent.event.challengePackId).not.toBe('classic-commander-v1');
+    expect(copiedEvent.event.challengePack.visibility).toBe('private');
+    expect(copiedEvent.event.challengePackVersion).toBe(1);
+
+    const saved = await app.inject({
+      method: 'PUT',
+      url: `/events/${joinCode}/pack`,
+      headers: { authorization: `Bearer ${hostToken}` },
+      payload: {
+        mode: 'save',
+        pack: {
+          ...copiedEvent.event.challengePack,
+          name: 'Night pack',
+        },
+      },
+    });
+    expect(saved.json()).toMatchObject({
+      event: { challengePackVersion: 2, challengePack: { name: 'Night pack' } },
+    });
+
+    const joined = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/join`,
+      payload: { displayName: 'Alex' },
+    });
+    const joinedBody = joined.json() as {
+      participant: { id: string };
+      token: string;
+    };
+    await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/ready`,
+      headers: { authorization: `Bearer ${joinedBody.token}` },
+      payload: { ready: true },
+    });
+    await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/dev/fill-bots`,
+      headers: { authorization: `Bearer ${hostToken}` },
+    });
+    const tables = await app.inject({
+      method: 'GET',
+      url: `/events/${joinCode}/tables`,
+    });
+    const tableId = (
+      tables.json() as { tables: Array<{ id: string; status: string }> }
+    ).tables.find((row) => row.status === 'occupied')?.id;
+    await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/tables/${tableId}/start`,
+      headers: { authorization: `Bearer ${hostToken}` },
+    });
+
+    const secondMatch = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/match`,
+      headers: { authorization: `Bearer ${hostToken}` },
+    });
+    expect(secondMatch.json()).toMatchObject({ pods: [] });
+
+    const result = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/result`,
+      headers: { authorization: `Bearer ${joinedBody.token}` },
+      payload: {
+        winnerParticipantId: joinedBody.participant.id,
+        durationSeconds: 90,
+      },
+    });
+    expect(result.statusCode).toBe(200);
+
+    const replay = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/result`,
+      headers: { authorization: `Bearer ${joinedBody.token}` },
+      payload: {
+        winnerParticipantId: joinedBody.participant.id,
+        durationSeconds: 90,
+      },
+    });
+    expect(replay.statusCode).toBe(200);
+
+    const lateChallenge = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/challenges/centurion/complete`,
+      headers: { authorization: `Bearer ${joinedBody.token}` },
+      payload: {
+        targetParticipantId: joinedBody.participant.id,
+        source: 'automatic',
+      },
+    });
+    expect(lateChallenge.statusCode).toBe(200);
+
+    const rating = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/pod-rating`,
+      headers: { authorization: `Bearer ${joinedBody.token}` },
+      payload: { rating: 4 },
+    });
+    expect(rating.json()).toMatchObject({ rating: 4, alreadyRecorded: false });
+
+    const metrics = await app.inject({
+      method: 'GET',
+      url: `/events/${joinCode}/metrics`,
+      headers: { authorization: `Bearer ${hostToken}` },
+    });
+    expect(metrics.statusCode).toBe(200);
+    expect(metrics.json()).toMatchObject({
+      metrics: {
+        games: 1,
+        challengeCompletions: 1,
+        podRating: { count: 1 },
+      },
     });
 
     await app.close();

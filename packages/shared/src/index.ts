@@ -43,9 +43,32 @@ export { COMMANDER_POOLS, OPEN_POOL_ID, poolLabel, poolShortLabel } from './pool
 
 export type { CommanderPoolId } from './pools';
 
+export {
+  CHALLENGE_CATEGORIES,
+  CHALLENGE_PRIMITIVE_TYPES,
+  OFFICIAL_COMMANDER_CHALLENGES,
+  challengeById,
+  challengeInPack,
+  cloneOfficialPack,
+  emptyPrivatePack,
+  parseChallengePack,
+} from './challenges';
+
+export type {
+  Challenge,
+  ChallengeDetectionMode,
+  ChallengePack,
+  ChallengePrimitive,
+  ChallengeRepeatRule,
+  PublicChallengeCompletion,
+} from './challenges';
+
 export type {
   CommanderSelection,
+  EventMetrics,
   EventSnapshot,
+  PodRating,
+  ProductEventName,
   PublicDeck,
   PublicEvent,
   PublicParticipant,
