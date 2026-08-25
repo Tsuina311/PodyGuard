@@ -58,6 +58,7 @@ import {
   type SecondaryCounter,
 } from './engine';
 import { DUNGEON_COUNT } from './dungeons';
+import { planFirstPlayerReveal, type RevealHop } from './first-player-reveal';
 import { DungeonTracker } from './DungeonTracker';
 import { useLandscape, useLandscapeLock } from './orientation';
 import {
@@ -127,6 +128,26 @@ const gilded =
 
 /* Art shows through more than text can survive on its own. */
 const onArt = '[text-shadow:0_2px_14px_var(--color-void)]';
+
+/*
+  The draw for the starting seat. Lifting the lit card above its neighbours
+  keeps the glow from being clipped by the card drawn next to it, and the seat
+  grows a touch as it settles so the landing is felt as well as seen.
+*/
+const spotlightCard = 'z-20 border-neon';
+const spotlightSweep = 'shadow-[0_0_0_3px_var(--color-neon),0_0_34px_-2px_var(--color-neon)]';
+const spotlightLanded: Record<'flash' | 'hold', string> = {
+  flash: 'first-player-flash scale-[1.02]',
+  hold: 'first-player-hold scale-[1.02]',
+};
+
+/*
+  The edge alone loses to commander art, so the whole seat lights up: a neon
+  wash over the picture, under the controls, which is what makes the draw
+  readable from the far side of the table.
+*/
+const spotlightWash =
+  'pointer-events-none absolute inset-0 z-[5] rounded-xl bg-[radial-gradient(circle_at_50%_45%,color-mix(in_oklab,var(--color-neon)_34%,transparent),transparent_72%)]';
 
 /*
   A knocked-out seat swaps its commander for the dagger-through-skull Vampiric
@@ -237,6 +258,7 @@ export function TrackerView({
   useLandscapeLock();
   usePreloadedEliminatedArt();
   const elapsed = useMatchClock(state);
+  const spotlight = useFirstPlayerSpotlight(state, past.length);
   const winner = state.players.find((row) => row.id === state.winnerId) ?? null;
   const confirmation = detectedConfirmation(state, challengePack);
 
@@ -401,14 +423,22 @@ export function TrackerView({
           <article
             key={player.id}
             className={cx(
-              'border-muted/20 relative flex min-h-0 flex-col overflow-hidden rounded-xl border p-2',
+              'border-muted/20 relative flex min-h-0 flex-col overflow-hidden rounded-xl border p-2 transition-transform duration-200',
               player.eliminated ? 'opacity-50' : 'bg-ink/[0.03]',
+              player.id === spotlight.playerId && spotlightCard,
+              player.id === spotlight.playerId &&
+                (spotlight.phase === 'sweep'
+                  ? spotlightSweep
+                  : spotlightLanded[spotlight.phase]),
             )}
           >
             <CommanderArt
               commanders={player.commanders}
               eliminated={player.eliminated}
             />
+            {player.id === spotlight.playerId ? (
+              <span aria-hidden className={spotlightWash} />
+            ) : null}
             <div
               className={cx(
                 'relative z-10 flex shrink-0 items-start justify-between gap-2',
@@ -430,9 +460,6 @@ export function TrackerView({
                 />
               </span>
               <span className="flex shrink-0 flex-wrap justify-end gap-1">
-                {player.id === state.firstPlayerId ? (
-                  <Badge tone="idle">1st</Badge>
-                ) : null}
                 {player.id === state.initiativeId ? (
                   <Badge tone="dev">
                     <Flag size={12} aria-hidden />
@@ -1038,6 +1065,89 @@ function dayNightRing(dayNight: TrackerState['dayNight']): string {
     return 'border-beam/50';
   }
   return 'border-muted/25';
+}
+
+/** How long the landing strobe runs before the glow settles: three 150ms beats. */
+const SPOTLIGHT_FLASH_MS = 450;
+
+/**
+ * Runs the draw for the starting seat and holds the result.
+ *
+ * The spotlight sweeps the board, strobes on the seat the engine drew, then
+ * holds steady until the pod touches anything, on the grounds that the first tap
+ * means the table has read it and the board has better uses for the light.
+ * `moves` is the history depth, which is the cheapest signal that something on
+ * the board actually changed.
+ */
+function useFirstPlayerSpotlight(
+  state: TrackerState,
+  moves: number,
+): { playerId: string | null; phase: 'sweep' | 'flash' | 'hold' } {
+  const [plan, setPlan] = useState<RevealHop[] | null>(null);
+  const [hop, setHop] = useState(0);
+  const [held, setHeld] = useState(false);
+  /*
+    A game restored from storage has already had its draw, and replaying the
+    spin on every reload would be a lie about where the game stands. Only a
+    board that starts under this mount earns the animation.
+  */
+  const drawn = useRef(Boolean(state.firstPlayerId));
+  const movesAtDraw = useRef(moves);
+
+  useEffect(() => {
+    if (!state.firstPlayerId) {
+      drawn.current = false;
+      setPlan(null);
+      setHop(0);
+      setHeld(false);
+      return;
+    }
+    if (drawn.current) {
+      return;
+    }
+    drawn.current = true;
+    movesAtDraw.current = moves;
+    setHop(0);
+    setHeld(false);
+    setPlan(
+      planFirstPlayerReveal(
+        state.players.map((row) => row.id),
+        state.firstPlayerId,
+      ),
+    );
+  }, [moves, state.firstPlayerId, state.players]);
+
+  useEffect(() => {
+    const next = plan?.[hop + 1];
+    if (!next) {
+      return;
+    }
+    const timer = window.setTimeout(() => setHop(hop + 1), next.delayMs);
+    return () => window.clearTimeout(timer);
+  }, [hop, plan]);
+
+  // The strobe is a one-shot, so the glow goes steady on its own clock rather
+  // than waiting on the pod.
+  const landed = plan !== null && hop === plan.length - 1;
+  useEffect(() => {
+    if (!landed) {
+      return;
+    }
+    const timer = window.setTimeout(() => setHeld(true), SPOTLIGHT_FLASH_MS);
+    return () => window.clearTimeout(timer);
+  }, [landed]);
+
+  // Any accepted action retires the spotlight, mid-spin included.
+  useEffect(() => {
+    if (plan && moves !== movesAtDraw.current) {
+      setPlan(null);
+    }
+  }, [moves, plan]);
+
+  return {
+    playerId: plan?.[hop]?.playerId ?? null,
+    phase: landed ? (held ? 'hold' : 'flash') : 'sweep',
+  };
 }
 
 /** Ticks only while the clock is actually running, so a pause costs nothing. */

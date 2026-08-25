@@ -160,6 +160,33 @@ export function HostPage() {
     }
   }
 
+  async function onStartAllTables() {
+    if (!hostToken) {
+      return;
+    }
+    const readyTables = tables.filter((table) => table.podStatus === 'formed');
+    if (readyTables.length === 0) {
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      await Promise.all(
+        readyTables.map((table) => startTable(code, hostToken, table.id)),
+      );
+      await refresh();
+    } catch (caught) {
+      await refresh();
+      setError(
+        caught instanceof ApiError
+          ? caught.message
+          : 'Could not start all ready games.',
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function onFinishTable(table: PublicTable) {
     if (!hostToken) {
       return;
@@ -278,6 +305,7 @@ export function HostPage() {
   );
   const pausedPlayers = participants.filter((row) => row.status === 'paused');
   const lobby = participants.filter((row) => row.status === 'joined');
+  const readyTables = tables.filter((table) => table.podStatus === 'formed');
 
   if (!event) {
     return (
@@ -508,6 +536,18 @@ export function HostPage() {
             This event was created without tables.
           </p>
         ) : (
+          <>
+          <Button
+            block
+            size="lg"
+            className="mb-5"
+            disabled={busy || readyTables.length === 0}
+            onClick={() => void onStartAllTables()}
+          >
+            {busy
+              ? 'Starting games…'
+              : `Start all ready games (${String(readyTables.length)})`}
+          </Button>
           <ul className="mb-5 grid gap-3 sm:grid-cols-2">
             {tables.map((table) => (
               <li
@@ -579,6 +619,7 @@ export function HostPage() {
               </li>
             ))}
           </ul>
+          </>
         )}
 
         <div className="mb-5 flex flex-wrap gap-2.5">

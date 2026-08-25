@@ -76,6 +76,45 @@
     linear-gradient(170deg, var(--color-abyss), var(--color-void) 65%);
 }
 
+/*
+  Landing on a seat is worth a moment of noise: the glow strobes a few times to
+  say the draw is in, then holds steady. A light that keeps blinking for as long
+  as the pod takes to make its first move stops being an announcement and starts
+  being something to ignore.
+*/
+@keyframes first-player-flash {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 7px var(--color-neon),
+      0 0 74px 8px color-mix(in oklab, var(--color-neon) 85%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--color-neon) 35%, transparent),
+      0 0 14px -8px color-mix(in oklab, var(--color-neon) 40%, transparent);
+  }
+}
+
+/* The steady state the strobe resolves into, and where it rests afterwards. */
+@utility first-player-hold {
+  box-shadow:
+    0 0 0 4px var(--color-neon),
+    0 0 52px 0 color-mix(in oklab, var(--color-neon) 80%, transparent);
+}
+
+@utility first-player-flash {
+  box-shadow:
+    0 0 0 4px var(--color-neon),
+    0 0 52px 0 color-mix(in oklab, var(--color-neon) 80%, transparent);
+  animation: first-player-flash 150ms ease-in-out 3;
+
+  /* A strobing board is what a motion-sensitive player asked not to get. */
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
 @utility bg-grid {
   background-image:
     linear-gradient(
