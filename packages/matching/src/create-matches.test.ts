@@ -303,4 +303,35 @@ describe('eventMatchOptions', () => {
       ).toEqual({ preferredSize: 4, allowedSizes: [4] });
     }
   });
+
+  it('makes Emperor strictly six players', () => {
+    expect(
+      eventMatchOptions({
+        gameMode: 'emperor',
+        allowThreePods: true,
+        allowFivePods: true,
+      }),
+    ).toEqual({ preferredSize: 6, allowedSizes: [6] });
+  });
+
+  it('makes Star strictly five players', () => {
+    expect(
+      eventMatchOptions({
+        gameMode: 'star',
+        allowThreePods: true,
+        allowFivePods: false,
+      }),
+    ).toEqual({ preferredSize: 5, allowedSizes: [5] });
+  });
+
+  it('matches Assassin from the preferred size down to three', () => {
+    expect(
+      eventMatchOptions({
+        gameMode: 'assassin',
+        allowThreePods: false,
+        allowFivePods: false,
+        preferredPodSize: 6,
+      }),
+    ).toEqual({ preferredSize: 6, allowedSizes: [6, 5, 4, 3] });
+  });
 });

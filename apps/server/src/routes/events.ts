@@ -54,7 +54,10 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
         gameMode:
           body.gameMode === 'treachery' ||
           body.gameMode === 'two-headed-giant' ||
-          body.gameMode === 'archenemy-commander'
+          body.gameMode === 'archenemy-commander' ||
+          body.gameMode === 'emperor' ||
+          body.gameMode === 'star' ||
+          body.gameMode === 'assassin'
             ? body.gameMode
             : 'commander',
         allowThreePods: body.allowThreePods === undefined ? undefined : Boolean(body.allowThreePods),

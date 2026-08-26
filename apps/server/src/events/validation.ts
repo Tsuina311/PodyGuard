@@ -1,6 +1,7 @@
 import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
 import { promisify } from 'node:util';
 import {
+  ASSASSIN_POD_SIZES,
   TREACHERY_POD_SIZES,
   type CommanderSelection,
   type GameMode,
@@ -104,6 +105,29 @@ export function assertPreferredPodSize(
   gameMode: GameMode,
   value: unknown,
 ): number {
+  if (gameMode === 'emperor') {
+    return 6;
+  }
+  if (gameMode === 'star') {
+    return 5;
+  }
+  if (gameMode === 'assassin') {
+    if (value === undefined || value === null) {
+      return 5;
+    }
+    const size = typeof value === 'number' ? value : Number(value);
+    if (
+      !Number.isInteger(size) ||
+      !ASSASSIN_POD_SIZES.includes(
+        size as (typeof ASSASSIN_POD_SIZES)[number],
+      )
+    ) {
+      throw new InvalidEventInputError(
+        'Choose an Assassin table size from 3 to 8 players.',
+      );
+    }
+    return size;
+  }
   if (gameMode !== 'treachery') {
     return 4;
   }

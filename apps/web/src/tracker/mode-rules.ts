@@ -39,7 +39,7 @@ export const MODE_RULES: Record<GameMode, ModeRules> = {
         heading: 'Turns',
         bullets: [
           'The starting player is drawn at random.',
-          'That player skips the draw step on their first turn.',
+          'In multiplayer Commander, that player draws on their first turn.',
         ],
       },
       {
@@ -61,7 +61,7 @@ export const MODE_RULES: Record<GameMode, ModeRules> = {
         bullets: [
           `Each player starts at ${String(STARTING_LIFE)} life.`,
           `A player loses at 0 life, ${String(POISON_LIMIT)} poison, or ${String(COMMANDER_DAMAGE_LIMIT)} combat damage from one commander.`,
-          'The Leader takes the first turn and skips that draw step.',
+          'The Leader takes the first turn and draws on that turn.',
           commanderTax,
         ],
       },
@@ -136,6 +136,111 @@ export const MODE_RULES: Record<GameMode, ModeRules> = {
           'The Archenemy loses at 0 life, or when the usual poison and commander-damage limits are reached.',
           'The heroes lose together when their shared life reaches 0.',
           commanderCombat,
+          commanderTax,
+        ],
+      },
+    ],
+  },
+  emperor: {
+    title: 'Emperor',
+    summary:
+      'Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.',
+    sections: [
+      {
+        heading: 'Teams and turns',
+        bullets: [
+          'Choose both teams and each team’s Emperor, or randomise either choice.',
+          `Every player starts at ${String(STARTING_LIFE)} life and keeps their own hand, mana, permanents, poison, and turn.`,
+          'Teammates may look at one another’s hands and discuss strategy, but may not manipulate one another’s cards.',
+          'Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn.',
+        ],
+      },
+      {
+        heading: 'Range and combat',
+        bullets: [
+          'Generals have range of influence 1. Emperors have range of influence 2.',
+          'Spells, abilities, effects, and information can affect only players and objects within their controller’s range.',
+          'A player may attack only an opponent seated immediately next to them, or that opponent’s planeswalkers and protected battles.',
+          'As players leave, the empty seats stop counting, bringing surviving players into range.',
+        ],
+      },
+      {
+        heading: 'Deploy creatures',
+        bullets: [
+          'Every creature has “Tap: Target teammate gains control of this creature. Activate only as a sorcery.”',
+          'This can move creatures through the team as the battle lines change.',
+        ],
+      },
+      {
+        heading: 'Winning and Commander rules',
+        bullets: [
+          'A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.',
+          `A player loses at 0 life, ${String(POISON_LIMIT)} poison, or ${String(COMMANDER_DAMAGE_LIMIT)} combat damage from one commander.`,
+          commanderTax,
+        ],
+      },
+    ],
+  },
+  star: {
+    title: 'Star',
+    summary:
+      'Five players sit in a circle. Your neighbors are allies and the two players across from you are enemies.',
+    sections: [
+      {
+        heading: 'Positions and allies',
+        bullets: [
+          'Choose the circular positions manually by exchanging two players, or randomise all five positions.',
+          'The players immediately to your left and right are your allies.',
+          'The two nonadjacent players across the circle are your enemies.',
+          'Positions stay fixed when a player is eliminated; your allies and enemies do not change.',
+        ],
+      },
+      {
+        heading: 'Combat and interaction',
+        bullets: [
+          'Players cannot attack their allies by default.',
+          'Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.',
+          'Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn.',
+        ],
+      },
+      {
+        heading: 'Winning',
+        bullets: [
+          'The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.',
+          'An eliminated player cannot win later.',
+          `Every player starts at ${String(STARTING_LIFE)} life and loses at 0 life, ${String(POISON_LIMIT)} poison, or ${String(COMMANDER_DAMAGE_LIMIT)} combat damage from one commander.`,
+          commanderTax,
+        ],
+      },
+    ],
+  },
+  assassin: {
+    title: 'Assassin',
+    summary:
+      'A free-for-all with secret contracts. Score marks, inherit new targets, and finish with the highest score.',
+    sections: [
+      {
+        heading: 'Secret contracts',
+        bullets: [
+          'Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.',
+          'Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.',
+          'Players may attack and affect anyone; the contract determines scoring, not legal targets.',
+        ],
+      },
+      {
+        heading: 'Elimination and inheritance',
+        bullets: [
+          'When a player is eliminated, record who dealt the finishing blow.',
+          'If you personally eliminate your assigned target, you score one mark.',
+          'The player who was hunting the eliminated target inherits that target’s contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player.',
+        ],
+      },
+      {
+        heading: 'Winning',
+        bullets: [
+          'Play until only one player remains. The last survivor scores one additional mark.',
+          'The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.',
+          `Commander rules still apply: ${String(STARTING_LIFE)} starting life, ${String(POISON_LIMIT)} poison, and ${String(COMMANDER_DAMAGE_LIMIT)} combat damage from one commander are lethal.`,
           commanderTax,
         ],
       },

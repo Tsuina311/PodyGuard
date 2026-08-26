@@ -196,6 +196,185 @@ describe('Archenemy Commander tracker', () => {
   });
 });
 
+describe('Emperor tracker', () => {
+  function emperor() {
+    return applyTrackerAction(createTracker([
+      { id: 'a', name: 'Ada' },
+      { id: 'b', name: 'Bea' },
+      { id: 'c', name: 'Cam' },
+      { id: 'd', name: 'Dee' },
+      { id: 'e', name: 'Eli' },
+      { id: 'f', name: 'Fay' },
+    ]), {
+      type: 'teams',
+      mode: 'emperor',
+      teams: [
+        ['a', 'b', 'c'],
+        ['d', 'e', 'f'],
+      ],
+      emperorIds: ['b', 'e'],
+    });
+  }
+
+  it('keeps individual life totals and chooses the first player from the emperors', () => {
+    let state = emperor();
+    expect(state.players.map((player) => player.life)).toEqual([
+      40, 40, 40, 40, 40, 40,
+    ]);
+    state = applyTrackerAction(state, {
+      type: 'life',
+      playerId: 'a',
+      delta: -5,
+    });
+    expect(state.players.map((player) => player.life)).toEqual([
+      35, 40, 40, 40, 40, 40,
+    ]);
+
+    state = pickFirstPlayer(state, () => 0);
+    expect(state.firstPlayerId).toBe('b');
+  });
+
+  it('allows a general to lose without eliminating their team', () => {
+    let state = applyTrackerAction(emperor(), {
+      type: 'life',
+      playerId: 'a',
+      delta: -40,
+    });
+    expect(state.players.find((player) => player.id === 'a')?.pendingLoss).toEqual(
+      { type: 'life' },
+    );
+    state = applyTrackerAction(state, {
+      type: 'confirmLoss',
+      playerId: 'a',
+    });
+    expect(state.players.find((player) => player.id === 'a')?.eliminated).toBe(
+      true,
+    );
+    expect(state.players.find((player) => player.id === 'b')?.eliminated).toBe(
+      false,
+    );
+    expect(state.winnerId).toBeNull();
+
+    state = applyTrackerAction(state, {
+      type: 'eliminate',
+      playerId: 'e',
+    });
+    expect(
+      state.players
+        .filter((player) => ['d', 'e', 'f'].includes(player.id))
+        .every((player) => player.eliminated),
+    ).toBe(true);
+    expect(state.winnerId).toBe('b');
+  });
+});
+
+describe('Star tracker', () => {
+  function star() {
+    return applyTrackerAction(createTracker([
+      { id: 'a', name: 'Ada' },
+      { id: 'b', name: 'Bea' },
+      { id: 'c', name: 'Cam' },
+      { id: 'd', name: 'Dee' },
+      { id: 'e', name: 'Eli' },
+    ]), {
+      type: 'starSeats',
+      order: ['a', 'b', 'c', 'd', 'e'],
+    });
+  }
+
+  it('keeps individual life and the chosen circular order', () => {
+    let state = star();
+    expect(state.starOrder).toEqual(['a', 'b', 'c', 'd', 'e']);
+    state = applyTrackerAction(state, {
+      type: 'life',
+      playerId: 'b',
+      delta: -5,
+    });
+    expect(state.players.map((player) => player.life)).toEqual([
+      40, 35, 40, 40, 40,
+    ]);
+  });
+
+  it('wins when both nonadjacent enemies have been eliminated', () => {
+    let state = applyTrackerAction(star(), {
+      type: 'eliminate',
+      playerId: 'c',
+    });
+    expect(state.winnerId).toBeNull();
+
+    state = applyTrackerAction(state, {
+      type: 'eliminate',
+      playerId: 'd',
+    });
+    expect(state.winnerId).toBe('a');
+  });
+});
+
+describe('Assassin tracker', () => {
+  function assassin() {
+    return applyTrackerAction(createTracker([
+      { id: 'a', name: 'Ada' },
+      { id: 'b', name: 'Bea' },
+      { id: 'c', name: 'Cam' },
+      { id: 'd', name: 'Dee' },
+    ]), {
+      type: 'assassinContracts',
+      order: ['a', 'b', 'c', 'd'],
+    });
+  }
+
+  it('deals one secret target each and inherits an eliminated target contract', () => {
+    let state = assassin();
+    expect(state.assassinTargets).toEqual({
+      a: 'b',
+      b: 'c',
+      c: 'd',
+      d: 'a',
+    });
+
+    state = applyTrackerAction(state, {
+      type: 'assassinate',
+      victimId: 'b',
+      killerId: 'a',
+    });
+    expect(state.assassinScores.a).toBe(1);
+    expect(state.assassinTargets.a).toBe('c');
+    expect(state.assassinTargets.b).toBeUndefined();
+  });
+
+  it('passes a contract without a score when someone else gets the kill', () => {
+    const state = applyTrackerAction(assassin(), {
+      type: 'assassinate',
+      victimId: 'b',
+      killerId: 'd',
+    });
+    expect(state.assassinScores.a).toBe(0);
+    expect(state.assassinScores.d).toBe(0);
+    expect(state.assassinTargets.a).toBe('c');
+  });
+
+  it('awards the survivor point and lets the highest score win', () => {
+    let state = assassin();
+    state = applyTrackerAction(state, {
+      type: 'assassinate',
+      victimId: 'b',
+      killerId: 'a',
+    });
+    state = applyTrackerAction(state, {
+      type: 'assassinate',
+      victimId: 'c',
+      killerId: 'a',
+    });
+    state = applyTrackerAction(state, {
+      type: 'assassinate',
+      victimId: 'd',
+      killerId: 'a',
+    });
+    expect(state.assassinScores.a).toBe(4);
+    expect(state.winnerId).toBe('a');
+  });
+});
+
 describe('commander tracker', () => {
   it('starts at 40 life and can undo via previous snapshots', () => {
     const start = createTracker([

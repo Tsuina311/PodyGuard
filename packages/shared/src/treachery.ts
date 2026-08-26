@@ -5,6 +5,9 @@ export const GAME_MODES = [
   'treachery',
   'two-headed-giant',
   'archenemy-commander',
+  'emperor',
+  'star',
+  'assassin',
 ] as const;
 export type GameMode = (typeof GAME_MODES)[number];
 
@@ -124,6 +127,9 @@ export function assignTreacheryIdentities(
 
 export const TREACHERY_POD_SIZES = [4, 5, 6, 7, 8] as const;
 export type TreacheryPodSize = (typeof TREACHERY_POD_SIZES)[number];
+
+export const ASSASSIN_POD_SIZES = [3, 4, 5, 6, 7, 8] as const;
+export type AssassinPodSize = (typeof ASSASSIN_POD_SIZES)[number];
 
 /**
  * The recommended identity mix from the Treachery comprehensive rules.

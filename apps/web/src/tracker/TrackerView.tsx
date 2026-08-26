@@ -69,9 +69,21 @@ import {
   schemeById,
   shuffleSchemeIds,
 } from './archenemy';
+import {
+  randomEmperorTeams,
+  randomEmperors,
+  seatEmperorTeam,
+} from './emperor';
+import {
+  randomStarOrder,
+  starAllies,
+  swapStarSeats,
+} from './star';
+import { dealAssassinContracts } from './assassin';
 import { planFirstPlayerReveal, type RevealHop } from './first-player-reveal';
 import { DungeonTracker } from './DungeonTracker';
 import { ModeRulesSheet } from './ModeRulesSheet';
+import { AssassinTargetsSheet } from './AssassinTargetsSheet';
 import { useLandscape, useLandscapeLock } from './orientation';
 import {
   detectAutomaticChallenges,
@@ -191,6 +203,14 @@ function seatGridClass(count: number): string {
   return 'grid-cols-2 landscape:grid-cols-3';
 }
 
+const starPositionClasses = [
+  'top-0 left-1/2 -translate-x-1/2',
+  'top-[30%] right-0',
+  'bottom-0 right-[12%]',
+  'bottom-0 left-[12%]',
+  'top-[30%] left-0',
+] as const;
+
 /**
  * Clearance for the chrome row that runs into the match clock.
  *
@@ -281,6 +301,18 @@ export function TrackerView({
   const [selectedArchenemy, setSelectedArchenemy] = useState<string | null>(
     null,
   );
+  const [selectedEmperorTeam, setSelectedEmperorTeam] = useState<string[]>([]);
+  const [selectedEmperors, setSelectedEmperors] = useState<
+    [string | null, string | null]
+  >([null, null]);
+  const [starOrder, setStarOrder] = useState(() =>
+    state.players.map((player) => player.id),
+  );
+  const [selectedStarPlayer, setSelectedStarPlayer] = useState<string | null>(
+    null,
+  );
+  const [assassinTargetsOpen, setAssassinTargetsOpen] = useState(false);
+  const [assassinVictimId, setAssassinVictimId] = useState<string | null>(null);
   const [schemeOpen, setSchemeOpen] = useState(false);
   const [rulesOpen, setRulesOpen] = useState(false);
   const attemptedChallenges = useRef(new Set<string>());
@@ -292,7 +324,9 @@ export function TrackerView({
   const winner = state.players.find((row) => row.id === state.winnerId) ?? null;
   const spotlightIds = new Set(
     spotlight.playerId
-      ? teamForPlayer(state, spotlight.playerId).map((player) => player.id)
+      ? state.teamMode === 'emperor'
+        ? [spotlight.playerId]
+        : teamForPlayer(state, spotlight.playerId).map((player) => player.id)
       : [],
   );
   const winnerIds = new Set(
@@ -305,17 +339,28 @@ export function TrackerView({
     : null;
   const startingTeamName =
     state.teams && state.firstPlayerId
-      ? teamForPlayer(state, state.firstPlayerId)
-          .map((player) => player.name)
-          .join(' & ')
+      ? state.teamMode === 'emperor'
+        ? state.players.find((player) => player.id === state.firstPlayerId)
+            ?.name ?? null
+        : teamForPlayer(state, state.firstPlayerId)
+            .map((player) => player.name)
+            .join(' & ')
       : null;
   const confirmation = detectedConfirmation(state, challengePack);
   const archenemyBoard =
     gameMode === 'archenemy-commander' &&
     state.teamMode === 'archenemy-commander';
+  const emperorBoard = gameMode === 'emperor' && state.teamMode === 'emperor';
+  const starBoard = gameMode === 'star' && state.starOrder.length === 5;
+  const sharedLifeBoard =
+    state.teamMode === 'two-headed-giant' ||
+    state.teamMode === 'archenemy-commander';
   const currentScheme = state.currentSchemeId
     ? schemeById(state.currentSchemeId)
     : undefined;
+  const assassinVictim = state.players.find(
+    (player) => player.id === assassinVictimId,
+  );
 
   useEffect(() => {
     if (!onChallengeComplete) {
@@ -424,7 +469,9 @@ export function TrackerView({
       !menuOpen &&
       !challengesOpen &&
       !schemeOpen &&
-      !rulesOpen
+      !rulesOpen &&
+      !assassinTargetsOpen &&
+      !assassinVictimId
     ) {
       return;
     }
@@ -437,6 +484,8 @@ export function TrackerView({
         setChallengesOpen(false);
         setSchemeOpen(false);
         setRulesOpen(false);
+        setAssassinTargetsOpen(false);
+        setAssassinVictimId(null);
       }
     }
     window.addEventListener('keydown', onKey);
@@ -445,6 +494,8 @@ export function TrackerView({
     };
   }, [
     challengesOpen,
+    assassinTargetsOpen,
+    assassinVictimId,
     commanderPlayer,
     counterPlayer,
     dungeonPlayer,
@@ -459,7 +510,7 @@ export function TrackerView({
           role="dialog"
           aria-modal="true"
           aria-label="Game rules"
-          className="bg-void/95 fixed inset-x-0 top-0 z-[70] flex h-[100dvh] p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm"
+          className="bg-void/70 fixed inset-0 z-[70] flex items-center justify-center p-4 pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] backdrop-blur-md"
           onClick={(event) => {
             if (event.target === event.currentTarget) {
               setRulesOpen(false);
@@ -474,6 +525,368 @@ export function TrackerView({
         document.body,
       )
     : null;
+
+  if (
+    gameMode === 'assassin' &&
+    Object.keys(state.assassinTargets).length === 0
+  ) {
+    return (
+      <>
+        <section className={cx(screenClass, 'items-center justify-center')}>
+          <div className="w-full max-w-lg text-center">
+            <Crosshair size={34} aria-hidden className="text-danger mx-auto mb-3" />
+            <h2 className="font-display mb-2 text-2xl font-bold">
+              Deal secret contracts
+            </h2>
+            <p className="text-muted mb-5 text-sm">
+              Every player receives one private target. The device will be
+              passed around so each contract can be checked in secret.
+            </p>
+            <div className="flex flex-wrap justify-center gap-3">
+              <Button variant="glass" onClick={() => setRulesOpen(true)}>
+                <BookOpen size={16} aria-hidden />
+                Read rules
+              </Button>
+              <Button
+                variant="neon"
+                onClick={() =>
+                  dispatch({
+                    type: 'action',
+                    action: {
+                      type: 'assassinContracts',
+                      order: dealAssassinContracts(
+                        state.players.map((player) => player.id),
+                      ),
+                    },
+                  })
+                }
+              >
+                <Shuffle size={16} aria-hidden />
+                Deal contracts
+              </Button>
+            </div>
+          </div>
+        </section>
+        {rulesSheet}
+      </>
+    );
+  }
+
+  if (gameMode === 'assassin' && !state.assassinContractsReady) {
+    return (
+      <section className={screenClass}>
+        <AssassinTargetsSheet
+          players={state.players}
+          targets={state.assassinTargets}
+          scores={state.assassinScores}
+          requireAllReviewed
+          onReady={() =>
+            dispatch({ type: 'action', action: { type: 'assassinReady' } })
+          }
+          onClose={() => undefined}
+        />
+      </section>
+    );
+  }
+
+  if (
+    gameMode === 'star' &&
+    state.players.length === 5 &&
+    state.starOrder.length === 0
+  ) {
+    return (
+      <>
+        <section className={cx(screenClass, 'items-center justify-center')}>
+          <div className="w-full max-w-lg">
+            <h2 className="font-display mb-2 text-center text-2xl font-bold">
+              Choose Star positions
+            </h2>
+            <p className="text-muted mb-3 text-center text-sm">
+              Players beside each other are allies. Tap two players to exchange
+              their positions, or randomise the whole circle.
+            </p>
+            <div className="relative mx-auto mb-3 h-72 w-72 max-w-[80vw]">
+              <svg
+                aria-hidden
+                viewBox="0 0 100 100"
+                className="text-neon/30 absolute inset-[12%] h-[76%] w-[76%]"
+              >
+                <polygon
+                  points="50,3 79,94 3,37 97,37 21,94"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
+              </svg>
+              {starOrder.map((playerId, index) => {
+                const player = state.players.find(
+                  (row) => row.id === playerId,
+                );
+                return (
+                  <button
+                    key={playerId}
+                    type="button"
+                    onClick={() => {
+                      if (!selectedStarPlayer) {
+                        setSelectedStarPlayer(playerId);
+                      } else if (selectedStarPlayer === playerId) {
+                        setSelectedStarPlayer(null);
+                      } else {
+                        setStarOrder((current) =>
+                          swapStarSeats(
+                            current,
+                            selectedStarPlayer,
+                            playerId,
+                          ),
+                        );
+                        setSelectedStarPlayer(null);
+                      }
+                    }}
+                    className={cx(
+                      'absolute z-10 flex h-14 w-24 items-center justify-center rounded-xl border px-2 text-center text-xs font-semibold shadow-lg transition',
+                      starPositionClasses[index],
+                      selectedStarPlayer === playerId
+                        ? 'border-warning bg-warning/20 text-warning'
+                        : 'border-neon/40 bg-void/95 text-ink',
+                    )}
+                  >
+                    {player?.name}
+                  </button>
+                );
+              })}
+              <p className="text-muted absolute top-1/2 left-1/2 w-24 -translate-x-1/2 -translate-y-1/2 text-center text-[0.65rem] font-semibold tracking-wide uppercase">
+                Adjacent
+                <br />
+                players ally
+              </p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-3">
+              <Button
+                variant="glass"
+                onClick={() => {
+                  setStarOrder(
+                    randomStarOrder(
+                      state.players.map((player) => player.id),
+                    ),
+                  );
+                  setSelectedStarPlayer(null);
+                }}
+              >
+                <Shuffle size={16} aria-hidden />
+                Random positions
+              </Button>
+              <Button variant="glass" onClick={() => setRulesOpen(true)}>
+                <BookOpen size={16} aria-hidden />
+                Read rules
+              </Button>
+              <Button
+                variant="neon"
+                onClick={() =>
+                  dispatch({
+                    type: 'action',
+                    action: { type: 'starSeats', order: starOrder },
+                  })
+                }
+              >
+                Confirm positions
+              </Button>
+            </div>
+          </div>
+        </section>
+        {rulesSheet}
+      </>
+    );
+  }
+
+  if (gameMode === 'emperor' && state.players.length === 6 && !state.teams) {
+    const otherTeam = state.players.filter(
+      (player) => !selectedEmperorTeam.includes(player.id),
+    );
+    const teamsReady = selectedEmperorTeam.length === 3;
+    const teams: [string[], string[]] = [
+      selectedEmperorTeam,
+      otherTeam.map((player) => player.id),
+    ];
+    const emperorsReady =
+      teamsReady &&
+      selectedEmperors.every(
+        (emperorId, index) =>
+          emperorId !== null && Boolean(teams[index]?.includes(emperorId)),
+      );
+    const setEmperor = (teamIndex: 0 | 1, playerId: string) => {
+      setSelectedEmperors((current) => {
+        const next: [string | null, string | null] = [...current];
+        next[teamIndex] = playerId;
+        return next;
+      });
+    };
+    return (
+      <>
+        <section
+          className={cx(
+            screenClass,
+            'items-center justify-center overflow-y-auto',
+          )}
+        >
+          <div className="w-full max-w-2xl py-3">
+            <h2 className="font-display mb-2 text-center text-2xl font-bold">
+              Build the Emperor teams
+            </h2>
+            <p className="text-muted mb-4 text-center text-sm">
+              Choose three players for Team A. The other three become Team B,
+              then choose the Emperor in the middle of each team.
+            </p>
+            <div className="mb-3 grid grid-cols-3 gap-2">
+              {state.players.map((player) => {
+                const teamA = selectedEmperorTeam.includes(player.id);
+                return (
+                  <button
+                    key={player.id}
+                    type="button"
+                    disabled={!teamA && selectedEmperorTeam.length >= 3}
+                    onClick={() => {
+                      setSelectedEmperorTeam((current) =>
+                        current.includes(player.id)
+                          ? current.filter((id) => id !== player.id)
+                          : [...current, player.id],
+                      );
+                      setSelectedEmperors([null, null]);
+                    }}
+                    className={cx(
+                      'rounded-xl border p-3 text-center text-sm font-semibold transition',
+                      teamA
+                        ? 'border-neon bg-neon/15 text-neon'
+                        : teamsReady
+                          ? 'border-warning bg-warning/15 text-warning'
+                          : 'border-muted/25 bg-void/70 text-ink',
+                    )}
+                  >
+                    {player.name}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="mb-4 flex flex-wrap justify-center gap-2">
+              <Button
+                size="sm"
+                variant="glass"
+                onClick={() => {
+                  const [teamA] = randomEmperorTeams(
+                    state.players.map((player) => player.id),
+                  );
+                  setSelectedEmperorTeam(teamA);
+                  setSelectedEmperors([null, null]);
+                }}
+              >
+                <Shuffle size={15} aria-hidden />
+                Random teams
+              </Button>
+              <Button
+                size="sm"
+                variant="glass"
+                disabled={selectedEmperorTeam.length === 0}
+                onClick={() => {
+                  setSelectedEmperorTeam([]);
+                  setSelectedEmperors([null, null]);
+                }}
+              >
+                Reset teams
+              </Button>
+            </div>
+            {teamsReady ? (
+              <>
+                <div className="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {teams.map((team, teamIndex) => (
+                    <fieldset
+                      key={teamIndex}
+                      className="border-muted/20 rounded-xl border p-3"
+                    >
+                      <legend className="text-muted px-1 text-xs font-bold tracking-wide uppercase">
+                        Team {teamIndex === 0 ? 'A' : 'B'} Emperor
+                      </legend>
+                      <div className="grid grid-cols-3 gap-2">
+                        {team.map((playerId) => (
+                          <button
+                            key={playerId}
+                            type="button"
+                            onClick={() =>
+                              setEmperor(
+                                teamIndex as 0 | 1,
+                                playerId,
+                              )
+                            }
+                            className={cx(
+                              'rounded-lg border p-2 text-xs font-semibold transition',
+                              selectedEmperors[teamIndex] === playerId
+                                ? 'border-warning bg-warning/15 text-warning'
+                                : 'border-muted/25 bg-void/70 text-ink',
+                            )}
+                          >
+                            {
+                              state.players.find(
+                                (player) => player.id === playerId,
+                              )?.name
+                            }
+                          </button>
+                        ))}
+                      </div>
+                    </fieldset>
+                  ))}
+                </div>
+                <div className="flex flex-wrap justify-center gap-3">
+                  <Button
+                    variant="glass"
+                    onClick={() => setSelectedEmperors(randomEmperors(teams))}
+                  >
+                    <Crown size={16} aria-hidden />
+                    Random Emperors
+                  </Button>
+                  <Button variant="glass" onClick={() => setRulesOpen(true)}>
+                    <BookOpen size={16} aria-hidden />
+                    Read rules
+                  </Button>
+                  <Button
+                    variant="neon"
+                    disabled={!emperorsReady}
+                    onClick={() => {
+                      if (!selectedEmperors[0] || !selectedEmperors[1]) {
+                        return;
+                      }
+                      dispatch({
+                        type: 'action',
+                        action: {
+                          type: 'teams',
+                          mode: 'emperor',
+                          teams: [
+                            seatEmperorTeam(teams[0], selectedEmperors[0]),
+                            seatEmperorTeam(teams[1], selectedEmperors[1]),
+                          ],
+                          emperorIds: [
+                            selectedEmperors[0],
+                            selectedEmperors[1],
+                          ],
+                        },
+                      });
+                    }}
+                  >
+                    Confirm teams
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <div className="flex justify-center">
+                <Button variant="glass" onClick={() => setRulesOpen(true)}>
+                  <BookOpen size={16} aria-hidden />
+                  Read rules
+                </Button>
+              </div>
+            )}
+          </div>
+        </section>
+        {rulesSheet}
+      </>
+    );
+  }
 
   if (
     gameMode === 'archenemy-commander' &&
@@ -716,7 +1129,7 @@ export function TrackerView({
       {/* auto-rows-fr splits the leftover height evenly between the seats. */}
       <div
         className={cx(
-          'grid min-h-0 flex-1 auto-rows-fr gap-2',
+          'relative grid min-h-0 flex-1 auto-rows-fr gap-2',
           archenemyBoard
             ? 'grid-cols-1 landscape:grid-cols-3'
             : seatGridClass(state.players.length),
@@ -766,6 +1179,33 @@ export function TrackerView({
                 />
               </span>
               <span className="flex shrink-0 flex-wrap justify-end gap-1">
+                {gameMode === 'assassin' ? (
+                  <Badge tone="crown">
+                    <Crosshair size={12} aria-hidden />
+                    {state.assassinScores[player.id] ?? 0} marks
+                  </Badge>
+                ) : null}
+                {starBoard ? (
+                  <Badge tone="ready">
+                    Allies:{' '}
+                    {starAllies(state.starOrder, player.id)
+                      .map(
+                        (id) =>
+                          state.players.find((row) => row.id === id)?.name,
+                      )
+                      .join(' · ')}
+                  </Badge>
+                ) : null}
+                {emperorBoard ? (
+                  state.emperorIds.includes(player.id) ? (
+                    <Badge tone="crown">
+                      <Crown size={12} aria-hidden />
+                      Emperor · range 2
+                    </Badge>
+                  ) : (
+                    <Badge tone="idle">General · range 1</Badge>
+                  )
+                ) : null}
                 {revealedIdentities[player.id] ? (
                   <button
                     type="button"
@@ -792,43 +1232,43 @@ export function TrackerView({
               them on the row's midline once the cap is reached instead of
               leaving them hanging from the top.
             */}
-            {!state.teams ? (
-            <div className="relative z-10 flex min-h-0 flex-1 items-center gap-1.5 py-1">
-              {[-5, -1].map((delta) => (
-                <LifeButton
-                  key={`life-${String(delta)}`}
-                  delta={delta}
-                  disabled={Boolean(state.winnerId)}
-                  onClick={() =>
-                    dispatch({
-                      type: 'action',
-                      action: { type: 'life', playerId: player.id, delta },
-                    })
-                  }
-                />
-              ))}
-              <p
-                className={cx(
-                  'font-display text-neon flex min-w-0 flex-1 items-center justify-center self-stretch text-center text-[clamp(1.75rem,6.5vh,3.25rem)] leading-none font-bold tabular-nums landscape:text-[clamp(1.75rem,11vh,3.25rem)]',
-                  onArt,
-                )}
-              >
-                {player.life}
-              </p>
-              {[1, 5].map((delta) => (
-                <LifeButton
-                  key={`life-${String(delta)}`}
-                  delta={delta}
-                  disabled={Boolean(state.winnerId)}
-                  onClick={() =>
-                    dispatch({
-                      type: 'action',
-                      action: { type: 'life', playerId: player.id, delta },
-                    })
-                  }
-                />
-              ))}
-            </div>
+            {!sharedLifeBoard ? (
+              <div className="relative z-10 flex min-h-0 flex-1 items-center gap-1.5 py-1">
+                {[-5, -1].map((delta) => (
+                  <LifeButton
+                    key={`life-${String(delta)}`}
+                    delta={delta}
+                    disabled={Boolean(state.winnerId)}
+                    onClick={() =>
+                      dispatch({
+                        type: 'action',
+                        action: { type: 'life', playerId: player.id, delta },
+                      })
+                    }
+                  />
+                ))}
+                <p
+                  className={cx(
+                    'font-display text-neon flex min-w-0 flex-1 items-center justify-center self-stretch text-center text-[clamp(1.75rem,6.5vh,3.25rem)] leading-none font-bold tabular-nums landscape:text-[clamp(1.75rem,11vh,3.25rem)]',
+                    onArt,
+                  )}
+                >
+                  {player.life}
+                </p>
+                {[1, 5].map((delta) => (
+                  <LifeButton
+                    key={`life-${String(delta)}`}
+                    delta={delta}
+                    disabled={Boolean(state.winnerId)}
+                    onClick={() =>
+                      dispatch({
+                        type: 'action',
+                        action: { type: 'life', playerId: player.id, delta },
+                      })
+                    }
+                  />
+                ))}
+              </div>
             ) : (
               <div className="min-h-0 flex-1" aria-hidden />
             )}
@@ -951,12 +1391,16 @@ export function TrackerView({
                   <Button
                     size="sm"
                     variant="primary"
-                    onClick={() =>
+                    onClick={() => {
+                      if (gameMode === 'assassin') {
+                        setAssassinVictimId(player.id);
+                        return;
+                      }
                       dispatch({
                         type: 'action',
                         action: { type: 'confirmLoss', playerId: player.id },
-                      })
-                    }
+                      });
+                    }}
                   >
                     Yes, they lost
                   </Button>
@@ -977,75 +1421,88 @@ export function TrackerView({
             ) : null}
           </article>
         ))}
-      </div>
-      {state.teams
-        ? state.teams.map((team, index) => {
-            const first = state.players.find((player) => player.id === team[0]);
-            if (!first) {
-              return null;
-            }
-            return (
-              <div
-                key={team.join(':')}
-                className={cx(
-                  plateAccent,
-                  'absolute left-1/2 z-20 flex h-16 w-[min(34rem,78vw)] -translate-x-1/2 items-center gap-2 rounded-2xl border border-neon/40 px-2 shadow-xl',
-                  index === 0
-                    ? 'top-1/4 -translate-y-1/2'
-                    : 'top-3/4 -translate-y-1/2',
-                )}
-              >
-                {archenemyBoard ? (
-                  <span
+        {/*
+          A team's life reads like a single seat's: the total in the middle of
+          the row with the buttons around it. It floats over the row rather than
+          living in a card, so it is measured against the grid instead of the
+          screen or it drifts down onto the seat controls.
+        */}
+        {sharedLifeBoard && state.teams
+          ? state.teams.map((team, index) => {
+              const first = state.players.find(
+                (player) => player.id === team[0],
+              );
+              if (!first) {
+                return null;
+              }
+              return (
+                <div
+                  key={team.join(':')}
+                  className={cx(
+                    'absolute left-1/2 z-20 flex h-16 w-[min(34rem,78vw)] -translate-x-1/2 items-center gap-1.5 px-2',
+                    index === 0
+                      ? 'top-1/4 -translate-y-1/2'
+                      : 'top-3/4 -translate-y-1/2',
+                  )}
+                >
+                  {archenemyBoard ? (
+                    <span
+                      className={cx(
+                        'hidden w-20 shrink-0 text-center text-[0.65rem] font-bold tracking-wider uppercase landscape:block',
+                        onArt,
+                        index === 0 ? 'text-warning' : 'text-neon',
+                      )}
+                    >
+                      {index === 0 ? 'Archenemy' : 'Heroes'}
+                    </span>
+                  ) : null}
+                  {[-5, -1].map((delta) => (
+                    <LifeButton
+                      key={delta}
+                      delta={delta}
+                      disabled={Boolean(state.winnerId)}
+                      onClick={() =>
+                        dispatch({
+                          type: 'action',
+                          action: {
+                            type: 'life',
+                            playerId: first.id,
+                            delta,
+                          },
+                        })
+                      }
+                    />
+                  ))}
+                  <p
                     className={cx(
-                      'hidden w-20 shrink-0 text-center text-[0.65rem] font-bold tracking-wider uppercase landscape:block',
-                      index === 0 ? 'text-warning' : 'text-neon',
+                      'font-display text-neon flex min-w-0 flex-1 items-center justify-center self-stretch text-center text-[clamp(1.75rem,6.5vh,3.25rem)] leading-none font-bold tabular-nums landscape:text-[clamp(1.75rem,11vh,3.25rem)]',
+                      onArt,
                     )}
                   >
-                    {index === 0 ? 'Archenemy' : 'Heroes'}
-                  </span>
-                ) : null}
-                {[-5, -1].map((delta) => (
-                  <LifeButton
-                    key={delta}
-                    delta={delta}
-                    disabled={Boolean(state.winnerId)}
-                    onClick={() =>
-                      dispatch({
-                        type: 'action',
-                        action: {
-                          type: 'life',
-                          playerId: first.id,
-                          delta,
-                        },
-                      })
-                    }
-                  />
-                ))}
-                <p className="font-display text-neon flex-1 text-center text-5xl font-bold tabular-nums">
-                  {first.life}
-                </p>
-                {[1, 5].map((delta) => (
-                  <LifeButton
-                    key={delta}
-                    delta={delta}
-                    disabled={Boolean(state.winnerId)}
-                    onClick={() =>
-                      dispatch({
-                        type: 'action',
-                        action: {
-                          type: 'life',
-                          playerId: first.id,
-                          delta,
-                        },
-                      })
-                    }
-                  />
-                ))}
-              </div>
-            );
-          })
-        : null}
+                    {first.life}
+                  </p>
+                  {[1, 5].map((delta) => (
+                    <LifeButton
+                      key={delta}
+                      delta={delta}
+                      disabled={Boolean(state.winnerId)}
+                      onClick={() =>
+                        dispatch({
+                          type: 'action',
+                          action: {
+                            type: 'life',
+                            playerId: first.id,
+                            delta,
+                          },
+                        })
+                      }
+                    />
+                  ))}
+                </div>
+              );
+            })
+          : null}
+      </div>
       {archenemyBoard ? (
         <Button
           variant="glass"
@@ -1065,7 +1522,9 @@ export function TrackerView({
         <p className="border-neon/40 bg-void/95 text-neon fixed top-[max(0.75rem,env(safe-area-inset-top))] left-1/2 z-[65] -translate-x-1/2 rounded-full border px-4 py-2 text-center text-xs font-semibold shadow-lg">
           {archenemyBoard
             ? `${startingTeamName} is the Archenemy — goes first and draws`
-            : `${startingTeamName} start — skip the first draw`}
+            : emperorBoard
+              ? `${startingTeamName} is the starting Emperor — goes first and draws`
+              : `${startingTeamName} start — skip the first draw`}
         </p>
       ) : null}
       {/*
@@ -1313,6 +1772,22 @@ export function TrackerView({
                   setMenuOpen(false);
                   setRulesOpen(true);
                 }}
+                onTargets={
+                  gameMode === 'assassin'
+                    ? () => {
+                        setMenuOpen(false);
+                        setAssassinTargetsOpen(true);
+                      }
+                    : undefined
+                }
+                onPlayerLost={
+                  gameMode === 'assassin'
+                    ? (playerId) => {
+                        setMenuOpen(false);
+                        setAssassinVictimId(playerId);
+                      }
+                    : undefined
+                }
                 onClose={() => setMenuOpen(false)}
               />
             </div>,
@@ -1320,6 +1795,92 @@ export function TrackerView({
           )
         : null}
       {rulesSheet}
+      {assassinTargetsOpen
+        ? createPortal(
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label="Secret contracts"
+              className="bg-void/95 fixed inset-x-0 top-0 z-[70] flex h-[100dvh] p-2 backdrop-blur-sm"
+            >
+              <AssassinTargetsSheet
+                players={state.players}
+                targets={state.assassinTargets}
+                scores={state.assassinScores}
+                onClose={() => setAssassinTargetsOpen(false)}
+              />
+            </div>,
+            document.body,
+          )
+        : null}
+      {assassinVictim
+        ? createPortal(
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label={`Who eliminated ${assassinVictim.name}?`}
+              className="bg-void/95 fixed inset-0 z-[75] flex items-center justify-center p-4 backdrop-blur-sm"
+            >
+              <section className="border-muted/25 bg-hull w-full max-w-md rounded-2xl border p-5 text-center">
+                <Crosshair
+                  size={28}
+                  aria-hidden
+                  className="text-danger mx-auto mb-2"
+                />
+                <h4 className="font-display mb-1 text-lg font-bold">
+                  Who eliminated {assassinVictim.name}?
+                </h4>
+                <p className="text-muted mb-4 text-sm">
+                  A player scores only if this was their assigned mark. The
+                  contract chain advances either way.
+                </p>
+                <div className="mb-3 grid grid-cols-2 gap-2">
+                  {state.players
+                    .filter(
+                      (player) =>
+                        player.id !== assassinVictim.id && !player.eliminated,
+                    )
+                    .map((player) => (
+                      <Button
+                        key={player.id}
+                        variant="glass"
+                        onClick={() => {
+                          dispatch({
+                            type: 'action',
+                            action: {
+                              type: 'assassinate',
+                              victimId: assassinVictim.id,
+                              killerId: player.id,
+                            },
+                          });
+                          setAssassinVictimId(null);
+                        }}
+                      >
+                        {player.name}
+                      </Button>
+                    ))}
+                </div>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    dispatch({
+                      type: 'action',
+                      action: {
+                        type: 'assassinate',
+                        victimId: assassinVictim.id,
+                        killerId: null,
+                      },
+                    });
+                    setAssassinVictimId(null);
+                  }}
+                >
+                  No player / unknown
+                </Button>
+              </section>
+            </div>,
+            document.body,
+          )
+        : null}
       {publicIdentityPlayerId && revealedIdentities[publicIdentityPlayerId]
         ? createPortal(
             <div
@@ -1642,13 +2203,22 @@ function useFirstPlayerSpotlight(
     setHeld(false);
     setPlan(
       planFirstPlayerReveal(
-        state.teams
+        state.teamMode === 'emperor'
+          ? state.emperorIds
+          : state.teams
           ? state.teams.flatMap((team) => team[0] ?? [])
           : state.players.map((row) => row.id),
         state.firstPlayerId,
       ),
     );
-  }, [moves, state.firstPlayerId, state.players, state.teams]);
+  }, [
+    moves,
+    state.emperorIds,
+    state.firstPlayerId,
+    state.players,
+    state.teamMode,
+    state.teams,
+  ]);
 
   useEffect(() => {
     const next = plan?.[hop + 1];
@@ -1718,6 +2288,8 @@ function MatchMenu({
   onCheckRole,
   onChallenges,
   onRules,
+  onTargets,
+  onPlayerLost,
   onClose,
 }: {
   state: TrackerState;
@@ -1730,6 +2302,8 @@ function MatchMenu({
   onCheckRole?: () => void;
   onChallenges: () => void;
   onRules: () => void;
+  onTargets?: () => void;
+  onPlayerLost?: (playerId: string) => void;
   onClose: () => void;
 }) {
   const paused = Boolean(state.pausedAt);
@@ -1789,6 +2363,12 @@ function MatchMenu({
             <BookOpen size={14} aria-hidden />
             Read rules
           </Button>
+          {onTargets ? (
+            <Button size="sm" variant="glass" onClick={onTargets}>
+              <Crosshair size={14} aria-hidden />
+              Check target
+            </Button>
+          ) : null}
           {onCheckRole ? (
             <Button
               size="sm"
@@ -1846,7 +2426,11 @@ function MatchMenu({
               variant="glass"
               disabled={decided || seat.eliminated}
               onClick={() => {
-                dispatch({ type: 'eliminate', playerId: seat.id });
+                if (onPlayerLost) {
+                  onPlayerLost(seat.id);
+                } else {
+                  dispatch({ type: 'eliminate', playerId: seat.id });
+                }
               }}
             >
               <UserX size={14} aria-hidden />
@@ -2774,6 +3358,11 @@ function restore(
           teams: parsed.teams ?? null,
           teamMode: parsed.teamMode ?? null,
           archenemyId: parsed.archenemyId ?? null,
+          emperorIds: parsed.emperorIds ?? [],
+          starOrder: parsed.starOrder ?? [],
+          assassinTargets: parsed.assassinTargets ?? {},
+          assassinScores: parsed.assassinScores ?? {},
+          assassinContractsReady: parsed.assassinContractsReady ?? false,
           schemeOrder: parsed.schemeOrder ?? [],
           currentSchemeId: parsed.currentSchemeId ?? null,
           activeSchemeIds: parsed.activeSchemeIds ?? [],

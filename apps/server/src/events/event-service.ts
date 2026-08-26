@@ -122,7 +122,10 @@ export class EventService {
     const gameMode: GameMode =
       input.gameMode === 'treachery' ||
       input.gameMode === 'two-headed-giant' ||
-      input.gameMode === 'archenemy-commander'
+      input.gameMode === 'archenemy-commander' ||
+      input.gameMode === 'emperor' ||
+      input.gameMode === 'star' ||
+      input.gameMode === 'assassin'
         ? input.gameMode
         : 'commander';
     const preferredPodSize = assertPreferredPodSize(
@@ -135,7 +138,7 @@ export class EventService {
       createdAt.getTime() + lifetimeHours * 60 * 60 * 1000,
     );
     const allowFivePods =
-      gameMode === 'treachery'
+      gameMode === 'treachery' || gameMode === 'assassin'
         ? preferredPodSize >= 5
         : gameMode === 'commander' && Boolean(input.allowFivePods);
     const labels = resolveTableLabels({ count: input.tableCount }, 0);
@@ -150,7 +153,8 @@ export class EventService {
           hostCredentialHash,
           gameMode,
           allowThreePods:
-            gameMode === 'commander' && input.allowThreePods !== false,
+            gameMode === 'assassin' ||
+            (gameMode === 'commander' && input.allowThreePods !== false),
           allowFivePods,
           preferredPodSize,
           expiresAt,
@@ -795,7 +799,7 @@ export class EventService {
         ? stored.preferredPodSize
         : assertPreferredPodSize(stored.gameMode, patch.preferredPodSize);
     const allowFivePods =
-      stored.gameMode === 'treachery'
+      stored.gameMode === 'treachery' || stored.gameMode === 'assassin'
         ? preferredPodSize >= 5
         : stored.gameMode === 'commander'
           ? patch.allowFivePods === undefined
@@ -811,7 +815,9 @@ export class EventService {
           );
     const updated = await this.store.updateEvent(stored.id, {
       allowThreePods:
-        stored.gameMode === 'treachery'
+        stored.gameMode === 'assassin'
+          ? true
+          : stored.gameMode === 'treachery'
           ? false
           : patch.allowThreePods === undefined
             ? stored.allowThreePods

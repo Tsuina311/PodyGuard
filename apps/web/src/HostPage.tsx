@@ -6,7 +6,11 @@ import type {
   PublicParticipant,
   PublicTable,
 } from '@podyguard/shared';
-import { poolShortLabel, TREACHERY_POD_SIZES } from '@podyguard/shared';
+import {
+  ASSASSIN_POD_SIZES,
+  poolShortLabel,
+  TREACHERY_POD_SIZES,
+} from '@podyguard/shared';
 import { countByStatus, queueByWait } from './match-view';
 import {
   ApiError,
@@ -447,14 +451,48 @@ export function HostPage() {
                 : 'Matching prefers 4-player tables.'}
             </p>
           </>
+        ) : event.gameMode === 'assassin' ? (
+          <>
+            <p className="text-muted mb-3 text-sm">
+              Target table size. Leftover contract circles can be as small as
+              three.
+            </p>
+            <div className="grid grid-cols-6 gap-2">
+              {ASSASSIN_POD_SIZES.map((size) => (
+                <button
+                  key={size}
+                  type="button"
+                  className={`rounded-xl border p-2 text-sm font-semibold transition ${
+                    event.preferredPodSize === size
+                      ? 'border-neon bg-neon/10 text-neon'
+                      : 'border-muted/20 text-muted hover:border-muted/40'
+                  }`}
+                  onClick={() =>
+                    void onToggleSetting({ preferredPodSize: size })
+                  }
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+          </>
         ) : event.gameMode === 'two-headed-giant' ? (
           <p className="text-muted text-sm">
             Two-Headed Giant matchmaking seats exactly four players per game.
           </p>
-        ) : (
+        ) : event.gameMode === 'archenemy-commander' ? (
           <p className="text-muted text-sm">
             Archenemy Commander matchmaking seats exactly four players per
             game: one Archenemy against a team of three.
+          </p>
+        ) : event.gameMode === 'emperor' ? (
+          <p className="text-muted text-sm">
+            Emperor matchmaking seats exactly six players per game: two teams
+            with an Emperor and two Generals each.
+          </p>
+        ) : (
+          <p className="text-muted text-sm">
+            Star matchmaking seats exactly five players in a circular order.
           </p>
         )}
       </Panel>

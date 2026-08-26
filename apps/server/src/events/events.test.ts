@@ -1054,6 +1054,80 @@ describe('event HTTP api', () => {
     await app.close();
   });
 
+  it('creates Emperor events as strict six-player games', async () => {
+    const app = await buildTestApp();
+    const created = await app.inject({
+      method: 'POST',
+      url: '/events',
+      payload: {
+        name: 'Emperor Night',
+        hostPin: '2468',
+        tableCount: 2,
+        gameMode: 'emperor',
+        allowThreePods: true,
+        allowFivePods: true,
+      },
+    });
+
+    expect(created.statusCode).toBe(201);
+    expect((created.json() as { event: object }).event).toMatchObject({
+      gameMode: 'emperor',
+      allowThreePods: false,
+      allowFivePods: false,
+      preferredPodSize: 6,
+    });
+    await app.close();
+  });
+
+  it('creates Star events as strict five-player games', async () => {
+    const app = await buildTestApp();
+    const created = await app.inject({
+      method: 'POST',
+      url: '/events',
+      payload: {
+        name: 'Star Night',
+        hostPin: '2468',
+        tableCount: 2,
+        gameMode: 'star',
+        allowThreePods: true,
+        allowFivePods: false,
+      },
+    });
+
+    expect(created.statusCode).toBe(201);
+    expect((created.json() as { event: object }).event).toMatchObject({
+      gameMode: 'star',
+      allowThreePods: false,
+      allowFivePods: false,
+      preferredPodSize: 5,
+    });
+    await app.close();
+  });
+
+  it('creates Assassin events with flexible contract circles', async () => {
+    const app = await buildTestApp();
+    const created = await app.inject({
+      method: 'POST',
+      url: '/events',
+      payload: {
+        name: 'Assassin Night',
+        hostPin: '2468',
+        tableCount: 2,
+        gameMode: 'assassin',
+        preferredPodSize: 6,
+      },
+    });
+
+    expect(created.statusCode).toBe(201);
+    expect((created.json() as { event: object }).event).toMatchObject({
+      gameMode: 'assassin',
+      allowThreePods: true,
+      allowFivePods: true,
+      preferredPodSize: 6,
+    });
+    await app.close();
+  });
+
   it('forms two 5-player Treachery pods when the host sets 5 as the base', async () => {
     const app = await buildTestApp();
     const created = await app.inject({

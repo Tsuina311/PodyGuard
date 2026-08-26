@@ -6,6 +6,8 @@ import {
 } from './dungeons';
 import type { CommanderSelection } from '../scryfall';
 import { schemeById } from './archenemy';
+import { assassinTargets } from './assassin';
+import { STAR_PLAYER_COUNT, starEnemies } from './star';
 
 export const STARTING_LIFE = 40;
 export const TWO_HEADED_GIANT_STARTING_LIFE = 60;
@@ -89,8 +91,14 @@ export type TrackerState = {
   players: TrackerPlayer[];
   /** Two sides in board order for team variants. */
   teams: string[][] | null;
-  teamMode: 'two-headed-giant' | 'archenemy-commander' | null;
+  teamMode: 'two-headed-giant' | 'archenemy-commander' | 'emperor' | null;
   archenemyId: string | null;
+  emperorIds: string[];
+  /** Circular seat order for Star; adjacent ids are allies. */
+  starOrder: string[];
+  assassinTargets: Record<string, string>;
+  assassinScores: Record<string, number>;
+  assassinContractsReady: boolean;
   schemeOrder: string[];
   currentSchemeId: string | null;
   activeSchemeIds: string[];
@@ -113,11 +121,16 @@ export type TrackerAction =
   | {
       type: 'teams';
       teams: string[][];
-      mode?: 'two-headed-giant' | 'archenemy-commander';
+      mode?: 'two-headed-giant' | 'archenemy-commander' | 'emperor';
       schemeOrder?: string[];
+      emperorIds?: string[];
     }
   | { type: 'scheme' }
   | { type: 'abandonScheme'; schemeId: string }
+  | { type: 'starSeats'; order: string[] }
+  | { type: 'assassinContracts'; order: string[] }
+  | { type: 'assassinReady' }
+  | { type: 'assassinate'; victimId: string; killerId: string | null }
   | { type: 'life'; playerId: string; delta: number }
   | { type: 'poison'; playerId: string; delta: number }
   | { type: 'tax'; playerId: string; delta: number }
@@ -176,6 +189,11 @@ export function createTracker(
     teams: null,
     teamMode: null,
     archenemyId: null,
+    emperorIds: [],
+    starOrder: [],
+    assassinTargets: {},
+    assassinScores: {},
+    assassinContractsReady: false,
     schemeOrder: [],
     currentSchemeId: null,
     activeSchemeIds: [],
@@ -218,10 +236,63 @@ export function applyTrackerAction(
   next.eliminations ??= [];
   next.teamMode ??= null;
   next.archenemyId ??= null;
+  next.emperorIds ??= [];
+  next.starOrder ??= [];
+  next.assassinTargets ??= {};
+  next.assassinScores ??= {};
+  next.assassinContractsReady ??= false;
   next.schemeOrder ??= [];
   next.currentSchemeId ??= null;
   next.activeSchemeIds ??= [];
   switch (action.type) {
+    case 'assassinContracts': {
+      if (
+        action.order.length < 3 ||
+        action.order.length !== next.players.length ||
+        new Set(action.order).size !== next.players.length ||
+        action.order.some(
+          (id) => !next.players.some((player) => player.id === id),
+        )
+      ) {
+        break;
+      }
+      next.assassinTargets = assassinTargets(action.order);
+      next.assassinScores = Object.fromEntries(
+        action.order.map((id) => [id, 0]),
+      );
+      next.assassinContractsReady = false;
+      break;
+    }
+    case 'assassinReady':
+      if (Object.keys(next.assassinTargets).length === next.players.length) {
+        next.assassinContractsReady = true;
+      }
+      break;
+    case 'assassinate': {
+      const victim = playerById(next, action.victimId);
+      if (!victim.eliminated) {
+        eliminateAssassinPlayer(next, victim, action.killerId, now);
+      }
+      break;
+    }
+    case 'starSeats': {
+      if (
+        next.players.length !== STAR_PLAYER_COUNT ||
+        action.order.length !== STAR_PLAYER_COUNT ||
+        new Set(action.order).size !== STAR_PLAYER_COUNT ||
+        action.order.some(
+          (id) => !next.players.some((player) => player.id === id),
+        )
+      ) {
+        break;
+      }
+      next.starOrder = [...action.order];
+      next.players.sort(
+        (left, right) =>
+          action.order.indexOf(left.id) - action.order.indexOf(right.id),
+      );
+      break;
+    }
     case 'teams': {
       const ids = action.teams.flat();
       const mode = action.mode ?? 'two-headed-giant';
@@ -230,11 +301,21 @@ export function applyTrackerAction(
           ? action.teams.length === 2 &&
             action.teams[0]?.length === 1 &&
             action.teams[1]?.length === 3
+          : mode === 'emperor'
+            ? action.teams.length === 2 &&
+              action.teams.every((team) => team.length === 3) &&
+              action.emperorIds?.length === 2 &&
+              action.teams.every(
+                (team, index) =>
+                  action.emperorIds?.[index] !== undefined &&
+                  team.includes(action.emperorIds[index]!),
+              )
           : action.teams.length === 2 &&
             action.teams.every((team) => team.length === 2);
+      const expectedPlayers = mode === 'emperor' ? 6 : 4;
       if (
         !validSizes ||
-        new Set(ids).size !== 4 ||
+        new Set(ids).size !== expectedPlayers ||
         ids.some((id) => !next.players.some((player) => player.id === id))
       ) {
         break;
@@ -243,6 +324,7 @@ export function applyTrackerAction(
       next.teamMode = mode;
       next.archenemyId =
         mode === 'archenemy-commander' ? action.teams[0]?.[0] ?? null : null;
+      next.emperorIds = mode === 'emperor' ? [...(action.emperorIds ?? [])] : [];
       next.schemeOrder =
         mode === 'archenemy-commander' ? [...(action.schemeOrder ?? [])] : [];
       next.currentSchemeId = null;
@@ -250,9 +332,11 @@ export function applyTrackerAction(
       next.players.sort(
         (left, right) => ids.indexOf(left.id) - ids.indexOf(right.id),
       );
-      for (const player of next.players) {
-        player.life = ARCHENEMY_STARTING_LIFE;
-        player.minimumLife = ARCHENEMY_STARTING_LIFE;
+      if (mode !== 'emperor') {
+        for (const player of next.players) {
+          player.life = ARCHENEMY_STARTING_LIFE;
+          player.minimumLife = ARCHENEMY_STARTING_LIFE;
+        }
       }
       if (next.archenemyId) {
         next.firstPlayerId = next.archenemyId;
@@ -420,7 +504,11 @@ export function applyTrackerAction(
     }
     case 'eliminate': {
       const player = playerById(next, action.playerId);
-      for (const member of teamForPlayer(next, player.id)) {
+      if (Object.keys(next.assassinTargets).length > 0) {
+        eliminateAssassinPlayer(next, player, null, now);
+        break;
+      }
+      for (const member of playersEliminatedWith(next, player.id)) {
         if (!member.eliminated) {
           next.eliminations.push({
             playerId: member.id,
@@ -435,7 +523,11 @@ export function applyTrackerAction(
     }
     case 'confirmLoss': {
       const player = playerById(next, action.playerId);
-      const losingTeam = teamForPlayer(next, player.id);
+      if (Object.keys(next.assassinTargets).length > 0) {
+        eliminateAssassinPlayer(next, player, null, now);
+        break;
+      }
+      const losingTeam = playersEliminatedWith(next, player.id);
       for (const member of losingTeam) {
         if (!member.eliminated) {
           next.eliminations.push({
@@ -491,12 +583,43 @@ export function applyTrackerAction(
         team.some((id) => !playerById(next, id).eliminated),
       )
     : [];
-  if (
+  const starWinner =
+    next.starOrder.length === STAR_PLAYER_COUNT
+      ? alive.find((player) =>
+          starEnemies(next.starOrder, player.id).every(
+            (id) => playerById(next, id).eliminated,
+          ),
+        )
+      : undefined;
+  const assassinSurvivor =
+    Object.keys(next.assassinTargets).length > 0 && alive.length === 1
+      ? alive[0]
+      : undefined;
+  if (!next.winnerId && assassinSurvivor) {
+    next.assassinScores[assassinSurvivor.id] =
+      (next.assassinScores[assassinSurvivor.id] ?? 0) + 1;
+    const highest = Math.max(...Object.values(next.assassinScores));
+    const leaders = next.players.filter(
+      (player) => (next.assassinScores[player.id] ?? 0) === highest,
+    );
+    next.winnerId =
+      leaders.find((player) => player.id === assassinSurvivor.id)?.id ??
+      leaders[0]?.id ??
+      assassinSurvivor.id;
+    next.pausedAt = now;
+  } else if (!next.winnerId && starWinner) {
+    next.winnerId = starWinner.id;
+    next.pausedAt = now;
+  } else if (
     !next.winnerId &&
     ((next.teams && aliveTeams.length === 1) ||
       (!next.teams && alive.length === 1 && next.players.length > 1))
   ) {
-    next.winnerId = next.teams ? aliveTeams[0]?.[0] ?? null : alive[0]?.id ?? null;
+    next.winnerId = next.teams
+      ? next.teamMode === 'emperor'
+        ? next.emperorIds.find((id) => !playerById(next, id).eliminated) ?? null
+        : aliveTeams[0]?.[0] ?? null
+      : alive[0]?.id ?? null;
     next.pausedAt = now;
   }
   if (next.winnerId) {
@@ -523,7 +646,8 @@ function raiseLossPrompts(state: TrackerState): void {
       continue;
     }
     const team = state.teams?.find((row) => row.includes(player.id));
-    const teamRepresentative = !team || team[0] === player.id;
+    const teamRepresentative =
+      state.teamMode === 'emperor' || !team || team[0] === player.id;
     const active = activeLossCauses(state, player).filter(
       (cause) =>
         teamRepresentative ||
@@ -711,12 +835,17 @@ export function pickFirstPlayer(
   random = Math.random,
   now = Date.now(),
 ): TrackerState {
-  const alive = state.teams
-    ? state.teams
+  const alive =
+    state.teamMode === 'emperor'
+      ? state.emperorIds
+          .map((id) => state.players.find((row) => row.id === id))
+          .filter((row): row is TrackerPlayer => Boolean(row && !row.eliminated))
+      : state.teams
+        ? state.teams
         .map((team) => team[0])
         .map((id) => state.players.find((row) => row.id === id))
         .filter((row): row is TrackerPlayer => Boolean(row && !row.eliminated))
-    : state.players.filter((row) => !row.eliminated);
+        : state.players.filter((row) => !row.eliminated);
   const pick = alive[Math.floor(random() * alive.length)];
   if (!pick) {
     return state;
@@ -734,12 +863,58 @@ export function teamForPlayer(
     : [playerById(state, playerId)];
 }
 
+function eliminateAssassinPlayer(
+  state: TrackerState,
+  victim: TrackerPlayer,
+  killerId: string | null,
+  now: number,
+): void {
+  const hunter = state.players.find(
+    (player) =>
+      !player.eliminated && state.assassinTargets[player.id] === victim.id,
+  );
+  const inheritedTarget = state.assassinTargets[victim.id];
+  if (hunter && inheritedTarget && hunter.id !== victim.id) {
+    state.assassinTargets[hunter.id] = inheritedTarget;
+    if (killerId === hunter.id) {
+      state.assassinScores[hunter.id] =
+        (state.assassinScores[hunter.id] ?? 0) + 1;
+    }
+  }
+  delete state.assassinTargets[victim.id];
+  state.eliminations.push({
+    playerId: victim.id,
+    cause: victim.pendingLoss,
+    at: now,
+  });
+  victim.eliminated = true;
+  victim.pendingLoss = null;
+}
+
+function playersEliminatedWith(
+  state: TrackerState,
+  playerId: string,
+): TrackerPlayer[] {
+  if (
+    state.teamMode === 'two-headed-giant' ||
+    state.teamMode === 'archenemy-commander' ||
+    (state.teamMode === 'emperor' && state.emperorIds.includes(playerId))
+  ) {
+    return teamForPlayer(state, playerId);
+  }
+  return [playerById(state, playerId)];
+}
+
 function setSharedLife(
   state: TrackerState,
   playerId: string,
   life: number,
 ): void {
-  for (const player of teamForPlayer(state, playerId)) {
+  const players =
+    state.teamMode === 'emperor'
+      ? [playerById(state, playerId)]
+      : teamForPlayer(state, playerId);
+  for (const player of players) {
     player.life = life;
     player.minimumLife = Math.min(player.minimumLife ?? life, life);
   }

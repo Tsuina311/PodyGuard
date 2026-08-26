@@ -1360,6 +1360,63 @@ Host-selectable mode with strict 4-player pods:
 
 Two-Headed Giant setup also offers random team assignment.
 
+## Emperor
+
+Host-selectable mode with strict 6-player pods and two teams of three:
+
+- each team selects one Emperor and two Generals, manually or at random;
+- teams can also be assigned manually or at random;
+- the Emperor sits between their two Generals;
+- each player keeps an individual 40-life total, poison, hand, mana, battlefield,
+  commander, and turn;
+- Generals have range of influence 1 and Emperors have range 2;
+- players can attack only an opponent seated immediately next to them;
+- every creature has “Tap: Target teammate gains control of this creature.
+  Activate only as a sorcery”;
+- randomly choose which Emperor goes first; that Emperor draws on the first
+  turn;
+- a General can be eliminated without eliminating the team;
+- eliminating an Emperor immediately eliminates that team;
+- the rules sheet is available during setup and from the timer menu.
+
+## Star
+
+Host-selectable Commander mode with strict 5-player pods:
+
+- players occupy five fixed positions around a circle/pentagram;
+- setup allows randomising all positions or manually exchanging any two
+  players;
+- each player’s two adjacent neighbors are allies;
+- each player’s two nonadjacent players are enemies;
+- allies cannot attack one another by default;
+- positions and relationships do not change when a player is eliminated;
+- each player keeps an individual 40-life total, poison, hand, mana,
+  battlefield, commander, and turn;
+- the first surviving player whose two enemies have both been eliminated wins,
+  regardless of who eliminated them;
+- the rules sheet is available during setup, beside Start, and from the timer
+  menu.
+
+## Assassin
+
+Host-selectable Commander mode for 3–8 players, based on Wizards’ archived
+House Rules Compendium variant:
+
+- randomly deal one secret target to every player in a single contract chain;
+- pass the tracker around so each player can privately reveal their target;
+- current contracts can be checked again from the timer menu;
+- players may attack and affect anyone;
+- when a player is eliminated, the table records who dealt the finishing blow;
+- personally eliminating your assigned target scores one mark;
+- the player hunting an eliminated target inherits that player’s target even
+  when somebody else delivered the finishing blow, preserving the contract
+  chain;
+- play continues until one player remains;
+- the last survivor scores one additional mark;
+- the highest score wins, with the last survivor favored if tied for the lead;
+- each player otherwise uses normal Commander life, poison, commander damage,
+  tax, and turn rules.
+
 ---
 
 # 38. Do NOT implement turn tracking

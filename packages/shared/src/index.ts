@@ -78,6 +78,7 @@ export type {
 
 export {
   GAME_MODES,
+  ASSASSIN_POD_SIZES,
   TREACHERY_POD_SIZES,
   TREACHERY_ROLES,
   TREACHERY_IDENTITIES,
@@ -91,6 +92,7 @@ export {
 
 export type {
   GameMode,
+  AssassinPodSize,
   TreacheryPodSize,
   TreacheryRole,
   TreacheryRoleAssignment,

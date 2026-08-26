@@ -1,6 +1,12 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { TREACHERY_POD_SIZES, type GameMode, type TreacheryPodSize } from '@podyguard/shared';
+import {
+  ASSASSIN_POD_SIZES,
+  TREACHERY_POD_SIZES,
+  type AssassinPodSize,
+  type GameMode,
+  type TreacheryPodSize,
+} from '@podyguard/shared';
 import { ApiError, createEvent, saveHostToken } from './api';
 import { activeMatchPath } from './active-match';
 import {
@@ -28,6 +34,7 @@ export function HomePage() {
   const [allowThreePods, setAllowThreePods] = useState(true);
   const [allowFivePods, setAllowFivePods] = useState(false);
   const [preferredPodSize, setPreferredPodSize] = useState<TreacheryPodSize>(4);
+  const [assassinPodSize, setAssassinPodSize] = useState<AssassinPodSize>(5);
   const [lifetimeHours, setLifetimeHours] = useState('24');
   const [joinCode, setJoinCode] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -66,7 +73,16 @@ export function HomePage() {
         gameMode,
         allowThreePods: gameMode === 'commander' && allowThreePods,
         allowFivePods,
-        preferredPodSize: gameMode === 'treachery' ? preferredPodSize : 4,
+        preferredPodSize:
+          gameMode === 'treachery'
+            ? preferredPodSize
+            : gameMode === 'assassin'
+              ? assassinPodSize
+            : gameMode === 'emperor'
+              ? 6
+              : gameMode === 'star'
+                ? 5
+              : 4,
         lifetimeHours: Number(lifetimeHours),
       });
       saveHostToken(result.event.joinCode, result.hostToken);
@@ -117,7 +133,7 @@ export function HomePage() {
         <p className="text-muted mb-2 text-xs font-medium tracking-[0.14em] uppercase">
           Game
         </p>
-        <div className="mb-2 grid grid-cols-1 gap-2 sm:grid-cols-3">
+        <div className="mb-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
           {STANDALONE_GAME_MODES.map((mode) => (
             <label
               key={mode.id}
@@ -160,7 +176,7 @@ export function HomePage() {
           </div>
         ) : (
           <p className="text-muted mb-4 text-xs">
-            Always four players in this mode.
+            Always {trackerSeatOptions[0]} players in this mode.
           </p>
         )}
         {ongoingMatch ? (
@@ -208,6 +224,9 @@ export function HomePage() {
                 ['treachery', 'Treachery'],
                 ['two-headed-giant', 'Two-Headed Giant'],
                 ['archenemy-commander', 'Archenemy Commander'],
+                ['emperor', 'Emperor'],
+                ['star', 'Star'],
+                ['assassin', 'Assassin'],
               ] as const
             ).map(([value, label]) => (
               <label
@@ -246,6 +265,21 @@ export function HomePage() {
             <p className="text-muted mt-2 text-xs">
               Strict 4-player Commander pods. One 60-life Archenemy faces a
               three-player team with 60 shared life and a 40-card scheme deck.
+            </p>
+          ) : gameMode === 'emperor' ? (
+            <p className="text-muted mt-2 text-xs">
+              Strict 6-player Commander pods. Two teams each place an Emperor
+              between two Generals and play with limited range of influence.
+            </p>
+          ) : gameMode === 'star' ? (
+            <p className="text-muted mt-2 text-xs">
+              Strict 5-player Commander pods. Adjacent players are allies; each
+              player wins by outlasting both opponents across the circle.
+            </p>
+          ) : gameMode === 'assassin' ? (
+            <p className="text-muted mt-2 text-xs">
+              Secret contracts for 3–8 players. Score by eliminating your mark,
+              then inherit their target.
             </p>
           ) : null}
         </fieldset>
@@ -310,6 +344,50 @@ export function HomePage() {
                 : 'Matchmaking prefers 4-player tables.'}
             </p>
           </fieldset>
+        ) : gameMode === 'assassin' ? (
+          <fieldset className="mb-4">
+            <legend className="text-muted mb-2 text-sm">
+              Target table size
+            </legend>
+            <div className="grid grid-cols-6 gap-2">
+              {ASSASSIN_POD_SIZES.map((size) => (
+                <label
+                  key={size}
+                  className={`cursor-pointer rounded-xl border p-2 text-center text-sm font-semibold transition ${
+                    assassinPodSize === size
+                      ? 'border-neon bg-neon/10 text-neon'
+                      : 'border-muted/20 text-muted hover:border-muted/40'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="assassinPodSize"
+                    value={size}
+                    checked={assassinPodSize === size}
+                    onChange={() => setAssassinPodSize(size)}
+                    className="sr-only"
+                  />
+                  {size}
+                </label>
+              ))}
+            </div>
+            <p className="text-muted mt-2 text-xs">
+              Matching prefers {assassinPodSize}-player tables; leftovers can
+              form contracts with as few as three.
+            </p>
+          </fieldset>
+        ) : gameMode === 'emperor' ? (
+          <p className="text-muted mb-4 text-sm">
+            Emperor games always seat exactly six players.
+          </p>
+        ) : gameMode === 'star' ? (
+          <p className="text-muted mb-4 text-sm">
+            Star games always seat exactly five players.
+          </p>
+        ) : gameMode === 'archenemy-commander' ? (
+          <p className="text-muted mb-4 text-sm">
+            Archenemy Commander games always seat exactly four players.
+          </p>
         ) : (
           <p className="text-muted mb-4 text-sm">
             Two-Headed Giant games always seat exactly four players.

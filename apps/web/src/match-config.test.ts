@@ -27,10 +27,13 @@ describe('standalone match config', () => {
     installSessionStorage();
   });
 
-  it('offers every seat count for Commander and only four for team modes', () => {
+  it('offers the correct seat count for every standalone mode', () => {
     expect(seatCountsForMode('commander')).toEqual([2, 3, 4, 5, 6]);
     expect(seatCountsForMode('two-headed-giant')).toEqual([4]);
     expect(seatCountsForMode('archenemy-commander')).toEqual([4]);
+    expect(seatCountsForMode('emperor')).toEqual([6]);
+    expect(seatCountsForMode('star')).toEqual([5]);
+    expect(seatCountsForMode('assassin')).toEqual([3, 4, 5, 6, 7, 8]);
     expect(seatCountForMode('archenemy-commander', 6)).toBe(4);
     expect(seatCountForMode('commander', 6)).toBe(6);
   });

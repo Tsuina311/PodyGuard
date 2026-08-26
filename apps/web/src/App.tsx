@@ -13,7 +13,10 @@ import { ServerWakeScreen } from './ui/ServerWakeScreen';
 export function App() {
   // `/match` deliberately shares the player layout so it matches a real phone.
   const wide = Boolean(useMatch('/host/:joinCode'));
-  const localOnly = Boolean(useMatch('/match') || useMatch('/match-config'));
+  // Both routes are probed on every render: `||` would skip the second hook.
+  const sandbox = useMatch('/match');
+  const sandboxConfig = useMatch('/match-config');
+  const localOnly = Boolean(sandbox || sandboxConfig);
   const waking = useServerWake() && !localOnly;
   return (
     <div className="bg-deep-space relative min-h-screen overflow-hidden">

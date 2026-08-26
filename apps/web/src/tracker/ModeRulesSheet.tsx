@@ -1,7 +1,12 @@
-import { BookOpen, X } from 'lucide-react';
+import { ArrowLeft, BookOpen, X } from 'lucide-react';
 import type { GameMode } from '@podyguard/shared';
+import { Button } from '../ui/Button';
 import { rulesForMode } from './mode-rules';
 
+/**
+ * A card rather than a full screen: the rules are read alongside the board a
+ * pod is already looking at, so the popup stays small and scrolls internally.
+ */
 export function ModeRulesSheet({
   gameMode,
   onClose,
@@ -11,10 +16,10 @@ export function ModeRulesSheet({
 }) {
   const rules = rulesForMode(gameMode);
   return (
-    <section className="flex h-full w-full flex-col">
-      <header className="mb-3 flex shrink-0 items-center justify-between gap-3">
+    <section className="border-muted/25 bg-hull flex max-h-[min(80dvh,34rem)] w-full max-w-md flex-col overflow-hidden rounded-2xl border shadow-[0_18px_50px_-24px_var(--color-void)]">
+      <header className="border-muted/15 flex shrink-0 items-center justify-between gap-3 border-b px-4 py-3">
         <div className="flex min-w-0 items-center gap-2">
-          <BookOpen size={18} aria-hidden className="text-neon shrink-0" />
+          <BookOpen size={17} aria-hidden className="text-neon shrink-0" />
           <h4 className="font-display truncate text-sm leading-tight font-bold">
             {rules.title}
           </h4>
@@ -25,13 +30,13 @@ export function ModeRulesSheet({
           onClick={onClose}
           className="border-muted/25 text-muted hover:text-ink hover:border-muted/50 flex size-8 shrink-0 items-center justify-center rounded-full border transition"
         >
-          <X size={18} aria-hidden />
+          <X size={17} aria-hidden />
         </button>
       </header>
-      <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3">
         <p className="text-muted mb-4 text-sm">{rules.summary}</p>
         {rules.sections.map((section) => (
-          <section key={section.heading} className="mb-4">
+          <section key={section.heading} className="mb-4 last:mb-0">
             <h5 className="text-muted mb-2 font-mono text-[0.68rem] tracking-wide uppercase">
               {section.heading}
             </h5>
@@ -42,6 +47,12 @@ export function ModeRulesSheet({
             </ul>
           </section>
         ))}
+      </div>
+      <div className="border-muted/15 shrink-0 border-t p-3">
+        <Button variant="glass" block onClick={onClose}>
+          <ArrowLeft size={16} aria-hidden />
+          Back to the game
+        </Button>
       </div>
     </section>
   );

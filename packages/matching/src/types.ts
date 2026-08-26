@@ -53,6 +53,10 @@ export const FIVE_POD_SIZE = 5;
 
 export const TREACHERY_MIN_POD_SIZE = 4;
 export const TREACHERY_MAX_POD_SIZE = 8;
+export const EMPEROR_POD_SIZE = 6;
+export const STAR_POD_SIZE = 5;
+export const ASSASSIN_MIN_POD_SIZE = 3;
+export const ASSASSIN_MAX_POD_SIZE = 8;
 
 export function allowedPodSizes(flags: {
   allowThree?: boolean;
@@ -80,7 +84,10 @@ export function eventMatchOptions(input: {
     | 'commander'
     | 'treachery'
     | 'two-headed-giant'
-    | 'archenemy-commander';
+    | 'archenemy-commander'
+    | 'emperor'
+    | 'star'
+    | 'assassin';
   allowThreePods: boolean;
   allowFivePods: boolean;
   preferredPodSize?: number;
@@ -92,6 +99,35 @@ export function eventMatchOptions(input: {
     return {
       preferredSize: PREFERRED_POD_SIZE,
       allowedSizes: [PREFERRED_POD_SIZE],
+    };
+  }
+  if (input.gameMode === 'emperor') {
+    return {
+      preferredSize: EMPEROR_POD_SIZE,
+      allowedSizes: [EMPEROR_POD_SIZE],
+    };
+  }
+  if (input.gameMode === 'star') {
+    return {
+      preferredSize: STAR_POD_SIZE,
+      allowedSizes: [STAR_POD_SIZE],
+    };
+  }
+  if (input.gameMode === 'assassin') {
+    const preferredSize = Math.min(
+      ASSASSIN_MAX_POD_SIZE,
+      Math.max(
+        ASSASSIN_MIN_POD_SIZE,
+        input.preferredPodSize ?? 5,
+      ),
+    );
+    return {
+      preferredSize,
+      allowedSizes: allowedPodSizes({
+        preferredSize,
+        minSize: ASSASSIN_MIN_POD_SIZE,
+        maxSize: preferredSize,
+      }),
     };
   }
   if (input.gameMode === 'treachery') {
