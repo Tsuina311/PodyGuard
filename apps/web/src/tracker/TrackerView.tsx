@@ -71,6 +71,7 @@ import {
 } from './archenemy';
 import { planFirstPlayerReveal, type RevealHop } from './first-player-reveal';
 import { DungeonTracker } from './DungeonTracker';
+import { ModeRulesSheet } from './ModeRulesSheet';
 import { useLandscape, useLandscapeLock } from './orientation';
 import {
   detectAutomaticChallenges,
@@ -281,6 +282,7 @@ export function TrackerView({
     null,
   );
   const [schemeOpen, setSchemeOpen] = useState(false);
+  const [rulesOpen, setRulesOpen] = useState(false);
   const attemptedChallenges = useRef(new Set<string>());
   const landscape = useLandscape();
   useLandscapeLock();
@@ -421,7 +423,8 @@ export function TrackerView({
       !counterPlayer &&
       !menuOpen &&
       !challengesOpen &&
-      !schemeOpen
+      !schemeOpen &&
+      !rulesOpen
     ) {
       return;
     }
@@ -433,6 +436,7 @@ export function TrackerView({
         setMenuOpen(false);
         setChallengesOpen(false);
         setSchemeOpen(false);
+        setRulesOpen(false);
       }
     }
     window.addEventListener('keydown', onKey);
@@ -445,8 +449,31 @@ export function TrackerView({
     counterPlayer,
     dungeonPlayer,
     menuOpen,
+    rulesOpen,
     schemeOpen,
   ]);
+
+  const rulesSheet = rulesOpen
+    ? createPortal(
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Game rules"
+          className="bg-void/95 fixed inset-x-0 top-0 z-[70] flex h-[100dvh] p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              setRulesOpen(false);
+            }
+          }}
+        >
+          <ModeRulesSheet
+            gameMode={gameMode}
+            onClose={() => setRulesOpen(false)}
+          />
+        </div>,
+        document.body,
+      )
+    : null;
 
   if (
     gameMode === 'archenemy-commander' &&
@@ -454,6 +481,7 @@ export function TrackerView({
     !state.teams
   ) {
     return (
+      <>
       <section className={cx(screenClass, 'items-center justify-center')}>
         <div className="w-full max-w-lg">
           <h2 className="font-display mb-2 text-center text-2xl font-bold">
@@ -482,6 +510,10 @@ export function TrackerView({
             ))}
           </div>
           <div className="flex flex-wrap justify-center gap-3">
+            <Button variant="glass" onClick={() => setRulesOpen(true)}>
+              <BookOpen size={16} aria-hidden />
+              Read rules
+            </Button>
             <Button
               variant="glass"
               onClick={() =>
@@ -522,6 +554,8 @@ export function TrackerView({
           </div>
         </div>
       </section>
+      {rulesSheet}
+    </>
     );
   }
 
@@ -535,6 +569,7 @@ export function TrackerView({
     );
     const teamsReady = selectedAllies.length === 2;
     return (
+      <>
       <section className={cx(screenClass, 'items-center justify-center')}>
         <div className="w-full max-w-lg">
           <h2 className="font-display mb-2 text-center text-2xl font-bold">
@@ -587,7 +622,11 @@ export function TrackerView({
               </span>
             </p>
           ) : null}
-          <div className="flex justify-center gap-3">
+          <div className="flex flex-wrap justify-center gap-3">
+            <Button variant="glass" onClick={() => setRulesOpen(true)}>
+              <BookOpen size={16} aria-hidden />
+              Read rules
+            </Button>
             <Button
               variant="glass"
               onClick={() =>
@@ -629,24 +668,42 @@ export function TrackerView({
           </div>
         </div>
       </section>
+      {rulesSheet}
+    </>
     );
   }
 
   if (!state.firstPlayerId) {
     return (
+      <>
       <section className={cx(screenClass, 'items-center justify-center')}>
-        <Button
-          variant="neon"
-          size="lg"
-          className="h-16 min-w-48 text-xl"
-          disabled={gameMode === 'treachery' && !startingPlayerId}
-          onClick={() => dispatch({ type: 'first', playerId: startingPlayerId })}
-        >
-          {gameMode === 'treachery' && !startingPlayerId
-            ? 'Loading roles…'
-            : 'Start'}
-        </Button>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <Button
+            variant="glass"
+            size="lg"
+            className="h-16 min-w-40 text-xl"
+            onClick={() => setRulesOpen(true)}
+          >
+            <BookOpen size={20} aria-hidden />
+            Read rules
+          </Button>
+          <Button
+            variant="neon"
+            size="lg"
+            className="h-16 min-w-48 text-xl"
+            disabled={gameMode === 'treachery' && !startingPlayerId}
+            onClick={() =>
+              dispatch({ type: 'first', playerId: startingPlayerId })
+            }
+          >
+            {gameMode === 'treachery' && !startingPlayerId
+              ? 'Loading roles…'
+              : 'Start'}
+          </Button>
+        </div>
       </section>
+      {rulesSheet}
+    </>
     );
   }
 
@@ -1252,12 +1309,17 @@ export function TrackerView({
                   setMenuOpen(false);
                   setChallengesOpen(true);
                 }}
+                onRules={() => {
+                  setMenuOpen(false);
+                  setRulesOpen(true);
+                }}
                 onClose={() => setMenuOpen(false)}
               />
             </div>,
             document.body,
           )
         : null}
+      {rulesSheet}
       {publicIdentityPlayerId && revealedIdentities[publicIdentityPlayerId]
         ? createPortal(
             <div
@@ -1655,6 +1717,7 @@ function MatchMenu({
   onQuit,
   onCheckRole,
   onChallenges,
+  onRules,
   onClose,
 }: {
   state: TrackerState;
@@ -1666,6 +1729,7 @@ function MatchMenu({
   onQuit: () => void;
   onCheckRole?: () => void;
   onChallenges: () => void;
+  onRules: () => void;
   onClose: () => void;
 }) {
   const paused = Boolean(state.pausedAt);
@@ -1720,6 +1784,10 @@ function MatchMenu({
           <Button size="sm" variant="glass" onClick={onChallenges}>
             <Sparkles size={14} aria-hidden />
             Challenges
+          </Button>
+          <Button size="sm" variant="glass" onClick={onRules}>
+            <BookOpen size={14} aria-hidden />
+            Read rules
           </Button>
           {onCheckRole ? (
             <Button
