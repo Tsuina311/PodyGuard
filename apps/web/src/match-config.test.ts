@@ -29,6 +29,7 @@ describe('standalone match config', () => {
 
   it('offers the correct seat count for every standalone mode', () => {
     expect(seatCountsForMode('commander')).toEqual([2, 3, 4, 5, 6]);
+    expect(seatCountsForMode('treachery')).toEqual([4, 5, 6, 7, 8]);
     expect(seatCountsForMode('two-headed-giant')).toEqual([4]);
     expect(seatCountsForMode('archenemy-commander')).toEqual([4]);
     expect(seatCountsForMode('emperor')).toEqual([6]);

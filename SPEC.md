@@ -1379,6 +1379,22 @@ Host-selectable mode with strict 6-player pods and two teams of three:
 - eliminating an Emperor immediately eliminates that team;
 - the rules sheet is available during setup and from the timer menu.
 
+## Treachery
+
+Host-selectable Commander mode for 4–8 players. A hosted pod receives its
+identities from the server, one per phone. A pod playing on a single tracker
+deals them on the device instead:
+
+- deal one secret role and one matching identity card to every player, using the
+  role mix printed for that table size;
+- pass the tracker around so each player privately reveals their own identity,
+  and only start once every identity has been read;
+- the Leader is public, takes the first turn, and is marked on the board;
+- identities can be checked again from the timer menu;
+- a player may unveil their identity to the table, which shows the card on their
+  seat for everyone;
+- every identity is revealed when the game is called.
+
 ## Star
 
 Host-selectable Commander mode with strict 5-player pods:

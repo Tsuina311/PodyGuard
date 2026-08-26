@@ -57,6 +57,7 @@ export function MatchSandboxPage() {
       <TrackerView
         storageKey={trackerStorageKey(config)}
         gameMode={config.gameMode}
+        dealTreachery={config.gameMode === 'treachery'}
         players={players}
         onFinish={async () => {
           forgetActiveMatch('/match');

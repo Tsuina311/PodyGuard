@@ -1,4 +1,11 @@
 import {
+  TREACHERY_ROLES,
+  treacheryDistribution,
+  treacheryIdentityById,
+  treacheryRolesForSize,
+  type TreacheryRole,
+} from '@podyguard/shared';
+import {
   dungeonById,
   legalNextRoomIds,
   type DungeonId,
@@ -8,6 +15,7 @@ import type { CommanderSelection } from '../scryfall';
 import { schemeById } from './archenemy';
 import { assassinTargets } from './assassin';
 import { STAR_PLAYER_COUNT, starEnemies } from './star';
+import type { TreacheryDeal } from './treachery';
 
 export const STARTING_LIFE = 40;
 export const TWO_HEADED_GIANT_STARTING_LIFE = 60;
@@ -99,6 +107,12 @@ export type TrackerState = {
   assassinTargets: Record<string, string>;
   assassinScores: Record<string, number>;
   assassinContractsReady: boolean;
+  /** Secret roles, only filled when this device deals Treachery itself. */
+  treacheryRoles: Record<string, TreacheryRole>;
+  treacheryIdentities: Record<string, number>;
+  /** Players who have shown their identity card to the whole table. */
+  treacheryUnveiled: string[];
+  treacheryRolesReady: boolean;
   schemeOrder: string[];
   currentSchemeId: string | null;
   activeSchemeIds: string[];
@@ -131,6 +145,9 @@ export type TrackerAction =
   | { type: 'assassinContracts'; order: string[] }
   | { type: 'assassinReady' }
   | { type: 'assassinate'; victimId: string; killerId: string | null }
+  | { type: 'treacheryIdentities'; deal: TreacheryDeal[] }
+  | { type: 'treacheryReady' }
+  | { type: 'unveilTreachery'; playerId: string }
   | { type: 'life'; playerId: string; delta: number }
   | { type: 'poison'; playerId: string; delta: number }
   | { type: 'tax'; playerId: string; delta: number }
@@ -194,6 +211,10 @@ export function createTracker(
     assassinTargets: {},
     assassinScores: {},
     assassinContractsReady: false,
+    treacheryRoles: {},
+    treacheryIdentities: {},
+    treacheryUnveiled: [],
+    treacheryRolesReady: false,
     schemeOrder: [],
     currentSchemeId: null,
     activeSchemeIds: [],
@@ -241,6 +262,10 @@ export function applyTrackerAction(
   next.assassinTargets ??= {};
   next.assassinScores ??= {};
   next.assassinContractsReady ??= false;
+  next.treacheryRoles ??= {};
+  next.treacheryIdentities ??= {};
+  next.treacheryUnveiled ??= [];
+  next.treacheryRolesReady ??= false;
   next.schemeOrder ??= [];
   next.currentSchemeId ??= null;
   next.activeSchemeIds ??= [];
@@ -275,6 +300,33 @@ export function applyTrackerAction(
       }
       break;
     }
+    case 'treacheryIdentities': {
+      if (!dealSeatsEveryPlayer(next, action.deal)) {
+        break;
+      }
+      next.treacheryRoles = Object.fromEntries(
+        action.deal.map((row) => [row.playerId, row.role]),
+      );
+      next.treacheryIdentities = Object.fromEntries(
+        action.deal.map((row) => [row.playerId, row.identityId]),
+      );
+      next.treacheryUnveiled = [];
+      next.treacheryRolesReady = false;
+      break;
+    }
+    case 'treacheryReady':
+      if (Object.keys(next.treacheryRoles).length === next.players.length) {
+        next.treacheryRolesReady = true;
+      }
+      break;
+    case 'unveilTreachery':
+      if (
+        next.treacheryIdentities[action.playerId] !== undefined &&
+        !next.treacheryUnveiled.includes(action.playerId)
+      ) {
+        next.treacheryUnveiled.push(action.playerId);
+      }
+      break;
     case 'starSeats': {
       if (
         next.players.length !== STAR_PLAYER_COUNT ||
@@ -861,6 +913,47 @@ export function teamForPlayer(
   return ids
     ? ids.map((id) => playerById(state, id))
     : [playerById(state, playerId)];
+}
+
+/**
+ * A dealt table is only accepted when it seats every player exactly once, uses
+ * the role mix Treachery prints for that size, and hands each player a distinct
+ * identity card of the role they were dealt.
+ */
+function dealSeatsEveryPlayer(
+  state: TrackerState,
+  deal: TreacheryDeal[],
+): boolean {
+  const playerIds = new Set(deal.map((row) => row.playerId));
+  if (
+    deal.length !== state.players.length ||
+    playerIds.size !== deal.length ||
+    new Set(deal.map((row) => row.identityId)).size !== deal.length ||
+    deal.some(
+      (row) =>
+        !state.players.some((player) => player.id === row.playerId) ||
+        treacheryIdentityById(row.identityId)?.role !== row.role,
+    )
+  ) {
+    return false;
+  }
+  let printed: Record<TreacheryRole, number>;
+  try {
+    printed = treacheryDistribution(treacheryRolesForSize(deal.length));
+  } catch {
+    return false;
+  }
+  const dealt = treacheryDistribution(deal.map((row) => row.role));
+  return TREACHERY_ROLES.every((role) => dealt[role] === printed[role]);
+}
+
+/** The Leader is public, so the table starts on that seat. */
+export function treacheryLeaderId(state: TrackerState): string | null {
+  return (
+    Object.entries(state.treacheryRoles ?? {}).find(
+      ([, role]) => role === 'leader',
+    )?.[0] ?? null
+  );
 }
 
 function eliminateAssassinPlayer(

@@ -9,9 +9,11 @@ import {
   createTracker,
   elapsedMs,
   pickFirstPlayer,
+  treacheryLeaderId,
   uniqueCompletedDungeonCount,
   worstCommanderDamage,
 } from './engine';
+import { dealTreacheryIdentities } from './treachery';
 
 function twoHeadedGiant() {
   let state = createTracker([
@@ -372,6 +374,60 @@ describe('Assassin tracker', () => {
     });
     expect(state.assassinScores.a).toBe(4);
     expect(state.winnerId).toBe('a');
+  });
+});
+
+describe('Treachery tracker', () => {
+  function treachery() {
+    const state = createTracker([
+      { id: 'a', name: 'Ada' },
+      { id: 'b', name: 'Bea' },
+      { id: 'c', name: 'Cam' },
+      { id: 'd', name: 'Dee' },
+    ]);
+    return applyTrackerAction(state, {
+      type: 'treacheryIdentities',
+      deal: dealTreacheryIdentities(['a', 'b', 'c', 'd'], () => 0),
+    });
+  }
+
+  it('deals one identity each and starts the table on the Leader', () => {
+    const state = treachery();
+    expect(Object.keys(state.treacheryRoles)).toHaveLength(4);
+    expect(Object.keys(state.treacheryIdentities)).toHaveLength(4);
+    expect(state.treacheryRolesReady).toBe(false);
+    const leaderId = treacheryLeaderId(state);
+    expect(leaderId).not.toBeNull();
+    expect(state.treacheryRoles[leaderId!]).toBe('leader');
+  });
+
+  it('refuses a deal that does not seat the table', () => {
+    const state = applyTrackerAction(treachery(), {
+      type: 'treacheryIdentities',
+      deal: dealTreacheryIdentities(['a', 'b', 'c', 'd', 'e'], () => 0),
+    });
+    expect(Object.keys(state.treacheryRoles)).toHaveLength(4);
+  });
+
+  it('opens the board once every identity has been read', () => {
+    const state = applyTrackerAction(treachery(), { type: 'treacheryReady' });
+    expect(state.treacheryRolesReady).toBe(true);
+  });
+
+  it('unveils an identity to the table only once', () => {
+    let state = applyTrackerAction(treachery(), {
+      type: 'unveilTreachery',
+      playerId: 'b',
+    });
+    state = applyTrackerAction(state, {
+      type: 'unveilTreachery',
+      playerId: 'b',
+    });
+    state = applyTrackerAction(state, {
+      type: 'unveilTreachery',
+      playerId: 'nobody',
+    });
+    expect(state.treacheryUnveiled).toEqual(['b']);
   });
 });
 

@@ -15,12 +15,15 @@ const roleColour = {
 export function TreacheryRoleDialog({
   assignment,
   revealed,
+  holderName,
   onReveal,
   onClose,
   onUnveil,
 }: {
-  assignment: TreacheryRoleAssignment;
+  assignment: Pick<TreacheryRoleAssignment, 'role' | 'identity' | 'unveiled'>;
   revealed: boolean;
+  /** Named when the table shares one device, so it can be handed over. */
+  holderName?: string;
   onReveal: () => void;
   onClose: () => void;
   onUnveil?: () => Promise<void>;
@@ -47,10 +50,14 @@ export function TreacheryRoleDialog({
               Treachery
             </p>
             <h2 className="font-display mb-3 text-2xl font-bold">
-              You have received your role
+              {holderName
+                ? `Hand the device to ${holderName}`
+                : 'You have received your role'}
             </h2>
             <p className="text-muted mb-6 text-sm">
-              Make sure nobody else can see your screen before revealing it.
+              {holderName
+                ? 'Everyone else should look away before the identity is revealed.'
+                : 'Make sure nobody else can see your screen before revealing it.'}
             </p>
             <Button variant="neon" size="lg" block onClick={onReveal}>
               Reveal
@@ -149,7 +156,7 @@ export function TreacheryRoleDialog({
               <p className="text-danger mb-3 text-sm">{unveilError}</p>
             ) : null}
             <Button variant="glass" size="lg" block onClick={onClose}>
-              Hide my identity
+              {holderName ? 'Hide & pass' : 'Hide my identity'}
             </Button>
           </>
         )}

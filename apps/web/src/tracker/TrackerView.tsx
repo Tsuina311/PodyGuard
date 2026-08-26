@@ -36,6 +36,8 @@ import {
 } from 'lucide-react';
 import {
   OFFICIAL_COMMANDER_CHALLENGES,
+  TREACHERY_ROLE_INFO,
+  treacheryIdentityById,
   type ChallengeDetectionMode,
   type ChallengePack,
   type GameMode,
@@ -53,6 +55,7 @@ import {
   pickFirstPlayer,
   primaryCommanderId,
   teamForPlayer,
+  treacheryLeaderId,
   uniqueCompletedDungeonCount,
   worstCommanderDamage,
   type Commander,
@@ -80,10 +83,12 @@ import {
   swapStarSeats,
 } from './star';
 import { dealAssassinContracts } from './assassin';
+import { dealTreacheryIdentities } from './treachery';
 import { planFirstPlayerReveal, type RevealHop } from './first-player-reveal';
 import { DungeonTracker } from './DungeonTracker';
 import { ModeRulesSheet } from './ModeRulesSheet';
 import { AssassinTargetsSheet } from './AssassinTargetsSheet';
+import { TreacheryRolesSheet } from './TreacheryRolesSheet';
 import { useLandscape, useLandscapeLock } from './orientation';
 import {
   detectAutomaticChallenges,
@@ -124,6 +129,11 @@ type Props = {
   startingPlayerId?: string;
   onCheckRole?: () => void;
   revealedIdentities?: Record<string, PublicTreacheryIdentity>;
+  /**
+   * Deals the Treachery identities here and passes the tracker around, for a
+   * pod playing on one device with no server to hand each player their own.
+   */
+  dealTreachery?: boolean;
 };
 
 /*
@@ -271,6 +281,7 @@ export function TrackerView({
   startingPlayerId,
   onCheckRole,
   revealedIdentities = {},
+  dealTreachery = false,
 }: Props) {
   const initial = useMemo<TrackerHistory>(
     () => ({ present: restore(storageKey, players, persist), past: [] }),
@@ -313,6 +324,7 @@ export function TrackerView({
   );
   const [assassinTargetsOpen, setAssassinTargetsOpen] = useState(false);
   const [assassinVictimId, setAssassinVictimId] = useState<string | null>(null);
+  const [treacheryRolesOpen, setTreacheryRolesOpen] = useState(false);
   const [schemeOpen, setSchemeOpen] = useState(false);
   const [rulesOpen, setRulesOpen] = useState(false);
   const attemptedChallenges = useRef(new Set<string>());
@@ -361,6 +373,35 @@ export function TrackerView({
   const assassinVictim = state.players.find(
     (player) => player.id === assassinVictimId,
   );
+  const deviceTreachery = gameMode === 'treachery' && dealTreachery;
+  const leaderId =
+    gameMode === 'treachery'
+      ? startingPlayerId ?? treacheryLeaderId(state)
+      : null;
+  const firstSeatId = startingPlayerId ?? leaderId ?? undefined;
+  /*
+    Identities the table has already seen: from the server for a hosted pod, and
+    from this device for a pod that dealt its own.
+  */
+  const publicIdentities = useMemo(() => {
+    const merged: Record<string, PublicTreacheryIdentity> = {
+      ...revealedIdentities,
+    };
+    for (const playerId of state.treacheryUnveiled ?? []) {
+      const identity = treacheryIdentityById(
+        state.treacheryIdentities[playerId] ?? -1,
+      );
+      if (identity) {
+        merged[playerId] = {
+          id: identity.id,
+          name: identity.name,
+          role: identity.role,
+          image: identity.image,
+        };
+      }
+    }
+    return merged;
+  }, [revealedIdentities, state.treacheryIdentities, state.treacheryUnveiled]);
 
   useEffect(() => {
     if (!onChallengeComplete) {
@@ -471,7 +512,8 @@ export function TrackerView({
       !schemeOpen &&
       !rulesOpen &&
       !assassinTargetsOpen &&
-      !assassinVictimId
+      !assassinVictimId &&
+      !treacheryRolesOpen
     ) {
       return;
     }
@@ -486,6 +528,7 @@ export function TrackerView({
         setRulesOpen(false);
         setAssassinTargetsOpen(false);
         setAssassinVictimId(null);
+        setTreacheryRolesOpen(false);
       }
     }
     window.addEventListener('keydown', onKey);
@@ -502,6 +545,7 @@ export function TrackerView({
     menuOpen,
     rulesOpen,
     schemeOpen,
+    treacheryRolesOpen,
   ]);
 
   const rulesSheet = rulesOpen
@@ -582,6 +626,67 @@ export function TrackerView({
           requireAllReviewed
           onReady={() =>
             dispatch({ type: 'action', action: { type: 'assassinReady' } })
+          }
+          onClose={() => undefined}
+        />
+      </section>
+    );
+  }
+
+  if (deviceTreachery && Object.keys(state.treacheryRoles).length === 0) {
+    return (
+      <>
+        <section className={cx(screenClass, 'items-center justify-center')}>
+          <div className="w-full max-w-lg text-center">
+            <Shield size={34} aria-hidden className="text-plasma mx-auto mb-3" />
+            <h2 className="font-display mb-2 text-2xl font-bold">
+              Deal secret identities
+            </h2>
+            <p className="text-muted mb-5 text-sm">
+              Every player receives one hidden identity. The device will be
+              passed around so each one can be read in secret.
+            </p>
+            <div className="flex flex-wrap justify-center gap-3">
+              <Button variant="glass" onClick={() => setRulesOpen(true)}>
+                <BookOpen size={16} aria-hidden />
+                Read rules
+              </Button>
+              <Button
+                variant="neon"
+                onClick={() =>
+                  dispatch({
+                    type: 'action',
+                    action: {
+                      type: 'treacheryIdentities',
+                      deal: dealTreacheryIdentities(
+                        state.players.map((player) => player.id),
+                      ),
+                    },
+                  })
+                }
+              >
+                <Shuffle size={16} aria-hidden />
+                Deal identities
+              </Button>
+            </div>
+          </div>
+        </section>
+        {rulesSheet}
+      </>
+    );
+  }
+
+  if (deviceTreachery && !state.treacheryRolesReady) {
+    return (
+      <section className={screenClass}>
+        <TreacheryRolesSheet
+          players={state.players}
+          roles={state.treacheryRoles}
+          identities={state.treacheryIdentities}
+          unveiled={state.treacheryUnveiled}
+          requireAllReviewed
+          onReady={() =>
+            dispatch({ type: 'action', action: { type: 'treacheryReady' } })
           }
           onClose={() => undefined}
         />
@@ -1104,12 +1209,10 @@ export function TrackerView({
             variant="neon"
             size="lg"
             className="h-16 min-w-48 text-xl"
-            disabled={gameMode === 'treachery' && !startingPlayerId}
-            onClick={() =>
-              dispatch({ type: 'first', playerId: startingPlayerId })
-            }
+            disabled={gameMode === 'treachery' && !firstSeatId}
+            onClick={() => dispatch({ type: 'first', playerId: firstSeatId })}
           >
-            {gameMode === 'treachery' && !startingPlayerId
+            {gameMode === 'treachery' && !firstSeatId
               ? 'Loading roles…'
               : 'Start'}
           </Button>
@@ -1206,13 +1309,20 @@ export function TrackerView({
                     <Badge tone="idle">General · range 1</Badge>
                   )
                 ) : null}
-                {revealedIdentities[player.id] ? (
+                {/* The Leader is public knowledge, so the seat can say so. */}
+                {leaderId === player.id ? (
+                  <Badge tone="crown">
+                    <Crown size={12} aria-hidden />
+                    Leader
+                  </Badge>
+                ) : null}
+                {publicIdentities[player.id] ? (
                   <button
                     type="button"
                     className="border-warning/50 bg-warning/15 text-warning rounded-full border px-2 py-0.5 text-[0.65rem] font-bold"
                     onClick={() => setPublicIdentityPlayerId(player.id)}
                   >
-                    {revealedIdentities[player.id]?.name}
+                    {publicIdentities[player.id]?.name}
                   </button>
                 ) : null}
                 {player.id === state.initiativeId ? (
@@ -1503,21 +1613,6 @@ export function TrackerView({
             })
           : null}
       </div>
-      {archenemyBoard ? (
-        <Button
-          variant="glass"
-          size="sm"
-          className="absolute top-3 right-3 z-30 shadow-lg"
-          disabled={Boolean(state.winnerId) || state.schemeOrder.length === 0}
-          onClick={() => {
-            dispatch({ type: 'action', action: { type: 'scheme' } });
-            setSchemeOpen(true);
-          }}
-        >
-          <Sparkles size={15} aria-hidden />
-          {currentScheme ? 'Next scheme' : 'First scheme'}
-        </Button>
-      ) : null}
       {startingTeamName && spotlight.playerId ? (
         <p className="border-neon/40 bg-void/95 text-neon fixed top-[max(0.75rem,env(safe-area-inset-top))] left-1/2 z-[65] -translate-x-1/2 rounded-full border px-4 py-2 text-center text-xs font-semibold shadow-lg">
           {archenemyBoard
@@ -1763,7 +1858,11 @@ export function TrackerView({
                 }}
                 onFinish={finish}
                 onQuit={onQuit}
-                onCheckRole={onCheckRole}
+                onCheckRole={
+                  deviceTreachery
+                    ? () => setTreacheryRolesOpen(true)
+                    : onCheckRole
+                }
                 onChallenges={() => {
                   setMenuOpen(false);
                   setChallengesOpen(true);
@@ -1772,6 +1871,15 @@ export function TrackerView({
                   setMenuOpen(false);
                   setRulesOpen(true);
                 }}
+                onScheme={
+                  archenemyBoard
+                    ? () => {
+                        setMenuOpen(false);
+                        dispatch({ type: 'action', action: { type: 'scheme' } });
+                        setSchemeOpen(true);
+                      }
+                    : undefined
+                }
                 onTargets={
                   gameMode === 'assassin'
                     ? () => {
@@ -1808,6 +1916,31 @@ export function TrackerView({
                 targets={state.assassinTargets}
                 scores={state.assassinScores}
                 onClose={() => setAssassinTargetsOpen(false)}
+              />
+            </div>,
+            document.body,
+          )
+        : null}
+      {treacheryRolesOpen
+        ? createPortal(
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label="Secret identities"
+              className="bg-void/95 fixed inset-x-0 top-0 z-[70] flex h-[100dvh] p-2 backdrop-blur-sm"
+            >
+              <TreacheryRolesSheet
+                players={state.players}
+                roles={state.treacheryRoles}
+                identities={state.treacheryIdentities}
+                unveiled={state.treacheryUnveiled}
+                onUnveil={(playerId) =>
+                  dispatch({
+                    type: 'action',
+                    action: { type: 'unveilTreachery', playerId },
+                  })
+                }
+                onClose={() => setTreacheryRolesOpen(false)}
               />
             </div>,
             document.body,
@@ -1881,7 +2014,7 @@ export function TrackerView({
             document.body,
           )
         : null}
-      {publicIdentityPlayerId && revealedIdentities[publicIdentityPlayerId]
+      {publicIdentityPlayerId && publicIdentities[publicIdentityPlayerId]
         ? createPortal(
             <div
               role="dialog"
@@ -1896,8 +2029,8 @@ export function TrackerView({
             >
               <section className="relative max-h-full max-w-md">
                 <img
-                  src={revealedIdentities[publicIdentityPlayerId].image}
-                  alt={revealedIdentities[publicIdentityPlayerId].name}
+                  src={publicIdentities[publicIdentityPlayerId].image}
+                  alt={publicIdentities[publicIdentityPlayerId].name}
                   className="max-h-[90dvh] max-w-full rounded-xl shadow-2xl"
                 />
                 <button
@@ -2012,6 +2145,28 @@ export function TrackerView({
                 <p className="text-muted mb-3 font-mono text-sm tabular-nums">
                   {formatClock(elapsed)}
                 </p>
+                {/*
+                  The secret is only worth keeping while the game is live, and
+                  the table always wants to know who was hunting whom.
+                */}
+                {deviceTreachery ? (
+                  <ul className="border-muted/20 mb-3 space-y-1 rounded-xl border p-3 text-left text-xs">
+                    {state.players.map((player) => {
+                      const role = state.treacheryRoles[player.id];
+                      return role ? (
+                        <li
+                          key={player.id}
+                          className="flex items-baseline justify-between gap-2"
+                        >
+                          <span className="truncate">{player.name}</span>
+                          <span className="shrink-0 font-semibold">
+                            {TREACHERY_ROLE_INFO[role].name}
+                          </span>
+                        </li>
+                      ) : null;
+                    })}
+                  </ul>
+                ) : null}
                 {confirmation &&
                 !(challengeProgress[
                   confirmation.participantId
@@ -2288,6 +2443,7 @@ function MatchMenu({
   onCheckRole,
   onChallenges,
   onRules,
+  onScheme,
   onTargets,
   onPlayerLost,
   onClose,
@@ -2302,6 +2458,7 @@ function MatchMenu({
   onCheckRole?: () => void;
   onChallenges: () => void;
   onRules: () => void;
+  onScheme?: () => void;
   onTargets?: () => void;
   onPlayerLost?: (playerId: string) => void;
   onClose: () => void;
@@ -2337,6 +2494,22 @@ function MatchMenu({
           {formatClock(elapsed)}
         </p>
         <div className="flex flex-wrap items-center justify-center gap-2">
+          {/*
+            The Archenemy turns a scheme every turn, which makes this the most
+            used control of that mode. It leads the menu rather than floating
+            over the board, because the seats own every pixel out there.
+          */}
+          {onScheme ? (
+            <Button
+              size="sm"
+              variant="neon"
+              disabled={decided || state.schemeOrder.length === 0}
+              onClick={onScheme}
+            >
+              <Sparkles size={14} aria-hidden />
+              {state.currentSchemeId ? 'Next scheme' : 'First scheme'}
+            </Button>
+          ) : null}
           <Button
             size="sm"
             variant={paused ? 'neon' : 'glass'}
@@ -3363,6 +3536,10 @@ function restore(
           assassinTargets: parsed.assassinTargets ?? {},
           assassinScores: parsed.assassinScores ?? {},
           assassinContractsReady: parsed.assassinContractsReady ?? false,
+          treacheryRoles: parsed.treacheryRoles ?? {},
+          treacheryIdentities: parsed.treacheryIdentities ?? {},
+          treacheryUnveiled: parsed.treacheryUnveiled ?? [],
+          treacheryRolesReady: parsed.treacheryRolesReady ?? false,
           schemeOrder: parsed.schemeOrder ?? [],
           currentSchemeId: parsed.currentSchemeId ?? null,
           activeSchemeIds: parsed.activeSchemeIds ?? [],

@@ -1,3 +1,4 @@
+import { TREACHERY_POD_SIZES } from '@podyguard/shared';
 import { randomSandboxCommanders } from './sandbox-commanders';
 import type { CommanderSelection } from './scryfall';
 
@@ -20,9 +21,9 @@ export type MatchConfig = {
   resetCount: number;
 };
 
-/** Treachery is missing here because its roles are dealt by the server. */
 export type StandaloneGameMode =
   | 'commander'
+  | 'treachery'
   | 'two-headed-giant'
   | 'archenemy-commander'
   | 'emperor'
@@ -38,6 +39,11 @@ export const STANDALONE_GAME_MODES: ReadonlyArray<{
     id: 'commander',
     label: 'Commander',
     hint: 'Free-for-all. Everyone starts on 40 life.',
+  },
+  {
+    id: 'treachery',
+    label: 'Treachery',
+    hint: 'Secret identities dealt on this device. Pass it around so everyone reads their own in private.',
   },
   {
     id: 'two-headed-giant',
@@ -80,6 +86,9 @@ export function seatCountsForMode(
   }
   if (gameMode === 'assassin') {
     return ASSASSIN_SEAT_COUNTS;
+  }
+  if (gameMode === 'treachery') {
+    return TREACHERY_POD_SIZES;
   }
   return [
     gameMode === 'emperor'

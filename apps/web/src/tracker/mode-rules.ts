@@ -69,6 +69,7 @@ export const MODE_RULES: Record<GameMode, ModeRules> = {
         heading: 'Identities',
         bullets: [
           'Open Check my role from the timer menu. Only you see that card.',
+          'On a single tracker, deal the identities at setup and pass the device around so each player reads theirs alone.',
           `${TREACHERY_ROLE_INFO.leader.name}: ${TREACHERY_ROLE_INFO.leader.objective} ${TREACHERY_ROLE_INFO.leader.guidance}`,
           `${TREACHERY_ROLE_INFO.guardian.name}: ${TREACHERY_ROLE_INFO.guardian.objective} ${TREACHERY_ROLE_INFO.guardian.guidance}`,
           `${TREACHERY_ROLE_INFO.assassin.name}: ${TREACHERY_ROLE_INFO.assassin.objective} ${TREACHERY_ROLE_INFO.assassin.guidance}`,
@@ -125,7 +126,7 @@ export const MODE_RULES: Record<GameMode, ModeRules> = {
         heading: 'Schemes',
         bullets: [
           'The 40 Duskmourn Commander schemes are shuffled at the start.',
-          'During each of the Archenemy’s first main phases, tap Next scheme to set one in motion.',
+          'During each of the Archenemy’s first main phases, open the timer menu and tap Next scheme to set one in motion.',
           'A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.',
           'An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.',
         ],
