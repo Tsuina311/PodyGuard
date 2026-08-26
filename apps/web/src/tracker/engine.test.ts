@@ -118,6 +118,84 @@ describe('Two-Headed Giant tracker', () => {
   });
 });
 
+describe('Archenemy Commander tracker', () => {
+  function archenemy() {
+    return applyTrackerAction(
+      createTracker([
+        { id: 'a', name: 'Ada' },
+        { id: 'b', name: 'Bea' },
+        { id: 'c', name: 'Cam' },
+        { id: 'd', name: 'Dee' },
+      ]),
+      {
+        type: 'teams',
+        mode: 'archenemy-commander',
+        teams: [['a'], ['b', 'c', 'd']],
+        schemeOrder: ['332', '328'],
+      },
+      1_000,
+    );
+  }
+
+  it('starts the Archenemy and hero team at 60 with the Archenemy first', () => {
+    let state = archenemy();
+    expect(state.archenemyId).toBe('a');
+    expect(state.firstPlayerId).toBe('a');
+    expect(state.players.map((player) => player.life)).toEqual([60, 60, 60, 60]);
+
+    state = applyTrackerAction(state, {
+      type: 'life',
+      playerId: 'c',
+      delta: -5,
+    });
+    expect(state.players.find((player) => player.id === 'a')?.life).toBe(60);
+    expect(
+      state.players
+        .filter((player) => ['b', 'c', 'd'].includes(player.id))
+        .map((player) => player.life),
+    ).toEqual([55, 55, 55]);
+  });
+
+  it('keeps ongoing schemes face up until they are abandoned', () => {
+    let state = applyTrackerAction(archenemy(), { type: 'scheme' });
+    expect(state.currentSchemeId).toBe('332');
+    expect(state.activeSchemeIds).toEqual(['332']);
+    expect(state.schemeOrder).toEqual(['328']);
+
+    state = applyTrackerAction(state, { type: 'scheme' });
+    expect(state.currentSchemeId).toBe('328');
+    expect(state.schemeOrder).toEqual(['328']);
+
+    state = applyTrackerAction(state, {
+      type: 'abandonScheme',
+      schemeId: '332',
+    });
+    expect(state.activeSchemeIds).toEqual([]);
+    expect(state.schemeOrder).toEqual(['328', '332']);
+  });
+
+  it('uses individual poison but wins and loses as a team', () => {
+    let state = applyTrackerAction(archenemy(), {
+      type: 'poison',
+      playerId: 'c',
+      delta: 10,
+    });
+    expect(state.players.find((player) => player.id === 'c')?.pendingLoss).toEqual(
+      { type: 'poison' },
+    );
+    state = applyTrackerAction(state, {
+      type: 'confirmLoss',
+      playerId: 'c',
+    });
+    expect(
+      state.players
+        .filter((player) => ['b', 'c', 'd'].includes(player.id))
+        .every((player) => player.eliminated),
+    ).toBe(true);
+    expect(state.winnerId).toBe('a');
+  });
+});
+
 describe('commander tracker', () => {
   it('starts at 40 life and can undo via previous snapshots', () => {
     const start = createTracker([

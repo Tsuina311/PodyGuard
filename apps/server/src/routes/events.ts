@@ -53,7 +53,8 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
         tableCount: parseTableCount(body.tableCount),
         gameMode:
           body.gameMode === 'treachery' ||
-          body.gameMode === 'two-headed-giant'
+          body.gameMode === 'two-headed-giant' ||
+          body.gameMode === 'archenemy-commander'
             ? body.gameMode
             : 'commander',
         allowThreePods: body.allowThreePods === undefined ? undefined : Boolean(body.allowThreePods),

@@ -6,9 +6,12 @@ import {
   loadMatchConfig,
   matchPlayers,
   saveMatchConfig,
+  seatCountForMode,
+  seatCountsForMode,
   trackerStorageKey,
-  SEAT_COUNTS,
+  STANDALONE_GAME_MODES,
   type MatchConfig,
+  type StandaloneGameMode,
 } from './match-config';
 import { Badge } from './ui/Badge';
 import { Brand } from './ui/Brand';
@@ -35,6 +38,13 @@ export function MatchConfigPage() {
       const next = { ...current, ...patch };
       saveMatchConfig(next);
       return next;
+    });
+  }
+
+  function setGameMode(gameMode: StandaloneGameMode) {
+    update({
+      gameMode,
+      seatCount: seatCountForMode(gameMode, config.seatCount),
     });
   }
 
@@ -78,10 +88,26 @@ export function MatchConfigPage() {
 
       <Panel title="Pod setup" aside={`${String(config.seatCount)} seats`}>
         <p className="text-muted mb-2 text-xs font-medium tracking-[0.14em] uppercase">
+          Game
+        </p>
+        <div className="mb-4 flex flex-wrap gap-1.5">
+          {STANDALONE_GAME_MODES.map((mode) => (
+            <Button
+              key={mode.id}
+              size="sm"
+              variant={config.gameMode === mode.id ? 'neon' : 'glass'}
+              onClick={() => setGameMode(mode.id)}
+            >
+              {mode.label}
+            </Button>
+          ))}
+        </div>
+
+        <p className="text-muted mb-2 text-xs font-medium tracking-[0.14em] uppercase">
           Seats
         </p>
         <div className="mb-4 flex flex-wrap gap-1.5">
-          {SEAT_COUNTS.map((count) => (
+          {seatCountsForMode(config.gameMode).map((count) => (
             <Button
               key={count}
               size="sm"

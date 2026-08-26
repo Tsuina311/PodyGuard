@@ -3,6 +3,14 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { TREACHERY_POD_SIZES, type GameMode, type TreacheryPodSize } from '@podyguard/shared';
 import { ApiError, createEvent, saveHostToken } from './api';
 import { activeMatchPath } from './active-match';
+import {
+  loadMatchConfig,
+  saveMatchConfig,
+  seatCountForMode,
+  seatCountsForMode,
+  STANDALONE_GAME_MODES,
+  type StandaloneGameMode,
+} from './match-config';
 import { Brand } from './ui/Brand';
 import { Button } from './ui/Button';
 import { Field } from './ui/Field';
@@ -25,6 +33,29 @@ export function HomePage() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const ongoingMatch = activeMatchPath();
+  const [trackerMode, setTrackerMode] = useState<StandaloneGameMode>(
+    () => loadMatchConfig().gameMode,
+  );
+  const [trackerSeats, setTrackerSeats] = useState(
+    () => loadMatchConfig().seatCount,
+  );
+  const trackerSeatOptions = seatCountsForMode(trackerMode);
+
+  function pickTrackerMode(mode: StandaloneGameMode) {
+    setTrackerMode(mode);
+    setTrackerSeats((seats) => seatCountForMode(mode, seats));
+  }
+
+  function startTracker() {
+    const config = loadMatchConfig();
+    saveMatchConfig({
+      ...config,
+      gameMode: trackerMode,
+      seatCount: trackerSeats,
+      resetCount: config.resetCount + 1,
+    });
+    void navigate('/match');
+  }
 
   async function onCreate(event: FormEvent) {
     event.preventDefault();
@@ -83,26 +114,100 @@ export function HomePage() {
           Open a battle screen immediately. You can leave it and return without
           losing an unfinished game.
         </p>
-        <Button
-          type="button"
-          variant="neon"
-          size="lg"
-          block
-          onClick={() => void navigate(ongoingMatch ?? '/match')}
-        >
-          {ongoingMatch ? 'Resume game' : 'Start a game'}
-        </Button>
+        <p className="text-muted mb-2 text-xs font-medium tracking-[0.14em] uppercase">
+          Game
+        </p>
+        <div className="mb-2 grid grid-cols-1 gap-2 sm:grid-cols-3">
+          {STANDALONE_GAME_MODES.map((mode) => (
+            <label
+              key={mode.id}
+              className={`cursor-pointer rounded-xl border p-3 text-center text-sm font-semibold transition ${
+                trackerMode === mode.id
+                  ? 'border-neon bg-neon/10 text-neon'
+                  : 'border-muted/20 text-muted hover:border-muted/40'
+              }`}
+            >
+              <input
+                type="radio"
+                name="trackerMode"
+                value={mode.id}
+                checked={trackerMode === mode.id}
+                onChange={() => pickTrackerMode(mode.id)}
+                className="sr-only"
+              />
+              {mode.label}
+            </label>
+          ))}
+        </div>
+        <p className="text-muted mb-4 text-xs">
+          {STANDALONE_GAME_MODES.find((mode) => mode.id === trackerMode)?.hint}
+        </p>
+        <p className="text-muted mb-2 text-xs font-medium tracking-[0.14em] uppercase">
+          Players
+        </p>
+        {trackerSeatOptions.length > 1 ? (
+          <div className="mb-4 flex flex-wrap gap-1.5">
+            {trackerSeatOptions.map((count) => (
+              <Button
+                key={count}
+                size="sm"
+                variant={trackerSeats === count ? 'neon' : 'glass'}
+                onClick={() => setTrackerSeats(count)}
+              >
+                {count}
+              </Button>
+            ))}
+          </div>
+        ) : (
+          <p className="text-muted mb-4 text-xs">
+            Always four players in this mode.
+          </p>
+        )}
+        {ongoingMatch ? (
+          <>
+            <Button
+              type="button"
+              variant="neon"
+              size="lg"
+              block
+              onClick={() => void navigate(ongoingMatch)}
+            >
+              Resume game
+            </Button>
+            <Button
+              type="button"
+              variant="glass"
+              size="lg"
+              block
+              className="mt-2"
+              onClick={startTracker}
+            >
+              Start a new game
+            </Button>
+          </>
+        ) : (
+          <Button
+            type="button"
+            variant="neon"
+            size="lg"
+            block
+            onClick={startTracker}
+          >
+            Start a game
+          </Button>
+        )}
       </Panel>
 
       <Panel title="Host an event" aside="new" onSubmit={onCreate}>
         <fieldset className="mb-5">
           <legend className="text-muted mb-2 text-sm">Game</legend>
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {(
               [
                 ['commander', 'Commander'],
                 ['treachery', 'Treachery'],
                 ['two-headed-giant', 'Two-Headed Giant'],
+                ['archenemy-commander', 'Archenemy Commander'],
               ] as const
             ).map(([value, label]) => (
               <label
@@ -136,6 +241,11 @@ export function HomePage() {
             <p className="text-muted mt-2 text-xs">
               Strict 4-player Commander pods. Two teams share 60 life and take
               their turns together.
+            </p>
+          ) : gameMode === 'archenemy-commander' ? (
+            <p className="text-muted mt-2 text-xs">
+              Strict 4-player Commander pods. One 60-life Archenemy faces a
+              three-player team with 60 shared life and a 40-card scheme deck.
             </p>
           ) : null}
         </fieldset>

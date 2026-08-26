@@ -447,9 +447,14 @@ export function HostPage() {
                 : 'Matching prefers 4-player tables.'}
             </p>
           </>
-        ) : (
+        ) : event.gameMode === 'two-headed-giant' ? (
           <p className="text-muted text-sm">
             Two-Headed Giant matchmaking seats exactly four players per game.
+          </p>
+        ) : (
+          <p className="text-muted text-sm">
+            Archenemy Commander matchmaking seats exactly four players per
+            game: one Archenemy against a team of three.
           </p>
         )}
       </Panel>

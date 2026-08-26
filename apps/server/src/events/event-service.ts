@@ -121,7 +121,8 @@ export class EventService {
     const hostPin = assertHostPin(input.hostPin);
     const gameMode: GameMode =
       input.gameMode === 'treachery' ||
-      input.gameMode === 'two-headed-giant'
+      input.gameMode === 'two-headed-giant' ||
+      input.gameMode === 'archenemy-commander'
         ? input.gameMode
         : 'commander';
     const preferredPodSize = assertPreferredPodSize(

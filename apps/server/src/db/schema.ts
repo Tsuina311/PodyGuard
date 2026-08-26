@@ -47,6 +47,7 @@ export const gameModeEnum = pgEnum('game_mode', [
   'commander',
   'treachery',
   'two-headed-giant',
+  'archenemy-commander',
 ]);
 
 export const treacheryRoleEnum = pgEnum('treachery_role', [

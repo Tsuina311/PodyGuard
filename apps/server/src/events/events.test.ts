@@ -1029,6 +1029,31 @@ describe('event HTTP api', () => {
     await app.close();
   });
 
+  it('creates Archenemy Commander events as strict four-player games', async () => {
+    const app = await buildTestApp();
+    const created = await app.inject({
+      method: 'POST',
+      url: '/events',
+      payload: {
+        name: 'Archenemy Night',
+        hostPin: '2468',
+        tableCount: 2,
+        gameMode: 'archenemy-commander',
+        allowThreePods: true,
+        allowFivePods: true,
+      },
+    });
+
+    expect(created.statusCode).toBe(201);
+    expect((created.json() as { event: object }).event).toMatchObject({
+      gameMode: 'archenemy-commander',
+      allowThreePods: false,
+      allowFivePods: false,
+      preferredPodSize: 4,
+    });
+    await app.close();
+  });
+
   it('forms two 5-player Treachery pods when the host sets 5 as the base', async () => {
     const app = await buildTestApp();
     const created = await app.inject({

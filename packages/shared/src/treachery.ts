@@ -4,6 +4,7 @@ export const GAME_MODES = [
   'commander',
   'treachery',
   'two-headed-giant',
+  'archenemy-commander',
 ] as const;
 export type GameMode = (typeof GAME_MODES)[number];
 

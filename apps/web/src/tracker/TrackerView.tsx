@@ -22,6 +22,7 @@ import {
   Radiation,
   RotateCw,
   Shield,
+  Shuffle,
   Sparkles,
   Skull,
   SlidersHorizontal,
@@ -62,6 +63,12 @@ import {
   type SecondaryCounter,
 } from './engine';
 import { DUNGEON_COUNT } from './dungeons';
+import {
+  randomPlayerId,
+  randomTwoHeadedTeam,
+  schemeById,
+  shuffleSchemeIds,
+} from './archenemy';
 import { planFirstPlayerReveal, type RevealHop } from './first-player-reveal';
 import { DungeonTracker } from './DungeonTracker';
 import { useLandscape, useLandscapeLock } from './orientation';
@@ -270,6 +277,10 @@ export function TrackerView({
   >(null);
   const [confirmationDismissed, setConfirmationDismissed] = useState(false);
   const [selectedAllies, setSelectedAllies] = useState<string[]>([]);
+  const [selectedArchenemy, setSelectedArchenemy] = useState<string | null>(
+    null,
+  );
+  const [schemeOpen, setSchemeOpen] = useState(false);
   const attemptedChallenges = useRef(new Set<string>());
   const landscape = useLandscape();
   useLandscapeLock();
@@ -297,6 +308,12 @@ export function TrackerView({
           .join(' & ')
       : null;
   const confirmation = detectedConfirmation(state, challengePack);
+  const archenemyBoard =
+    gameMode === 'archenemy-commander' &&
+    state.teamMode === 'archenemy-commander';
+  const currentScheme = state.currentSchemeId
+    ? schemeById(state.currentSchemeId)
+    : undefined;
 
   useEffect(() => {
     if (!onChallengeComplete) {
@@ -358,6 +375,7 @@ export function TrackerView({
     setCommanderPlayerId(null);
     setCounterPlayerId(null);
     setDungeonPlayerId(null);
+    setSchemeOpen(false);
   }, [state.winnerId]);
 
   /*
@@ -402,7 +420,8 @@ export function TrackerView({
       !commanderPlayer &&
       !counterPlayer &&
       !menuOpen &&
-      !challengesOpen
+      !challengesOpen &&
+      !schemeOpen
     ) {
       return;
     }
@@ -413,6 +432,7 @@ export function TrackerView({
         setCounterPlayerId(null);
         setMenuOpen(false);
         setChallengesOpen(false);
+        setSchemeOpen(false);
       }
     }
     window.addEventListener('keydown', onKey);
@@ -425,7 +445,85 @@ export function TrackerView({
     counterPlayer,
     dungeonPlayer,
     menuOpen,
+    schemeOpen,
   ]);
+
+  if (
+    gameMode === 'archenemy-commander' &&
+    state.players.length === 4 &&
+    !state.teams
+  ) {
+    return (
+      <section className={cx(screenClass, 'items-center justify-center')}>
+        <div className="w-full max-w-lg">
+          <h2 className="font-display mb-2 text-center text-2xl font-bold">
+            Choose the Archenemy
+          </h2>
+          <p className="text-muted mb-5 text-center text-sm">
+            The Archenemy faces the other three players. Both sides share 60
+            life. The Archenemy goes first, draws on that turn, and sets a
+            scheme in motion during each first main phase.
+          </p>
+          <div className="mb-5 grid grid-cols-2 gap-3">
+            {state.players.map((player) => (
+              <button
+                key={player.id}
+                type="button"
+                onClick={() => setSelectedArchenemy(player.id)}
+                className={cx(
+                  'rounded-xl border p-4 text-center font-semibold transition',
+                  selectedArchenemy === player.id
+                    ? 'border-warning bg-warning/15 text-warning'
+                    : 'border-muted/25 bg-void/70 text-ink',
+                )}
+              >
+                {player.name}
+              </button>
+            ))}
+          </div>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Button
+              variant="glass"
+              onClick={() =>
+                setSelectedArchenemy(
+                  randomPlayerId(state.players.map((player) => player.id)) ??
+                    null,
+                )
+              }
+            >
+              <Shuffle size={16} aria-hidden />
+              Random
+            </Button>
+            <Button
+              variant="neon"
+              disabled={!selectedArchenemy}
+              onClick={() => {
+                if (!selectedArchenemy) {
+                  return;
+                }
+                dispatch({
+                  type: 'action',
+                  action: {
+                    type: 'teams',
+                    mode: 'archenemy-commander',
+                    teams: [
+                      [selectedArchenemy],
+                      state.players
+                        .filter((player) => player.id !== selectedArchenemy)
+                        .map((player) => player.id),
+                    ],
+                    schemeOrder: shuffleSchemeIds(),
+                  },
+                });
+              }}
+            >
+              Confirm Archenemy
+            </Button>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (
     gameMode === 'two-headed-giant' &&
@@ -492,6 +590,19 @@ export function TrackerView({
           <div className="flex justify-center gap-3">
             <Button
               variant="glass"
+              onClick={() =>
+                setSelectedAllies(
+                  randomTwoHeadedTeam(
+                    state.players.map((player) => player.id),
+                  ),
+                )
+              }
+            >
+              <Shuffle size={16} aria-hidden />
+              Random
+            </Button>
+            <Button
+              variant="glass"
               disabled={selectedAllies.length === 0}
               onClick={() => setSelectedAllies([])}
             >
@@ -549,7 +660,9 @@ export function TrackerView({
       <div
         className={cx(
           'grid min-h-0 flex-1 auto-rows-fr gap-2',
-          seatGridClass(state.players.length),
+          archenemyBoard
+            ? 'grid-cols-1 landscape:grid-cols-3'
+            : seatGridClass(state.players.length),
         )}
       >
         {state.players.map((player, index) => (
@@ -558,6 +671,7 @@ export function TrackerView({
             className={cx(
               'border-muted/20 relative flex min-h-0 flex-col overflow-hidden rounded-xl border p-2 transition-transform duration-200',
               player.eliminated ? 'opacity-50' : 'bg-ink/[0.03]',
+              archenemyBoard && index === 0 && 'landscape:col-span-3',
               spotlightIds.has(player.id) && spotlightCard,
               spotlightIds.has(player.id) &&
                 (spotlight.phase === 'sweep'
@@ -575,7 +689,9 @@ export function TrackerView({
             <div
               className={cx(
                 'relative z-10 flex shrink-0 items-start justify-between gap-2',
-                clockClearance(state.players.length, index, 'top'),
+                archenemyBoard
+                  ? ''
+                  : clockClearance(state.players.length, index, 'top'),
               )}
             >
               {/*
@@ -619,7 +735,7 @@ export function TrackerView({
               them on the row's midline once the cap is reached instead of
               leaving them hanging from the top.
             */}
-            {gameMode !== 'two-headed-giant' ? (
+            {!state.teams ? (
             <div className="relative z-10 flex min-h-0 flex-1 items-center gap-1.5 py-1">
               {[-5, -1].map((delta) => (
                 <LifeButton
@@ -667,7 +783,9 @@ export function TrackerView({
             <div
               className={cx(
                 'relative z-10 flex shrink-0 flex-col landscape:flex-row landscape:items-center landscape:gap-2',
-                clockClearance(state.players.length, index, 'bottom'),
+                archenemyBoard
+                  ? ''
+                  : clockClearance(state.players.length, index, 'bottom'),
               )}
             >
               <div className="flex min-w-0 shrink-0 gap-1 overflow-x-auto [scrollbar-width:none] landscape:flex-1 [&::-webkit-scrollbar]:hidden">
@@ -803,7 +921,7 @@ export function TrackerView({
           </article>
         ))}
       </div>
-      {gameMode === 'two-headed-giant' && state.teams
+      {state.teams
         ? state.teams.map((team, index) => {
             const first = state.players.find((player) => player.id === team[0]);
             if (!first) {
@@ -820,6 +938,16 @@ export function TrackerView({
                     : 'top-3/4 -translate-y-1/2',
                 )}
               >
+                {archenemyBoard ? (
+                  <span
+                    className={cx(
+                      'hidden w-20 shrink-0 text-center text-[0.65rem] font-bold tracking-wider uppercase landscape:block',
+                      index === 0 ? 'text-warning' : 'text-neon',
+                    )}
+                  >
+                    {index === 0 ? 'Archenemy' : 'Heroes'}
+                  </span>
+                ) : null}
                 {[-5, -1].map((delta) => (
                   <LifeButton
                     key={delta}
@@ -861,9 +989,26 @@ export function TrackerView({
             );
           })
         : null}
+      {archenemyBoard ? (
+        <Button
+          variant="glass"
+          size="sm"
+          className="absolute top-3 right-3 z-30 shadow-lg"
+          disabled={Boolean(state.winnerId) || state.schemeOrder.length === 0}
+          onClick={() => {
+            dispatch({ type: 'action', action: { type: 'scheme' } });
+            setSchemeOpen(true);
+          }}
+        >
+          <Sparkles size={15} aria-hidden />
+          {currentScheme ? 'Next scheme' : 'First scheme'}
+        </Button>
+      ) : null}
       {startingTeamName && spotlight.playerId ? (
         <p className="border-neon/40 bg-void/95 text-neon fixed top-[max(0.75rem,env(safe-area-inset-top))] left-1/2 z-[65] -translate-x-1/2 rounded-full border px-4 py-2 text-center text-xs font-semibold shadow-lg">
-          {startingTeamName} start — skip the first draw
+          {archenemyBoard
+            ? `${startingTeamName} is the Archenemy — goes first and draws`
+            : `${startingTeamName} start — skip the first draw`}
         </p>
       ) : null}
       {/*
@@ -922,6 +1067,88 @@ export function TrackerView({
           <MoreHorizontal size={12} className="text-muted" aria-hidden />
         )}
       </button>
+      {schemeOpen && currentScheme ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={currentScheme.name}
+          className="bg-void/95 fixed inset-0 z-[75] flex items-center justify-center p-3 backdrop-blur-sm"
+        >
+          <div className="flex max-h-full w-full max-w-4xl flex-col items-center gap-3 landscape:flex-row landscape:items-stretch">
+            <img
+              src={currentScheme.imageUrl}
+              alt={currentScheme.name}
+              className="max-h-[72dvh] min-h-0 rounded-xl object-contain shadow-2xl landscape:max-h-[94dvh] landscape:max-w-[62%]"
+            />
+            <div className="flex min-h-0 w-full max-w-sm flex-col justify-center gap-3">
+              <div>
+                <p className="text-muted text-xs font-bold tracking-wider uppercase">
+                  {currentScheme.ongoing ? 'Ongoing scheme' : 'Scheme'}
+                </p>
+                <h2 className="font-display text-xl font-bold">
+                  {currentScheme.name}
+                </h2>
+              </div>
+              {state.activeSchemeIds.length > 0 ? (
+                <div className="border-warning/30 bg-warning/10 rounded-xl border p-3">
+                  <p className="text-warning mb-2 text-xs font-bold tracking-wider uppercase">
+                    Active ongoing schemes
+                  </p>
+                  <div className="flex flex-col gap-2">
+                    {state.activeSchemeIds.map((schemeId) => {
+                      const active = schemeById(schemeId);
+                      return active ? (
+                        <div
+                          key={schemeId}
+                          className="flex items-center justify-between gap-2 text-sm"
+                        >
+                          <span>{active.name}</span>
+                          <Button
+                            size="sm"
+                            variant="glass"
+                            onClick={() =>
+                              dispatch({
+                                type: 'action',
+                                action: {
+                                  type: 'abandonScheme',
+                                  schemeId,
+                                },
+                              })
+                            }
+                          >
+                            Abandon
+                          </Button>
+                        </div>
+                      ) : null;
+                    })}
+                  </div>
+                </div>
+              ) : null}
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="neon"
+                  disabled={
+                    Boolean(state.winnerId) || state.schemeOrder.length === 0
+                  }
+                  onClick={() =>
+                    dispatch({ type: 'action', action: { type: 'scheme' } })
+                  }
+                >
+                  <Sparkles size={16} aria-hidden />
+                  Next scheme
+                </Button>
+                <Button variant="glass" onClick={() => setSchemeOpen(false)}>
+                  Close
+                </Button>
+              </div>
+              <p className="text-muted text-[0.65rem]">
+                Card image via Scryfall. Magic: The Gathering is © Wizards of
+                the Coast.
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : null}
       {/*
         Where the browser lets go of the orientation the board turns itself, so
         this only ever shows on a phone that refused — every iPhone, which has
@@ -2477,6 +2704,11 @@ function restore(
         return {
           ...parsed,
           teams: parsed.teams ?? null,
+          teamMode: parsed.teamMode ?? null,
+          archenemyId: parsed.archenemyId ?? null,
+          schemeOrder: parsed.schemeOrder ?? [],
+          currentSchemeId: parsed.currentSchemeId ?? null,
+          activeSchemeIds: parsed.activeSchemeIds ?? [],
           dayNight: parsed.dayNight ?? null,
           dungeons: parsed.dungeons ?? {},
           completedDungeons: normalizeCompletedDungeons(

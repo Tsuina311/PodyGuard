@@ -76,12 +76,19 @@ export function allowedPodSizes(flags: {
 }
 
 export function eventMatchOptions(input: {
-  gameMode: 'commander' | 'treachery' | 'two-headed-giant';
+  gameMode:
+    | 'commander'
+    | 'treachery'
+    | 'two-headed-giant'
+    | 'archenemy-commander';
   allowThreePods: boolean;
   allowFivePods: boolean;
   preferredPodSize?: number;
 }): MatchOptions {
-  if (input.gameMode === 'two-headed-giant') {
+  if (
+    input.gameMode === 'two-headed-giant' ||
+    input.gameMode === 'archenemy-commander'
+  ) {
     return {
       preferredSize: PREFERRED_POD_SIZE,
       allowedSizes: [PREFERRED_POD_SIZE],

@@ -289,13 +289,18 @@ describe('eventMatchOptions', () => {
     ).toEqual({ preferredSize: 7, allowedSizes: [7, 6, 5, 4] });
   });
 
-  it('makes Two-Headed Giant strictly four players', () => {
-    expect(
-      eventMatchOptions({
-        gameMode: 'two-headed-giant',
-        allowThreePods: true,
-        allowFivePods: true,
-      }),
-    ).toEqual({ preferredSize: 4, allowedSizes: [4] });
+  it('makes team Commander modes strictly four players', () => {
+    for (const gameMode of [
+      'two-headed-giant',
+      'archenemy-commander',
+    ] as const) {
+      expect(
+        eventMatchOptions({
+          gameMode,
+          allowThreePods: true,
+          allowFivePods: true,
+        }),
+      ).toEqual({ preferredSize: 4, allowedSizes: [4] });
+    }
   });
 });

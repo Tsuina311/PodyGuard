@@ -1342,6 +1342,24 @@ Design for one phone/tablet placed in the middle of the table.
 
 Do NOT synchronise life totals between all player phones initially.
 
+## Archenemy Commander
+
+Host-selectable mode with strict 4-player pods:
+
+- one Archenemy against a team of three;
+- both sides start at 60 life;
+- the hero team shares life and takes its turn together;
+- players choose the Archenemy before the tracker starts, or assign one at
+  random;
+- the Archenemy always goes first and draws on the first turn;
+- shuffle all 40 Duskmourn Commander schemes;
+- reveal the next scheme during each Archenemy first main phase;
+- non-ongoing schemes return to the bottom after resolving;
+- ongoing schemes stay face up until the table marks them abandoned, then
+  return to the bottom.
+
+Two-Headed Giant setup also offers random team assignment.
+
 ---
 
 # 38. Do NOT implement turn tracking

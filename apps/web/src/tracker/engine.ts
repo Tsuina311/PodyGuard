@@ -5,10 +5,12 @@ import {
   type DungeonProgress,
 } from './dungeons';
 import type { CommanderSelection } from '../scryfall';
+import { schemeById } from './archenemy';
 
 export const STARTING_LIFE = 40;
 export const TWO_HEADED_GIANT_STARTING_LIFE = 60;
 export const TWO_HEADED_GIANT_POISON_LIMIT = 20;
+export const ARCHENEMY_STARTING_LIFE = 60;
 export const POISON_LIMIT = 10;
 export const COMMANDER_DAMAGE_LIMIT = 21;
 export const HIT_LIMIT = 3;
@@ -85,8 +87,13 @@ export type TrackerPlayer = {
 
 export type TrackerState = {
   players: TrackerPlayer[];
-  /** Two pairs in board order for Two-Headed Giant. */
+  /** Two sides in board order for team variants. */
   teams: string[][] | null;
+  teamMode: 'two-headed-giant' | 'archenemy-commander' | null;
+  archenemyId: string | null;
+  schemeOrder: string[];
+  currentSchemeId: string | null;
+  activeSchemeIds: string[];
   dayNight: 'day' | 'night' | null;
   dungeons: Record<string, DungeonProgress | undefined>;
   /** Completions in order, including repeats. The 0–4 counter is unique ids. */
@@ -103,7 +110,14 @@ export type TrackerState = {
 };
 
 export type TrackerAction =
-  | { type: 'teams'; teams: string[][] }
+  | {
+      type: 'teams';
+      teams: string[][];
+      mode?: 'two-headed-giant' | 'archenemy-commander';
+      schemeOrder?: string[];
+    }
+  | { type: 'scheme' }
+  | { type: 'abandonScheme'; schemeId: string }
   | { type: 'life'; playerId: string; delta: number }
   | { type: 'poison'; playerId: string; delta: number }
   | { type: 'tax'; playerId: string; delta: number }
@@ -160,6 +174,11 @@ export function createTracker(
       answeredCauses: [],
     })),
     teams: null,
+    teamMode: null,
+    archenemyId: null,
+    schemeOrder: [],
+    currentSchemeId: null,
+    activeSchemeIds: [],
     dayNight: null,
     dungeons: {},
     completedDungeons: {},
@@ -197,24 +216,73 @@ export function applyTrackerAction(
   next.dungeons ??= {};
   next.completedDungeons ??= {};
   next.eliminations ??= [];
+  next.teamMode ??= null;
+  next.archenemyId ??= null;
+  next.schemeOrder ??= [];
+  next.currentSchemeId ??= null;
+  next.activeSchemeIds ??= [];
   switch (action.type) {
     case 'teams': {
       const ids = action.teams.flat();
+      const mode = action.mode ?? 'two-headed-giant';
+      const validSizes =
+        mode === 'archenemy-commander'
+          ? action.teams.length === 2 &&
+            action.teams[0]?.length === 1 &&
+            action.teams[1]?.length === 3
+          : action.teams.length === 2 &&
+            action.teams.every((team) => team.length === 2);
       if (
-        action.teams.length !== 2 ||
-        action.teams.some((team) => team.length !== 2) ||
+        !validSizes ||
         new Set(ids).size !== 4 ||
         ids.some((id) => !next.players.some((player) => player.id === id))
       ) {
         break;
       }
       next.teams = action.teams.map((team) => [...team]);
+      next.teamMode = mode;
+      next.archenemyId =
+        mode === 'archenemy-commander' ? action.teams[0]?.[0] ?? null : null;
+      next.schemeOrder =
+        mode === 'archenemy-commander' ? [...(action.schemeOrder ?? [])] : [];
+      next.currentSchemeId = null;
+      next.activeSchemeIds = [];
       next.players.sort(
         (left, right) => ids.indexOf(left.id) - ids.indexOf(right.id),
       );
       for (const player of next.players) {
-        player.life = TWO_HEADED_GIANT_STARTING_LIFE;
-        player.minimumLife = TWO_HEADED_GIANT_STARTING_LIFE;
+        player.life = ARCHENEMY_STARTING_LIFE;
+        player.minimumLife = ARCHENEMY_STARTING_LIFE;
+      }
+      if (next.archenemyId) {
+        next.firstPlayerId = next.archenemyId;
+        next.startedAt = now;
+        next.pausedAt = null;
+        next.accumulatedPausedMs = 0;
+      }
+      break;
+    }
+    case 'scheme':
+      if (
+        next.teamMode === 'archenemy-commander' &&
+        next.schemeOrder.length > 0
+      ) {
+        const schemeId = next.schemeOrder.shift();
+        if (schemeId) {
+          next.currentSchemeId = schemeId;
+          if (schemeById(schemeId)?.ongoing) {
+            next.activeSchemeIds.push(schemeId);
+          } else {
+            next.schemeOrder.push(schemeId);
+          }
+        }
+      }
+      break;
+    case 'abandonScheme': {
+      const active = next.activeSchemeIds.indexOf(action.schemeId);
+      if (active >= 0) {
+        next.activeSchemeIds.splice(active, 1);
+        next.schemeOrder.push(action.schemeId);
       }
       break;
     }
@@ -459,7 +527,8 @@ function raiseLossPrompts(state: TrackerState): void {
     const active = activeLossCauses(state, player).filter(
       (cause) =>
         teamRepresentative ||
-        (cause.type !== 'life' && cause.type !== 'poison'),
+        (cause.type !== 'life' &&
+          (state.teamMode !== 'two-headed-giant' || cause.type !== 'poison')),
     );
     const activeKeys = new Set(active.map(causeKey));
     player.answeredCauses = player.answeredCauses.filter((key) =>
@@ -490,7 +559,7 @@ function activeLossCauses(
   if (player.life <= 0) {
     causes.push({ type: 'life' });
   }
-  const poison = state.teams
+  const poison = state.teamMode === 'two-headed-giant'
     ? teamForPlayer(state, player.id).reduce(
         (total, member) => total + member.poison,
         0,
@@ -498,7 +567,9 @@ function activeLossCauses(
     : player.poison;
   if (
     poison >=
-    (state.teams ? TWO_HEADED_GIANT_POISON_LIMIT : POISON_LIMIT)
+    (state.teamMode === 'two-headed-giant'
+      ? TWO_HEADED_GIANT_POISON_LIMIT
+      : POISON_LIMIT)
   ) {
     causes.push({ type: 'poison' });
   }
