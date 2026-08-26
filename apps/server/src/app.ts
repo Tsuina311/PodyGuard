@@ -1,4 +1,5 @@
 import Fastify from 'fastify';
+import cors from '@fastify/cors';
 import fastifyStatic from '@fastify/static';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -32,9 +33,9 @@ export async function buildApp(options: BuildAppOptions = {}) {
 
   const app = Fastify({
     logger: options.logger ?? true,
-    // The browser always calls /api/* in development and production. Vite
-    // removes that prefix locally; production runs as one Fastify service, so
-    // do the equivalent before Fastify routes the request.
+    // The browser always calls /api/* from the Vite proxy, the Render-hosted
+    // copy, and the GitHub Pages site. Vite strips the prefix locally;
+    // production Fastify does the same before routing.
     rewriteUrl: (request) => {
       const url = request.url ?? '/';
       return url.startsWith('/api/') ? url.slice(4) : url;
@@ -44,6 +45,12 @@ export async function buildApp(options: BuildAppOptions = {}) {
   app.decorate('identity', identity);
   app.decorate('events', events);
   app.decorate('live', attachLive(app));
+
+  await app.register(cors, {
+    origin: true,
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
 
   await app.register(healthRoutes);
   await app.register(eventRoutes);

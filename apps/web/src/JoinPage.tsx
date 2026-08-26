@@ -117,16 +117,21 @@ export function JoinPage() {
         }
       })
       .catch((caught: unknown) => {
-        if (!cancelled) {
-          setError(
-            caught instanceof ApiError ? caught.message : 'Event not found.',
-          );
+        if (cancelled) {
+          return;
         }
+        if (caught instanceof ApiError && caught.status === 404) {
+          void navigate('/', { replace: true, state: { staleJoin: true } });
+          return;
+        }
+        setError(
+          caught instanceof ApiError ? caught.message : 'Event not found.',
+        );
       });
     return () => {
       cancelled = true;
     };
-  }, [joinCode]);
+  }, [joinCode, navigate]);
 
   const onSnapshot = useCallback((next: EventSnapshot) => {
     setSnapshot(next);

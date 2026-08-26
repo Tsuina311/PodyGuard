@@ -1,17 +1,24 @@
+import { useEffect, useState } from 'react';
 import { Link, Route, Routes, useMatch } from 'react-router-dom';
+import { checkHealth } from './api';
+import { shouldShowWakeScreen } from './server-wake';
 import { HomePage } from './HomePage';
 import { HostPage } from './HostPage';
 import { JoinPage } from './JoinPage';
 import { MatchConfigPage } from './MatchConfigPage';
 import { MatchSandboxPage } from './MatchSandboxPage';
 import { cx } from './ui/cx';
+import { ServerWakeScreen } from './ui/ServerWakeScreen';
 
 export function App() {
   // `/match` deliberately shares the player layout so it matches a real phone.
   const wide = Boolean(useMatch('/host/:joinCode'));
+  const localOnly = Boolean(useMatch('/match') || useMatch('/match-config'));
+  const waking = useServerWake() && !localOnly;
   return (
     <div className="bg-deep-space relative min-h-screen overflow-hidden">
       <div aria-hidden className="bg-grid pointer-events-none absolute inset-0" />
+      {waking ? <ServerWakeScreen /> : null}
       <main
         className={cx(
           'relative mx-auto flex min-h-screen w-full flex-col gap-5 px-5 py-14',
@@ -39,4 +46,41 @@ export function App() {
       </main>
     </div>
   );
+}
+
+function useServerWake(): boolean {
+  const isProd = import.meta.env.PROD;
+  const [healthOk, setHealthOk] = useState<boolean | null>(isProd ? null : true);
+  const [waitedMs, setWaitedMs] = useState(0);
+
+  useEffect(() => {
+    if (!isProd) {
+      return;
+    }
+    const started = Date.now();
+    let cancelled = false;
+    let timer = 0;
+    const tick = async () => {
+      const ok = await checkHealth();
+      if (cancelled) {
+        return;
+      }
+      setWaitedMs(Date.now() - started);
+      setHealthOk(ok);
+      if (!ok) {
+        timer = window.setTimeout(() => void tick(), 2500);
+      }
+    };
+    const delay = window.setTimeout(() => {
+      setWaitedMs(Date.now() - started);
+    }, 800);
+    void tick();
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+      window.clearTimeout(delay);
+    };
+  }, [isProd]);
+
+  return shouldShowWakeScreen({ isProd, healthOk, waitedMs });
 }

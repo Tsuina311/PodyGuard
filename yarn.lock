@@ -961,6 +961,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fastify/cors@npm:^11.3.0":
+  version: 11.3.0
+  resolution: "@fastify/cors@npm:11.3.0"
+  dependencies:
+    fastify-plugin: ^6.0.0
+    toad-cache: ^3.7.0
+  checksum: 7673fa62e435118df249ba5dcc45f4a48adc8bc2980506f8aa69aa71dfc2017f0528185866bc3fde4cfc49ea2a7d8a6948a80c2f68a12417c2fcb002d02e4b8b
+  languageName: node
+  linkType: hard
+
 "@fastify/error@npm:^4.0.0":
   version: 4.2.0
   resolution: "@fastify/error@npm:4.2.0"
@@ -1148,6 +1158,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@podyguard/server@workspace:apps/server"
   dependencies:
+    "@fastify/cors": ^11.3.0
     "@fastify/static": ^10.1.3
     "@neondatabase/serverless": ^1.1.0
     "@podyguard/matching": "workspace:*"

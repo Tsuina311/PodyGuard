@@ -24,6 +24,9 @@ createRoot(rootElement).render(
 */
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    void navigator.serviceWorker.register('/sw.js');
+    const workerUrl = `${import.meta.env.BASE_URL}sw.js`;
+    void navigator.serviceWorker.register(workerUrl, {
+      scope: import.meta.env.BASE_URL,
+    });
   });
 }

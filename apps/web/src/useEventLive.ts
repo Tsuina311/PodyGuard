@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { io } from 'socket.io-client';
 import type { EventSnapshot } from '@podyguard/shared';
+import { apiRoot } from './api-base';
 
 export function useEventLive(
   joinCode: string | undefined,
@@ -11,10 +12,12 @@ export function useEventLive(
     if (!joinCode || !enabled) {
       return;
     }
-    const socket = io({
+    const remote = apiRoot();
+    const options = {
       path: '/socket.io',
       transports: ['websocket', 'polling'],
-    });
+    };
+    const socket = remote === '' ? io(options) : io(remote, options);
     const handle = (snapshot: EventSnapshot) => {
       onSnapshot(snapshot);
     };

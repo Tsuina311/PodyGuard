@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import type { GameMode } from '@podyguard/shared';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { TREACHERY_POD_SIZES, type GameMode, type TreacheryPodSize } from '@podyguard/shared';
 import { ApiError, createEvent, saveHostToken } from './api';
 import { activeMatchPath } from './active-match';
 import { Brand } from './ui/Brand';
@@ -11,12 +11,16 @@ import { ThemeToggleCorner } from './ui/ThemeToggle';
 
 export function HomePage() {
   const navigate = useNavigate();
+  const staleJoin =
+    (useLocation().state as { staleJoin?: boolean } | null)?.staleJoin === true;
   const [name, setName] = useState('');
   const [hostPin, setHostPin] = useState('');
   const [tableCount, setTableCount] = useState('8');
   const [gameMode, setGameMode] = useState<GameMode>('commander');
   const [allowThreePods, setAllowThreePods] = useState(true);
   const [allowFivePods, setAllowFivePods] = useState(false);
+  const [preferredPodSize, setPreferredPodSize] = useState<TreacheryPodSize>(4);
+  const [lifetimeHours, setLifetimeHours] = useState('24');
   const [joinCode, setJoinCode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -31,6 +35,8 @@ export function HomePage() {
         gameMode,
         allowThreePods: gameMode === 'commander' && allowThreePods,
         allowFivePods,
+        preferredPodSize: gameMode === 'treachery' ? preferredPodSize : 4,
+        lifetimeHours: Number(lifetimeHours),
       });
       saveHostToken(result.event.joinCode, result.hostToken);
       void navigate(`/host/${result.event.joinCode}`);
@@ -91,11 +97,12 @@ export function HomePage() {
       <Panel title="Host an event" aside="new" onSubmit={onCreate}>
         <fieldset className="mb-5">
           <legend className="text-muted mb-2 text-sm">Game</legend>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
             {(
               [
                 ['commander', 'Commander'],
                 ['treachery', 'Treachery'],
+                ['two-headed-giant', 'Two-Headed Giant'],
               ] as const
             ).map(([value, label]) => (
               <label
@@ -113,9 +120,6 @@ export function HomePage() {
                   checked={gameMode === value}
                   onChange={() => {
                     setGameMode(value);
-                    if (value === 'treachery') {
-                      setAllowFivePods(true);
-                    }
                   }}
                   className="sr-only"
                 />
@@ -125,7 +129,13 @@ export function HomePage() {
           </div>
           {gameMode === 'treachery' ? (
             <p className="text-muted mt-2 text-xs">
-              Secret roles for 4–5 player Commander pods. The Leader starts.
+              Secret roles for Commander pods. Matching fills your chosen table
+              size first; leftovers can sit as small as four.
+            </p>
+          ) : gameMode === 'two-headed-giant' ? (
+            <p className="text-muted mt-2 text-xs">
+              Strict 4-player Commander pods. Two teams share 60 life and take
+              their turns together.
             </p>
           ) : null}
         </fieldset>
@@ -157,15 +167,65 @@ export function HomePage() {
             />
             Allow 3-player pods
           </label>
+        ) : gameMode === 'treachery' ? (
+          <fieldset className="mb-4">
+            <legend className="text-muted mb-2 text-sm">
+              Target table size
+            </legend>
+            <div className="grid grid-cols-5 gap-2">
+              {TREACHERY_POD_SIZES.map((size) => (
+                <label
+                  key={size}
+                  className={`cursor-pointer rounded-xl border p-2 text-center text-sm font-semibold transition ${
+                    preferredPodSize === size
+                      ? 'border-neon bg-neon/10 text-neon'
+                      : 'border-muted/20 text-muted hover:border-muted/40'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="preferredPodSize"
+                    value={size}
+                    checked={preferredPodSize === size}
+                    onChange={() => setPreferredPodSize(size)}
+                    className="sr-only"
+                  />
+                  {size}
+                </label>
+              ))}
+            </div>
+            <p className="text-muted mt-2 text-xs">
+              {preferredPodSize >= 5
+                ? `Matchmaking prefers ${String(preferredPodSize)}-player tables.`
+                : 'Matchmaking prefers 4-player tables.'}
+            </p>
+          </fieldset>
+        ) : (
+          <p className="text-muted mb-4 text-sm">
+            Two-Headed Giant games always seat exactly four players.
+          </p>
+        )}
+        {gameMode === 'commander' ? (
+          <label className="text-muted mb-4 flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={allowFivePods}
+              onChange={(change) => setAllowFivePods(change.target.checked)}
+            />
+            Allow 5-player pods
+          </label>
         ) : null}
-        <label className="text-muted mb-4 flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={allowFivePods}
-            onChange={(change) => setAllowFivePods(change.target.checked)}
-          />
-          Allow 5-player pods
-        </label>
+        <Field
+          label="Event lasts"
+          hint="Join code dies after this many hours. Use 48 or 72 for a weekend."
+          value={lifetimeHours}
+          onChange={(change) => setLifetimeHours(change.target.value)}
+          type="number"
+          inputMode="numeric"
+          min={1}
+          max={168}
+          required
+        />
         <Field
           label="Host PIN"
           hint="4 to 8 digits — reopens the host desk later."
@@ -197,6 +257,11 @@ export function HomePage() {
         </form>
       </Panel>
 
+      {staleJoin ? (
+        <p className="text-muted text-sm">
+          That event is gone. Join with a new code, or host a new night.
+        </p>
+      ) : null}
       {error ? <p className="text-danger text-sm">{error}</p> : null}
 
       <p className="text-muted/70 text-xs">

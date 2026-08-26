@@ -28,7 +28,7 @@ import {
   InvalidParticipantSessionError,
   type IdentityBoundary,
 } from '../identity/index.js';
-import { boundedFlex, createMatches, allowedPodSizes } from '@podyguard/matching';
+import { boundedFlex, createMatches, eventMatchOptions } from '@podyguard/matching';
 import { generateJoinCode } from './join-code.js';
 import { nextBotName } from './bot-names.js';
 import { SEATS_PER_TABLE } from './plan-pods.js';
@@ -53,6 +53,8 @@ import {
   assertDecks,
   assertDisplayName,
   assertEventName,
+  assertLifetimeHours,
+  assertPreferredPodSize,
   assertHostPin,
   assertTableCount,
   assertTableLabel,
@@ -72,6 +74,8 @@ export type CreateEventInput = {
   gameMode?: GameMode;
   allowThreePods?: boolean;
   allowFivePods?: boolean;
+  preferredPodSize?: number;
+  lifetimeHours?: number;
 };
 
 export type CreateEventResult = {
@@ -97,6 +101,7 @@ export type AddTablesInput = {
 
 export type EventServiceOptions = {
   isDev?: boolean;
+  now?: () => Date;
 };
 
 export type MatchResult = {
@@ -115,7 +120,23 @@ export class EventService {
     const name = assertEventName(input.name);
     const hostPin = assertHostPin(input.hostPin);
     const gameMode: GameMode =
-      input.gameMode === 'treachery' ? 'treachery' : 'commander';
+      input.gameMode === 'treachery' ||
+      input.gameMode === 'two-headed-giant'
+        ? input.gameMode
+        : 'commander';
+    const preferredPodSize = assertPreferredPodSize(
+      gameMode,
+      input.preferredPodSize,
+    );
+    const lifetimeHours = assertLifetimeHours(input.lifetimeHours);
+    const createdAt = this.now();
+    const expiresAt = new Date(
+      createdAt.getTime() + lifetimeHours * 60 * 60 * 1000,
+    );
+    const allowFivePods =
+      gameMode === 'treachery'
+        ? preferredPodSize >= 5
+        : gameMode === 'commander' && Boolean(input.allowFivePods);
     const labels = resolveTableLabels({ count: input.tableCount }, 0);
     const hostCredentialHash = await hashHostPin(hostPin);
 
@@ -129,7 +150,10 @@ export class EventService {
           gameMode,
           allowThreePods:
             gameMode === 'commander' && input.allowThreePods !== false,
-          allowFivePods: Boolean(input.allowFivePods),
+          allowFivePods,
+          preferredPodSize,
+          expiresAt,
+          createdAt,
         });
         break;
       } catch (error) {
@@ -757,18 +781,43 @@ export class EventService {
   async updateMatchSettings(
     joinCode: string,
     hostToken: string,
-    patch: { allowThreePods?: boolean; allowFivePods?: boolean },
+    patch: {
+      allowThreePods?: boolean;
+      allowFivePods?: boolean;
+      preferredPodSize?: number;
+      lifetimeHours?: number;
+    },
   ): Promise<PublicEvent> {
     const stored = await this.requireHostToken(joinCode, hostToken);
+    const preferredPodSize =
+      patch.preferredPodSize === undefined
+        ? stored.preferredPodSize
+        : assertPreferredPodSize(stored.gameMode, patch.preferredPodSize);
+    const allowFivePods =
+      stored.gameMode === 'treachery'
+        ? preferredPodSize >= 5
+        : stored.gameMode === 'commander'
+          ? patch.allowFivePods === undefined
+            ? stored.allowFivePods
+            : Boolean(patch.allowFivePods)
+          : false;
+    const expiresAt =
+      patch.lifetimeHours === undefined
+        ? stored.expiresAt
+        : new Date(
+            stored.createdAt.getTime() +
+              assertLifetimeHours(patch.lifetimeHours) * 60 * 60 * 1000,
+          );
     const updated = await this.store.updateEvent(stored.id, {
       allowThreePods:
-        patch.allowThreePods === undefined
-          ? stored.allowThreePods
-          : Boolean(patch.allowThreePods),
-      allowFivePods:
-        patch.allowFivePods === undefined
-          ? stored.allowFivePods
-          : Boolean(patch.allowFivePods),
+        stored.gameMode === 'treachery'
+          ? false
+          : patch.allowThreePods === undefined
+            ? stored.allowThreePods
+            : Boolean(patch.allowThreePods),
+      allowFivePods,
+      preferredPodSize,
+      expiresAt,
     });
     return this.presentEvent(updated);
   }
@@ -889,14 +938,9 @@ export class EventService {
     const readyCount = people.filter(
       (row) => row.status === ParticipantStatus.Ready,
     ).length;
+    const matchOptions = eventMatchOptions(stored);
     const seatsNeeded =
-      freeTables.length *
-      Math.max(
-        ...allowedPodSizes({
-          allowThree: stored.allowThreePods,
-          allowFive: stored.allowFivePods,
-        }),
-      );
+      freeTables.length * Math.max(...(matchOptions.allowedSizes ?? [4]));
     const botsToAdd = Math.max(0, seatsNeeded - readyCount);
     const taken = new Set(
       people.map((row) => row.displayName.toLowerCase()),
@@ -947,10 +991,7 @@ export class EventService {
     if (!event) {
       throw new EventNotFoundError();
     }
-    const sizes = allowedPodSizes({
-      allowThree: event.gameMode === 'commander' && event.allowThreePods,
-      allowFive: event.allowFivePods,
-    });
+    const matchOptions = eventMatchOptions(event);
     const freeTables = tables.filter(
       (table) => table.status === PhysicalTableStatus.Free,
     );
@@ -971,7 +1012,7 @@ export class EventService {
       })),
       freeTables.map((table) => ({ id: table.id })),
       { groups: history },
-      { allowedSizes: sizes, preferredSize: 4 },
+      matchOptions,
     );
     const created: PublicPod[] = [];
     for (const match of result.matches) {
@@ -1143,9 +1184,13 @@ export class EventService {
     );
   }
 
+  private now(): Date {
+    return this.options.now?.() ?? new Date();
+  }
+
   private async requireByJoinCode(joinCode: string): Promise<StoredEvent> {
     const stored = await this.store.findEventByJoinCode(joinCode);
-    if (!stored) {
+    if (!stored || stored.expiresAt.getTime() <= this.now().getTime()) {
       throw new EventNotFoundError();
     }
     return stored;
@@ -1164,6 +1209,14 @@ function toPublicEvent(
     gameMode: event.gameMode,
     allowThreePods: event.allowThreePods,
     allowFivePods: event.allowFivePods,
+    preferredPodSize: event.preferredPodSize,
+    lifetimeHours: Math.max(
+      1,
+      Math.round(
+        (event.expiresAt.getTime() - event.createdAt.getTime()) / (60 * 60 * 1000),
+      ),
+    ),
+    expiresAt: event.expiresAt.toISOString(),
     challengePackId: event.challengePackId,
     challengePackVersion: event.challengePackVersion,
     challengePack: pack,

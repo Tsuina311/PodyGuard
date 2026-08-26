@@ -60,6 +60,10 @@ export class PostgresEventStore implements EventStore {
           gameMode: input.gameMode ?? 'commander',
           allowThreePods: input.allowThreePods !== false,
           allowFivePods: Boolean(input.allowFivePods),
+          preferredPodSize: input.preferredPodSize ?? 4,
+          expiresAt:
+            input.expiresAt ?? new Date(Date.now() + 24 * 60 * 60 * 1000),
+          ...(input.createdAt ? { createdAt: input.createdAt } : {}),
         })
         .returning();
       if (!row) {
@@ -916,6 +920,8 @@ export class PostgresEventStore implements EventStore {
     patch: {
       allowThreePods?: boolean;
       allowFivePods?: boolean;
+      preferredPodSize?: number;
+      expiresAt?: Date;
       challengePackId?: string;
       challengePackVersion?: number;
     },
@@ -929,6 +935,12 @@ export class PostgresEventStore implements EventStore {
         ...(patch.allowFivePods === undefined
           ? {}
           : { allowFivePods: patch.allowFivePods }),
+        ...(patch.preferredPodSize === undefined
+          ? {}
+          : { preferredPodSize: patch.preferredPodSize }),
+        ...(patch.expiresAt === undefined
+          ? {}
+          : { expiresAt: patch.expiresAt }),
         ...(patch.challengePackId === undefined
           ? {}
           : { challengePackId: patch.challengePackId }),
@@ -991,6 +1003,8 @@ function mapEvent(row: typeof events.$inferSelect): StoredEvent {
     hostCredentialHash: row.hostCredentialHash,
     allowThreePods: row.allowThreePods,
     allowFivePods: row.allowFivePods,
+    preferredPodSize: row.preferredPodSize,
+    expiresAt: row.expiresAt,
     challengePackId: row.challengePackId,
     challengePackVersion: row.challengePackVersion,
     createdAt: row.createdAt,

@@ -4,25 +4,37 @@
   answer a navigation while offline, so it keeps the last shell it was served
   and hands that back when the network is gone.
 
-  It caches nothing else on purpose. A pod's state lives on the server, and a
+  It caches nothing else on purpose. A pod's state lives on the API host, and a
   cache-first board would open on yesterday's build; every request goes to the
   network first and the cache is only ever the fallback.
 */
-const SHELL = 'podyguard-shell-v1';
-const SHELL_URL = '/';
+const SHELL = 'podyguard-shell-v3';
+
+function shellUrl() {
+  return self.registration.scope;
+}
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches
       .open(SHELL)
-      .then((cache) => cache.add(SHELL_URL))
+      .then((cache) => cache.add(shellUrl()))
       .catch(() => undefined),
   );
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(
+          keys.filter((key) => key !== SHELL).map((key) => caches.delete(key)),
+        ),
+      )
+      .then(() => self.clients.claim()),
+  );
 });
 
 self.addEventListener('fetch', (event) => {
@@ -32,14 +44,15 @@ self.addEventListener('fetch', (event) => {
   }
   event.respondWith(
     (async () => {
+      const cache = await caches.open(SHELL);
       try {
         const response = await fetch(request);
-        const cache = await caches.open(SHELL);
-        await cache.put(SHELL_URL, response.clone());
+        if (response.ok) {
+          await cache.put(shellUrl(), response.clone());
+        }
         return response;
       } catch {
-        const cached = await caches.match(SHELL_URL);
-        return cached ?? Response.error();
+        return (await cache.match(shellUrl())) ?? Response.error();
       }
     })(),
   );

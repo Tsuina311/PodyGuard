@@ -4,6 +4,7 @@ import {
   HIT_LIMIT,
   POISON_LIMIT,
   STARTING_LIFE,
+  TWO_HEADED_GIANT_STARTING_LIFE,
   applyTrackerAction,
   createTracker,
   elapsedMs,
@@ -11,6 +12,111 @@ import {
   uniqueCompletedDungeonCount,
   worstCommanderDamage,
 } from './engine';
+
+function twoHeadedGiant() {
+  let state = createTracker([
+    { id: 'a', name: 'Ada' },
+    { id: 'b', name: 'Bea' },
+    { id: 'c', name: 'Cam' },
+    { id: 'd', name: 'Dee' },
+  ]);
+  state = applyTrackerAction(state, {
+    type: 'teams',
+    teams: [
+      ['a', 'b'],
+      ['c', 'd'],
+    ],
+  });
+  return state;
+}
+
+describe('Two-Headed Giant tracker', () => {
+  it('starts both teams at a shared 60 life', () => {
+    let state = twoHeadedGiant();
+    expect(state.players.map((player) => player.life)).toEqual([
+      TWO_HEADED_GIANT_STARTING_LIFE,
+      TWO_HEADED_GIANT_STARTING_LIFE,
+      TWO_HEADED_GIANT_STARTING_LIFE,
+      TWO_HEADED_GIANT_STARTING_LIFE,
+    ]);
+
+    state = applyTrackerAction(state, {
+      type: 'life',
+      playerId: 'b',
+      delta: -5,
+    });
+    expect(
+      state.players
+        .filter((player) => ['a', 'b'].includes(player.id))
+        .map((player) => player.life),
+    ).toEqual([55, 55]);
+    expect(
+      state.players
+        .filter((player) => ['c', 'd'].includes(player.id))
+        .map((player) => player.life),
+    ).toEqual([60, 60]);
+  });
+
+  it('applies commander damage to shared life but tracks it per player', () => {
+    const state = applyTrackerAction(twoHeadedGiant(), {
+      type: 'commander',
+      commanderId: 'c:1',
+      toId: 'a',
+      delta: 7,
+    });
+    expect(state.players.find((player) => player.id === 'a')?.life).toBe(53);
+    expect(state.players.find((player) => player.id === 'b')?.life).toBe(53);
+    expect(
+      state.players.find((player) => player.id === 'a')?.commanderDamage[
+        'c:1'
+      ],
+    ).toBe(7);
+    expect(
+      state.players.find((player) => player.id === 'b')?.commanderDamage[
+        'c:1'
+      ],
+    ).toBeUndefined();
+  });
+
+  it('randomly chooses a starting team', () => {
+    const state = pickFirstPlayer(twoHeadedGiant(), () => 0.99);
+    expect(state.firstPlayerId).toBe('c');
+  });
+
+  it('uses the Commander team poison limit of 20', () => {
+    let state = twoHeadedGiant();
+    state = applyTrackerAction(state, {
+      type: 'poison',
+      playerId: 'a',
+      delta: 10,
+    });
+    state = applyTrackerAction(state, {
+      type: 'poison',
+      playerId: 'b',
+      delta: 10,
+    });
+    expect(
+      state.players.find((player) => player.id === 'a')?.pendingLoss,
+    ).toEqual({ type: 'poison' });
+    expect(
+      state.players.find((player) => player.id === 'b')?.pendingLoss,
+    ).toBeNull();
+  });
+
+  it('eliminates a whole team and names the opposing team winner', () => {
+    const state = applyTrackerAction(twoHeadedGiant(), {
+      type: 'eliminate',
+      playerId: 'a',
+    });
+    expect(state.players.find((player) => player.id === 'a')?.eliminated).toBe(
+      true,
+    );
+    expect(state.players.find((player) => player.id === 'b')?.eliminated).toBe(
+      true,
+    );
+    expect(state.winnerId).toBe('c');
+  });
+});
 
 describe('commander tracker', () => {
   it('starts at 40 life and can undo via previous snapshots', () => {

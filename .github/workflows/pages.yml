@@ -1,0 +1,61 @@
+name: Pages
+
+on:
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build the always-on site
+        env:
+          GITHUB_PAGES: "true"
+          API_ORIGIN: ${{ vars.API_ORIGIN }}
+          PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL }}
+        run: |
+          if [ -z "$API_ORIGIN" ]; then
+            echo "Set repository variable API_ORIGIN to the Render origin, e.g. https://podyguard.onrender.com"
+            exit 1
+          fi
+          export VITE_API_URL="$API_ORIGIN"
+          if [ -n "$PUBLIC_SITE_URL" ]; then
+            export VITE_PUBLIC_ORIGIN="$PUBLIC_SITE_URL"
+          else
+            OWNER="$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')"
+            export VITE_PUBLIC_ORIGIN="https://${OWNER}.github.io/${{ github.event.repository.name }}"
+          fi
+          yarn workspace @podyguard/shared build
+          yarn workspace @podyguard/matching build
+          yarn workspace @podyguard/web build
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/web/dist
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

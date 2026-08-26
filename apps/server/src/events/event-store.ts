@@ -92,6 +92,8 @@ export type StoredEvent = {
   hostCredentialHash: string;
   allowThreePods: boolean;
   allowFivePods: boolean;
+  preferredPodSize: number;
+  expiresAt: Date;
   challengePackId: string;
   challengePackVersion: number;
   createdAt: Date;
@@ -218,6 +220,9 @@ export type NewStoredEvent = {
   gameMode?: GameMode;
   allowThreePods?: boolean;
   allowFivePods?: boolean;
+  preferredPodSize?: number;
+  expiresAt?: Date;
+  createdAt?: Date;
 };
 
 export type NewStoredParticipant = {
@@ -319,6 +324,8 @@ export interface EventStore {
     patch: {
       allowThreePods?: boolean;
       allowFivePods?: boolean;
+      preferredPodSize?: number;
+      expiresAt?: Date;
       challengePackId?: string;
       challengePackVersion?: number;
     },

@@ -6,7 +6,7 @@ import type {
   PublicParticipant,
   PublicTable,
 } from '@podyguard/shared';
-import { poolShortLabel } from '@podyguard/shared';
+import { poolShortLabel, TREACHERY_POD_SIZES } from '@podyguard/shared';
 import { countByStatus, queueByWait } from './match-view';
 import {
   ApiError,
@@ -27,9 +27,9 @@ import {
 } from './api';
 import {
   isLocalHostname,
+  joinLinkParts,
   lanHostFromBuild,
   playerJoinUrl,
-  shareableOrigin,
 } from './join-url';
 import { Badge, statusTone } from './ui/Badge';
 import { Brand } from './ui/Brand';
@@ -55,6 +55,7 @@ export function HostPage() {
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
   const [metrics, setMetrics] = useState<EventMetrics | null>(null);
+  const [hoursDraft, setHoursDraft] = useState('24');
 
   const refresh = useCallback(async () => {
     const [roster, tableList] = await Promise.all([
@@ -108,6 +109,12 @@ export function HostPage() {
       cancelled = true;
     };
   }, [code, refresh, refreshMetrics]);
+
+  useEffect(() => {
+    if (event) {
+      setHoursDraft(String(event.lifetimeHours));
+    }
+  }, [event]);
 
   async function onUnlock(submit: FormEvent) {
     submit.preventDefault();
@@ -219,7 +226,12 @@ export function HostPage() {
   }
 
   async function onToggleSetting(
-    patch: { allowThreePods?: boolean; allowFivePods?: boolean },
+    patch: {
+      allowThreePods?: boolean;
+      allowFivePods?: boolean;
+      preferredPodSize?: number;
+      lifetimeHours?: number;
+    },
   ) {
     if (!hostToken) {
       return;
@@ -277,11 +289,18 @@ export function HostPage() {
   const joinUrl =
     typeof window === 'undefined'
       ? ''
-      : playerJoinUrl(
-          shareableOrigin(window.location, lanHostFromBuild()),
-          window.location.pathname,
-          event?.joinCode ?? code,
-        );
+      : (() => {
+          const link = joinLinkParts(
+            window.location,
+            lanHostFromBuild(),
+            import.meta.env.VITE_PUBLIC_ORIGIN,
+          );
+          return playerJoinUrl(
+            link.origin,
+            link.pathname,
+            event?.joinCode ?? code,
+          );
+        })();
 
   const unreachableFromPhones =
     typeof window !== 'undefined' &&
@@ -363,6 +382,14 @@ export function HostPage() {
           <span>{counts.matched} matched</span>
           <span>{counts.playing} playing</span>
           <span>{counts.paused} paused</span>
+          <span>
+            ends{' '}
+            {new Date(event.expiresAt).toLocaleString(undefined, {
+              weekday: 'short',
+              hour: 'numeric',
+              minute: '2-digit',
+            })}
+          </span>
           <Badge tone={event.gameMode === 'treachery' ? 'dev' : 'idle'}>
             {event.gameMode}
           </Badge>
@@ -371,31 +398,86 @@ export function HostPage() {
 
       <Panel title="Pod sizes" aside="matching">
         {event.gameMode === 'commander' ? (
-          <label className="text-muted mb-2 flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={event.allowThreePods}
-              onChange={(change) =>
-                void onToggleSetting({ allowThreePods: change.target.checked })
-              }
-            />
-            Allow leftover 3-player pods
-          </label>
+          <>
+            <label className="text-muted mb-2 flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={event.allowThreePods}
+                onChange={(change) =>
+                  void onToggleSetting({ allowThreePods: change.target.checked })
+                }
+              />
+              Allow leftover 3-player pods
+            </label>
+            <label className="text-muted flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={event.allowFivePods}
+                onChange={(change) =>
+                  void onToggleSetting({ allowFivePods: change.target.checked })
+                }
+              />
+              Allow 5-player pods
+            </label>
+          </>
+        ) : event.gameMode === 'treachery' ? (
+          <>
+            <p className="text-muted mb-3 text-sm">
+              Target table size. Leftover pods can be as small as four.
+            </p>
+            <div className="grid grid-cols-5 gap-2">
+              {TREACHERY_POD_SIZES.map((size) => (
+                <button
+                  key={size}
+                  type="button"
+                  className={`rounded-xl border p-2 text-sm font-semibold transition ${
+                    event.preferredPodSize === size
+                      ? 'border-neon bg-neon/10 text-neon'
+                      : 'border-muted/20 text-muted hover:border-muted/40'
+                  }`}
+                  onClick={() => void onToggleSetting({ preferredPodSize: size })}
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+            <p className="text-muted mt-3 text-xs">
+              {event.preferredPodSize >= 5
+                ? `Matching prefers ${String(event.preferredPodSize)}-player tables.`
+                : 'Matching prefers 4-player tables.'}
+            </p>
+          </>
         ) : (
-          <p className="text-muted mb-2 text-sm">
-            Treachery roles require at least four players.
+          <p className="text-muted text-sm">
+            Two-Headed Giant matchmaking seats exactly four players per game.
           </p>
         )}
-        <label className="text-muted flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={event.allowFivePods}
-            onChange={(change) =>
-              void onToggleSetting({ allowFivePods: change.target.checked })
+      </Panel>
+
+      <Panel title="Event length" aside="join code dies">
+        <Field
+          label="Hours from start"
+          hint="Change this for a multi-day event. After it ends, the QR opens the home page."
+          type="number"
+          inputMode="numeric"
+          min={1}
+          max={168}
+          value={hoursDraft}
+          onChange={(change) => setHoursDraft(change.target.value)}
+          onBlur={() => {
+            const hours = Number(hoursDraft);
+            if (
+              Number.isInteger(hours) &&
+              hours >= 1 &&
+              hours <= 168 &&
+              hours !== event.lifetimeHours
+            ) {
+              void onToggleSetting({ lifetimeHours: hours });
+            } else {
+              setHoursDraft(String(event.lifetimeHours));
             }
-          />
-          Allow 5-player pods
-        </label>
+          }}
+        />
       </Panel>
 
       {metrics ? <HostMetrics metrics={metrics} /> : null}

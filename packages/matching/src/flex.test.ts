@@ -29,6 +29,25 @@ describe('flex credits', () => {
     ).toBe(-2);
   });
 
+  it('treats a leftover 4 as a concession when 5 is preferred', () => {
+    expect(
+      computeFlexDelta({
+        concession: false,
+        podSize: 5,
+        flexCredits: 0,
+        preferredSize: 5,
+      }),
+    ).toBe(0);
+    expect(
+      computeFlexDelta({
+        concession: false,
+        podSize: 4,
+        flexCredits: 0,
+        preferredSize: 5,
+      }),
+    ).toBe(2);
+  });
+
   it('keeps wait-time dominance in the score weight', () => {
     expect(flexScore(6)).toBeLessThan(1);
   });

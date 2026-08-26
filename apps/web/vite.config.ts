@@ -33,7 +33,20 @@ function lanHost(): string {
   return candidates[0]?.address ?? '';
 }
 
+function publicBase(): string {
+  const fromEnv = process.env.VITE_BASE?.trim();
+  if (fromEnv) {
+    return fromEnv.endsWith('/') ? fromEnv : `${fromEnv}/`;
+  }
+  if (process.env.GITHUB_PAGES === 'true' && process.env.GITHUB_REPOSITORY) {
+    const repo = process.env.GITHUB_REPOSITORY.split('/')[1];
+    return `/${repo}/`;
+  }
+  return '/';
+}
+
 export default defineConfig({
+  base: publicBase(),
   plugins: [react(), tailwindcss()],
   define: {
     __LAN_HOST__: JSON.stringify(lanHost()),

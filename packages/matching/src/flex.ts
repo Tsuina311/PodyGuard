@@ -32,13 +32,10 @@ export function computeFlexDelta(input: {
   if (input.concession) {
     delta += SECONDARY_POOL_FLEX;
   }
-  if (input.podSize === 3) {
-    delta += THREE_POD_FLEX;
-  }
-  if (input.podSize === 5) {
-    delta += FIVE_POD_FLEX;
-  }
   const preferredSize = input.preferredSize ?? PREFERRED_POD_SIZE;
+  if (input.podSize !== preferredSize) {
+    delta += input.podSize === 3 ? THREE_POD_FLEX : FIVE_POD_FLEX;
+  }
   if (
     input.podSize === preferredSize &&
     !input.concession &&

@@ -43,15 +43,25 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
       gameMode?: unknown;
       allowThreePods?: unknown;
       allowFivePods?: unknown;
+      preferredPodSize?: unknown;
+      lifetimeHours?: unknown;
     };
     try {
       const result = await app.events.createEvent({
         name: typeof body.name === 'string' ? body.name : '',
         hostPin: typeof body.hostPin === 'string' ? body.hostPin : '',
         tableCount: parseTableCount(body.tableCount),
-        gameMode: body.gameMode === 'treachery' ? 'treachery' : 'commander',
+        gameMode:
+          body.gameMode === 'treachery' ||
+          body.gameMode === 'two-headed-giant'
+            ? body.gameMode
+            : 'commander',
         allowThreePods: body.allowThreePods === undefined ? undefined : Boolean(body.allowThreePods),
         allowFivePods: body.allowFivePods === undefined ? undefined : Boolean(body.allowFivePods),
+        preferredPodSize:
+          typeof body.preferredPodSize === 'number' ? body.preferredPodSize : undefined,
+        lifetimeHours:
+          typeof body.lifetimeHours === 'number' ? body.lifetimeHours : undefined,
       });
       return reply.code(201).send(result);
     } catch (error) {
@@ -405,6 +415,8 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
     const body = (request.body ?? {}) as {
       allowThreePods?: unknown;
       allowFivePods?: unknown;
+      preferredPodSize?: unknown;
+      lifetimeHours?: unknown;
     };
     try {
       const event = await app.events.updateMatchSettings(
@@ -415,6 +427,10 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
             typeof body.allowThreePods === 'boolean' ? body.allowThreePods : undefined,
           allowFivePods:
             typeof body.allowFivePods === 'boolean' ? body.allowFivePods : undefined,
+          preferredPodSize:
+            typeof body.preferredPodSize === 'number' ? body.preferredPodSize : undefined,
+          lifetimeHours:
+            typeof body.lifetimeHours === 'number' ? body.lifetimeHours : undefined,
         },
       );
       await app.live.publish(normalizeJoinCode(joinCode));

@@ -1,6 +1,10 @@
 import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
 import { promisify } from 'node:util';
-import type { CommanderSelection } from '@podyguard/shared';
+import {
+  TREACHERY_POD_SIZES,
+  type CommanderSelection,
+  type GameMode,
+} from '@podyguard/shared';
 
 const scryptAsync = promisify(scrypt);
 const KEY_LENGTH = 32;
@@ -73,6 +77,49 @@ export function assertTableCount(count: number): number {
     throw new InvalidEventInputError('Choose between 1 and 40 tables.');
   }
   return count;
+}
+
+export const DEFAULT_EVENT_LIFETIME_HOURS = 24;
+export const MIN_EVENT_LIFETIME_HOURS = 1;
+export const MAX_EVENT_LIFETIME_HOURS = 168;
+
+export function assertLifetimeHours(value: unknown): number {
+  if (value === undefined || value === null) {
+    return DEFAULT_EVENT_LIFETIME_HOURS;
+  }
+  const hours = typeof value === 'number' ? value : Number(value);
+  if (
+    !Number.isInteger(hours) ||
+    hours < MIN_EVENT_LIFETIME_HOURS ||
+    hours > MAX_EVENT_LIFETIME_HOURS
+  ) {
+    throw new InvalidEventInputError(
+      'Choose how long the event lasts, from 1 hour up to 7 days.',
+    );
+  }
+  return hours;
+}
+
+export function assertPreferredPodSize(
+  gameMode: GameMode,
+  value: unknown,
+): number {
+  if (gameMode !== 'treachery') {
+    return 4;
+  }
+  if (value === undefined || value === null) {
+    return 4;
+  }
+  const size = typeof value === 'number' ? value : Number(value);
+  if (
+    !Number.isInteger(size) ||
+    !TREACHERY_POD_SIZES.includes(size as (typeof TREACHERY_POD_SIZES)[number])
+  ) {
+    throw new InvalidEventInputError(
+      'Choose a Treachery table size from 4 to 8 players.',
+    );
+  }
+  return size;
 }
 
 export type DeckDraft = {

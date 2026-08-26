@@ -43,7 +43,11 @@ export const podStatusEnum = pgEnum('pod_status', [
   'cancelled',
 ]);
 
-export const gameModeEnum = pgEnum('game_mode', ['commander', 'treachery']);
+export const gameModeEnum = pgEnum('game_mode', [
+  'commander',
+  'treachery',
+  'two-headed-giant',
+]);
 
 export const treacheryRoleEnum = pgEnum('treachery_role', [
   'leader',
@@ -75,6 +79,8 @@ export const events = pgTable('events', {
   hostCredentialHash: text('host_credential_hash').notNull(),
   allowThreePods: boolean('allow_three_pods').notNull().default(true),
   allowFivePods: boolean('allow_five_pods').notNull().default(false),
+  preferredPodSize: integer('preferred_pod_size').notNull().default(4),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
   challengePackId: text('challenge_pack_id')
     .notNull()
     .default('classic-commander-v1'),

@@ -1,6 +1,10 @@
 import identityData from './treachery-identities.json';
 
-export const GAME_MODES = ['commander', 'treachery'] as const;
+export const GAME_MODES = [
+  'commander',
+  'treachery',
+  'two-headed-giant',
+] as const;
 export type GameMode = (typeof GAME_MODES)[number];
 
 export const TREACHERY_ROLES = [
@@ -117,10 +121,12 @@ export function assignTreacheryIdentities(
   return assigned;
 }
 
+export const TREACHERY_POD_SIZES = [4, 5, 6, 7, 8] as const;
+export type TreacheryPodSize = (typeof TREACHERY_POD_SIZES)[number];
+
 /**
  * The recommended identity mix from the Treachery comprehensive rules.
- * PodyGuard currently forms at most five-player pods, but keeping the full
- * official table here prevents the mode model from inheriting that UI limit.
+ * Matching prefers the host's chosen base size and leftover tables down to 4.
  */
 const ROLE_DISTRIBUTIONS: Record<number, TreacheryRole[]> = {
   4: ['leader', 'traitor', 'assassin', 'assassin'],

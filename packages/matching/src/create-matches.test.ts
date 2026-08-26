@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createMatches } from './create-matches.js';
-import type { ReadyParticipant } from './types.js';
+import { eventMatchOptions, type ReadyParticipant } from './types.js';
 
 function player(
   id: string,
@@ -220,5 +220,82 @@ describe('createMatches', () => {
     expect(result.matches).toHaveLength(1);
     expect(result.matches[0]?.seats).toHaveLength(4);
     expect(result.unmatchedIds).toHaveLength(3);
+  });
+
+  it('prefers 5-pods when the organiser sets 5 as the base size', () => {
+    const people = Array.from({ length: 10 }, (_, index) =>
+      player(`p${String(index + 1)}`, index, [{ poolId: 'b3' }]),
+    );
+    const result = createMatches(people, tables(2), { groups: [] }, {
+      allowedSizes: [5, 4],
+      preferredSize: 5,
+    });
+    expect(result.matches.map((row) => row.seats.length)).toEqual([5, 5]);
+    expect(result.unmatchedIds).toEqual([]);
+  });
+
+  it('uses leftover 4s when a 5-base field cannot fill another 5', () => {
+    const people = Array.from({ length: 9 }, (_, index) =>
+      player(`p${String(index + 1)}`, index, [{ poolId: 'b3' }]),
+    );
+    const result = createMatches(people, tables(2), { groups: [] }, {
+      allowedSizes: [5, 4],
+      preferredSize: 5,
+    });
+    expect(result.matches.map((row) => row.seats.length).sort()).toEqual([4, 5]);
+    expect(result.unmatchedIds).toEqual([]);
+  });
+
+  it('prefers 6-pods over three 4s when 6 is the base size', () => {
+    const people = Array.from({ length: 12 }, (_, index) =>
+      player(`p${String(index + 1)}`, index, [{ poolId: 'b3' }]),
+    );
+    const result = createMatches(people, tables(3), { groups: [] }, {
+      allowedSizes: [6, 5, 4],
+      preferredSize: 6,
+    });
+    expect(result.matches.map((row) => row.seats.length)).toEqual([6, 6]);
+    expect(result.unmatchedIds).toEqual([]);
+  });
+});
+
+describe('eventMatchOptions', () => {
+  it('keeps commander on 4s with leftover 3s', () => {
+    expect(
+      eventMatchOptions({
+        gameMode: 'commander',
+        allowThreePods: true,
+        allowFivePods: false,
+      }),
+    ).toEqual({ preferredSize: 4, allowedSizes: [4, 3] });
+  });
+
+  it('lets treachery prefer 5+ with leftover 4s', () => {
+    expect(
+      eventMatchOptions({
+        gameMode: 'treachery',
+        allowThreePods: true,
+        allowFivePods: false,
+        preferredPodSize: 5,
+      }),
+    ).toEqual({ preferredSize: 5, allowedSizes: [5, 4] });
+    expect(
+      eventMatchOptions({
+        gameMode: 'treachery',
+        allowThreePods: false,
+        allowFivePods: true,
+        preferredPodSize: 7,
+      }),
+    ).toEqual({ preferredSize: 7, allowedSizes: [7, 6, 5, 4] });
+  });
+
+  it('makes Two-Headed Giant strictly four players', () => {
+    expect(
+      eventMatchOptions({
+        gameMode: 'two-headed-giant',
+        allowThreePods: true,
+        allowFivePods: true,
+      }),
+    ).toEqual({ preferredSize: 4, allowedSizes: [4] });
   });
 });

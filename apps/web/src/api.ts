@@ -9,6 +9,7 @@ import type {
   PublicTable,
   TreacheryRoleAssignment,
 } from '@podyguard/shared';
+import { resolveApiUrl } from './api-base';
 import type {
   CommanderArtwork,
   CommanderCandidate,
@@ -37,7 +38,7 @@ export class ApiError extends Error {
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(`/api${path}`, {
+    response = await fetch(resolveApiUrl(path), {
       ...init,
       headers: {
         // Fastify rejects an empty body when the JSON content type is declared.
@@ -51,7 +52,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     throw new ApiError(
       0,
       'API_UNREACHABLE',
-      'Cannot reach the API. Is the server running (yarn dev:server)?',
+      import.meta.env.PROD
+        ? 'The host is waking up. Keep this page open — it usually takes under a minute.'
+        : 'Cannot reach the API. Is the server running (yarn dev:server)?',
     );
   }
 
@@ -72,6 +75,29 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return body as T;
 }
 
+export async function checkHealth(): Promise<boolean> {
+  const controller = new AbortController();
+  const timer = window.setTimeout(() => controller.abort(), 8_000);
+  try {
+    const response = await fetch(resolveApiUrl('/health'), {
+      cache: 'no-store',
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      return false;
+    }
+    const body = (await response.json().catch(() => ({}))) as {
+      ok?: boolean;
+      database?: string;
+    };
+    return body.ok === true && body.database === 'up';
+  } catch {
+    return false;
+  } finally {
+    window.clearTimeout(timer);
+  }
+}
+
 export function createEvent(
   name: string,
   hostPin: string,
@@ -80,6 +106,8 @@ export function createEvent(
     gameMode?: GameMode;
     allowThreePods?: boolean;
     allowFivePods?: boolean;
+    preferredPodSize?: number;
+    lifetimeHours?: number;
   },
 ) {
   return request<{ event: PublicEvent; hostToken: string }>('/events', {
@@ -353,7 +381,12 @@ export function cancelTable(joinCode: string, token: string, tableId: string) {
 export function updateMatchSettings(
   joinCode: string,
   token: string,
-  patch: { allowThreePods?: boolean; allowFivePods?: boolean },
+  patch: {
+    allowThreePods?: boolean;
+    allowFivePods?: boolean;
+    preferredPodSize?: number;
+    lifetimeHours?: number;
+  },
 ) {
   return request<{ event: PublicEvent }>(`/events/${joinCode}/settings`, {
     method: 'PATCH',

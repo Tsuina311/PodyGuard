@@ -39,6 +39,9 @@ describe('match-view', () => {
         gameMode: 'commander',
         allowThreePods: true,
         allowFivePods: false,
+        preferredPodSize: 4,
+        lifetimeHours: 24,
+        expiresAt: '2026-08-27T18:00:00.000Z',
       },
       participants: [participant],
       tables: [

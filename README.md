@@ -51,11 +51,16 @@ If `DATABASE_URL` is missing, the server exits with a setup message. It will not
 
 ## Deploy a test release
 
-The production build is one Node service: Fastify serves the built React app,
-the `/api` routes, and Socket.IO from the same origin. This keeps QR links,
-requests, and live event updates working without cross-origin configuration.
+The player-facing site is a static build on **GitHub Pages** (always on). The
+API, database, and live updates stay on **Render** (free instances sleep when
+idle). Phones open Pages immediately and see a wake message while Render boots.
 
-The included `render.yaml` is the shortest deployment path:
+Share and print the GitHub Pages URL, not the Render URL. Event links look like
+`https://<user>.github.io/PodyGuard/#/e/ABC123`.
+
+### 1. API on Render
+
+The included `render.yaml` is the shortest API path:
 
 1. Create a separate production PostgreSQL database and copy its pooled
    `DATABASE_URL`.
@@ -64,11 +69,10 @@ The included `render.yaml` is the shortest deployment path:
    `PARTICIPANT_SESSION_SECRET`.
 4. Deploy. The start command applies committed migrations before accepting
    traffic (Render reserves its dedicated pre-deploy command for paid services).
-5. Open `/health` on the public URL and confirm `ok` and `database: "up"`.
+5. Open `/health` on the Render URL and confirm `ok` and `database: "up"`.
 
-Render builds all workspaces and the web assets, then starts the Fastify server.
-Direct browser routes fall back to the React app, while unknown API requests
-still return JSON 404 responses. Event links use `/#/e/ABC123`.
+Render still serves a copy of the web app as a fallback. That copy sleeps with
+the API, so it is the wrong link for players.
 
 For any other Node host, use the same commands and environment:
 
@@ -83,11 +87,27 @@ NODE_ENV=production yarn db:migrate
 NODE_ENV=production yarn workspace @podyguard/server start
 ```
 
-Required production variables:
+Required production variables on the API host:
 
 - `DATABASE_URL`: production PostgreSQL connection string.
 - `PARTICIPANT_SESSION_SECRET`: a long random value, stable across deploys.
 - `NODE_ENV=production`.
+
+### 2. Always-on site on GitHub Pages
+
+1. In the GitHub repo: **Settings → Pages → Source: GitHub Actions**.
+2. **Settings → Secrets and variables → Actions → Variables**: add `API_ORIGIN`
+   with the Render origin, no trailing slash
+   (`https://podyguard.onrender.com`). Optional: `PUBLIC_SITE_URL` if you later
+   put the UI on a custom domain.
+3. Push to `main`. The Pages workflow builds the web app pointed at that API
+   and publishes it.
+
+Until `API_ORIGIN` is set, the Pages workflow fails on purpose so a site is
+never published that cannot reach the API.
+
+When Render is on a paid always-on plan, keep this split or serve everything
+from Render again. The wake screen only appears when `/api/health` fails.
 
 ## Install on a phone
 
@@ -98,8 +118,8 @@ the short side of a phone, and no tab to lose a match behind.
 - **iPhone:** Safari, Share, *Add to Home Screen*.
 - **Android:** Chrome, menu, *Install app*.
 
-Both require HTTPS, which the deployed URL has and a LAN dev address does not, so
-install from the deployed site rather than from `yarn dev`.
+Both require HTTPS, which GitHub Pages has and a LAN dev address does not, so
+install from the Pages URL rather than from `yarn dev`.
 
 While the game tracker is open it asks the browser for landscape and fullscreen.
 Chrome grants both; WebKit implements neither the orientation lock nor the

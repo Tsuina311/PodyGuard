@@ -167,7 +167,7 @@ function evaluate(
       .filter((row) => !seated.has(row.id))
       .map((row) => row.id),
     matched: seated.size,
-    fours: matches.filter((row) => row.seats.length === PREFERRED_POD_SIZE).length,
+    fours: matches.filter((row) => row.seats.length === preferredSize).length,
     concessions: matches.reduce(
       (sum, row) => sum + row.seats.filter((seat) => seat.concession).length,
       0,

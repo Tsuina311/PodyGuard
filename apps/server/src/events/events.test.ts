@@ -4,11 +4,17 @@ import { EventService } from '../events/event-service.js';
 import { MemoryEventStore } from '../events/memory-event-store.js';
 import { createIdentityBoundary } from '../identity/index.js';
 
-async function buildTestApp(isDev = true) {
+async function buildTestApp(
+  isDev = true,
+  options: { now?: () => Date } = {},
+) {
   const identity = createIdentityBoundary({
     participantSessionSecret: 'test-secret',
   });
-  const events = new EventService(new MemoryEventStore(), identity, { isDev });
+  const events = new EventService(new MemoryEventStore(), identity, {
+    isDev,
+    now: options.now,
+  });
   return buildApp({ identity, events, logger: false });
 }
 
@@ -23,11 +29,21 @@ describe('event HTTP api', () => {
     });
     expect(created.statusCode).toBe(201);
     const createdBody = created.json() as {
-      event: { joinCode: string; name: string; status: string };
+      event: {
+        joinCode: string;
+        name: string;
+        status: string;
+        lifetimeHours: number;
+        expiresAt: string;
+      };
       hostToken: string;
     };
     expect(createdBody.event.name).toBe('Friday Commander');
     expect(createdBody.event.status).toBe('open');
+    expect(createdBody.event.lifetimeHours).toBe(24);
+    expect(new Date(createdBody.event.expiresAt).getTime()).toBeGreaterThan(
+      Date.now(),
+    );
     expect(createdBody.hostToken.length).toBeGreaterThan(8);
     const { joinCode } = createdBody.event;
 
@@ -104,6 +120,52 @@ describe('event HTTP api', () => {
       url: '/events/ZZZZZZ',
     });
     expect(response.statusCode).toBe(404);
+    await app.close();
+  });
+
+  it('treats an expired event as gone', async () => {
+    let now = Date.parse('2026-08-26T12:00:00.000Z');
+    const app = await buildTestApp(true, { now: () => new Date(now) });
+    const created = await app.inject({
+      method: 'POST',
+      url: '/events',
+      payload: {
+        name: 'Friday Commander',
+        hostPin: '2468',
+        tableCount: 1,
+        lifetimeHours: 24,
+      },
+    });
+    expect(created.statusCode).toBe(201);
+    const joinCode = (created.json() as { event: { joinCode: string } }).event
+      .joinCode;
+
+    now += 24 * 60 * 60 * 1000;
+    const expired = await app.inject({
+      method: 'GET',
+      url: `/events/${joinCode}`,
+    });
+    expect(expired.statusCode).toBe(404);
+    await app.close();
+  });
+
+  it('lets the host keep a weekend event alive for 72 hours', async () => {
+    const app = await buildTestApp();
+    const created = await app.inject({
+      method: 'POST',
+      url: '/events',
+      payload: {
+        name: 'Commander Weekend',
+        hostPin: '2468',
+        tableCount: 1,
+        lifetimeHours: 72,
+      },
+    });
+    const createdBody = created.json() as {
+      event: { lifetimeHours: number };
+    };
+    expect(created.statusCode).toBe(201);
+    expect(createdBody.event.lifetimeHours).toBe(72);
     await app.close();
   });
 
@@ -669,6 +731,7 @@ describe('event HTTP api', () => {
     expect(createdBody.event).toMatchObject({
       gameMode: 'treachery',
       allowThreePods: false,
+      preferredPodSize: 4,
     });
     const tokens: string[] = [];
     for (const displayName of ['Ada', 'Bea', 'Cam', 'Dee']) {
@@ -901,6 +964,135 @@ describe('event HTTP api', () => {
       pods: Array<{ playerNames: string[] }>;
     };
     expect(matchedBody.pods[0]?.playerNames).toHaveLength(5);
+
+    await app.close();
+  });
+
+  it('keeps Two-Headed Giant pods strictly at four players', async () => {
+    const app = await buildTestApp();
+    const created = await app.inject({
+      method: 'POST',
+      url: '/events',
+      payload: {
+        name: 'Two-Headed Commander',
+        hostPin: '2468',
+        tableCount: 2,
+        gameMode: 'two-headed-giant',
+        allowThreePods: true,
+        allowFivePods: true,
+      },
+    });
+    expect(created.statusCode).toBe(201);
+    const createdBody = created.json() as {
+      event: {
+        joinCode: string;
+        gameMode: string;
+        allowThreePods: boolean;
+        allowFivePods: boolean;
+      };
+      hostToken: string;
+    };
+    expect(createdBody.event).toMatchObject({
+      gameMode: 'two-headed-giant',
+      allowThreePods: false,
+      allowFivePods: false,
+    });
+
+    for (const displayName of ['Ada', 'Bea', 'Cam', 'Drew', 'Eve']) {
+      const joined = await app.inject({
+        method: 'POST',
+        url: `/events/${createdBody.event.joinCode}/join`,
+        payload: { displayName },
+      });
+      const token = (joined.json() as { token: string }).token;
+      await app.inject({
+        method: 'POST',
+        url: `/events/${createdBody.event.joinCode}/ready`,
+        headers: { authorization: `Bearer ${token}` },
+        payload: { ready: true },
+      });
+    }
+
+    const matched = await app.inject({
+      method: 'POST',
+      url: `/events/${createdBody.event.joinCode}/match`,
+      headers: {
+        authorization: `Bearer ${createdBody.hostToken}`,
+      },
+    });
+    const matchedBody = matched.json() as {
+      pods: Array<{ playerNames: string[] }>;
+    };
+    expect(matchedBody.pods).toHaveLength(1);
+    expect(matchedBody.pods[0]?.playerNames).toHaveLength(4);
+
+    await app.close();
+  });
+
+  it('forms two 5-player Treachery pods when the host sets 5 as the base', async () => {
+    const app = await buildTestApp();
+    const created = await app.inject({
+      method: 'POST',
+      url: '/events',
+      payload: {
+        name: 'Friday Treachery',
+        hostPin: '2468',
+        tableCount: 2,
+        gameMode: 'treachery',
+        preferredPodSize: 5,
+      },
+    });
+    const createdBody = created.json() as {
+      event: {
+        joinCode: string;
+        preferredPodSize: number;
+        allowFivePods: boolean;
+      };
+      hostToken: string;
+    };
+    expect(createdBody.event).toMatchObject({
+      preferredPodSize: 5,
+      allowFivePods: true,
+    });
+    const { joinCode } = createdBody.event;
+    const { hostToken } = createdBody;
+    const names = [
+      'Ada',
+      'Bea',
+      'Cam',
+      'Drew',
+      'Eve',
+      'Fay',
+      'Gus',
+      'Hal',
+      'Ivy',
+      'Jay',
+    ];
+    for (const displayName of names) {
+      const joined = await app.inject({
+        method: 'POST',
+        url: `/events/${joinCode}/join`,
+        payload: { displayName },
+      });
+      const token = (joined.json() as { token: string }).token;
+      await app.inject({
+        method: 'POST',
+        url: `/events/${joinCode}/ready`,
+        headers: { authorization: `Bearer ${token}` },
+        payload: { ready: true },
+      });
+    }
+
+    const matched = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/match`,
+      headers: { authorization: `Bearer ${hostToken}` },
+    });
+    expect(matched.statusCode).toBe(200);
+    const matchedBody = matched.json() as {
+      pods: Array<{ playerNames: string[] }>;
+    };
+    expect(matchedBody.pods.map((pod) => pod.playerNames.length)).toEqual([5, 5]);
 
     await app.close();
   });

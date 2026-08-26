@@ -14,6 +14,11 @@ export type PublicEvent = {
   gameMode: GameMode;
   allowThreePods: boolean;
   allowFivePods: boolean;
+  /** Target table size. Treachery leftover pods may be smaller, down to 4. */
+  preferredPodSize: number;
+  /** Total hours from creation until the join code dies. */
+  lifetimeHours: number;
+  expiresAt: string;
   challengePackId?: string;
   challengePackVersion?: number;
   challengePack?: ChallengePack;

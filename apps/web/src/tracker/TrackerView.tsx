@@ -51,6 +51,7 @@ import {
   POISON_LIMIT,
   pickFirstPlayer,
   primaryCommanderId,
+  teamForPlayer,
   uniqueCompletedDungeonCount,
   worstCommanderDamage,
   type Commander,
@@ -268,6 +269,7 @@ export function TrackerView({
     string | null
   >(null);
   const [confirmationDismissed, setConfirmationDismissed] = useState(false);
+  const [selectedAllies, setSelectedAllies] = useState<string[]>([]);
   const attemptedChallenges = useRef(new Set<string>());
   const landscape = useLandscape();
   useLandscapeLock();
@@ -275,6 +277,25 @@ export function TrackerView({
   const elapsed = useMatchClock(state);
   const spotlight = useFirstPlayerSpotlight(state, past.length);
   const winner = state.players.find((row) => row.id === state.winnerId) ?? null;
+  const spotlightIds = new Set(
+    spotlight.playerId
+      ? teamForPlayer(state, spotlight.playerId).map((player) => player.id)
+      : [],
+  );
+  const winnerIds = new Set(
+    winner ? teamForPlayer(state, winner.id).map((player) => player.id) : [],
+  );
+  const winnerName = winner
+    ? teamForPlayer(state, winner.id)
+        .map((player) => player.name)
+        .join(' & ')
+    : null;
+  const startingTeamName =
+    state.teams && state.firstPlayerId
+      ? teamForPlayer(state, state.firstPlayerId)
+          .map((player) => player.name)
+          .join(' & ')
+      : null;
   const confirmation = detectedConfirmation(state, challengePack);
 
   useEffect(() => {
@@ -406,6 +427,100 @@ export function TrackerView({
     menuOpen,
   ]);
 
+  if (
+    gameMode === 'two-headed-giant' &&
+    state.players.length === 4 &&
+    !state.teams
+  ) {
+    const remaining = state.players.filter(
+      (player) => !selectedAllies.includes(player.id),
+    );
+    const teamsReady = selectedAllies.length === 2;
+    return (
+      <section className={cx(screenClass, 'items-center justify-center')}>
+        <div className="w-full max-w-lg">
+          <h2 className="font-display mb-2 text-center text-2xl font-bold">
+            Choose the allies
+          </h2>
+          <p className="text-muted mb-5 text-center text-sm">
+            Select two players for the first team. The other two players become
+            the opposing team. Teams share 60 life and turns; all other
+            player controls stay separate.
+          </p>
+          <div className="mb-5 grid grid-cols-2 gap-3">
+            {state.players.map((player) => {
+              const ally = selectedAllies.includes(player.id);
+              return (
+                <button
+                  key={player.id}
+                  type="button"
+                  disabled={!ally && selectedAllies.length >= 2}
+                  onClick={() =>
+                    setSelectedAllies((current) =>
+                      current.includes(player.id)
+                        ? current.filter((id) => id !== player.id)
+                        : [...current, player.id],
+                    )
+                  }
+                  className={cx(
+                    'rounded-xl border p-4 text-center font-semibold transition',
+                    ally
+                      ? 'border-neon bg-neon/15 text-neon'
+                      : teamsReady
+                        ? 'border-warning bg-warning/15 text-warning'
+                        : 'border-muted/25 bg-void/70 text-ink',
+                  )}
+                >
+                  {player.name}
+                </button>
+              );
+            })}
+          </div>
+          {teamsReady ? (
+            <p className="text-muted mb-4 text-center text-sm">
+              <span className="text-neon">
+                {selectedAllies
+                  .map((id) => state.players.find((row) => row.id === id)?.name)
+                  .join(' & ')}
+              </span>{' '}
+              versus{' '}
+              <span className="text-warning">
+                {remaining.map((player) => player.name).join(' & ')}
+              </span>
+            </p>
+          ) : null}
+          <div className="flex justify-center gap-3">
+            <Button
+              variant="glass"
+              disabled={selectedAllies.length === 0}
+              onClick={() => setSelectedAllies([])}
+            >
+              Reset
+            </Button>
+            <Button
+              variant="neon"
+              disabled={!teamsReady}
+              onClick={() =>
+                dispatch({
+                  type: 'action',
+                  action: {
+                    type: 'teams',
+                    teams: [
+                      selectedAllies,
+                      remaining.map((player) => player.id),
+                    ],
+                  },
+                })
+              }
+            >
+              Confirm teams
+            </Button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   if (!state.firstPlayerId) {
     return (
       <section className={cx(screenClass, 'items-center justify-center')}>
@@ -443,8 +558,8 @@ export function TrackerView({
             className={cx(
               'border-muted/20 relative flex min-h-0 flex-col overflow-hidden rounded-xl border p-2 transition-transform duration-200',
               player.eliminated ? 'opacity-50' : 'bg-ink/[0.03]',
-              player.id === spotlight.playerId && spotlightCard,
-              player.id === spotlight.playerId &&
+              spotlightIds.has(player.id) && spotlightCard,
+              spotlightIds.has(player.id) &&
                 (spotlight.phase === 'sweep'
                   ? spotlightSweep
                   : spotlightLanded[spotlight.phase]),
@@ -454,7 +569,7 @@ export function TrackerView({
               commanders={player.commanders}
               eliminated={player.eliminated}
             />
-            {player.id === spotlight.playerId ? (
+            {spotlightIds.has(player.id) ? (
               <span aria-hidden className={spotlightWash} />
             ) : null}
             <div
@@ -492,7 +607,7 @@ export function TrackerView({
                     <Flag size={12} aria-hidden />
                   </Badge>
                 ) : null}
-                {player.id === state.winnerId ? (
+                {winnerIds.has(player.id) ? (
                   <Badge tone="live">Winner</Badge>
                 ) : null}
               </span>
@@ -504,6 +619,7 @@ export function TrackerView({
               them on the row's midline once the cap is reached instead of
               leaving them hanging from the top.
             */}
+            {gameMode !== 'two-headed-giant' ? (
             <div className="relative z-10 flex min-h-0 flex-1 items-center gap-1.5 py-1">
               {[-5, -1].map((delta) => (
                 <LifeButton
@@ -540,6 +656,9 @@ export function TrackerView({
                 />
               ))}
             </div>
+            ) : (
+              <div className="min-h-0 flex-1" aria-hidden />
+            )}
 
             {/*
               Laid flat there is width to spare and no height to waste, so the
@@ -684,6 +803,69 @@ export function TrackerView({
           </article>
         ))}
       </div>
+      {gameMode === 'two-headed-giant' && state.teams
+        ? state.teams.map((team, index) => {
+            const first = state.players.find((player) => player.id === team[0]);
+            if (!first) {
+              return null;
+            }
+            return (
+              <div
+                key={team.join(':')}
+                className={cx(
+                  plateAccent,
+                  'absolute left-1/2 z-20 flex h-16 w-[min(34rem,78vw)] -translate-x-1/2 items-center gap-2 rounded-2xl border border-neon/40 px-2 shadow-xl',
+                  index === 0
+                    ? 'top-1/4 -translate-y-1/2'
+                    : 'top-3/4 -translate-y-1/2',
+                )}
+              >
+                {[-5, -1].map((delta) => (
+                  <LifeButton
+                    key={delta}
+                    delta={delta}
+                    disabled={Boolean(state.winnerId)}
+                    onClick={() =>
+                      dispatch({
+                        type: 'action',
+                        action: {
+                          type: 'life',
+                          playerId: first.id,
+                          delta,
+                        },
+                      })
+                    }
+                  />
+                ))}
+                <p className="font-display text-neon flex-1 text-center text-5xl font-bold tabular-nums">
+                  {first.life}
+                </p>
+                {[1, 5].map((delta) => (
+                  <LifeButton
+                    key={delta}
+                    delta={delta}
+                    disabled={Boolean(state.winnerId)}
+                    onClick={() =>
+                      dispatch({
+                        type: 'action',
+                        action: {
+                          type: 'life',
+                          playerId: first.id,
+                          delta,
+                        },
+                      })
+                    }
+                  />
+                ))}
+              </div>
+            );
+          })
+        : null}
+      {startingTeamName && spotlight.playerId ? (
+        <p className="border-neon/40 bg-void/95 text-neon fixed top-[max(0.75rem,env(safe-area-inset-top))] left-1/2 z-[65] -translate-x-1/2 rounded-full border px-4 py-2 text-center text-xs font-semibold shadow-lg">
+          {startingTeamName} start — skip the first draw
+        </p>
+      ) : null}
       {/*
         The clock rides the seam between the seats, which is the one piece of
         the board no seat owns and the one place every player can reach. It is
@@ -975,7 +1157,7 @@ export function TrackerView({
                   className="text-warning fill-warning/30 mx-auto mb-2"
                 />
                 <h2 className="font-display truncate text-lg leading-tight font-bold">
-                  {winner.name} wins
+                  {winnerName} wins
                 </h2>
                 <p className="text-muted mb-3 font-mono text-sm tabular-nums">
                   {formatClock(elapsed)}
@@ -1171,11 +1353,13 @@ function useFirstPlayerSpotlight(
     setHeld(false);
     setPlan(
       planFirstPlayerReveal(
-        state.players.map((row) => row.id),
+        state.teams
+          ? state.teams.flatMap((team) => team[0] ?? [])
+          : state.players.map((row) => row.id),
         state.firstPlayerId,
       ),
     );
-  }, [moves, state.firstPlayerId, state.players]);
+  }, [moves, state.firstPlayerId, state.players, state.teams]);
 
   useEffect(() => {
     const next = plan?.[hop + 1];
@@ -1260,6 +1444,9 @@ function MatchMenu({
   const paused = Boolean(state.pausedAt);
   const decided = Boolean(state.winnerId);
   const winner = state.players.find((row) => row.id === state.winnerId) ?? null;
+  const menuWinnerTeam = winner ? teamForPlayer(state, winner.id) : [];
+  const menuWinnerIds = new Set(menuWinnerTeam.map((player) => player.id));
+  const menuWinnerName = menuWinnerTeam.map((player) => player.name).join(' & ');
   return (
     <section className="flex h-full w-full flex-col">
       <header className="mb-1 flex shrink-0 items-center justify-between gap-3">
@@ -1379,13 +1566,13 @@ function MatchMenu({
         */}
         <div className="flex flex-wrap items-center justify-center gap-2 border-t border-muted/15 pt-3">
           <span className="text-muted font-mono text-[0.68rem] tracking-wide uppercase">
-            {winner ? `${winner.name} won` : 'Game won by'}
+            {menuWinnerName ? `${menuWinnerName} won` : 'Game won by'}
           </span>
           {state.players.map((seat) => (
             <Button
               key={seat.id}
               size="sm"
-              variant={seat.id === state.winnerId ? 'neon' : 'glass'}
+              variant={menuWinnerIds.has(seat.id) ? 'neon' : 'glass'}
               disabled={decided || seat.eliminated}
               onClick={() => {
                 dispatch({ type: 'winner', playerId: seat.id });
@@ -2289,6 +2476,7 @@ function restore(
       if (parsed.players?.length === players.length) {
         return {
           ...parsed,
+          teams: parsed.teams ?? null,
           dayNight: parsed.dayNight ?? null,
           dungeons: parsed.dungeons ?? {},
           completedDungeons: normalizeCompletedDungeons(

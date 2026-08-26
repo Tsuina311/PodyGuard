@@ -7,6 +7,8 @@ import {
 import type { CommanderSelection } from '../scryfall';
 
 export const STARTING_LIFE = 40;
+export const TWO_HEADED_GIANT_STARTING_LIFE = 60;
+export const TWO_HEADED_GIANT_POISON_LIMIT = 20;
 export const POISON_LIMIT = 10;
 export const COMMANDER_DAMAGE_LIMIT = 21;
 export const HIT_LIMIT = 3;
@@ -83,6 +85,8 @@ export type TrackerPlayer = {
 
 export type TrackerState = {
   players: TrackerPlayer[];
+  /** Two pairs in board order for Two-Headed Giant. */
+  teams: string[][] | null;
   dayNight: 'day' | 'night' | null;
   dungeons: Record<string, DungeonProgress | undefined>;
   /** Completions in order, including repeats. The 0–4 counter is unique ids. */
@@ -99,6 +103,7 @@ export type TrackerState = {
 };
 
 export type TrackerAction =
+  | { type: 'teams'; teams: string[][] }
   | { type: 'life'; playerId: string; delta: number }
   | { type: 'poison'; playerId: string; delta: number }
   | { type: 'tax'; playerId: string; delta: number }
@@ -154,6 +159,7 @@ export function createTracker(
       pendingLoss: null,
       answeredCauses: [],
     })),
+    teams: null,
     dayNight: null,
     dungeons: {},
     completedDungeons: {},
@@ -192,10 +198,29 @@ export function applyTrackerAction(
   next.completedDungeons ??= {};
   next.eliminations ??= [];
   switch (action.type) {
+    case 'teams': {
+      const ids = action.teams.flat();
+      if (
+        action.teams.length !== 2 ||
+        action.teams.some((team) => team.length !== 2) ||
+        new Set(ids).size !== 4 ||
+        ids.some((id) => !next.players.some((player) => player.id === id))
+      ) {
+        break;
+      }
+      next.teams = action.teams.map((team) => [...team]);
+      next.players.sort(
+        (left, right) => ids.indexOf(left.id) - ids.indexOf(right.id),
+      );
+      for (const player of next.players) {
+        player.life = TWO_HEADED_GIANT_STARTING_LIFE;
+        player.minimumLife = TWO_HEADED_GIANT_STARTING_LIFE;
+      }
+      break;
+    }
     case 'life': {
       const player = playerById(next, action.playerId);
-      player.life += action.delta;
-      player.minimumLife = Math.min(player.minimumLife ?? player.life, player.life);
+      setSharedLife(next, player.id, player.life + action.delta);
       break;
     }
     case 'poison': {
@@ -237,11 +262,7 @@ export function applyTrackerAction(
       const current = target.commanderDamage[action.commanderId] ?? 0;
       const nextDamage = Math.max(0, current + action.delta);
       // Commander damage is combat damage, so life changes by the same amount.
-      target.life -= nextDamage - current;
-      target.minimumLife = Math.min(
-        target.minimumLife ?? target.life,
-        target.life,
-      );
+      setSharedLife(next, target.id, target.life - (nextDamage - current));
       target.commanderDamage[action.commanderId] = nextDamage;
       break;
     }
@@ -331,28 +352,33 @@ export function applyTrackerAction(
     }
     case 'eliminate': {
       const player = playerById(next, action.playerId);
-      if (!player.eliminated) {
-        next.eliminations.push({
-          playerId: player.id,
-          cause: null,
-          at: now,
-        });
+      for (const member of teamForPlayer(next, player.id)) {
+        if (!member.eliminated) {
+          next.eliminations.push({
+            playerId: member.id,
+            cause: null,
+            at: now,
+          });
+        }
+        member.eliminated = true;
+        member.pendingLoss = null;
       }
-      player.eliminated = true;
-      player.pendingLoss = null;
       break;
     }
     case 'confirmLoss': {
       const player = playerById(next, action.playerId);
-      if (!player.eliminated) {
-        next.eliminations.push({
-          playerId: player.id,
-          cause: player.pendingLoss,
-          at: now,
-        });
+      const losingTeam = teamForPlayer(next, player.id);
+      for (const member of losingTeam) {
+        if (!member.eliminated) {
+          next.eliminations.push({
+            playerId: member.id,
+            cause: member.id === player.id ? player.pendingLoss : null,
+            at: now,
+          });
+        }
+        member.eliminated = true;
+        member.pendingLoss = null;
       }
-      player.eliminated = true;
-      player.pendingLoss = null;
       break;
     }
     case 'declineLoss': {
@@ -392,8 +418,17 @@ export function applyTrackerAction(
     next.initiativeId = null;
   }
   const alive = next.players.filter((row) => !row.eliminated);
-  if (!next.winnerId && alive.length === 1 && next.players.length > 1) {
-    next.winnerId = alive[0]?.id ?? null;
+  const aliveTeams = next.teams
+    ? next.teams.filter((team) =>
+        team.some((id) => !playerById(next, id).eliminated),
+      )
+    : [];
+  if (
+    !next.winnerId &&
+    ((next.teams && aliveTeams.length === 1) ||
+      (!next.teams && alive.length === 1 && next.players.length > 1))
+  ) {
+    next.winnerId = next.teams ? aliveTeams[0]?.[0] ?? null : alive[0]?.id ?? null;
     next.pausedAt = now;
   }
   if (next.winnerId) {
@@ -419,7 +454,13 @@ function raiseLossPrompts(state: TrackerState): void {
       player.answeredCauses = [];
       continue;
     }
-    const active = activeLossCauses(player);
+    const team = state.teams?.find((row) => row.includes(player.id));
+    const teamRepresentative = !team || team[0] === player.id;
+    const active = activeLossCauses(state, player).filter(
+      (cause) =>
+        teamRepresentative ||
+        (cause.type !== 'life' && cause.type !== 'poison'),
+    );
     const activeKeys = new Set(active.map(causeKey));
     player.answeredCauses = player.answeredCauses.filter((key) =>
       activeKeys.has(key),
@@ -441,12 +482,24 @@ function raiseLossPrompts(state: TrackerState): void {
   }
 }
 
-function activeLossCauses(player: TrackerPlayer): LossCause[] {
+function activeLossCauses(
+  state: TrackerState,
+  player: TrackerPlayer,
+): LossCause[] {
   const causes: LossCause[] = [];
   if (player.life <= 0) {
     causes.push({ type: 'life' });
   }
-  if (player.poison >= POISON_LIMIT) {
+  const poison = state.teams
+    ? teamForPlayer(state, player.id).reduce(
+        (total, member) => total + member.poison,
+        0,
+      )
+    : player.poison;
+  if (
+    poison >=
+    (state.teams ? TWO_HEADED_GIANT_POISON_LIMIT : POISON_LIMIT)
+  ) {
     causes.push({ type: 'poison' });
   }
   if ((player.counters?.hit ?? 0) >= HIT_LIMIT) {
@@ -587,12 +640,38 @@ export function pickFirstPlayer(
   random = Math.random,
   now = Date.now(),
 ): TrackerState {
-  const alive = state.players.filter((row) => !row.eliminated);
+  const alive = state.teams
+    ? state.teams
+        .map((team) => team[0])
+        .map((id) => state.players.find((row) => row.id === id))
+        .filter((row): row is TrackerPlayer => Boolean(row && !row.eliminated))
+    : state.players.filter((row) => !row.eliminated);
   const pick = alive[Math.floor(random() * alive.length)];
   if (!pick) {
     return state;
   }
   return applyTrackerAction(state, { type: 'first', playerId: pick.id }, now);
+}
+
+export function teamForPlayer(
+  state: TrackerState,
+  playerId: string,
+): TrackerPlayer[] {
+  const ids = state.teams?.find((team) => team.includes(playerId));
+  return ids
+    ? ids.map((id) => playerById(state, id))
+    : [playerById(state, playerId)];
+}
+
+function setSharedLife(
+  state: TrackerState,
+  playerId: string,
+  life: number,
+): void {
+  for (const player of teamForPlayer(state, playerId)) {
+    player.life = life;
+    player.minimumLife = Math.min(player.minimumLife ?? life, life);
+  }
 }
 
 function playerById(state: TrackerState, id: string): TrackerPlayer {

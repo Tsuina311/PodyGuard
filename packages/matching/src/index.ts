@@ -27,7 +27,10 @@ export {
   FIVE_POD_SIZE,
   OPEN_POOL_ID,
   PREFERRED_POD_SIZE,
+  TREACHERY_MAX_POD_SIZE,
+  TREACHERY_MIN_POD_SIZE,
   allowedPodSizes,
+  eventMatchOptions,
 } from './types.js';
 export type {
   AvailableTable,

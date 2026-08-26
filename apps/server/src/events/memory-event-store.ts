@@ -55,9 +55,11 @@ export class MemoryEventStore implements EventStore {
       hostCredentialHash: input.hostCredentialHash,
       allowThreePods: input.allowThreePods !== false,
       allowFivePods: Boolean(input.allowFivePods),
+      preferredPodSize: input.preferredPodSize ?? 4,
+      expiresAt: input.expiresAt ?? new Date(Date.now() + 24 * 60 * 60 * 1000),
       challengePackId: 'classic-commander-v1',
       challengePackVersion: 1,
-      createdAt: new Date(),
+      createdAt: input.createdAt ?? new Date(),
     };
     this.events.set(event.id, event);
     this.byJoinCode.set(event.joinCode, event.id);
@@ -537,6 +539,8 @@ export class MemoryEventStore implements EventStore {
     patch: {
       allowThreePods?: boolean;
       allowFivePods?: boolean;
+      preferredPodSize?: number;
+      expiresAt?: Date;
       challengePackId?: string;
       challengePackVersion?: number;
     },
@@ -550,6 +554,12 @@ export class MemoryEventStore implements EventStore {
     }
     if (patch.allowFivePods !== undefined) {
       event.allowFivePods = patch.allowFivePods;
+    }
+    if (patch.preferredPodSize !== undefined) {
+      event.preferredPodSize = patch.preferredPodSize;
+    }
+    if (patch.expiresAt !== undefined) {
+      event.expiresAt = patch.expiresAt;
     }
     if (patch.challengePackId !== undefined) {
       event.challengePackId = patch.challengePackId;
