@@ -40,6 +40,7 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
       name?: unknown;
       hostPin?: unknown;
       tableCount?: unknown;
+      gameMode?: unknown;
       allowThreePods?: unknown;
       allowFivePods?: unknown;
     };
@@ -48,6 +49,7 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
         name: typeof body.name === 'string' ? body.name : '',
         hostPin: typeof body.hostPin === 'string' ? body.hostPin : '',
         tableCount: parseTableCount(body.tableCount),
+        gameMode: body.gameMode === 'treachery' ? 'treachery' : 'commander',
         allowThreePods: body.allowThreePods === undefined ? undefined : Boolean(body.allowThreePods),
         allowFivePods: body.allowFivePods === undefined ? undefined : Boolean(body.allowFivePods),
       });
@@ -110,6 +112,36 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
       return sendEventError(reply, error);
     }
   });
+
+  app.get('/events/:joinCode/me/treachery-role', async (request, reply) => {
+    const { joinCode } = request.params as { joinCode: string };
+    try {
+      const assignment = await app.events.getTreacheryRole(
+        normalizeJoinCode(joinCode),
+        bearerToken(request.headers.authorization),
+      );
+      return { assignment };
+    } catch (error) {
+      return sendEventError(reply, error);
+    }
+  });
+
+  app.post(
+    '/events/:joinCode/me/treachery-identity/unveil',
+    async (request, reply) => {
+      const { joinCode } = request.params as { joinCode: string };
+      try {
+        const assignment = await app.events.unveilTreacheryIdentity(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return { assignment };
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
 
   app.put('/events/:joinCode/decks', async (request, reply) => {
     const { joinCode } = request.params as { joinCode: string };

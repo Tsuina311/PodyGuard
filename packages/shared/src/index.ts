@@ -75,3 +75,24 @@ export type {
   PublicPod,
   PublicTable,
 } from './event-api';
+
+export {
+  GAME_MODES,
+  TREACHERY_ROLES,
+  TREACHERY_IDENTITIES,
+  TREACHERY_ROLE_INFO,
+  assignTreacheryIdentities,
+  assignTreacheryRoles,
+  treacheryIdentityById,
+  treacheryDistribution,
+  treacheryRolesForSize,
+} from './treachery';
+
+export type {
+  GameMode,
+  TreacheryRole,
+  TreacheryRoleAssignment,
+  TreacheryRoleInfo,
+  TreacheryIdentityCard,
+  PublicTreacheryIdentity,
+} from './treachery';

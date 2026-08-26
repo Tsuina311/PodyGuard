@@ -363,20 +363,29 @@ export function HostPage() {
           <span>{counts.matched} matched</span>
           <span>{counts.playing} playing</span>
           <span>{counts.paused} paused</span>
+          <Badge tone={event.gameMode === 'treachery' ? 'dev' : 'idle'}>
+            {event.gameMode}
+          </Badge>
         </div>
       </header>
 
       <Panel title="Pod sizes" aside="matching">
-        <label className="text-muted mb-2 flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={event.allowThreePods}
-            onChange={(change) =>
-              void onToggleSetting({ allowThreePods: change.target.checked })
-            }
-          />
-          Allow leftover 3-player pods
-        </label>
+        {event.gameMode === 'commander' ? (
+          <label className="text-muted mb-2 flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={event.allowThreePods}
+              onChange={(change) =>
+                void onToggleSetting({ allowThreePods: change.target.checked })
+              }
+            />
+            Allow leftover 3-player pods
+          </label>
+        ) : (
+          <p className="text-muted mb-2 text-sm">
+            Treachery roles require at least four players.
+          </p>
+        )}
         <label className="text-muted flex items-center gap-2 text-sm">
           <input
             type="checkbox"

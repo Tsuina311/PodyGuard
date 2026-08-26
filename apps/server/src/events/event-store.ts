@@ -1,12 +1,14 @@
 import type {
   ChallengePack,
   CommanderSelection,
+  GameMode,
   ProductEventName,
   PublicEvent,
   PublicParticipant,
   PublicPod,
   PublicTable,
   PublicChallengeCompletion,
+  TreacheryRole,
 } from '@podyguard/shared';
 
 export class EventNotFoundError extends Error {
@@ -86,6 +88,7 @@ export type StoredEvent = {
   name: string;
   joinCode: string;
   status: PublicEvent['status'];
+  gameMode: GameMode;
   hostCredentialHash: string;
   allowThreePods: boolean;
   allowFivePods: boolean;
@@ -115,6 +118,18 @@ export type StoredAssignment = {
   poolId?: string;
   deckName?: string;
   commanders: CommanderSelection[];
+  treacheryRole?: TreacheryRole;
+  treacheryIdentityId?: number;
+  treacheryUnveiledAt?: Date;
+};
+
+export type StoredTreacheryAssignment = {
+  podId: string;
+  participantId: string;
+  role: TreacheryRole;
+  identityId: number;
+  unveiledAt?: Date;
+  podStatus: 'formed' | 'playing';
 };
 
 export type StoredDeck = {
@@ -200,6 +215,7 @@ export type NewStoredEvent = {
   name: string;
   joinCode: string;
   hostCredentialHash: string;
+  gameMode?: GameMode;
   allowThreePods?: boolean;
   allowFivePods?: boolean;
 };
@@ -220,6 +236,8 @@ export type NewStoredPod = {
     participantId: string;
     deckId: string;
     assignedPoolId: string;
+    treacheryRole?: TreacheryRole;
+    treacheryIdentityId?: number;
   }>;
 };
 
@@ -253,6 +271,14 @@ export interface EventStore {
   ): Promise<StoredTable>;
   createPod(input: NewStoredPod): Promise<StoredPod>;
   listAssignments(eventId: string): Promise<StoredAssignment[]>;
+  findActiveTreacheryAssignment(
+    eventId: string,
+    participantId: string,
+  ): Promise<StoredTreacheryAssignment | undefined>;
+  unveilTreacheryIdentity(
+    podId: string,
+    participantId: string,
+  ): Promise<StoredTreacheryAssignment>;
   listDecks(eventId: string): Promise<StoredDeck[]>;
   replaceDecks(
     participantId: string,

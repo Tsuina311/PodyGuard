@@ -36,6 +36,7 @@ import {
   type StoredParticipant,
   type StoredPod,
   type StoredTable,
+  type StoredTreacheryAssignment,
 } from './event-store.js';
 
 function isUniqueViolation(error: unknown): boolean {
@@ -56,6 +57,7 @@ export class PostgresEventStore implements EventStore {
           name: input.name,
           publicJoinCode: input.joinCode,
           hostCredentialHash: input.hostCredentialHash,
+          gameMode: input.gameMode ?? 'commander',
           allowThreePods: input.allowThreePods !== false,
           allowFivePods: Boolean(input.allowFivePods),
         })
@@ -279,6 +281,10 @@ export class PostgresEventStore implements EventStore {
               assignedPoolId: seat.assignedPoolId,
               assignedDeckId: deck?.id ?? null,
               assignedDeckName: deck?.name ?? null,
+              treacheryRole: seat.treacheryRole ?? null,
+              treacheryIdentityId: seat.treacheryIdentityId ?? null,
+              treacheryUnveiledAt:
+                seat.treacheryRole === 'leader' ? new Date() : null,
               waitSeconds: readyAt
                 ? Math.max(0, Math.round((now - readyAt) / 1000))
                 : 0,
@@ -331,6 +337,9 @@ export class PostgresEventStore implements EventStore {
         poolId: podMembers.assignedPoolId,
         deckName: podMembers.assignedDeckName,
         commanders: deckOptions.commanders,
+        treacheryRole: podMembers.treacheryRole,
+        treacheryIdentityId: podMembers.treacheryIdentityId,
+        treacheryUnveiledAt: podMembers.treacheryUnveiledAt,
       })
       .from(podMembers)
       .innerJoin(pods, eq(podMembers.podId, pods.id))
@@ -349,7 +358,91 @@ export class PostgresEventStore implements EventStore {
       poolId: row.poolId ?? undefined,
       deckName: row.deckName ?? undefined,
       commanders: row.commanders ?? [],
+      treacheryRole: row.treacheryRole ?? undefined,
+      treacheryIdentityId: row.treacheryIdentityId ?? undefined,
+      treacheryUnveiledAt: row.treacheryUnveiledAt ?? undefined,
     }));
+  }
+
+  async findActiveTreacheryAssignment(
+    eventId: string,
+    participantId: string,
+  ): Promise<StoredTreacheryAssignment | undefined> {
+    const [row] = await getDb()
+      .select({
+        podId: pods.id,
+        participantId: podMembers.participantId,
+        role: podMembers.treacheryRole,
+        identityId: podMembers.treacheryIdentityId,
+        unveiledAt: podMembers.treacheryUnveiledAt,
+        podStatus: pods.status,
+      })
+      .from(podMembers)
+      .innerJoin(pods, eq(podMembers.podId, pods.id))
+      .where(
+        and(
+          eq(pods.eventId, eventId),
+          eq(podMembers.participantId, participantId),
+          inArray(pods.status, ['formed', 'playing']),
+        ),
+      )
+      .limit(1);
+    if (!row?.role || row.identityId === null) {
+      return undefined;
+    }
+    return {
+      podId: row.podId,
+      participantId: row.participantId,
+      role: row.role,
+      identityId: row.identityId,
+      unveiledAt: row.unveiledAt ?? undefined,
+      podStatus: row.podStatus === 'playing' ? 'playing' : 'formed',
+    };
+  }
+
+  async unveilTreacheryIdentity(
+    podId: string,
+    participantId: string,
+  ): Promise<StoredTreacheryAssignment> {
+    const [podRow] = await getDb()
+      .select({ eventId: pods.eventId, status: pods.status })
+      .from(pods)
+      .where(eq(pods.id, podId))
+      .limit(1);
+    if (
+      !podRow ||
+      (podRow.status !== 'formed' && podRow.status !== 'playing')
+    ) {
+      throw new PodNotFoundError();
+    }
+    const active = await this.findActiveTreacheryAssignment(
+      podRow.eventId,
+      participantId,
+    );
+    if (!active || active.podId !== podId) {
+      throw new PodNotFoundError();
+    }
+    const [member] = await getDb()
+      .update(podMembers)
+      .set({ treacheryUnveiledAt: new Date() })
+      .where(
+        and(
+          eq(podMembers.podId, podId),
+          eq(podMembers.participantId, participantId),
+        ),
+      )
+      .returning();
+    if (!member?.treacheryRole || member.treacheryIdentityId === null) {
+      throw new PodNotFoundError();
+    }
+    return {
+      podId,
+      participantId,
+      role: member.treacheryRole,
+      identityId: member.treacheryIdentityId,
+      unveiledAt: member.treacheryUnveiledAt ?? undefined,
+      podStatus: podRow.status,
+    };
   }
 
   async listDecks(eventId: string): Promise<StoredDeck[]> {
@@ -894,6 +987,7 @@ function mapEvent(row: typeof events.$inferSelect): StoredEvent {
     name: row.name,
     joinCode: row.publicJoinCode,
     status: row.status,
+    gameMode: row.gameMode,
     hostCredentialHash: row.hostCredentialHash,
     allowThreePods: row.allowThreePods,
     allowFivePods: row.allowFivePods,

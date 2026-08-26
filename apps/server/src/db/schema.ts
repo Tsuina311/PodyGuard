@@ -43,6 +43,15 @@ export const podStatusEnum = pgEnum('pod_status', [
   'cancelled',
 ]);
 
+export const gameModeEnum = pgEnum('game_mode', ['commander', 'treachery']);
+
+export const treacheryRoleEnum = pgEnum('treachery_role', [
+  'leader',
+  'guardian',
+  'assassin',
+  'traitor',
+]);
+
 /**
  * Minimal foundation tables for Phase 0 connectivity.
  * Domain tables expand in Phase 1+.
@@ -61,6 +70,7 @@ export const events = pgTable('events', {
   publicJoinCode: text('public_join_code').notNull().unique(),
   name: text('name').notNull(),
   status: eventStatusEnum('status').notNull().default('open'),
+  gameMode: gameModeEnum('game_mode').notNull().default('commander'),
   /** Event-local host PIN hash. Not a Neon Auth account. */
   hostCredentialHash: text('host_credential_hash').notNull(),
   allowThreePods: boolean('allow_three_pods').notNull().default(true),
@@ -179,6 +189,11 @@ export const podMembers = pgTable(
       onDelete: 'set null',
     }),
     assignedDeckName: text('assigned_deck_name'),
+    treacheryRole: treacheryRoleEnum('treachery_role'),
+    treacheryIdentityId: integer('treachery_identity_id'),
+    treacheryUnveiledAt: timestamp('treachery_unveiled_at', {
+      withTimezone: true,
+    }),
     waitSeconds: integer('wait_seconds'),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()

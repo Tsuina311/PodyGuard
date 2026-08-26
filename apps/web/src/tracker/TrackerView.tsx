@@ -8,6 +8,7 @@ import {
   Crosshair,
   Check,
   Crown,
+  Eye,
   Flag,
   Gauge,
   Minus,
@@ -36,6 +37,8 @@ import {
   OFFICIAL_COMMANDER_CHALLENGES,
   type ChallengeDetectionMode,
   type ChallengePack,
+  type GameMode,
+  type PublicTreacheryIdentity,
 } from '@podyguard/shared';
 import {
   applyTrackerAction,
@@ -95,6 +98,11 @@ type Props = {
     confirmed?: boolean,
   ) => Promise<boolean>;
   challengePack?: ChallengePack;
+  gameMode?: GameMode;
+  /** Treachery's public Leader replaces the normal random starting seat. */
+  startingPlayerId?: string;
+  onCheckRole?: () => void;
+  revealedIdentities?: Record<string, PublicTreacheryIdentity>;
 };
 
 /*
@@ -230,6 +238,10 @@ export function TrackerView({
   challengeProgress = {},
   onChallengeComplete,
   challengePack = OFFICIAL_COMMANDER_CHALLENGES,
+  gameMode = 'commander',
+  startingPlayerId,
+  onCheckRole,
+  revealedIdentities = {},
 }: Props) {
   const initial = useMemo<TrackerHistory>(
     () => ({ present: restore(storageKey, players, persist), past: [] }),
@@ -252,6 +264,9 @@ export function TrackerView({
   const [challengeNotice, setChallengeNotice] = useState<string | null>(null);
   const [challengeError, setChallengeError] = useState<string | null>(null);
   const [challengeSaving, setChallengeSaving] = useState(0);
+  const [publicIdentityPlayerId, setPublicIdentityPlayerId] = useState<
+    string | null
+  >(null);
   const [confirmationDismissed, setConfirmationDismissed] = useState(false);
   const attemptedChallenges = useRef(new Set<string>());
   const landscape = useLandscape();
@@ -398,9 +413,12 @@ export function TrackerView({
           variant="neon"
           size="lg"
           className="h-16 min-w-48 text-xl"
-          onClick={() => dispatch({ type: 'first' })}
+          disabled={gameMode === 'treachery' && !startingPlayerId}
+          onClick={() => dispatch({ type: 'first', playerId: startingPlayerId })}
         >
-          Start
+          {gameMode === 'treachery' && !startingPlayerId
+            ? 'Loading roles…'
+            : 'Start'}
         </Button>
       </section>
     );
@@ -460,6 +478,15 @@ export function TrackerView({
                 />
               </span>
               <span className="flex shrink-0 flex-wrap justify-end gap-1">
+                {revealedIdentities[player.id] ? (
+                  <button
+                    type="button"
+                    className="border-warning/50 bg-warning/15 text-warning rounded-full border px-2 py-0.5 text-[0.65rem] font-bold"
+                    onClick={() => setPublicIdentityPlayerId(player.id)}
+                  >
+                    {revealedIdentities[player.id]?.name}
+                  </button>
+                ) : null}
                 {player.id === state.initiativeId ? (
                   <Badge tone="dev">
                     <Flag size={12} aria-hidden />
@@ -811,12 +838,45 @@ export function TrackerView({
                 }}
                 onFinish={finish}
                 onQuit={onQuit}
+                onCheckRole={onCheckRole}
                 onChallenges={() => {
                   setMenuOpen(false);
                   setChallengesOpen(true);
                 }}
                 onClose={() => setMenuOpen(false)}
               />
+            </div>,
+            document.body,
+          )
+        : null}
+      {publicIdentityPlayerId && revealedIdentities[publicIdentityPlayerId]
+        ? createPortal(
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label="Revealed Treachery identity"
+              className="bg-void/90 fixed inset-0 z-[80] flex items-center justify-center p-4 backdrop-blur-md"
+              onClick={(event) => {
+                if (event.target === event.currentTarget) {
+                  setPublicIdentityPlayerId(null);
+                }
+              }}
+            >
+              <section className="relative max-h-full max-w-md">
+                <img
+                  src={revealedIdentities[publicIdentityPlayerId].image}
+                  alt={revealedIdentities[publicIdentityPlayerId].name}
+                  className="max-h-[90dvh] max-w-full rounded-xl shadow-2xl"
+                />
+                <button
+                  type="button"
+                  aria-label="Close revealed identity"
+                  className="bg-void/90 text-ink absolute top-2 right-2 flex size-9 items-center justify-center rounded-full"
+                  onClick={() => setPublicIdentityPlayerId(null)}
+                >
+                  <X size={18} aria-hidden />
+                </button>
+              </section>
             </div>,
             document.body,
           )
@@ -1182,6 +1242,7 @@ function MatchMenu({
   onUndo,
   onFinish,
   onQuit,
+  onCheckRole,
   onChallenges,
   onClose,
 }: {
@@ -1192,6 +1253,7 @@ function MatchMenu({
   onUndo: () => void;
   onFinish: () => Promise<void>;
   onQuit: () => void;
+  onCheckRole?: () => void;
   onChallenges: () => void;
   onClose: () => void;
 }) {
@@ -1245,6 +1307,19 @@ function MatchMenu({
             <Sparkles size={14} aria-hidden />
             Challenges
           </Button>
+          {onCheckRole ? (
+            <Button
+              size="sm"
+              variant="glass"
+              onClick={() => {
+                onClose();
+                onCheckRole();
+              }}
+            >
+              <Eye size={14} aria-hidden />
+              Check my role
+            </Button>
+          ) : null}
           {/*
             Day and night exist only once a card has set them, and no card ever
             takes the table back to neither, so this is a two-way switch.
@@ -2156,7 +2231,7 @@ function CommanderTile({
 
 export type Msg =
   | { type: 'action'; action: TrackerAction }
-  | { type: 'first' }
+  | { type: 'first'; playerId?: string }
   | { type: 'undo' };
 
 /*
@@ -2181,7 +2256,12 @@ export function reduceHistory(
   }
   const present =
     message.type === 'first'
-      ? pickFirstPlayer(history.present)
+      ? message.playerId
+        ? applyTrackerAction(history.present, {
+            type: 'first',
+            playerId: message.playerId,
+          })
+        : pickFirstPlayer(history.present)
       : applyTrackerAction(history.present, message.action);
   // An action the engine refused changes nothing, so it earns no history entry.
   if (present === history.present) {

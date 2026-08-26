@@ -20,6 +20,7 @@ import {
   type StoredParticipant,
   type StoredPod,
   type StoredTable,
+  type StoredTreacheryAssignment,
 } from './event-store.js';
 
 export class MemoryEventStore implements EventStore {
@@ -50,6 +51,7 @@ export class MemoryEventStore implements EventStore {
       name: input.name,
       joinCode: input.joinCode,
       status: 'open',
+      gameMode: input.gameMode ?? 'commander',
       hostCredentialHash: input.hostCredentialHash,
       allowThreePods: input.allowThreePods !== false,
       allowFivePods: Boolean(input.allowFivePods),
@@ -241,6 +243,10 @@ export class MemoryEventStore implements EventStore {
         poolId: seat.assignedPoolId,
         deckName: deck?.name ?? undefined,
         commanders: deck?.commanders ?? [],
+        treacheryRole: seat.treacheryRole,
+        treacheryIdentityId: seat.treacheryIdentityId,
+        treacheryUnveiledAt:
+          seat.treacheryRole === 'leader' ? new Date() : undefined,
       });
     }
     this.assignments.set(input.eventId, assignments);
@@ -249,6 +255,59 @@ export class MemoryEventStore implements EventStore {
 
   async listAssignments(eventId: string): Promise<StoredAssignment[]> {
     return [...(this.assignments.get(eventId) ?? [])];
+  }
+
+  async findActiveTreacheryAssignment(
+    eventId: string,
+    participantId: string,
+  ): Promise<StoredTreacheryAssignment | undefined> {
+    const assignment = (this.assignments.get(eventId) ?? []).find(
+      (row) => row.participantId === participantId && row.treacheryRole,
+    );
+    if (
+      !assignment?.treacheryRole ||
+      assignment.treacheryIdentityId === undefined
+    ) {
+      return undefined;
+    }
+    return {
+      podId: assignment.podId,
+      participantId,
+      role: assignment.treacheryRole,
+      identityId: assignment.treacheryIdentityId,
+      unveiledAt: assignment.treacheryUnveiledAt,
+      podStatus: assignment.podStatus,
+    };
+  }
+
+  async unveilTreacheryIdentity(
+    podId: string,
+    participantId: string,
+  ): Promise<StoredTreacheryAssignment> {
+    const assignment = [...this.assignments.values()]
+      .flat()
+      .find(
+        (row) =>
+          row.podId === podId &&
+          row.participantId === participantId &&
+          row.treacheryRole &&
+          row.treacheryIdentityId !== undefined,
+      );
+    if (
+      !assignment?.treacheryRole ||
+      assignment.treacheryIdentityId === undefined
+    ) {
+      throw new PodNotFoundError();
+    }
+    assignment.treacheryUnveiledAt ??= new Date();
+    return {
+      podId,
+      participantId,
+      role: assignment.treacheryRole,
+      identityId: assignment.treacheryIdentityId,
+      unveiledAt: assignment.treacheryUnveiledAt,
+      podStatus: assignment.podStatus,
+    };
   }
 
   async listDecks(eventId: string): Promise<StoredDeck[]> {

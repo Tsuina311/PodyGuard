@@ -4,12 +4,14 @@ import type {
   PhysicalTableStatus,
 } from './enums';
 import type { ChallengePack, PublicChallengeCompletion } from './challenges';
+import type { GameMode, PublicTreacheryIdentity } from './treachery';
 
 export type PublicEvent = {
   id: string;
   name: string;
   joinCode: string;
   status: EventStatus;
+  gameMode: GameMode;
   allowThreePods: boolean;
   allowFivePods: boolean;
   challengePackId?: string;
@@ -51,6 +53,8 @@ export type PublicParticipant = {
   flexCredits: number;
   challengePoints?: number;
   challengeCompletions?: PublicChallengeCompletion[];
+  /** Public only after this player has chosen to unveil at the table. */
+  revealedTreacheryIdentity?: PublicTreacheryIdentity;
 };
 
 export type PublicTable = {
@@ -93,6 +97,7 @@ export type ProductEventName =
   | 'left_event'
   | 'challenge_completed'
   | 'flex_concession_used'
+  | 'identity_unveiled'
   | 'pod_rated';
 
 export type EventMetrics = {

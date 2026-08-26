@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   OFFICIAL_COMMANDER_CHALLENGES,
@@ -8,12 +8,14 @@ import {
   type PodRating,
   type PublicEvent,
   type PublicParticipant,
+  type TreacheryRoleAssignment,
 } from '@podyguard/shared';
 import {
   ApiError,
   chooseGameTracker,
   completeChallenge,
   getEvent,
+  getMyTreacheryRole,
   getMe,
   joinEvent,
   listParticipants,
@@ -26,6 +28,7 @@ import {
   setDecks,
   setPaused,
   setReady,
+  unveilMyTreacheryIdentity,
 } from './api';
 import { DeckEditor, defaultDeckRows, type DeckFormRow } from './DeckEditor';
 import { Badge, statusTone } from './ui/Badge';
@@ -37,6 +40,7 @@ import { ThemeToggleCorner } from './ui/ThemeToggle';
 import { WaitTime } from './ui/WaitTime';
 import { assignedDeckLine, tableForParticipant } from './match-view';
 import { TrackerView } from './tracker/TrackerView';
+import { TreacheryRoleDialog } from './TreacheryRoleDialog';
 import { useEventLive } from './useEventLive';
 import { forgetActiveMatch, rememberActiveMatch } from './active-match';
 import {
@@ -60,6 +64,11 @@ export function JoinPage() {
   const [atTable, setAtTable] = useState(false);
   const [showTracker, setShowTracker] = useState(false);
   const [askRating, setAskRating] = useState(false);
+  const [treacheryRole, setTreacheryRole] =
+    useState<TreacheryRoleAssignment | null>(null);
+  const [roleOpen, setRoleOpen] = useState(false);
+  const [roleRevealed, setRoleRevealed] = useState(false);
+  const rolePod = useRef<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -131,6 +140,56 @@ export function JoinPage() {
   }, []);
 
   useEventLive(event?.joinCode, Boolean(event && token), onSnapshot);
+
+  useEffect(() => {
+    if (
+      event?.gameMode !== 'treachery' ||
+      !token ||
+      !participant?.tableLabel
+    ) {
+      setTreacheryRole(null);
+      setRoleOpen(false);
+      rolePod.current = null;
+      return;
+    }
+    let cancelled = false;
+    void getMyTreacheryRole(event.joinCode, token)
+      .then(({ assignment }) => {
+        if (cancelled) {
+          return;
+        }
+        const firstReceipt = rolePod.current !== assignment.podId;
+        rolePod.current = assignment.podId;
+        setTreacheryRole(assignment);
+        const seenKey = treacheryRoleSeenKey(assignment.podId, participant.id);
+        if (
+          firstReceipt &&
+          sessionStorage.getItem(seenKey) !== 'true'
+        ) {
+          setRoleRevealed(false);
+          setRoleOpen(true);
+        }
+      })
+      .catch((caught: unknown) => {
+        if (
+          !cancelled &&
+          caught instanceof ApiError &&
+          caught.code !== 'POD_NOT_FOUND'
+        ) {
+          setError(caught.message);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    event?.gameMode,
+    event?.joinCode,
+    participant?.id,
+    participant?.status,
+    participant?.tableLabel,
+    token,
+  ]);
 
   useEffect(() => {
     if (!event || !participant) {
@@ -334,6 +393,14 @@ export function JoinPage() {
     }
   }
 
+  async function onUnveilIdentity() {
+    if (!event || !token) {
+      throw new Error('Your event session is no longer available.');
+    }
+    const result = await unveilMyTreacheryIdentity(event.joinCode, token);
+    setTreacheryRole(result.assignment);
+  }
+
   async function onTrackerFinished(
     winnerId: string,
     durationSeconds: number,
@@ -427,21 +494,55 @@ export function JoinPage() {
   */
   if (participant && token && seated && participant.status === 'playing' && showTracker) {
     return (
-      <TrackerView
-        storageKey={`podyguard.tracker.${event?.joinCode ?? ''}.${matchTable?.id ?? participant.id}`}
-        players={(snapshot?.participants ?? [])
-          .filter((row) => row.tableLabel === participant.tableLabel)
-          .map((row) => ({
-            id: row.id,
-            name: row.displayName,
-            commanders: row.assignedCommanders ?? [],
-          }))}
-        onFinish={onTrackerFinished}
-        onQuit={() => void navigate('/')}
-        challengeProgress={challengeProgress}
-        onChallengeComplete={onChallengeComplete}
-        challengePack={event?.challengePack ?? OFFICIAL_COMMANDER_CHALLENGES}
-      />
+      <>
+        <TrackerView
+          storageKey={`podyguard.tracker.${event?.joinCode ?? ''}.${matchTable?.id ?? participant.id}`}
+          players={(snapshot?.participants ?? [])
+            .filter((row) => row.tableLabel === participant.tableLabel)
+            .map((row) => ({
+              id: row.id,
+              name: row.displayName,
+              commanders: row.assignedCommanders ?? [],
+            }))}
+          onFinish={onTrackerFinished}
+          onQuit={() => void navigate('/')}
+          challengeProgress={challengeProgress}
+          onChallengeComplete={onChallengeComplete}
+          challengePack={event?.challengePack ?? OFFICIAL_COMMANDER_CHALLENGES}
+          gameMode={event?.gameMode}
+          startingPlayerId={treacheryRole?.leaderParticipantId}
+          revealedIdentities={Object.fromEntries(
+            (snapshot?.participants ?? [])
+              .filter((row) => row.revealedTreacheryIdentity)
+              .map((row) => [row.id, row.revealedTreacheryIdentity!]),
+          )}
+          onCheckRole={
+            treacheryRole
+              ? () => {
+                  setRoleRevealed(true);
+                  setRoleOpen(true);
+                }
+              : undefined
+          }
+        />
+        {roleOpen && treacheryRole ? (
+          <TreacheryRoleDialog
+            assignment={treacheryRole}
+            revealed={roleRevealed}
+            onReveal={() => setRoleRevealed(true)}
+            onUnveil={
+              participant.status === 'playing' ? onUnveilIdentity : undefined
+            }
+            onClose={() => {
+              sessionStorage.setItem(
+                treacheryRoleSeenKey(treacheryRole.podId, participant.id),
+                'true',
+              );
+              setRoleOpen(false);
+            }}
+          />
+        ) : null}
+      </>
     );
   }
 
@@ -506,6 +607,19 @@ export function JoinPage() {
               <p className="mb-4 text-center text-base font-medium">
                 {assignedDeckLine(participant)}
               </p>
+              {treacheryRole ? (
+                <Button
+                  variant="glass"
+                  block
+                  className="mb-3"
+                  onClick={() => {
+                    setRoleRevealed(true);
+                    setRoleOpen(true);
+                  }}
+                >
+                  Check my role
+                </Button>
+              ) : null}
               {participant.status === 'playing' ? (
                 <>
                   <p className="text-muted mb-3 text-center text-sm">
@@ -752,6 +866,24 @@ export function JoinPage() {
 
       {error ? <p className="text-danger text-sm">{error}</p> : null}
 
+      {roleOpen && treacheryRole && participant ? (
+        <TreacheryRoleDialog
+          assignment={treacheryRole}
+          revealed={roleRevealed}
+          onReveal={() => setRoleRevealed(true)}
+          onUnveil={
+            participant.status === 'playing' ? onUnveilIdentity : undefined
+          }
+          onClose={() => {
+            sessionStorage.setItem(
+              treacheryRoleSeenKey(treacheryRole.podId, participant.id),
+              'true',
+            );
+            setRoleOpen(false);
+          }}
+        />
+      ) : null}
+
       <p className="text-muted/70 text-xs">
         <Link className="hover:text-ink" to="/">
           Home
@@ -766,4 +898,8 @@ export function JoinPage() {
       </p>
     </>
   );
+}
+
+function treacheryRoleSeenKey(podId: string, participantId: string): string {
+  return `podyguard.treachery-role-seen.${podId}.${participantId}`;
 }

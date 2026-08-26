@@ -26,6 +26,11 @@ function life(state: TrackerState): number | undefined {
 }
 
 describe('match history', () => {
+  it('starts Treachery with the assigned Leader', () => {
+    const played = play(start(), { type: 'first', playerId: 'b' });
+    expect(played.present.firstPlayerId).toBe('b');
+  });
+
   it('walks back the last change and leaves the rest standing', () => {
     const played = play(
       start(),

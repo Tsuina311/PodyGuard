@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import type { GameMode } from '@podyguard/shared';
 import { ApiError, createEvent, saveHostToken } from './api';
 import { activeMatchPath } from './active-match';
 import { Brand } from './ui/Brand';
@@ -13,6 +14,7 @@ export function HomePage() {
   const [name, setName] = useState('');
   const [hostPin, setHostPin] = useState('');
   const [tableCount, setTableCount] = useState('8');
+  const [gameMode, setGameMode] = useState<GameMode>('commander');
   const [allowThreePods, setAllowThreePods] = useState(true);
   const [allowFivePods, setAllowFivePods] = useState(false);
   const [joinCode, setJoinCode] = useState('');
@@ -26,7 +28,8 @@ export function HomePage() {
     setBusy(true);
     try {
       const result = await createEvent(name, hostPin, Number(tableCount), {
-        allowThreePods,
+        gameMode,
+        allowThreePods: gameMode === 'commander' && allowThreePods,
         allowFivePods,
       });
       saveHostToken(result.event.joinCode, result.hostToken);
@@ -86,6 +89,46 @@ export function HomePage() {
       </Panel>
 
       <Panel title="Host an event" aside="new" onSubmit={onCreate}>
+        <fieldset className="mb-5">
+          <legend className="text-muted mb-2 text-sm">Game</legend>
+          <div className="grid grid-cols-2 gap-2">
+            {(
+              [
+                ['commander', 'Commander'],
+                ['treachery', 'Treachery'],
+              ] as const
+            ).map(([value, label]) => (
+              <label
+                key={value}
+                className={`cursor-pointer rounded-xl border p-3 text-center text-sm font-semibold transition ${
+                  gameMode === value
+                    ? 'border-neon bg-neon/10 text-neon'
+                    : 'border-muted/20 text-muted hover:border-muted/40'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="gameMode"
+                  value={value}
+                  checked={gameMode === value}
+                  onChange={() => {
+                    setGameMode(value);
+                    if (value === 'treachery') {
+                      setAllowFivePods(true);
+                    }
+                  }}
+                  className="sr-only"
+                />
+                {label}
+              </label>
+            ))}
+          </div>
+          {gameMode === 'treachery' ? (
+            <p className="text-muted mt-2 text-xs">
+              Secret roles for 4–5 player Commander pods. The Leader starts.
+            </p>
+          ) : null}
+        </fieldset>
         <Field
           label="Event name"
           value={name}
@@ -105,14 +148,16 @@ export function HomePage() {
           max={40}
           required
         />
-        <label className="text-muted mb-3 flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={allowThreePods}
-            onChange={(change) => setAllowThreePods(change.target.checked)}
-          />
-          Allow 3-player pods
-        </label>
+        {gameMode === 'commander' ? (
+          <label className="text-muted mb-3 flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={allowThreePods}
+              onChange={(change) => setAllowThreePods(change.target.checked)}
+            />
+            Allow 3-player pods
+          </label>
+        ) : null}
         <label className="text-muted mb-4 flex items-center gap-2 text-sm">
           <input
             type="checkbox"

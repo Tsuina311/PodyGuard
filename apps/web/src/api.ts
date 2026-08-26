@@ -1,11 +1,13 @@
 import type {
   EventMetrics,
+  GameMode,
   PodRating,
   PublicEvent,
   PublicChallengeCompletion,
   PublicParticipant,
   PublicPod,
   PublicTable,
+  TreacheryRoleAssignment,
 } from '@podyguard/shared';
 import type {
   CommanderArtwork,
@@ -74,7 +76,11 @@ export function createEvent(
   name: string,
   hostPin: string,
   tableCount: number,
-  options?: { allowThreePods?: boolean; allowFivePods?: boolean },
+  options?: {
+    gameMode?: GameMode;
+    allowThreePods?: boolean;
+    allowFivePods?: boolean;
+  },
 ) {
   return request<{ event: PublicEvent; hostToken: string }>('/events', {
     method: 'POST',
@@ -84,6 +90,23 @@ export function createEvent(
 
 export function getEvent(joinCode: string) {
   return request<PublicEvent>(`/events/${joinCode}`);
+}
+
+export function getMyTreacheryRole(joinCode: string, token: string) {
+  return request<{ assignment: TreacheryRoleAssignment }>(
+    `/events/${joinCode}/me/treachery-role`,
+    { headers: { Authorization: `Bearer ${token}` } },
+  );
+}
+
+export function unveilMyTreacheryIdentity(joinCode: string, token: string) {
+  return request<{ assignment: TreacheryRoleAssignment }>(
+    `/events/${joinCode}/me/treachery-identity/unveil`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
 }
 
 export function listParticipants(joinCode: string) {

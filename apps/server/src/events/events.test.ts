@@ -644,6 +644,167 @@ describe('event HTTP api', () => {
     await app.close();
   });
 
+  it('assigns private Treachery roles and never exposes them in the roster', async () => {
+    const app = await buildTestApp();
+    const created = await app.inject({
+      method: 'POST',
+      url: '/events',
+      payload: {
+        name: 'Friday Treachery',
+        hostPin: '2468',
+        tableCount: 1,
+        gameMode: 'treachery',
+        allowThreePods: true,
+      },
+    });
+    expect(created.statusCode).toBe(201);
+    const createdBody = created.json() as {
+      event: {
+        joinCode: string;
+        gameMode: string;
+        allowThreePods: boolean;
+      };
+      hostToken: string;
+    };
+    expect(createdBody.event).toMatchObject({
+      gameMode: 'treachery',
+      allowThreePods: false,
+    });
+    const tokens: string[] = [];
+    for (const displayName of ['Ada', 'Bea', 'Cam', 'Dee']) {
+      const joined = await app.inject({
+        method: 'POST',
+        url: `/events/${createdBody.event.joinCode}/join`,
+        payload: { displayName },
+      });
+      const token = (joined.json() as { token: string }).token;
+      tokens.push(token);
+      await app.inject({
+        method: 'POST',
+        url: `/events/${createdBody.event.joinCode}/ready`,
+        headers: { authorization: `Bearer ${token}` },
+        payload: { ready: true },
+      });
+    }
+    const matched = await app.inject({
+      method: 'POST',
+      url: `/events/${createdBody.event.joinCode}/match`,
+      headers: { authorization: `Bearer ${createdBody.hostToken}` },
+    });
+    expect(matched.statusCode).toBe(200);
+
+    const assignments = await Promise.all(
+      tokens.map((token) =>
+        app.inject({
+          method: 'GET',
+          url: `/events/${createdBody.event.joinCode}/me/treachery-role`,
+          headers: { authorization: `Bearer ${token}` },
+        }),
+      ),
+    );
+    expect(assignments.every((response) => response.statusCode === 200)).toBe(
+      true,
+    );
+    const roles = assignments.map(
+      (response) =>
+        (
+          response.json() as {
+            assignment: {
+              role: string;
+              identity: { id: number; role: string; image: string };
+              leaderParticipantId: string;
+              distribution: Record<string, number>;
+            };
+          }
+        ).assignment,
+    );
+    expect(roles.map((row) => row.role).sort()).toEqual([
+      'assassin',
+      'assassin',
+      'leader',
+      'traitor',
+    ]);
+    expect(new Set(roles.map((row) => row.leaderParticipantId)).size).toBe(1);
+    expect(new Set(roles.map((row) => row.identity.id)).size).toBe(4);
+    for (const assignment of roles) {
+      expect(assignment.identity.role).toBe(assignment.role);
+      expect(assignment.identity.image).toMatch(
+        /^\/treachery-identities\/\d{3}\.jpg$/,
+      );
+    }
+    expect(roles[0]?.distribution).toEqual({
+      leader: 1,
+      guardian: 0,
+      assassin: 2,
+      traitor: 1,
+    });
+
+    const roster = await app.inject({
+      method: 'GET',
+      url: `/events/${createdBody.event.joinCode}/participants`,
+    });
+    expect(roster.statusCode).toBe(200);
+    expect(roster.body).not.toContain('treacheryRole');
+    const publicBeforeUnveil = (
+      roster.json() as {
+        participants: Array<{
+          revealedTreacheryIdentity?: { id: number; role: string };
+        }>;
+      }
+    ).participants.flatMap((row) =>
+      row.revealedTreacheryIdentity ? [row.revealedTreacheryIdentity] : [],
+    );
+    expect(publicBeforeUnveil).toHaveLength(1);
+    expect(publicBeforeUnveil[0]?.role).toBe('leader');
+
+    const tables = await app.inject({
+      method: 'GET',
+      url: `/events/${createdBody.event.joinCode}/tables`,
+    });
+    const tableId = (
+      tables.json() as { tables: Array<{ id: string }> }
+    ).tables[0]?.id;
+    await app.inject({
+      method: 'POST',
+      url: `/events/${createdBody.event.joinCode}/tables/${tableId}/start`,
+      headers: { authorization: `Bearer ${createdBody.hostToken}` },
+    });
+
+    const hiddenIndex = roles.findIndex((assignment) => assignment.role !== 'leader');
+    const unveiled = await app.inject({
+      method: 'POST',
+      url: `/events/${createdBody.event.joinCode}/me/treachery-identity/unveil`,
+      headers: { authorization: `Bearer ${tokens[hiddenIndex]}` },
+    });
+    expect(unveiled.statusCode).toBe(200);
+    expect(unveiled.json()).toMatchObject({
+      assignment: {
+        unveiled: true,
+        identity: { id: roles[hiddenIndex]?.identity.id },
+      },
+    });
+    const publicAfterUnveil = await app.inject({
+      method: 'GET',
+      url: `/events/${createdBody.event.joinCode}/participants`,
+    });
+    const publicIdentities = (
+      publicAfterUnveil.json() as {
+        participants: Array<{ revealedTreacheryIdentity?: { id: number } }>;
+      }
+    ).participants.flatMap((row) =>
+      row.revealedTreacheryIdentity ? [row.revealedTreacheryIdentity] : [],
+    );
+    expect(publicIdentities).toHaveLength(2);
+    expect(publicIdentities).toContainEqual({
+      id: roles[hiddenIndex]?.identity.id,
+      name: expect.any(String),
+      role: roles[hiddenIndex]?.role,
+      image: roles[hiddenIndex]?.identity.image,
+    });
+
+    await app.close();
+  });
+
   it('awards event-local flex credits for a leftover 3-pod', async () => {
     const app = await buildTestApp();
     const created = await app.inject({

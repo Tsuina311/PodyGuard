@@ -4,11 +4,16 @@ import {
   emptyPrivatePack,
   OFFICIAL_COMMANDER_CHALLENGES,
   parseChallengePack,
+  assignTreacheryRoles,
+  assignTreacheryIdentities,
+  treacheryIdentityById,
+  treacheryDistribution,
   EventStatus,
   ParticipantStatus,
   PhysicalTableStatus,
   type ChallengePack,
   type EventMetrics,
+  type GameMode,
   type PodRating,
   type ProductEventName,
   type PublicEvent,
@@ -16,6 +21,7 @@ import {
   type PublicPod,
   type PublicTable,
   type PublicChallengeCompletion,
+  type TreacheryRoleAssignment,
 } from '@podyguard/shared';
 import { randomUUID } from 'node:crypto';
 import {
@@ -63,6 +69,7 @@ export type CreateEventInput = {
   name: string;
   hostPin: string;
   tableCount: number;
+  gameMode?: GameMode;
   allowThreePods?: boolean;
   allowFivePods?: boolean;
 };
@@ -107,6 +114,8 @@ export class EventService {
   async createEvent(input: CreateEventInput): Promise<CreateEventResult> {
     const name = assertEventName(input.name);
     const hostPin = assertHostPin(input.hostPin);
+    const gameMode: GameMode =
+      input.gameMode === 'treachery' ? 'treachery' : 'commander';
     const labels = resolveTableLabels({ count: input.tableCount }, 0);
     const hostCredentialHash = await hashHostPin(hostPin);
 
@@ -117,7 +126,9 @@ export class EventService {
           name,
           joinCode: generateJoinCode(),
           hostCredentialHash,
-          allowThreePods: input.allowThreePods !== false,
+          gameMode,
+          allowThreePods:
+            gameMode === 'commander' && input.allowThreePods !== false,
           allowFivePods: Boolean(input.allowFivePods),
         });
         break;
@@ -273,6 +284,72 @@ export class EventService {
       event: await this.presentEvent(stored),
       participant: await this.present(participant, seat),
     };
+  }
+
+  async getTreacheryRole(
+    joinCode: string,
+    participantToken: string,
+  ): Promise<TreacheryRoleAssignment> {
+    const stored = await this.requireByJoinCode(joinCode);
+    if (stored.gameMode !== 'treachery') {
+      throw new InvalidParticipantTransitionError(
+        'This event does not use Treachery roles.',
+      );
+    }
+    const participant = await this.requireParticipant(
+      stored.id,
+      participantToken,
+    );
+    const own = await this.store.findActiveTreacheryAssignment(
+      stored.id,
+      participant.id,
+    );
+    if (!own) {
+      throw new PodNotFoundError();
+    }
+    const podAssignments = (await this.store.listAssignments(stored.id)).filter(
+      (row) => row.podId === own.podId && row.treacheryRole,
+    );
+    const leader = podAssignments.find(
+      (row) => row.treacheryRole === 'leader',
+    );
+    if (!leader) {
+      throw new Error('Treachery pod has no Leader.');
+    }
+    return {
+      podId: own.podId,
+      role: own.role,
+      identity: requireTreacheryIdentity(own.identityId),
+      unveiled: Boolean(own.unveiledAt),
+      leaderParticipantId: leader.participantId,
+      distribution: treacheryDistribution(
+        podAssignments.map((row) => row.treacheryRole!),
+      ),
+    };
+  }
+
+  async unveilTreacheryIdentity(
+    joinCode: string,
+    participantToken: string,
+  ): Promise<TreacheryRoleAssignment> {
+    const current = await this.getTreacheryRole(joinCode, participantToken);
+    const stored = await this.requireByJoinCode(joinCode);
+    const participant = await this.requireParticipant(
+      stored.id,
+      participantToken,
+    );
+    const active = await this.store.findActiveTreacheryAssignment(
+      stored.id,
+      participant.id,
+    );
+    if (active?.podStatus !== 'playing') {
+      throw new InvalidParticipantTransitionError(
+        'An identity can only be unveiled after the game starts.',
+      );
+    }
+    await this.store.unveilTreacheryIdentity(current.podId, participant.id);
+    await this.track(stored.id, 'identity_unveiled');
+    return { ...current, unveiled: true };
   }
 
   async setReady(
@@ -871,7 +948,7 @@ export class EventService {
       throw new EventNotFoundError();
     }
     const sizes = allowedPodSizes({
-      allowThree: event.allowThreePods,
+      allowThree: event.gameMode === 'commander' && event.allowThreePods,
       allowFive: event.allowFivePods,
     });
     const freeTables = tables.filter(
@@ -898,6 +975,13 @@ export class EventService {
     );
     const created: PublicPod[] = [];
     for (const match of result.matches) {
+      const treacheryRoles =
+        event.gameMode === 'treachery'
+          ? assignTreacheryRoles(match.seats.map((seat) => seat.participantId))
+          : undefined;
+      const treacheryIdentities = treacheryRoles
+        ? assignTreacheryIdentities(treacheryRoles)
+        : undefined;
       const pod = await this.store.createPod({
         eventId,
         tableId: match.tableId,
@@ -906,6 +990,8 @@ export class EventService {
           participantId: seat.participantId,
           deckId: seat.deckId,
           assignedPoolId: seat.poolId,
+          treacheryRole: treacheryRoles?.get(seat.participantId),
+          treacheryIdentityId: treacheryIdentities?.get(seat.participantId),
         })),
       });
       for (const seat of match.seats) {
@@ -1075,6 +1161,7 @@ function toPublicEvent(
     name: event.name,
     joinCode: event.joinCode,
     status: event.status,
+    gameMode: event.gameMode,
     allowThreePods: event.allowThreePods,
     allowFivePods: event.allowFivePods,
     challengePackId: event.challengePackId,
@@ -1113,7 +1200,25 @@ function toPublicParticipant(
       0,
     ),
     challengeCompletions,
+    revealedTreacheryIdentity:
+      assignment?.treacheryUnveiledAt &&
+      assignment.treacheryIdentityId !== undefined
+        ? publicTreacheryIdentity(assignment.treacheryIdentityId)
+        : undefined,
   };
+}
+
+function requireTreacheryIdentity(id: number) {
+  const identity = treacheryIdentityById(id);
+  if (!identity) {
+    throw new Error(`Unknown Treachery identity #${String(id)}.`);
+  }
+  return identity;
+}
+
+function publicTreacheryIdentity(id: number) {
+  const { name, role, image } = requireTreacheryIdentity(id);
+  return { id, name, role, image };
 }
 
 function toPublicTable(

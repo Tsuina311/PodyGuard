@@ -36,6 +36,7 @@ describe('match-view', () => {
         name: 'Night',
         joinCode: 'ABCD',
         status: 'open',
+        gameMode: 'commander',
         allowThreePods: true,
         allowFivePods: false,
       },
