@@ -43,6 +43,7 @@ import {
   InvalidHostPinError,
   InvalidParticipantTransitionError,
   JoinCodeConflictError,
+  ParticipantNotFoundError,
   TableNotFoundError,
   PodNotFoundError,
   type EventStore,
@@ -499,6 +500,48 @@ export class EventService {
           await this.store.cancelPod(pod.id);
         }
       }
+    }
+    const updated = await this.store.updateParticipant(participant.id, {
+      status: ParticipantStatus.Left,
+      readyAt: null,
+    });
+    await this.track(stored.id, 'left_event');
+    return this.present(updated);
+  }
+
+  /**
+   * The host's broom. A player whose phone lost its seat key rejoins as someone
+   * new, and the roster is left holding a name nobody is behind — matching would
+   * keep seating that ghost. Only the host can sweep it, and only once the table
+   * it sits at is done, so a live game is never pulled apart underneath the
+   * players who are still at it.
+   */
+  async removeParticipant(
+    joinCode: string,
+    hostToken: string,
+    participantId: string,
+  ): Promise<PublicParticipant> {
+    const stored = await this.requireHostToken(joinCode, hostToken);
+    const participant = await this.store.findParticipantById(participantId);
+    if (!participant || participant.eventId !== stored.id) {
+      throw new ParticipantNotFoundError();
+    }
+    if (participant.status === ParticipantStatus.Playing) {
+      throw new InvalidParticipantTransitionError(
+        'Finish or cancel the table before removing a player seated at it.',
+      );
+    }
+    const assignments = await this.store.listAssignments(stored.id);
+    const seat = assignments.find((row) => row.participantId === participant.id);
+    if (seat) {
+      if (seat.podStatus === 'playing') {
+        throw new InvalidParticipantTransitionError(
+          'Finish or cancel the table before removing a player seated at it.',
+        );
+      }
+      // A pod is dealt as a whole, so the rest of the seats go back to the
+      // queue to be matched again rather than playing a hand short.
+      await this.store.cancelPod(seat.podId);
     }
     const updated = await this.store.updateParticipant(participant.id, {
       status: ParticipantStatus.Left,

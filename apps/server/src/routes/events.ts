@@ -10,6 +10,7 @@ import {
   EventNotJoinableError,
   InvalidHostPinError,
   InvalidParticipantTransitionError,
+  ParticipantNotFoundError,
   TableNotFoundError,
   DevToolsDisabledError,
   PodNotFoundError,
@@ -217,6 +218,27 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
       return sendEventError(reply, error);
     }
   });
+
+  app.delete(
+    '/events/:joinCode/participants/:participantId',
+    async (request, reply) => {
+      const { joinCode, participantId } = request.params as {
+        joinCode: string;
+        participantId: string;
+      };
+      try {
+        const participant = await app.events.removeParticipant(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          participantId,
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return { participant };
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
 
   app.post('/events/:joinCode/tracker-choice', async (request, reply) => {
     const { joinCode } = request.params as { joinCode: string };
@@ -652,7 +674,12 @@ function sendEventError(
   if (error instanceof InvalidEventInputError) {
     return reply.code(400).send(errorBody(error.code, error.message));
   }
-  if (error instanceof EventNotFoundError || error instanceof TableNotFoundError || error instanceof PodNotFoundError) {
+  if (
+    error instanceof EventNotFoundError ||
+    error instanceof TableNotFoundError ||
+    error instanceof PodNotFoundError ||
+    error instanceof ParticipantNotFoundError
+  ) {
     return reply.code(404).send(errorBody(error.code, error.message));
   }
   if (

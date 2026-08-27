@@ -10,9 +10,9 @@ import {
 } from './match-config';
 
 // The node test environment has no web storage, so stand one up by hand.
-function installSessionStorage(): void {
+function installStorage(name: 'localStorage' | 'sessionStorage'): void {
   const store = new Map<string, string>();
-  Object.defineProperty(globalThis, 'sessionStorage', {
+  Object.defineProperty(globalThis, name, {
     configurable: true,
     value: {
       getItem: (key: string) => store.get(key) ?? null,
@@ -25,7 +25,8 @@ function installSessionStorage(): void {
 
 describe('standalone match config', () => {
   beforeEach(() => {
-    installSessionStorage();
+    installStorage('localStorage');
+    installStorage('sessionStorage');
   });
 
   it('offers the correct seat count for every standalone mode', () => {

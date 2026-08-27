@@ -1,75 +1,75 @@
 {
   "common": {
-    "home": "Home",
-    "cancel": "Cancel",
-    "close": "Close",
-    "save": "Save",
-    "loading": "Loading…",
-    "players": "Players",
-    "game": "Game",
-    "language": "Language",
-    "yes": "Yes",
-    "no": "No",
-    "reset": "Reset",
-    "random": "Random",
-    "remove": "Remove",
-    "empty": "Empty",
+    "home": "Heim",
+    "cancel": "Hætta við",
+    "close": "Loka",
+    "save": "Vista",
+    "loading": "Hleður…",
+    "players": "Leikmenn",
+    "game": "Leikur",
+    "language": "Tungumál",
+    "yes": "Já",
+    "no": "Nei",
+    "reset": "Endurstilla",
+    "random": "Handahófskennt",
+    "remove": "Fjarlægja",
+    "empty": "Tómt",
     "bot": "bot",
     "dev": "dev",
-    "official": "official",
-    "open": "Open",
-    "preferred": "preferred",
-    "player": "Player {{number}}",
-    "versus": "versus",
-    "teamA": "Team A",
-    "teamB": "Team B",
-    "working": "Working…",
-    "creating": "Creating…",
-    "checking": "Checking…",
-    "joining": "Joining…",
-    "updating": "Updating…",
-    "submitting": "Submitting…",
-    "saving": "Saving…",
-    "searching": "Searching…",
-    "unveiling": "Unveiling…",
-    "copied": "Copied",
-    "noneYet": "none yet",
+    "official": "opinbert",
+    "open": "Opið",
+    "preferred": "valið",
+    "player": "Leikmaður {{number}}",
+    "versus": "gegn",
+    "teamA": "Lið A",
+    "teamB": "Lið B",
+    "working": "Vinnur…",
+    "creating": "Býr til…",
+    "checking": "Athugar…",
+    "joining": "Tengist…",
+    "updating": "Uppfærir…",
+    "submitting": "Sendir…",
+    "saving": "Vistar…",
+    "searching": "Leitar…",
+    "unveiling": "Afhjúpar…",
+    "copied": "Afritað",
+    "noneYet": "ekkert enn",
     "dash": "—",
     "errors": {
-      "generic": "Something went wrong.",
-      "createEvent": "Could not create event.",
-      "unlockHost": "Could not unlock host.",
-      "updateTable": "Could not update table.",
-      "startGame": "Could not start the game.",
-      "startAllGames": "Could not start all ready games.",
-      "finishTable": "Could not finish the table.",
-      "cancelPod": "Could not cancel the pod.",
-      "updateSettings": "Could not update settings.",
-      "matchTables": "Could not match tables.",
-      "fillBots": "Could not fill tables with bots.",
-      "clipboard": "Clipboard blocked — copy the link manually.",
-      "eventNotFound": "Event not found.",
-      "joinEvent": "Could not join event.",
-      "saveDecks": "Could not save decks.",
-      "updateReady": "Could not update ready.",
-      "updatePause": "Could not update pause.",
-      "leaveEvent": "Could not leave event.",
-      "trackerChoice": "Could not save the tracker choice.",
-      "saveRating": "Could not save that rating.",
-      "chooseCommander": "Choose a commander for every deck.",
-      "enterJoinCode": "Enter a join code.",
-      "sessionUnavailable": "Your event session is no longer available.",
-      "savePack": "Could not save the pack.",
-      "searchScryfall": "Could not search Scryfall.",
-      "loadArtwork": "Could not load alternate artwork.",
-      "submitResult": "Could not submit the result.",
-      "saveChallenge": "Could not save challenge progress.",
-      "unveilIdentity": "Could not unveil your identity.",
-      "apiWaking": "The host is waking up. Keep this page open — it usually takes under a minute.",
-      "apiUnreachable": "Cannot reach the API. Is the server running (yarn dev:server)?"
+      "generic": "Eitthvað fór úrskeiðis.",
+      "createEvent": "Ekki tókst að búa til viðburð.",
+      "unlockHost": "Ekki tókst að opna stjórnborð gestgjafa.",
+      "updateTable": "Ekki tókst að uppfæra borðið.",
+      "startGame": "Ekki tókst að hefja leikinn.",
+      "startAllGames": "Ekki tókst að hefja alla tilbúna leiki.",
+      "finishTable": "Ekki tókst að ljúka leiknum við borðið.",
+      "cancelPod": "Ekki tókst að hætta við pod.",
+      "updateSettings": "Ekki tókst að uppfæra stillingar.",
+      "matchTables": "Ekki tókst að para borð.",
+      "fillBots": "Ekki tókst að fylla borð með bottum.",
+      "clipboard": "Klemmuspjaldið er lokað — afritaðu hlekkinn handvirkt.",
+      "eventNotFound": "Viðburður fannst ekki.",
+      "joinEvent": "Ekki tókst að tengjast viðburðinum.",
+      "saveDecks": "Ekki tókst að vista stokka.",
+      "updateReady": "Ekki tókst að uppfæra tilbúinn-stöðu.",
+      "updatePause": "Ekki tókst að uppfæra hlé.",
+      "leaveEvent": "Ekki tókst að yfirgefa viðburðinn.",
+      "trackerChoice": "Ekki tókst að vista val á tracker.",
+      "saveRating": "Ekki tókst að vista þessa einkunn.",
+      "chooseCommander": "Veldu commander fyrir hvern stokk.",
+      "enterJoinCode": "Sláðu inn þátttökukóða.",
+      "sessionUnavailable": "Viðburðarlotan þín er ekki lengur tiltæk.",
+      "savePack": "Ekki tókst að vista pakkann.",
+      "searchScryfall": "Ekki tókst að leita í Scryfall.",
+      "loadArtwork": "Ekki tókst að hlaða öðru myndefni.",
+      "submitResult": "Ekki tókst að senda niðurstöðuna.",
+      "saveChallenge": "Ekki tókst að vista framvindu áskorunar.",
+      "unveilIdentity": "Ekki tókst að afhjúpa auðkenni þitt.",
+      "apiWaking": "Þjónninn er að vakna. Hafðu þessa síðu opna — það tekur yfirleitt minna en mínútu.",
+      "apiUnreachable": "Ekki næst samband við API. Er þjónninn í gangi (yarn dev:server)?"
     },
-    "assignedAtTable": "Assigned at the table",
-    "scanToJoin": "Scan to join this event"
+    "assignedAtTable": "Úthlutað við borðið",
+    "scanToJoin": "Skannaðu til að tengjast þessum viðburði"
   },
   "language": {
     "en": "English",
@@ -109,173 +109,173 @@
     "cy": "Cymraeg"
   },
   "families": {
-    "normal": "Normal",
+    "normal": "Venjulegt",
     "commander": "Commander"
   },
   "modes": {
     "shared": {
-      "commanderCombat": "A player loses after taking {{commanderDamage}} combat damage from one commander.",
-      "commanderTax": "Each time a commander is recast from the command zone, it costs 2 more mana.",
-      "lifeAndLoss": "Life and loss",
-      "turns": "Turns",
+      "commanderCombat": "Leikmaður tapar eftir að hafa fengið {{commanderDamage}} combat damage frá einum commander.",
+      "commanderTax": "Í hvert sinn sem commander er spilaður aftur úr command zone kostar hann 2 mana meira.",
+      "lifeAndLoss": "Líf og tap",
+      "turns": "Umferðir",
       "commanders": "Commanders",
-      "eachPlayerLife": "Each player starts at {{life}} life.",
-      "loseAtZero": "A player loses at 0 life.",
-      "loseAtPoison": "A player loses at {{poison}} poison counters.",
-      "startingPlayerRandom": "The starting player is drawn at random.",
-      "startingPlayerSkipDraw": "The starting player is drawn at random and skips the draw step on the first turn.",
-      "multiplayerFirstTurnDraw": "In multiplayer, that player draws on their first turn.",
-      "commanderFirstTurnDraw": "In multiplayer Commander, that player draws on their first turn.",
-      "commandersInZone": "Commanders begin in the command zone and may be recast from there.",
-      "commanderRulesApply": "Commander rules still apply: {{life}} starting life, {{poison}} poison, and {{commanderDamage}} combat damage from one commander are lethal."
+      "eachPlayerLife": "Hver leikmaður byrjar með {{life}} líf.",
+      "loseAtZero": "Leikmaður tapar við 0 líf.",
+      "loseAtPoison": "Leikmaður tapar við {{poison}} poison counters.",
+      "startingPlayerRandom": "Byrjunarleikmaður er valinn af handahófi.",
+      "startingPlayerSkipDraw": "Byrjunarleikmaður er valinn af handahófi og sleppir draw step í fyrstu umferð sinni.",
+      "multiplayerFirstTurnDraw": "Í multiplayer dregur sá leikmaður spil í fyrstu umferð sinni.",
+      "commanderFirstTurnDraw": "Í multiplayer Commander dregur sá leikmaður spil í fyrstu umferð sinni.",
+      "commandersInZone": "Commanders byrja í command zone og má spila þá aftur þaðan.",
+      "commanderRulesApply": "Commander-reglur gilda áfram: {{life}} byrjunarlíf, {{poison}} poison og {{commanderDamage}} combat damage frá einum commander eru banvæn."
     },
     "duel": {
-      "label": "Duel",
-      "hint": "Two players. Each starts on 20 life.",
-      "hostHint": "Strict 2-player tables. Each player starts on 20 life.",
-      "hostFixedSeats": "Duel events always seat exactly two players.",
-      "title": "Duel",
-      "summary": "Two-player Magic. No commanders — just life and the board.",
+      "label": "Einvígi",
+      "hint": "Tveir leikmenn. Hvor byrjar með 20 líf.",
+      "hostHint": "Strangt tveggja manna borð. Hver leikmaður byrjar með 20 líf.",
+      "hostFixedSeats": "Einvígi hafa alltaf nákvæmlega tvo leikmenn.",
+      "title": "Einvígi",
+      "summary": "Magic fyrir tvo leikmenn. Engir commanders — aðeins líf og borðið.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Líf og tap",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters."
+            "Hver leikmaður byrjar með {{life}} líf.",
+            "Leikmaður tapar við 0 líf.",
+            "Leikmaður tapar við {{poison}} poison counters."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Umferðir",
           "bullets": [
-            "The starting player is drawn at random and skips the draw step on the first turn."
+            "Byrjunarleikmaður er valinn af handahófi og sleppir draw step í fyrstu umferð sinni."
           ]
         }
       }
     },
     "multiplayer": {
       "label": "Multiplayer",
-      "hint": "Free-for-all without commanders. Everyone starts on 20 life.",
-      "hostHint": "Free-for-all without commanders. Matching fills your chosen table size; leftovers can sit as small as three.",
+      "hint": "Allir gegn öllum án commanders. Allir byrja með 20 líf.",
+      "hostHint": "Allir gegn öllum án commanders. Pörunin fyllir fyrst valda borðstærð; afgangsborð geta verið með allt niður í þrjá leikmenn.",
       "title": "Multiplayer",
-      "summary": "Free-for-all without the Commander format. Useful for casual multiplayer, Planechase, or any 20-life table.",
+      "summary": "Allir gegn öllum án Commander-formatsins. Hentar fyrir casual multiplayer, Planechase eða hvaða 20 lífa borð sem er.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Líf og tap",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters."
+            "Hver leikmaður byrjar með {{life}} líf.",
+            "Leikmaður tapar við 0 líf.",
+            "Leikmaður tapar við {{poison}} poison counters."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Umferðir",
           "bullets": [
-            "The starting player is drawn at random.",
-            "In multiplayer, that player draws on their first turn."
+            "Byrjunarleikmaður er valinn af handahófi.",
+            "Í multiplayer dregur sá leikmaður spil í fyrstu umferð sinni."
           ]
         }
       }
     },
     "commander": {
-      "label": "Classic",
-      "hint": "Free-for-all. Everyone starts on 40 life.",
-      "hostHint": "Free-for-all Commander. Matching prefers four; leftover pods can be three or five when allowed.",
-      "title": "Classic",
-      "summary": "Free-for-all multiplayer. Each player fights for themselves.",
+      "label": "Klassískt",
+      "hint": "Allir gegn öllum. Allir byrja með 40 líf.",
+      "hostHint": "Commander allir gegn öllum. Pörunin kýs fjögurra manna pod; afgangspod geta verið þrír eða fimm leikmenn þegar það er leyft.",
+      "title": "Klassískt",
+      "summary": "Multiplayer þar sem allir eru gegn öllum. Hver leikmaður berst fyrir sjálfan sig.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Líf og tap",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters.",
-            "A player loses after taking {{commanderDamage}} combat damage from one commander."
+            "Hver leikmaður byrjar með {{life}} líf.",
+            "Leikmaður tapar við 0 líf.",
+            "Leikmaður tapar við {{poison}} poison counters.",
+            "Leikmaður tapar eftir að hafa fengið {{commanderDamage}} combat damage frá einum commander."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Umferðir",
           "bullets": [
-            "The starting player is drawn at random.",
-            "In multiplayer Commander, that player draws on their first turn."
+            "Byrjunarleikmaður er valinn af handahófi.",
+            "Í multiplayer Commander dregur sá leikmaður spil í fyrstu umferð sinni."
           ]
         },
         "commanders": {
           "heading": "Commanders",
           "bullets": [
-            "Commanders begin in the command zone and may be recast from there.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Commanders byrja í command zone og má spila þá aftur þaðan.",
+            "Í hvert sinn sem commander er spilaður aftur úr command zone kostar hann 2 mana meira."
           ]
         }
       }
     },
     "treachery": {
-      "label": "Treachery",
-      "hint": "Secret identities dealt on this device. Pass it around so everyone reads their own in private.",
-      "hostHint": "Secret roles for Commander pods. Matching fills your chosen table size first; leftovers can sit as small as four.",
-      "title": "Treachery",
-      "summary": "Commander with secret identities. The Leader is public; everyone else stays hidden.",
+      "label": "Svik",
+      "hint": "Leyniauðkennum er úthlutað á þessu tæki. Láttu tækið ganga á milli svo allir geti lesið sitt í einrúmi.",
+      "hostHint": "Leynileg hlutverk fyrir Commander pod. Pörunin fyllir fyrst valda borðstærð; afgangspod geta verið með allt niður í fjóra leikmenn.",
+      "title": "Svik",
+      "summary": "Commander með leynilegum auðkennum. Leiðtoginn er opinber; allir aðrir halda sér leyndum.",
       "sections": {
         "commander": {
-          "heading": "Commander rules still apply",
+          "heading": "Commander-reglur gilda áfram",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "The Leader takes the first turn and draws on that turn.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Hver leikmaður byrjar með {{life}} líf.",
+            "Leikmaður tapar við 0 líf, {{poison}} poison eða {{commanderDamage}} combat damage frá einum commander.",
+            "Leiðtoginn tekur fyrstu umferðina og dregur spil í þeirri umferð.",
+            "Í hvert sinn sem commander er spilaður aftur úr command zone kostar hann 2 mana meira."
           ]
         },
         "identities": {
-          "heading": "Identities",
+          "heading": "Auðkenni",
           "bullets": [
-            "Open Check my role from the timer menu. Only you see that card.",
-            "On a single tracker, deal the identities at setup and pass the device around so each player reads theirs alone.",
-            "Leader: Survive until every Assassin and Traitor is eliminated. Reveal yourself to the table. The Guardians share your victory, but you do not know who they are.",
-            "Guardian: Keep the Leader alive and eliminate the Leader's enemies. Your identity is secret. You win and lose with the Leader, even if you are eliminated first.",
-            "Assassin: Eliminate the Leader. Your identity is secret. Assassins share the same objective, but you do not know who the other Assassins are.",
-            "Traitor: Be the last player standing. Your identity is secret. Keep the Leader alive until the other threats are gone, then take the throne for yourself.",
-            "Follow any extra abilities printed on your identity card."
+            "Opnaðu Athuga hlutverkið mitt úr timer-valmyndinni. Aðeins þú sérð það spil.",
+            "Ef einn tracker er notaður skaltu úthluta auðkennunum við uppsetningu og láta tækið ganga á milli þannig að hver leikmaður lesi sitt einn.",
+            "Leiðtogi: Lifðu af þar til allir Morðingjar og Svikarinn hafa verið felldir. Afhjúpaðu þig fyrir borðinu. Verðirnir deila sigrinum þínum, en þú veist ekki hverjir þeir eru.",
+            "Vörður: Haltu Leiðtoganum á lífi og felldu óvini hans. Auðkenni þitt er leynilegt. Þú vinnur og tapar með Leiðtoganum, jafnvel þótt þú sért felldur fyrst.",
+            "Morðingi: Felldu Leiðtogann. Auðkenni þitt er leynilegt. Morðingjarnir hafa sama markmið, en þú veist ekki hverjir hinir Morðingjarnir eru.",
+            "Svikari: Vertu síðasti leikmaðurinn sem stendur. Auðkenni þitt er leynilegt. Haltu Leiðtoganum á lífi þar til aðrar ógnir eru horfnar og taktu síðan hásætið sjálfur.",
+            "Fylgdu öllum viðbótarhæfileikum sem eru prentaðir á auðkennisspilið þitt."
           ]
         }
       },
       "roles": {
         "leader": {
-          "name": "Leader",
-          "objective": "Survive until every Assassin and Traitor is eliminated.",
-          "guidance": "Reveal yourself to the table. The Guardians share your victory, but you do not know who they are.",
-          "publicNote": "Your role is public. Tell the table you are the Leader."
+          "name": "Leiðtogi",
+          "objective": "Lifðu af þar til allir Morðingjar og Svikarinn hafa verið felldir.",
+          "guidance": "Afhjúpaðu þig fyrir borðinu. Verðirnir deila sigrinum þínum, en þú veist ekki hverjir þeir eru.",
+          "publicNote": "Hlutverk þitt er opinbert. Segðu borðinu að þú sért Leiðtoginn."
         },
         "guardian": {
-          "name": "Guardian",
-          "objective": "Keep the Leader alive and eliminate the Leader's enemies.",
-          "guidance": "Your identity is secret. You win and lose with the Leader, even if you are eliminated first.",
-          "publicNote": "Keep this role secret."
+          "name": "Vörður",
+          "objective": "Haltu Leiðtoganum á lífi og felldu óvini hans.",
+          "guidance": "Auðkenni þitt er leynilegt. Þú vinnur og tapar með Leiðtoganum, jafnvel þótt þú sért felldur fyrst.",
+          "publicNote": "Haltu þessu hlutverki leyndu."
         },
         "assassin": {
-          "name": "Assassin",
-          "objective": "Eliminate the Leader.",
-          "guidance": "Your identity is secret. Assassins share the same objective, but you do not know who the other Assassins are.",
-          "publicNote": "Keep this role secret."
+          "name": "Morðingi",
+          "objective": "Felldu Leiðtogann.",
+          "guidance": "Auðkenni þitt er leynilegt. Morðingjarnir hafa sama markmið, en þú veist ekki hverjir hinir Morðingjarnir eru.",
+          "publicNote": "Haltu þessu hlutverki leyndu."
         },
         "traitor": {
-          "name": "Traitor",
-          "objective": "Be the last player standing.",
-          "guidance": "Your identity is secret. Keep the Leader alive until the other threats are gone, then take the throne for yourself.",
-          "publicNote": "Keep this role secret."
+          "name": "Svikari",
+          "objective": "Vertu síðasti leikmaðurinn sem stendur.",
+          "guidance": "Auðkenni þitt er leynilegt. Haltu Leiðtoganum á lífi þar til aðrar ógnir eru horfnar og taktu síðan hásætið sjálfur.",
+          "publicNote": "Haltu þessu hlutverki leyndu."
         }
       },
       "normal": {
-        "hint": "Secret identities on a shared phone. Everyone starts on 20 life — no commanders.",
-        "hostHint": "Secret roles without commanders. Matching fills your chosen table size first; leftovers can sit as small as four.",
-        "summary": "Secret identities without the Commander format. The Leader is public; everyone else stays hidden.",
+        "hint": "Leynileg auðkenni á sameiginlegum síma. Allir byrja með 20 líf — engir commanders.",
+        "hostHint": "Leynileg hlutverk án commanders. Pörunin fyllir fyrst valda borðstærð; afgangspod geta verið með allt niður í fjóra leikmenn.",
+        "summary": "Leynileg auðkenni án Commander-formatsins. Leiðtoginn er opinber; allir aðrir halda sér leyndum.",
         "sections": {
           "life": {
-            "heading": "Life and loss",
+            "heading": "Líf og tap",
             "bullets": [
-              "Each player starts at {{life}} life.",
-              "A player loses at 0 life.",
-              "A player loses at {{poison}} poison counters.",
-              "The Leader takes the first turn and draws on that turn."
+              "Hver leikmaður byrjar með {{life}} líf.",
+              "Leikmaður tapar við 0 líf.",
+              "Leikmaður tapar við {{poison}} poison counters.",
+              "Leiðtoginn tekur fyrstu umferðina og dregur spil í þeirri umferð."
             ]
           },
           "identities": null
@@ -283,63 +283,63 @@
       }
     },
     "two-headed-giant": {
-      "label": "Two-Headed Giant",
-      "hint": "Two teams of two, 60 shared life each, turns taken together.",
-      "hostHint": "Strict 4-player Commander pods. Two teams share 60 life and take their turns together.",
-      "hostFixedSeats": "Two-Headed Giant games always seat exactly four players.",
-      "title": "Two-Headed Giant",
-      "summary": "Two teams of two. Teammates share a life total and a turn.",
+      "label": "Tvíhöfða risi",
+      "hint": "Tvö tveggja manna lið, hvort með 60 sameiginleg líf, og liðsmenn taka umferðir saman.",
+      "hostHint": "Strangt fjögurra manna Commander pod. Tvö lið deila 60 lífum hvort og taka umferðir saman.",
+      "hostFixedSeats": "Tvíhöfða risa leikir hafa alltaf nákvæmlega fjóra leikmenn.",
+      "title": "Tvíhöfða risi",
+      "summary": "Tvö tveggja manna lið. Liðsfélagar deila lífstölu og umferð.",
       "sections": {
         "teams": {
-          "heading": "Teams",
+          "heading": "Lið",
           "bullets": [
-            "Pick two allies, or let the table randomise the pairs.",
-            "Each team starts at {{sharedLife}} shared life.",
-            "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+            "Veldu tvo bandamenn eða láttu pörin ráðast af handahófi.",
+            "Hvort lið byrjar með {{sharedLife}} sameiginleg líf.",
+            "Liðsfélagar taka umferðina saman. Hver leikmaður hefur samt sína eigin hönd, library og commanders."
           ]
         },
         "life": {
-          "heading": "Life and loss",
+          "heading": "Líf og tap",
           "bullets": [
-            "A team loses when its shared life reaches 0.",
-            "A team loses at {{sharedPoison}} shared poison counters.",
-            "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+            "Lið tapar þegar sameiginleg lífstala þess nær 0.",
+            "Lið tapar við {{sharedPoison}} sameiginlega poison counters.",
+            "Lið tapar eftir að hafa fengið {{commanderDamage}} sameiginlegt combat damage frá einum commander."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Umferðir",
           "bullets": [
-            "The starting team is drawn at random and skips the draw step on its first turn.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Byrjunarliðið er valið af handahófi og sleppir draw step í fyrstu umferð sinni.",
+            "Í hvert sinn sem commander er spilaður aftur úr command zone kostar hann 2 mana meira."
           ]
         }
       },
       "normal": {
-        "hint": "Two teams of two, 40 shared life each, turns taken together.",
-        "hostHint": "Strict 4-player tables. Two teams share 40 life and take their turns together — no commanders.",
-        "summary": "Two teams of two. Teammates share a life total and a turn — standard decks, 20 life each in team terms.",
+        "hint": "Tvö tveggja manna lið, hvort með 40 sameiginleg líf, og liðsmenn taka umferðir saman.",
+        "hostHint": "Strangt fjögurra manna borð. Tvö lið deila 40 lífum hvort og taka umferðir saman — engir commanders.",
+        "summary": "Tvö tveggja manna lið. Liðsfélagar deila lífstölu og umferð — venjulegir stokkar, 20 líf á mann í liðssamhengi.",
         "sections": {
           "teams": {
-            "heading": "Teams",
+            "heading": "Lið",
             "bullets": [
-              "Pick two allies, or let the table randomise the pairs.",
-              "Each team starts at {{sharedLife}} shared life.",
-              "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+              "Veldu tvo bandamenn eða láttu pörin ráðast af handahófi.",
+              "Hvort lið byrjar með {{sharedLife}} sameiginleg líf.",
+              "Liðsfélagar taka umferðina saman. Hver leikmaður hefur samt sína eigin hönd, library og commanders."
             ]
           },
           "life": {
-            "heading": "Life and loss",
+            "heading": "Líf og tap",
             "bullets": [
-              "A team loses when its shared life reaches 0.",
-              "A team loses at {{sharedPoison}} shared poison counters.",
-              "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+              "Lið tapar þegar sameiginleg lífstala þess nær 0.",
+              "Lið tapar við {{sharedPoison}} sameiginlega poison counters.",
+              "Lið tapar eftir að hafa fengið {{commanderDamage}} sameiginlegt combat damage frá einum commander."
             ]
           },
           "turns": {
-            "heading": "Turns",
+            "heading": "Umferðir",
             "bullets": [
-              "The starting team is drawn at random and skips the draw step on its first turn.",
-              "Each time a commander is recast from the command zone, it costs 2 more mana."
+              "Byrjunarliðið er valið af handahófi og sleppir draw step í fyrstu umferð sinni.",
+              "Í hvert sinn sem commander er spilaður aftur úr command zone kostar hann 2 mana meira."
             ]
           }
         }
@@ -347,286 +347,286 @@
     },
     "archenemy-commander": {
       "label": "Archenemy",
-      "hint": "One Archenemy on 60 life with a 40-card scheme deck against three heroes sharing 60 life.",
-      "hostHint": "Strict 4-player Commander pods. One 60-life Archenemy faces a three-player team with 60 shared life and a 40-card scheme deck.",
-      "hostFixedSeats": "Archenemy Commander games always seat exactly four players.",
+      "hint": "Einn Archenemy með 60 líf og 40 spila scheme-stokk gegn þremur hetjum sem deila 60 lífum.",
+      "hostHint": "Strangt fjögurra manna Commander pod. Einn Archenemy með 60 líf mætir þriggja manna liði með 60 sameiginleg líf og 40 spila scheme-stokk.",
+      "hostFixedSeats": "Archenemy Commander leikir hafa alltaf nákvæmlega fjóra leikmenn.",
       "title": "Archenemy Commander",
-      "summary": "One Archenemy against a team of three, with a scheme deck in motion.",
+      "summary": "Einn Archenemy gegn þriggja manna liði, með scheme-stokk í gangi.",
       "sections": {
         "sides": {
-          "heading": "Sides",
+          "heading": "Hliðar",
           "bullets": [
-            "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
-            "Both sides start at {{life}} life.",
-            "The heroes share that life total and take their turn together.",
-            "The Archenemy goes first and draws on that turn."
+            "Veldu Archenemy eða úthlutaðu einum af handahófi. Hinir þrír leikmennirnir eru hetjurnar.",
+            "Báðar hliðar byrja með {{life}} líf.",
+            "Hetjurnar deila þeirri lífstölu og taka umferð sína saman.",
+            "Archenemy byrjar og dregur spil í þeirri umferð."
           ]
         },
         "schemes": {
           "heading": "Schemes",
           "bullets": [
-            "The 40 Duskmourn Commander schemes are shuffled at the start.",
-            "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
-            "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
-            "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
-            "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+            "40 Duskmourn Commander schemes eru stokkuð í byrjun.",
+            "Í hverjum first main phase Archenemy skaltu opna timer-valmyndina og ýta á Next scheme til að setja eitt af stað.",
+            "Scheme sem er ekki ongoing leysist og fer síðan neðst í scheme-stokkinn.",
+            "Ongoing scheme helst uppi þar til borðið merkir það abandoned og fer þá neðst í stokkinn.",
+            "Schemes sem eru uppi og graveyard þeirra sem eru búin birtast undir spilinu sem smámyndir; ýttu á eina til að lesa hana stærri."
           ]
         },
         "life": {
-          "heading": "Life and loss",
+          "heading": "Líf og tap",
           "bullets": [
-            "The Archenemy loses at 0 life, or when the usual poison and commander-damage limits are reached.",
-            "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
-            "A player loses after taking {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Archenemy tapar við 0 líf eða þegar venjulegum poison- og commander-damage mörkum er náð.",
+            "Hetjurnar tapa saman þegar sameiginleg lífstala þeirra nær 0 og deila einnig poison og commander damage.",
+            "Leikmaður tapar eftir að hafa fengið {{commanderDamage}} combat damage frá einum commander.",
+            "Í hvert sinn sem commander er spilaður aftur úr command zone kostar hann 2 mana meira."
           ]
         }
       },
       "normal": {
-        "hint": "One Archenemy on 20 life with schemes against three heroes sharing 40 life.",
-        "hostHint": "Strict 4-player tables. One Archenemy with a scheme deck against a three-player team — no commanders.",
-        "summary": "One Archenemy against a team of three, with a scheme deck in motion — standard 20-life tables.",
+        "hint": "Einn Archenemy með 20 líf og schemes gegn þremur hetjum sem deila 40 lífum.",
+        "hostHint": "Strangt fjögurra manna borð. Einn Archenemy með scheme-stokk gegn þriggja manna liði — engir commanders.",
+        "summary": "Einn Archenemy gegn þriggja manna liði, með scheme-stokk í gangi — venjuleg 20 lífa borð.",
         "sections": {
           "sides": {
-            "heading": "Sides",
+            "heading": "Hliðar",
             "bullets": [
-              "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
-              "Both sides start at {{life}} life.",
-              "The heroes share that life total and take their turn together.",
-              "The Archenemy goes first and draws on that turn."
+              "Veldu Archenemy eða úthlutaðu einum af handahófi. Hinir þrír leikmennirnir eru hetjurnar.",
+              "Báðar hliðar byrja með {{life}} líf.",
+              "Hetjurnar deila þeirri lífstölu og taka umferð sína saman.",
+              "Archenemy byrjar og dregur spil í þeirri umferð."
             ]
           },
           "schemes": {
             "heading": "Schemes",
             "bullets": [
-              "The 40 Duskmourn Commander schemes are shuffled at the start.",
-              "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
-              "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
-              "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
-              "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+              "40 Duskmourn Commander schemes eru stokkuð í byrjun.",
+              "Í hverjum first main phase Archenemy skaltu opna timer-valmyndina og ýta á Next scheme til að setja eitt af stað.",
+              "Scheme sem er ekki ongoing leysist og fer síðan neðst í scheme-stokkinn.",
+              "Ongoing scheme helst uppi þar til borðið merkir það abandoned og fer þá neðst í stokkinn.",
+              "Schemes sem eru uppi og graveyard þeirra sem eru búin birtast undir spilinu sem smámyndir; ýttu á eina til að lesa hana stærri."
             ]
           },
           "life": {
-            "heading": "Life and loss",
+            "heading": "Líf og tap",
             "bullets": [
-              "The Archenemy loses at 0 life, or when the usual poison and poison limits are reached.",
-              "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
-              "A player loses after taking {{poison}} poison counters."
+              "Archenemy tapar við 0 líf eða þegar venjulegum poison-mörkum er náð.",
+              "Hetjurnar tapa saman þegar sameiginleg lífstala þeirra nær 0 og deila einnig poison og commander damage.",
+              "Leikmaður tapar eftir að hafa fengið {{poison}} poison counters."
             ]
           }
         }
       }
     },
     "emperor": {
-      "label": "Emperor",
-      "hint": "Two teams of three. Protect your Emperor using limited range of influence and deploy creatures.",
-      "hostHint": "Strict 6-player Commander pods. Two teams each place an Emperor between two Generals and play with limited range of influence.",
-      "hostFixedSeats": "Emperor games always seat exactly six players.",
-      "title": "Emperor",
-      "summary": "Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.",
+      "label": "Keisari",
+      "hint": "Tvö þriggja manna lið. Verndaðu Keisarann þinn með takmörkuðu áhrifasviði og færðu creatures.",
+      "hostHint": "Strangt sex manna Commander pod. Hvort lið setur Keisara á milli tveggja Hershöfðingja og spilar með takmörkuðu áhrifasviði.",
+      "hostFixedSeats": "Keisaraleikir hafa alltaf nákvæmlega sex leikmenn.",
+      "title": "Keisari",
+      "summary": "Tvö þriggja manna lið. Hver Keisari situr á milli tveggja Hershöfðingja og að fella Keisara vinnur leikinn.",
       "sections": {
         "teams": {
-          "heading": "Teams and turns",
+          "heading": "Lið og umferðir",
           "bullets": [
-            "Choose both teams and each team's Emperor, or randomise either choice.",
-            "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
-            "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
-            "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+            "Veldu bæði lið og Keisara hvors liðs, eða veldu annað eða bæði af handahófi.",
+            "Hver leikmaður byrjar með {{life}} líf og heldur eigin hendi, mana, permanents, poison og umferð.",
+            "Liðsfélagar mega skoða hendur hver annars og ræða stefnu, en mega ekki meðhöndla spil hver annars.",
+            "Veldu af handahófi hvor Keisarinn tekur fyrstu umferðina. Sá Keisari dregur spil í fyrstu umferð."
           ]
         },
         "range": {
-          "heading": "Range and combat",
+          "heading": "Áhrifasvið og bardagi",
           "bullets": [
-            "Generals have range of influence 1. Emperors have range of influence 2.",
-            "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
-            "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
-            "As players leave, the empty seats stop counting, bringing surviving players into range."
+            "Hershöfðingjar hafa áhrifasvið 1. Keisarar hafa áhrifasvið 2.",
+            "Spells, abilities, effects og upplýsingar geta aðeins haft áhrif á leikmenn og hluti innan áhrifasviðs controller þeirra.",
+            "Leikmaður má aðeins ráðast á andstæðing sem situr beint við hlið hans, eða planeswalkers og protected battles þess andstæðings.",
+            "Þegar leikmenn detta út hætta tóm sæti að telja og eftirlifandi leikmenn færast inn á áhrifasvið hver annars."
           ]
         },
         "deploy": {
-          "heading": "Deploy creatures",
+          "heading": "Færa creatures",
           "bullets": [
-            "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
-            "This can move creatures through the team as the battle lines change."
+            "Hvert creature hefur \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
+            "Þetta gerir kleift að færa creatures innan liðsins þegar víglínurnar breytast."
           ]
         },
         "winning": {
-          "heading": "Winning and Commander rules",
+          "heading": "Sigur og Commander-reglur",
           "bullets": [
-            "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
-            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Lið vinnur ef Keisari þess vinnur og tapar strax ef Keisari þess tapar. Hershöfðingi getur verið felldur án þess að leikurinn endi.",
+            "Leikmaður tapar við 0 líf, {{poison}} poison eða {{commanderDamage}} combat damage frá einum commander.",
+            "Í hvert sinn sem commander er spilaður aftur úr command zone kostar hann 2 mana meira."
           ]
         }
       },
       "normal": {
-        "hint": "Two teams of three on 20 life. Protect your Emperor with limited range of influence.",
-        "hostHint": "Strict 6-player tables. Two Emperors between Generals — standard 20-life decks, no commanders.",
-        "summary": "Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.",
+        "hint": "Tvö þriggja manna lið með 20 líf. Verndaðu Keisarann þinn með takmörkuðu áhrifasviði.",
+        "hostHint": "Strangt sex manna borð. Tveir Keisarar á milli Hershöfðingja — venjulegir 20 lífa stokkar, engir commanders.",
+        "summary": "Tvö þriggja manna lið. Hver Keisari situr á milli tveggja Hershöfðingja og að fella Keisara vinnur leikinn.",
         "sections": {
           "teams": {
-            "heading": "Teams and turns",
+            "heading": "Lið og umferðir",
             "bullets": [
-              "Choose both teams and each team's Emperor, or randomise either choice.",
-              "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
-              "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
-              "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+              "Veldu bæði lið og Keisara hvors liðs, eða veldu annað eða bæði af handahófi.",
+              "Hver leikmaður byrjar með {{life}} líf og heldur eigin hendi, mana, permanents, poison og umferð.",
+              "Liðsfélagar mega skoða hendur hver annars og ræða stefnu, en mega ekki meðhöndla spil hver annars.",
+              "Veldu af handahófi hvor Keisarinn tekur fyrstu umferðina. Sá Keisari dregur spil í fyrstu umferð."
             ]
           },
           "range": {
-            "heading": "Range and combat",
+            "heading": "Áhrifasvið og bardagi",
             "bullets": [
-              "Generals have range of influence 1. Emperors have range of influence 2.",
-              "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
-              "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
-              "As players leave, the empty seats stop counting, bringing surviving players into range."
+              "Hershöfðingjar hafa áhrifasvið 1. Keisarar hafa áhrifasvið 2.",
+              "Spells, abilities, effects og upplýsingar geta aðeins haft áhrif á leikmenn og hluti innan áhrifasviðs controller þeirra.",
+              "Leikmaður má aðeins ráðast á andstæðing sem situr beint við hlið hans, eða planeswalkers og protected battles þess andstæðings.",
+              "Þegar leikmenn detta út hætta tóm sæti að telja og eftirlifandi leikmenn færast inn á áhrifasvið hver annars."
             ]
           },
           "deploy": {
-            "heading": "Deploy creatures",
+            "heading": "Færa creatures",
             "bullets": [
-              "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
-              "This can move creatures through the team as the battle lines change."
+              "Hvert creature hefur \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
+              "Þetta gerir kleift að færa creatures innan liðsins þegar víglínurnar breytast."
             ]
           },
           "winning": {
-            "heading": "Winning and Commander rules",
+            "heading": "Sigur",
             "bullets": [
-              "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
-              "A player loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+              "Lið vinnur ef Keisari þess vinnur og tapar strax ef Keisari þess tapar. Hershöfðingi getur verið felldur án þess að leikurinn endi.",
+              "Leikmaður tapar við 0 líf eða {{poison}} poison counters."
             ]
           }
         }
       }
     },
     "star": {
-      "label": "Star",
-      "hint": "Five players in a circle. Your neighbors are allies; eliminate both players across from you.",
-      "hostHint": "Strict 5-player Commander pods. Adjacent players are allies; each player wins by outlasting both opponents across the circle.",
-      "hostFixedSeats": "Star games always seat exactly five players.",
-      "title": "Star",
-      "summary": "Five players sit in a circle. Your neighbors are allies and the two players across from you are enemies.",
+      "label": "Stjarna",
+      "hint": "Fimm leikmenn í hring. Nágrannar þínir eru bandamenn; felldu báða leikmennina á móti þér.",
+      "hostHint": "Strangt fimm manna Commander pod. Aðliggjandi leikmenn eru bandamenn; hver leikmaður vinnur með því að lifa lengur en báðir andstæðingarnir hinum megin í hringnum.",
+      "hostFixedSeats": "Stjörnuleikir hafa alltaf nákvæmlega fimm leikmenn.",
+      "title": "Stjarna",
+      "summary": "Fimm leikmenn sitja í hring. Nágrannar þínir eru bandamenn og tveir leikmennirnir á móti þér eru óvinir.",
       "sections": {
         "positions": {
-          "heading": "Positions and allies",
+          "heading": "Stöður og bandamenn",
           "bullets": [
-            "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
-            "The players immediately to your left and right are your allies.",
-            "The two nonadjacent players across the circle are your enemies.",
-            "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+            "Veldu stöðurnar í hringnum handvirkt með því að skipta tveimur leikmönnum, eða raðaðu öllum fimm af handahófi.",
+            "Leikmennirnir beint til vinstri og hægri við þig eru bandamenn þínir.",
+            "Tveir leikmennirnir sem sitja ekki við hliðina á þér hinum megin í hringnum eru óvinir þínir.",
+            "Stöðurnar breytast ekki þegar leikmaður er felldur; bandamenn þínir og óvinir haldast þeir sömu."
           ]
         },
         "combat": {
-          "heading": "Combat and interaction",
+          "heading": "Bardagi og samskipti",
           "bullets": [
-            "Players cannot attack their allies by default.",
-            "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
-            "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+            "Sjálfgefið geta leikmenn ekki ráðist á bandamenn sína.",
+            "Spells og abilities geta samt hjálpað eða haft áhrif á hvaða leikmann sem er nema borðið samþykki strangari útgáfu.",
+            "Umferðir ganga réttsælis. Veldu byrjunarleikmann af handahófi; sá leikmaður dregur spil í fyrstu umferð."
           ]
         },
         "winning": {
-          "heading": "Winning",
+          "heading": "Sigur",
           "bullets": [
-            "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
-            "An eliminated player cannot win later.",
-            "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Fyrsti eftirlifandi leikmaðurinn sem hefur báða óvini sína fellda vinnur, óháð því hver felldi þá.",
+            "Felldur leikmaður getur ekki unnið síðar.",
+            "Hver leikmaður byrjar með {{life}} líf og tapar við 0 líf, {{poison}} poison eða {{commanderDamage}} combat damage frá einum commander.",
+            "Í hvert sinn sem commander er spilaður aftur úr command zone kostar hann 2 mana meira."
           ]
         }
       },
       "normal": {
-        "hint": "Five players in a circle on 20 life. Neighbors are allies; eliminate both players across from you.",
-        "hostHint": "Strict 5-player tables. Adjacent players ally; each player wins by outlasting both opponents across the circle.",
-        "summary": "Five players sit in a circle on 20 life. Your neighbors are allies and the two players across from you are enemies.",
+        "hint": "Fimm leikmenn í hring með 20 líf. Nágrannar eru bandamenn; felldu báða leikmennina á móti þér.",
+        "hostHint": "Strangt fimm manna borð. Aðliggjandi leikmenn eru bandamenn; hver leikmaður vinnur með því að lifa lengur en báðir andstæðingarnir hinum megin í hringnum.",
+        "summary": "Fimm leikmenn sitja í hring með 20 líf. Nágrannar þínir eru bandamenn og tveir leikmennirnir á móti þér eru óvinir.",
         "sections": {
           "positions": {
-            "heading": "Positions and allies",
+            "heading": "Stöður og bandamenn",
             "bullets": [
-              "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
-              "The players immediately to your left and right are your allies.",
-              "The two nonadjacent players across the circle are your enemies.",
-              "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+              "Veldu stöðurnar í hringnum handvirkt með því að skipta tveimur leikmönnum, eða raðaðu öllum fimm af handahófi.",
+              "Leikmennirnir beint til vinstri og hægri við þig eru bandamenn þínir.",
+              "Tveir leikmennirnir sem sitja ekki við hliðina á þér hinum megin í hringnum eru óvinir þínir.",
+              "Stöðurnar breytast ekki þegar leikmaður er felldur; bandamenn þínir og óvinir haldast þeir sömu."
             ]
           },
           "combat": {
-            "heading": "Combat and interaction",
+            "heading": "Bardagi og samskipti",
             "bullets": [
-              "Players cannot attack their allies by default.",
-              "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
-              "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+              "Sjálfgefið geta leikmenn ekki ráðist á bandamenn sína.",
+              "Spells og abilities geta samt hjálpað eða haft áhrif á hvaða leikmann sem er nema borðið samþykki strangari útgáfu.",
+              "Umferðir ganga réttsælis. Veldu byrjunarleikmann af handahófi; sá leikmaður dregur spil í fyrstu umferð."
             ]
           },
           "winning": {
-            "heading": "Winning",
+            "heading": "Sigur",
             "bullets": [
-              "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
-              "An eliminated player cannot win later.",
-              "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+              "Fyrsti eftirlifandi leikmaðurinn sem hefur báða óvini sína fellda vinnur, óháð því hver felldi þá.",
+              "Felldur leikmaður getur ekki unnið síðar.",
+              "Hver leikmaður byrjar með {{life}} líf og tapar við 0 líf eða {{poison}} poison counters."
             ]
           }
         }
       }
     },
     "assassin": {
-      "label": "Assassin",
-      "hint": "Secret contracts in a free-for-all. Eliminate your mark, score, and inherit their target.",
-      "hostHint": "Secret contracts for 3–8 players. Score by eliminating your mark, then inherit their target.",
-      "title": "Assassin",
-      "summary": "A free-for-all with secret contracts. Score marks, inherit new targets, and finish with the highest score.",
+      "label": "Morðingi",
+      "hint": "Leynilegir samningar í allir-gegn-öllum leik. Felldu skotmarkið þitt, fáðu stig og erfðu skotmark þess.",
+      "hostHint": "Leynilegir samningar fyrir 3–8 leikmenn. Fáðu stig með því að fella skotmarkið þitt og erfðu síðan samning þess.",
+      "title": "Morðingi",
+      "summary": "Allir gegn öllum með leynilegum samningum. Felldu skotmörk, erfðu ný og endaðu með hæsta stigið.",
       "sections": {
         "contracts": {
-          "heading": "Secret contracts",
+          "heading": "Leynilegir samningar",
           "bullets": [
-            "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
-            "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
-            "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+            "Hver leikmaður fær eitt skotmark í leyni. Samningarnir mynda hring þannig að enginn fær sjálfan sig sem skotmark og hver leikmaður er aðeins veiddur af einum.",
+            "Láttu tækið ganga á milli við uppsetningu. Opnaðu Athuga skotmark úr timer-valmyndinni þegar þú þarft að lesa núverandi samning aftur.",
+            "Leikmenn mega ráðast á og hafa áhrif á hvern sem er; samningurinn ákvarðar stigagjöfina, ekki lögleg skotmörk."
           ]
         },
         "elimination": {
-          "heading": "Elimination and inheritance",
+          "heading": "Felling og erfðir",
           "bullets": [
-            "When a player is eliminated, record who dealt the finishing blow.",
-            "If you personally eliminate your assigned target, you score one mark.",
-            "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+            "Þegar leikmaður er felldur skaltu skrá hver veitti lokahöggið.",
+            "Ef þú fellir persónulega úthlutaða skotmarkið þitt færðu eitt mark.",
+            "Leikmaðurinn sem var að elta fellda skotmarkið erfir samning þess, jafnvel þótt einhver annar hafi veitt lokahöggið. Þannig heldur hver eftirlifandi leikmaður einum virkum samningi."
           ]
         },
         "winning": {
-          "heading": "Winning",
+          "heading": "Sigur",
           "bullets": [
-            "Play until only one player remains. The last survivor scores one additional mark.",
-            "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
-            "Commander rules still apply: {{life}} starting life, {{poison}} poison, and {{commanderDamage}} combat damage from one commander are lethal.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Spilið þar til aðeins einn leikmaður er eftir. Síðasti eftirlifandinn fær eitt auka mark.",
+            "Leikmaðurinn með flest marks vinnur; ef jafntefli er um hæsta stig vinnur síðasti eftirlifandinn jafnteflið.",
+            "Commander-reglur gilda áfram: {{life}} byrjunarlíf, {{poison}} poison og {{commanderDamage}} combat damage frá einum commander eru banvæn.",
+            "Í hvert sinn sem commander er spilaður aftur úr command zone kostar hann 2 mana meira."
           ]
         }
       },
       "normal": {
-        "hint": "Secret contracts for 3–8 players on 20 life. Score by eliminating your mark.",
-        "hostHint": "Secret contracts without commanders. Matching fills your chosen table size; leftovers can sit as small as three.",
-        "summary": "A free-for-all with secret contracts on 20 life. Score marks, inherit new targets, and finish with the highest score.",
+        "hint": "Leynilegir samningar fyrir 3–8 leikmenn með 20 líf. Fáðu stig með því að fella skotmarkið þitt.",
+        "hostHint": "Leynilegir samningar án commanders. Pörunin fyllir valda borðstærð; afgangshringir geta verið með allt niður í þrjá leikmenn.",
+        "summary": "Allir gegn öllum með leynilegum samningum og 20 líf. Felldu skotmörk, erfðu ný og endaðu með hæsta stigið.",
         "sections": {
           "contracts": {
-            "heading": "Secret contracts",
+            "heading": "Leynilegir samningar",
             "bullets": [
-              "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
-              "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
-              "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+              "Hver leikmaður fær eitt skotmark í leyni. Samningarnir mynda hring þannig að enginn fær sjálfan sig sem skotmark og hver leikmaður er aðeins veiddur af einum.",
+              "Láttu tækið ganga á milli við uppsetningu. Opnaðu Athuga skotmark úr timer-valmyndinni þegar þú þarft að lesa núverandi samning aftur.",
+              "Leikmenn mega ráðast á og hafa áhrif á hvern sem er; samningurinn ákvarðar stigagjöfina, ekki lögleg skotmörk."
             ]
           },
           "elimination": {
-            "heading": "Elimination and inheritance",
+            "heading": "Felling og erfðir",
             "bullets": [
-              "When a player is eliminated, record who dealt the finishing blow.",
-              "If you personally eliminate your assigned target, you score one mark.",
-              "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+              "Þegar leikmaður er felldur skaltu skrá hver veitti lokahöggið.",
+              "Ef þú fellir persónulega úthlutaða skotmarkið þitt færðu eitt mark.",
+              "Leikmaðurinn sem var að elta fellda skotmarkið erfir samning þess, jafnvel þótt einhver annar hafi veitt lokahöggið. Þannig heldur hver eftirlifandi leikmaður einum virkum samningi."
             ]
           },
           "winning": {
-            "heading": "Winning",
+            "heading": "Sigur",
             "bullets": [
-              "Play until only one player remains. The last survivor scores one additional mark.",
-              "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
-              "{{life}} starting life, {{poison}} poison, and {{poison}} poison counters are lethal."
+              "Spilið þar til aðeins einn leikmaður er eftir. Síðasti eftirlifandinn fær eitt auka mark.",
+              "Leikmaðurinn með flest marks vinnur; ef jafntefli er um hæsta stig vinnur síðasti eftirlifandinn jafnteflið.",
+              "{{life}} byrjunarlíf og {{poison}} poison counters eru banvæn mörk."
             ]
           }
         }
@@ -634,446 +634,446 @@
     }
   },
   "home": {
-    "taglineBefore": "Your next",
-    "taglineHighlight": "pod",
-    "taglineAfter": ", sorted.",
-    "startPlaying": "Start playing",
-    "ongoingGame": "ongoing game",
-    "noEventNeeded": "no event needed",
-    "startPlayingHint": "Open a battle screen on this device. Leave and come back without losing an unfinished game.",
-    "alwaysPlayers": "Always {{count}} players in this mode.",
-    "resumeGame": "Resume game",
-    "startNewGame": "Start a new game",
-    "startGame": "Start a game",
+    "taglineBefore": "Næsta",
+    "taglineHighlight": "podið",
+    "taglineAfter": " þitt, klárt.",
+    "startPlaying": "Byrja að spila",
+    "ongoingGame": "leikur í gangi",
+    "noEventNeeded": "enginn viðburður nauðsynlegur",
+    "startPlayingHint": "Opnaðu leikjaskjá á þessu tæki. Þú getur farið og komið aftur án þess að tapa ókláruðum leik.",
+    "alwaysPlayers": "Þessi hamur hefur alltaf {{count}} leikmenn.",
+    "resumeGame": "Halda áfram leik",
+    "startNewGame": "Hefja nýjan leik",
+    "startGame": "Hefja leik",
     "commanderSetup": "Commanders",
-    "commanderSetupHint": "Search Scryfall for each player's commander. Partner pairs need both commanders.",
-    "chooseAllCommanders": "Choose a commander for every player.",
-    "advancedMatchConfig": "Advanced match config",
-    "hostEvent": "Host event",
-    "new": "new",
-    "targetTableSize": "Target table size",
-    "allowThreePods": "Allow 3-player pods",
-    "allowFivePods": "Allow 5-player pods",
-    "duelFixedSeats": "Duel events always seat exactly two players.",
-    "emperorFixedSeats": "Emperor games always seat exactly six players.",
-    "starFixedSeats": "Star games always seat exactly five players.",
-    "archenemyFixedSeats": "Archenemy Commander games always seat exactly four players.",
-    "twoHeadedFixedSeats": "Two-Headed Giant games always seat exactly four players.",
-    "eventName": "Event name",
-    "eventNamePlaceholder": "Friday Commander",
-    "tables": "Tables",
-    "tablesHint": "How many physical tables are free for this event.",
-    "eventLasts": "Event lasts",
-    "eventLastsHint": "Join code dies after this many hours. Use 48 or 72 for a weekend.",
-    "hostPin": "Host PIN",
-    "hostPinHint": "4 to 8 digits — reopens the host desk later.",
-    "createEvent": "Create event",
-    "joinWithCode": "Join with a code",
-    "playerAside": "player",
-    "joinCode": "Join code",
+    "commanderSetupHint": "Leitaðu á Scryfall að commander hvers leikmanns. Partner-pör þurfa báða commanders.",
+    "chooseAllCommanders": "Veldu commander fyrir hvern leikmann.",
+    "advancedMatchConfig": "Ítarlegar leikstillingar",
+    "hostEvent": "Halda viðburð",
+    "new": "nýtt",
+    "targetTableSize": "Markstærð borðs",
+    "allowThreePods": "Leyfa 3 leikmanna pod",
+    "allowFivePods": "Leyfa 5 leikmanna pod",
+    "duelFixedSeats": "Einvígi hafa alltaf nákvæmlega tvo leikmenn.",
+    "emperorFixedSeats": "Keisaraleikir hafa alltaf nákvæmlega sex leikmenn.",
+    "starFixedSeats": "Stjörnuleikir hafa alltaf nákvæmlega fimm leikmenn.",
+    "archenemyFixedSeats": "Archenemy Commander leikir hafa alltaf nákvæmlega fjóra leikmenn.",
+    "twoHeadedFixedSeats": "Tvíhöfða risa leikir hafa alltaf nákvæmlega fjóra leikmenn.",
+    "eventName": "Heiti viðburðar",
+    "eventNamePlaceholder": "Föstudags Commander",
+    "tables": "Borð",
+    "tablesHint": "Hversu mörg raunveruleg borð eru laus fyrir þennan viðburð.",
+    "eventLasts": "Viðburður stendur",
+    "eventLastsHint": "Þátttökukóðinn rennur út eftir þennan fjölda klukkustunda. Notaðu 48 eða 72 fyrir helgi.",
+    "hostPin": "PIN gestgjafa",
+    "hostPinHint": "4 til 8 tölustafir — opnar stjórnborð gestgjafa aftur síðar.",
+    "createEvent": "Búa til viðburð",
+    "joinWithCode": "Tengjast með kóða",
+    "playerAside": "leikmaður",
+    "joinCode": "Þátttökukóði",
     "joinCodePlaceholder": "AB23CD",
-    "join": "Join",
-    "scanQr": "Scan QR",
-    "staleJoin": "That event is gone. Join with a new code, or host a new night."
+    "join": "Tengjast",
+    "scanQr": "Skanna QR",
+    "staleJoin": "Þessi viðburður er ekki lengur til. Tengstu með nýjum kóða eða haltu nýtt spilakvöld."
   },
   "host": {
-    "desk": "Host desk",
-    "locked": "Locked",
-    "hostOnly": "host only",
-    "unlockHostDesk": "Unlock host desk",
-    "playerCount": "{{count}} player",
-    "playerCount_plural": "{{count}} players",
-    "ready": "{{count}} ready",
-    "matched": "{{count}} matched",
-    "playing": "{{count}} playing",
-    "paused": "{{count}} paused",
-    "ends": "ends {{date}}",
-    "podSizes": "Pod sizes",
-    "matching": "matching",
-    "allowLeftoverThree": "Allow leftover 3-player pods",
-    "allowFivePods": "Allow 5-player pods",
-    "treacheryTargetHint": "Target table size. Leftover pods can be as small as four.",
-    "matchingPrefers": "Matching prefers {{size}}-player tables.",
-    "matchingPrefersFour": "Matching prefers 4-player tables.",
-    "assassinTargetHint": "Target table size. Leftover contract circles can be as small as three.",
-    "multiplayerTargetHint": "Target table size. Leftover tables can be as small as three.",
-    "duelMatchmaking": "Duel matchmaking seats exactly two players per game.",
-    "twoHeadedMatchmaking": "Two-Headed Giant matchmaking seats exactly four players per game.",
-    "archenemyMatchmaking": "Archenemy Commander matchmaking seats exactly four players per game: one Archenemy against a team of three.",
-    "emperorMatchmaking": "Emperor matchmaking seats exactly six players per game: two teams with an Emperor and two Generals each.",
-    "starMatchmaking": "Star matchmaking seats exactly five players in a circular order.",
-    "eventLength": "Event length",
-    "joinCodeDies": "join code dies",
-    "hoursFromStart": "Hours from start",
-    "hoursFromStartHint": "Change this for a multi-day event. After it ends, the QR opens the home page.",
-    "joinCodeTitle": "Join code",
-    "share": "share",
-    "noLanAddress": "No LAN address found — this link only works on this computer.",
-    "copyPlayerLink": "Copy player link",
-    "queue": "Queue",
-    "nobodyWaiting": "Nobody waiting.",
+    "desk": "Stjórnborð gestgjafa",
+    "locked": "Læst",
+    "hostOnly": "aðeins gestgjafi",
+    "unlockHostDesk": "Opna stjórnborð gestgjafa",
+    "playerCount": "{{count}} leikmaður",
+    "playerCount_plural": "{{count}} leikmenn",
+    "ready": "{{count}} tilbúnir",
+    "matched": "{{count}} paraðir",
+    "playing": "{{count}} spila",
+    "paused": "{{count}} í hléi",
+    "ends": "lýkur {{date}}",
+    "podSizes": "Stærðir poda",
+    "matching": "pörun",
+    "allowLeftoverThree": "Leyfa afgangspod með 3 leikmönnum",
+    "allowFivePods": "Leyfa 5 leikmanna pod",
+    "treacheryTargetHint": "Markstærð borðs. Afgangspod geta verið með allt niður í fjóra leikmenn.",
+    "matchingPrefers": "Pörunin kýs {{size}} leikmanna borð.",
+    "matchingPrefersFour": "Pörunin kýs 4 leikmanna borð.",
+    "assassinTargetHint": "Markstærð borðs. Afgangshringir samninga geta verið með allt niður í þrjá leikmenn.",
+    "multiplayerTargetHint": "Markstærð borðs. Afgangsborð geta verið með allt niður í þrjá leikmenn.",
+    "duelMatchmaking": "Einvígispörun setur nákvæmlega tvo leikmenn í hvern leik.",
+    "twoHeadedMatchmaking": "Tvíhöfða risa pörun setur nákvæmlega fjóra leikmenn í hvern leik.",
+    "archenemyMatchmaking": "Archenemy Commander pörun setur nákvæmlega fjóra leikmenn í hvern leik: einn Archenemy gegn þriggja manna liði.",
+    "emperorMatchmaking": "Keisarapörun setur nákvæmlega sex leikmenn í hvern leik: tvö lið, hvort með Keisara og tvo Hershöfðingja.",
+    "starMatchmaking": "Stjörnupörun setur nákvæmlega fimm leikmenn í hring.",
+    "eventLength": "Lengd viðburðar",
+    "joinCodeDies": "þátttökukóði rennur út",
+    "hoursFromStart": "Klukkustundir frá upphafi",
+    "hoursFromStartHint": "Breyttu þessu fyrir margra daga viðburð. Þegar honum lýkur opnar QR-kóðinn heimasíðuna.",
+    "joinCodeTitle": "Þátttökukóði",
+    "share": "deila",
+    "noLanAddress": "Ekkert LAN-vistfang fannst — þessi hlekkur virkar aðeins á þessari tölvu.",
+    "copyPlayerLink": "Afrita leikmannahlekk",
+    "queue": "Biðröð",
+    "nobodyWaiting": "Enginn bíður.",
     "flex": "flex {{count}}",
-    "challengePts": "{{count}} challenge pts",
-    "pts": "{{count}} pts",
-    "notReady": "Not ready",
-    "pausedTitle": "Paused",
-    "seated": "Seated",
-    "atTables": "{{count}} at tables",
-    "tablesTitle": "Tables",
-    "total": "{{count}} total",
-    "noTables": "This event was created without tables.",
-    "startingGames": "Starting games…",
-    "startAllReady": "Start all ready games ({{count}})",
-    "startGame": "Start game",
-    "finishTable": "Finish table",
-    "cancelPod": "Cancel pod",
-    "enable": "Enable",
-    "disable": "Disable",
+    "challengePts": "{{count}} áskorunarstig",
+    "pts": "{{count}} stig",
+    "notReady": "Ekki tilbúinn",
+    "pausedTitle": "Í hléi",
+    "seated": "Sestur",
+    "atTables": "{{count}} við borð",
+    "tablesTitle": "Borð",
+    "total": "{{count}} samtals",
+    "noTables": "Þessi viðburður var búinn til án borða.",
+    "startingGames": "Hef leiki…",
+    "startAllReady": "Hefja alla tilbúna leiki ({{count}})",
+    "startGame": "Hefja leik",
+    "finishTable": "Ljúka borði",
+    "cancelPod": "Hætta við pod",
+    "enable": "Virkja",
+    "disable": "Slökkva",
     "trackerUsed": "tracker",
-    "noTracker": "no tracker",
-    "matchNow": "Match now",
-    "fillBots": "Fill tables with bots",
-    "playerJoinPage": "Player join page"
+    "noTracker": "án tracker",
+    "matchNow": "Para núna",
+    "fillBots": "Fylla borð með bottum",
+    "playerJoinPage": "Þátttökusíða leikmanna"
   },
   "join": {
-    "joinEvent": "Join event",
-    "takeSeat": "Take a seat",
-    "displayName": "Display name",
+    "joinEvent": "Tengjast viðburði",
+    "takeSeat": "Taka sæti",
+    "displayName": "Birtingarnafn",
     "displayNamePlaceholder": "Alex",
-    "joinEventButton": "Join event",
-    "saveDecks": "Save decks",
-    "matchFound": "Match found",
-    "yourDeck": "Your deck",
-    "checkMyRole": "Check my role",
-    "playingWithoutTracker": "Playing without the tracker. The host can finish the table.",
-    "chooseTracker": "Choose how this pod will record its game.",
-    "useGameTracker": "Use game tracker",
-    "playWithoutTracker": "Play without tracker",
-    "atTableMarked": "You're marked as at the table on this phone. The host still starts the game from the desk.",
-    "imAtTable": "I'm at the table",
-    "leftEvent": "You left this event. Scan the QR again if you want back in.",
-    "openPool": "Open pool — any table.",
-    "ready": "Ready",
-    "waiting": "waiting",
-    "holdTight": "Hold tight — a table is coming.",
-    "flex": "Flex: {{flex}} · Challenge Points: {{points}}",
-    "howWasPod": "How was your pod?",
-    "pause": "Pause",
-    "leave": "Leave",
-    "pausedMessage": "You are paused. Resume when you can sit, or leave the event.",
-    "imReady": "I'm ready",
-    "leaveEvent": "Leave event",
-    "markReady": "Mark ready when you can sit down for a game.",
-    "matchingShortly": "Matching will send you to a table shortly.",
-    "imTheHost": "I'm the host",
-    "offlineSaved": "Saved on this phone. It will send when you are back online.",
-    "stayAtTable": "Stay at the table until the host calls the game."
+    "joinEventButton": "Tengjast viðburði",
+    "saveDecks": "Vista stokka",
+    "matchFound": "Leikur fundinn",
+    "yourDeck": "Stokkurinn þinn",
+    "checkMyRole": "Athuga hlutverkið mitt",
+    "playingWithoutTracker": "Spilað án tracker. Gestgjafinn getur lokið borðinu.",
+    "chooseTracker": "Veldu hvernig þetta pod skráir leikinn.",
+    "useGameTracker": "Nota leikjatracker",
+    "playWithoutTracker": "Spila án tracker",
+    "atTableMarked": "Þú ert merktur við borðið á þessum síma. Gestgjafinn byrjar samt leikinn úr stjórnborðinu.",
+    "imAtTable": "Ég er við borðið",
+    "leftEvent": "Þú yfirgafst þennan viðburð. Skannaðu QR-kóðann aftur ef þú vilt koma aftur.",
+    "openPool": "Opið pool — hvaða borð sem er.",
+    "ready": "Tilbúinn",
+    "waiting": "bíður",
+    "holdTight": "Bíddu aðeins — borð er á leiðinni.",
+    "flex": "Flex: {{flex}} · Áskorunarstig: {{points}}",
+    "howWasPod": "Hvernig var podið þitt?",
+    "pause": "Hlé",
+    "leave": "Fara",
+    "pausedMessage": "Þú ert í hléi. Haltu áfram þegar þú getur sest eða yfirgefðu viðburðinn.",
+    "imReady": "Ég er tilbúinn",
+    "leaveEvent": "Yfirgefa viðburð",
+    "markReady": "Merktu þig tilbúinn þegar þú getur sest niður í leik.",
+    "matchingShortly": "Pörunin mun senda þig að borði fljótlega.",
+    "imTheHost": "Ég er gestgjafinn",
+    "offlineSaved": "Vistað á þessum síma. Það verður sent þegar þú ert aftur nettengdur.",
+    "stayAtTable": "Vertu við borðið þar til gestgjafinn lýkur leiknum."
   },
   "matchConfig": {
-    "title": "Match config",
-    "description": "Sets up the fake seated pod behind /match. Nothing here touches the server, and none of it appears on the battle screen, so that route can be checked on a phone as-is.",
-    "podSetup": "Pod setup",
-    "seats": "Seats",
-    "seatsCount": "{{count}} seats",
+    "title": "Leikstillingar",
+    "description": "Setur upp sýndar-podið á bak við /match. Ekkert hér hefur áhrif á þjóninn og ekkert birtist á leikjaskjánum, þannig að hægt er að prófa þessa route á síma eins og hún er.",
+    "podSetup": "Uppsetning pods",
+    "seats": "Sæti",
+    "seatsCount": "{{count}} sæti",
     "bracket": "Bracket",
-    "header": "Header",
-    "eventNamePlaceholder": "Event name",
-    "joinCodePlaceholder": "Join code",
-    "matchCard": "Match card",
-    "tableLabelPlaceholder": "Table label",
-    "assignedDeckPlaceholder": "Assigned deck",
-    "openBattleScreen": "Open battle screen",
-    "resetGameState": "Reset game state",
+    "header": "Haus",
+    "eventNamePlaceholder": "Heiti viðburðar",
+    "joinCodePlaceholder": "Þátttökukóði",
+    "matchCard": "Leikjaspjald",
+    "tableLabelPlaceholder": "Merki borðs",
+    "assignedDeckPlaceholder": "Úthlutaður stokkur",
+    "openBattleScreen": "Opna leikjaskjá",
+    "resetGameState": "Endurstilla leikstöðu",
     "commander": "Commander",
-    "secondCommander": "Second commander"
+    "secondCommander": "Annar commander"
   },
   "app": {
-    "notFound": "Not found."
+    "notFound": "Fannst ekki."
   },
   "wake": {
-    "title": "Waking the tables",
-    "message": "The free host went to sleep. Keep this page open — it usually takes under a minute."
+    "title": "Vek borðin",
+    "message": "Ókeypis þjónninn sofnaði. Hafðu þessa síðu opna — það tekur yfirleitt minna en mínútu."
   },
   "scanner": {
-    "title": "Scan QR",
-    "ariaLabel": "Scan join QR code",
-    "hint": "Point at the host desk code.",
-    "closeScanner": "Close scanner",
-    "openingCamera": "Opening camera…",
-    "noCamera": "This browser cannot open the camera. Type the join code instead.",
-    "permissionDenied": "Camera permission was denied. Type the join code, or allow the camera and try again."
+    "title": "Skanna QR",
+    "ariaLabel": "Skanna þátttöku-QR-kóða",
+    "hint": "Beindu myndavélinni að kóða gestgjafans.",
+    "closeScanner": "Loka skanna",
+    "openingCamera": "Opna myndavél…",
+    "noCamera": "Þessi vafri getur ekki opnað myndavélina. Sláðu þátttökukóðann inn í staðinn.",
+    "permissionDenied": "Aðgangi að myndavél var hafnað. Sláðu inn þátttökukóðann eða leyfðu myndavélina og reyndu aftur."
   },
   "theme": {
-    "switchToLight": "Switch to light mode",
-    "switchToDark": "Switch to dark mode"
+    "switchToLight": "Skipta í ljósa stillingu",
+    "switchToDark": "Skipta í dökka stillingu"
   },
   "hostMetrics": {
-    "title": "Event recap",
-    "aside": "pilot",
-    "players": "Players",
-    "games": "Games",
-    "gamesPerPlayer": "Games / player",
-    "waitAvg": "Wait avg",
-    "waitP95": "Wait p95",
-    "waitMax": "Wait max",
-    "rematchPairs": "Rematch pairs",
-    "flexEarned": "Flex earned",
-    "flexSeats": "Flex seats",
-    "durationAvg": "Duration avg",
-    "tablesOccupied": "Tables occupied",
-    "trackerUsed": "Tracker used",
-    "trackerUsedValue": "{{used}} used · {{skipped}} skipped",
-    "challenges": "Challenges",
-    "challengePts": "Challenge pts",
-    "podRating": "Pod rating",
-    "podSizes": "Pod sizes:",
+    "title": "Samantekt viðburðar",
+    "aside": "tilraun",
+    "players": "Leikmenn",
+    "games": "Leikir",
+    "gamesPerPlayer": "Leikir / leikmaður",
+    "waitAvg": "Meðalbið",
+    "waitP95": "Bið p95",
+    "waitMax": "Hámarksbið",
+    "rematchPairs": "Endurspilspör",
+    "flexEarned": "Flex unnið",
+    "flexSeats": "Flex sæti",
+    "durationAvg": "Meðallengd",
+    "tablesOccupied": "Upptekin borð",
+    "trackerUsed": "Tracker notaður",
+    "trackerUsedValue": "{{used}} notað · {{skipped}} sleppt",
+    "challenges": "Áskoranir",
+    "challengePts": "Áskorunarstig",
+    "podRating": "Einkunn pods",
+    "podSizes": "Stærðir poda:",
     "pools": "Pools:"
   },
   "deckEditor": {
-    "title": "Commander decks",
-    "deckNamePlaceholder": "Deck name (optional)",
+    "title": "Commander stokkar",
+    "deckNamePlaceholder": "Heiti stokks (valfrjálst)",
     "commander": "Commander",
-    "secondCommander": "Second commander",
-    "markPreferred": "Mark preferred",
-    "addAcceptedDeck": "Add accepted deck",
-    "hint": "Same-pool pods only. Extra decks let matching flex you into another bracket."
+    "secondCommander": "Annar commander",
+    "markPreferred": "Merkja sem valið",
+    "addAcceptedDeck": "Bæta við samþykktum stokki",
+    "hint": "Aðeins pod úr sama pooli. Aukastokkar gera pöruninni kleift að færa þig í annan bracket."
   },
   "commanderPicker": {
-    "searchCommander": "Search commander",
-    "searchPartner": "Commander that can pair with {{name}}",
-    "removeCommander": "Remove {{name}}",
-    "artworkFor": "Artwork for",
-    "loadingArtwork": "Loading artwork…"
+    "searchCommander": "Leita að commander",
+    "searchPartner": "Commander sem getur parast við {{name}}",
+    "removeCommander": "Fjarlægja {{name}}",
+    "artworkFor": "Myndefni fyrir",
+    "loadingArtwork": "Hleður myndefni…"
   },
   "challengePack": {
-    "title": "Challenge pack",
-    "description": "Only predefined primitives. Saving writes a new version and never mutates a pack already used by this event.",
-    "copyOfficial": "Copy official",
-    "startBlank": "Start blank",
-    "saveNewVersion": "Save new version",
-    "editHint": "Copy the official pack or start blank before editing.",
-    "packName": "Pack name",
-    "descriptionLabel": "Description",
-    "addChallenge": "Add challenge",
+    "title": "Áskorunarpakki",
+    "description": "Aðeins fyrirfram skilgreind primitives. Vistun býr til nýja útgáfu og breytir aldrei pakka sem þessi viðburður hefur þegar notað.",
+    "copyOfficial": "Afrita opinbera",
+    "startBlank": "Byrja tómt",
+    "saveNewVersion": "Vista nýja útgáfu",
+    "editHint": "Afritaðu opinbera pakkann eða byrjaðu tómt áður en þú breytir.",
+    "packName": "Heiti pakka",
+    "descriptionLabel": "Lýsing",
+    "addChallenge": "Bæta við áskorun",
     "id": "Id",
-    "name": "Name",
-    "category": "Category",
-    "points": "Points",
+    "name": "Nafn",
+    "category": "Flokkur",
+    "points": "Stig",
     "primitive": "Primitive",
-    "threshold": "Threshold",
-    "confirmationQuestion": "Confirmation question",
-    "defaultConfirmation": "Did this happen at the table?",
-    "newClaimName": "New claim",
-    "newClaimDescription": "Award this at the table."
+    "threshold": "Þröskuldur",
+    "confirmationQuestion": "Staðfestingarspurning",
+    "defaultConfirmation": "Gerðist þetta við borðið?",
+    "newClaimName": "Ný skráning",
+    "newClaimDescription": "Veittu þetta við borðið."
   },
   "treacheryRole": {
-    "treachery": "Treachery",
-    "receivedRole": "You received a role",
-    "handDeviceTo": "Hand the device to {{name}}",
-    "lookAwayIdentity": "Everyone else should look away before the identity is revealed.",
-    "lookAwayScreen": "Make sure nobody else can see your screen before revealing it.",
-    "reveal": "Reveal",
-    "yourRole": "Your role",
-    "identityAlt": "{{name}}, {{role}} identity",
-    "illustratedBy": "Illustrated by {{artist}}",
-    "yourObjective": "Your objective",
-    "unveiledToTable": "Unveiled to the table",
-    "unveilWarning": "Everyone at your table will see this identity. Its ability must be resolved in the game.",
-    "confirmUnveil": "Confirm unveil",
-    "unveilToTable": "Unveil to the table",
-    "hideAndPass": "Hide & pass",
-    "hideIdentity": "Hide my identity"
+    "treachery": "Svik",
+    "receivedRole": "Þú fékkst hlutverk",
+    "handDeviceTo": "Réttu {{name}} tækið",
+    "lookAwayIdentity": "Allir aðrir ættu að líta undan áður en auðkennið er afhjúpað.",
+    "lookAwayScreen": "Gakktu úr skugga um að enginn annar sjái skjáinn áður en þú afhjúpar.",
+    "reveal": "Afhjúpa",
+    "yourRole": "Hlutverkið þitt",
+    "identityAlt": "{{name}}, {{role}} auðkenni",
+    "illustratedBy": "Myndskreyting eftir {{artist}}",
+    "yourObjective": "Markmið þitt",
+    "unveiledToTable": "Afhjúpað fyrir borðinu",
+    "unveilWarning": "Allir við borðið munu sjá þetta auðkenni. Hæfileika þess verður að leysa í leiknum.",
+    "confirmUnveil": "Staðfesta afhjúpun",
+    "unveilToTable": "Afhjúpa fyrir borðinu",
+    "hideAndPass": "Fela og rétta áfram",
+    "hideIdentity": "Fela auðkennið mitt"
   },
   "modeRulesSheet": {
-    "closeRules": "Close rules",
-    "backToGame": "Back to the game"
+    "closeRules": "Loka reglum",
+    "backToGame": "Til baka í leikinn"
   },
   "assassinTargets": {
-    "title": "Secret contracts",
-    "chooseOwnName": "Choose only your own name.",
-    "closeContracts": "Close contracts",
-    "handDeviceTo": "Hand the device to {{name}}",
-    "lookAway": "Everyone else should look away before the contract is revealed.",
-    "revealTarget": "Reveal my target",
-    "yourTarget": "Your target",
-    "noActiveTarget": "No active target",
-    "marksScored": "Marks scored: {{count}}",
-    "hideAndPass": "Hide & pass",
-    "allContractsChecked": "All contracts checked"
+    "title": "Leynilegir samningar",
+    "chooseOwnName": "Veldu aðeins þitt eigið nafn.",
+    "closeContracts": "Loka samningum",
+    "handDeviceTo": "Réttu {{name}} tækið",
+    "lookAway": "Allir aðrir ættu að líta undan áður en samningurinn er afhjúpaður.",
+    "revealTarget": "Afhjúpa skotmarkið mitt",
+    "yourTarget": "Skotmarkið þitt",
+    "noActiveTarget": "Ekkert virkt skotmark",
+    "marksScored": "Marks fengin: {{count}}",
+    "hideAndPass": "Fela og rétta áfram",
+    "allContractsChecked": "Allir samningar athugaðir"
   },
   "scheme": {
     "ongoingScheme": "Ongoing scheme",
     "scheme": "Scheme",
-    "pastScheme": "Past scheme",
+    "pastScheme": "Fyrra scheme",
     "abandon": "Abandon {{name}}",
     "ongoingSchemes": "Ongoing schemes",
     "graveyard": "Graveyard · {{count}}",
     "nextScheme": "Next scheme",
-    "remainingInDeck": "{{count}} left in the deck",
-    "scryfallCredit": "Card image via Scryfall. Magic: The Gathering is © Wizards of the Coast."
+    "remainingInDeck": "{{count}} eftir í stokknum",
+    "scryfallCredit": "Spilamynd í gegnum Scryfall. Magic: The Gathering er © Wizards of the Coast."
   },
   "dungeon": {
-    "takeInitiativeTitle": "Take the initiative?",
-    "takeInitiativeEnter": "This also ventures into Undercity. Only take it when the table just gave this seat the initiative.",
-    "takeInitiativeWait": "Finish or leave the current dungeon before Undercity can open. Only take the initiative when the table just gave it to this seat.",
-    "takeInitiativeAndEnter": "Take initiative & enter Undercity",
-    "takeInitiative": "Take initiative",
-    "alreadyHoldInitiative": "You already hold the initiative",
-    "takeAndEnterUndercity": "Take the initiative and enter Undercity",
-    "completed": "{{name}} (completed)",
-    "ventureInto": "Venture into {{name}}",
-    "done": "Done",
-    "ventureTo": "Venture to {{room}}: {{effect}}",
-    "releaseInitiative": "Release the initiative",
-    "undoRoom": "Undo room",
-    "closeDungeon": "Close dungeon"
+    "takeInitiativeTitle": "Taka initiative?",
+    "takeInitiativeEnter": "Þetta venture-ar einnig inn í Undercity. Taktu initiative aðeins þegar borðið var rétt í þessu að gefa þessu sæti það.",
+    "takeInitiativeWait": "Ljúktu eða yfirgefðu núverandi dungeon áður en Undercity getur opnast. Taktu initiative aðeins þegar borðið var rétt í þessu að gefa þessu sæti það.",
+    "takeInitiativeAndEnter": "Taka initiative og fara inn í Undercity",
+    "takeInitiative": "Taka initiative",
+    "alreadyHoldInitiative": "Þú ert þegar með initiative",
+    "takeAndEnterUndercity": "Taktu initiative og farðu inn í Undercity",
+    "completed": "{{name}} (lokið)",
+    "ventureInto": "Venture inn í {{name}}",
+    "done": "Lokið",
+    "ventureTo": "Venture til {{room}}: {{effect}}",
+    "releaseInitiative": "Sleppa initiative",
+    "undoRoom": "Afturkalla room",
+    "closeDungeon": "Loka dungeon"
   },
   "treacheryRolesSheet": {
-    "title": "Secret identities",
-    "chooseOwnName": "Choose only your own name.",
-    "closeIdentities": "Close identities",
-    "allIdentitiesChecked": "All identities checked"
+    "title": "Leynileg auðkenni",
+    "chooseOwnName": "Veldu aðeins þitt eigið nafn.",
+    "closeIdentities": "Loka auðkennum",
+    "allIdentitiesChecked": "Öll auðkenni athuguð"
   },
   "tracker": {
-    "gameRules": "Game rules",
-    "loadingRoles": "Loading roles…",
-    "start": "Start",
-    "readRules": "Read rules",
-    "readyToBegin": "Ready to begin",
-    "readyToBeginHint": "Start the match when everyone is seated, or read the rules first.",
-    "dealContracts": "Deal contracts",
-    "dealContractsTitle": "Deal secret contracts",
-    "dealContractsHint": "Every player receives one private target. The device will be passed around so each contract can be checked in secret.",
-    "dealIdentities": "Deal identities",
-    "dealIdentitiesTitle": "Deal secret identities",
-    "dealIdentitiesHint": "Every player receives one hidden identity. The device will be passed around so each one can be read in secret.",
-    "chooseStarPositions": "Choose Star positions",
-    "starPositionsHint": "Players beside each other are allies. Tap two players to exchange their positions, or randomise the whole circle.",
-    "randomPositions": "Random positions",
-    "confirmPositions": "Confirm positions",
-    "adjacentPlayersAlly": "Adjacent\nplayers ally",
-    "buildEmperorTeams": "Build the Emperor teams",
-    "chooseTeamA": "Choose three players for Team A.",
-    "randomTeams": "Random teams",
-    "resetTeams": "Reset teams",
-    "teamEmperor": "Team {{team}} Emperor",
-    "randomEmperors": "Random Emperors",
-    "confirmTeams": "Confirm teams",
-    "chooseArchenemy": "Choose the Archenemy",
-    "chooseArchenemyHint": "The Archenemy faces the other three players. Both sides share 60 life. The Archenemy goes first, draws on that turn, and sets a scheme in motion during each first main phase.",
-    "confirmArchenemy": "Confirm Archenemy",
-    "chooseAllies": "Choose the allies",
-    "chooseAlliesHint": "Select two players for the first team. The other two players become the opposing team. Teams share 60 life and turns; all other player controls stay separate.",
-    "emperor": "Emperor",
-    "emperorRange": "Emperor · range 2",
-    "leader": "Leader",
-    "general": "General",
-    "generalRange": "General · range 1",
+    "gameRules": "Leikreglur",
+    "loadingRoles": "Hleður hlutverkum…",
+    "start": "Byrja",
+    "readRules": "Lesa reglur",
+    "readyToBegin": "Tilbúið að byrja",
+    "readyToBeginHint": "Hefjið leikinn þegar allir eru sestir eða lesið reglurnar fyrst.",
+    "dealContracts": "Úthluta samningum",
+    "dealContractsTitle": "Úthluta leynilegum samningum",
+    "dealContractsHint": "Hver leikmaður fær eitt leynilegt skotmark. Tækið verður látið ganga á milli svo hægt sé að athuga hvern samning í leyni.",
+    "dealIdentities": "Úthluta auðkennum",
+    "dealIdentitiesTitle": "Úthluta leynilegum auðkennum",
+    "dealIdentitiesHint": "Hver leikmaður fær eitt falið auðkenni. Tækið verður látið ganga á milli svo hver leikmaður geti lesið sitt í leyni.",
+    "chooseStarPositions": "Velja Stjörnu-stöður",
+    "starPositionsHint": "Leikmenn sem sitja hlið við hlið eru bandamenn. Ýttu á tvo leikmenn til að skipta um stöður eða raðaðu öllum hringnum af handahófi.",
+    "randomPositions": "Handahófskenndar stöður",
+    "confirmPositions": "Staðfesta stöður",
+    "adjacentPlayersAlly": "Aðliggjandi\nleikmenn eru bandamenn",
+    "buildEmperorTeams": "Setja saman Keisaraliðin",
+    "chooseTeamA": "Veldu þrjá leikmenn í Lið A.",
+    "randomTeams": "Handahófskennd lið",
+    "resetTeams": "Endurstilla lið",
+    "teamEmperor": "Keisari liðs {{team}}",
+    "randomEmperors": "Handahófskenndir Keisarar",
+    "confirmTeams": "Staðfesta lið",
+    "chooseArchenemy": "Velja Archenemy",
+    "chooseArchenemyHint": "Archenemy mætir hinum þremur leikmönnunum. Báðar hliðar hafa 60 líf. Archenemy byrjar, dregur spil í þeirri umferð og setur scheme af stað í hverjum first main phase.",
+    "confirmArchenemy": "Staðfesta Archenemy",
+    "chooseAllies": "Velja bandamenn",
+    "chooseAlliesHint": "Veldu tvo leikmenn í fyrsta liðið. Hinir tveir verða mótherjaliðið. Lið deila 60 lífum og umferðum; allar aðrar leikmannastýringar haldast aðskildar.",
+    "emperor": "Keisari",
+    "emperorRange": "Keisari · áhrifasvið 2",
+    "leader": "Leiðtogi",
+    "general": "Hershöfðingi",
+    "generalRange": "Hershöfðingi · áhrifasvið 1",
     "marks": "{{count}} marks",
-    "winner": "Winner",
-    "turnPhone": "Turn your phone for the full board",
-    "matchMenu": "Match menu",
-    "matchMenuElapsed": "Match menu. {{clock}} elapsed",
-    "matchMenuPaused": ", paused",
-    "matchMenuDayNight": ", it is {{phase}}",
-    "day": "day",
-    "night": "night",
-    "closeMatchMenu": "Close match menu",
-    "match": "Match",
-    "firstScheme": "First scheme",
-    "nextScheme": "Next scheme",
-    "resume": "Resume",
-    "pause": "Pause",
-    "undo": "Undo",
-    "challenges": "Challenges",
-    "checkTarget": "Check target",
-    "checkMyRole": "Check my role",
-    "dayButton": "Day",
-    "nightButton": "Night",
-    "playerLost": "Player lost",
-    "gameWonBy": "Game won by",
-    "won": "{{name}} won",
-    "doneRequeue": "Done & requeue",
-    "savingChallenges": "Saving challenges…",
-    "quitToHome": "Quit to home",
-    "quitHint": "The game is kept — reopen it from the home screen.",
-    "secretContracts": "Secret contracts",
-    "secretIdentities": "Secret identities",
-    "whoEliminated": "Who eliminated {{name}}?",
-    "whoEliminatedHint": "A player scores only if this was their assigned mark. The contract chain advances either way.",
-    "noPlayerUnknown": "No player / unknown",
-    "revealedIdentity": "Revealed Treachery identity",
-    "closeRevealedIdentity": "Close revealed identity",
-    "commanderChallenges": "Commander challenges",
-    "challengeCompleted": "{{name}} completed",
-    "challengeFallback": "Challenge",
-    "matchResult": "Match result",
-    "wins": "{{name}} wins",
-    "reviewBoard": "Review board",
-    "yes": "Yes",
-    "no": "No",
-    "yesTheyLost": "Yes, they lost",
-    "noStillIn": "No, still in",
-    "openCounters": "Open counters for {{name}}",
-    "commanderDamageOn": "Commander damage on {{name}}",
-    "countersFor": "Counters for {{name}}",
-    "countersTitle": "Counters for {{name}}",
-    "closeCounters": "Close counters",
-    "closeChallenges": "Close challenges",
-    "sharedCommanderDamage": "Shared commander damage",
-    "closeCommanderDamage": "Close commander damage",
-    "highestCommanderDamage": "Highest commander damage on {{name}}: {{value}} from {{commander}}",
-    "noCommanderDamage": "No commander damage on {{name}}",
-    "removeCommanderDamage": "Remove commander damage from {{owner}}'s {{name}}",
-    "addCommanderDamage": "Add commander damage from {{owner}}'s {{name}}",
-    "isMonarch": "{{name}} is the monarch",
-    "makeMonarch": "Make {{name}} the monarch",
-    "enduringStory": "{{name}} {{has}} an enduring story",
-    "cityBlessing": "{{name}} {{has}} the city's blessing",
-    "has": "has",
-    "doesNotHave": "does not have",
-    "didLose": "Did {{name}} lose the game?",
-    "thisTeam": "This team",
-    "didTheyLose": "Did they lose?",
-    "poisonPrompt": "{{name}} has {{count}} poison counters. Did they lose?",
-    "sharedPoisonPrompt": "{{subject}} has {{count}} shared poison counters. {{lose}}",
-    "hitPrompt": "{{name}} owns {{count}} exiled cards with hit counters. Did they lose?",
-    "commanderPrompt": "{{name}} has taken {{damage}} commander damage from {{from}}. Did they lose?",
-    "sharedCommanderPrompt": "{{subject}} has taken {{damage}} commander damage from {{from}}. {{lose}}",
-    "lifePrompt": "{{name}} is at {{life}} life. Did they lose?",
-    "sharedLifePrompt": "{{subject}} is at {{life}} life. {{lose}}",
-    "anotherCommander": "another commander",
-    "addLife": "Add 1 life. Long press for a larger amount.",
-    "removeLife": "Remove 1 life. Long press for a larger amount.",
-    "addLifeFor": "Add life for {{name}}",
-    "removeLifeFor": "Remove life for {{name}}",
-    "addLifeLabel": "Add life · {{name}}",
-    "removeLifeLabel": "Remove life · {{name}}",
-    "deleteDigit": "Delete digit",
-    "add": "Add",
-    "removeVerb": "Remove",
-    "lower": "Lower {{label}}",
-    "raise": "Raise {{label}}",
-    "seatColour": "Seat colour for {{name}}",
-    "dungeonFor": "Dungeon for {{name}}",
-    "dungeonInitiative": "Dungeon and initiative for {{name}}. {{title}}",
-    "dungeonInitiativeActive": "{{name}} has the initiative · {{filled}} of {{total}} unique dungeons",
-    "dungeonInitiativeCompleted": "{{name}} has completed {{filled}} of {{total}} unique dungeons",
-    "counterOn": "{{label}} on {{name}}: {{value}}",
-    "counterFor": "{{label}} for {{name}}",
-    "claimFor": "Claim for {{name}}",
-    "challengesSubtitle": "Same challenges for every player · points never affect matching",
+    "winner": "Sigurvegari",
+    "turnPhone": "Snúðu símanum til að sjá allt borðið",
+    "matchMenu": "Leikjavalmynd",
+    "matchMenuElapsed": "Leikjavalmynd. {{clock}} liðið",
+    "matchMenuPaused": ", í hléi",
+    "matchMenuDayNight": ", það er {{phase}}",
+    "day": "dagur",
+    "night": "nótt",
+    "closeMatchMenu": "Loka leikjavalmynd",
+    "match": "Leikur",
+    "firstScheme": "Fyrsta scheme",
+    "nextScheme": "Næsta scheme",
+    "resume": "Halda áfram",
+    "pause": "Hlé",
+    "undo": "Afturkalla",
+    "challenges": "Áskoranir",
+    "checkTarget": "Athuga skotmark",
+    "checkMyRole": "Athuga hlutverkið mitt",
+    "dayButton": "Dagur",
+    "nightButton": "Nótt",
+    "playerLost": "Leikmaður tapaði",
+    "gameWonBy": "Leikurinn vannst af",
+    "won": "{{name}} vann",
+    "doneRequeue": "Lokið og aftur í biðröð",
+    "savingChallenges": "Vistar áskoranir…",
+    "quitToHome": "Hætta á heimasíðu",
+    "quitHint": "Leikurinn varðveitist — opnaðu hann aftur af heimasíðunni.",
+    "secretContracts": "Leynilegir samningar",
+    "secretIdentities": "Leynileg auðkenni",
+    "whoEliminated": "Hver felldi {{name}}?",
+    "whoEliminatedHint": "Leikmaður fær aðeins stig ef þetta var úthlutaða skotmarkið hans. Samningakeðjan heldur áfram hvort sem er.",
+    "noPlayerUnknown": "Enginn leikmaður / óþekkt",
+    "revealedIdentity": "Afhjúpað Treachery auðkenni",
+    "closeRevealedIdentity": "Loka afhjúpuðu auðkenni",
+    "commanderChallenges": "Commander áskoranir",
+    "challengeCompleted": "{{name}} lokið",
+    "challengeFallback": "Áskorun",
+    "matchResult": "Niðurstaða leiks",
+    "wins": "{{name}} vinnur",
+    "reviewBoard": "Skoða borðið",
+    "yes": "Já",
+    "no": "Nei",
+    "yesTheyLost": "Já, þau töpuðu",
+    "noStillIn": "Nei, enn í leik",
+    "openCounters": "Opna counters fyrir {{name}}",
+    "commanderDamageOn": "Commander damage á {{name}}",
+    "countersFor": "Counters fyrir {{name}}",
+    "countersTitle": "Counters fyrir {{name}}",
+    "closeCounters": "Loka counters",
+    "closeChallenges": "Loka áskorunum",
+    "sharedCommanderDamage": "Sameiginlegt commander damage",
+    "closeCommanderDamage": "Loka commander damage",
+    "highestCommanderDamage": "Hæsta commander damage á {{name}}: {{value}} frá {{commander}}",
+    "noCommanderDamage": "Ekkert commander damage á {{name}}",
+    "removeCommanderDamage": "Fjarlægja commander damage frá {{owner}}'s {{name}}",
+    "addCommanderDamage": "Bæta við commander damage frá {{owner}}'s {{name}}",
+    "isMonarch": "{{name}} er monarch",
+    "makeMonarch": "Gera {{name}} að monarch",
+    "enduringStory": "{{name}} {{has}} enduring story",
+    "cityBlessing": "{{name}} {{has}} city's blessing",
+    "has": "hefur",
+    "doesNotHave": "hefur ekki",
+    "didLose": "Tapaði {{name}} leiknum?",
+    "thisTeam": "Þetta lið",
+    "didTheyLose": "Töpuðu þau?",
+    "poisonPrompt": "{{name}} hefur {{count}} poison counters. Tapaði leikmaðurinn?",
+    "sharedPoisonPrompt": "{{subject}} hefur {{count}} sameiginlega poison counters. {{lose}}",
+    "hitPrompt": "{{name}} á {{count}} exiled spil með hit counters. Tapaði leikmaðurinn?",
+    "commanderPrompt": "{{name}} hefur fengið {{damage}} commander damage frá {{from}}. Tapaði leikmaðurinn?",
+    "sharedCommanderPrompt": "{{subject}} hefur fengið {{damage}} commander damage frá {{from}}. {{lose}}",
+    "lifePrompt": "{{name}} er með {{life}} líf. Tapaði leikmaðurinn?",
+    "sharedLifePrompt": "{{subject}} er með {{life}} líf. {{lose}}",
+    "anotherCommander": "annar commander",
+    "addLife": "Bæta við 1 lífi. Haltu inni fyrir stærra magn.",
+    "removeLife": "Draga frá 1 líf. Haltu inni fyrir stærra magn.",
+    "addLifeFor": "Bæta lífi við {{name}}",
+    "removeLifeFor": "Draga líf frá {{name}}",
+    "addLifeLabel": "Bæta við lífi · {{name}}",
+    "removeLifeLabel": "Draga frá líf · {{name}}",
+    "deleteDigit": "Eyða tölustaf",
+    "add": "Bæta við",
+    "removeVerb": "Fjarlægja",
+    "lower": "Lækka {{label}}",
+    "raise": "Hækka {{label}}",
+    "seatColour": "Sætislitur fyrir {{name}}",
+    "dungeonFor": "Dungeon fyrir {{name}}",
+    "dungeonInitiative": "Dungeon og initiative fyrir {{name}}. {{title}}",
+    "dungeonInitiativeActive": "{{name}} hefur initiative · {{filled}} af {{total}} einstökum dungeons",
+    "dungeonInitiativeCompleted": "{{name}} hefur lokið {{filled}} af {{total}} einstökum dungeons",
+    "counterOn": "{{label}} á {{name}}: {{value}}",
+    "counterFor": "{{label}} fyrir {{name}}",
+    "claimFor": "Skráning fyrir {{name}}",
+    "challengesSubtitle": "Sömu áskoranir fyrir alla leikmenn · stig hafa aldrei áhrif á pörun",
     "counters": {
       "poison": "Poison",
       "tax": "Commander tax",
-      "acorn": "Acorns",
-      "energy": "Energy",
-      "experience": "Experience",
+      "acorn": "Akörn",
+      "energy": "Orka",
+      "experience": "Reynsla",
       "hit": "Etrata hits",
-      "rad": "Radiation",
+      "rad": "Geislun",
       "ring": "Ring temptation",
-      "speed": "Speed",
-      "ticket": "Tickets"
+      "speed": "Hraði",
+      "ticket": "Miðar"
     }
   }
 }

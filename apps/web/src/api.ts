@@ -1,15 +1,17 @@
-import type {
-  EventMetrics,
-  GameMode,
-  PodRating,
-  PublicEvent,
-  PublicChallengeCompletion,
-  PublicParticipant,
-  PublicPod,
-  PublicTable,
-  TreacheryRoleAssignment,
+import {
+  normalizeJoinCode,
+  type EventMetrics,
+  type GameMode,
+  type PodRating,
+  type PublicEvent,
+  type PublicChallengeCompletion,
+  type PublicParticipant,
+  type PublicPod,
+  type PublicTable,
+  type TreacheryRoleAssignment,
 } from '@podyguard/shared';
 import { resolveApiUrl } from './api-base';
+import { readStored, removeStored, writeStored } from './device-storage';
 import i18n from './i18n';
 import type {
   CommanderArtwork,
@@ -259,6 +261,21 @@ export function leaveEvent(joinCode: string, token: string) {
   );
 }
 
+/** Host-only: drops a player the pod has given up on from the roster. */
+export function removeParticipant(
+  joinCode: string,
+  hostToken: string,
+  participantId: string,
+) {
+  return request<{ participant: PublicParticipant }>(
+    `/events/${joinCode}/participants/${participantId}`,
+    {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${hostToken}` },
+    },
+  );
+}
+
 export function chooseGameTracker(
   joinCode: string,
   token: string,
@@ -438,26 +455,37 @@ export function ratePod(joinCode: string, token: string, rating: PodRating) {
   );
 }
 
-const HOST_KEY = (joinCode: string) => `podyguard.host.${joinCode}`;
-const PLAYER_KEY = (joinCode: string) => `podyguard.player.${joinCode}`;
+/*
+  Seat keys are stored per event and normalized the same way the server does,
+  so `/e/abc-123` and `/e/ABC123` find the same session on the way back in.
+*/
+const HOST_KEY = (joinCode: string) =>
+  `podyguard.host.${normalizeJoinCode(joinCode)}`;
+const PLAYER_KEY = (joinCode: string) =>
+  `podyguard.player.${normalizeJoinCode(joinCode)}`;
 
 export function saveHostToken(joinCode: string, token: string) {
-  sessionStorage.setItem(HOST_KEY(joinCode), token);
+  writeStored(HOST_KEY(joinCode), token);
 }
 
 export function loadHostToken(joinCode: string) {
-  return sessionStorage.getItem(HOST_KEY(joinCode));
+  return readStored(HOST_KEY(joinCode));
+}
+
+/** For a token the server has stopped honouring; the host can re-enter the PIN. */
+export function clearHostToken(joinCode: string) {
+  removeStored(HOST_KEY(joinCode));
 }
 
 export function savePlayerSession(
   joinCode: string,
   session: { token: string; displayName: string },
 ) {
-  sessionStorage.setItem(PLAYER_KEY(joinCode), JSON.stringify(session));
+  writeStored(PLAYER_KEY(joinCode), JSON.stringify(session));
 }
 
 export function loadPlayerSession(joinCode: string) {
-  const raw = sessionStorage.getItem(PLAYER_KEY(joinCode));
+  const raw = readStored(PLAYER_KEY(joinCode));
   if (!raw) {
     return null;
   }
@@ -466,4 +494,13 @@ export function loadPlayerSession(joinCode: string) {
   } catch {
     return null;
   }
+}
+
+/**
+ * Forgets the seat. Only for a session the server has refused: a durable key
+ * that no longer opens anything would otherwise sit in front of the join form
+ * for good.
+ */
+export function clearPlayerSession(joinCode: string) {
+  removeStored(PLAYER_KEY(joinCode));
 }

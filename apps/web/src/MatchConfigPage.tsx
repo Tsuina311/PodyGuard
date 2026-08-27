@@ -19,6 +19,7 @@ import {
   type MatchConfig,
   type StandaloneGameMode,
 } from './match-config';
+import { removeStored } from './device-storage';
 import { Badge } from './ui/Badge';
 import { Brand } from './ui/Brand';
 import { Button } from './ui/Button';
@@ -62,7 +63,7 @@ export function MatchConfigPage() {
   }
 
   function resetGame() {
-    sessionStorage.removeItem(trackerStorageKey(config));
+    removeStored(trackerStorageKey(config));
     update({ resetCount: config.resetCount + 1 });
   }
 
@@ -80,7 +81,7 @@ export function MatchConfigPage() {
   }
 
   function startGame() {
-    sessionStorage.removeItem(trackerStorageKey(config));
+    removeStored(trackerStorageKey(config));
     const next = { ...config, resetCount: config.resetCount + 1 };
     saveMatchConfig(next);
     setConfig(next);

@@ -1,75 +1,75 @@
 {
   "common": {
-    "home": "Home",
-    "cancel": "Cancel",
-    "close": "Close",
-    "save": "Save",
-    "loading": "Loading…",
-    "players": "Players",
-    "game": "Game",
-    "language": "Language",
-    "yes": "Yes",
-    "no": "No",
-    "reset": "Reset",
-    "random": "Random",
-    "remove": "Remove",
-    "empty": "Empty",
+    "home": "Pradžia",
+    "cancel": "Atšaukti",
+    "close": "Uždaryti",
+    "save": "Išsaugoti",
+    "loading": "Kraunama…",
+    "players": "Žaidėjai",
+    "game": "Žaidimas",
+    "language": "Kalba",
+    "yes": "Taip",
+    "no": "Ne",
+    "reset": "Atstatyti",
+    "random": "Atsitiktinai",
+    "remove": "Pašalinti",
+    "empty": "Tuščia",
     "bot": "bot",
     "dev": "dev",
-    "official": "official",
-    "open": "Open",
-    "preferred": "preferred",
-    "player": "Player {{number}}",
-    "versus": "versus",
-    "teamA": "Team A",
-    "teamB": "Team B",
-    "working": "Working…",
-    "creating": "Creating…",
-    "checking": "Checking…",
-    "joining": "Joining…",
-    "updating": "Updating…",
-    "submitting": "Submitting…",
-    "saving": "Saving…",
-    "searching": "Searching…",
-    "unveiling": "Unveiling…",
-    "copied": "Copied",
-    "noneYet": "none yet",
+    "official": "oficialu",
+    "open": "Atvira",
+    "preferred": "pageidaujama",
+    "player": "Žaidėjas {{number}}",
+    "versus": "prieš",
+    "teamA": "A komanda",
+    "teamB": "B komanda",
+    "working": "Vykdoma…",
+    "creating": "Kuriama…",
+    "checking": "Tikrinama…",
+    "joining": "Jungiamasi…",
+    "updating": "Atnaujinama…",
+    "submitting": "Siunčiama…",
+    "saving": "Išsaugoma…",
+    "searching": "Ieškoma…",
+    "unveiling": "Atskleidžiama…",
+    "copied": "Nukopijuota",
+    "noneYet": "dar nėra",
     "dash": "—",
     "errors": {
-      "generic": "Something went wrong.",
-      "createEvent": "Could not create event.",
-      "unlockHost": "Could not unlock host.",
-      "updateTable": "Could not update table.",
-      "startGame": "Could not start the game.",
-      "startAllGames": "Could not start all ready games.",
-      "finishTable": "Could not finish the table.",
-      "cancelPod": "Could not cancel the pod.",
-      "updateSettings": "Could not update settings.",
-      "matchTables": "Could not match tables.",
-      "fillBots": "Could not fill tables with bots.",
-      "clipboard": "Clipboard blocked — copy the link manually.",
-      "eventNotFound": "Event not found.",
-      "joinEvent": "Could not join event.",
-      "saveDecks": "Could not save decks.",
-      "updateReady": "Could not update ready.",
-      "updatePause": "Could not update pause.",
-      "leaveEvent": "Could not leave event.",
-      "trackerChoice": "Could not save the tracker choice.",
-      "saveRating": "Could not save that rating.",
-      "chooseCommander": "Choose a commander for every deck.",
-      "enterJoinCode": "Enter a join code.",
-      "sessionUnavailable": "Your event session is no longer available.",
-      "savePack": "Could not save the pack.",
-      "searchScryfall": "Could not search Scryfall.",
-      "loadArtwork": "Could not load alternate artwork.",
-      "submitResult": "Could not submit the result.",
-      "saveChallenge": "Could not save challenge progress.",
-      "unveilIdentity": "Could not unveil your identity.",
-      "apiWaking": "The host is waking up. Keep this page open — it usually takes under a minute.",
-      "apiUnreachable": "Cannot reach the API. Is the server running (yarn dev:server)?"
+      "generic": "Kažkas nepavyko.",
+      "createEvent": "Nepavyko sukurti renginio.",
+      "unlockHost": "Nepavyko atrakinti organizatoriaus valdymo.",
+      "updateTable": "Nepavyko atnaujinti stalo.",
+      "startGame": "Nepavyko pradėti žaidimo.",
+      "startAllGames": "Nepavyko pradėti visų paruoštų žaidimų.",
+      "finishTable": "Nepavyko užbaigti stalo žaidimo.",
+      "cancelPod": "Nepavyko atšaukti pod.",
+      "updateSettings": "Nepavyko atnaujinti nustatymų.",
+      "matchTables": "Nepavyko suporuoti stalų.",
+      "fillBots": "Nepavyko užpildyti stalų botais.",
+      "clipboard": "Iškarpinė užblokuota — nukopijuokite nuorodą rankiniu būdu.",
+      "eventNotFound": "Renginys nerastas.",
+      "joinEvent": "Nepavyko prisijungti prie renginio.",
+      "saveDecks": "Nepavyko išsaugoti kaladžių.",
+      "updateReady": "Nepavyko atnaujinti pasirengimo būsenos.",
+      "updatePause": "Nepavyko atnaujinti pauzės.",
+      "leaveEvent": "Nepavyko palikti renginio.",
+      "trackerChoice": "Nepavyko išsaugoti tracker pasirinkimo.",
+      "saveRating": "Nepavyko išsaugoti šio įvertinimo.",
+      "chooseCommander": "Pasirinkite commander kiekvienai kaladei.",
+      "enterJoinCode": "Įveskite prisijungimo kodą.",
+      "sessionUnavailable": "Jūsų renginio sesija nebepasiekiama.",
+      "savePack": "Nepavyko išsaugoti paketo.",
+      "searchScryfall": "Nepavyko atlikti paieškos Scryfall.",
+      "loadArtwork": "Nepavyko įkelti alternatyvios iliustracijos.",
+      "submitResult": "Nepavyko pateikti rezultato.",
+      "saveChallenge": "Nepavyko išsaugoti iššūkio progreso.",
+      "unveilIdentity": "Nepavyko atskleisti jūsų tapatybės.",
+      "apiWaking": "Serveris bunda. Palikite šį puslapį atidarytą — paprastai tai užtrunka mažiau nei minutę.",
+      "apiUnreachable": "Nepavyksta pasiekti API. Ar serveris veikia (yarn dev:server)?"
     },
-    "assignedAtTable": "Assigned at the table",
-    "scanToJoin": "Scan to join this event"
+    "assignedAtTable": "Priskirta prie stalo",
+    "scanToJoin": "Nuskaitykite, kad prisijungtumėte prie šio renginio"
   },
   "language": {
     "en": "English",
@@ -109,173 +109,173 @@
     "cy": "Cymraeg"
   },
   "families": {
-    "normal": "Normal",
+    "normal": "Įprastas",
     "commander": "Commander"
   },
   "modes": {
     "shared": {
-      "commanderCombat": "A player loses after taking {{commanderDamage}} combat damage from one commander.",
-      "commanderTax": "Each time a commander is recast from the command zone, it costs 2 more mana.",
-      "lifeAndLoss": "Life and loss",
-      "turns": "Turns",
+      "commanderCombat": "Žaidėjas pralaimi gavęs {{commanderDamage}} combat damage iš vieno commander.",
+      "commanderTax": "Kiekvieną kartą, kai commander iš naujo žaidžiamas iš command zone, jis kainuoja 2 mana daugiau.",
+      "lifeAndLoss": "Gyvybė ir pralaimėjimas",
+      "turns": "Ėjimai",
       "commanders": "Commanders",
-      "eachPlayerLife": "Each player starts at {{life}} life.",
-      "loseAtZero": "A player loses at 0 life.",
-      "loseAtPoison": "A player loses at {{poison}} poison counters.",
-      "startingPlayerRandom": "The starting player is drawn at random.",
-      "startingPlayerSkipDraw": "The starting player is drawn at random and skips the draw step on the first turn.",
-      "multiplayerFirstTurnDraw": "In multiplayer, that player draws on their first turn.",
-      "commanderFirstTurnDraw": "In multiplayer Commander, that player draws on their first turn.",
-      "commandersInZone": "Commanders begin in the command zone and may be recast from there.",
-      "commanderRulesApply": "Commander rules still apply: {{life}} starting life, {{poison}} poison, and {{commanderDamage}} combat damage from one commander are lethal."
+      "eachPlayerLife": "Kiekvienas žaidėjas pradeda su {{life}} gyvybės taškų.",
+      "loseAtZero": "Žaidėjas pralaimi pasiekęs 0 gyvybės taškų.",
+      "loseAtPoison": "Žaidėjas pralaimi pasiekęs {{poison}} poison counters.",
+      "startingPlayerRandom": "Pradedantis žaidėjas parenkamas atsitiktinai.",
+      "startingPlayerSkipDraw": "Pradedantis žaidėjas parenkamas atsitiktinai ir per pirmąjį ėjimą praleidžia draw step.",
+      "multiplayerFirstTurnDraw": "Multiplayer žaidime tas žaidėjas traukia kortą per savo pirmąjį ėjimą.",
+      "commanderFirstTurnDraw": "Multiplayer Commander žaidime tas žaidėjas traukia kortą per savo pirmąjį ėjimą.",
+      "commandersInZone": "Commanders pradeda command zone ir gali būti iš ten žaidžiami iš naujo.",
+      "commanderRulesApply": "Commander taisyklės vis dar galioja: {{life}} pradinių gyvybės taškų, {{poison}} poison ir {{commanderDamage}} combat damage iš vieno commander yra mirtini."
     },
     "duel": {
-      "label": "Duel",
-      "hint": "Two players. Each starts on 20 life.",
-      "hostHint": "Strict 2-player tables. Each player starts on 20 life.",
-      "hostFixedSeats": "Duel events always seat exactly two players.",
-      "title": "Duel",
-      "summary": "Two-player Magic. No commanders — just life and the board.",
+      "label": "Dvikova",
+      "hint": "Du žaidėjai. Kiekvienas pradeda su 20 gyvybės taškų.",
+      "hostHint": "Tiksliai 2 žaidėjų stalai. Kiekvienas žaidėjas pradeda su 20 gyvybės taškų.",
+      "hostFixedSeats": "Dvikovose visada žaidžia tiksliai du žaidėjai.",
+      "title": "Dvikova",
+      "summary": "Magic dviem žaidėjams. Be commanders — tik gyvybė ir žaidimo lenta.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Gyvybė ir pralaimėjimas",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters."
+            "Kiekvienas žaidėjas pradeda su {{life}} gyvybės taškų.",
+            "Žaidėjas pralaimi pasiekęs 0 gyvybės taškų.",
+            "Žaidėjas pralaimi pasiekęs {{poison}} poison counters."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Ėjimai",
           "bullets": [
-            "The starting player is drawn at random and skips the draw step on the first turn."
+            "Pradedantis žaidėjas parenkamas atsitiktinai ir per pirmąjį ėjimą praleidžia draw step."
           ]
         }
       }
     },
     "multiplayer": {
       "label": "Multiplayer",
-      "hint": "Free-for-all without commanders. Everyone starts on 20 life.",
-      "hostHint": "Free-for-all without commanders. Matching fills your chosen table size; leftovers can sit as small as three.",
+      "hint": "Visi prieš visus be commanders. Visi pradeda su 20 gyvybės taškų.",
+      "hostHint": "Visi prieš visus be commanders. Poravimas pirmiausia užpildo pasirinktą stalo dydį; likę stalai gali turėti mažiausiai tris žaidėjus.",
       "title": "Multiplayer",
-      "summary": "Free-for-all without the Commander format. Useful for casual multiplayer, Planechase, or any 20-life table.",
+      "summary": "Visi prieš visus be Commander formato. Tinka casual multiplayer, Planechase ar bet kuriam 20 gyvybės taškų stalui.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Gyvybė ir pralaimėjimas",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters."
+            "Kiekvienas žaidėjas pradeda su {{life}} gyvybės taškų.",
+            "Žaidėjas pralaimi pasiekęs 0 gyvybės taškų.",
+            "Žaidėjas pralaimi pasiekęs {{poison}} poison counters."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Ėjimai",
           "bullets": [
-            "The starting player is drawn at random.",
-            "In multiplayer, that player draws on their first turn."
+            "Pradedantis žaidėjas parenkamas atsitiktinai.",
+            "Multiplayer žaidime tas žaidėjas traukia kortą per savo pirmąjį ėjimą."
           ]
         }
       }
     },
     "commander": {
-      "label": "Classic",
-      "hint": "Free-for-all. Everyone starts on 40 life.",
-      "hostHint": "Free-for-all Commander. Matching prefers four; leftover pods can be three or five when allowed.",
-      "title": "Classic",
-      "summary": "Free-for-all multiplayer. Each player fights for themselves.",
+      "label": "Klasikinis",
+      "hint": "Visi prieš visus. Visi pradeda su 40 gyvybės taškų.",
+      "hostHint": "Commander visi prieš visus. Poravimas teikia pirmenybę keturiems žaidėjams; likę pod gali būti trijų arba penkių žaidėjų, kai tai leidžiama.",
+      "title": "Klasikinis",
+      "summary": "Multiplayer visi prieš visus. Kiekvienas žaidėjas kovoja už save.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Gyvybė ir pralaimėjimas",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters.",
-            "A player loses after taking {{commanderDamage}} combat damage from one commander."
+            "Kiekvienas žaidėjas pradeda su {{life}} gyvybės taškų.",
+            "Žaidėjas pralaimi pasiekęs 0 gyvybės taškų.",
+            "Žaidėjas pralaimi pasiekęs {{poison}} poison counters.",
+            "Žaidėjas pralaimi gavęs {{commanderDamage}} combat damage iš vieno commander."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Ėjimai",
           "bullets": [
-            "The starting player is drawn at random.",
-            "In multiplayer Commander, that player draws on their first turn."
+            "Pradedantis žaidėjas parenkamas atsitiktinai.",
+            "Multiplayer Commander žaidime tas žaidėjas traukia kortą per savo pirmąjį ėjimą."
           ]
         },
         "commanders": {
           "heading": "Commanders",
           "bullets": [
-            "Commanders begin in the command zone and may be recast from there.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Commanders pradeda command zone ir gali būti iš ten žaidžiami iš naujo.",
+            "Kiekvieną kartą, kai commander iš naujo žaidžiamas iš command zone, jis kainuoja 2 mana daugiau."
           ]
         }
       }
     },
     "treachery": {
-      "label": "Treachery",
-      "hint": "Secret identities dealt on this device. Pass it around so everyone reads their own in private.",
-      "hostHint": "Secret roles for Commander pods. Matching fills your chosen table size first; leftovers can sit as small as four.",
-      "title": "Treachery",
-      "summary": "Commander with secret identities. The Leader is public; everyone else stays hidden.",
+      "label": "Išdavystė",
+      "hint": "Slaptos tapatybės išdalijamos šiame įrenginyje. Perduokite jį aplink stalą, kad kiekvienas galėtų privačiai perskaityti savąją.",
+      "hostHint": "Slapti vaidmenys Commander pod. Poravimas pirmiausia užpildo pasirinktą stalo dydį; likę pod gali turėti mažiausiai keturis žaidėjus.",
+      "title": "Išdavystė",
+      "summary": "Commander su slaptomis tapatybėmis. Lyderis yra viešas; visi kiti lieka paslėpti.",
       "sections": {
         "commander": {
-          "heading": "Commander rules still apply",
+          "heading": "Commander taisyklės vis dar galioja",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "The Leader takes the first turn and draws on that turn.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Kiekvienas žaidėjas pradeda su {{life}} gyvybės taškų.",
+            "Žaidėjas pralaimi pasiekęs 0 gyvybės taškų, {{poison}} poison arba gavęs {{commanderDamage}} combat damage iš vieno commander.",
+            "Lyderis žaidžia pirmas ir per tą ėjimą traukia kortą.",
+            "Kiekvieną kartą, kai commander iš naujo žaidžiamas iš command zone, jis kainuoja 2 mana daugiau."
           ]
         },
         "identities": {
-          "heading": "Identities",
+          "heading": "Tapatybės",
           "bullets": [
-            "Open Check my role from the timer menu. Only you see that card.",
-            "On a single tracker, deal the identities at setup and pass the device around so each player reads theirs alone.",
-            "Leader: Survive until every Assassin and Traitor is eliminated. Reveal yourself to the table. The Guardians share your victory, but you do not know who they are.",
-            "Guardian: Keep the Leader alive and eliminate the Leader's enemies. Your identity is secret. You win and lose with the Leader, even if you are eliminated first.",
-            "Assassin: Eliminate the Leader. Your identity is secret. Assassins share the same objective, but you do not know who the other Assassins are.",
-            "Traitor: Be the last player standing. Your identity is secret. Keep the Leader alive until the other threats are gone, then take the throne for yourself.",
-            "Follow any extra abilities printed on your identity card."
+            "Atidarykite „Patikrinti mano vaidmenį“ timer meniu. Šią kortą matote tik jūs.",
+            "Naudojant vieną tracker, išdalinkite tapatybes per paruošimą ir perduokite įrenginį aplink stalą, kad kiekvienas žaidėjas savo tapatybę perskaitytų vienas.",
+            "Lyderis: Išgyvenkite, kol bus pašalinti visi Žudikai ir Išdavikas. Atskleiskite save stalui. Sargai dalijasi jūsų pergale, bet jūs nežinote, kas jie.",
+            "Sargas: Išlaikykite Lyderį gyvą ir pašalinkite jo priešus. Jūsų tapatybė slapta. Laimite ir pralaimite kartu su Lyderiu, net jei esate pašalinamas pirmas.",
+            "Žudikas: Pašalinkite Lyderį. Jūsų tapatybė slapta. Žudikai turi tą patį tikslą, bet nežinote, kas yra kiti Žudikai.",
+            "Išdavikas: Likite paskutinis žaidėjas. Jūsų tapatybė slapta. Išlaikykite Lyderį gyvą, kol išnyks kitos grėsmės, tada pasiimkite sostą sau.",
+            "Laikykitės visų papildomų gebėjimų, išspausdintų jūsų tapatybės kortoje."
           ]
         }
       },
       "roles": {
         "leader": {
-          "name": "Leader",
-          "objective": "Survive until every Assassin and Traitor is eliminated.",
-          "guidance": "Reveal yourself to the table. The Guardians share your victory, but you do not know who they are.",
-          "publicNote": "Your role is public. Tell the table you are the Leader."
+          "name": "Lyderis",
+          "objective": "Išgyvenkite, kol bus pašalinti visi Žudikai ir Išdavikas.",
+          "guidance": "Atskleiskite save stalui. Sargai dalijasi jūsų pergale, bet jūs nežinote, kas jie.",
+          "publicNote": "Jūsų vaidmuo viešas. Pasakykite stalui, kad esate Lyderis."
         },
         "guardian": {
-          "name": "Guardian",
-          "objective": "Keep the Leader alive and eliminate the Leader's enemies.",
-          "guidance": "Your identity is secret. You win and lose with the Leader, even if you are eliminated first.",
-          "publicNote": "Keep this role secret."
+          "name": "Sargas",
+          "objective": "Išlaikykite Lyderį gyvą ir pašalinkite jo priešus.",
+          "guidance": "Jūsų tapatybė slapta. Laimite ir pralaimite kartu su Lyderiu, net jei esate pašalinamas pirmas.",
+          "publicNote": "Laikykite šį vaidmenį paslaptyje."
         },
         "assassin": {
-          "name": "Assassin",
-          "objective": "Eliminate the Leader.",
-          "guidance": "Your identity is secret. Assassins share the same objective, but you do not know who the other Assassins are.",
-          "publicNote": "Keep this role secret."
+          "name": "Žudikas",
+          "objective": "Pašalinkite Lyderį.",
+          "guidance": "Jūsų tapatybė slapta. Žudikai turi tą patį tikslą, bet nežinote, kas yra kiti Žudikai.",
+          "publicNote": "Laikykite šį vaidmenį paslaptyje."
         },
         "traitor": {
-          "name": "Traitor",
-          "objective": "Be the last player standing.",
-          "guidance": "Your identity is secret. Keep the Leader alive until the other threats are gone, then take the throne for yourself.",
-          "publicNote": "Keep this role secret."
+          "name": "Išdavikas",
+          "objective": "Likite paskutinis žaidėjas.",
+          "guidance": "Jūsų tapatybė slapta. Išlaikykite Lyderį gyvą, kol išnyks kitos grėsmės, tada pasiimkite sostą sau.",
+          "publicNote": "Laikykite šį vaidmenį paslaptyje."
         }
       },
       "normal": {
-        "hint": "Secret identities on a shared phone. Everyone starts on 20 life — no commanders.",
-        "hostHint": "Secret roles without commanders. Matching fills your chosen table size first; leftovers can sit as small as four.",
-        "summary": "Secret identities without the Commander format. The Leader is public; everyone else stays hidden.",
+        "hint": "Slaptos tapatybės bendrame telefone. Visi pradeda su 20 gyvybės taškų — be commanders.",
+        "hostHint": "Slapti vaidmenys be commanders. Poravimas pirmiausia užpildo pasirinktą stalo dydį; likę pod gali turėti mažiausiai keturis žaidėjus.",
+        "summary": "Slaptos tapatybės be Commander formato. Lyderis yra viešas; visi kiti lieka paslėpti.",
         "sections": {
           "life": {
-            "heading": "Life and loss",
+            "heading": "Gyvybė ir pralaimėjimas",
             "bullets": [
-              "Each player starts at {{life}} life.",
-              "A player loses at 0 life.",
-              "A player loses at {{poison}} poison counters.",
-              "The Leader takes the first turn and draws on that turn."
+              "Kiekvienas žaidėjas pradeda su {{life}} gyvybės taškų.",
+              "Žaidėjas pralaimi pasiekęs 0 gyvybės taškų.",
+              "Žaidėjas pralaimi pasiekęs {{poison}} poison counters.",
+              "Lyderis žaidžia pirmas ir per tą ėjimą traukia kortą."
             ]
           },
           "identities": null
@@ -283,63 +283,63 @@
       }
     },
     "two-headed-giant": {
-      "label": "Two-Headed Giant",
-      "hint": "Two teams of two, 60 shared life each, turns taken together.",
-      "hostHint": "Strict 4-player Commander pods. Two teams share 60 life and take their turns together.",
-      "hostFixedSeats": "Two-Headed Giant games always seat exactly four players.",
-      "title": "Two-Headed Giant",
-      "summary": "Two teams of two. Teammates share a life total and a turn.",
+      "label": "Dviejų galvų milžinas",
+      "hint": "Dvi komandos po du žaidėjus, kiekviena turi 60 bendrų gyvybės taškų ir ėjimus atlieka kartu.",
+      "hostHint": "Tiksliai 4 žaidėjų Commander pod. Dvi komandos dalijasi po 60 gyvybės taškų ir atlieka savo ėjimus kartu.",
+      "hostFixedSeats": "Dviejų galvų milžino žaidimuose visada žaidžia tiksliai keturi žaidėjai.",
+      "title": "Dviejų galvų milžinas",
+      "summary": "Dvi komandos po du žaidėjus. Komandos nariai dalijasi gyvybės taškais ir ėjimu.",
       "sections": {
         "teams": {
-          "heading": "Teams",
+          "heading": "Komandos",
           "bullets": [
-            "Pick two allies, or let the table randomise the pairs.",
-            "Each team starts at {{sharedLife}} shared life.",
-            "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+            "Pasirinkite du sąjungininkus arba leiskite poras parinkti atsitiktinai.",
+            "Kiekviena komanda pradeda su {{sharedLife}} bendrų gyvybės taškų.",
+            "Komandos nariai atlieka ėjimą kartu. Kiekvienas žaidėjas vis tiek turi savo ranką, library ir commanders."
           ]
         },
         "life": {
-          "heading": "Life and loss",
+          "heading": "Gyvybė ir pralaimėjimas",
           "bullets": [
-            "A team loses when its shared life reaches 0.",
-            "A team loses at {{sharedPoison}} shared poison counters.",
-            "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+            "Komanda pralaimi, kai jos bendri gyvybės taškai pasiekia 0.",
+            "Komanda pralaimi pasiekusi {{sharedPoison}} bendrų poison counters.",
+            "Komanda pralaimi gavusi {{commanderDamage}} bendro combat damage iš vieno commander."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Ėjimai",
           "bullets": [
-            "The starting team is drawn at random and skips the draw step on its first turn.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Pradedanti komanda parenkama atsitiktinai ir per pirmąjį ėjimą praleidžia draw step.",
+            "Kiekvieną kartą, kai commander iš naujo žaidžiamas iš command zone, jis kainuoja 2 mana daugiau."
           ]
         }
       },
       "normal": {
-        "hint": "Two teams of two, 40 shared life each, turns taken together.",
-        "hostHint": "Strict 4-player tables. Two teams share 40 life and take their turns together — no commanders.",
-        "summary": "Two teams of two. Teammates share a life total and a turn — standard decks, 20 life each in team terms.",
+        "hint": "Dvi komandos po du žaidėjus, kiekviena turi 40 bendrų gyvybės taškų ir ėjimus atlieka kartu.",
+        "hostHint": "Tiksliai 4 žaidėjų stalai. Dvi komandos dalijasi po 40 gyvybės taškų ir atlieka savo ėjimus kartu — be commanders.",
+        "summary": "Dvi komandos po du žaidėjus. Komandos nariai dalijasi gyvybės taškais ir ėjimu — standartinės kaladės, komandos požiūriu po 20 gyvybės taškų kiekvienam.",
         "sections": {
           "teams": {
-            "heading": "Teams",
+            "heading": "Komandos",
             "bullets": [
-              "Pick two allies, or let the table randomise the pairs.",
-              "Each team starts at {{sharedLife}} shared life.",
-              "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+              "Pasirinkite du sąjungininkus arba leiskite poras parinkti atsitiktinai.",
+              "Kiekviena komanda pradeda su {{sharedLife}} bendrų gyvybės taškų.",
+              "Komandos nariai atlieka ėjimą kartu. Kiekvienas žaidėjas vis tiek turi savo ranką, library ir commanders."
             ]
           },
           "life": {
-            "heading": "Life and loss",
+            "heading": "Gyvybė ir pralaimėjimas",
             "bullets": [
-              "A team loses when its shared life reaches 0.",
-              "A team loses at {{sharedPoison}} shared poison counters.",
-              "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+              "Komanda pralaimi, kai jos bendri gyvybės taškai pasiekia 0.",
+              "Komanda pralaimi pasiekusi {{sharedPoison}} bendrų poison counters.",
+              "Komanda pralaimi gavusi {{commanderDamage}} bendro combat damage iš vieno commander."
             ]
           },
           "turns": {
-            "heading": "Turns",
+            "heading": "Ėjimai",
             "bullets": [
-              "The starting team is drawn at random and skips the draw step on its first turn.",
-              "Each time a commander is recast from the command zone, it costs 2 more mana."
+              "Pradedanti komanda parenkama atsitiktinai ir per pirmąjį ėjimą praleidžia draw step.",
+              "Kiekvieną kartą, kai commander iš naujo žaidžiamas iš command zone, jis kainuoja 2 mana daugiau."
             ]
           }
         }
@@ -347,286 +347,286 @@
     },
     "archenemy-commander": {
       "label": "Archenemy",
-      "hint": "One Archenemy on 60 life with a 40-card scheme deck against three heroes sharing 60 life.",
-      "hostHint": "Strict 4-player Commander pods. One 60-life Archenemy faces a three-player team with 60 shared life and a 40-card scheme deck.",
-      "hostFixedSeats": "Archenemy Commander games always seat exactly four players.",
+      "hint": "Vienas Archenemy su 60 gyvybės taškų ir 40 kortų scheme kalade prieš tris herojus, besidalijančius 60 gyvybės taškų.",
+      "hostHint": "Tiksliai 4 žaidėjų Commander pod. Vienas Archenemy su 60 gyvybės taškų susiduria su trijų žaidėjų komanda, turinčia 60 bendrų gyvybės taškų ir 40 kortų scheme kaladę.",
+      "hostFixedSeats": "Archenemy Commander žaidimuose visada žaidžia tiksliai keturi žaidėjai.",
       "title": "Archenemy Commander",
-      "summary": "One Archenemy against a team of three, with a scheme deck in motion.",
+      "summary": "Vienas Archenemy prieš trijų žaidėjų komandą, naudojant scheme kaladę.",
       "sections": {
         "sides": {
-          "heading": "Sides",
+          "heading": "Pusės",
           "bullets": [
-            "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
-            "Both sides start at {{life}} life.",
-            "The heroes share that life total and take their turn together.",
-            "The Archenemy goes first and draws on that turn."
+            "Pasirinkite Archenemy arba paskirkite jį atsitiktinai. Kiti trys žaidėjai yra herojai.",
+            "Abi pusės pradeda su {{life}} gyvybės taškų.",
+            "Herojai dalijasi šiais gyvybės taškais ir atlieka savo ėjimą kartu.",
+            "Archenemy pradeda pirmas ir per tą ėjimą traukia kortą."
           ]
         },
         "schemes": {
           "heading": "Schemes",
           "bullets": [
-            "The 40 Duskmourn Commander schemes are shuffled at the start.",
-            "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
-            "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
-            "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
-            "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+            "40 Duskmourn Commander schemes sumaišomi žaidimo pradžioje.",
+            "Per kiekvieną Archenemy first main phase atidarykite timer meniu ir paspauskite Next scheme, kad paleistumėte vieną scheme.",
+            "Scheme, kuris nėra ongoing, išsprendžiamas ir tada dedamas į scheme kaladės apačią.",
+            "Ongoing scheme lieka atverstas, kol stalas pažymi jį kaip abandoned, tada jis dedamas į kaladės apačią.",
+            "Atversti schemes ir užbaigtų schemes graveyard rodomi po korta kaip miniatiūros; paspauskite vieną, kad perskaitytumėte didesniu vaizdu."
           ]
         },
         "life": {
-          "heading": "Life and loss",
+          "heading": "Gyvybė ir pralaimėjimas",
           "bullets": [
-            "The Archenemy loses at 0 life, or when the usual poison and commander-damage limits are reached.",
-            "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
-            "A player loses after taking {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Archenemy pralaimi pasiekęs 0 gyvybės taškų arba įprastus poison ir commander-damage limitus.",
+            "Herojai pralaimi kartu, kai jų bendri gyvybės taškai pasiekia 0, ir taip pat dalijasi poison bei commander damage.",
+            "Žaidėjas pralaimi gavęs {{commanderDamage}} combat damage iš vieno commander.",
+            "Kiekvieną kartą, kai commander iš naujo žaidžiamas iš command zone, jis kainuoja 2 mana daugiau."
           ]
         }
       },
       "normal": {
-        "hint": "One Archenemy on 20 life with schemes against three heroes sharing 40 life.",
-        "hostHint": "Strict 4-player tables. One Archenemy with a scheme deck against a three-player team — no commanders.",
-        "summary": "One Archenemy against a team of three, with a scheme deck in motion — standard 20-life tables.",
+        "hint": "Vienas Archenemy su 20 gyvybės taškų ir schemes prieš tris herojus, besidalijančius 40 gyvybės taškų.",
+        "hostHint": "Tiksliai 4 žaidėjų stalai. Vienas Archenemy su scheme kalade prieš trijų žaidėjų komandą — be commanders.",
+        "summary": "Vienas Archenemy prieš trijų žaidėjų komandą su scheme kalade — standartiniai 20 gyvybės taškų stalai.",
         "sections": {
           "sides": {
-            "heading": "Sides",
+            "heading": "Pusės",
             "bullets": [
-              "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
-              "Both sides start at {{life}} life.",
-              "The heroes share that life total and take their turn together.",
-              "The Archenemy goes first and draws on that turn."
+              "Pasirinkite Archenemy arba paskirkite jį atsitiktinai. Kiti trys žaidėjai yra herojai.",
+              "Abi pusės pradeda su {{life}} gyvybės taškų.",
+              "Herojai dalijasi šiais gyvybės taškais ir atlieka savo ėjimą kartu.",
+              "Archenemy pradeda pirmas ir per tą ėjimą traukia kortą."
             ]
           },
           "schemes": {
             "heading": "Schemes",
             "bullets": [
-              "The 40 Duskmourn Commander schemes are shuffled at the start.",
-              "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
-              "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
-              "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
-              "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+              "40 Duskmourn Commander schemes sumaišomi žaidimo pradžioje.",
+              "Per kiekvieną Archenemy first main phase atidarykite timer meniu ir paspauskite Next scheme, kad paleistumėte vieną scheme.",
+              "Scheme, kuris nėra ongoing, išsprendžiamas ir tada dedamas į scheme kaladės apačią.",
+              "Ongoing scheme lieka atverstas, kol stalas pažymi jį kaip abandoned, tada jis dedamas į kaladės apačią.",
+              "Atversti schemes ir užbaigtų schemes graveyard rodomi po korta kaip miniatiūros; paspauskite vieną, kad perskaitytumėte didesniu vaizdu."
             ]
           },
           "life": {
-            "heading": "Life and loss",
+            "heading": "Gyvybė ir pralaimėjimas",
             "bullets": [
-              "The Archenemy loses at 0 life, or when the usual poison and poison limits are reached.",
-              "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
-              "A player loses after taking {{poison}} poison counters."
+              "Archenemy pralaimi pasiekęs 0 gyvybės taškų arba įprastus poison ir poison limitus.",
+              "Herojai pralaimi kartu, kai jų bendri gyvybės taškai pasiekia 0, ir taip pat dalijasi poison bei commander damage.",
+              "Žaidėjas pralaimi gavęs {{poison}} poison counters."
             ]
           }
         }
       }
     },
     "emperor": {
-      "label": "Emperor",
-      "hint": "Two teams of three. Protect your Emperor using limited range of influence and deploy creatures.",
-      "hostHint": "Strict 6-player Commander pods. Two teams each place an Emperor between two Generals and play with limited range of influence.",
-      "hostFixedSeats": "Emperor games always seat exactly six players.",
-      "title": "Emperor",
-      "summary": "Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.",
+      "label": "Imperatorius",
+      "hint": "Dvi komandos po tris žaidėjus. Saugokite savo Imperatorių naudodami ribotą įtakos diapazoną ir perkeldami creatures.",
+      "hostHint": "Tiksliai 6 žaidėjų Commander pod. Kiekviena komanda pasodina Imperatorių tarp dviejų Generolų ir žaidžia su ribotu įtakos diapazonu.",
+      "hostFixedSeats": "Imperatoriaus žaidimuose visada žaidžia tiksliai šeši žaidėjai.",
+      "title": "Imperatorius",
+      "summary": "Dvi komandos po tris žaidėjus. Kiekvienas Imperatorius sėdi tarp dviejų Generolų, o Imperatoriaus pašalinimas laimi žaidimą.",
       "sections": {
         "teams": {
-          "heading": "Teams and turns",
+          "heading": "Komandos ir ėjimai",
           "bullets": [
-            "Choose both teams and each team's Emperor, or randomise either choice.",
-            "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
-            "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
-            "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+            "Pasirinkite abi komandas ir kiekvienos komandos Imperatorių arba atsitiktinai parinkite bet kurį iš šių pasirinkimų.",
+            "Kiekvienas žaidėjas pradeda su {{life}} gyvybės taškų ir turi savo ranką, mana, permanents, poison bei ėjimą.",
+            "Komandos nariai gali žiūrėti vieni kitų rankas ir aptarti strategiją, bet negali manipuliuoti vieni kitų kortomis.",
+            "Atsitiktinai pasirinkite, kuris Imperatorius atlieka pirmąjį ėjimą. Tas Imperatorius per pirmąjį ėjimą traukia kortą."
           ]
         },
         "range": {
-          "heading": "Range and combat",
+          "heading": "Diapazonas ir kova",
           "bullets": [
-            "Generals have range of influence 1. Emperors have range of influence 2.",
-            "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
-            "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
-            "As players leave, the empty seats stop counting, bringing surviving players into range."
+            "Generolai turi 1 įtakos diapazoną. Imperatoriai turi 2 įtakos diapazoną.",
+            "Spells, abilities, effects ir informacija gali paveikti tik žaidėjus ir objektus jų controller diapazone.",
+            "Žaidėjas gali pulti tik iškart šalia sėdintį priešininką arba to priešininko planeswalkers ir protected battles.",
+            "Žaidėjams iškritus, tuščios vietos nebeskaičiuojamos, todėl likę žaidėjai patenka vieni kitų diapazonan."
           ]
         },
         "deploy": {
-          "heading": "Deploy creatures",
+          "heading": "Perkelti creatures",
           "bullets": [
-            "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
-            "This can move creatures through the team as the battle lines change."
+            "Kiekvienas creature turi \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
+            "Tai leidžia perkelti creatures tarp komandos narių keičiantis mūšio linijoms."
           ]
         },
         "winning": {
-          "heading": "Winning and Commander rules",
+          "heading": "Pergalė ir Commander taisyklės",
           "bullets": [
-            "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
-            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Komanda laimi, jei laimi jos Imperatorius, ir iškart pralaimi, jei jos Imperatorius pralaimi. Generolas gali būti pašalintas nebaigiant žaidimo.",
+            "Žaidėjas pralaimi pasiekęs 0 gyvybės taškų, {{poison}} poison arba gavęs {{commanderDamage}} combat damage iš vieno commander.",
+            "Kiekvieną kartą, kai commander iš naujo žaidžiamas iš command zone, jis kainuoja 2 mana daugiau."
           ]
         }
       },
       "normal": {
-        "hint": "Two teams of three on 20 life. Protect your Emperor with limited range of influence.",
-        "hostHint": "Strict 6-player tables. Two Emperors between Generals — standard 20-life decks, no commanders.",
-        "summary": "Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.",
+        "hint": "Dvi komandos po tris žaidėjus su 20 gyvybės taškų. Saugokite savo Imperatorių naudodami ribotą įtakos diapazoną.",
+        "hostHint": "Tiksliai 6 žaidėjų stalai. Du Imperatoriai tarp Generolų — standartinės 20 gyvybės taškų kaladės, be commanders.",
+        "summary": "Dvi komandos po tris žaidėjus. Kiekvienas Imperatorius sėdi tarp dviejų Generolų, o Imperatoriaus pašalinimas laimi žaidimą.",
         "sections": {
           "teams": {
-            "heading": "Teams and turns",
+            "heading": "Komandos ir ėjimai",
             "bullets": [
-              "Choose both teams and each team's Emperor, or randomise either choice.",
-              "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
-              "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
-              "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+              "Pasirinkite abi komandas ir kiekvienos komandos Imperatorių arba atsitiktinai parinkite bet kurį iš šių pasirinkimų.",
+              "Kiekvienas žaidėjas pradeda su {{life}} gyvybės taškų ir turi savo ranką, mana, permanents, poison bei ėjimą.",
+              "Komandos nariai gali žiūrėti vieni kitų rankas ir aptarti strategiją, bet negali manipuliuoti vieni kitų kortomis.",
+              "Atsitiktinai pasirinkite, kuris Imperatorius atlieka pirmąjį ėjimą. Tas Imperatorius per pirmąjį ėjimą traukia kortą."
             ]
           },
           "range": {
-            "heading": "Range and combat",
+            "heading": "Diapazonas ir kova",
             "bullets": [
-              "Generals have range of influence 1. Emperors have range of influence 2.",
-              "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
-              "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
-              "As players leave, the empty seats stop counting, bringing surviving players into range."
+              "Generolai turi 1 įtakos diapazoną. Imperatoriai turi 2 įtakos diapazoną.",
+              "Spells, abilities, effects ir informacija gali paveikti tik žaidėjus ir objektus jų controller diapazone.",
+              "Žaidėjas gali pulti tik iškart šalia sėdintį priešininką arba to priešininko planeswalkers ir protected battles.",
+              "Žaidėjams iškritus, tuščios vietos nebeskaičiuojamos, todėl likę žaidėjai patenka vieni kitų diapazonan."
             ]
           },
           "deploy": {
-            "heading": "Deploy creatures",
+            "heading": "Perkelti creatures",
             "bullets": [
-              "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
-              "This can move creatures through the team as the battle lines change."
+              "Kiekvienas creature turi \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
+              "Tai leidžia perkelti creatures tarp komandos narių keičiantis mūšio linijoms."
             ]
           },
           "winning": {
-            "heading": "Winning and Commander rules",
+            "heading": "Pergalė ir Commander taisyklės",
             "bullets": [
-              "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
-              "A player loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+              "Komanda laimi, jei laimi jos Imperatorius, ir iškart pralaimi, jei jos Imperatorius pralaimi. Generolas gali būti pašalintas nebaigiant žaidimo.",
+              "Žaidėjas pralaimi pasiekęs 0 gyvybės taškų, {{poison}} poison arba {{poison}} poison counters."
             ]
           }
         }
       }
     },
     "star": {
-      "label": "Star",
-      "hint": "Five players in a circle. Your neighbors are allies; eliminate both players across from you.",
-      "hostHint": "Strict 5-player Commander pods. Adjacent players are allies; each player wins by outlasting both opponents across the circle.",
-      "hostFixedSeats": "Star games always seat exactly five players.",
-      "title": "Star",
-      "summary": "Five players sit in a circle. Your neighbors are allies and the two players across from you are enemies.",
+      "label": "Žvaigždė",
+      "hint": "Penki žaidėjai ratu. Jūsų kaimynai yra sąjungininkai; pašalinkite abu priešais jus esančius žaidėjus.",
+      "hostHint": "Tiksliai 5 žaidėjų Commander pod. Gretimi žaidėjai yra sąjungininkai; kiekvienas žaidėjas laimi išgyvenęs abu priešais esančius priešininkus.",
+      "hostFixedSeats": "Žvaigždės žaidimuose visada žaidžia tiksliai penki žaidėjai.",
+      "title": "Žvaigždė",
+      "summary": "Penki žaidėjai sėdi ratu. Jūsų kaimynai yra sąjungininkai, o du priešais jus esantys žaidėjai — priešai.",
       "sections": {
         "positions": {
-          "heading": "Positions and allies",
+          "heading": "Vietos ir sąjungininkai",
           "bullets": [
-            "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
-            "The players immediately to your left and right are your allies.",
-            "The two nonadjacent players across the circle are your enemies.",
-            "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+            "Pasirinkite vietas rate rankiniu būdu sukeisdami du žaidėjus arba atsitiktinai išdėstykite visus penkis.",
+            "Iškart kairėje ir dešinėje nuo jūsų esantys žaidėjai yra jūsų sąjungininkai.",
+            "Du negretimi žaidėjai kitoje rato pusėje yra jūsų priešai.",
+            "Pašalinus žaidėją vietos nesikeičia; jūsų sąjungininkai ir priešai lieka tie patys."
           ]
         },
         "combat": {
-          "heading": "Combat and interaction",
+          "heading": "Kova ir sąveika",
           "bullets": [
-            "Players cannot attack their allies by default.",
-            "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
-            "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+            "Pagal numatytąsias taisykles žaidėjai negali pulti savo sąjungininkų.",
+            "Spells ir abilities vis tiek gali padėti arba paveikti bet kurį žaidėją, nebent stalas susitaria dėl griežtesnės versijos.",
+            "Ėjimai vyksta pagal laikrodžio rodyklę. Atsitiktinai pasirinkite pradedantį žaidėją; tas žaidėjas per pirmąjį ėjimą traukia kortą."
           ]
         },
         "winning": {
-          "heading": "Winning",
+          "heading": "Pergalė",
           "bullets": [
-            "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
-            "An eliminated player cannot win later.",
-            "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Laimi pirmasis dar gyvas žaidėjas, kurio abu priešai buvo pašalinti, nesvarbu, kas juos pašalino.",
+            "Pašalintas žaidėjas vėliau laimėti negali.",
+            "Kiekvienas žaidėjas pradeda su {{life}} gyvybės taškų ir pralaimi pasiekęs 0 gyvybės taškų, {{poison}} poison arba gavęs {{commanderDamage}} combat damage iš vieno commander.",
+            "Kiekvieną kartą, kai commander iš naujo žaidžiamas iš command zone, jis kainuoja 2 mana daugiau."
           ]
         }
       },
       "normal": {
-        "hint": "Five players in a circle on 20 life. Neighbors are allies; eliminate both players across from you.",
-        "hostHint": "Strict 5-player tables. Adjacent players ally; each player wins by outlasting both opponents across the circle.",
-        "summary": "Five players sit in a circle on 20 life. Your neighbors are allies and the two players across from you are enemies.",
+        "hint": "Penki žaidėjai ratu su 20 gyvybės taškų. Kaimynai yra sąjungininkai; pašalinkite abu priešais jus esančius žaidėjus.",
+        "hostHint": "Tiksliai 5 žaidėjų stalai. Gretimi žaidėjai yra sąjungininkai; kiekvienas žaidėjas laimi išgyvenęs abu priešais esančius priešininkus.",
+        "summary": "Penki žaidėjai sėdi ratu su 20 gyvybės taškų. Jūsų kaimynai yra sąjungininkai, o du priešais jus esantys žaidėjai — priešai.",
         "sections": {
           "positions": {
-            "heading": "Positions and allies",
+            "heading": "Vietos ir sąjungininkai",
             "bullets": [
-              "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
-              "The players immediately to your left and right are your allies.",
-              "The two nonadjacent players across the circle are your enemies.",
-              "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+              "Pasirinkite vietas rate rankiniu būdu sukeisdami du žaidėjus arba atsitiktinai išdėstykite visus penkis.",
+              "Iškart kairėje ir dešinėje nuo jūsų esantys žaidėjai yra jūsų sąjungininkai.",
+              "Du negretimi žaidėjai kitoje rato pusėje yra jūsų priešai.",
+              "Pašalinus žaidėją vietos nesikeičia; jūsų sąjungininkai ir priešai lieka tie patys."
             ]
           },
           "combat": {
-            "heading": "Combat and interaction",
+            "heading": "Kova ir sąveika",
             "bullets": [
-              "Players cannot attack their allies by default.",
-              "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
-              "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+              "Pagal numatytąsias taisykles žaidėjai negali pulti savo sąjungininkų.",
+              "Spells ir abilities vis tiek gali padėti arba paveikti bet kurį žaidėją, nebent stalas susitaria dėl griežtesnės versijos.",
+              "Ėjimai vyksta pagal laikrodžio rodyklę. Atsitiktinai pasirinkite pradedantį žaidėją; tas žaidėjas per pirmąjį ėjimą traukia kortą."
             ]
           },
           "winning": {
-            "heading": "Winning",
+            "heading": "Pergalė",
             "bullets": [
-              "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
-              "An eliminated player cannot win later.",
-              "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+              "Laimi pirmasis dar gyvas žaidėjas, kurio abu priešai buvo pašalinti, nesvarbu, kas juos pašalino.",
+              "Pašalintas žaidėjas vėliau laimėti negali.",
+              "Kiekvienas žaidėjas pradeda su {{life}} gyvybės taškų ir pralaimi pasiekęs 0 gyvybės taškų, {{poison}} poison arba {{poison}} poison counters."
             ]
           }
         }
       }
     },
     "assassin": {
-      "label": "Assassin",
-      "hint": "Secret contracts in a free-for-all. Eliminate your mark, score, and inherit their target.",
-      "hostHint": "Secret contracts for 3–8 players. Score by eliminating your mark, then inherit their target.",
-      "title": "Assassin",
-      "summary": "A free-for-all with secret contracts. Score marks, inherit new targets, and finish with the highest score.",
+      "label": "Žudikas",
+      "hint": "Slaptos sutartys žaidime visi prieš visus. Pašalinkite savo taikinį, gaukite tašką ir paveldėkite jo taikinį.",
+      "hostHint": "Slaptos sutartys 3–8 žaidėjams. Gaukite tašką pašalindami savo taikinį, tada paveldėkite jo sutartį.",
+      "title": "Žudikas",
+      "summary": "Visi prieš visus su slaptomis sutartimis. Pašalinkite taikinius, paveldėkite naujus ir užbaikite su daugiausia taškų.",
       "sections": {
         "contracts": {
-          "heading": "Secret contracts",
+          "heading": "Slaptos sutartys",
           "bullets": [
-            "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
-            "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
-            "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+            "Kiekvienas žaidėjas privačiai gauna vieną taikinį. Sutartys sudaro ratą, todėl niekas netaiko į save ir kiekvieną žaidėją medžioja tik vienas kitas žaidėjas.",
+            "Per paruošimą perduokite įrenginį aplink stalą. Atidarykite „Patikrinti taikinį“ timer meniu, kai norite dar kartą perskaityti savo dabartinę sutartį.",
+            "Žaidėjai gali pulti ir paveikti bet ką; sutartis lemia taškų skyrimą, o ne leistinus taikinius."
           ]
         },
         "elimination": {
-          "heading": "Elimination and inheritance",
+          "heading": "Pašalinimas ir paveldėjimas",
           "bullets": [
-            "When a player is eliminated, record who dealt the finishing blow.",
-            "If you personally eliminate your assigned target, you score one mark.",
-            "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+            "Kai žaidėjas pašalinamas, užregistruokite, kas sudavė paskutinį smūgį.",
+            "Jei asmeniškai pašalinate jums priskirtą taikinį, gaunate vieną žymą.",
+            "Žaidėjas, kuris medžiojo pašalintą taikinį, paveldi to taikinio sutartį, net jei paskutinį smūgį sudavė kas nors kitas. Taip kiekvienas išlikęs žaidėjas visada turi vieną aktyvią sutartį."
           ]
         },
         "winning": {
-          "heading": "Winning",
+          "heading": "Pergalė",
           "bullets": [
-            "Play until only one player remains. The last survivor scores one additional mark.",
-            "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
-            "Commander rules still apply: {{life}} starting life, {{poison}} poison, and {{commanderDamage}} combat damage from one commander are lethal.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Žaiskite, kol liks tik vienas žaidėjas. Paskutinis išlikęs žaidėjas gauna vieną papildomą žymą.",
+            "Laimi daugiausia žymų turintis žaidėjas; jei didžiausias rezultatas lygus, lygiąsias laimi paskutinis išlikęs žaidėjas.",
+            "Commander taisyklės vis dar galioja: {{life}} pradinių gyvybės taškų, {{poison}} poison ir {{commanderDamage}} combat damage iš vieno commander yra mirtini.",
+            "Kiekvieną kartą, kai commander iš naujo žaidžiamas iš command zone, jis kainuoja 2 mana daugiau."
           ]
         }
       },
       "normal": {
-        "hint": "Secret contracts for 3–8 players on 20 life. Score by eliminating your mark.",
-        "hostHint": "Secret contracts without commanders. Matching fills your chosen table size; leftovers can sit as small as three.",
-        "summary": "A free-for-all with secret contracts on 20 life. Score marks, inherit new targets, and finish with the highest score.",
+        "hint": "Slaptos sutartys 3–8 žaidėjams su 20 gyvybės taškų. Gaukite tašką pašalindami savo taikinį.",
+        "hostHint": "Slaptos sutartys be commanders. Poravimas užpildo pasirinktą stalo dydį; likę ratai gali turėti mažiausiai tris žaidėjus.",
+        "summary": "Visi prieš visus su slaptomis sutartimis ir 20 gyvybės taškų. Pašalinkite taikinius, paveldėkite naujus ir užbaikite su daugiausia taškų.",
         "sections": {
           "contracts": {
-            "heading": "Secret contracts",
+            "heading": "Slaptos sutartys",
             "bullets": [
-              "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
-              "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
-              "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+              "Kiekvienas žaidėjas privačiai gauna vieną taikinį. Sutartys sudaro ratą, todėl niekas netaiko į save ir kiekvieną žaidėją medžioja tik vienas kitas žaidėjas.",
+              "Per paruošimą perduokite įrenginį aplink stalą. Atidarykite „Patikrinti taikinį“ timer meniu, kai norite dar kartą perskaityti savo dabartinę sutartį.",
+              "Žaidėjai gali pulti ir paveikti bet ką; sutartis lemia taškų skyrimą, o ne leistinus taikinius."
             ]
           },
           "elimination": {
-            "heading": "Elimination and inheritance",
+            "heading": "Pašalinimas ir paveldėjimas",
             "bullets": [
-              "When a player is eliminated, record who dealt the finishing blow.",
-              "If you personally eliminate your assigned target, you score one mark.",
-              "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+              "Kai žaidėjas pašalinamas, užregistruokite, kas sudavė paskutinį smūgį.",
+              "Jei asmeniškai pašalinate jums priskirtą taikinį, gaunate vieną žymą.",
+              "Žaidėjas, kuris medžiojo pašalintą taikinį, paveldi to taikinio sutartį, net jei paskutinį smūgį sudavė kas nors kitas. Taip kiekvienas išlikęs žaidėjas visada turi vieną aktyvią sutartį."
             ]
           },
           "winning": {
-            "heading": "Winning",
+            "heading": "Pergalė",
             "bullets": [
-              "Play until only one player remains. The last survivor scores one additional mark.",
-              "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
-              "{{life}} starting life, {{poison}} poison, and {{poison}} poison counters are lethal."
+              "Žaiskite, kol liks tik vienas žaidėjas. Paskutinis išlikęs žaidėjas gauna vieną papildomą žymą.",
+              "Laimi daugiausia žymų turintis žaidėjas; jei didžiausias rezultatas lygus, lygiąsias laimi paskutinis išlikęs žaidėjas.",
+              "{{life}} pradinių gyvybės taškų, {{poison}} poison ir {{poison}} poison counters yra mirtini."
             ]
           }
         }
@@ -634,446 +634,446 @@
     }
   },
   "home": {
-    "taglineBefore": "Your next",
+    "taglineBefore": "Jūsų kitas",
     "taglineHighlight": "pod",
-    "taglineAfter": ", sorted.",
-    "startPlaying": "Start playing",
-    "ongoingGame": "ongoing game",
-    "noEventNeeded": "no event needed",
-    "startPlayingHint": "Open a battle screen on this device. Leave and come back without losing an unfinished game.",
-    "alwaysPlayers": "Always {{count}} players in this mode.",
-    "resumeGame": "Resume game",
-    "startNewGame": "Start a new game",
-    "startGame": "Start a game",
+    "taglineAfter": " — sutvarkyta.",
+    "startPlaying": "Pradėti žaisti",
+    "ongoingGame": "vykstantis žaidimas",
+    "noEventNeeded": "renginys nereikalingas",
+    "startPlayingHint": "Atidarykite žaidimo ekraną šiame įrenginyje. Galite išeiti ir grįžti neprarasdami nebaigto žaidimo.",
+    "alwaysPlayers": "Šiame režime visada yra {{count}} žaidėjų.",
+    "resumeGame": "Tęsti žaidimą",
+    "startNewGame": "Pradėti naują žaidimą",
+    "startGame": "Pradėti žaidimą",
     "commanderSetup": "Commanders",
-    "commanderSetupHint": "Search Scryfall for each player's commander. Partner pairs need both commanders.",
-    "chooseAllCommanders": "Choose a commander for every player.",
-    "advancedMatchConfig": "Advanced match config",
-    "hostEvent": "Host event",
-    "new": "new",
-    "targetTableSize": "Target table size",
-    "allowThreePods": "Allow 3-player pods",
-    "allowFivePods": "Allow 5-player pods",
-    "duelFixedSeats": "Duel events always seat exactly two players.",
-    "emperorFixedSeats": "Emperor games always seat exactly six players.",
-    "starFixedSeats": "Star games always seat exactly five players.",
-    "archenemyFixedSeats": "Archenemy Commander games always seat exactly four players.",
-    "twoHeadedFixedSeats": "Two-Headed Giant games always seat exactly four players.",
-    "eventName": "Event name",
-    "eventNamePlaceholder": "Friday Commander",
-    "tables": "Tables",
-    "tablesHint": "How many physical tables are free for this event.",
-    "eventLasts": "Event lasts",
-    "eventLastsHint": "Join code dies after this many hours. Use 48 or 72 for a weekend.",
-    "hostPin": "Host PIN",
-    "hostPinHint": "4 to 8 digits — reopens the host desk later.",
-    "createEvent": "Create event",
-    "joinWithCode": "Join with a code",
-    "playerAside": "player",
-    "joinCode": "Join code",
+    "commanderSetupHint": "Scryfall ieškokite kiekvieno žaidėjo commander. Partner poroms reikia abiejų commanders.",
+    "chooseAllCommanders": "Pasirinkite commander kiekvienam žaidėjui.",
+    "advancedMatchConfig": "Išplėstiniai žaidimo nustatymai",
+    "hostEvent": "Organizuoti renginį",
+    "new": "nauja",
+    "targetTableSize": "Tikslinis stalo dydis",
+    "allowThreePods": "Leisti 3 žaidėjų pod",
+    "allowFivePods": "Leisti 5 žaidėjų pod",
+    "duelFixedSeats": "Dvikovose visada žaidžia tiksliai du žaidėjai.",
+    "emperorFixedSeats": "Imperatoriaus žaidimuose visada žaidžia tiksliai šeši žaidėjai.",
+    "starFixedSeats": "Žvaigždės žaidimuose visada žaidžia tiksliai penki žaidėjai.",
+    "archenemyFixedSeats": "Archenemy Commander žaidimuose visada žaidžia tiksliai keturi žaidėjai.",
+    "twoHeadedFixedSeats": "Dviejų galvų milžino žaidimuose visada žaidžia tiksliai keturi žaidėjai.",
+    "eventName": "Renginio pavadinimas",
+    "eventNamePlaceholder": "Penktadienio Commander",
+    "tables": "Stalai",
+    "tablesHint": "Kiek fizinių stalų yra laisvų šiam renginiui.",
+    "eventLasts": "Renginio trukmė",
+    "eventLastsHint": "Prisijungimo kodas nustos galioti po tiek valandų. Savaitgaliui naudokite 48 arba 72.",
+    "hostPin": "Organizatoriaus PIN",
+    "hostPinHint": "4–8 skaitmenys — vėliau vėl atidaro organizatoriaus valdymą.",
+    "createEvent": "Sukurti renginį",
+    "joinWithCode": "Prisijungti su kodu",
+    "playerAside": "žaidėjas",
+    "joinCode": "Prisijungimo kodas",
     "joinCodePlaceholder": "AB23CD",
-    "join": "Join",
-    "scanQr": "Scan QR",
-    "staleJoin": "That event is gone. Join with a new code, or host a new night."
+    "join": "Prisijungti",
+    "scanQr": "Nuskaityti QR",
+    "staleJoin": "Šio renginio nebėra. Prisijunkite su nauju kodu arba sukurkite naują žaidimų vakarą."
   },
   "host": {
-    "desk": "Host desk",
-    "locked": "Locked",
-    "hostOnly": "host only",
-    "unlockHostDesk": "Unlock host desk",
-    "playerCount": "{{count}} player",
-    "playerCount_plural": "{{count}} players",
-    "ready": "{{count}} ready",
-    "matched": "{{count}} matched",
-    "playing": "{{count}} playing",
-    "paused": "{{count}} paused",
-    "ends": "ends {{date}}",
-    "podSizes": "Pod sizes",
-    "matching": "matching",
-    "allowLeftoverThree": "Allow leftover 3-player pods",
-    "allowFivePods": "Allow 5-player pods",
-    "treacheryTargetHint": "Target table size. Leftover pods can be as small as four.",
-    "matchingPrefers": "Matching prefers {{size}}-player tables.",
-    "matchingPrefersFour": "Matching prefers 4-player tables.",
-    "assassinTargetHint": "Target table size. Leftover contract circles can be as small as three.",
-    "multiplayerTargetHint": "Target table size. Leftover tables can be as small as three.",
-    "duelMatchmaking": "Duel matchmaking seats exactly two players per game.",
-    "twoHeadedMatchmaking": "Two-Headed Giant matchmaking seats exactly four players per game.",
-    "archenemyMatchmaking": "Archenemy Commander matchmaking seats exactly four players per game: one Archenemy against a team of three.",
-    "emperorMatchmaking": "Emperor matchmaking seats exactly six players per game: two teams with an Emperor and two Generals each.",
-    "starMatchmaking": "Star matchmaking seats exactly five players in a circular order.",
-    "eventLength": "Event length",
-    "joinCodeDies": "join code dies",
-    "hoursFromStart": "Hours from start",
-    "hoursFromStartHint": "Change this for a multi-day event. After it ends, the QR opens the home page.",
-    "joinCodeTitle": "Join code",
-    "share": "share",
-    "noLanAddress": "No LAN address found — this link only works on this computer.",
-    "copyPlayerLink": "Copy player link",
-    "queue": "Queue",
-    "nobodyWaiting": "Nobody waiting.",
+    "desk": "Organizatoriaus valdymas",
+    "locked": "Užrakinta",
+    "hostOnly": "tik organizatoriui",
+    "unlockHostDesk": "Atrakinti organizatoriaus valdymą",
+    "playerCount": "{{count}} žaidėjas",
+    "playerCount_plural": "{{count}} žaidėjai",
+    "ready": "{{count}} pasiruošę",
+    "matched": "{{count}} suporuoti",
+    "playing": "{{count}} žaidžia",
+    "paused": "{{count}} pristabdyti",
+    "ends": "baigiasi {{date}}",
+    "podSizes": "Pod dydžiai",
+    "matching": "poravimas",
+    "allowLeftoverThree": "Leisti likusius 3 žaidėjų pod",
+    "allowFivePods": "Leisti 5 žaidėjų pod",
+    "treacheryTargetHint": "Tikslinis stalo dydis. Likę pod gali turėti mažiausiai keturis žaidėjus.",
+    "matchingPrefers": "Poravimas teikia pirmenybę {{size}} žaidėjų stalams.",
+    "matchingPrefersFour": "Poravimas teikia pirmenybę 4 žaidėjų stalams.",
+    "assassinTargetHint": "Tikslinis stalo dydis. Likę sutarčių ratai gali turėti mažiausiai tris žaidėjus.",
+    "multiplayerTargetHint": "Tikslinis stalo dydis. Likę stalai gali turėti mažiausiai tris žaidėjus.",
+    "duelMatchmaking": "Dvikovos poravimas kiekvienam žaidimui priskiria tiksliai du žaidėjus.",
+    "twoHeadedMatchmaking": "Dviejų galvų milžino poravimas kiekvienam žaidimui priskiria tiksliai keturis žaidėjus.",
+    "archenemyMatchmaking": "Archenemy Commander poravimas kiekvienam žaidimui priskiria tiksliai keturis žaidėjus: vieną Archenemy prieš trijų žaidėjų komandą.",
+    "emperorMatchmaking": "Imperatoriaus poravimas kiekvienam žaidimui priskiria tiksliai šešis žaidėjus: dvi komandas, kiekvieną su Imperatoriumi ir dviem Generolais.",
+    "starMatchmaking": "Žvaigždės poravimas susodina tiksliai penkis žaidėjus ratu.",
+    "eventLength": "Renginio trukmė",
+    "joinCodeDies": "prisijungimo kodas nustos galioti",
+    "hoursFromStart": "Valandos nuo pradžios",
+    "hoursFromStartHint": "Pakeiskite tai kelių dienų renginiui. Jam pasibaigus QR atidarys pradžios puslapį.",
+    "joinCodeTitle": "Prisijungimo kodas",
+    "share": "bendrinti",
+    "noLanAddress": "LAN adresas nerastas — ši nuoroda veikia tik šiame kompiuteryje.",
+    "copyPlayerLink": "Kopijuoti žaidėjų nuorodą",
+    "queue": "Eilė",
+    "nobodyWaiting": "Niekas nelaukia.",
     "flex": "flex {{count}}",
-    "challengePts": "{{count}} challenge pts",
-    "pts": "{{count}} pts",
-    "notReady": "Not ready",
-    "pausedTitle": "Paused",
-    "seated": "Seated",
-    "atTables": "{{count}} at tables",
-    "tablesTitle": "Tables",
-    "total": "{{count}} total",
-    "noTables": "This event was created without tables.",
-    "startingGames": "Starting games…",
-    "startAllReady": "Start all ready games ({{count}})",
-    "startGame": "Start game",
-    "finishTable": "Finish table",
-    "cancelPod": "Cancel pod",
-    "enable": "Enable",
-    "disable": "Disable",
+    "challengePts": "{{count}} iššūkio tšk.",
+    "pts": "{{count}} tšk.",
+    "notReady": "Nepasiruošęs",
+    "pausedTitle": "Pristabdyta",
+    "seated": "Prie stalo",
+    "atTables": "{{count}} prie stalų",
+    "tablesTitle": "Stalai",
+    "total": "{{count}} iš viso",
+    "noTables": "Šis renginys sukurtas be stalų.",
+    "startingGames": "Pradedami žaidimai…",
+    "startAllReady": "Pradėti visus paruoštus žaidimus ({{count}})",
+    "startGame": "Pradėti žaidimą",
+    "finishTable": "Užbaigti stalą",
+    "cancelPod": "Atšaukti pod",
+    "enable": "Įjungti",
+    "disable": "Išjungti",
     "trackerUsed": "tracker",
-    "noTracker": "no tracker",
-    "matchNow": "Match now",
-    "fillBots": "Fill tables with bots",
-    "playerJoinPage": "Player join page"
+    "noTracker": "be tracker",
+    "matchNow": "Suporuoti dabar",
+    "fillBots": "Užpildyti stalus botais",
+    "playerJoinPage": "Žaidėjų prisijungimo puslapis"
   },
   "join": {
-    "joinEvent": "Join event",
-    "takeSeat": "Take a seat",
-    "displayName": "Display name",
+    "joinEvent": "Prisijungti prie renginio",
+    "takeSeat": "Užimti vietą",
+    "displayName": "Rodomas vardas",
     "displayNamePlaceholder": "Alex",
-    "joinEventButton": "Join event",
-    "saveDecks": "Save decks",
-    "matchFound": "Match found",
-    "yourDeck": "Your deck",
-    "checkMyRole": "Check my role",
-    "playingWithoutTracker": "Playing without the tracker. The host can finish the table.",
-    "chooseTracker": "Choose how this pod will record its game.",
-    "useGameTracker": "Use game tracker",
-    "playWithoutTracker": "Play without tracker",
-    "atTableMarked": "You're marked as at the table on this phone. The host still starts the game from the desk.",
-    "imAtTable": "I'm at the table",
-    "leftEvent": "You left this event. Scan the QR again if you want back in.",
-    "openPool": "Open pool — any table.",
-    "ready": "Ready",
-    "waiting": "waiting",
-    "holdTight": "Hold tight — a table is coming.",
-    "flex": "Flex: {{flex}} · Challenge Points: {{points}}",
-    "howWasPod": "How was your pod?",
-    "pause": "Pause",
-    "leave": "Leave",
-    "pausedMessage": "You are paused. Resume when you can sit, or leave the event.",
-    "imReady": "I'm ready",
-    "leaveEvent": "Leave event",
-    "markReady": "Mark ready when you can sit down for a game.",
-    "matchingShortly": "Matching will send you to a table shortly.",
-    "imTheHost": "I'm the host",
-    "offlineSaved": "Saved on this phone. It will send when you are back online.",
-    "stayAtTable": "Stay at the table until the host calls the game."
+    "joinEventButton": "Prisijungti prie renginio",
+    "saveDecks": "Išsaugoti kalades",
+    "matchFound": "Žaidimas rastas",
+    "yourDeck": "Jūsų kaladė",
+    "checkMyRole": "Patikrinti mano vaidmenį",
+    "playingWithoutTracker": "Žaidžiate be tracker. Organizatorius gali užbaigti stalą.",
+    "chooseTracker": "Pasirinkite, kaip šis pod registruos savo žaidimą.",
+    "useGameTracker": "Naudoti žaidimo tracker",
+    "playWithoutTracker": "Žaisti be tracker",
+    "atTableMarked": "Šiame telefone pažymėta, kad esate prie stalo. Organizatorius vis tiek pradeda žaidimą iš savo valdymo.",
+    "imAtTable": "Esu prie stalo",
+    "leftEvent": "Palikote šį renginį. Jei norite grįžti, dar kartą nuskaitykite QR.",
+    "openPool": "Atviras pool — bet kuris stalas.",
+    "ready": "Pasiruošęs",
+    "waiting": "laukiama",
+    "holdTight": "Palaukite — netrukus gausite stalą.",
+    "flex": "Flex: {{flex}} · Iššūkio taškai: {{points}}",
+    "howWasPod": "Kaip sekėsi jūsų pod?",
+    "pause": "Pauzė",
+    "leave": "Išeiti",
+    "pausedMessage": "Esate pristabdytas. Tęskite, kai galėsite sėsti žaisti, arba palikite renginį.",
+    "imReady": "Esu pasiruošęs",
+    "leaveEvent": "Palikti renginį",
+    "markReady": "Pažymėkite save kaip pasiruošusį, kai galėsite sėsti žaisti.",
+    "matchingShortly": "Poravimas netrukus paskirs jums stalą.",
+    "imTheHost": "Aš esu organizatorius",
+    "offlineSaved": "Išsaugota šiame telefone. Duomenys bus išsiųsti, kai vėl būsite prisijungę.",
+    "stayAtTable": "Likite prie stalo, kol organizatorius užbaigs žaidimą."
   },
   "matchConfig": {
-    "title": "Match config",
-    "description": "Sets up the fake seated pod behind /match. Nothing here touches the server, and none of it appears on the battle screen, so that route can be checked on a phone as-is.",
-    "podSetup": "Pod setup",
-    "seats": "Seats",
-    "seatsCount": "{{count}} seats",
+    "title": "Žaidimo nustatymai",
+    "description": "Nustato bandomąjį susodintą pod už /match. Niekas čia neliečia serverio ir niekas nerodoma žaidimo ekrane, todėl šį route galima patikrinti telefone tokį, koks jis yra.",
+    "podSetup": "Pod nustatymai",
+    "seats": "Vietos",
+    "seatsCount": "{{count}} vietos",
     "bracket": "Bracket",
-    "header": "Header",
-    "eventNamePlaceholder": "Event name",
-    "joinCodePlaceholder": "Join code",
-    "matchCard": "Match card",
-    "tableLabelPlaceholder": "Table label",
-    "assignedDeckPlaceholder": "Assigned deck",
-    "openBattleScreen": "Open battle screen",
-    "resetGameState": "Reset game state",
+    "header": "Antraštė",
+    "eventNamePlaceholder": "Renginio pavadinimas",
+    "joinCodePlaceholder": "Prisijungimo kodas",
+    "matchCard": "Žaidimo kortelė",
+    "tableLabelPlaceholder": "Stalo žyma",
+    "assignedDeckPlaceholder": "Priskirta kaladė",
+    "openBattleScreen": "Atidaryti žaidimo ekraną",
+    "resetGameState": "Atstatyti žaidimo būseną",
     "commander": "Commander",
-    "secondCommander": "Second commander"
+    "secondCommander": "Antras commander"
   },
   "app": {
-    "notFound": "Not found."
+    "notFound": "Nerasta."
   },
   "wake": {
-    "title": "Waking the tables",
-    "message": "The free host went to sleep. Keep this page open — it usually takes under a minute."
+    "title": "Žadinami stalai",
+    "message": "Nemokamas serveris užmigo. Palikite šį puslapį atidarytą — paprastai tai užtrunka mažiau nei minutę."
   },
   "scanner": {
-    "title": "Scan QR",
-    "ariaLabel": "Scan join QR code",
-    "hint": "Point at the host desk code.",
-    "closeScanner": "Close scanner",
-    "openingCamera": "Opening camera…",
-    "noCamera": "This browser cannot open the camera. Type the join code instead.",
-    "permissionDenied": "Camera permission was denied. Type the join code, or allow the camera and try again."
+    "title": "Nuskaityti QR",
+    "ariaLabel": "Nuskaityti prisijungimo QR kodą",
+    "hint": "Nukreipkite kamerą į organizatoriaus kodą.",
+    "closeScanner": "Uždaryti skaitytuvą",
+    "openingCamera": "Atidaroma kamera…",
+    "noCamera": "Ši naršyklė negali atidaryti kameros. Vietoje to įveskite prisijungimo kodą.",
+    "permissionDenied": "Prieiga prie kameros atmesta. Įveskite prisijungimo kodą arba suteikite leidimą kamerai ir bandykite dar kartą."
   },
   "theme": {
-    "switchToLight": "Switch to light mode",
-    "switchToDark": "Switch to dark mode"
+    "switchToLight": "Perjungti į šviesų režimą",
+    "switchToDark": "Perjungti į tamsų režimą"
   },
   "hostMetrics": {
-    "title": "Event recap",
-    "aside": "pilot",
-    "players": "Players",
-    "games": "Games",
-    "gamesPerPlayer": "Games / player",
-    "waitAvg": "Wait avg",
-    "waitP95": "Wait p95",
-    "waitMax": "Wait max",
-    "rematchPairs": "Rematch pairs",
-    "flexEarned": "Flex earned",
-    "flexSeats": "Flex seats",
-    "durationAvg": "Duration avg",
-    "tablesOccupied": "Tables occupied",
-    "trackerUsed": "Tracker used",
-    "trackerUsedValue": "{{used}} used · {{skipped}} skipped",
-    "challenges": "Challenges",
-    "challengePts": "Challenge pts",
-    "podRating": "Pod rating",
-    "podSizes": "Pod sizes:",
+    "title": "Renginio suvestinė",
+    "aside": "pilotas",
+    "players": "Žaidėjai",
+    "games": "Žaidimai",
+    "gamesPerPlayer": "Žaidimai / žaidėjui",
+    "waitAvg": "Vid. laukimas",
+    "waitP95": "Laukimas p95",
+    "waitMax": "Maks. laukimas",
+    "rematchPairs": "Pakartotinių porų sk.",
+    "flexEarned": "Gauta Flex",
+    "flexSeats": "Flex vietos",
+    "durationAvg": "Vid. trukmė",
+    "tablesOccupied": "Užimti stalai",
+    "trackerUsed": "Naudotas tracker",
+    "trackerUsedValue": "{{used}} naudota · {{skipped}} praleista",
+    "challenges": "Iššūkiai",
+    "challengePts": "Iššūkio tšk.",
+    "podRating": "Pod įvertinimas",
+    "podSizes": "Pod dydžiai:",
     "pools": "Pools:"
   },
   "deckEditor": {
-    "title": "Commander decks",
-    "deckNamePlaceholder": "Deck name (optional)",
+    "title": "Commander kaladės",
+    "deckNamePlaceholder": "Kaladės pavadinimas (neprivaloma)",
     "commander": "Commander",
-    "secondCommander": "Second commander",
-    "markPreferred": "Mark preferred",
-    "addAcceptedDeck": "Add accepted deck",
-    "hint": "Same-pool pods only. Extra decks let matching flex you into another bracket."
+    "secondCommander": "Antras commander",
+    "markPreferred": "Pažymėti kaip pageidaujamą",
+    "addAcceptedDeck": "Pridėti priimtiną kaladę",
+    "hint": "Tik to paties pool pod. Papildomos kaladės leidžia poravimui perkelti jus į kitą bracket."
   },
   "commanderPicker": {
-    "searchCommander": "Search commander",
-    "searchPartner": "Commander that can pair with {{name}}",
-    "removeCommander": "Remove {{name}}",
-    "artworkFor": "Artwork for",
-    "loadingArtwork": "Loading artwork…"
+    "searchCommander": "Ieškoti commander",
+    "searchPartner": "Commander, kurį galima poruoti su {{name}}",
+    "removeCommander": "Pašalinti {{name}}",
+    "artworkFor": "Iliustracija:",
+    "loadingArtwork": "Kraunama iliustracija…"
   },
   "challengePack": {
-    "title": "Challenge pack",
-    "description": "Only predefined primitives. Saving writes a new version and never mutates a pack already used by this event.",
-    "copyOfficial": "Copy official",
-    "startBlank": "Start blank",
-    "saveNewVersion": "Save new version",
-    "editHint": "Copy the official pack or start blank before editing.",
-    "packName": "Pack name",
-    "descriptionLabel": "Description",
-    "addChallenge": "Add challenge",
+    "title": "Iššūkių paketas",
+    "description": "Tik iš anksto apibrėžti primitives. Išsaugojus sukuriama nauja versija ir niekada nekeičiama versija, kurią šis renginys jau naudojo.",
+    "copyOfficial": "Kopijuoti oficialų",
+    "startBlank": "Pradėti tuščią",
+    "saveNewVersion": "Išsaugoti naują versiją",
+    "editHint": "Prieš redaguodami nukopijuokite oficialų paketą arba pradėkite nuo tuščio.",
+    "packName": "Paketo pavadinimas",
+    "descriptionLabel": "Aprašymas",
+    "addChallenge": "Pridėti iššūkį",
     "id": "Id",
-    "name": "Name",
-    "category": "Category",
-    "points": "Points",
+    "name": "Pavadinimas",
+    "category": "Kategorija",
+    "points": "Taškai",
     "primitive": "Primitive",
-    "threshold": "Threshold",
-    "confirmationQuestion": "Confirmation question",
-    "defaultConfirmation": "Did this happen at the table?",
-    "newClaimName": "New claim",
-    "newClaimDescription": "Award this at the table."
+    "threshold": "Slenkstis",
+    "confirmationQuestion": "Patvirtinimo klausimas",
+    "defaultConfirmation": "Ar tai įvyko prie stalo?",
+    "newClaimName": "Naujas pasiekimas",
+    "newClaimDescription": "Priskirkite tai prie stalo."
   },
   "treacheryRole": {
-    "treachery": "Treachery",
-    "receivedRole": "You received a role",
-    "handDeviceTo": "Hand the device to {{name}}",
-    "lookAwayIdentity": "Everyone else should look away before the identity is revealed.",
-    "lookAwayScreen": "Make sure nobody else can see your screen before revealing it.",
-    "reveal": "Reveal",
-    "yourRole": "Your role",
-    "identityAlt": "{{name}}, {{role}} identity",
-    "illustratedBy": "Illustrated by {{artist}}",
-    "yourObjective": "Your objective",
-    "unveiledToTable": "Unveiled to the table",
-    "unveilWarning": "Everyone at your table will see this identity. Its ability must be resolved in the game.",
-    "confirmUnveil": "Confirm unveil",
-    "unveilToTable": "Unveil to the table",
-    "hideAndPass": "Hide & pass",
-    "hideIdentity": "Hide my identity"
+    "treachery": "Išdavystė",
+    "receivedRole": "Gavote vaidmenį",
+    "handDeviceTo": "Perduokite įrenginį žaidėjui {{name}}",
+    "lookAwayIdentity": "Visi kiti turėtų nusisukti prieš atskleidžiant tapatybę.",
+    "lookAwayScreen": "Prieš atskleisdami įsitikinkite, kad niekas kitas nemato jūsų ekrano.",
+    "reveal": "Atskleisti",
+    "yourRole": "Jūsų vaidmuo",
+    "identityAlt": "{{name}}, {{role}} tapatybė",
+    "illustratedBy": "Iliustravo {{artist}}",
+    "yourObjective": "Jūsų tikslas",
+    "unveiledToTable": "Atskleista stalui",
+    "unveilWarning": "Visi prie jūsų stalo matys šią tapatybę. Jos gebėjimas turi būti išspręstas žaidime.",
+    "confirmUnveil": "Patvirtinti atskleidimą",
+    "unveilToTable": "Atskleisti stalui",
+    "hideAndPass": "Paslėpti ir perduoti",
+    "hideIdentity": "Paslėpti mano tapatybę"
   },
   "modeRulesSheet": {
-    "closeRules": "Close rules",
-    "backToGame": "Back to the game"
+    "closeRules": "Uždaryti taisykles",
+    "backToGame": "Grįžti į žaidimą"
   },
   "assassinTargets": {
-    "title": "Secret contracts",
-    "chooseOwnName": "Choose only your own name.",
-    "closeContracts": "Close contracts",
-    "handDeviceTo": "Hand the device to {{name}}",
-    "lookAway": "Everyone else should look away before the contract is revealed.",
-    "revealTarget": "Reveal my target",
-    "yourTarget": "Your target",
-    "noActiveTarget": "No active target",
-    "marksScored": "Marks scored: {{count}}",
-    "hideAndPass": "Hide & pass",
-    "allContractsChecked": "All contracts checked"
+    "title": "Slaptos sutartys",
+    "chooseOwnName": "Pasirinkite tik savo vardą.",
+    "closeContracts": "Uždaryti sutartis",
+    "handDeviceTo": "Perduokite įrenginį žaidėjui {{name}}",
+    "lookAway": "Visi kiti turėtų nusisukti prieš atskleidžiant sutartį.",
+    "revealTarget": "Atskleisti mano taikinį",
+    "yourTarget": "Jūsų taikinys",
+    "noActiveTarget": "Nėra aktyvaus taikinio",
+    "marksScored": "Gautos žymos: {{count}}",
+    "hideAndPass": "Paslėpti ir perduoti",
+    "allContractsChecked": "Visos sutartys patikrintos"
   },
   "scheme": {
     "ongoingScheme": "Ongoing scheme",
     "scheme": "Scheme",
-    "pastScheme": "Past scheme",
+    "pastScheme": "Ankstesnis scheme",
     "abandon": "Abandon {{name}}",
     "ongoingSchemes": "Ongoing schemes",
     "graveyard": "Graveyard · {{count}}",
     "nextScheme": "Next scheme",
-    "remainingInDeck": "{{count}} left in the deck",
-    "scryfallCredit": "Card image via Scryfall. Magic: The Gathering is © Wizards of the Coast."
+    "remainingInDeck": "{{count}} liko kaladėje",
+    "scryfallCredit": "Kortos vaizdas per Scryfall. Magic: The Gathering yra © Wizards of the Coast."
   },
   "dungeon": {
-    "takeInitiativeTitle": "Take the initiative?",
-    "takeInitiativeEnter": "This also ventures into Undercity. Only take it when the table just gave this seat the initiative.",
-    "takeInitiativeWait": "Finish or leave the current dungeon before Undercity can open. Only take the initiative when the table just gave it to this seat.",
-    "takeInitiativeAndEnter": "Take initiative & enter Undercity",
-    "takeInitiative": "Take initiative",
-    "alreadyHoldInitiative": "You already hold the initiative",
-    "takeAndEnterUndercity": "Take the initiative and enter Undercity",
-    "completed": "{{name}} (completed)",
-    "ventureInto": "Venture into {{name}}",
-    "done": "Done",
-    "ventureTo": "Venture to {{room}}: {{effect}}",
-    "releaseInitiative": "Release the initiative",
-    "undoRoom": "Undo room",
-    "closeDungeon": "Close dungeon"
+    "takeInitiativeTitle": "Perimti initiative?",
+    "takeInitiativeEnter": "Tai taip pat leidžia venture į Undercity. Perimkite initiative tik tada, kai stalas ką tik jį suteikė šiai vietai.",
+    "takeInitiativeWait": "Užbaikite arba palikite dabartinį dungeon prieš atsidarant Undercity. Perimkite initiative tik tada, kai stalas ką tik jį suteikė šiai vietai.",
+    "takeInitiativeAndEnter": "Perimti initiative ir įeiti į Undercity",
+    "takeInitiative": "Perimti initiative",
+    "alreadyHoldInitiative": "Jūs jau turite initiative",
+    "takeAndEnterUndercity": "Perimti initiative ir įeiti į Undercity",
+    "completed": "{{name}} (užbaigta)",
+    "ventureInto": "Venture į {{name}}",
+    "done": "Baigta",
+    "ventureTo": "Venture į {{room}}: {{effect}}",
+    "releaseInitiative": "Paleisti initiative",
+    "undoRoom": "Atšaukti room",
+    "closeDungeon": "Uždaryti dungeon"
   },
   "treacheryRolesSheet": {
-    "title": "Secret identities",
-    "chooseOwnName": "Choose only your own name.",
-    "closeIdentities": "Close identities",
-    "allIdentitiesChecked": "All identities checked"
+    "title": "Slaptos tapatybės",
+    "chooseOwnName": "Pasirinkite tik savo vardą.",
+    "closeIdentities": "Uždaryti tapatybes",
+    "allIdentitiesChecked": "Visos tapatybės patikrintos"
   },
   "tracker": {
-    "gameRules": "Game rules",
-    "loadingRoles": "Loading roles…",
-    "start": "Start",
-    "readRules": "Read rules",
-    "readyToBegin": "Ready to begin",
-    "readyToBeginHint": "Start the match when everyone is seated, or read the rules first.",
-    "dealContracts": "Deal contracts",
-    "dealContractsTitle": "Deal secret contracts",
-    "dealContractsHint": "Every player receives one private target. The device will be passed around so each contract can be checked in secret.",
-    "dealIdentities": "Deal identities",
-    "dealIdentitiesTitle": "Deal secret identities",
-    "dealIdentitiesHint": "Every player receives one hidden identity. The device will be passed around so each one can be read in secret.",
-    "chooseStarPositions": "Choose Star positions",
-    "starPositionsHint": "Players beside each other are allies. Tap two players to exchange their positions, or randomise the whole circle.",
-    "randomPositions": "Random positions",
-    "confirmPositions": "Confirm positions",
-    "adjacentPlayersAlly": "Adjacent\nplayers ally",
-    "buildEmperorTeams": "Build the Emperor teams",
-    "chooseTeamA": "Choose three players for Team A.",
-    "randomTeams": "Random teams",
-    "resetTeams": "Reset teams",
-    "teamEmperor": "Team {{team}} Emperor",
-    "randomEmperors": "Random Emperors",
-    "confirmTeams": "Confirm teams",
-    "chooseArchenemy": "Choose the Archenemy",
-    "chooseArchenemyHint": "The Archenemy faces the other three players. Both sides share 60 life. The Archenemy goes first, draws on that turn, and sets a scheme in motion during each first main phase.",
-    "confirmArchenemy": "Confirm Archenemy",
-    "chooseAllies": "Choose the allies",
-    "chooseAlliesHint": "Select two players for the first team. The other two players become the opposing team. Teams share 60 life and turns; all other player controls stay separate.",
-    "emperor": "Emperor",
-    "emperorRange": "Emperor · range 2",
-    "leader": "Leader",
-    "general": "General",
-    "generalRange": "General · range 1",
-    "marks": "{{count}} marks",
-    "winner": "Winner",
-    "turnPhone": "Turn your phone for the full board",
-    "matchMenu": "Match menu",
-    "matchMenuElapsed": "Match menu. {{clock}} elapsed",
-    "matchMenuPaused": ", paused",
-    "matchMenuDayNight": ", it is {{phase}}",
-    "day": "day",
-    "night": "night",
-    "closeMatchMenu": "Close match menu",
-    "match": "Match",
-    "firstScheme": "First scheme",
-    "nextScheme": "Next scheme",
-    "resume": "Resume",
-    "pause": "Pause",
-    "undo": "Undo",
-    "challenges": "Challenges",
-    "checkTarget": "Check target",
-    "checkMyRole": "Check my role",
-    "dayButton": "Day",
-    "nightButton": "Night",
-    "playerLost": "Player lost",
-    "gameWonBy": "Game won by",
-    "won": "{{name}} won",
-    "doneRequeue": "Done & requeue",
-    "savingChallenges": "Saving challenges…",
-    "quitToHome": "Quit to home",
-    "quitHint": "The game is kept — reopen it from the home screen.",
-    "secretContracts": "Secret contracts",
-    "secretIdentities": "Secret identities",
-    "whoEliminated": "Who eliminated {{name}}?",
-    "whoEliminatedHint": "A player scores only if this was their assigned mark. The contract chain advances either way.",
-    "noPlayerUnknown": "No player / unknown",
-    "revealedIdentity": "Revealed Treachery identity",
-    "closeRevealedIdentity": "Close revealed identity",
-    "commanderChallenges": "Commander challenges",
-    "challengeCompleted": "{{name}} completed",
-    "challengeFallback": "Challenge",
-    "matchResult": "Match result",
-    "wins": "{{name}} wins",
-    "reviewBoard": "Review board",
-    "yes": "Yes",
-    "no": "No",
-    "yesTheyLost": "Yes, they lost",
-    "noStillIn": "No, still in",
-    "openCounters": "Open counters for {{name}}",
-    "commanderDamageOn": "Commander damage on {{name}}",
-    "countersFor": "Counters for {{name}}",
-    "countersTitle": "Counters for {{name}}",
-    "closeCounters": "Close counters",
-    "closeChallenges": "Close challenges",
-    "sharedCommanderDamage": "Shared commander damage",
-    "closeCommanderDamage": "Close commander damage",
-    "highestCommanderDamage": "Highest commander damage on {{name}}: {{value}} from {{commander}}",
-    "noCommanderDamage": "No commander damage on {{name}}",
-    "removeCommanderDamage": "Remove commander damage from {{owner}}'s {{name}}",
-    "addCommanderDamage": "Add commander damage from {{owner}}'s {{name}}",
-    "isMonarch": "{{name}} is the monarch",
-    "makeMonarch": "Make {{name}} the monarch",
-    "enduringStory": "{{name}} {{has}} an enduring story",
-    "cityBlessing": "{{name}} {{has}} the city's blessing",
-    "has": "has",
-    "doesNotHave": "does not have",
-    "didLose": "Did {{name}} lose the game?",
-    "thisTeam": "This team",
-    "didTheyLose": "Did they lose?",
-    "poisonPrompt": "{{name}} has {{count}} poison counters. Did they lose?",
-    "sharedPoisonPrompt": "{{subject}} has {{count}} shared poison counters. {{lose}}",
-    "hitPrompt": "{{name}} owns {{count}} exiled cards with hit counters. Did they lose?",
-    "commanderPrompt": "{{name}} has taken {{damage}} commander damage from {{from}}. Did they lose?",
-    "sharedCommanderPrompt": "{{subject}} has taken {{damage}} commander damage from {{from}}. {{lose}}",
-    "lifePrompt": "{{name}} is at {{life}} life. Did they lose?",
-    "sharedLifePrompt": "{{subject}} is at {{life}} life. {{lose}}",
-    "anotherCommander": "another commander",
-    "addLife": "Add 1 life. Long press for a larger amount.",
-    "removeLife": "Remove 1 life. Long press for a larger amount.",
-    "addLifeFor": "Add life for {{name}}",
-    "removeLifeFor": "Remove life for {{name}}",
-    "addLifeLabel": "Add life · {{name}}",
-    "removeLifeLabel": "Remove life · {{name}}",
-    "deleteDigit": "Delete digit",
-    "add": "Add",
-    "removeVerb": "Remove",
-    "lower": "Lower {{label}}",
-    "raise": "Raise {{label}}",
-    "seatColour": "Seat colour for {{name}}",
-    "dungeonFor": "Dungeon for {{name}}",
-    "dungeonInitiative": "Dungeon and initiative for {{name}}. {{title}}",
-    "dungeonInitiativeActive": "{{name}} has the initiative · {{filled}} of {{total}} unique dungeons",
-    "dungeonInitiativeCompleted": "{{name}} has completed {{filled}} of {{total}} unique dungeons",
-    "counterOn": "{{label}} on {{name}}: {{value}}",
-    "counterFor": "{{label}} for {{name}}",
-    "claimFor": "Claim for {{name}}",
-    "challengesSubtitle": "Same challenges for every player · points never affect matching",
+    "gameRules": "Žaidimo taisyklės",
+    "loadingRoles": "Kraunami vaidmenys…",
+    "start": "Pradėti",
+    "readRules": "Skaityti taisykles",
+    "readyToBegin": "Pasiruošę pradėti",
+    "readyToBeginHint": "Pradėkite žaidimą, kai visi susėdo, arba pirmiausia perskaitykite taisykles.",
+    "dealContracts": "Išdalinti sutartis",
+    "dealContractsTitle": "Išdalinti slaptas sutartis",
+    "dealContractsHint": "Kiekvienas žaidėjas gauna vieną privatų taikinį. Įrenginys bus perduodamas aplink stalą, kad kiekvieną sutartį būtų galima patikrinti slapta.",
+    "dealIdentities": "Išdalinti tapatybes",
+    "dealIdentitiesTitle": "Išdalinti slaptas tapatybes",
+    "dealIdentitiesHint": "Kiekvienas žaidėjas gauna vieną paslėptą tapatybę. Įrenginys bus perduodamas aplink stalą, kad kiekvienas galėtų slapta perskaityti savąją.",
+    "chooseStarPositions": "Pasirinkti Žvaigždės vietas",
+    "starPositionsHint": "Greta sėdintys žaidėjai yra sąjungininkai. Paspauskite du žaidėjus, kad sukeistumėte jų vietas, arba atsitiktinai išdėstykite visą ratą.",
+    "randomPositions": "Atsitiktinės vietos",
+    "confirmPositions": "Patvirtinti vietas",
+    "adjacentPlayersAlly": "Gretimi\nžaidėjai yra sąjungininkai",
+    "buildEmperorTeams": "Sudaryti Imperatoriaus komandas",
+    "chooseTeamA": "Pasirinkite tris žaidėjus A komandai.",
+    "randomTeams": "Atsitiktinės komandos",
+    "resetTeams": "Atstatyti komandas",
+    "teamEmperor": "{{team}} komandos Imperatorius",
+    "randomEmperors": "Atsitiktiniai Imperatoriai",
+    "confirmTeams": "Patvirtinti komandas",
+    "chooseArchenemy": "Pasirinkti Archenemy",
+    "chooseArchenemyHint": "Archenemy susiduria su kitais trimis žaidėjais. Abi pusės turi 60 gyvybės taškų. Archenemy pradeda pirmas, per tą ėjimą traukia kortą ir per kiekvieną first main phase paleidžia scheme.",
+    "confirmArchenemy": "Patvirtinti Archenemy",
+    "chooseAllies": "Pasirinkti sąjungininkus",
+    "chooseAlliesHint": "Pasirinkite du žaidėjus pirmajai komandai. Kiti du žaidėjai tampa priešininkų komanda. Komandos dalijasi 60 gyvybės taškų ir ėjimais; visi kiti žaidėjų valdikliai lieka atskiri.",
+    "emperor": "Imperatorius",
+    "emperorRange": "Imperatorius · diapazonas 2",
+    "leader": "Lyderis",
+    "general": "Generolas",
+    "generalRange": "Generolas · diapazonas 1",
+    "marks": "{{count}} žymos",
+    "winner": "Nugalėtojas",
+    "turnPhone": "Pasukite telefoną, kad matytumėte visą lentą",
+    "matchMenu": "Žaidimo meniu",
+    "matchMenuElapsed": "Žaidimo meniu. Praėjo {{clock}}",
+    "matchMenuPaused": ", pristabdyta",
+    "matchMenuDayNight": ", dabar {{phase}}",
+    "day": "diena",
+    "night": "naktis",
+    "closeMatchMenu": "Uždaryti žaidimo meniu",
+    "match": "Žaidimas",
+    "firstScheme": "Pirmas scheme",
+    "nextScheme": "Kitas scheme",
+    "resume": "Tęsti",
+    "pause": "Pauzė",
+    "undo": "Atšaukti",
+    "challenges": "Iššūkiai",
+    "checkTarget": "Patikrinti taikinį",
+    "checkMyRole": "Patikrinti mano vaidmenį",
+    "dayButton": "Diena",
+    "nightButton": "Naktis",
+    "playerLost": "Žaidėjas pralaimėjo",
+    "gameWonBy": "Žaidimą laimėjo",
+    "won": "{{name}} laimėjo",
+    "doneRequeue": "Baigta ir grįžti į eilę",
+    "savingChallenges": "Išsaugomi iššūkiai…",
+    "quitToHome": "Grįžti į pradžią",
+    "quitHint": "Žaidimas išsaugomas — vėl atidarykite jį iš pradžios ekrano.",
+    "secretContracts": "Slaptos sutartys",
+    "secretIdentities": "Slaptos tapatybės",
+    "whoEliminated": "Kas pašalino {{name}}?",
+    "whoEliminatedHint": "Žaidėjas gauna tašką tik jei tai buvo jam priskirtas taikinys. Sutarčių grandinė bet kuriuo atveju tęsiasi.",
+    "noPlayerUnknown": "Nė vienas žaidėjas / nežinoma",
+    "revealedIdentity": "Atskleista Treachery tapatybė",
+    "closeRevealedIdentity": "Uždaryti atskleistą tapatybę",
+    "commanderChallenges": "Commander iššūkiai",
+    "challengeCompleted": "{{name}} užbaigta",
+    "challengeFallback": "Iššūkis",
+    "matchResult": "Žaidimo rezultatas",
+    "wins": "{{name}} laimi",
+    "reviewBoard": "Peržiūrėti lentą",
+    "yes": "Taip",
+    "no": "Ne",
+    "yesTheyLost": "Taip, pralaimėjo",
+    "noStillIn": "Ne, vis dar žaidime",
+    "openCounters": "Atidaryti {{name}} counters",
+    "commanderDamageOn": "Commander damage žaidėjui {{name}}",
+    "countersFor": "Counters žaidėjui {{name}}",
+    "countersTitle": "{{name}} counters",
+    "closeCounters": "Uždaryti counters",
+    "closeChallenges": "Uždaryti iššūkius",
+    "sharedCommanderDamage": "Bendras commander damage",
+    "closeCommanderDamage": "Uždaryti commander damage",
+    "highestCommanderDamage": "Didžiausias commander damage žaidėjui {{name}}: {{value}} nuo {{commander}}",
+    "noCommanderDamage": "Nėra commander damage žaidėjui {{name}}",
+    "removeCommanderDamage": "Pašalinti commander damage nuo {{owner}} {{name}}",
+    "addCommanderDamage": "Pridėti commander damage nuo {{owner}} {{name}}",
+    "isMonarch": "{{name}} yra monarch",
+    "makeMonarch": "Padaryti {{name}} monarch",
+    "enduringStory": "{{name}} {{has}} enduring story",
+    "cityBlessing": "{{name}} {{has}} city's blessing",
+    "has": "turi",
+    "doesNotHave": "neturi",
+    "didLose": "Ar {{name}} pralaimėjo žaidimą?",
+    "thisTeam": "Ši komanda",
+    "didTheyLose": "Ar jie pralaimėjo?",
+    "poisonPrompt": "{{name}} turi {{count}} poison counters. Ar pralaimėjo?",
+    "sharedPoisonPrompt": "{{subject}} turi {{count}} bendrų poison counters. {{lose}}",
+    "hitPrompt": "{{name}} turi {{count}} exiled kortų su hit counters. Ar pralaimėjo?",
+    "commanderPrompt": "{{name}} gavo {{damage}} commander damage nuo {{from}}. Ar pralaimėjo?",
+    "sharedCommanderPrompt": "{{subject}} gavo {{damage}} commander damage nuo {{from}}. {{lose}}",
+    "lifePrompt": "{{name}} turi {{life}} gyvybės taškų. Ar pralaimėjo?",
+    "sharedLifePrompt": "{{subject}} turi {{life}} gyvybės taškų. {{lose}}",
+    "anotherCommander": "kitas commander",
+    "addLife": "Pridėti 1 gyvybės tašką. Ilgai palaikykite, kad pasirinktumėte didesnį kiekį.",
+    "removeLife": "Atimti 1 gyvybės tašką. Ilgai palaikykite, kad pasirinktumėte didesnį kiekį.",
+    "addLifeFor": "Pridėti gyvybės taškų žaidėjui {{name}}",
+    "removeLifeFor": "Atimti gyvybės taškų iš {{name}}",
+    "addLifeLabel": "Pridėti gyvybės · {{name}}",
+    "removeLifeLabel": "Atimti gyvybės · {{name}}",
+    "deleteDigit": "Ištrinti skaitmenį",
+    "add": "Pridėti",
+    "removeVerb": "Pašalinti",
+    "lower": "Sumažinti {{label}}",
+    "raise": "Padidinti {{label}}",
+    "seatColour": "{{name}} vietos spalva",
+    "dungeonFor": "Dungeon žaidėjui {{name}}",
+    "dungeonInitiative": "Dungeon ir initiative žaidėjui {{name}}. {{title}}",
+    "dungeonInitiativeActive": "{{name}} turi initiative · {{filled}} iš {{total}} unikalių dungeons",
+    "dungeonInitiativeCompleted": "{{name}} užbaigė {{filled}} iš {{total}} unikalių dungeons",
+    "counterOn": "{{label}} žaidėjui {{name}}: {{value}}",
+    "counterFor": "{{label}} žaidėjui {{name}}",
+    "claimFor": "Pasiekimas žaidėjui {{name}}",
+    "challengesSubtitle": "Tie patys iššūkiai kiekvienam žaidėjui · taškai niekada neturi įtakos poravimui",
     "counters": {
       "poison": "Poison",
       "tax": "Commander tax",
-      "acorn": "Acorns",
-      "energy": "Energy",
-      "experience": "Experience",
+      "acorn": "Gilės",
+      "energy": "Energija",
+      "experience": "Patirtis",
       "hit": "Etrata hits",
-      "rad": "Radiation",
+      "rad": "Radiacija",
       "ring": "Ring temptation",
-      "speed": "Speed",
-      "ticket": "Tickets"
+      "speed": "Greitis",
+      "ticket": "Bilietai"
     }
   }
 }

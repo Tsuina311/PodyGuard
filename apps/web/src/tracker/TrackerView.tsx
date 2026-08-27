@@ -115,6 +115,7 @@ import {
 import i18n from '../i18n';
 import { assetUrl } from '../asset-url';
 import { forgetActiveMatch } from '../active-match';
+import { readStored, removeStored, writeStored } from '../device-storage';
 import { useFeedback } from '../feedback/FeedbackContext';
 import { seatColor } from '../match-config';
 import { Badge } from '../ui/Badge';
@@ -724,7 +725,7 @@ export function TrackerView({
     setFinishError(null);
     try {
       await onFinish(state.winnerId, Math.floor(elapsed / 1000));
-      sessionStorage.removeItem(storageKey);
+      removeStored(storageKey);
     } catch (caught) {
       setFinishError(
         caught instanceof Error ? caught.message : t('common.errors.submitResult'),
@@ -735,7 +736,7 @@ export function TrackerView({
 
   /** Abandon setup and leave the tracker; drop any half-built snapshot. */
   function leaveSetup() {
-    sessionStorage.removeItem(storageKey);
+    removeStored(storageKey);
     forgetActiveMatch();
     onQuit();
   }
@@ -751,10 +752,10 @@ export function TrackerView({
 
   useEffect(() => {
     if (!persist) {
-      sessionStorage.removeItem(storageKey);
+      removeStored(storageKey);
       return;
     }
-    sessionStorage.setItem(storageKey, JSON.stringify(state));
+    writeStored(storageKey, JSON.stringify(state));
   }, [state, persist, storageKey]);
   const dungeonPlayer =
     state.players.find((row) => row.id === dungeonPlayerId) ?? null;
@@ -4202,14 +4203,14 @@ function restore(
   rulesFormat: RulesFormat = 'commander',
 ): TrackerState {
   if (!persist) {
-    sessionStorage.removeItem(storageKey);
+    removeStored(storageKey);
     return createTracker(players, Date.now(), {
       startingLife,
       gameMode,
       rulesFormat,
     });
   }
-  const raw = sessionStorage.getItem(storageKey);
+  const raw = readStored(storageKey);
   if (raw) {
     try {
       const parsed = JSON.parse(raw) as TrackerState;

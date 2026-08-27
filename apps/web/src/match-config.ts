@@ -11,6 +11,7 @@ import {
 } from '@podyguard/shared';
 import type { CommanderSelection } from './scryfall';
 import { emptySeatCommanders } from './CommanderSeatPickers';
+import { readStored, writeStored } from './device-storage';
 
 /**
  * Shared state for the two local match routes. `/match-config` writes it and
@@ -209,7 +210,7 @@ export function defaultMatchConfig(): MatchConfig {
 
 export function loadMatchConfig(): MatchConfig {
   const defaults = defaultMatchConfig();
-  const raw = sessionStorage.getItem(CONFIG_KEY);
+  const raw = readStored(CONFIG_KEY);
   if (!raw) {
     return defaults;
   }
@@ -247,7 +248,7 @@ export function loadMatchConfig(): MatchConfig {
 }
 
 export function saveMatchConfig(config: MatchConfig): void {
-  sessionStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+  writeStored(CONFIG_KEY, JSON.stringify(config));
 }
 
 export function commanderSearchProfileForConfig(

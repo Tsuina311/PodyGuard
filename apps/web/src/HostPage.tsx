@@ -16,12 +16,14 @@ import {
 import { countByStatus, queueByWait } from './match-view';
 import {
   ApiError,
+  clearHostToken,
   fillTablesWithBots,
   getEventMetrics,
   listParticipants,
   listTables,
   loadHostToken,
   matchNow,
+  removeParticipant,
   saveHostToken,
   setTableStatus,
   startTable,
@@ -63,6 +65,7 @@ export function HostPage() {
   const [copied, setCopied] = useState(false);
   const [metrics, setMetrics] = useState<EventMetrics | null>(null);
   const [hoursDraft, setHoursDraft] = useState('24');
+  const [removeArmed, setRemoveArmed] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     const [roster, tableList] = await Promise.all([
@@ -110,7 +113,9 @@ export function HostPage() {
         await refreshMetrics(token);
       })
       .catch(() => {
-        /* show PIN form */
+        // The PIN form is the way back in, so drop the key the server refused
+        // rather than retrying it on every visit.
+        clearHostToken(code);
       });
     return () => {
       cancelled = true;
@@ -242,6 +247,32 @@ export function HostPage() {
     }
   }
 
+  /*
+    Two taps, because a name is all the host has to go on and the player behind
+    it does not get a say: the first tap arms the row, the second one drops it.
+  */
+  async function onRemovePlayer(row: PublicParticipant) {
+    if (!hostToken) {
+      return;
+    }
+    if (removeArmed !== row.id) {
+      setRemoveArmed(row.id);
+      return;
+    }
+    setRemoveArmed(null);
+    setError(null);
+    try {
+      await removeParticipant(code, hostToken, row.id);
+      await refresh();
+    } catch (caught) {
+      setError(
+        caught instanceof ApiError
+          ? caught.message
+          : t('common.errors.removePlayer'),
+      );
+    }
+  }
+
   async function onToggleSetting(
     patch: {
       allowThreePods?: boolean;
@@ -336,6 +367,23 @@ export function HostPage() {
     } catch {
       setError(t('common.errors.clipboard'));
     }
+  }
+
+  function removeButton(row: PublicParticipant) {
+    const armed = removeArmed === row.id;
+    return (
+      <Button
+        variant={armed ? 'danger' : 'ghost'}
+        size="sm"
+        aria-label={t('host.removePlayer', { name: row.displayName })}
+        onClick={() => void onRemovePlayer(row)}
+        onBlur={() =>
+          setRemoveArmed((current) => (current === row.id ? null : current))
+        }
+      >
+        {armed ? t('host.removeConfirm') : t('host.remove')}
+      </Button>
+    );
   }
 
   const counts = countByStatus(participants);
@@ -637,7 +685,10 @@ export function HostPage() {
                     </Badge>
                   ) : null}
                 </span>
-                <WaitTime since={row.readyAt} />
+                <span className="flex shrink-0 items-center gap-2">
+                  <WaitTime since={row.readyAt} />
+                  {removeButton(row)}
+                </span>
               </li>
             ))}
           </ul>
@@ -658,6 +709,7 @@ export function HostPage() {
                   </Badge>
                 ) : null}
                 {row.isBot ? <Badge tone="dev">{t('common.bot')}</Badge> : null}
+                <span className="ml-auto shrink-0">{removeButton(row)}</span>
               </li>
             ))}
           </ul>
@@ -680,6 +732,7 @@ export function HostPage() {
                     })}
                   </Badge>
                 ) : null}
+                <span className="ml-auto shrink-0">{removeButton(row)}</span>
               </li>
             ))}
           </ul>

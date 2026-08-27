@@ -1,75 +1,75 @@
 {
   "common": {
-    "home": "Home",
-    "cancel": "Cancel",
-    "close": "Close",
-    "save": "Save",
-    "loading": "Loading…",
-    "players": "Players",
-    "game": "Game",
-    "language": "Language",
-    "yes": "Yes",
-    "no": "No",
-    "reset": "Reset",
-    "random": "Random",
-    "remove": "Remove",
-    "empty": "Empty",
+    "home": "Kezdőlap",
+    "cancel": "Mégse",
+    "close": "Bezárás",
+    "save": "Mentés",
+    "loading": "Betöltés…",
+    "players": "Játékosok",
+    "game": "Játék",
+    "language": "Nyelv",
+    "yes": "Igen",
+    "no": "Nem",
+    "reset": "Visszaállítás",
+    "random": "Véletlenszerű",
+    "remove": "Eltávolítás",
+    "empty": "Üres",
     "bot": "bot",
     "dev": "dev",
-    "official": "official",
-    "open": "Open",
-    "preferred": "preferred",
-    "player": "Player {{number}}",
-    "versus": "versus",
-    "teamA": "Team A",
-    "teamB": "Team B",
-    "working": "Working…",
-    "creating": "Creating…",
-    "checking": "Checking…",
-    "joining": "Joining…",
-    "updating": "Updating…",
-    "submitting": "Submitting…",
-    "saving": "Saving…",
-    "searching": "Searching…",
-    "unveiling": "Unveiling…",
-    "copied": "Copied",
-    "noneYet": "none yet",
+    "official": "hivatalos",
+    "open": "Nyitott",
+    "preferred": "előnyben részesített",
+    "player": "{{number}}. játékos",
+    "versus": "ellen",
+    "teamA": "A csapat",
+    "teamB": "B csapat",
+    "working": "Feldolgozás…",
+    "creating": "Létrehozás…",
+    "checking": "Ellenőrzés…",
+    "joining": "Csatlakozás…",
+    "updating": "Frissítés…",
+    "submitting": "Küldés…",
+    "saving": "Mentés…",
+    "searching": "Keresés…",
+    "unveiling": "Felfedés…",
+    "copied": "Másolva",
+    "noneYet": "még nincs",
     "dash": "—",
     "errors": {
-      "generic": "Something went wrong.",
-      "createEvent": "Could not create event.",
-      "unlockHost": "Could not unlock host.",
-      "updateTable": "Could not update table.",
-      "startGame": "Could not start the game.",
-      "startAllGames": "Could not start all ready games.",
-      "finishTable": "Could not finish the table.",
-      "cancelPod": "Could not cancel the pod.",
-      "updateSettings": "Could not update settings.",
-      "matchTables": "Could not match tables.",
-      "fillBots": "Could not fill tables with bots.",
-      "clipboard": "Clipboard blocked — copy the link manually.",
-      "eventNotFound": "Event not found.",
-      "joinEvent": "Could not join event.",
-      "saveDecks": "Could not save decks.",
-      "updateReady": "Could not update ready.",
-      "updatePause": "Could not update pause.",
-      "leaveEvent": "Could not leave event.",
-      "trackerChoice": "Could not save the tracker choice.",
-      "saveRating": "Could not save that rating.",
-      "chooseCommander": "Choose a commander for every deck.",
-      "enterJoinCode": "Enter a join code.",
-      "sessionUnavailable": "Your event session is no longer available.",
-      "savePack": "Could not save the pack.",
-      "searchScryfall": "Could not search Scryfall.",
-      "loadArtwork": "Could not load alternate artwork.",
-      "submitResult": "Could not submit the result.",
-      "saveChallenge": "Could not save challenge progress.",
-      "unveilIdentity": "Could not unveil your identity.",
-      "apiWaking": "The host is waking up. Keep this page open — it usually takes under a minute.",
-      "apiUnreachable": "Cannot reach the API. Is the server running (yarn dev:server)?"
+      "generic": "Valami hiba történt.",
+      "createEvent": "Nem sikerült létrehozni az eseményt.",
+      "unlockHost": "Nem sikerült feloldani a szervezői felületet.",
+      "updateTable": "Nem sikerült frissíteni az asztalt.",
+      "startGame": "Nem sikerült elindítani a játékot.",
+      "startAllGames": "Nem sikerült elindítani az összes kész játékot.",
+      "finishTable": "Nem sikerült befejezni az asztal játékát.",
+      "cancelPod": "Nem sikerült törölni a podot.",
+      "updateSettings": "Nem sikerült frissíteni a beállításokat.",
+      "matchTables": "Nem sikerült párosítani az asztalokat.",
+      "fillBots": "Nem sikerült botokkal feltölteni az asztalokat.",
+      "clipboard": "A vágólap le van tiltva — másold ki kézzel a hivatkozást.",
+      "eventNotFound": "Az esemény nem található.",
+      "joinEvent": "Nem sikerült csatlakozni az eseményhez.",
+      "saveDecks": "Nem sikerült menteni a paklikat.",
+      "updateReady": "Nem sikerült frissíteni a készenléti állapotot.",
+      "updatePause": "Nem sikerült frissíteni a szünetet.",
+      "leaveEvent": "Nem sikerült kilépni az eseményből.",
+      "trackerChoice": "Nem sikerült menteni a tracker választását.",
+      "saveRating": "Nem sikerült menteni az értékelést.",
+      "chooseCommander": "Válassz commandert minden paklihoz.",
+      "enterJoinCode": "Adj meg egy csatlakozási kódot.",
+      "sessionUnavailable": "Az eseményhez tartozó munkameneted már nem érhető el.",
+      "savePack": "Nem sikerült menteni a csomagot.",
+      "searchScryfall": "Nem sikerült keresni a Scryfallon.",
+      "loadArtwork": "Nem sikerült betölteni az alternatív illusztrációt.",
+      "submitResult": "Nem sikerült elküldeni az eredményt.",
+      "saveChallenge": "Nem sikerült menteni a kihívás előrehaladását.",
+      "unveilIdentity": "Nem sikerült felfedni a személyazonosságodat.",
+      "apiWaking": "A szerver ébredezik. Hagyd nyitva ezt az oldalt — ez általában kevesebb mint egy percet vesz igénybe.",
+      "apiUnreachable": "Az API nem érhető el. Fut a szerver (yarn dev:server)?"
     },
-    "assignedAtTable": "Assigned at the table",
-    "scanToJoin": "Scan to join this event"
+    "assignedAtTable": "Asztalhoz rendelve",
+    "scanToJoin": "Olvasd be a kódot az eseményhez való csatlakozáshoz"
   },
   "language": {
     "en": "English",
@@ -109,173 +109,173 @@
     "cy": "Cymraeg"
   },
   "families": {
-    "normal": "Normal",
+    "normal": "Normál",
     "commander": "Commander"
   },
   "modes": {
     "shared": {
-      "commanderCombat": "A player loses after taking {{commanderDamage}} combat damage from one commander.",
-      "commanderTax": "Each time a commander is recast from the command zone, it costs 2 more mana.",
-      "lifeAndLoss": "Life and loss",
-      "turns": "Turns",
-      "commanders": "Commanders",
-      "eachPlayerLife": "Each player starts at {{life}} life.",
-      "loseAtZero": "A player loses at 0 life.",
-      "loseAtPoison": "A player loses at {{poison}} poison counters.",
-      "startingPlayerRandom": "The starting player is drawn at random.",
-      "startingPlayerSkipDraw": "The starting player is drawn at random and skips the draw step on the first turn.",
-      "multiplayerFirstTurnDraw": "In multiplayer, that player draws on their first turn.",
-      "commanderFirstTurnDraw": "In multiplayer Commander, that player draws on their first turn.",
-      "commandersInZone": "Commanders begin in the command zone and may be recast from there.",
-      "commanderRulesApply": "Commander rules still apply: {{life}} starting life, {{poison}} poison, and {{commanderDamage}} combat damage from one commander are lethal."
+      "commanderCombat": "Egy játékos veszít, ha egyetlen commandertől {{commanderDamage}} harci sebzést kapott.",
+      "commanderTax": "Minden alkalommal, amikor egy commandert újra kijátszanak a command zone-ból, 2 manával többe kerül.",
+      "lifeAndLoss": "Élet és vereség",
+      "turns": "Körök",
+      "commanders": "Commanderek",
+      "eachPlayerLife": "Minden játékos {{life}} életponttal kezd.",
+      "loseAtZero": "A játékos 0 életpontnál veszít.",
+      "loseAtPoison": "A játékos {{poison}} méregjelzőnél veszít.",
+      "startingPlayerRandom": "A kezdőjátékost véletlenszerűen választják ki.",
+      "startingPlayerSkipDraw": "A kezdőjátékost véletlenszerűen választják ki, és az első körében kihagyja a draw stepet.",
+      "multiplayerFirstTurnDraw": "Multiplayerben ez a játékos húz lapot az első körében.",
+      "commanderFirstTurnDraw": "Multiplayer Commanderben ez a játékos húz lapot az első körében.",
+      "commandersInZone": "A commanderek a command zone-ban kezdenek, és onnan újra kijátszhatók.",
+      "commanderRulesApply": "A Commander szabályai továbbra is érvényesek: {{life}} kezdő életpont, {{poison}} poison és egyetlen commandertől kapott {{commanderDamage}} harci sebzés halálos."
     },
     "duel": {
-      "label": "Duel",
-      "hint": "Two players. Each starts on 20 life.",
-      "hostHint": "Strict 2-player tables. Each player starts on 20 life.",
-      "hostFixedSeats": "Duel events always seat exactly two players.",
-      "title": "Duel",
-      "summary": "Two-player Magic. No commanders — just life and the board.",
+      "label": "Párbaj",
+      "hint": "Két játékos. Mindketten 20 életponttal kezdenek.",
+      "hostHint": "Szigorúan 2 játékos asztalonként. Minden játékos 20 életponttal kezd.",
+      "hostFixedSeats": "A Párbaj játékokban mindig pontosan két játékos ül.",
+      "title": "Párbaj",
+      "summary": "Kétszemélyes Magic. Nincsenek commanderek — csak életpontok és a játéktér.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Élet és vereség",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters."
+            "Minden játékos {{life}} életponttal kezd.",
+            "A játékos 0 életpontnál veszít.",
+            "A játékos {{poison}} méregjelzőnél veszít."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Körök",
           "bullets": [
-            "The starting player is drawn at random and skips the draw step on the first turn."
+            "A kezdőjátékost véletlenszerűen választják ki, és az első körében kihagyja a draw stepet."
           ]
         }
       }
     },
     "multiplayer": {
       "label": "Multiplayer",
-      "hint": "Free-for-all without commanders. Everyone starts on 20 life.",
-      "hostHint": "Free-for-all without commanders. Matching fills your chosen table size; leftovers can sit as small as three.",
+      "hint": "Mindenki mindenki ellen commanderek nélkül. Mindenki 20 életponttal kezd.",
+      "hostHint": "Mindenki mindenki ellen commanderek nélkül. A párosítás először a választott asztalméretet tölti fel; a maradék asztalok legalább három játékossal indulhatnak.",
       "title": "Multiplayer",
-      "summary": "Free-for-all without the Commander format. Useful for casual multiplayer, Planechase, or any 20-life table.",
+      "summary": "Mindenki mindenki ellen a Commander formátum nélkül. Használható casual multiplayerhez, Planechase-hez vagy bármilyen 20 életpontos asztalhoz.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Élet és vereség",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters."
+            "Minden játékos {{life}} életponttal kezd.",
+            "A játékos 0 életpontnál veszít.",
+            "A játékos {{poison}} méregjelzőnél veszít."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Körök",
           "bullets": [
-            "The starting player is drawn at random.",
-            "In multiplayer, that player draws on their first turn."
+            "A kezdőjátékost véletlenszerűen választják ki.",
+            "Multiplayerben ez a játékos húz lapot az első körében."
           ]
         }
       }
     },
     "commander": {
-      "label": "Classic",
-      "hint": "Free-for-all. Everyone starts on 40 life.",
-      "hostHint": "Free-for-all Commander. Matching prefers four; leftover pods can be three or five when allowed.",
-      "title": "Classic",
-      "summary": "Free-for-all multiplayer. Each player fights for themselves.",
+      "label": "Klasszikus",
+      "hint": "Mindenki mindenki ellen. Mindenki 40 életponttal kezd.",
+      "hostHint": "Mindenki mindenki ellen Commander. A párosítás a négyfős podokat részesíti előnyben; a maradék podok három- vagy ötfősek lehetnek, ha ez engedélyezett.",
+      "title": "Klasszikus",
+      "summary": "Mindenki mindenki ellen multiplayer. Minden játékos saját magáért harcol.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Élet és vereség",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters.",
-            "A player loses after taking {{commanderDamage}} combat damage from one commander."
+            "Minden játékos {{life}} életponttal kezd.",
+            "A játékos 0 életpontnál veszít.",
+            "A játékos {{poison}} méregjelzőnél veszít.",
+            "Egy játékos veszít, ha egyetlen commandertől {{commanderDamage}} harci sebzést kapott."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Körök",
           "bullets": [
-            "The starting player is drawn at random.",
-            "In multiplayer Commander, that player draws on their first turn."
+            "A kezdőjátékost véletlenszerűen választják ki.",
+            "Multiplayer Commanderben ez a játékos húz lapot az első körében."
           ]
         },
         "commanders": {
-          "heading": "Commanders",
+          "heading": "Commanderek",
           "bullets": [
-            "Commanders begin in the command zone and may be recast from there.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "A commanderek a command zone-ban kezdenek, és onnan újra kijátszhatók.",
+            "Minden alkalommal, amikor egy commandert újra kijátszanak a command zone-ból, 2 manával többe kerül."
           ]
         }
       }
     },
     "treachery": {
-      "label": "Treachery",
-      "hint": "Secret identities dealt on this device. Pass it around so everyone reads their own in private.",
-      "hostHint": "Secret roles for Commander pods. Matching fills your chosen table size first; leftovers can sit as small as four.",
-      "title": "Treachery",
-      "summary": "Commander with secret identities. The Leader is public; everyone else stays hidden.",
+      "label": "Árulás",
+      "hint": "A titkos személyazonosságokat ezen az eszközön osztják ki. Add körbe, hogy mindenki négyszemközt elolvashassa a sajátját.",
+      "hostHint": "Titkos szerepek Commander podokhoz. A párosítás először a választott asztalméretet tölti fel; a maradék podok legalább négyfősek lehetnek.",
+      "title": "Árulás",
+      "summary": "Commander titkos személyazonosságokkal. A Vezető nyilvános; mindenki más rejtve marad.",
       "sections": {
         "commander": {
-          "heading": "Commander rules still apply",
+          "heading": "A Commander szabályai továbbra is érvényesek",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "The Leader takes the first turn and draws on that turn.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Minden játékos {{life}} életponttal kezd.",
+            "A játékos 0 életpontnál, {{poison}} poisonnál vagy egyetlen commandertől kapott {{commanderDamage}} harci sebzésnél veszít.",
+            "A Vezető kezdi a játékot, és húz lapot abban a körben.",
+            "Minden alkalommal, amikor egy commandert újra kijátszanak a command zone-ból, 2 manával többe kerül."
           ]
         },
         "identities": {
-          "heading": "Identities",
+          "heading": "Személyazonosságok",
           "bullets": [
-            "Open Check my role from the timer menu. Only you see that card.",
-            "On a single tracker, deal the identities at setup and pass the device around so each player reads theirs alone.",
-            "Leader: Survive until every Assassin and Traitor is eliminated. Reveal yourself to the table. The Guardians share your victory, but you do not know who they are.",
-            "Guardian: Keep the Leader alive and eliminate the Leader's enemies. Your identity is secret. You win and lose with the Leader, even if you are eliminated first.",
-            "Assassin: Eliminate the Leader. Your identity is secret. Assassins share the same objective, but you do not know who the other Assassins are.",
-            "Traitor: Be the last player standing. Your identity is secret. Keep the Leader alive until the other threats are gone, then take the throne for yourself.",
-            "Follow any extra abilities printed on your identity card."
+            "Nyisd meg a „Szerepem ellenőrzése” lehetőséget az időzítő menüjéből. Csak te látod ezt a kártyát.",
+            "Egyetlen tracker használatakor osszátok ki a személyazonosságokat az előkészítés során, majd adjátok körbe az eszközt, hogy minden játékos egyedül olvashassa el a sajátját.",
+            "Vezető: Maradj életben, amíg minden Orgyilkost és az Árulót ki nem iktatják. Fedd fel magad az asztal előtt. Az Őrzők osztoznak a győzelmedben, de nem tudod, kik ők.",
+            "Őrző: Tartsd életben a Vezetőt, és iktasd ki a Vezető ellenségeit. A személyazonosságod titkos. A Vezetővel együtt nyersz és veszítesz, még akkor is, ha téged iktatnak ki először.",
+            "Orgyilkos: Iktasd ki a Vezetőt. A személyazonosságod titkos. Az Orgyilkosok célja közös, de nem tudod, kik a többi Orgyilkosok.",
+            "Áruló: Maradj az utolsó játékos. A személyazonosságod titkos. Tartsd életben a Vezetőt, amíg a többi fenyegetés el nem tűnik, majd szerezd meg magadnak a trónt.",
+            "Kövesd a személyazonosság-kártyádra nyomtatott további képességeket."
           ]
         }
       },
       "roles": {
         "leader": {
-          "name": "Leader",
-          "objective": "Survive until every Assassin and Traitor is eliminated.",
-          "guidance": "Reveal yourself to the table. The Guardians share your victory, but you do not know who they are.",
-          "publicNote": "Your role is public. Tell the table you are the Leader."
+          "name": "Vezető",
+          "objective": "Maradj életben, amíg minden Orgyilkost és az Árulót ki nem iktatják.",
+          "guidance": "Fedd fel magad az asztal előtt. Az Őrzők osztoznak a győzelmedben, de nem tudod, kik ők.",
+          "publicNote": "A szereped nyilvános. Mondd meg az asztalnak, hogy te vagy a Vezető."
         },
         "guardian": {
-          "name": "Guardian",
-          "objective": "Keep the Leader alive and eliminate the Leader's enemies.",
-          "guidance": "Your identity is secret. You win and lose with the Leader, even if you are eliminated first.",
-          "publicNote": "Keep this role secret."
+          "name": "Őrző",
+          "objective": "Tartsd életben a Vezetőt, és iktasd ki a Vezető ellenségeit.",
+          "guidance": "A személyazonosságod titkos. A Vezetővel együtt nyersz és veszítesz, még akkor is, ha téged iktatnak ki először.",
+          "publicNote": "Tartsd titokban ezt a szerepet."
         },
         "assassin": {
-          "name": "Assassin",
-          "objective": "Eliminate the Leader.",
-          "guidance": "Your identity is secret. Assassins share the same objective, but you do not know who the other Assassins are.",
-          "publicNote": "Keep this role secret."
+          "name": "Orgyilkos",
+          "objective": "Iktasd ki a Vezetőt.",
+          "guidance": "A személyazonosságod titkos. Az Orgyilkosok célja közös, de nem tudod, kik a többi Orgyilkosok.",
+          "publicNote": "Tartsd titokban ezt a szerepet."
         },
         "traitor": {
-          "name": "Traitor",
-          "objective": "Be the last player standing.",
-          "guidance": "Your identity is secret. Keep the Leader alive until the other threats are gone, then take the throne for yourself.",
-          "publicNote": "Keep this role secret."
+          "name": "Áruló",
+          "objective": "Maradj az utolsó játékos.",
+          "guidance": "A személyazonosságod titkos. Tartsd életben a Vezetőt, amíg a többi fenyegetés el nem tűnik, majd szerezd meg magadnak a trónt.",
+          "publicNote": "Tartsd titokban ezt a szerepet."
         }
       },
       "normal": {
-        "hint": "Secret identities on a shared phone. Everyone starts on 20 life — no commanders.",
-        "hostHint": "Secret roles without commanders. Matching fills your chosen table size first; leftovers can sit as small as four.",
-        "summary": "Secret identities without the Commander format. The Leader is public; everyone else stays hidden.",
+        "hint": "Titkos személyazonosságok egy közös telefonon. Mindenki 20 életponttal kezd — commanderek nélkül.",
+        "hostHint": "Titkos szerepek commanderek nélkül. A párosítás először a választott asztalméretet tölti fel; a maradék podok legalább négyfősek lehetnek.",
+        "summary": "Titkos személyazonosságok a Commander formátum nélkül. A Vezető nyilvános; mindenki más rejtve marad.",
         "sections": {
           "life": {
-            "heading": "Life and loss",
+            "heading": "Élet és vereség",
             "bullets": [
-              "Each player starts at {{life}} life.",
-              "A player loses at 0 life.",
-              "A player loses at {{poison}} poison counters.",
-              "The Leader takes the first turn and draws on that turn."
+              "Minden játékos {{life}} életponttal kezd.",
+              "A játékos 0 életpontnál veszít.",
+              "A játékos {{poison}} méregjelzőnél veszít.",
+              "A Vezető kezdi a játékot, és húz lapot abban a körben."
             ]
           },
           "identities": null
@@ -283,63 +283,63 @@
       }
     },
     "two-headed-giant": {
-      "label": "Two-Headed Giant",
-      "hint": "Two teams of two, 60 shared life each, turns taken together.",
-      "hostHint": "Strict 4-player Commander pods. Two teams share 60 life and take their turns together.",
-      "hostFixedSeats": "Two-Headed Giant games always seat exactly four players.",
-      "title": "Two-Headed Giant",
-      "summary": "Two teams of two. Teammates share a life total and a turn.",
+      "label": "Kétfejű Óriás",
+      "hint": "Két kétfős csapat, csapatonként 60 közös életponttal, közösen végrehajtott körökkel.",
+      "hostHint": "Szigorúan 4 játékos Commander podonként. Két csapat egyenként 60 életpontot oszt meg, és együtt játsszák a köreiket.",
+      "hostFixedSeats": "A Kétfejű Óriás játékokban mindig pontosan négy játékos ül.",
+      "title": "Kétfejű Óriás",
+      "summary": "Két kétfős csapat. A csapattársak közös életpontszámmal és közös körrel rendelkeznek.",
       "sections": {
         "teams": {
-          "heading": "Teams",
+          "heading": "Csapatok",
           "bullets": [
-            "Pick two allies, or let the table randomise the pairs.",
-            "Each team starts at {{sharedLife}} shared life.",
-            "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+            "Válassz két szövetségest, vagy hagyd, hogy a párok véletlenszerűen legyenek kijelölve.",
+            "Minden csapat {{sharedLife}} közös életponttal kezd.",
+            "A csapattársak együtt hajtják végre a körüket. Minden játékosnak továbbra is saját keze, libraryje és commanderei vannak."
           ]
         },
         "life": {
-          "heading": "Life and loss",
+          "heading": "Élet és vereség",
           "bullets": [
-            "A team loses when its shared life reaches 0.",
-            "A team loses at {{sharedPoison}} shared poison counters.",
-            "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+            "Egy csapat veszít, ha a közös életpontjai elérik a 0-t.",
+            "Egy csapat {{sharedPoison}} közös méregjelzőnél veszít.",
+            "Egy csapat veszít, ha egyetlen commandertől {{commanderDamage}} közös harci sebzést kapott."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Körök",
           "bullets": [
-            "The starting team is drawn at random and skips the draw step on its first turn.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "A kezdőcsapatot véletlenszerűen választják ki, és az első körében kihagyja a draw stepet.",
+            "Minden alkalommal, amikor egy commandert újra kijátszanak a command zone-ból, 2 manával többe kerül."
           ]
         }
       },
       "normal": {
-        "hint": "Two teams of two, 40 shared life each, turns taken together.",
-        "hostHint": "Strict 4-player tables. Two teams share 40 life and take their turns together — no commanders.",
-        "summary": "Two teams of two. Teammates share a life total and a turn — standard decks, 20 life each in team terms.",
+        "hint": "Két kétfős csapat, csapatonként 40 közös életponttal, közösen végrehajtott körökkel.",
+        "hostHint": "Szigorúan 4 játékos asztalonként. Két csapat egyenként 40 életpontot oszt meg, és együtt játsszák a köreiket — commanderek nélkül.",
+        "summary": "Két kétfős csapat. A csapattársak közös életpontszámmal és közös körrel rendelkeznek — standard paklik, csapatonként játékosonként 20 életponttal számolva.",
         "sections": {
           "teams": {
-            "heading": "Teams",
+            "heading": "Csapatok",
             "bullets": [
-              "Pick two allies, or let the table randomise the pairs.",
-              "Each team starts at {{sharedLife}} shared life.",
-              "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+              "Válassz két szövetségest, vagy hagyd, hogy a párok véletlenszerűen legyenek kijelölve.",
+              "Minden csapat {{sharedLife}} közös életponttal kezd.",
+              "A csapattársak együtt hajtják végre a körüket. Minden játékosnak továbbra is saját keze, libraryje és commanderei vannak."
             ]
           },
           "life": {
-            "heading": "Life and loss",
+            "heading": "Élet és vereség",
             "bullets": [
-              "A team loses when its shared life reaches 0.",
-              "A team loses at {{sharedPoison}} shared poison counters.",
-              "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+              "Egy csapat veszít, ha a közös életpontjai elérik a 0-t.",
+              "Egy csapat {{sharedPoison}} közös méregjelzőnél veszít.",
+              "Egy csapat veszít, ha egyetlen commandertől {{commanderDamage}} közös harci sebzést kapott."
             ]
           },
           "turns": {
-            "heading": "Turns",
+            "heading": "Körök",
             "bullets": [
-              "The starting team is drawn at random and skips the draw step on its first turn.",
-              "Each time a commander is recast from the command zone, it costs 2 more mana."
+              "A kezdőcsapatot véletlenszerűen választják ki, és az első körében kihagyja a draw stepet.",
+              "Minden alkalommal, amikor egy commandert újra kijátszanak a command zone-ból, 2 manával többe kerül."
             ]
           }
         }
@@ -347,286 +347,286 @@
     },
     "archenemy-commander": {
       "label": "Archenemy",
-      "hint": "One Archenemy on 60 life with a 40-card scheme deck against three heroes sharing 60 life.",
-      "hostHint": "Strict 4-player Commander pods. One 60-life Archenemy faces a three-player team with 60 shared life and a 40-card scheme deck.",
-      "hostFixedSeats": "Archenemy Commander games always seat exactly four players.",
+      "hint": "Egy 60 életpontos Archenemy 40 lapos scheme paklival három, összesen 60 életpontot megosztó hős ellen.",
+      "hostHint": "Szigorúan 4 játékos Commander podonként. Egy 60 életpontos Archenemy egy háromfős, 60 közös életpontos csapattal néz szembe, 40 lapos scheme paklival.",
+      "hostFixedSeats": "Az Archenemy Commander játékokban mindig pontosan négy játékos ül.",
       "title": "Archenemy Commander",
-      "summary": "One Archenemy against a team of three, with a scheme deck in motion.",
+      "summary": "Egy Archenemy egy háromfős csapat ellen, aktív scheme paklival.",
       "sections": {
         "sides": {
-          "heading": "Sides",
+          "heading": "Oldalak",
           "bullets": [
-            "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
-            "Both sides start at {{life}} life.",
-            "The heroes share that life total and take their turn together.",
-            "The Archenemy goes first and draws on that turn."
+            "Válaszd ki az Archenemyt, vagy jelöljetek ki egyet véletlenszerűen. A másik három játékos a hős.",
+            "Mindkét oldal {{life}} életponttal kezd.",
+            "A hősök közösen használják ezt az életpontszámot, és együtt hajtják végre a körüket.",
+            "Az Archenemy kezd, és húz lapot abban a körben."
           ]
         },
         "schemes": {
           "heading": "Schemes",
           "bullets": [
-            "The 40 Duskmourn Commander schemes are shuffled at the start.",
-            "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
-            "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
-            "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
-            "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+            "A 40 Duskmourn Commander scheme-et a játék elején megkeverik.",
+            "Az Archenemy minden first main phase-e alatt nyisd meg az időzítő menüjét, és koppints a Next scheme lehetőségre egy scheme elindításához.",
+            "Egy nem ongoing scheme végrehajtódik, majd a scheme pakli aljára kerül.",
+            "Egy ongoing scheme képpel felfelé marad, amíg az asztal abandonedként nem jelöli, majd a pakli aljára kerül.",
+            "A képpel felfelé lévő scheme-ek és a befejezettek graveyardja miniatűrként jelenik meg a kártya alatt; koppints valamelyikre a nagyobb megtekintéshez."
           ]
         },
         "life": {
-          "heading": "Life and loss",
+          "heading": "Élet és vereség",
           "bullets": [
-            "The Archenemy loses at 0 life, or when the usual poison and commander-damage limits are reached.",
-            "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
-            "A player loses after taking {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Az Archenemy 0 életpontnál veszít, vagy amikor eléri a szokásos poison- vagy commander-damage limiteket.",
+            "A hősök együtt veszítenek, ha a közös életpontjuk eléri a 0-t, és ugyanígy közösen kezelik a poisont és a commander damage-et.",
+            "Egy játékos veszít, ha egyetlen commandertől {{commanderDamage}} harci sebzést kapott.",
+            "Minden alkalommal, amikor egy commandert újra kijátszanak a command zone-ból, 2 manával többe kerül."
           ]
         }
       },
       "normal": {
-        "hint": "One Archenemy on 20 life with schemes against three heroes sharing 40 life.",
-        "hostHint": "Strict 4-player tables. One Archenemy with a scheme deck against a three-player team — no commanders.",
-        "summary": "One Archenemy against a team of three, with a scheme deck in motion — standard 20-life tables.",
+        "hint": "Egy 20 életpontos Archenemy schemes-ekkel három, összesen 40 életpontot megosztó hős ellen.",
+        "hostHint": "Szigorúan 4 játékos asztalonként. Egy scheme paklis Archenemy egy háromfős csapat ellen — commanderek nélkül.",
+        "summary": "Egy Archenemy egy háromfős csapat ellen, aktív scheme paklival — standard 20 életpontos asztalokon.",
         "sections": {
           "sides": {
-            "heading": "Sides",
+            "heading": "Oldalak",
             "bullets": [
-              "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
-              "Both sides start at {{life}} life.",
-              "The heroes share that life total and take their turn together.",
-              "The Archenemy goes first and draws on that turn."
+              "Válaszd ki az Archenemyt, vagy jelöljetek ki egyet véletlenszerűen. A másik három játékos a hős.",
+              "Mindkét oldal {{life}} életponttal kezd.",
+              "A hősök közösen használják ezt az életpontszámot, és együtt hajtják végre a körüket.",
+              "Az Archenemy kezd, és húz lapot abban a körben."
             ]
           },
           "schemes": {
             "heading": "Schemes",
             "bullets": [
-              "The 40 Duskmourn Commander schemes are shuffled at the start.",
-              "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
-              "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
-              "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
-              "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+              "A 40 Duskmourn Commander scheme-et a játék elején megkeverik.",
+              "Az Archenemy minden first main phase-e alatt nyisd meg az időzítő menüjét, és koppints a Next scheme lehetőségre egy scheme elindításához.",
+              "Egy nem ongoing scheme végrehajtódik, majd a scheme pakli aljára kerül.",
+              "Egy ongoing scheme képpel felfelé marad, amíg az asztal abandonedként nem jelöli, majd a pakli aljára kerül.",
+              "A képpel felfelé lévő scheme-ek és a befejezettek graveyardja miniatűrként jelenik meg a kártya alatt; koppints valamelyikre a nagyobb megtekintéshez."
             ]
           },
           "life": {
-            "heading": "Life and loss",
+            "heading": "Élet és vereség",
             "bullets": [
-              "The Archenemy loses at 0 life, or when the usual poison and poison limits are reached.",
-              "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
-              "A player loses after taking {{poison}} poison counters."
+              "Az Archenemy 0 életpontnál veszít, vagy amikor eléri a szokásos poison- és poison-limiteket.",
+              "A hősök együtt veszítenek, ha a közös életpontjuk eléri a 0-t, és ugyanígy közösen kezelik a poisont és a commander damage-et.",
+              "Egy játékos {{poison}} poison counter után veszít."
             ]
           }
         }
       }
     },
     "emperor": {
-      "label": "Emperor",
-      "hint": "Two teams of three. Protect your Emperor using limited range of influence and deploy creatures.",
-      "hostHint": "Strict 6-player Commander pods. Two teams each place an Emperor between two Generals and play with limited range of influence.",
-      "hostFixedSeats": "Emperor games always seat exactly six players.",
-      "title": "Emperor",
-      "summary": "Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.",
+      "label": "Császár",
+      "hint": "Két háromfős csapat. Védd meg a Császárodat korlátozott hatótávolsággal és creature-ök mozgatásával.",
+      "hostHint": "Szigorúan 6 játékos Commander podonként. Mindkét csapat egy Császárt helyez két Tábornok közé, és korlátozott hatótávolsággal játszik.",
+      "hostFixedSeats": "A Császár játékokban mindig pontosan hat játékos ül.",
+      "title": "Császár",
+      "summary": "Két háromfős csapat. Minden Császár két Tábornok között ül, és a Császár kiiktatása megnyeri a játékot.",
       "sections": {
         "teams": {
-          "heading": "Teams and turns",
+          "heading": "Csapatok és körök",
           "bullets": [
-            "Choose both teams and each team's Emperor, or randomise either choice.",
-            "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
-            "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
-            "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+            "Válaszd ki mindkét csapatot és mindkét csapat Császárát, vagy véletlenszerűsítsd bármelyik választást.",
+            "Minden játékos {{life}} életponttal kezd, és megtartja saját kezét, manáját, permanentjeit, poisonját és körét.",
+            "A csapattársak megnézhetik egymás kezét és megbeszélhetik a stratégiát, de nem kezelhetik egymás lapjait.",
+            "Véletlenszerűen válasszátok ki, melyik Császár kezdi a játékot. Ez a Császár húz lapot az első körében."
           ]
         },
         "range": {
-          "heading": "Range and combat",
+          "heading": "Hatótávolság és harc",
           "bullets": [
-            "Generals have range of influence 1. Emperors have range of influence 2.",
-            "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
-            "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
-            "As players leave, the empty seats stop counting, bringing surviving players into range."
+            "A Tábornokok hatótávolsága 1. A Császárok hatótávolsága 2.",
+            "A spellek, abilityk, effektek és információk csak a controllerük hatótávolságán belüli játékosokra és objektumokra hathatnak.",
+            "Egy játékos csak a közvetlenül mellette ülő ellenfelet, illetve annak planeswalkereit és protected battle-jeit támadhatja.",
+            "Ahogy a játékosok kiesnek, az üres helyek már nem számítanak, így a megmaradt játékosok egymás hatótávolságába kerülnek."
           ]
         },
         "deploy": {
-          "heading": "Deploy creatures",
+          "heading": "Creature-ök mozgatása",
           "bullets": [
-            "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
-            "This can move creatures through the team as the battle lines change."
+            "Minden creature rendelkezik ezzel: \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
+            "Ez lehetővé teszi, hogy a creature-ök a csapaton belül mozogjanak, ahogy a frontvonalak változnak."
           ]
         },
         "winning": {
-          "heading": "Winning and Commander rules",
+          "heading": "Győzelem és Commander-szabályok",
           "bullets": [
-            "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
-            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Egy csapat nyer, ha a Császára nyer, és azonnal veszít, ha a Császára veszít. Egy Tábornok kieshet anélkül, hogy a játék véget érne.",
+            "A játékos 0 életpontnál, {{poison}} poisonnál vagy egyetlen commandertől kapott {{commanderDamage}} harci sebzésnél veszít.",
+            "Minden alkalommal, amikor egy commandert újra kijátszanak a command zone-ból, 2 manával többe kerül."
           ]
         }
       },
       "normal": {
-        "hint": "Two teams of three on 20 life. Protect your Emperor with limited range of influence.",
-        "hostHint": "Strict 6-player tables. Two Emperors between Generals — standard 20-life decks, no commanders.",
-        "summary": "Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.",
+        "hint": "Két háromfős csapat 20 életponttal. Védd meg a Császárodat korlátozott hatótávolsággal.",
+        "hostHint": "Szigorúan 6 játékos asztalonként. Két Császár a Tábornokok között — standard 20 életpontos paklik, commanderek nélkül.",
+        "summary": "Két háromfős csapat. Minden Császár két Tábornok között ül, és a Császár kiiktatása megnyeri a játékot.",
         "sections": {
           "teams": {
-            "heading": "Teams and turns",
+            "heading": "Csapatok és körök",
             "bullets": [
-              "Choose both teams and each team's Emperor, or randomise either choice.",
-              "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
-              "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
-              "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+              "Válaszd ki mindkét csapatot és mindkét csapat Császárát, vagy véletlenszerűsítsd bármelyik választást.",
+              "Minden játékos {{life}} életponttal kezd, és megtartja saját kezét, manáját, permanentjeit, poisonját és körét.",
+              "A csapattársak megnézhetik egymás kezét és megbeszélhetik a stratégiát, de nem kezelhetik egymás lapjait.",
+              "Véletlenszerűen válasszátok ki, melyik Császár kezdi a játékot. Ez a Császár húz lapot az első körében."
             ]
           },
           "range": {
-            "heading": "Range and combat",
+            "heading": "Hatótávolság és harc",
             "bullets": [
-              "Generals have range of influence 1. Emperors have range of influence 2.",
-              "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
-              "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
-              "As players leave, the empty seats stop counting, bringing surviving players into range."
+              "A Tábornokok hatótávolsága 1. A Császárok hatótávolsága 2.",
+              "A spellek, abilityk, effektek és információk csak a controllerük hatótávolságán belüli játékosokra és objektumokra hathatnak.",
+              "Egy játékos csak a közvetlenül mellette ülő ellenfelet, illetve annak planeswalkereit és protected battle-jeit támadhatja.",
+              "Ahogy a játékosok kiesnek, az üres helyek már nem számítanak, így a megmaradt játékosok egymás hatótávolságába kerülnek."
             ]
           },
           "deploy": {
-            "heading": "Deploy creatures",
+            "heading": "Creature-ök mozgatása",
             "bullets": [
-              "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
-              "This can move creatures through the team as the battle lines change."
+              "Minden creature rendelkezik ezzel: \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
+              "Ez lehetővé teszi, hogy a creature-ök a csapaton belül mozogjanak, ahogy a frontvonalak változnak."
             ]
           },
           "winning": {
-            "heading": "Winning and Commander rules",
+            "heading": "Győzelem és Commander-szabályok",
             "bullets": [
-              "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
-              "A player loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+              "Egy csapat nyer, ha a Császára nyer, és azonnal veszít, ha a Császára veszít. Egy Tábornok kieshet anélkül, hogy a játék véget érne.",
+              "A játékos 0 életpontnál, {{poison}} poisonnál vagy {{poison}} poison counternél veszít."
             ]
           }
         }
       }
     },
     "star": {
-      "label": "Star",
-      "hint": "Five players in a circle. Your neighbors are allies; eliminate both players across from you.",
-      "hostHint": "Strict 5-player Commander pods. Adjacent players are allies; each player wins by outlasting both opponents across the circle.",
-      "hostFixedSeats": "Star games always seat exactly five players.",
-      "title": "Star",
-      "summary": "Five players sit in a circle. Your neighbors are allies and the two players across from you are enemies.",
+      "label": "Csillag",
+      "hint": "Öt játékos körben. A szomszédaid a szövetségeseid; iktasd ki a veled szemben lévő két játékost.",
+      "hostHint": "Szigorúan 5 játékos Commander podonként. A szomszédos játékosok szövetségesek; minden játékos úgy nyer, ha túléli a kör túloldalán lévő két ellenfelét.",
+      "hostFixedSeats": "A Csillag játékokban mindig pontosan öt játékos ül.",
+      "title": "Csillag",
+      "summary": "Öt játékos körben ül. A szomszédaid a szövetségeseid, a veled szemben lévő két játékos pedig az ellenséged.",
       "sections": {
         "positions": {
-          "heading": "Positions and allies",
+          "heading": "Pozíciók és szövetségesek",
           "bullets": [
-            "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
-            "The players immediately to your left and right are your allies.",
-            "The two nonadjacent players across the circle are your enemies.",
-            "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+            "Válaszd ki kézzel a körbeli pozíciókat két játékos felcserélésével, vagy véletlenszerűsítsd mind az öt pozíciót.",
+            "A közvetlenül melletted balra és jobbra ülő játékosok a szövetségeseid.",
+            "A kör túloldalán lévő két nem szomszédos játékos az ellenséged.",
+            "A pozíciók nem változnak, amikor egy játékost kiiktatnak; a szövetségeseid és az ellenségeid ugyanazok maradnak."
           ]
         },
         "combat": {
-          "heading": "Combat and interaction",
+          "heading": "Harc és interakció",
           "bullets": [
-            "Players cannot attack their allies by default.",
-            "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
-            "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+            "Alapértelmezés szerint a játékosok nem támadhatják a szövetségeseiket.",
+            "A spellek és abilityk továbbra is segíthetnek vagy hathatnak bármely játékosra, kivéve ha az asztal szigorúbb változatban állapodik meg.",
+            "A körök az óramutató járásával megegyezően haladnak. Véletlenszerűen válasszátok ki a kezdőjátékost; ez a játékos húz lapot az első körében."
           ]
         },
         "winning": {
-          "heading": "Winning",
+          "heading": "Győzelem",
           "bullets": [
-            "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
-            "An eliminated player cannot win later.",
-            "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Az első még életben lévő játékos nyer, akinek mindkét ellenségét kiiktatták, függetlenül attól, ki iktatta ki őket.",
+            "Egy kiiktatott játékos később már nem nyerhet.",
+            "Minden játékos {{life}} életponttal kezd, és 0 életpontnál, {{poison}} poisonnál vagy egyetlen commandertől kapott {{commanderDamage}} harci sebzésnél veszít.",
+            "Minden alkalommal, amikor egy commandert újra kijátszanak a command zone-ból, 2 manával többe kerül."
           ]
         }
       },
       "normal": {
-        "hint": "Five players in a circle on 20 life. Neighbors are allies; eliminate both players across from you.",
-        "hostHint": "Strict 5-player tables. Adjacent players ally; each player wins by outlasting both opponents across the circle.",
-        "summary": "Five players sit in a circle on 20 life. Your neighbors are allies and the two players across from you are enemies.",
+        "hint": "Öt játékos körben, 20 életponttal. A szomszédok szövetségesek; iktasd ki a veled szemben lévő két játékost.",
+        "hostHint": "Szigorúan 5 játékos asztalonként. A szomszédos játékosok szövetségesek; minden játékos úgy nyer, ha túléli a kör túloldalán lévő két ellenfelét.",
+        "summary": "Öt játékos körben ül 20 életponttal. A szomszédaid a szövetségeseid, a veled szemben lévő két játékos pedig az ellenséged.",
         "sections": {
           "positions": {
-            "heading": "Positions and allies",
+            "heading": "Pozíciók és szövetségesek",
             "bullets": [
-              "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
-              "The players immediately to your left and right are your allies.",
-              "The two nonadjacent players across the circle are your enemies.",
-              "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+              "Válaszd ki kézzel a körbeli pozíciókat két játékos felcserélésével, vagy véletlenszerűsítsd mind az öt pozíciót.",
+              "A közvetlenül melletted balra és jobbra ülő játékosok a szövetségeseid.",
+              "A kör túloldalán lévő két nem szomszédos játékos az ellenséged.",
+              "A pozíciók nem változnak, amikor egy játékost kiiktatnak; a szövetségeseid és az ellenségeid ugyanazok maradnak."
             ]
           },
           "combat": {
-            "heading": "Combat and interaction",
+            "heading": "Harc és interakció",
             "bullets": [
-              "Players cannot attack their allies by default.",
-              "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
-              "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+              "Alapértelmezés szerint a játékosok nem támadhatják a szövetségeseiket.",
+              "A spellek és abilityk továbbra is segíthetnek vagy hathatnak bármely játékosra, kivéve ha az asztal szigorúbb változatban állapodik meg.",
+              "A körök az óramutató járásával megegyezően haladnak. Véletlenszerűen válasszátok ki a kezdőjátékost; ez a játékos húz lapot az első körében."
             ]
           },
           "winning": {
-            "heading": "Winning",
+            "heading": "Győzelem",
             "bullets": [
-              "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
-              "An eliminated player cannot win later.",
-              "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+              "Az első még életben lévő játékos nyer, akinek mindkét ellenségét kiiktatták, függetlenül attól, ki iktatta ki őket.",
+              "Egy kiiktatott játékos később már nem nyerhet.",
+              "Minden játékos {{life}} életponttal kezd, és 0 életpontnál, {{poison}} poisonnál vagy {{poison}} poison counternél veszít."
             ]
           }
         }
       }
     },
     "assassin": {
-      "label": "Assassin",
-      "hint": "Secret contracts in a free-for-all. Eliminate your mark, score, and inherit their target.",
-      "hostHint": "Secret contracts for 3–8 players. Score by eliminating your mark, then inherit their target.",
-      "title": "Assassin",
-      "summary": "A free-for-all with secret contracts. Score marks, inherit new targets, and finish with the highest score.",
+      "label": "Orgyilkos",
+      "hint": "Titkos szerződések mindenki mindenki ellen. Iktasd ki a célpontodat, szerezz pontot, majd örököld a célpontját.",
+      "hostHint": "Titkos szerződések 3–8 játékoshoz. Szerezz pontot a célpontod kiiktatásával, majd örököld annak célpontját.",
+      "title": "Orgyilkos",
+      "summary": "Mindenki mindenki ellen titkos szerződésekkel. Iktasd ki a célpontokat, örökölj újakat, és végezz a legmagasabb pontszámmal.",
       "sections": {
         "contracts": {
-          "heading": "Secret contracts",
+          "heading": "Titkos szerződések",
           "bullets": [
-            "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
-            "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
-            "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+            "Minden játékos titokban kap egy célpontot. A szerződések kört alkotnak, így senki sem saját magát célozza, és minden játékosra pontosan egy másik játékos vadászik.",
+            "Az előkészítés során adjátok körbe az eszközt. Nyisd meg a „Célpont ellenőrzése” lehetőséget az időzítő menüjéből, amikor újra el szeretnéd olvasni az aktuális szerződésedet.",
+            "A játékosok bárkit támadhatnak és befolyásolhatnak; a szerződés a pontozást határozza meg, nem a szabályos célpontokat."
           ]
         },
         "elimination": {
-          "heading": "Elimination and inheritance",
+          "heading": "Kiiktatás és öröklés",
           "bullets": [
-            "When a player is eliminated, record who dealt the finishing blow.",
-            "If you personally eliminate your assigned target, you score one mark.",
-            "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+            "Amikor egy játékost kiiktatnak, jegyezd fel, ki adta a végső csapást.",
+            "Ha személyesen iktatod ki a kijelölt célpontodat, egy markot kapsz.",
+            "Az a játékos, aki a kiiktatott célpontra vadászott, örökli annak szerződését, még akkor is, ha valaki más adta a végső csapást. Így minden túlélő játékosnak mindig egy aktív szerződése marad."
           ]
         },
         "winning": {
-          "heading": "Winning",
+          "heading": "Győzelem",
           "bullets": [
-            "Play until only one player remains. The last survivor scores one additional mark.",
-            "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
-            "Commander rules still apply: {{life}} starting life, {{poison}} poison, and {{commanderDamage}} combat damage from one commander are lethal.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Játsszatok addig, amíg csak egy játékos marad. Az utolsó túlélő egy további markot kap.",
+            "A legtöbb markkal rendelkező játékos nyer; ha a legmagasabb pontszám döntetlen, az utolsó túlélő nyeri a döntetlent.",
+            "A Commander szabályai továbbra is érvényesek: {{life}} kezdő életpont, {{poison}} poison és egyetlen commandertől kapott {{commanderDamage}} harci sebzés halálos.",
+            "Minden alkalommal, amikor egy commandert újra kijátszanak a command zone-ból, 2 manával többe kerül."
           ]
         }
       },
       "normal": {
-        "hint": "Secret contracts for 3–8 players on 20 life. Score by eliminating your mark.",
-        "hostHint": "Secret contracts without commanders. Matching fills your chosen table size; leftovers can sit as small as three.",
-        "summary": "A free-for-all with secret contracts on 20 life. Score marks, inherit new targets, and finish with the highest score.",
+        "hint": "Titkos szerződések 3–8 játékoshoz, 20 életponttal. Szerezz pontot a célpontod kiiktatásával.",
+        "hostHint": "Titkos szerződések commanderek nélkül. A párosítás feltölti a választott asztalméretet; a maradék körök legalább három játékossal indulhatnak.",
+        "summary": "Mindenki mindenki ellen titkos szerződésekkel, 20 életponttal. Iktasd ki a célpontokat, örökölj újakat, és végezz a legmagasabb pontszámmal.",
         "sections": {
           "contracts": {
-            "heading": "Secret contracts",
+            "heading": "Titkos szerződések",
             "bullets": [
-              "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
-              "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
-              "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+              "Minden játékos titokban kap egy célpontot. A szerződések kört alkotnak, így senki sem saját magát célozza, és minden játékosra pontosan egy másik játékos vadászik.",
+              "Az előkészítés során adjátok körbe az eszközt. Nyisd meg a „Célpont ellenőrzése” lehetőséget az időzítő menüjéből, amikor újra el szeretnéd olvasni az aktuális szerződésedet.",
+              "A játékosok bárkit támadhatnak és befolyásolhatnak; a szerződés a pontozást határozza meg, nem a szabályos célpontokat."
             ]
           },
           "elimination": {
-            "heading": "Elimination and inheritance",
+            "heading": "Kiiktatás és öröklés",
             "bullets": [
-              "When a player is eliminated, record who dealt the finishing blow.",
-              "If you personally eliminate your assigned target, you score one mark.",
-              "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+              "Amikor egy játékost kiiktatnak, jegyezd fel, ki adta a végső csapást.",
+              "Ha személyesen iktatod ki a kijelölt célpontodat, egy markot kapsz.",
+              "Az a játékos, aki a kiiktatott célpontra vadászott, örökli annak szerződését, még akkor is, ha valaki más adta a végső csapást. Így minden túlélő játékosnak mindig egy aktív szerződése marad."
             ]
           },
           "winning": {
-            "heading": "Winning",
+            "heading": "Győzelem",
             "bullets": [
-              "Play until only one player remains. The last survivor scores one additional mark.",
-              "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
-              "{{life}} starting life, {{poison}} poison, and {{poison}} poison counters are lethal."
+              "Játsszatok addig, amíg csak egy játékos marad. Az utolsó túlélő egy további markot kap.",
+              "A legtöbb markkal rendelkező játékos nyer; ha a legmagasabb pontszám döntetlen, az utolsó túlélő nyeri a döntetlent.",
+              "{{life}} kezdő életpont, {{poison}} poison és {{poison}} poison counter halálos."
             ]
           }
         }
@@ -634,446 +634,446 @@
     }
   },
   "home": {
-    "taglineBefore": "Your next",
-    "taglineHighlight": "pod",
-    "taglineAfter": ", sorted.",
-    "startPlaying": "Start playing",
-    "ongoingGame": "ongoing game",
-    "noEventNeeded": "no event needed",
-    "startPlayingHint": "Open a battle screen on this device. Leave and come back without losing an unfinished game.",
-    "alwaysPlayers": "Always {{count}} players in this mode.",
-    "resumeGame": "Resume game",
-    "startNewGame": "Start a new game",
-    "startGame": "Start a game",
-    "commanderSetup": "Commanders",
-    "commanderSetupHint": "Search Scryfall for each player's commander. Partner pairs need both commanders.",
-    "chooseAllCommanders": "Choose a commander for every player.",
-    "advancedMatchConfig": "Advanced match config",
-    "hostEvent": "Host event",
-    "new": "new",
-    "targetTableSize": "Target table size",
-    "allowThreePods": "Allow 3-player pods",
-    "allowFivePods": "Allow 5-player pods",
-    "duelFixedSeats": "Duel events always seat exactly two players.",
-    "emperorFixedSeats": "Emperor games always seat exactly six players.",
-    "starFixedSeats": "Star games always seat exactly five players.",
-    "archenemyFixedSeats": "Archenemy Commander games always seat exactly four players.",
-    "twoHeadedFixedSeats": "Two-Headed Giant games always seat exactly four players.",
-    "eventName": "Event name",
-    "eventNamePlaceholder": "Friday Commander",
-    "tables": "Tables",
-    "tablesHint": "How many physical tables are free for this event.",
-    "eventLasts": "Event lasts",
-    "eventLastsHint": "Join code dies after this many hours. Use 48 or 72 for a weekend.",
-    "hostPin": "Host PIN",
-    "hostPinHint": "4 to 8 digits — reopens the host desk later.",
-    "createEvent": "Create event",
-    "joinWithCode": "Join with a code",
-    "playerAside": "player",
-    "joinCode": "Join code",
+    "taglineBefore": "A következő",
+    "taglineHighlight": "podod",
+    "taglineAfter": ", elintézve.",
+    "startPlaying": "Játék indítása",
+    "ongoingGame": "folyamatban lévő játék",
+    "noEventNeeded": "nincs szükség eseményre",
+    "startPlayingHint": "Nyiss meg egy játékfelületet ezen az eszközön. Kiléphetsz és visszatérhetsz anélkül, hogy elveszítenéd a befejezetlen játékot.",
+    "alwaysPlayers": "Ebben a módban mindig {{count}} játékos van.",
+    "resumeGame": "Játék folytatása",
+    "startNewGame": "Új játék indítása",
+    "startGame": "Játék indítása",
+    "commanderSetup": "Commanderek",
+    "commanderSetupHint": "Keresd meg minden játékos commanderét a Scryfallon. A Partner párokhoz mindkét commander szükséges.",
+    "chooseAllCommanders": "Válassz commandert minden játékosnak.",
+    "advancedMatchConfig": "Speciális játékbeállítások",
+    "hostEvent": "Esemény szervezése",
+    "new": "új",
+    "targetTableSize": "Célzott asztalméret",
+    "allowThreePods": "3 játékos podok engedélyezése",
+    "allowFivePods": "5 játékos podok engedélyezése",
+    "duelFixedSeats": "A Párbaj eseményekben mindig pontosan két játékos ül.",
+    "emperorFixedSeats": "A Császár játékokban mindig pontosan hat játékos ül.",
+    "starFixedSeats": "A Csillag játékokban mindig pontosan öt játékos ül.",
+    "archenemyFixedSeats": "Az Archenemy Commander játékokban mindig pontosan négy játékos ül.",
+    "twoHeadedFixedSeats": "A Kétfejű Óriás játékokban mindig pontosan négy játékos ül.",
+    "eventName": "Esemény neve",
+    "eventNamePlaceholder": "Pénteki Commander",
+    "tables": "Asztalok",
+    "tablesHint": "Hány fizikai asztal áll rendelkezésre ehhez az eseményhez.",
+    "eventLasts": "Esemény időtartama",
+    "eventLastsHint": "A csatlakozási kód ennyi óra után lejár. Egy hétvégéhez használj 48 vagy 72 órát.",
+    "hostPin": "Szervező PIN-kódja",
+    "hostPinHint": "4–8 számjegy — később ezzel nyitható újra a szervezői felület.",
+    "createEvent": "Esemény létrehozása",
+    "joinWithCode": "Csatlakozás kóddal",
+    "playerAside": "játékos",
+    "joinCode": "Csatlakozási kód",
     "joinCodePlaceholder": "AB23CD",
-    "join": "Join",
-    "scanQr": "Scan QR",
-    "staleJoin": "That event is gone. Join with a new code, or host a new night."
+    "join": "Csatlakozás",
+    "scanQr": "QR beolvasása",
+    "staleJoin": "Ez az esemény már nem érhető el. Csatlakozz egy új kóddal, vagy szervezz új játékestet."
   },
   "host": {
-    "desk": "Host desk",
-    "locked": "Locked",
-    "hostOnly": "host only",
-    "unlockHostDesk": "Unlock host desk",
-    "playerCount": "{{count}} player",
-    "playerCount_plural": "{{count}} players",
-    "ready": "{{count}} ready",
-    "matched": "{{count}} matched",
-    "playing": "{{count}} playing",
-    "paused": "{{count}} paused",
-    "ends": "ends {{date}}",
-    "podSizes": "Pod sizes",
-    "matching": "matching",
-    "allowLeftoverThree": "Allow leftover 3-player pods",
-    "allowFivePods": "Allow 5-player pods",
-    "treacheryTargetHint": "Target table size. Leftover pods can be as small as four.",
-    "matchingPrefers": "Matching prefers {{size}}-player tables.",
-    "matchingPrefersFour": "Matching prefers 4-player tables.",
-    "assassinTargetHint": "Target table size. Leftover contract circles can be as small as three.",
-    "multiplayerTargetHint": "Target table size. Leftover tables can be as small as three.",
-    "duelMatchmaking": "Duel matchmaking seats exactly two players per game.",
-    "twoHeadedMatchmaking": "Two-Headed Giant matchmaking seats exactly four players per game.",
-    "archenemyMatchmaking": "Archenemy Commander matchmaking seats exactly four players per game: one Archenemy against a team of three.",
-    "emperorMatchmaking": "Emperor matchmaking seats exactly six players per game: two teams with an Emperor and two Generals each.",
-    "starMatchmaking": "Star matchmaking seats exactly five players in a circular order.",
-    "eventLength": "Event length",
-    "joinCodeDies": "join code dies",
-    "hoursFromStart": "Hours from start",
-    "hoursFromStartHint": "Change this for a multi-day event. After it ends, the QR opens the home page.",
-    "joinCodeTitle": "Join code",
-    "share": "share",
-    "noLanAddress": "No LAN address found — this link only works on this computer.",
-    "copyPlayerLink": "Copy player link",
-    "queue": "Queue",
-    "nobodyWaiting": "Nobody waiting.",
+    "desk": "Szervezői felület",
+    "locked": "Zárolva",
+    "hostOnly": "csak szervező",
+    "unlockHostDesk": "Szervezői felület feloldása",
+    "playerCount": "{{count}} játékos",
+    "playerCount_plural": "{{count}} játékos",
+    "ready": "{{count}} kész",
+    "matched": "{{count}} párosítva",
+    "playing": "{{count}} játszik",
+    "paused": "{{count}} szünetel",
+    "ends": "vége: {{date}}",
+    "podSizes": "Podméretek",
+    "matching": "párosítás",
+    "allowLeftoverThree": "Maradék 3 játékos podok engedélyezése",
+    "allowFivePods": "5 játékos podok engedélyezése",
+    "treacheryTargetHint": "Célzott asztalméret. A maradék podok legalább négyfősek lehetnek.",
+    "matchingPrefers": "A párosítás a {{size}} játékos asztalokat részesíti előnyben.",
+    "matchingPrefersFour": "A párosítás a 4 játékos asztalokat részesíti előnyben.",
+    "assassinTargetHint": "Célzott asztalméret. A maradék szerződéskörök legalább három játékossal indulhatnak.",
+    "multiplayerTargetHint": "Célzott asztalméret. A maradék asztalok legalább három játékossal indulhatnak.",
+    "duelMatchmaking": "A Párbaj párosítás pontosan két játékost ült minden játékba.",
+    "twoHeadedMatchmaking": "A Kétfejű Óriás párosítás pontosan négy játékost ült minden játékba.",
+    "archenemyMatchmaking": "Az Archenemy Commander párosítás pontosan négy játékost ült minden játékba: egy Archenemyt egy háromfős csapat ellen.",
+    "emperorMatchmaking": "A Császár párosítás pontosan hat játékost ült minden játékba: két csapatot, csapatonként egy Császárral és két Tábornokkal.",
+    "starMatchmaking": "A Csillag párosítás pontosan öt játékost ült kör alakú sorrendben.",
+    "eventLength": "Esemény időtartama",
+    "joinCodeDies": "a csatlakozási kód lejár",
+    "hoursFromStart": "Órák a kezdéstől",
+    "hoursFromStartHint": "Többnapos eseménynél módosítsd ezt. A lejárat után a QR-kód a kezdőlapot nyitja meg.",
+    "joinCodeTitle": "Csatlakozási kód",
+    "share": "megosztás",
+    "noLanAddress": "Nem található LAN-cím — ez a hivatkozás csak ezen a számítógépen működik.",
+    "copyPlayerLink": "Játékoslink másolása",
+    "queue": "Várólista",
+    "nobodyWaiting": "Senki sem várakozik.",
     "flex": "flex {{count}}",
-    "challengePts": "{{count}} challenge pts",
-    "pts": "{{count}} pts",
-    "notReady": "Not ready",
-    "pausedTitle": "Paused",
-    "seated": "Seated",
-    "atTables": "{{count}} at tables",
-    "tablesTitle": "Tables",
-    "total": "{{count}} total",
-    "noTables": "This event was created without tables.",
-    "startingGames": "Starting games…",
-    "startAllReady": "Start all ready games ({{count}})",
-    "startGame": "Start game",
-    "finishTable": "Finish table",
-    "cancelPod": "Cancel pod",
-    "enable": "Enable",
-    "disable": "Disable",
+    "challengePts": "{{count}} kihíváspont",
+    "pts": "{{count}} pont",
+    "notReady": "Nem kész",
+    "pausedTitle": "Szünetel",
+    "seated": "Asztalnál",
+    "atTables": "{{count}} asztalnál",
+    "tablesTitle": "Asztalok",
+    "total": "{{count}} összesen",
+    "noTables": "Ez az esemény asztalok nélkül lett létrehozva.",
+    "startingGames": "Játékok indítása…",
+    "startAllReady": "Minden kész játék indítása ({{count}})",
+    "startGame": "Játék indítása",
+    "finishTable": "Asztal befejezése",
+    "cancelPod": "Pod törlése",
+    "enable": "Engedélyezés",
+    "disable": "Letiltás",
     "trackerUsed": "tracker",
-    "noTracker": "no tracker",
-    "matchNow": "Match now",
-    "fillBots": "Fill tables with bots",
-    "playerJoinPage": "Player join page"
+    "noTracker": "tracker nélkül",
+    "matchNow": "Párosítás most",
+    "fillBots": "Asztalok feltöltése botokkal",
+    "playerJoinPage": "Játékos csatlakozási oldal"
   },
   "join": {
-    "joinEvent": "Join event",
-    "takeSeat": "Take a seat",
-    "displayName": "Display name",
+    "joinEvent": "Csatlakozás az eseményhez",
+    "takeSeat": "Foglalj helyet",
+    "displayName": "Megjelenített név",
     "displayNamePlaceholder": "Alex",
-    "joinEventButton": "Join event",
-    "saveDecks": "Save decks",
-    "matchFound": "Match found",
-    "yourDeck": "Your deck",
-    "checkMyRole": "Check my role",
-    "playingWithoutTracker": "Playing without the tracker. The host can finish the table.",
-    "chooseTracker": "Choose how this pod will record its game.",
-    "useGameTracker": "Use game tracker",
-    "playWithoutTracker": "Play without tracker",
-    "atTableMarked": "You're marked as at the table on this phone. The host still starts the game from the desk.",
-    "imAtTable": "I'm at the table",
-    "leftEvent": "You left this event. Scan the QR again if you want back in.",
-    "openPool": "Open pool — any table.",
-    "ready": "Ready",
-    "waiting": "waiting",
-    "holdTight": "Hold tight — a table is coming.",
-    "flex": "Flex: {{flex}} · Challenge Points: {{points}}",
-    "howWasPod": "How was your pod?",
-    "pause": "Pause",
-    "leave": "Leave",
-    "pausedMessage": "You are paused. Resume when you can sit, or leave the event.",
-    "imReady": "I'm ready",
-    "leaveEvent": "Leave event",
-    "markReady": "Mark ready when you can sit down for a game.",
-    "matchingShortly": "Matching will send you to a table shortly.",
-    "imTheHost": "I'm the host",
-    "offlineSaved": "Saved on this phone. It will send when you are back online.",
-    "stayAtTable": "Stay at the table until the host calls the game."
+    "joinEventButton": "Csatlakozás az eseményhez",
+    "saveDecks": "Paklik mentése",
+    "matchFound": "Játék találva",
+    "yourDeck": "A paklid",
+    "checkMyRole": "Szerepem ellenőrzése",
+    "playingWithoutTracker": "Tracker nélkül játszol. A szervező befejezheti az asztalt.",
+    "chooseTracker": "Válaszd ki, hogyan rögzítse ez a pod a játékot.",
+    "useGameTracker": "Játéktracker használata",
+    "playWithoutTracker": "Játék tracker nélkül",
+    "atTableMarked": "Ezen a telefonon asztalnál lévőként vagy megjelölve. A játékot továbbra is a szervező indítja el a saját felületéről.",
+    "imAtTable": "Az asztalnál vagyok",
+    "leftEvent": "Kiléptél az eseményből. Olvasd be újra a QR-kódot, ha vissza szeretnél térni.",
+    "openPool": "Nyitott pool — bármelyik asztal.",
+    "ready": "Kész",
+    "waiting": "várakozás",
+    "holdTight": "Tarts ki — hamarosan lesz asztal.",
+    "flex": "Flex: {{flex}} · Kihíváspontok: {{points}}",
+    "howWasPod": "Milyen volt a podod?",
+    "pause": "Szünet",
+    "leave": "Kilépés",
+    "pausedMessage": "Szünetelsz. Folytasd, amikor újra le tudsz ülni játszani, vagy lépj ki az eseményből.",
+    "imReady": "Készen állok",
+    "leaveEvent": "Kilépés az eseményből",
+    "markReady": "Jelöld magad késznek, amikor le tudsz ülni egy játékra.",
+    "matchingShortly": "A párosítás hamarosan asztalhoz küld.",
+    "imTheHost": "Én vagyok a szervező",
+    "offlineSaved": "Elmentve ezen a telefonon. Amint újra online leszel, elküldésre kerül.",
+    "stayAtTable": "Maradj az asztalnál, amíg a szervező le nem zárja a játékot."
   },
   "matchConfig": {
-    "title": "Match config",
-    "description": "Sets up the fake seated pod behind /match. Nothing here touches the server, and none of it appears on the battle screen, so that route can be checked on a phone as-is.",
-    "podSetup": "Pod setup",
-    "seats": "Seats",
-    "seatsCount": "{{count}} seats",
+    "title": "Játékbeállítás",
+    "description": "Beállítja a /match mögötti tesztként leültetett podot. Semmi itt nem érinti a szervert, és semmi nem jelenik meg a játékfelületen, így ez a route telefonon változtatás nélkül ellenőrizhető.",
+    "podSetup": "Pod beállítása",
+    "seats": "Helyek",
+    "seatsCount": "{{count}} hely",
     "bracket": "Bracket",
-    "header": "Header",
-    "eventNamePlaceholder": "Event name",
-    "joinCodePlaceholder": "Join code",
-    "matchCard": "Match card",
-    "tableLabelPlaceholder": "Table label",
-    "assignedDeckPlaceholder": "Assigned deck",
-    "openBattleScreen": "Open battle screen",
-    "resetGameState": "Reset game state",
+    "header": "Fejléc",
+    "eventNamePlaceholder": "Esemény neve",
+    "joinCodePlaceholder": "Csatlakozási kód",
+    "matchCard": "Játékkártya",
+    "tableLabelPlaceholder": "Asztal címkéje",
+    "assignedDeckPlaceholder": "Kiosztott pakli",
+    "openBattleScreen": "Játékfelület megnyitása",
+    "resetGameState": "Játékállapot visszaállítása",
     "commander": "Commander",
-    "secondCommander": "Second commander"
+    "secondCommander": "Második commander"
   },
   "app": {
-    "notFound": "Not found."
+    "notFound": "Nem található."
   },
   "wake": {
-    "title": "Waking the tables",
-    "message": "The free host went to sleep. Keep this page open — it usually takes under a minute."
+    "title": "Asztalok felébresztése",
+    "message": "Az ingyenes szerver elaludt. Hagyd nyitva ezt az oldalt — ez általában kevesebb mint egy percet vesz igénybe."
   },
   "scanner": {
-    "title": "Scan QR",
-    "ariaLabel": "Scan join QR code",
-    "hint": "Point at the host desk code.",
-    "closeScanner": "Close scanner",
-    "openingCamera": "Opening camera…",
-    "noCamera": "This browser cannot open the camera. Type the join code instead.",
-    "permissionDenied": "Camera permission was denied. Type the join code, or allow the camera and try again."
+    "title": "QR beolvasása",
+    "ariaLabel": "Csatlakozási QR-kód beolvasása",
+    "hint": "Irányítsd a kamerát a szervező kódjára.",
+    "closeScanner": "Szkenner bezárása",
+    "openingCamera": "Kamera megnyitása…",
+    "noCamera": "Ez a böngésző nem tudja megnyitni a kamerát. Írd be helyette a csatlakozási kódot.",
+    "permissionDenied": "A kameraengedély megtagadva. Írd be a csatlakozási kódot, vagy engedélyezd a kamerát és próbáld újra."
   },
   "theme": {
-    "switchToLight": "Switch to light mode",
-    "switchToDark": "Switch to dark mode"
+    "switchToLight": "Váltás világos módra",
+    "switchToDark": "Váltás sötét módra"
   },
   "hostMetrics": {
-    "title": "Event recap",
+    "title": "Esemény összefoglaló",
     "aside": "pilot",
-    "players": "Players",
-    "games": "Games",
-    "gamesPerPlayer": "Games / player",
-    "waitAvg": "Wait avg",
-    "waitP95": "Wait p95",
-    "waitMax": "Wait max",
-    "rematchPairs": "Rematch pairs",
-    "flexEarned": "Flex earned",
-    "flexSeats": "Flex seats",
-    "durationAvg": "Duration avg",
-    "tablesOccupied": "Tables occupied",
-    "trackerUsed": "Tracker used",
-    "trackerUsedValue": "{{used}} used · {{skipped}} skipped",
-    "challenges": "Challenges",
-    "challengePts": "Challenge pts",
-    "podRating": "Pod rating",
-    "podSizes": "Pod sizes:",
-    "pools": "Pools:"
+    "players": "Játékosok",
+    "games": "Játékok",
+    "gamesPerPlayer": "Játékok / játékos",
+    "waitAvg": "Átl. várakozás",
+    "waitP95": "p95 várakozás",
+    "waitMax": "Max. várakozás",
+    "rematchPairs": "Újrapárosított párok",
+    "flexEarned": "Szerzett Flex",
+    "flexSeats": "Flex helyek",
+    "durationAvg": "Átl. időtartam",
+    "tablesOccupied": "Foglalt asztalok",
+    "trackerUsed": "Tracker használva",
+    "trackerUsedValue": "{{used}} használta · {{skipped}} kihagyta",
+    "challenges": "Kihívások",
+    "challengePts": "Kihíváspontok",
+    "podRating": "Pod értékelése",
+    "podSizes": "Podméretek:",
+    "pools": "Poolok:"
   },
   "deckEditor": {
-    "title": "Commander decks",
-    "deckNamePlaceholder": "Deck name (optional)",
+    "title": "Commander paklik",
+    "deckNamePlaceholder": "Pakli neve (opcionális)",
     "commander": "Commander",
-    "secondCommander": "Second commander",
-    "markPreferred": "Mark preferred",
-    "addAcceptedDeck": "Add accepted deck",
-    "hint": "Same-pool pods only. Extra decks let matching flex you into another bracket."
+    "secondCommander": "Második commander",
+    "markPreferred": "Megjelölés előnyben részesítettként",
+    "addAcceptedDeck": "Elfogadott pakli hozzáadása",
+    "hint": "Csak azonos poolból származó podok. A további paklik lehetővé teszik, hogy a párosítás egy másik bracketbe helyezzen."
   },
   "commanderPicker": {
-    "searchCommander": "Search commander",
-    "searchPartner": "Commander that can pair with {{name}}",
-    "removeCommander": "Remove {{name}}",
-    "artworkFor": "Artwork for",
-    "loadingArtwork": "Loading artwork…"
+    "searchCommander": "Commander keresése",
+    "searchPartner": "{{name}} mellé választható commander",
+    "removeCommander": "{{name}} eltávolítása",
+    "artworkFor": "Illusztráció ehhez:",
+    "loadingArtwork": "Illusztráció betöltése…"
   },
   "challengePack": {
-    "title": "Challenge pack",
-    "description": "Only predefined primitives. Saving writes a new version and never mutates a pack already used by this event.",
-    "copyOfficial": "Copy official",
-    "startBlank": "Start blank",
-    "saveNewVersion": "Save new version",
-    "editHint": "Copy the official pack or start blank before editing.",
-    "packName": "Pack name",
-    "descriptionLabel": "Description",
-    "addChallenge": "Add challenge",
+    "title": "Kihíváscsomag",
+    "description": "Csak előre meghatározott primitive-ek. A mentés új verziót hoz létre, és soha nem módosít olyan csomagot, amelyet ez az esemény már használt.",
+    "copyOfficial": "Hivatalos másolása",
+    "startBlank": "Kezdés üresen",
+    "saveNewVersion": "Új verzió mentése",
+    "editHint": "Szerkesztés előtt másold le a hivatalos csomagot, vagy kezdj üresen.",
+    "packName": "Csomag neve",
+    "descriptionLabel": "Leírás",
+    "addChallenge": "Kihívás hozzáadása",
     "id": "Id",
-    "name": "Name",
-    "category": "Category",
-    "points": "Points",
+    "name": "Név",
+    "category": "Kategória",
+    "points": "Pontok",
     "primitive": "Primitive",
-    "threshold": "Threshold",
-    "confirmationQuestion": "Confirmation question",
-    "defaultConfirmation": "Did this happen at the table?",
-    "newClaimName": "New claim",
-    "newClaimDescription": "Award this at the table."
+    "threshold": "Küszöb",
+    "confirmationQuestion": "Megerősítő kérdés",
+    "defaultConfirmation": "Megtörtént ez az asztalnál?",
+    "newClaimName": "Új teljesítés",
+    "newClaimDescription": "Add meg ezt az asztalnál."
   },
   "treacheryRole": {
-    "treachery": "Treachery",
-    "receivedRole": "You received a role",
-    "handDeviceTo": "Hand the device to {{name}}",
-    "lookAwayIdentity": "Everyone else should look away before the identity is revealed.",
-    "lookAwayScreen": "Make sure nobody else can see your screen before revealing it.",
-    "reveal": "Reveal",
-    "yourRole": "Your role",
-    "identityAlt": "{{name}}, {{role}} identity",
-    "illustratedBy": "Illustrated by {{artist}}",
-    "yourObjective": "Your objective",
-    "unveiledToTable": "Unveiled to the table",
-    "unveilWarning": "Everyone at your table will see this identity. Its ability must be resolved in the game.",
-    "confirmUnveil": "Confirm unveil",
-    "unveilToTable": "Unveil to the table",
-    "hideAndPass": "Hide & pass",
-    "hideIdentity": "Hide my identity"
+    "treachery": "Árulás",
+    "receivedRole": "Szerepet kaptál",
+    "handDeviceTo": "Add át az eszközt {{name}} részére",
+    "lookAwayIdentity": "Mindenki más nézzen félre, mielőtt felfedik a személyazonosságot.",
+    "lookAwayScreen": "Felfedés előtt győződj meg róla, hogy senki más nem látja a képernyődet.",
+    "reveal": "Felfedés",
+    "yourRole": "A szereped",
+    "identityAlt": "{{name}}, {{role}} személyazonosság",
+    "illustratedBy": "Illusztrálta: {{artist}}",
+    "yourObjective": "A célod",
+    "unveiledToTable": "Felfedve az asztalnak",
+    "unveilWarning": "Az asztalnál mindenki látni fogja ezt a személyazonosságot. A képességét a játékban végre kell hajtani.",
+    "confirmUnveil": "Felfedés megerősítése",
+    "unveilToTable": "Felfedés az asztalnak",
+    "hideAndPass": "Elrejtés és továbbadás",
+    "hideIdentity": "Személyazonosságom elrejtése"
   },
   "modeRulesSheet": {
-    "closeRules": "Close rules",
-    "backToGame": "Back to the game"
+    "closeRules": "Szabályok bezárása",
+    "backToGame": "Vissza a játékhoz"
   },
   "assassinTargets": {
-    "title": "Secret contracts",
-    "chooseOwnName": "Choose only your own name.",
-    "closeContracts": "Close contracts",
-    "handDeviceTo": "Hand the device to {{name}}",
-    "lookAway": "Everyone else should look away before the contract is revealed.",
-    "revealTarget": "Reveal my target",
-    "yourTarget": "Your target",
-    "noActiveTarget": "No active target",
-    "marksScored": "Marks scored: {{count}}",
-    "hideAndPass": "Hide & pass",
-    "allContractsChecked": "All contracts checked"
+    "title": "Titkos szerződések",
+    "chooseOwnName": "Csak a saját nevedet válaszd ki.",
+    "closeContracts": "Szerződések bezárása",
+    "handDeviceTo": "Add át az eszközt {{name}} részére",
+    "lookAway": "Mindenki más nézzen félre, mielőtt felfedik a szerződést.",
+    "revealTarget": "Célpontom felfedése",
+    "yourTarget": "A célpontod",
+    "noActiveTarget": "Nincs aktív célpont",
+    "marksScored": "Szerzett markok: {{count}}",
+    "hideAndPass": "Elrejtés és továbbadás",
+    "allContractsChecked": "Minden szerződés ellenőrizve"
   },
   "scheme": {
     "ongoingScheme": "Ongoing scheme",
     "scheme": "Scheme",
-    "pastScheme": "Past scheme",
+    "pastScheme": "Korábbi scheme",
     "abandon": "Abandon {{name}}",
     "ongoingSchemes": "Ongoing schemes",
     "graveyard": "Graveyard · {{count}}",
     "nextScheme": "Next scheme",
-    "remainingInDeck": "{{count}} left in the deck",
-    "scryfallCredit": "Card image via Scryfall. Magic: The Gathering is © Wizards of the Coast."
+    "remainingInDeck": "{{count}} maradt a pakliban",
+    "scryfallCredit": "Kártyakép a Scryfallon keresztül. A Magic: The Gathering © Wizards of the Coast."
   },
   "dungeon": {
-    "takeInitiativeTitle": "Take the initiative?",
-    "takeInitiativeEnter": "This also ventures into Undercity. Only take it when the table just gave this seat the initiative.",
-    "takeInitiativeWait": "Finish or leave the current dungeon before Undercity can open. Only take the initiative when the table just gave it to this seat.",
-    "takeInitiativeAndEnter": "Take initiative & enter Undercity",
-    "takeInitiative": "Take initiative",
-    "alreadyHoldInitiative": "You already hold the initiative",
-    "takeAndEnterUndercity": "Take the initiative and enter Undercity",
-    "completed": "{{name}} (completed)",
-    "ventureInto": "Venture into {{name}}",
-    "done": "Done",
-    "ventureTo": "Venture to {{room}}: {{effect}}",
-    "releaseInitiative": "Release the initiative",
-    "undoRoom": "Undo room",
-    "closeDungeon": "Close dungeon"
+    "takeInitiativeTitle": "Átveszed az initiative-et?",
+    "takeInitiativeEnter": "Ez egyben venture-t is indít az Undercitybe. Csak akkor vedd át, amikor az asztal éppen ennek a helynek adta az initiative-et.",
+    "takeInitiativeWait": "Fejezd be vagy hagyd el az aktuális dungeont, mielőtt az Undercity megnyílhat. Csak akkor vedd át az initiative-et, amikor az asztal éppen ennek a helynek adta.",
+    "takeInitiativeAndEnter": "Initiative átvétele és belépés az Undercitybe",
+    "takeInitiative": "Initiative átvétele",
+    "alreadyHoldInitiative": "Már nálad van az initiative",
+    "takeAndEnterUndercity": "Vedd át az initiative-et és lépj be az Undercitybe",
+    "completed": "{{name}} (teljesítve)",
+    "ventureInto": "Venture ide: {{name}}",
+    "done": "Kész",
+    "ventureTo": "Venture ide: {{room}}: {{effect}}",
+    "releaseInitiative": "Initiative elengedése",
+    "undoRoom": "Room visszavonása",
+    "closeDungeon": "Dungeon bezárása"
   },
   "treacheryRolesSheet": {
-    "title": "Secret identities",
-    "chooseOwnName": "Choose only your own name.",
-    "closeIdentities": "Close identities",
-    "allIdentitiesChecked": "All identities checked"
+    "title": "Titkos személyazonosságok",
+    "chooseOwnName": "Csak a saját nevedet válaszd ki.",
+    "closeIdentities": "Személyazonosságok bezárása",
+    "allIdentitiesChecked": "Minden személyazonosság ellenőrizve"
   },
   "tracker": {
-    "gameRules": "Game rules",
-    "loadingRoles": "Loading roles…",
-    "start": "Start",
-    "readRules": "Read rules",
-    "readyToBegin": "Ready to begin",
-    "readyToBeginHint": "Start the match when everyone is seated, or read the rules first.",
-    "dealContracts": "Deal contracts",
-    "dealContractsTitle": "Deal secret contracts",
-    "dealContractsHint": "Every player receives one private target. The device will be passed around so each contract can be checked in secret.",
-    "dealIdentities": "Deal identities",
-    "dealIdentitiesTitle": "Deal secret identities",
-    "dealIdentitiesHint": "Every player receives one hidden identity. The device will be passed around so each one can be read in secret.",
-    "chooseStarPositions": "Choose Star positions",
-    "starPositionsHint": "Players beside each other are allies. Tap two players to exchange their positions, or randomise the whole circle.",
-    "randomPositions": "Random positions",
-    "confirmPositions": "Confirm positions",
-    "adjacentPlayersAlly": "Adjacent\nplayers ally",
-    "buildEmperorTeams": "Build the Emperor teams",
-    "chooseTeamA": "Choose three players for Team A.",
-    "randomTeams": "Random teams",
-    "resetTeams": "Reset teams",
-    "teamEmperor": "Team {{team}} Emperor",
-    "randomEmperors": "Random Emperors",
-    "confirmTeams": "Confirm teams",
-    "chooseArchenemy": "Choose the Archenemy",
-    "chooseArchenemyHint": "The Archenemy faces the other three players. Both sides share 60 life. The Archenemy goes first, draws on that turn, and sets a scheme in motion during each first main phase.",
-    "confirmArchenemy": "Confirm Archenemy",
-    "chooseAllies": "Choose the allies",
-    "chooseAlliesHint": "Select two players for the first team. The other two players become the opposing team. Teams share 60 life and turns; all other player controls stay separate.",
-    "emperor": "Emperor",
-    "emperorRange": "Emperor · range 2",
-    "leader": "Leader",
-    "general": "General",
-    "generalRange": "General · range 1",
-    "marks": "{{count}} marks",
-    "winner": "Winner",
-    "turnPhone": "Turn your phone for the full board",
-    "matchMenu": "Match menu",
-    "matchMenuElapsed": "Match menu. {{clock}} elapsed",
-    "matchMenuPaused": ", paused",
-    "matchMenuDayNight": ", it is {{phase}}",
-    "day": "day",
-    "night": "night",
-    "closeMatchMenu": "Close match menu",
-    "match": "Match",
-    "firstScheme": "First scheme",
-    "nextScheme": "Next scheme",
-    "resume": "Resume",
-    "pause": "Pause",
-    "undo": "Undo",
-    "challenges": "Challenges",
-    "checkTarget": "Check target",
-    "checkMyRole": "Check my role",
-    "dayButton": "Day",
-    "nightButton": "Night",
-    "playerLost": "Player lost",
-    "gameWonBy": "Game won by",
-    "won": "{{name}} won",
-    "doneRequeue": "Done & requeue",
-    "savingChallenges": "Saving challenges…",
-    "quitToHome": "Quit to home",
-    "quitHint": "The game is kept — reopen it from the home screen.",
-    "secretContracts": "Secret contracts",
-    "secretIdentities": "Secret identities",
-    "whoEliminated": "Who eliminated {{name}}?",
-    "whoEliminatedHint": "A player scores only if this was their assigned mark. The contract chain advances either way.",
-    "noPlayerUnknown": "No player / unknown",
-    "revealedIdentity": "Revealed Treachery identity",
-    "closeRevealedIdentity": "Close revealed identity",
-    "commanderChallenges": "Commander challenges",
-    "challengeCompleted": "{{name}} completed",
-    "challengeFallback": "Challenge",
-    "matchResult": "Match result",
-    "wins": "{{name}} wins",
-    "reviewBoard": "Review board",
-    "yes": "Yes",
-    "no": "No",
-    "yesTheyLost": "Yes, they lost",
-    "noStillIn": "No, still in",
-    "openCounters": "Open counters for {{name}}",
-    "commanderDamageOn": "Commander damage on {{name}}",
-    "countersFor": "Counters for {{name}}",
-    "countersTitle": "Counters for {{name}}",
-    "closeCounters": "Close counters",
-    "closeChallenges": "Close challenges",
-    "sharedCommanderDamage": "Shared commander damage",
-    "closeCommanderDamage": "Close commander damage",
-    "highestCommanderDamage": "Highest commander damage on {{name}}: {{value}} from {{commander}}",
-    "noCommanderDamage": "No commander damage on {{name}}",
-    "removeCommanderDamage": "Remove commander damage from {{owner}}'s {{name}}",
-    "addCommanderDamage": "Add commander damage from {{owner}}'s {{name}}",
-    "isMonarch": "{{name}} is the monarch",
-    "makeMonarch": "Make {{name}} the monarch",
-    "enduringStory": "{{name}} {{has}} an enduring story",
-    "cityBlessing": "{{name}} {{has}} the city's blessing",
-    "has": "has",
-    "doesNotHave": "does not have",
-    "didLose": "Did {{name}} lose the game?",
-    "thisTeam": "This team",
-    "didTheyLose": "Did they lose?",
-    "poisonPrompt": "{{name}} has {{count}} poison counters. Did they lose?",
-    "sharedPoisonPrompt": "{{subject}} has {{count}} shared poison counters. {{lose}}",
-    "hitPrompt": "{{name}} owns {{count}} exiled cards with hit counters. Did they lose?",
-    "commanderPrompt": "{{name}} has taken {{damage}} commander damage from {{from}}. Did they lose?",
-    "sharedCommanderPrompt": "{{subject}} has taken {{damage}} commander damage from {{from}}. {{lose}}",
-    "lifePrompt": "{{name}} is at {{life}} life. Did they lose?",
-    "sharedLifePrompt": "{{subject}} is at {{life}} life. {{lose}}",
-    "anotherCommander": "another commander",
-    "addLife": "Add 1 life. Long press for a larger amount.",
-    "removeLife": "Remove 1 life. Long press for a larger amount.",
-    "addLifeFor": "Add life for {{name}}",
-    "removeLifeFor": "Remove life for {{name}}",
-    "addLifeLabel": "Add life · {{name}}",
-    "removeLifeLabel": "Remove life · {{name}}",
-    "deleteDigit": "Delete digit",
-    "add": "Add",
-    "removeVerb": "Remove",
-    "lower": "Lower {{label}}",
-    "raise": "Raise {{label}}",
-    "seatColour": "Seat colour for {{name}}",
-    "dungeonFor": "Dungeon for {{name}}",
-    "dungeonInitiative": "Dungeon and initiative for {{name}}. {{title}}",
-    "dungeonInitiativeActive": "{{name}} has the initiative · {{filled}} of {{total}} unique dungeons",
-    "dungeonInitiativeCompleted": "{{name}} has completed {{filled}} of {{total}} unique dungeons",
-    "counterOn": "{{label}} on {{name}}: {{value}}",
-    "counterFor": "{{label}} for {{name}}",
-    "claimFor": "Claim for {{name}}",
-    "challengesSubtitle": "Same challenges for every player · points never affect matching",
+    "gameRules": "Játékszabályok",
+    "loadingRoles": "Szerepek betöltése…",
+    "start": "Indítás",
+    "readRules": "Szabályok elolvasása",
+    "readyToBegin": "Készen áll az indulásra",
+    "readyToBeginHint": "Indítsd el a játékot, amikor mindenki leült, vagy előbb olvasd el a szabályokat.",
+    "dealContracts": "Szerződések kiosztása",
+    "dealContractsTitle": "Titkos szerződések kiosztása",
+    "dealContractsHint": "Minden játékos egy titkos célpontot kap. Az eszközt körbe kell adni, hogy minden szerződést titokban lehessen ellenőrizni.",
+    "dealIdentities": "Személyazonosságok kiosztása",
+    "dealIdentitiesTitle": "Titkos személyazonosságok kiosztása",
+    "dealIdentitiesHint": "Minden játékos egy rejtett személyazonosságot kap. Az eszközt körbe kell adni, hogy mindenki titokban elolvashassa a sajátját.",
+    "chooseStarPositions": "Csillag pozíciók kiválasztása",
+    "starPositionsHint": "Az egymás mellett ülő játékosok szövetségesek. Koppints két játékosra a pozíciójuk felcseréléséhez, vagy véletlenszerűsítsd az egész kört.",
+    "randomPositions": "Véletlenszerű pozíciók",
+    "confirmPositions": "Pozíciók megerősítése",
+    "adjacentPlayersAlly": "A szomszédos\njátékosok szövetségesek",
+    "buildEmperorTeams": "Császár csapatok összeállítása",
+    "chooseTeamA": "Válassz három játékost az A csapatba.",
+    "randomTeams": "Véletlenszerű csapatok",
+    "resetTeams": "Csapatok visszaállítása",
+    "teamEmperor": "{{team}} csapat Császára",
+    "randomEmperors": "Véletlenszerű Császárok",
+    "confirmTeams": "Csapatok megerősítése",
+    "chooseArchenemy": "Archenemy kiválasztása",
+    "chooseArchenemyHint": "Az Archenemy a másik három játékossal néz szembe. Mindkét oldal 60 életponttal rendelkezik. Az Archenemy kezd, húz lapot abban a körben, és minden first main phase során elindít egy scheme-et.",
+    "confirmArchenemy": "Archenemy megerősítése",
+    "chooseAllies": "Szövetségesek kiválasztása",
+    "chooseAlliesHint": "Válassz két játékost az első csapatba. A másik két játékos lesz az ellenfél csapata. A csapatok 60 életpontot és a köröket megosztják; minden más játékosvezérlő külön marad.",
+    "emperor": "Császár",
+    "emperorRange": "Császár · hatótávolság 2",
+    "leader": "Vezető",
+    "general": "Tábornok",
+    "generalRange": "Tábornok · hatótávolság 1",
+    "marks": "{{count}} mark",
+    "winner": "Győztes",
+    "turnPhone": "Fordítsd el a telefonodat a teljes játéktér megjelenítéséhez",
+    "matchMenu": "Játékmenü",
+    "matchMenuElapsed": "Játékmenü. Eltelt idő: {{clock}}",
+    "matchMenuPaused": ", szünetel",
+    "matchMenuDayNight": ", jelenleg {{phase}} van",
+    "day": "nappal",
+    "night": "éjszaka",
+    "closeMatchMenu": "Játékmenü bezárása",
+    "match": "Játék",
+    "firstScheme": "Első scheme",
+    "nextScheme": "Következő scheme",
+    "resume": "Folytatás",
+    "pause": "Szünet",
+    "undo": "Visszavonás",
+    "challenges": "Kihívások",
+    "checkTarget": "Célpont ellenőrzése",
+    "checkMyRole": "Szerepem ellenőrzése",
+    "dayButton": "Nappal",
+    "nightButton": "Éjszaka",
+    "playerLost": "A játékos veszített",
+    "gameWonBy": "A játék győztese",
+    "won": "{{name}} nyert",
+    "doneRequeue": "Kész és vissza a várólistára",
+    "savingChallenges": "Kihívások mentése…",
+    "quitToHome": "Kilépés a kezdőlapra",
+    "quitHint": "A játék megmarad — a kezdőképernyőről újra megnyithatod.",
+    "secretContracts": "Titkos szerződések",
+    "secretIdentities": "Titkos személyazonosságok",
+    "whoEliminated": "Ki iktatta ki {{name}} játékost?",
+    "whoEliminatedHint": "A játékos csak akkor kap pontot, ha ez volt a kijelölt markja. A szerződéslánc ettől függetlenül továbbhalad.",
+    "noPlayerUnknown": "Nincs játékos / ismeretlen",
+    "revealedIdentity": "Felfedett Treachery személyazonosság",
+    "closeRevealedIdentity": "Felfedett személyazonosság bezárása",
+    "commanderChallenges": "Commander kihívások",
+    "challengeCompleted": "{{name}} teljesítve",
+    "challengeFallback": "Kihívás",
+    "matchResult": "Játék eredménye",
+    "wins": "{{name}} nyer",
+    "reviewBoard": "Játéktér áttekintése",
+    "yes": "Igen",
+    "no": "Nem",
+    "yesTheyLost": "Igen, veszített",
+    "noStillIn": "Nem, még játékban van",
+    "openCounters": "{{name}} countereinek megnyitása",
+    "commanderDamageOn": "Commander damage {{name}} játékoson",
+    "countersFor": "Counterek {{name}} számára",
+    "countersTitle": "{{name}} counterei",
+    "closeCounters": "Counterek bezárása",
+    "closeChallenges": "Kihívások bezárása",
+    "sharedCommanderDamage": "Közös commander damage",
+    "closeCommanderDamage": "Commander damage bezárása",
+    "highestCommanderDamage": "Legmagasabb commander damage {{name}} játékoson: {{value}} ettől: {{commander}}",
+    "noCommanderDamage": "Nincs commander damage {{name}} játékoson",
+    "removeCommanderDamage": "Commander damage eltávolítása {{owner}} {{name}} commanderétől",
+    "addCommanderDamage": "Commander damage hozzáadása {{owner}} {{name}} commanderétől",
+    "isMonarch": "{{name}} a monarch",
+    "makeMonarch": "{{name}} legyen a monarch",
+    "enduringStory": "{{name}} {{has}} enduring storyval",
+    "cityBlessing": "{{name}} {{has}} city's blessinggel",
+    "has": "rendelkezik",
+    "doesNotHave": "nem rendelkezik",
+    "didLose": "{{name}} elvesztette a játékot?",
+    "thisTeam": "Ez a csapat",
+    "didTheyLose": "Veszítettek?",
+    "poisonPrompt": "{{name}} játékosnak {{count}} poison countere van. Veszített?",
+    "sharedPoisonPrompt": "{{subject}} {{count}} közös poison counterrel rendelkezik. {{lose}}",
+    "hitPrompt": "{{name}} {{count}} exiled kártyával rendelkezik hit counterekkel. Veszített?",
+    "commanderPrompt": "{{name}} {{damage}} commander damage-et kapott ettől: {{from}}. Veszített?",
+    "sharedCommanderPrompt": "{{subject}} {{damage}} commander damage-et kapott ettől: {{from}}. {{lose}}",
+    "lifePrompt": "{{name}} jelenlegi életpontja: {{life}}. Veszített?",
+    "sharedLifePrompt": "{{subject}} jelenlegi életpontja: {{life}}. {{lose}}",
+    "anotherCommander": "egy másik commander",
+    "addLife": "Adj hozzá 1 életpontot. Tartsd lenyomva nagyobb mennyiséghez.",
+    "removeLife": "Vonj le 1 életpontot. Tartsd lenyomva nagyobb mennyiséghez.",
+    "addLifeFor": "Életpont hozzáadása {{name}} számára",
+    "removeLifeFor": "Életpont levonása {{name}} számára",
+    "addLifeLabel": "Életpont hozzáadása · {{name}}",
+    "removeLifeLabel": "Életpont levonása · {{name}}",
+    "deleteDigit": "Számjegy törlése",
+    "add": "Hozzáadás",
+    "removeVerb": "Eltávolítás",
+    "lower": "{{label}} csökkentése",
+    "raise": "{{label}} növelése",
+    "seatColour": "{{name}} helyének színe",
+    "dungeonFor": "Dungeon {{name}} számára",
+    "dungeonInitiative": "Dungeon és initiative {{name}} számára. {{title}}",
+    "dungeonInitiativeActive": "{{name}} rendelkezik az initiative-tel · {{filled}} / {{total}} egyedi dungeon",
+    "dungeonInitiativeCompleted": "{{name}} teljesített {{filled}} / {{total}} egyedi dungeont",
+    "counterOn": "{{label}} {{name}} játékoson: {{value}}",
+    "counterFor": "{{label}} {{name}} számára",
+    "claimFor": "Teljesítés {{name}} számára",
+    "challengesSubtitle": "Ugyanazok a kihívások minden játékosnak · a pontok soha nem befolyásolják a párosítást",
     "counters": {
       "poison": "Poison",
       "tax": "Commander tax",
-      "acorn": "Acorns",
-      "energy": "Energy",
-      "experience": "Experience",
+      "acorn": "Makkok",
+      "energy": "Energia",
+      "experience": "Tapasztalat",
       "hit": "Etrata hits",
-      "rad": "Radiation",
+      "rad": "Sugárzás",
       "ring": "Ring temptation",
-      "speed": "Speed",
-      "ticket": "Tickets"
+      "speed": "Sebesség",
+      "ticket": "Jegyek"
     }
   }
 }

@@ -84,6 +84,15 @@ export class PodNotFoundError extends Error {
   }
 }
 
+export class ParticipantNotFoundError extends Error {
+  readonly code = 'PARTICIPANT_NOT_FOUND';
+
+  constructor() {
+    super('That player is not in this event.');
+    this.name = 'ParticipantNotFoundError';
+  }
+}
+
 export type StoredEvent = {
   id: string;
   name: string;

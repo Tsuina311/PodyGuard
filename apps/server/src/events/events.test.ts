@@ -620,6 +620,196 @@ describe('event HTTP api', () => {
     await app.close();
   });
 
+  it('lets the host sweep a player nobody is behind out of the queue', async () => {
+    const app = await buildTestApp();
+    const created = await app.inject({
+      method: 'POST',
+      url: '/events',
+      payload: { name: 'Friday Commander', hostPin: '2468', tableCount: 1 },
+    });
+    const createdBody = created.json() as {
+      event: { joinCode: string };
+      hostToken: string;
+    };
+    const { joinCode } = createdBody.event;
+    const { hostToken } = createdBody;
+
+    const joined = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/join`,
+      payload: { displayName: 'Ghost' },
+    });
+    const joinedBody = joined.json() as {
+      participant: { id: string };
+      token: string;
+    };
+    await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/ready`,
+      headers: { authorization: `Bearer ${joinedBody.token}` },
+      payload: { ready: true },
+    });
+
+    const removed = await app.inject({
+      method: 'DELETE',
+      url: `/events/${joinCode}/participants/${joinedBody.participant.id}`,
+      headers: { authorization: `Bearer ${hostToken}` },
+    });
+    expect(removed.statusCode).toBe(200);
+    expect(removed.json()).toMatchObject({ participant: { status: 'left' } });
+
+    const roster = await app.inject({
+      method: 'GET',
+      url: `/events/${joinCode}/participants`,
+    });
+    const rosterBody = roster.json() as {
+      participants: Array<{ id: string; status: string }>;
+    };
+    expect(
+      rosterBody.participants.filter((row) => row.status === 'ready'),
+    ).toHaveLength(0);
+
+    await app.close();
+  });
+
+  it('refuses the host token for a stranger and any token for a live seat', async () => {
+    const app = await buildTestApp();
+    const created = await app.inject({
+      method: 'POST',
+      url: '/events',
+      payload: { name: 'Friday Commander', hostPin: '2468', tableCount: 1 },
+    });
+    const createdBody = created.json() as {
+      event: { joinCode: string };
+      hostToken: string;
+    };
+    const { joinCode } = createdBody.event;
+    const { hostToken } = createdBody;
+
+    const ids: string[] = [];
+    for (const displayName of ['Ada', 'Bea', 'Cam', 'Drew']) {
+      const joined = await app.inject({
+        method: 'POST',
+        url: `/events/${joinCode}/join`,
+        payload: { displayName },
+      });
+      const body = joined.json() as {
+        participant: { id: string };
+        token: string;
+      };
+      ids.push(body.participant.id);
+      await app.inject({
+        method: 'POST',
+        url: `/events/${joinCode}/ready`,
+        headers: { authorization: `Bearer ${body.token}` },
+        payload: { ready: true },
+      });
+    }
+
+    const unknown = await app.inject({
+      method: 'DELETE',
+      url: `/events/${joinCode}/participants/00000000-0000-4000-8000-000000000000`,
+      headers: { authorization: `Bearer ${hostToken}` },
+    });
+    expect(unknown.statusCode).toBe(404);
+
+    const unauthorized = await app.inject({
+      method: 'DELETE',
+      url: `/events/${joinCode}/participants/${ids[0]}`,
+      headers: { authorization: 'Bearer hs1.not-a-token' },
+    });
+    expect(unauthorized.statusCode).toBe(401);
+
+    await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/match`,
+      headers: { authorization: `Bearer ${hostToken}` },
+    });
+    const tables = await app.inject({
+      method: 'GET',
+      url: `/events/${joinCode}/tables`,
+    });
+    const tableId = (
+      tables.json() as { tables: Array<{ id: string }> }
+    ).tables[0]?.id;
+    await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/tables/${tableId}/start`,
+      headers: { authorization: `Bearer ${hostToken}` },
+    });
+
+    const playing = await app.inject({
+      method: 'DELETE',
+      url: `/events/${joinCode}/participants/${ids[0]}`,
+      headers: { authorization: `Bearer ${hostToken}` },
+    });
+    expect(playing.statusCode).toBe(409);
+
+    await app.close();
+  });
+
+  it('sends the rest of a seated pod back to the queue when one seat is swept', async () => {
+    const app = await buildTestApp();
+    const created = await app.inject({
+      method: 'POST',
+      url: '/events',
+      payload: { name: 'Friday Commander', hostPin: '2468', tableCount: 1 },
+    });
+    const createdBody = created.json() as {
+      event: { joinCode: string };
+      hostToken: string;
+    };
+    const { joinCode } = createdBody.event;
+    const { hostToken } = createdBody;
+
+    const ids: string[] = [];
+    for (const displayName of ['Ada', 'Bea', 'Cam', 'Drew']) {
+      const joined = await app.inject({
+        method: 'POST',
+        url: `/events/${joinCode}/join`,
+        payload: { displayName },
+      });
+      const body = joined.json() as {
+        participant: { id: string };
+        token: string;
+      };
+      ids.push(body.participant.id);
+      await app.inject({
+        method: 'POST',
+        url: `/events/${joinCode}/ready`,
+        headers: { authorization: `Bearer ${body.token}` },
+        payload: { ready: true },
+      });
+    }
+    await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/match`,
+      headers: { authorization: `Bearer ${hostToken}` },
+    });
+
+    const removed = await app.inject({
+      method: 'DELETE',
+      url: `/events/${joinCode}/participants/${ids[0]}`,
+      headers: { authorization: `Bearer ${hostToken}` },
+    });
+    expect(removed.statusCode).toBe(200);
+
+    const roster = await app.inject({
+      method: 'GET',
+      url: `/events/${joinCode}/participants`,
+    });
+    const rosterBody = roster.json() as {
+      participants: Array<{ id: string; status: string; tableLabel?: string }>;
+    };
+    const remaining = rosterBody.participants.filter(
+      (row) => row.id !== ids[0],
+    );
+    expect(remaining.every((row) => row.status === 'ready')).toBe(true);
+    expect(remaining.every((row) => !row.tableLabel)).toBe(true);
+
+    await app.close();
+  });
+
   it('keeps same-pool pods and lets a player update decks', async () => {
     const app = await buildTestApp();
     const created = await app.inject({

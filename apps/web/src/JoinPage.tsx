@@ -16,6 +16,7 @@ import {
 import {
   ApiError,
   chooseGameTracker,
+  clearPlayerSession,
   completeChallenge,
   getEvent,
   getMyTreacheryRole,
@@ -46,6 +47,7 @@ import { TrackerView } from './tracker/TrackerView';
 import { TreacheryRoleDialog } from './TreacheryRoleDialog';
 import { useEventLive } from './useEventLive';
 import { forgetActiveMatch, rememberActiveMatch } from './active-match';
+import { readStored, writeStored } from './device-storage';
 import {
   enqueuePending,
   flushPending,
@@ -79,7 +81,7 @@ export function JoinPage() {
     setError(null);
     setEvent(null);
     setParticipant(null);
-    const existing = loadPlayerSession(joinCode.toUpperCase());
+    const existing = loadPlayerSession(joinCode);
     void getEvent(joinCode)
       .then(async (loaded) => {
         if (cancelled) {
@@ -89,7 +91,27 @@ export function JoinPage() {
         if (!existing) {
           return;
         }
-        const me = await getMe(loaded.joinCode, existing.token);
+        // Ready for the form in case the seat has gone, so a player who has to
+        // ask for a new one at least does not have to retype who they are.
+        setDisplayName(existing.displayName);
+        const me = await getMe(loaded.joinCode, existing.token).catch(
+          (caught: unknown) => {
+            // A seat the server no longer knows — event recycled, participant
+            // dropped — must not leave a stored key parked in front of the
+            // join form for good.
+            if (
+              caught instanceof ApiError &&
+              (caught.status === 401 || caught.status === 404)
+            ) {
+              clearPlayerSession(loaded.joinCode);
+              return null;
+            }
+            throw caught;
+          },
+        );
+        if (!me) {
+          return;
+        }
         const [roster, tableList] = await Promise.all([
           listParticipants(loaded.joinCode),
           listTables(loaded.joinCode),
@@ -173,10 +195,7 @@ export function JoinPage() {
         rolePod.current = assignment.podId;
         setTreacheryRole(assignment);
         const seenKey = treacheryRoleSeenKey(assignment.podId, participant.id);
-        if (
-          firstReceipt &&
-          sessionStorage.getItem(seenKey) !== 'true'
-        ) {
+        if (firstReceipt && readStored(seenKey) !== 'true') {
           setRoleRevealed(false);
           setRoleOpen(true);
         }
@@ -356,6 +375,19 @@ export function JoinPage() {
     }
   }
 
+  /**
+   * Drops the stored seat and shows the join form again. The key now outlives
+   * the app, so without this a player who left — or was removed by the host —
+   * would land back on a panel they can do nothing with.
+   */
+  function onForgetSeat() {
+    const code = event?.joinCode ?? joinCode.toUpperCase();
+    clearPlayerSession(code);
+    forgetActiveMatch(`/e/${code}`);
+    setToken(null);
+    setParticipant(null);
+  }
+
   async function onLeave() {
     if (!event || !token) {
       return;
@@ -363,8 +395,8 @@ export function JoinPage() {
     setBusy(true);
     setError(null);
     try {
-      const result = await leaveEvent(event.joinCode, token);
-      setParticipant(result.participant);
+      await leaveEvent(event.joinCode, token);
+      onForgetSeat();
     } catch (caught) {
       setError(
         caught instanceof ApiError
@@ -568,7 +600,7 @@ export function JoinPage() {
               participant.status === 'playing' ? onUnveilIdentity : undefined
             }
             onClose={() => {
-              sessionStorage.setItem(
+              writeStored(
                 treacheryRoleSeenKey(treacheryRole.podId, participant.id),
                 'true',
               );
@@ -706,7 +738,14 @@ export function JoinPage() {
               )}
             </div>
           ) : hasLeft ? (
-            <p className="text-muted text-sm">{t('join.leftEvent')}</p>
+            <div>
+              <p className="text-muted mb-4 text-sm">{t('join.leftEvent')}</p>
+              {/* The seat is gone, by their own hand or the host's, so the way
+                  on is a fresh one rather than this panel for ever. */}
+              <Button variant="neon" block onClick={onForgetSeat}>
+                {t('join.joinAgain')}
+              </Button>
+            </div>
           ) : isReady ? (
             <>
               {participant.decks.length > 0 ? (
@@ -920,7 +959,7 @@ export function JoinPage() {
             participant.status === 'playing' ? onUnveilIdentity : undefined
           }
           onClose={() => {
-            sessionStorage.setItem(
+            writeStored(
               treacheryRoleSeenKey(treacheryRole.podId, participant.id),
               'true',
             );
