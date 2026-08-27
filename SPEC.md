@@ -1356,7 +1356,11 @@ Host-selectable mode with strict 4-player pods:
 - reveal the next scheme during each Archenemy first main phase;
 - non-ongoing schemes return to the bottom after resolving;
 - ongoing schemes stay face up until the table marks them abandoned, then
-  return to the bottom.
+  return to the bottom;
+- the scheme sheet keeps every face-up scheme and a graveyard of the resolved
+  and abandoned ones as miniatures, and tapping one shows that card large
+  without advancing the deck;
+- Next scheme lives in the timer menu, because the seats own the whole board.
 
 Two-Headed Giant setup also offers random team assignment.
 

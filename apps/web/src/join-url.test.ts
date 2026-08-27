@@ -1,5 +1,31 @@
 import { describe, expect, it } from 'vitest';
-import { joinLinkParts, playerJoinUrl, shareableOrigin } from './join-url';
+import {
+  joinCodeFromScan,
+  joinLinkParts,
+  playerJoinUrl,
+  shareableOrigin,
+} from './join-url';
+
+describe('joinCodeFromScan', () => {
+  it('accepts a bare join code', () => {
+    expect(joinCodeFromScan('ab23cd')).toBe('AB23CD');
+  });
+
+  it('pulls the code from a project-pages join URL', () => {
+    expect(
+      joinCodeFromScan('https://tsuina311.github.io/PodyGuard/#/e/AB23CD'),
+    ).toBe('AB23CD');
+  });
+
+  it('pulls the code from a hash-only route', () => {
+    expect(joinCodeFromScan('#/e/XY9Z2K')).toBe('XY9Z2K');
+  });
+
+  it('rejects noise that is not a join code', () => {
+    expect(joinCodeFromScan('https://example.com')).toBeNull();
+    expect(joinCodeFromScan('ABC')).toBeNull();
+  });
+});
 
 describe('playerJoinUrl', () => {
   it('builds a hash-router join link', () => {

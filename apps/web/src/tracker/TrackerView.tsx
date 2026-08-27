@@ -87,6 +87,7 @@ import { dealTreacheryIdentities } from './treachery';
 import { planFirstPlayerReveal, type RevealHop } from './first-player-reveal';
 import { DungeonTracker } from './DungeonTracker';
 import { ModeRulesSheet } from './ModeRulesSheet';
+import { SchemeSheet } from './SchemeSheet';
 import { AssassinTargetsSheet } from './AssassinTargetsSheet';
 import { TreacheryRolesSheet } from './TreacheryRolesSheet';
 import { useLandscape, useLandscapeLock } from './orientation';
@@ -1555,17 +1556,6 @@ export function TrackerView({
                       : 'top-3/4 -translate-y-1/2',
                   )}
                 >
-                  {archenemyBoard ? (
-                    <span
-                      className={cx(
-                        'hidden w-20 shrink-0 text-center text-[0.65rem] font-bold tracking-wider uppercase landscape:block',
-                        onArt,
-                        index === 0 ? 'text-warning' : 'text-neon',
-                      )}
-                    >
-                      {index === 0 ? 'Archenemy' : 'Heroes'}
-                    </span>
-                  ) : null}
                   {[-5, -1].map((delta) => (
                     <LifeButton
                       key={delta}
@@ -1685,79 +1675,23 @@ export function TrackerView({
           aria-label={currentScheme.name}
           className="bg-void/95 fixed inset-0 z-[75] flex items-center justify-center p-3 backdrop-blur-sm"
         >
-          <div className="flex max-h-full w-full max-w-4xl flex-col items-center gap-3 landscape:flex-row landscape:items-stretch">
-            <img
-              src={currentScheme.imageUrl}
-              alt={currentScheme.name}
-              className="max-h-[72dvh] min-h-0 rounded-xl object-contain shadow-2xl landscape:max-h-[94dvh] landscape:max-w-[62%]"
-            />
-            <div className="flex min-h-0 w-full max-w-sm flex-col justify-center gap-3">
-              <div>
-                <p className="text-muted text-xs font-bold tracking-wider uppercase">
-                  {currentScheme.ongoing ? 'Ongoing scheme' : 'Scheme'}
-                </p>
-                <h2 className="font-display text-xl font-bold">
-                  {currentScheme.name}
-                </h2>
-              </div>
-              {state.activeSchemeIds.length > 0 ? (
-                <div className="border-warning/30 bg-warning/10 rounded-xl border p-3">
-                  <p className="text-warning mb-2 text-xs font-bold tracking-wider uppercase">
-                    Active ongoing schemes
-                  </p>
-                  <div className="flex flex-col gap-2">
-                    {state.activeSchemeIds.map((schemeId) => {
-                      const active = schemeById(schemeId);
-                      return active ? (
-                        <div
-                          key={schemeId}
-                          className="flex items-center justify-between gap-2 text-sm"
-                        >
-                          <span>{active.name}</span>
-                          <Button
-                            size="sm"
-                            variant="glass"
-                            onClick={() =>
-                              dispatch({
-                                type: 'action',
-                                action: {
-                                  type: 'abandonScheme',
-                                  schemeId,
-                                },
-                              })
-                            }
-                          >
-                            Abandon
-                          </Button>
-                        </div>
-                      ) : null;
-                    })}
-                  </div>
-                </div>
-              ) : null}
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  variant="neon"
-                  disabled={
-                    Boolean(state.winnerId) || state.schemeOrder.length === 0
-                  }
-                  onClick={() =>
-                    dispatch({ type: 'action', action: { type: 'scheme' } })
-                  }
-                >
-                  <Sparkles size={16} aria-hidden />
-                  Next scheme
-                </Button>
-                <Button variant="glass" onClick={() => setSchemeOpen(false)}>
-                  Close
-                </Button>
-              </div>
-              <p className="text-muted text-[0.65rem]">
-                Card image via Scryfall. Magic: The Gathering is © Wizards of
-                the Coast.
-              </p>
-            </div>
-          </div>
+          <SchemeSheet
+            currentSchemeId={state.currentSchemeId}
+            activeSchemeIds={state.activeSchemeIds}
+            pastSchemeIds={state.pastSchemeIds}
+            remaining={state.schemeOrder.length}
+            disabled={Boolean(state.winnerId)}
+            onNext={() =>
+              dispatch({ type: 'action', action: { type: 'scheme' } })
+            }
+            onAbandon={(schemeId) =>
+              dispatch({
+                type: 'action',
+                action: { type: 'abandonScheme', schemeId },
+              })
+            }
+            onClose={() => setSchemeOpen(false)}
+          />
         </div>
       ) : null}
       {/*
@@ -3536,6 +3470,7 @@ function restore(
           assassinTargets: parsed.assassinTargets ?? {},
           assassinScores: parsed.assassinScores ?? {},
           assassinContractsReady: parsed.assassinContractsReady ?? false,
+          pastSchemeIds: parsed.pastSchemeIds ?? [],
           treacheryRoles: parsed.treacheryRoles ?? {},
           treacheryIdentities: parsed.treacheryIdentities ?? {},
           treacheryUnveiled: parsed.treacheryUnveiled ?? [],

@@ -116,6 +116,8 @@ export type TrackerState = {
   schemeOrder: string[];
   currentSchemeId: string | null;
   activeSchemeIds: string[];
+  /** Schemes that have finished with the table, newest last. */
+  pastSchemeIds: string[];
   dayNight: 'day' | 'night' | null;
   dungeons: Record<string, DungeonProgress | undefined>;
   /** Completions in order, including repeats. The 0–4 counter is unique ids. */
@@ -218,6 +220,7 @@ export function createTracker(
     schemeOrder: [],
     currentSchemeId: null,
     activeSchemeIds: [],
+    pastSchemeIds: [],
     dayNight: null,
     dungeons: {},
     completedDungeons: {},
@@ -269,6 +272,7 @@ export function applyTrackerAction(
   next.schemeOrder ??= [];
   next.currentSchemeId ??= null;
   next.activeSchemeIds ??= [];
+  next.pastSchemeIds ??= [];
   switch (action.type) {
     case 'assassinContracts': {
       if (
@@ -405,6 +409,12 @@ export function applyTrackerAction(
       ) {
         const schemeId = next.schemeOrder.shift();
         if (schemeId) {
+          // The scheme being replaced is done with the table unless it is
+          // ongoing, in which case it stays face up until it is abandoned.
+          const outgoing = next.currentSchemeId;
+          if (outgoing && !schemeById(outgoing)?.ongoing) {
+            next.pastSchemeIds.push(outgoing);
+          }
           next.currentSchemeId = schemeId;
           if (schemeById(schemeId)?.ongoing) {
             next.activeSchemeIds.push(schemeId);
@@ -419,6 +429,7 @@ export function applyTrackerAction(
       if (active >= 0) {
         next.activeSchemeIds.splice(active, 1);
         next.schemeOrder.push(action.schemeId);
+        next.pastSchemeIds.push(action.schemeId);
       }
       break;
     }

@@ -16,6 +16,7 @@ export function App() {
   // Both routes are probed on every render: `||` would skip the second hook.
   const sandbox = useMatch('/match');
   const sandboxConfig = useMatch('/match-config');
+  const home = useMatch({ path: '/', end: true });
   const localOnly = Boolean(sandbox || sandboxConfig);
   const waking = useServerWake() && !localOnly;
   return (
@@ -24,8 +25,10 @@ export function App() {
       {waking ? <ServerWakeScreen /> : null}
       <main
         className={cx(
-          'relative mx-auto flex min-h-screen w-full flex-col gap-5 px-5 py-14',
-          wide ? 'max-w-4xl justify-start' : 'max-w-2xl justify-center',
+          'relative mx-auto flex min-h-screen w-full flex-col gap-5 px-5',
+          home ? 'justify-start py-8' : 'py-14',
+          wide ? 'max-w-4xl justify-start' : 'max-w-2xl',
+          !wide && !home && 'justify-center',
         )}
       >
         <Routes>

@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@podyguard/shared": "workspace:*",
+    "jsqr": "^1.4.0",
     "lucide-react": "^1.33.0",
     "qrcode.react": "^4.2.0",
     "react": "^19.0.0",

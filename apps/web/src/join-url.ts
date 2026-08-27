@@ -1,4 +1,20 @@
+import { isJoinCodeFormat, normalizeJoinCode } from '@podyguard/shared';
+
 const LOCAL_HOSTNAMES = new Set(['localhost', '127.0.0.1', '::1', '[::1]']);
+
+/**
+ * Pulls a join code out of whatever a QR (or a paste) handed us: a full join
+ * URL, a bare hash route, or the six characters themselves.
+ */
+export function joinCodeFromScan(raw: string): string | null {
+  const trimmed = raw.trim();
+  if (!trimmed) {
+    return null;
+  }
+  const fromRoute = trimmed.match(/#?\/e\/([A-Za-z0-9]+)/i)?.[1];
+  const candidate = normalizeJoinCode(fromRoute ?? trimmed);
+  return isJoinCodeFormat(candidate) ? candidate : null;
+}
 
 export function playerJoinUrl(
   origin: string,

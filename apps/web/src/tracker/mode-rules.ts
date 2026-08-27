@@ -129,6 +129,7 @@ export const MODE_RULES: Record<GameMode, ModeRules> = {
           'During each of the Archenemy’s first main phases, open the timer menu and tap Next scheme to set one in motion.',
           'A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.',
           'An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.',
+          'Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large.',
         ],
       },
       {

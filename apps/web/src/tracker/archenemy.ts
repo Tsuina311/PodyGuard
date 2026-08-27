@@ -3,6 +3,8 @@ export type SchemeCard = {
   name: string;
   ongoing: boolean;
   imageUrl: string;
+  /** The small render, so a row of miniatures costs one card's bandwidth. */
+  thumbnailUrl: string;
 };
 
 const ONGOING = new Set([
@@ -68,6 +70,7 @@ export const ARCHENEMY_SCHEMES: SchemeCard[] = SCHEME_NAMES.map(
     name,
     ongoing: ONGOING.has(id),
     imageUrl: `https://api.scryfall.com/cards/dsc/${id}?format=image&version=normal`,
+    thumbnailUrl: `https://api.scryfall.com/cards/dsc/${id}?format=image&version=small`,
   }),
 );
 

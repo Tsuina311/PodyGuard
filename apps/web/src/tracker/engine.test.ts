@@ -176,6 +176,22 @@ describe('Archenemy Commander tracker', () => {
     expect(state.schemeOrder).toEqual(['328', '332']);
   });
 
+  it('buries a resolved scheme and an abandoned ongoing one', () => {
+    // 332 is ongoing and stays face up; 328 resolves as soon as it is replaced.
+    let state = applyTrackerAction(archenemy(), { type: 'scheme' });
+    state = applyTrackerAction(state, { type: 'scheme' });
+    expect(state.pastSchemeIds).toEqual([]);
+
+    state = applyTrackerAction(state, { type: 'scheme' });
+    expect(state.pastSchemeIds).toEqual(['328']);
+
+    state = applyTrackerAction(state, {
+      type: 'abandonScheme',
+      schemeId: '332',
+    });
+    expect(state.pastSchemeIds).toEqual(['328', '332']);
+  });
+
   it('uses individual poison but wins and loses as a team', () => {
     let state = applyTrackerAction(archenemy(), {
       type: 'poison',

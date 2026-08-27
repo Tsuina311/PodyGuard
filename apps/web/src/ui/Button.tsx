@@ -15,7 +15,7 @@ export type ButtonVariant =
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 const base =
-  'group relative inline-flex items-center justify-center gap-2 rounded-xl font-semibold tracking-wide whitespace-nowrap transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-neon/70 focus-visible:ring-offset-2 focus-visible:ring-offset-void active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45';
+  'group relative inline-flex items-center gap-2 rounded-xl font-semibold tracking-wide whitespace-nowrap transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-neon/70 focus-visible:ring-offset-2 focus-visible:ring-offset-void active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45';
 
 const variants: Record<ButtonVariant, string> = {
   primary:
@@ -60,6 +60,7 @@ export function Button({
         variants[variant],
         sizes[size],
         block && 'w-full',
+        !className?.includes('justify-') && 'justify-center',
         className,
       )}
       {...rest}
