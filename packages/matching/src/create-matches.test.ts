@@ -334,4 +334,25 @@ describe('eventMatchOptions', () => {
       }),
     ).toEqual({ preferredSize: 6, allowedSizes: [6, 5, 4, 3] });
   });
+
+  it('makes duel strictly two players', () => {
+    expect(
+      eventMatchOptions({
+        gameMode: 'duel',
+        allowThreePods: true,
+        allowFivePods: true,
+      }),
+    ).toEqual({ preferredSize: 2, allowedSizes: [2] });
+  });
+
+  it('matches multiplayer from the preferred size down to three', () => {
+    expect(
+      eventMatchOptions({
+        gameMode: 'multiplayer',
+        allowThreePods: false,
+        allowFivePods: false,
+        preferredPodSize: 5,
+      }),
+    ).toEqual({ preferredSize: 5, allowedSizes: [5, 4, 3] });
+  });
 });

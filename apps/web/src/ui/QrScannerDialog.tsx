@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { CameraOff, X } from 'lucide-react';
 import jsQR from 'jsqr';
+import { useTranslation } from 'react-i18next';
 import { joinCodeFromScan } from '../join-url';
 import { Button } from './Button';
 
@@ -40,6 +41,7 @@ export function QrScannerDialog({
   onDetect: (joinCode: string) => void;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const onDetectRef = useRef(onDetect);
@@ -58,7 +60,7 @@ export function QrScannerDialog({
 
     async function start() {
       if (!navigator.mediaDevices?.getUserMedia) {
-        setError('This browser cannot open the camera. Type the join code instead.');
+        setError(t('scanner.noCamera'));
         setStarting(false);
         return;
       }
@@ -73,9 +75,7 @@ export function QrScannerDialog({
         });
       } catch {
         if (!cancelled) {
-          setError(
-            'Camera permission was denied. Type the join code, or allow the camera and try again.',
-          );
+          setError(t('scanner.permissionDenied'));
           setStarting(false);
         }
         return;
@@ -140,25 +140,23 @@ export function QrScannerDialog({
         }
       }
     };
-  }, []);
+  }, [t]);
 
   return (
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Scan join QR code"
+      aria-label={t('scanner.ariaLabel')}
       className="bg-void/95 fixed inset-0 z-[80] flex flex-col p-4 pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-[max(1rem,env(safe-area-inset-top))] backdrop-blur-md"
     >
       <header className="mb-3 flex shrink-0 items-center justify-between gap-3">
         <div>
-          <h2 className="font-display text-lg font-bold">Scan QR</h2>
-          <p className="text-muted text-xs">
-            Point at the host desk code.
-          </p>
+          <h2 className="font-display text-lg font-bold">{t('scanner.title')}</h2>
+          <p className="text-muted text-xs">{t('scanner.hint')}</p>
         </div>
         <button
           type="button"
-          aria-label="Close scanner"
+          aria-label={t('scanner.closeScanner')}
           onClick={onClose}
           className="border-muted/25 text-muted hover:text-ink flex size-9 items-center justify-center rounded-full border"
         >
@@ -179,7 +177,7 @@ export function QrScannerDialog({
         />
         {starting && !error ? (
           <p className="text-muted absolute inset-0 flex items-center justify-center text-sm">
-            Opening camera…
+            {t('scanner.openingCamera')}
           </p>
         ) : null}
         {error ? (
@@ -187,7 +185,7 @@ export function QrScannerDialog({
             <CameraOff size={28} aria-hidden className="text-danger" />
             <p className="text-sm">{error}</p>
             <Button variant="glass" onClick={onClose}>
-              Close
+              {t('common.close')}
             </Button>
           </div>
         ) : null}

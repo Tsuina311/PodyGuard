@@ -1,15 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { GAME_MODES } from '@podyguard/shared';
-import { MODE_RULES, rulesForMode } from './mode-rules';
+import i18n from '../i18n';
+import { rulesForMode } from './mode-rules';
 
 describe('mode rules', () => {
   it('covers every implemented game mode', () => {
-    expect(Object.keys(MODE_RULES).sort()).toEqual([...GAME_MODES].sort());
+    const covered = GAME_MODES.map((mode) => rulesForMode(mode, i18n.t));
+    expect(covered).toHaveLength(GAME_MODES.length);
   });
 
   it('gives each mode a title, a summary, and at least one section of bullets', () => {
     for (const mode of GAME_MODES) {
-      const rules = rulesForMode(mode);
+      const rules = rulesForMode(mode, i18n.t);
       expect(rules.title.length).toBeGreaterThan(0);
       expect(rules.summary.length).toBeGreaterThan(0);
       expect(rules.sections.length).toBeGreaterThan(0);

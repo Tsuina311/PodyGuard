@@ -1,21 +1,23 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { COMMANDER_POOLS } from '@podyguard/shared';
+import { COMMANDER_POOLS, usesCommanderRules, type RulesFormat } from '@podyguard/shared';
+import { useTranslation } from 'react-i18next';
 import { CommanderPicker } from './CommanderPicker';
 import {
   loadMatchConfig,
   matchPlayers,
+  modesForFamily,
   saveMatchConfig,
   seatCountForMode,
   seatCountsForMode,
   trackerStorageKey,
-  STANDALONE_GAME_MODES,
   type MatchConfig,
   type StandaloneGameMode,
 } from './match-config';
 import { Badge } from './ui/Badge';
 import { Brand } from './ui/Brand';
 import { Button } from './ui/Button';
+import { LanguageSwitcherCorner } from './ui/LanguageSwitcher';
 import { Panel } from './ui/Panel';
 import { ThemeToggleCorner } from './ui/ThemeToggle';
 import { cx } from './ui/cx';
@@ -29,9 +31,11 @@ const inputClass =
  * renders nothing a real seated player would not see.
  */
 export function MatchConfigPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [config, setConfig] = useState<MatchConfig>(() => loadMatchConfig());
   const players = matchPlayers(config);
+  const commanderRules = usesCommanderRules(config.gameMode, config.rulesFormat);
 
   function update(patch: Partial<MatchConfig>) {
     setConfig((current) => {
@@ -41,9 +45,10 @@ export function MatchConfigPage() {
     });
   }
 
-  function setGameMode(gameMode: StandaloneGameMode) {
+  function setGameMode(gameMode: StandaloneGameMode, rulesFormat: RulesFormat) {
     update({
       gameMode,
+      rulesFormat,
       seatCount: seatCountForMode(gameMode, config.seatCount),
     });
   }
@@ -70,41 +75,55 @@ export function MatchConfigPage() {
 
   return (
     <>
+      <LanguageSwitcherCorner />
       <ThemeToggleCorner />
       <header>
         <Brand className="mb-6" />
         <div className="mb-2 flex items-center gap-3">
           <h1 className="font-display text-3xl font-bold tracking-tight">
-            Match config
+            {t('matchConfig.title')}
           </h1>
-          <Badge tone="dev">dev</Badge>
+          <Badge tone="dev">{t('common.dev')}</Badge>
         </div>
-        <p className="text-muted mb-8 text-sm">
-          Sets up the fake seated pod behind <code>/match</code>. Nothing here
-          touches the server, and none of it appears on the battle screen, so
-          that route can be checked on a phone as-is.
-        </p>
+        <p className="text-muted mb-8 text-sm">{t('matchConfig.description')}</p>
       </header>
 
-      <Panel title="Pod setup" aside={`${String(config.seatCount)} seats`}>
-        <p className="text-muted mb-2 text-xs font-medium tracking-[0.14em] uppercase">
-          Game
-        </p>
-        <div className="mb-4 flex flex-wrap gap-1.5">
-          {STANDALONE_GAME_MODES.map((mode) => (
-            <Button
-              key={mode.id}
-              size="sm"
-              variant={config.gameMode === mode.id ? 'neon' : 'glass'}
-              onClick={() => setGameMode(mode.id)}
-            >
-              {mode.label}
-            </Button>
-          ))}
-        </div>
+      <Panel
+        title={t('matchConfig.podSetup')}
+        aside={t('matchConfig.seatsCount', { count: config.seatCount })}
+      >
+        {(
+          [
+            ['normal', 'families.normal'],
+            ['commander', 'families.commander'],
+          ] as const
+        ).map(([family, labelKey]) => (
+          <div key={family} className="mb-4">
+            <p className="text-muted mb-2 text-xs font-medium tracking-[0.14em] uppercase">
+              {t(labelKey)}
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {modesForFamily(family).map((mode) => (
+                <Button
+                  key={`${family}-${mode.id}`}
+                  size="sm"
+                  variant={
+                    config.gameMode === mode.id &&
+                    config.rulesFormat === family
+                      ? 'neon'
+                      : 'glass'
+                  }
+                  onClick={() => setGameMode(mode.id, family)}
+                >
+                  {t(`modes.${mode.id}.label`)}
+                </Button>
+              ))}
+            </div>
+          </div>
+        ))}
 
         <p className="text-muted mb-2 text-xs font-medium tracking-[0.14em] uppercase">
-          Seats
+          {t('matchConfig.seats')}
         </p>
         <div className="mb-4 flex flex-wrap gap-1.5">
           {seatCountsForMode(config.gameMode).map((count) => (
@@ -119,29 +138,35 @@ export function MatchConfigPage() {
           ))}
         </div>
 
-        <p className="text-muted mb-2 text-xs font-medium tracking-[0.14em] uppercase">
-          Bracket
-        </p>
-        <div className="mb-4 flex flex-wrap gap-1.5">
-          {[...COMMANDER_POOLS, { id: 'open', short: 'Open' }].map((pool) => (
-            <button
-              key={pool.id}
-              type="button"
-              className={cx(
-                'rounded-lg border px-2 py-1 font-mono text-xs tracking-wide',
-                config.poolId === pool.id
-                  ? 'border-neon/60 bg-neon/15 text-neon'
-                  : 'border-muted/20 text-muted hover:border-muted/35 hover:text-ink',
+        {commanderRules ? (
+          <>
+            <p className="text-muted mb-2 text-xs font-medium tracking-[0.14em] uppercase">
+              {t('matchConfig.bracket')}
+            </p>
+            <div className="mb-4 flex flex-wrap gap-1.5">
+              {[...COMMANDER_POOLS, { id: 'open', short: t('common.open') }].map(
+                (pool) => (
+                  <button
+                    key={pool.id}
+                    type="button"
+                    className={cx(
+                      'rounded-lg border px-2 py-1 font-mono text-xs tracking-wide',
+                      config.poolId === pool.id
+                        ? 'border-neon/60 bg-neon/15 text-neon'
+                        : 'border-muted/20 text-muted hover:border-muted/35 hover:text-ink',
+                    )}
+                    onClick={() => update({ poolId: pool.id })}
+                  >
+                    {pool.short}
+                  </button>
+                ),
               )}
-              onClick={() => update({ poolId: pool.id })}
-            >
-              {pool.short}
-            </button>
-          ))}
-        </div>
+            </div>
+          </>
+        ) : null}
 
         <p className="text-muted mb-2 text-xs font-medium tracking-[0.14em] uppercase">
-          Players
+          {t('common.players')}
         </p>
         <div className="mb-4 grid gap-3 sm:grid-cols-2">
           {players.map((player, index) => (
@@ -149,69 +174,73 @@ export function MatchConfigPage() {
               <input
                 className={inputClass}
                 value={config.names[index] ?? ''}
-                placeholder={`Player ${String(index + 1)}`}
+                placeholder={t('common.player', { number: index + 1 })}
                 onChange={(change) => renameSeat(index, change.target.value)}
               />
-              <CommanderPicker
-                label="Commander"
-                value={player.commanders[0] ?? null}
-                onChange={(commander) =>
-                  setSeatCommanders(index, commander ? [commander] : [])
-                }
-              />
-              {player.commanders[0] &&
-              (player.commanders[1] ||
-                canHaveSecondCommander(player.commanders[0])) ? (
-                <CommanderPicker
-                  label="Second commander"
-                  value={player.commanders[1] ?? null}
-                  partnerFor={player.commanders[0]}
-                  onChange={(commander) =>
-                    setSeatCommanders(
-                      index,
-                      commander
-                        ? [player.commanders[0]!, commander]
-                        : [player.commanders[0]!],
-                    )
-                  }
-                />
+              {commanderRules ? (
+                <>
+                  <CommanderPicker
+                    label={t('matchConfig.commander')}
+                    value={player.commanders[0] ?? null}
+                    onChange={(commander) =>
+                      setSeatCommanders(index, commander ? [commander] : [])
+                    }
+                  />
+                  {player.commanders[0] &&
+                  (player.commanders[1] ||
+                    canHaveSecondCommander(player.commanders[0])) ? (
+                    <CommanderPicker
+                      label={t('matchConfig.secondCommander')}
+                      value={player.commanders[1] ?? null}
+                      partnerFor={player.commanders[0]}
+                      onChange={(commander) =>
+                        setSeatCommanders(
+                          index,
+                          commander
+                            ? [player.commanders[0]!, commander]
+                            : [player.commanders[0]!],
+                        )
+                      }
+                    />
+                  ) : null}
+                </>
               ) : null}
             </div>
           ))}
         </div>
 
         <p className="text-muted mb-2 text-xs font-medium tracking-[0.14em] uppercase">
-          Header
+          {t('matchConfig.header')}
         </p>
         <div className="mb-4 grid gap-2 sm:grid-cols-2">
           <input
             className={inputClass}
             value={config.eventName}
-            placeholder="Event name"
+            placeholder={t('matchConfig.eventNamePlaceholder')}
             onChange={(change) => update({ eventName: change.target.value })}
           />
           <input
             className={cx(inputClass, 'font-mono tracking-[0.2em] uppercase')}
             value={config.joinCode}
-            placeholder="Join code"
+            placeholder={t('matchConfig.joinCodePlaceholder')}
             onChange={(change) => update({ joinCode: change.target.value })}
           />
         </div>
 
         <p className="text-muted mb-2 text-xs font-medium tracking-[0.14em] uppercase">
-          Match card
+          {t('matchConfig.matchCard')}
         </p>
         <div className="mb-4 grid gap-2 sm:grid-cols-2">
           <input
             className={inputClass}
             value={config.tableLabel}
-            placeholder="Table label"
+            placeholder={t('matchConfig.tableLabelPlaceholder')}
             onChange={(change) => update({ tableLabel: change.target.value })}
           />
           <input
             className={inputClass}
             value={config.deckName}
-            placeholder="Assigned deck"
+            placeholder={t('matchConfig.assignedDeckPlaceholder')}
             onChange={(change) => update({ deckName: change.target.value })}
           />
         </div>
@@ -222,17 +251,17 @@ export function MatchConfigPage() {
             size="lg"
             onClick={() => void navigate('/match')}
           >
-            Open battle screen
+            {t('matchConfig.openBattleScreen')}
           </Button>
           <Button variant="glass" size="lg" onClick={resetGame}>
-            Reset game state
+            {t('matchConfig.resetGameState')}
           </Button>
         </div>
       </Panel>
 
       <p className="text-muted/70 text-xs">
         <Link className="hover:text-ink" to="/">
-          Home
+          {t('common.home')}
         </Link>
       </p>
     </>

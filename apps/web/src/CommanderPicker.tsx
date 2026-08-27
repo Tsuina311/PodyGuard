@@ -1,5 +1,6 @@
 import { useEffect, useId, useState } from 'react';
 import { Search, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { ApiError, listCommanderArtwork, searchCommanders } from './api';
 import type {
   CommanderArtwork,
@@ -23,6 +24,7 @@ export function CommanderPicker({
   disabled,
   onChange,
 }: Props) {
+  const { t } = useTranslation();
   const id = useId();
   const [query, setQuery] = useState(value?.name ?? '');
   const [results, setResults] = useState<CommanderCandidate[]>([]);
@@ -59,7 +61,7 @@ export function CommanderPicker({
             setError(
               caught instanceof ApiError
                 ? caught.message
-                : 'Could not search Scryfall.',
+                : t('common.errors.searchScryfall'),
             );
           }
         })
@@ -73,7 +75,7 @@ export function CommanderPicker({
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [partnerFor?.cardId, query, value?.name]);
+  }, [partnerFor?.cardId, query, t, value?.name]);
 
   async function chooseCard(card: CommanderCandidate) {
     setResults([]);
@@ -94,7 +96,7 @@ export function CommanderPicker({
       setError(
         caught instanceof ApiError
           ? caught.message
-          : 'Could not load alternate artwork.',
+          : t('common.errors.loadArtwork'),
       );
     } finally {
       setLoadingArt(false);
@@ -135,7 +137,7 @@ export function CommanderPicker({
           </span>
           <button
             type="button"
-            aria-label={`Remove ${value.name}`}
+            aria-label={t('commanderPicker.removeCommander', { name: value.name })}
             disabled={disabled}
             onClick={() => onChange(null)}
             className="text-muted hover:text-ink flex size-8 shrink-0 items-center justify-center disabled:opacity-40"
@@ -157,8 +159,8 @@ export function CommanderPicker({
             autoComplete="off"
             placeholder={
               partnerFor
-                ? `Commander that can pair with ${partnerFor.name}`
-                : 'Search commander'
+                ? t('commanderPicker.searchPartner', { name: partnerFor.name })
+                : t('commanderPicker.searchCommander')
             }
             className="h-10 w-full rounded-lg border border-muted/20 bg-void/70 pr-3 pl-9 text-sm outline-none placeholder:text-muted/50 focus:border-neon/70"
             onChange={(event) => setQuery(event.target.value)}
@@ -169,7 +171,7 @@ export function CommanderPicker({
       {!value && (searching || results.length > 0 || error) ? (
         <div className="border-muted/25 bg-void absolute top-full right-0 left-0 z-30 mt-1 max-h-56 overflow-y-auto rounded-xl border p-1 shadow-xl">
           {searching ? (
-            <p className="text-muted px-3 py-2 text-xs">Searching…</p>
+            <p className="text-muted px-3 py-2 text-xs">{t('common.searching')}</p>
           ) : null}
           {results.map((card) => (
             <button
@@ -206,16 +208,16 @@ export function CommanderPicker({
         <div className="border-muted/20 bg-void/70 mt-2 rounded-xl border p-2">
           <header className="mb-2 flex items-center justify-between gap-2">
             <p className="text-muted min-w-0 truncate text-xs">
-              Artwork for{' '}
+              {t('commanderPicker.artworkFor')}{' '}
               <span className="text-ink font-medium">{artCard.name}</span>
             </p>
             <Button size="sm" variant="ghost" onClick={() => setArtCard(null)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
           </header>
           {loadingArt ? (
             <p className="text-muted px-1 py-6 text-center text-xs">
-              Loading artwork…
+              {t('commanderPicker.loadingArtwork')}
             </p>
           ) : (
             <div className="grid max-h-72 grid-cols-2 gap-2 overflow-y-auto sm:grid-cols-3">

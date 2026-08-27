@@ -10,6 +10,7 @@ import type {
   TreacheryRoleAssignment,
 } from '@podyguard/shared';
 import { resolveApiUrl } from './api-base';
+import i18n from './i18n';
 import type {
   CommanderArtwork,
   CommanderCandidate,
@@ -53,8 +54,8 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       0,
       'API_UNREACHABLE',
       import.meta.env.PROD
-        ? 'The host is waking up. Keep this page open — it usually takes under a minute.'
-        : 'Cannot reach the API. Is the server running (yarn dev:server)?',
+        ? i18n.t('common.errors.apiWaking')
+        : i18n.t('common.errors.apiUnreachable'),
     );
   }
 
@@ -104,6 +105,7 @@ export function createEvent(
   tableCount: number,
   options?: {
     gameMode?: GameMode;
+    rulesFormat?: 'normal' | 'commander';
     allowThreePods?: boolean;
     allowFivePods?: boolean;
     preferredPodSize?: number;

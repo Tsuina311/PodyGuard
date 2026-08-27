@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import type {
   EventMetrics,
   PublicEvent,
@@ -10,6 +11,7 @@ import {
   ASSASSIN_POD_SIZES,
   poolShortLabel,
   TREACHERY_POD_SIZES,
+  usesCommanderRules,
 } from '@podyguard/shared';
 import { countByStatus, queueByWait } from './match-view';
 import {
@@ -41,6 +43,7 @@ import { Button } from './ui/Button';
 import { Field } from './ui/Field';
 import { JoinQr } from './ui/JoinQr';
 import { Panel } from './ui/Panel';
+import { LanguageSwitcherCorner } from './ui/LanguageSwitcher';
 import { ThemeToggleCorner } from './ui/ThemeToggle';
 import { WaitTime } from './ui/WaitTime';
 import { useEventLive } from './useEventLive';
@@ -48,6 +51,7 @@ import { ChallengePackEditor } from './ChallengePackEditor';
 import { HostMetrics } from './HostMetrics';
 
 export function HostPage() {
+  const { t } = useTranslation();
   const { joinCode = '' } = useParams();
   const code = joinCode.toUpperCase();
   const [event, setEvent] = useState<PublicEvent | null>(null);
@@ -133,7 +137,9 @@ export function HostPage() {
       await refreshMetrics(result.hostToken);
     } catch (caught) {
       setError(
-        caught instanceof ApiError ? caught.message : 'Could not unlock host.',
+        caught instanceof ApiError
+          ? caught.message
+          : t('common.errors.unlockHost'),
       );
     } finally {
       setBusy(false);
@@ -151,7 +157,9 @@ export function HostPage() {
       await refresh();
     } catch (caught) {
       setError(
-        caught instanceof ApiError ? caught.message : 'Could not update table.',
+        caught instanceof ApiError
+          ? caught.message
+          : t('common.errors.updateTable'),
       );
     }
   }
@@ -166,7 +174,9 @@ export function HostPage() {
       await refresh();
     } catch (caught) {
       setError(
-        caught instanceof ApiError ? caught.message : 'Could not start the game.',
+        caught instanceof ApiError
+          ? caught.message
+          : t('common.errors.startGame'),
       );
     }
   }
@@ -191,7 +201,7 @@ export function HostPage() {
       setError(
         caught instanceof ApiError
           ? caught.message
-          : 'Could not start all ready games.',
+          : t('common.errors.startAllGames'),
       );
     } finally {
       setBusy(false);
@@ -209,7 +219,9 @@ export function HostPage() {
       await refreshMetrics(hostToken);
     } catch (caught) {
       setError(
-        caught instanceof ApiError ? caught.message : 'Could not finish the table.',
+        caught instanceof ApiError
+          ? caught.message
+          : t('common.errors.finishTable'),
       );
     }
   }
@@ -224,7 +236,9 @@ export function HostPage() {
       await refresh();
     } catch (caught) {
       setError(
-        caught instanceof ApiError ? caught.message : 'Could not cancel the pod.',
+        caught instanceof ApiError
+          ? caught.message
+          : t('common.errors.cancelPod'),
       );
     }
   }
@@ -246,7 +260,9 @@ export function HostPage() {
       setEvent(result.event);
     } catch (caught) {
       setError(
-        caught instanceof ApiError ? caught.message : 'Could not update settings.',
+        caught instanceof ApiError
+          ? caught.message
+          : t('common.errors.updateSettings'),
       );
     }
   }
@@ -263,7 +279,9 @@ export function HostPage() {
       await refreshMetrics(hostToken);
     } catch (caught) {
       setError(
-        caught instanceof ApiError ? caught.message : 'Could not match tables.',
+        caught instanceof ApiError
+          ? caught.message
+          : t('common.errors.matchTables'),
       );
     } finally {
       setBusy(false);
@@ -283,7 +301,7 @@ export function HostPage() {
       setError(
         caught instanceof ApiError
           ? caught.message
-          : 'Could not fill tables with bots.',
+          : t('common.errors.fillBots'),
       );
     } finally {
       setBusy(false);
@@ -317,7 +335,7 @@ export function HostPage() {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1500);
     } catch {
-      setError('Clipboard blocked — copy the link manually.');
+      setError(t('common.errors.clipboard'));
     }
   }
 
@@ -333,20 +351,21 @@ export function HostPage() {
   if (!event) {
     return (
       <>
+        <LanguageSwitcherCorner />
         <ThemeToggleCorner />
         <header>
           <Brand className="mb-6" />
           <h1 className="font-display mb-2 text-3xl font-bold tracking-tight">
-            Host desk
+            {t('host.desk')}
           </h1>
           <p className="text-muted mb-8 font-mono text-sm tracking-[0.28em] uppercase">
             {code}
           </p>
         </header>
 
-        <Panel title="Locked" aside="host only" onSubmit={onUnlock}>
+        <Panel title={t('host.locked')} aside={t('host.hostOnly')} onSubmit={onUnlock}>
           <Field
-            label="Host PIN"
+            label={t('home.hostPin')}
             value={hostPin}
             onChange={(change) => setHostPin(change.target.value)}
             inputMode="numeric"
@@ -355,7 +374,7 @@ export function HostPage() {
             required
           />
           <Button type="submit" size="lg" block disabled={busy}>
-            {busy ? 'Checking…' : 'Unlock host desk'}
+            {busy ? t('common.checking') : t('host.unlockHostDesk')}
           </Button>
         </Panel>
 
@@ -363,7 +382,7 @@ export function HostPage() {
 
         <p className="text-muted/70 text-xs">
           <Link className="hover:text-ink" to="/">
-            Home
+            {t('common.home')}
           </Link>
         </p>
       </>
@@ -372,6 +391,7 @@ export function HostPage() {
 
   return (
     <>
+      <LanguageSwitcherCorner />
       <ThemeToggleCorner />
       <header>
         <Brand className="mb-6" />
@@ -380,27 +400,33 @@ export function HostPage() {
         </h1>
         <div className="text-muted mb-8 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
           <span>
-            {participants.length} player{participants.length === 1 ? '' : 's'}
+            {t('host.playerCount', { count: participants.length })}
           </span>
-          <span className="text-neon">{counts.ready} ready</span>
-          <span>{counts.matched} matched</span>
-          <span>{counts.playing} playing</span>
-          <span>{counts.paused} paused</span>
+          <span className="text-neon">
+            {t('host.ready', { count: counts.ready })}
+          </span>
+          <span>{t('host.matched', { count: counts.matched })}</span>
+          <span>{t('host.playing', { count: counts.playing })}</span>
+          <span>{t('host.paused', { count: counts.paused })}</span>
           <span>
-            ends{' '}
-            {new Date(event.expiresAt).toLocaleString(undefined, {
-              weekday: 'short',
-              hour: 'numeric',
-              minute: '2-digit',
+            {t('host.ends', {
+              date: new Date(event.expiresAt).toLocaleString(undefined, {
+                weekday: 'short',
+                hour: 'numeric',
+                minute: '2-digit',
+              }),
             })}
           </span>
           <Badge tone={event.gameMode === 'treachery' ? 'dev' : 'idle'}>
-            {event.gameMode}
+            {t(`modes.${event.gameMode}.label`)}
+          </Badge>
+          <Badge tone={event.rulesFormat === 'normal' ? 'live' : 'idle'}>
+            {t(`families.${event.rulesFormat}`)}
           </Badge>
         </div>
       </header>
 
-      <Panel title="Pod sizes" aside="matching">
+      <Panel title={t('host.podSizes')} aside={t('host.matching')}>
         {event.gameMode === 'commander' ? (
           <>
             <label className="text-muted mb-2 flex items-center gap-2 text-sm">
@@ -411,7 +437,7 @@ export function HostPage() {
                   void onToggleSetting({ allowThreePods: change.target.checked })
                 }
               />
-              Allow leftover 3-player pods
+              {t('host.allowLeftoverThree')}
             </label>
             <label className="text-muted flex items-center gap-2 text-sm">
               <input
@@ -421,13 +447,13 @@ export function HostPage() {
                   void onToggleSetting({ allowFivePods: change.target.checked })
                 }
               />
-              Allow 5-player pods
+              {t('host.allowFivePods')}
             </label>
           </>
         ) : event.gameMode === 'treachery' ? (
           <>
             <p className="text-muted mb-3 text-sm">
-              Target table size. Leftover pods can be as small as four.
+              {t('host.treacheryTargetHint')}
             </p>
             <div className="grid grid-cols-5 gap-2">
               {TREACHERY_POD_SIZES.map((size) => (
@@ -447,15 +473,14 @@ export function HostPage() {
             </div>
             <p className="text-muted mt-3 text-xs">
               {event.preferredPodSize >= 5
-                ? `Matching prefers ${String(event.preferredPodSize)}-player tables.`
-                : 'Matching prefers 4-player tables.'}
+                ? t('host.matchingPrefers', { size: event.preferredPodSize })
+                : t('host.matchingPrefersFour')}
             </p>
           </>
         ) : event.gameMode === 'assassin' ? (
           <>
             <p className="text-muted mb-3 text-sm">
-              Target table size. Leftover contract circles can be as small as
-              three.
+              {t('host.assassinTargetHint')}
             </p>
             <div className="grid grid-cols-6 gap-2">
               {ASSASSIN_POD_SIZES.map((size) => (
@@ -476,31 +501,47 @@ export function HostPage() {
               ))}
             </div>
           </>
+        ) : event.gameMode === 'multiplayer' ? (
+          <>
+            <p className="text-muted mb-3 text-sm">
+              {t('host.multiplayerTargetHint')}
+            </p>
+            <div className="grid grid-cols-4 gap-2">
+              {[3, 4, 5, 6].map((size) => (
+                <button
+                  key={size}
+                  type="button"
+                  className={`rounded-xl border p-2 text-sm font-semibold transition ${
+                    event.preferredPodSize === size
+                      ? 'border-neon bg-neon/10 text-neon'
+                      : 'border-muted/20 text-muted hover:border-muted/40'
+                  }`}
+                  onClick={() =>
+                    void onToggleSetting({ preferredPodSize: size })
+                  }
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+          </>
+        ) : event.gameMode === 'duel' ? (
+          <p className="text-muted text-sm">{t('host.duelMatchmaking')}</p>
         ) : event.gameMode === 'two-headed-giant' ? (
-          <p className="text-muted text-sm">
-            Two-Headed Giant matchmaking seats exactly four players per game.
-          </p>
+          <p className="text-muted text-sm">{t('host.twoHeadedMatchmaking')}</p>
         ) : event.gameMode === 'archenemy-commander' ? (
-          <p className="text-muted text-sm">
-            Archenemy Commander matchmaking seats exactly four players per
-            game: one Archenemy against a team of three.
-          </p>
+          <p className="text-muted text-sm">{t('host.archenemyMatchmaking')}</p>
         ) : event.gameMode === 'emperor' ? (
-          <p className="text-muted text-sm">
-            Emperor matchmaking seats exactly six players per game: two teams
-            with an Emperor and two Generals each.
-          </p>
+          <p className="text-muted text-sm">{t('host.emperorMatchmaking')}</p>
         ) : (
-          <p className="text-muted text-sm">
-            Star matchmaking seats exactly five players in a circular order.
-          </p>
+          <p className="text-muted text-sm">{t('host.starMatchmaking')}</p>
         )}
       </Panel>
 
-      <Panel title="Event length" aside="join code dies">
+      <Panel title={t('host.eventLength')} aside={t('host.joinCodeDies')}>
         <Field
-          label="Hours from start"
-          hint="Change this for a multi-day event. After it ends, the QR opens the home page."
+          label={t('host.hoursFromStart')}
+          hint={t('host.hoursFromStartHint')}
           type="number"
           inputMode="numeric"
           min={1}
@@ -525,7 +566,7 @@ export function HostPage() {
 
       {metrics ? <HostMetrics metrics={metrics} /> : null}
 
-      {hostToken ? (
+      {hostToken && usesCommanderRules(event.gameMode, event.rulesFormat) ? (
         <ChallengePackEditor
           joinCode={code}
           hostToken={hostToken}
@@ -535,7 +576,7 @@ export function HostPage() {
         />
       ) : null}
 
-      <Panel title="Join code" aside="share">
+      <Panel title={t('host.joinCodeTitle')} aside={t('host.share')}>
         <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
           <JoinQr value={joinUrl} />
           <div className="min-w-0">
@@ -545,19 +586,19 @@ export function HostPage() {
             <p className="text-muted mb-4 font-mono text-xs break-all">{joinUrl}</p>
             {unreachableFromPhones ? (
               <p className="text-warning mb-4 text-xs">
-                No LAN address found — this link only works on this computer.
+                {t('host.noLanAddress')}
               </p>
             ) : null}
             <Button variant="glass" size="sm" onClick={() => void onCopyLink()}>
-              {copied ? 'Copied' : 'Copy player link'}
+              {copied ? t('common.copied') : t('host.copyPlayerLink')}
             </Button>
           </div>
         </div>
       </Panel>
 
-      <Panel title="Queue" aside={`${String(counts.ready)} ready`}>
+      <Panel title={t('host.queue')} aside={t('host.ready', { count: counts.ready })}>
         {queue.length === 0 ? (
-          <p className="text-muted text-sm">Nobody waiting.</p>
+          <p className="text-muted text-sm">{t('host.nobodyWaiting')}</p>
         ) : (
           <ul className="divide-y divide-white/5">
             {queue.map((row) => (
@@ -567,13 +608,15 @@ export function HostPage() {
               >
                 <span className="flex min-w-0 items-center gap-2">
                   <span className="truncate">{row.displayName}</span>
-                  {row.isBot ? <Badge tone="dev">bot</Badge> : null}
+                  {row.isBot ? <Badge tone="dev">{t('common.bot')}</Badge> : null}
                   {row.flexCredits > 0 ? (
-                    <Badge>flex {String(row.flexCredits)}</Badge>
+                    <Badge>{t('host.flex', { count: row.flexCredits })}</Badge>
                   ) : null}
                   {(row.challengePoints ?? 0) > 0 ? (
                     <Badge tone="live">
-                      {String(row.challengePoints)} challenge pts
+                      {t('host.challengePts', {
+                        count: row.challengePoints ?? 0,
+                      })}
                     </Badge>
                   ) : null}
                   {row.decks[0] ? (
@@ -595,17 +638,19 @@ export function HostPage() {
       </Panel>
 
       {lobby.length > 0 ? (
-        <Panel title="Not ready" aside={String(lobby.length)}>
+        <Panel title={t('host.notReady')} aside={String(lobby.length)}>
           <ul className="divide-y divide-white/5">
             {lobby.map((row) => (
               <li key={row.id} className="flex items-center gap-2 py-2.5 text-sm">
                 <span className="truncate">{row.displayName}</span>
                 {(row.challengePoints ?? 0) > 0 ? (
                   <Badge tone="live">
-                    {String(row.challengePoints)} challenge pts
+                    {t('host.challengePts', {
+                      count: row.challengePoints ?? 0,
+                    })}
                   </Badge>
                 ) : null}
-                {row.isBot ? <Badge tone="dev">bot</Badge> : null}
+                {row.isBot ? <Badge tone="dev">{t('common.bot')}</Badge> : null}
               </li>
             ))}
           </ul>
@@ -613,7 +658,7 @@ export function HostPage() {
       ) : null}
 
       {pausedPlayers.length > 0 ? (
-        <Panel title="Paused" aside={String(pausedPlayers.length)}>
+        <Panel title={t('host.pausedTitle')} aside={String(pausedPlayers.length)}>
           <ul className="divide-y divide-white/5">
             {pausedPlayers.map((row) => (
               <li
@@ -623,7 +668,9 @@ export function HostPage() {
                 <span>{row.displayName}</span>
                 {(row.challengePoints ?? 0) > 0 ? (
                   <Badge tone="live">
-                    {String(row.challengePoints)} challenge pts
+                    {t('host.challengePts', {
+                      count: row.challengePoints ?? 0,
+                    })}
                   </Badge>
                 ) : null}
               </li>
@@ -634,8 +681,10 @@ export function HostPage() {
 
       {seatedPlayers.length > 0 ? (
         <Panel
-          title="Seated"
-          aside={`${String(counts.matched + counts.playing)} at tables`}
+          title={t('host.seated')}
+          aside={t('host.atTables', {
+            count: counts.matched + counts.playing,
+          })}
         >
           <ul className="divide-y divide-white/5">
             {seatedPlayers.map((row) => (
@@ -647,7 +696,7 @@ export function HostPage() {
                 <span className="flex shrink-0 items-center gap-2">
                   {(row.challengePoints ?? 0) > 0 ? (
                     <Badge tone="live">
-                      {String(row.challengePoints)} pts
+                      {t('host.pts', { count: row.challengePoints ?? 0 })}
                     </Badge>
                   ) : null}
                   {row.assignedPoolId ? (
@@ -664,11 +713,9 @@ export function HostPage() {
         </Panel>
       ) : null}
 
-      <Panel title="Tables" aside={`${String(tables.length)} total`}>
+      <Panel title={t('host.tablesTitle')} aside={t('host.total', { count: tables.length })}>
         {tables.length === 0 ? (
-          <p className="text-muted text-sm">
-            This event was created without tables.
-          </p>
+          <p className="text-muted text-sm">{t('host.noTables')}</p>
         ) : (
           <>
           <Button
@@ -679,8 +726,8 @@ export function HostPage() {
             onClick={() => void onStartAllTables()}
           >
             {busy
-              ? 'Starting games…'
-              : `Start all ready games (${String(readyTables.length)})`}
+              ? t('host.startingGames')
+              : t('host.startAllReady', { count: readyTables.length })}
           </Button>
           <ul className="mb-5 grid gap-3 sm:grid-cols-2">
             {tables.map((table) => (
@@ -702,13 +749,17 @@ export function HostPage() {
                       : (table.podStatus ?? table.status)}
                   </Badge>
                   {table.trackerUsed !== undefined ? (
-                    <Badge>{table.trackerUsed ? 'tracker' : 'no tracker'}</Badge>
+                    <Badge>
+                      {table.trackerUsed
+                        ? t('host.trackerUsed')
+                        : t('host.noTracker')}
+                    </Badge>
                   ) : null}
                 </div>
                 <p className="text-muted mb-3 text-xs">
                   {table.seatedNames.length > 0
                     ? table.seatedNames.join(' · ')
-                    : 'Empty'}
+                    : t('common.empty')}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {table.podStatus === 'formed' ? (
@@ -717,7 +768,7 @@ export function HostPage() {
                       disabled={busy}
                       onClick={() => void onStartTable(table)}
                     >
-                      Start game
+                      {t('host.startGame')}
                     </Button>
                   ) : null}
                   {table.podStatus === 'formed' || table.podStatus === 'playing' ? (
@@ -728,7 +779,7 @@ export function HostPage() {
                       disabled={busy}
                       onClick={() => void onFinishTable(table)}
                     >
-                      Finish table
+                      {t('host.finishTable')}
                     </Button>
                     <Button
                       variant="ghost"
@@ -736,7 +787,7 @@ export function HostPage() {
                       disabled={busy}
                       onClick={() => void onCancelTable(table)}
                     >
-                      Cancel pod
+                      {t('host.cancelPod')}
                     </Button>
                     </>
                   ) : (
@@ -746,7 +797,9 @@ export function HostPage() {
                       disabled={table.status === 'occupied'}
                       onClick={() => void onToggleTable(table)}
                     >
-                      {table.status === 'disabled' ? 'Enable' : 'Disable'}
+                      {table.status === 'disabled'
+                        ? t('host.enable')
+                        : t('host.disable')}
                     </Button>
                   )}
                 </div>
@@ -758,7 +811,7 @@ export function HostPage() {
 
         <div className="mb-5 flex flex-wrap gap-2.5">
           <Button disabled={busy} onClick={() => void onMatch()}>
-            {busy ? 'Working…' : 'Match now'}
+            {busy ? t('common.working') : t('host.matchNow')}
           </Button>
           {import.meta.env.DEV ? (
             <Button
@@ -767,7 +820,7 @@ export function HostPage() {
               disabled={busy}
               onClick={() => void onFillBots()}
             >
-              {busy ? 'Working…' : 'Fill tables with bots'}
+              {busy ? t('common.working') : t('host.fillBots')}
             </Button>
           ) : null}
         </div>
@@ -777,11 +830,11 @@ export function HostPage() {
 
       <p className="text-muted/70 text-xs">
         <Link className="hover:text-ink" to="/">
-          Home
+          {t('common.home')}
         </Link>
         <span className="mx-2">·</span>
         <Link className="hover:text-ink" to={`/e/${code}`}>
-          Player join page
+          {t('host.playerJoinPage')}
         </Link>
       </p>
     </>

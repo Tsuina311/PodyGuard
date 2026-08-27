@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export type Theme = 'light' | 'dark';
 
@@ -42,6 +43,7 @@ export function ThemeToggleCorner() {
 }
 
 export function ThemeToggle() {
+  const { t } = useTranslation();
   const [theme, setTheme] = useState<Theme>(() => preferredTheme());
 
   useEffect(() => {
@@ -64,14 +66,18 @@ export function ThemeToggle() {
   }, []);
 
   const nextTheme = theme === 'dark' ? 'light' : 'dark';
+  const switchLabel =
+    nextTheme === 'light'
+      ? t('theme.switchToLight')
+      : t('theme.switchToDark');
 
   return (
     <button
       type="button"
       className="theme-toggle"
-      aria-label={`Switch to ${nextTheme} mode`}
+      aria-label={switchLabel}
       aria-pressed={theme === 'light'}
-      title={`Switch to ${nextTheme} mode`}
+      title={switchLabel}
       onClick={() => setTheme(nextTheme)}
     >
       <span aria-hidden className="theme-toggle__icon">

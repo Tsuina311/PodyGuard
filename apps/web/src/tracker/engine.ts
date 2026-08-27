@@ -1,9 +1,10 @@
+import type { GameMode, RulesFormat, TreacheryRole } from '@podyguard/shared';
 import {
   TREACHERY_ROLES,
+  resolveRulesFormat,
   treacheryDistribution,
   treacheryIdentityById,
   treacheryRolesForSize,
-  type TreacheryRole,
 } from '@podyguard/shared';
 import {
   dungeonById,
@@ -18,12 +19,48 @@ import { STAR_PLAYER_COUNT, starEnemies } from './star';
 import type { TreacheryDeal } from './treachery';
 
 export const STARTING_LIFE = 40;
+export const NORMAL_STARTING_LIFE = 20;
+export const NORMAL_TWO_HEADED_GIANT_STARTING_LIFE = 40;
+export const NORMAL_ARCHENEMY_STARTING_LIFE = 20;
 export const TWO_HEADED_GIANT_STARTING_LIFE = 60;
 export const TWO_HEADED_GIANT_POISON_LIMIT = 20;
 export const ARCHENEMY_STARTING_LIFE = 60;
 export const POISON_LIMIT = 10;
 export const COMMANDER_DAMAGE_LIMIT = 21;
 export const HIT_LIMIT = 3;
+
+export function sharedTeamStartingLife(
+  teamMode: 'two-headed-giant' | 'archenemy-commander',
+  format: RulesFormat,
+): number {
+  if (teamMode === 'two-headed-giant') {
+    return format === 'normal'
+      ? NORMAL_TWO_HEADED_GIANT_STARTING_LIFE
+      : TWO_HEADED_GIANT_STARTING_LIFE;
+  }
+  return format === 'normal'
+    ? NORMAL_ARCHENEMY_STARTING_LIFE
+    : ARCHENEMY_STARTING_LIFE;
+}
+
+export function sharedTeamPoisonLimit(format: RulesFormat): number {
+  return format === 'normal' ? POISON_LIMIT : TWO_HEADED_GIANT_POISON_LIMIT;
+}
+
+/** Starting life per seat before team setup. Normal Magic is 20; Commander is 40. */
+export function startingLifeForMode(
+  gameMode: GameMode | string,
+  format?: RulesFormat | null,
+): number {
+  const resolved = resolveRulesFormat(gameMode as GameMode, format);
+  if (resolved === 'normal') {
+    return NORMAL_STARTING_LIFE;
+  }
+  if (gameMode === 'duel' || gameMode === 'multiplayer') {
+    return NORMAL_STARTING_LIFE;
+  }
+  return STARTING_LIFE;
+}
 
 export type SecondaryCounter =
   | 'acorn'
@@ -97,6 +134,8 @@ export type TrackerPlayer = {
 
 export type TrackerState = {
   players: TrackerPlayer[];
+  /** Normal (20 life) vs Commander (40 life, commander damage, tax). */
+  rulesFormat: RulesFormat;
   /** Two sides in board order for team variants. */
   teams: string[][] | null;
   teamMode: 'two-headed-giant' | 'archenemy-commander' | 'emperor' | null;
@@ -187,19 +226,26 @@ export type TrackerAction =
 export function createTracker(
   names: TrackerSeed[],
   now = Date.now(),
+  options: { startingLife?: number; rulesFormat?: RulesFormat; gameMode?: GameMode } = {},
 ): TrackerState {
+  const gameMode = options.gameMode ?? 'commander';
+  const rulesFormat = resolveRulesFormat(gameMode, options.rulesFormat);
+  const startingLife =
+    options.startingLife ?? startingLifeForMode(gameMode, rulesFormat);
+  const withCommanders = rulesFormat === 'commander';
   return {
+    rulesFormat,
     players: names.map((row) => ({
       id: row.id,
       name: row.name,
-      life: STARTING_LIFE,
-      minimumLife: STARTING_LIFE,
+      life: startingLife,
+      minimumLife: startingLife,
       poison: 0,
       commanderTax: 0,
       counters: emptySecondaryCounters(),
       enduringStory: false,
       cityBlessing: false,
-      commanders: seedCommanders(row),
+      commanders: withCommanders ? seedCommanders(row) : [],
       commanderDamage: {},
       eliminated: false,
       pendingLoss: null,
@@ -258,6 +304,7 @@ export function applyTrackerAction(
   next.dungeons ??= {};
   next.completedDungeons ??= {};
   next.eliminations ??= [];
+  next.rulesFormat ??= 'commander';
   next.teamMode ??= null;
   next.archenemyId ??= null;
   next.emperorIds ??= [];
@@ -389,9 +436,13 @@ export function applyTrackerAction(
         (left, right) => ids.indexOf(left.id) - ids.indexOf(right.id),
       );
       if (mode !== 'emperor') {
+        const sharedLife =
+          mode === 'two-headed-giant' || mode === 'archenemy-commander'
+            ? sharedTeamStartingLife(mode, next.rulesFormat)
+            : startingLifeForMode('multiplayer', next.rulesFormat);
         for (const player of next.players) {
-          player.life = ARCHENEMY_STARTING_LIFE;
-          player.minimumLife = ARCHENEMY_STARTING_LIFE;
+          player.life = sharedLife;
+          player.minimumLife = sharedLife;
         }
       }
       if (next.archenemyId) {
@@ -470,7 +521,12 @@ export function applyTrackerAction(
     }
     case 'commander': {
       const source = commanderById(next, action.commanderId);
-      if (!source || source.owner.id === action.toId) {
+      if (
+        !source ||
+        !commanderOpponents(next, action.toId).some(
+          (opponent) => opponent.id === source.owner.id,
+        )
+      ) {
         break;
       }
       const target = playerById(next, action.toId);
@@ -765,7 +821,7 @@ function activeLossCauses(
   if (
     player.poison >=
     (state.teamMode === 'two-headed-giant'
-      ? TWO_HEADED_GIANT_POISON_LIMIT
+      ? sharedTeamPoisonLimit(state.rulesFormat)
       : POISON_LIMIT)
   ) {
     causes.push({ type: 'poison' });
@@ -773,8 +829,21 @@ function activeLossCauses(
   if ((player.counters?.hit ?? 0) >= HIT_LIMIT) {
     causes.push({ type: 'hit' });
   }
-  for (const [commanderId, damage] of Object.entries(player.commanderDamage)) {
-    if (damage >= COMMANDER_DAMAGE_LIMIT) {
+  if (state.rulesFormat === 'commander') {
+    for (const [commanderId, damage] of Object.entries(player.commanderDamage)) {
+      if (damage < COMMANDER_DAMAGE_LIMIT) {
+        continue;
+      }
+      const source = commanderById(state, commanderId);
+      // Ally or teammate damage is not a legal lethal here (Star circle, 2HG, …).
+      if (
+        source &&
+        !commanderOpponents(state, player.id).some(
+          (opponent) => opponent.id === source.owner.id,
+        )
+      ) {
+        continue;
+      }
       causes.push({ type: 'commander', commanderId });
     }
   }
@@ -829,16 +898,14 @@ function incomingCommanderDamage(
   state: TrackerState,
   player: TrackerPlayer,
 ): IncomingCommanderDamage[] {
-  return state.players
-    .filter((other) => other.id !== player.id)
-    .flatMap((other) =>
-      other.commanders.map((commander) => ({
-        commanderId: commander.id,
-        owner: other.name,
-        commander: commander.name,
-        value: player.commanderDamage[commander.id] ?? 0,
-      })),
-    );
+  return commanderOpponents(state, player.id).flatMap((other) =>
+    other.commanders.map((commander) => ({
+      commanderId: commander.id,
+      owner: other.name,
+      commander: commander.name,
+      value: player.commanderDamage[commander.id] ?? 0,
+    })),
+  );
 }
 
 /**
@@ -934,6 +1001,23 @@ export function teamForPlayer(
   return ids
     ? ids.map((id) => playerById(state, id))
     : [playerById(state, playerId)];
+}
+
+/**
+ * Players whose commanders can deal combat damage to this seat: everyone else
+ * in a free-for-all, the far side of a shared-life or Emperor team, and only
+ * the two nonadjacent seats in Star.
+ */
+export function commanderOpponents(
+  state: TrackerState,
+  playerId: string,
+): TrackerPlayer[] {
+  if (state.starOrder.length === STAR_PLAYER_COUNT) {
+    const enemies = new Set(starEnemies(state.starOrder, playerId));
+    return state.players.filter((player) => enemies.has(player.id));
+  }
+  const allies = new Set(teamForPlayer(state, playerId).map((row) => row.id));
+  return state.players.filter((player) => !allies.has(player.id));
 }
 
 /**

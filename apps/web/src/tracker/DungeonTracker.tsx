@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { Flag, Undo2, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
   DUNGEONS,
   dungeonById,
@@ -30,6 +31,7 @@ const CARD_H = 680;
   the wasted margins for roughly double the map.
 */
 export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
+  const { t } = useTranslation();
   const { landscape } = useBoardLandscape();
   const progress = state.dungeons[playerId];
   const completedIds = new Set(state.completedDungeons[playerId] ?? []);
@@ -65,7 +67,7 @@ export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Take the initiative?"
+      aria-label={t('dungeon.takeInitiativeTitle')}
       className="bg-void/90 absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 overflow-auto rounded-xl p-4 text-center backdrop-blur-sm"
     >
       <Flag
@@ -74,24 +76,25 @@ export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
         className="text-warning fill-warning/35"
       />
       <p className="font-display text-base font-semibold">
-        Take the initiative?
+        {t('dungeon.takeInitiativeTitle')}
       </p>
       <p className="text-muted max-w-sm text-xs">
         {willEnterUndercity
-          ? 'This also ventures into Undercity. Only take it when the table just gave this seat the initiative.'
-          : 'Finish or leave the current dungeon before Undercity can open. Only take the initiative when the table just gave it to this seat.'}
+          ? t('dungeon.takeInitiativeEnter')
+          : t('dungeon.takeInitiativeWait')}
       </p>
       <div className="flex flex-wrap justify-center gap-2">
         <Button size="sm" variant="neon" onClick={takeInitiative}>
-          Take initiative
-          {willEnterUndercity ? ' & enter Undercity' : ''}
+          {willEnterUndercity
+            ? t('dungeon.takeInitiativeAndEnter')
+            : t('dungeon.takeInitiative')}
         </Button>
         <Button
           size="sm"
           variant="glass"
           onClick={() => setConfirmInitiative(false)}
         >
-          Cancel
+          {t('common.cancel')}
         </Button>
       </div>
     </div>
@@ -111,11 +114,11 @@ export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
                 title={
                   isUndercity
                     ? holdsInitiative
-                      ? 'You already hold the initiative'
-                      : 'Take the initiative and enter Undercity'
+                      ? t('dungeon.alreadyHoldInitiative')
+                      : t('dungeon.takeAndEnterUndercity')
                     : completedIds.has(dungeon.id)
-                      ? `${dungeon.name} (completed)`
-                      : `Venture into ${dungeon.name}`
+                      ? t('dungeon.completed', { name: dungeon.name })
+                      : t('dungeon.ventureInto', { name: dungeon.name })
                 }
                 className={cx(
                   'border-muted/20 relative aspect-[488/680] h-auto max-h-full w-full max-w-full min-h-0 overflow-hidden rounded-lg border transition',
@@ -148,7 +151,7 @@ export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
                 />
                 {completedIds.has(dungeon.id) ? (
                   <span className="absolute top-1.5 right-1.5 rounded-full bg-amber-400/90 px-1.5 py-0.5 font-mono text-[0.6rem] font-bold text-void">
-                    Done
+                    {t('dungeon.done')}
                   </span>
                 ) : null}
               </button>
@@ -241,7 +244,10 @@ export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
                   tabIndex={isLegal ? 0 : undefined}
                   aria-label={
                     isLegal
-                      ? `Venture to ${room.name}: ${room.effect}`
+                      ? t('dungeon.ventureTo', {
+                          room: room.name,
+                          effect: room.effect,
+                        })
                       : undefined
                   }
                   aria-current={isCurrent ? 'step' : undefined}
@@ -296,6 +302,7 @@ function Shell({
   onStepBack?: () => void;
   children: ReactNode;
 }) {
+  const { t } = useTranslation();
   return (
     <section className="flex h-full min-h-0 w-full items-stretch gap-2">
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</div>
@@ -307,7 +314,9 @@ function Shell({
       <div className="flex shrink-0 flex-col justify-end gap-2">
         <ControlButton
           label={
-            initiative.active ? 'Release the initiative' : 'Take the initiative'
+            initiative.active
+              ? t('dungeon.releaseInitiative')
+              : t('dungeon.takeInitiative')
           }
           active={initiative.active}
           onClick={initiative.onToggle}
@@ -319,11 +328,11 @@ function Shell({
           />
         </ControlButton>
         {onStepBack ? (
-          <ControlButton label="Undo room" onClick={onStepBack}>
+          <ControlButton label={t('dungeon.undoRoom')} onClick={onStepBack}>
             <Undo2 size={18} aria-hidden />
           </ControlButton>
         ) : null}
-        <ControlButton label="Close dungeon" onClick={onClose}>
+        <ControlButton label={t('dungeon.closeDungeon')} onClick={onClose}>
           <X size={18} aria-hidden />
         </ControlButton>
       </div>

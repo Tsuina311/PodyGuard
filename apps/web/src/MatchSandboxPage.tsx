@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   challengeById,
   poolLabel,
@@ -11,6 +12,7 @@ import { TrackerView } from './tracker/TrackerView';
 import { Badge, statusTone } from './ui/Badge';
 import { Brand } from './ui/Brand';
 import { Button } from './ui/Button';
+import { LanguageSwitcherCorner } from './ui/LanguageSwitcher';
 import { Panel } from './ui/Panel';
 import { ThemeToggleCorner } from './ui/ThemeToggle';
 import { forgetActiveMatch, rememberActiveMatch } from './active-match';
@@ -22,6 +24,7 @@ import { forgetActiveMatch, rememberActiveMatch } from './active-match';
  * `/match-config` so nothing dev-only reaches this route.
  */
 export function MatchSandboxPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const config = useMemo(() => loadMatchConfig(), []);
   const players = matchPlayers(config);
@@ -57,6 +60,7 @@ export function MatchSandboxPage() {
       <TrackerView
         storageKey={trackerStorageKey(config)}
         gameMode={config.gameMode}
+        rulesFormat={config.rulesFormat}
         dealTreachery={config.gameMode === 'treachery'}
         players={players}
         onFinish={async () => {
@@ -92,6 +96,7 @@ export function MatchSandboxPage() {
 
   return (
     <>
+      <LanguageSwitcherCorner />
       <ThemeToggleCorner />
       <header>
         <Brand className="mb-6" />
@@ -113,7 +118,7 @@ export function MatchSandboxPage() {
       >
         <div className="border-neon/30 from-neon/10 mb-4 rounded-xl border bg-gradient-to-br to-transparent p-5">
           <p className="text-muted mb-1 text-center text-xs tracking-[0.2em] uppercase">
-            Match found
+            {t('join.matchFound')}
           </p>
           <p className="font-display text-neon mb-1 text-center text-3xl font-bold">
             {participant.tableLabel}
@@ -125,13 +130,13 @@ export function MatchSandboxPage() {
             ))}
           </ul>
           <p className="text-muted mb-1 text-center text-xs tracking-[0.16em] uppercase">
-            Your deck
+            {t('join.yourDeck')}
           </p>
           <p className="mb-4 text-center text-base font-medium">
             {assignedDeckLine(participant)}
           </p>
           <p className="text-muted mb-3 text-center text-sm">
-            Stay at the table until the host calls the game.
+            {t('join.stayAtTable')}
           </p>
           <Button
             variant="neon"
@@ -139,18 +144,18 @@ export function MatchSandboxPage() {
             block
             onClick={() => setShowTracker(true)}
           >
-            Use game tracker
+            {t('join.useGameTracker')}
           </Button>
         </div>
       </Panel>
 
       <p className="text-muted/70 text-xs">
         <Link className="hover:text-ink" to="/">
-          Home
+          {t('common.home')}
         </Link>
         <span className="mx-2">·</span>
         <Link className="hover:text-ink" to={`/host/${config.joinCode}`}>
-          I&apos;m the host
+          {t('join.imTheHost')}
         </Link>
       </p>
     </>

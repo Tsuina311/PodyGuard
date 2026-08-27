@@ -6,6 +6,7 @@ import {
   STARTING_LIFE,
   TWO_HEADED_GIANT_STARTING_LIFE,
   applyTrackerAction,
+  commanderOpponents,
   createTracker,
   elapsedMs,
   pickFirstPlayer,
@@ -78,6 +79,27 @@ describe('Two-Headed Giant tracker', () => {
         'c:1'
       ],
     ).toBe(7);
+  });
+
+  it('ignores commander damage from a teammate', () => {
+    const state = applyTrackerAction(twoHeadedGiant(), {
+      type: 'commander',
+      commanderId: 'b:1',
+      toId: 'a',
+      delta: 7,
+    });
+    expect(state.players.find((player) => player.id === 'a')?.life).toBe(
+      TWO_HEADED_GIANT_STARTING_LIFE,
+    );
+    expect(
+      state.players.find((player) => player.id === 'a')?.commanderDamage[
+        'b:1'
+      ],
+    ).toBeUndefined();
+    expect(commanderOpponents(state, 'a').map((player) => player.id)).toEqual([
+      'c',
+      'd',
+    ]);
   });
 
   it('randomly chooses a starting team', () => {
@@ -314,6 +336,40 @@ describe('Star tracker', () => {
     expect(state.players.map((player) => player.life)).toEqual([
       40, 35, 40, 40, 40,
     ]);
+  });
+
+  it('only accepts commander damage from the two enemies', () => {
+    const state = star();
+    // Order a-b-c-d-e: a’s allies are e and b; enemies are c and d.
+    expect(commanderOpponents(state, 'a').map((player) => player.id)).toEqual([
+      'c',
+      'd',
+    ]);
+    const fromAlly = applyTrackerAction(state, {
+      type: 'commander',
+      commanderId: 'b:1',
+      toId: 'a',
+      delta: 5,
+    });
+    expect(fromAlly.players.find((player) => player.id === 'a')?.life).toBe(40);
+    expect(
+      fromAlly.players.find((player) => player.id === 'a')?.commanderDamage[
+        'b:1'
+      ],
+    ).toBeUndefined();
+
+    const fromEnemy = applyTrackerAction(state, {
+      type: 'commander',
+      commanderId: 'c:1',
+      toId: 'a',
+      delta: 5,
+    });
+    expect(fromEnemy.players.find((player) => player.id === 'a')?.life).toBe(35);
+    expect(
+      fromEnemy.players.find((player) => player.id === 'a')?.commanderDamage[
+        'c:1'
+      ],
+    ).toBe(5);
   });
 
   it('wins when both nonadjacent enemies have been eliminated', () => {

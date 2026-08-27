@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Skull, Sparkles } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { schemeById, type SchemeCard } from './archenemy';
 import { Button } from '../ui/Button';
 import { cx } from '../ui/cx';
@@ -30,6 +31,7 @@ export function SchemeSheet({
   onAbandon: (schemeId: string) => void;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [graveyardOpen, setGraveyardOpen] = useState(false);
 
@@ -55,6 +57,15 @@ export function SchemeSheet({
     );
   const abandonable = activeSchemeIds.includes(shown.id);
 
+  const schemeKind =
+    shown.id === currentSchemeId
+      ? shown.ongoing
+        ? t('scheme.ongoingScheme')
+        : t('scheme.scheme')
+      : abandonable
+        ? t('scheme.ongoingScheme')
+        : t('scheme.pastScheme');
+
   return (
     <div className="flex max-h-full w-full max-w-4xl flex-col items-center gap-3 landscape:flex-row landscape:items-stretch">
       <img
@@ -65,13 +76,7 @@ export function SchemeSheet({
       <div className="flex min-h-0 w-full max-w-sm flex-col justify-center gap-3 overflow-y-auto">
         <div>
           <p className="text-muted text-xs font-bold tracking-wider uppercase">
-            {shown.id === currentSchemeId
-              ? shown.ongoing
-                ? 'Ongoing scheme'
-                : 'Scheme'
-              : abandonable
-                ? 'Ongoing scheme'
-                : 'Past scheme'}
+            {schemeKind}
           </p>
           <h2 className="font-display text-xl font-bold">{shown.name}</h2>
         </div>
@@ -81,13 +86,13 @@ export function SchemeSheet({
             variant="glass"
             onClick={() => onAbandon(shown.id)}
           >
-            Abandon {shown.name}
+            {t('scheme.abandon', { name: shown.name })}
           </Button>
         ) : null}
         {ongoing.length > 0 ? (
           <div className="border-warning/30 bg-warning/10 rounded-xl border p-3">
             <p className="text-warning mb-2 text-xs font-bold tracking-wider uppercase">
-              Ongoing schemes
+              {t('scheme.ongoingSchemes')}
             </p>
             <SchemeStrip
               schemes={ongoing.map((scheme) => ({
@@ -108,7 +113,7 @@ export function SchemeSheet({
               className="text-muted hover:text-ink flex w-full items-center gap-2 text-xs font-bold tracking-wider uppercase transition"
             >
               <Skull size={14} aria-hidden />
-              Graveyard · {graveyard.length}
+              {t('scheme.graveyard', { count: graveyard.length })}
             </button>
             {graveyardOpen ? (
               <div className="mt-2">
@@ -128,19 +133,16 @@ export function SchemeSheet({
             onClick={onNext}
           >
             <Sparkles size={16} aria-hidden />
-            Next scheme
+            {t('scheme.nextScheme')}
           </Button>
           <Button variant="glass" onClick={onClose}>
-            Close
+            {t('common.close')}
           </Button>
           <span className="text-muted text-[0.65rem]">
-            {remaining} left in the deck
+            {t('scheme.remainingInDeck', { count: remaining })}
           </span>
         </div>
-        <p className="text-muted text-[0.65rem]">
-          Card image via Scryfall. Magic: The Gathering is © Wizards of the
-          Coast.
-        </p>
+        <p className="text-muted text-[0.65rem]">{t('scheme.scryfallCredit')}</p>
       </div>
     </div>
   );

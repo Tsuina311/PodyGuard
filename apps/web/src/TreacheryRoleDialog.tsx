@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
-  TREACHERY_ROLE_INFO,
+  type TreacheryRole,
   type TreacheryRoleAssignment,
 } from '@podyguard/shared';
 import { Button } from './ui/Button';
@@ -28,7 +29,13 @@ export function TreacheryRoleDialog({
   onClose: () => void;
   onUnveil?: () => Promise<void>;
 }) {
-  const info = TREACHERY_ROLE_INFO[assignment.role];
+  const { t } = useTranslation();
+  const roleKey = assignment.role as TreacheryRole;
+  const roleName = t(`modes.treachery.roles.${roleKey}.name`);
+  const roleObjective = t(`modes.treachery.roles.${roleKey}.objective`);
+  const roleGuidance = t(`modes.treachery.roles.${roleKey}.guidance`);
+  const rolePublicNote = t(`modes.treachery.roles.${roleKey}.publicNote`);
+  const isPublicRole = roleKey === 'leader';
   const [confirmingUnveil, setConfirmingUnveil] = useState(false);
   const [unveiling, setUnveiling] = useState(false);
   const [unveilError, setUnveilError] = useState<string | null>(null);
@@ -36,7 +43,11 @@ export function TreacheryRoleDialog({
     <div
       role="dialog"
       aria-modal="true"
-      aria-label={revealed ? `Your role: ${info.name}` : 'You received a role'}
+      aria-label={
+        revealed
+          ? t('treacheryRole.yourRole') + `: ${roleName}`
+          : t('treacheryRole.receivedRole')
+      }
       className="bg-void/90 fixed inset-0 z-[80] flex items-center justify-center overflow-y-auto p-4 backdrop-blur-md"
     >
       <section
@@ -47,69 +58,73 @@ export function TreacheryRoleDialog({
         {!revealed ? (
           <>
             <p className="text-muted mb-2 font-mono text-xs tracking-[0.22em] uppercase">
-              Treachery
+              {t('treacheryRole.treachery')}
             </p>
             <h2 className="font-display mb-3 text-2xl font-bold">
               {holderName
-                ? `Hand the device to ${holderName}`
-                : 'You have received your role'}
+                ? t('treacheryRole.handDeviceTo', { name: holderName })
+                : t('treacheryRole.receivedRole')}
             </h2>
             <p className="text-muted mb-6 text-sm">
               {holderName
-                ? 'Everyone else should look away before the identity is revealed.'
-                : 'Make sure nobody else can see your screen before revealing it.'}
+                ? t('treacheryRole.lookAwayIdentity')
+                : t('treacheryRole.lookAwayScreen')}
             </p>
             <Button variant="neon" size="lg" block onClick={onReveal}>
-              Reveal
+              {t('treacheryRole.reveal')}
             </Button>
           </>
         ) : (
           <>
             <p className="text-muted mb-2 font-mono text-xs tracking-[0.22em] uppercase">
-              Your role
+              {t('treacheryRole.yourRole')}
             </p>
             <h2 className="font-display mb-4 text-4xl font-black uppercase">
-              {info.name}
+              {roleName}
             </h2>
             <img
               src={assignment.identity.image}
-              alt={`${assignment.identity.name}, ${info.name} identity`}
+              alt={t('treacheryRole.identityAlt', {
+                name: assignment.identity.name,
+                role: roleName,
+              })}
               className="mx-auto mb-4 max-h-[52dvh] w-auto max-w-full rounded-xl shadow-2xl"
             />
             <h3 className="font-display mb-1 text-xl font-bold">
               {assignment.identity.name}
             </h3>
             <p className="text-muted mb-4 text-xs">
-              Illustrated by {assignment.identity.artist}
+              {t('treacheryRole.illustratedBy', {
+                artist: assignment.identity.artist,
+              })}
             </p>
             <div className="text-ink mb-5 space-y-3 text-left">
               <div>
                 <p className="text-muted mb-1 text-xs font-semibold tracking-wide uppercase">
-                  Your objective
+                  {t('treacheryRole.yourObjective')}
                 </p>
-                <p className="font-semibold">{info.objective}</p>
+                <p className="font-semibold">{roleObjective}</p>
               </div>
-              <p className="text-muted text-sm">{info.guidance}</p>
-              {info.public ? (
+              <p className="text-muted text-sm">{roleGuidance}</p>
+              {isPublicRole ? (
                 <p className="text-warning text-sm font-semibold">
-                  Your role is public. Tell the table you are the Leader.
+                  {rolePublicNote}
                 </p>
               ) : (
                 <p className="text-neon text-sm font-semibold">
-                  Keep this role secret.
+                  {rolePublicNote}
                 </p>
               )}
             </div>
             {assignment.unveiled ? (
               <p className="text-warning mb-3 text-sm font-bold tracking-wide uppercase">
-                Unveiled to the table
+                {t('treacheryRole.unveiledToTable')}
               </p>
             ) : onUnveil ? (
               confirmingUnveil ? (
                 <div className="border-danger/30 mb-3 rounded-xl border p-3">
                   <p className="text-danger mb-3 text-sm font-semibold">
-                    Everyone at your table will see this identity. Its ability
-                    must be resolved in the game.
+                    {t('treacheryRole.unveilWarning')}
                   </p>
                   <div className="grid grid-cols-2 gap-2">
                     <Button
@@ -117,7 +132,7 @@ export function TreacheryRoleDialog({
                       disabled={unveiling}
                       onClick={() => setConfirmingUnveil(false)}
                     >
-                      Cancel
+                      {t('common.cancel')}
                     </Button>
                     <Button
                       variant="danger"
@@ -131,13 +146,15 @@ export function TreacheryRoleDialog({
                             setUnveilError(
                               caught instanceof Error
                                 ? caught.message
-                                : 'Could not unveil your identity.',
+                                : t('common.errors.unveilIdentity'),
                             );
                           })
                           .finally(() => setUnveiling(false));
                       }}
                     >
-                      {unveiling ? 'Unveiling…' : 'Confirm unveil'}
+                      {unveiling
+                        ? t('common.unveiling')
+                        : t('treacheryRole.confirmUnveil')}
                     </Button>
                   </div>
                 </div>
@@ -148,7 +165,7 @@ export function TreacheryRoleDialog({
                   className="mb-3"
                   onClick={() => setConfirmingUnveil(true)}
                 >
-                  Unveil to the table
+                  {t('treacheryRole.unveilToTable')}
                 </Button>
               )
             ) : null}
@@ -156,7 +173,9 @@ export function TreacheryRoleDialog({
               <p className="text-danger mb-3 text-sm">{unveilError}</p>
             ) : null}
             <Button variant="glass" size="lg" block onClick={onClose}>
-              {holderName ? 'Hide & pass' : 'Hide my identity'}
+              {holderName
+                ? t('treacheryRole.hideAndPass')
+                : t('treacheryRole.hideIdentity')}
             </Button>
           </>
         )}

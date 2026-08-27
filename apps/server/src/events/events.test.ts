@@ -1128,6 +1128,79 @@ describe('event HTTP api', () => {
     await app.close();
   });
 
+  it('creates duel events as strict 2-player tables', async () => {
+    const app = await buildTestApp();
+    const created = await app.inject({
+      method: 'POST',
+      url: '/events',
+      payload: {
+        name: 'Duel Night',
+        hostPin: '2468',
+        tableCount: 4,
+        gameMode: 'duel',
+      },
+    });
+
+    expect(created.statusCode).toBe(201);
+    expect((created.json() as { event: object }).event).toMatchObject({
+      gameMode: 'duel',
+      rulesFormat: 'normal',
+      allowThreePods: false,
+      allowFivePods: false,
+      preferredPodSize: 2,
+    });
+    await app.close();
+  });
+
+  it('creates multiplayer events with a chosen table size', async () => {
+    const app = await buildTestApp();
+    const created = await app.inject({
+      method: 'POST',
+      url: '/events',
+      payload: {
+        name: 'Casual Multi',
+        hostPin: '2468',
+        tableCount: 2,
+        gameMode: 'multiplayer',
+        preferredPodSize: 5,
+      },
+    });
+
+    expect(created.statusCode).toBe(201);
+    expect((created.json() as { event: object }).event).toMatchObject({
+      gameMode: 'multiplayer',
+      rulesFormat: 'normal',
+      allowThreePods: true,
+      allowFivePods: true,
+      preferredPodSize: 5,
+    });
+    await app.close();
+  });
+
+  it('stores rulesFormat for special modes played as normal', async () => {
+    const app = await buildTestApp();
+    const created = await app.inject({
+      method: 'POST',
+      url: '/events',
+      payload: {
+        name: 'Normal Treachery',
+        hostPin: '2468',
+        tableCount: 2,
+        gameMode: 'treachery',
+        rulesFormat: 'normal',
+        preferredPodSize: 4,
+      },
+    });
+
+    expect(created.statusCode).toBe(201);
+    expect((created.json() as { event: object }).event).toMatchObject({
+      gameMode: 'treachery',
+      rulesFormat: 'normal',
+      preferredPodSize: 4,
+    });
+    await app.close();
+  });
+
   it('forms two 5-player Treachery pods when the host sets 5 as the base', async () => {
     const app = await buildTestApp();
     const created = await app.inject({

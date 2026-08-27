@@ -6,6 +6,9 @@ import {
   parseChallengePack,
   assignTreacheryRoles,
   assignTreacheryIdentities,
+  parseGameMode,
+  parseRulesFormat,
+  resolveRulesFormat,
   treacheryIdentityById,
   treacheryDistribution,
   EventStatus,
@@ -21,6 +24,7 @@ import {
   type PublicPod,
   type PublicTable,
   type PublicChallengeCompletion,
+  type RulesFormat,
   type TreacheryRoleAssignment,
 } from '@podyguard/shared';
 import { randomUUID } from 'node:crypto';
@@ -72,6 +76,7 @@ export type CreateEventInput = {
   hostPin: string;
   tableCount: number;
   gameMode?: GameMode;
+  rulesFormat?: RulesFormat;
   allowThreePods?: boolean;
   allowFivePods?: boolean;
   preferredPodSize?: number;
@@ -119,15 +124,11 @@ export class EventService {
   async createEvent(input: CreateEventInput): Promise<CreateEventResult> {
     const name = assertEventName(input.name);
     const hostPin = assertHostPin(input.hostPin);
-    const gameMode: GameMode =
-      input.gameMode === 'treachery' ||
-      input.gameMode === 'two-headed-giant' ||
-      input.gameMode === 'archenemy-commander' ||
-      input.gameMode === 'emperor' ||
-      input.gameMode === 'star' ||
-      input.gameMode === 'assassin'
-        ? input.gameMode
-        : 'commander';
+    const gameMode: GameMode = parseGameMode(input.gameMode);
+    const rulesFormat = resolveRulesFormat(
+      gameMode,
+      parseRulesFormat(input.rulesFormat),
+    );
     const preferredPodSize = assertPreferredPodSize(
       gameMode,
       input.preferredPodSize,
@@ -138,7 +139,9 @@ export class EventService {
       createdAt.getTime() + lifetimeHours * 60 * 60 * 1000,
     );
     const allowFivePods =
-      gameMode === 'treachery' || gameMode === 'assassin'
+      gameMode === 'treachery' ||
+      gameMode === 'assassin' ||
+      gameMode === 'multiplayer'
         ? preferredPodSize >= 5
         : gameMode === 'commander' && Boolean(input.allowFivePods);
     const labels = resolveTableLabels({ count: input.tableCount }, 0);
@@ -152,8 +155,10 @@ export class EventService {
           joinCode: generateJoinCode(),
           hostCredentialHash,
           gameMode,
+          rulesFormat,
           allowThreePods:
             gameMode === 'assassin' ||
+            gameMode === 'multiplayer' ||
             (gameMode === 'commander' && input.allowThreePods !== false),
           allowFivePods,
           preferredPodSize,
@@ -799,7 +804,9 @@ export class EventService {
         ? stored.preferredPodSize
         : assertPreferredPodSize(stored.gameMode, patch.preferredPodSize);
     const allowFivePods =
-      stored.gameMode === 'treachery' || stored.gameMode === 'assassin'
+      stored.gameMode === 'treachery' ||
+      stored.gameMode === 'assassin' ||
+      stored.gameMode === 'multiplayer'
         ? preferredPodSize >= 5
         : stored.gameMode === 'commander'
           ? patch.allowFivePods === undefined
@@ -815,13 +822,13 @@ export class EventService {
           );
     const updated = await this.store.updateEvent(stored.id, {
       allowThreePods:
-        stored.gameMode === 'assassin'
+        stored.gameMode === 'assassin' || stored.gameMode === 'multiplayer'
           ? true
-          : stored.gameMode === 'treachery'
-          ? false
-          : patch.allowThreePods === undefined
-            ? stored.allowThreePods
-            : Boolean(patch.allowThreePods),
+          : stored.gameMode === 'treachery' || stored.gameMode === 'duel'
+            ? false
+            : patch.allowThreePods === undefined
+              ? stored.allowThreePods
+              : Boolean(patch.allowThreePods),
       allowFivePods,
       preferredPodSize,
       expiresAt,
@@ -1214,6 +1221,7 @@ function toPublicEvent(
     joinCode: event.joinCode,
     status: event.status,
     gameMode: event.gameMode,
+    rulesFormat: event.rulesFormat,
     allowThreePods: event.allowThreePods,
     allowFivePods: event.allowFivePods,
     preferredPodSize: event.preferredPodSize,

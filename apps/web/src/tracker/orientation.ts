@@ -83,6 +83,11 @@ export function useBoardLandscape(): {
  *
  * WebKit has neither this lock nor a per-page manifest orientation, so on an
  * iPhone nothing here fires and `useBoardLandscape` rotates the board instead.
+ *
+ * Desktop Chrome with the phone emulator reports a coarse pointer and can enter
+ * fullscreen, but orientation.lock still rejects — without a bail-out every
+ * click would keep toggling fullscreen. Once fullscreen is entered and lock
+ * still fails, we stop and leave the window alone.
  */
 export function useLandscapeLock(enabled = true): void {
   useEffect(() => {
@@ -106,17 +111,20 @@ export function useLandscapeLock(enabled = true): void {
     let cancelled = false;
     let locked = false;
     let inflight = false;
+    let unsupported = false;
 
     async function lockLandscape(): Promise<void> {
-      if (cancelled || locked || inflight) {
+      if (cancelled || locked || inflight || unsupported) {
         return;
       }
       inflight = true;
+      let enteredFullscreen = false;
       try {
         if (!document.fullscreenElement) {
           await document.documentElement.requestFullscreen({
             navigationUI: 'hide',
           });
+          enteredFullscreen = Boolean(document.fullscreenElement);
         }
         if (cancelled) {
           return;
@@ -125,14 +133,21 @@ export function useLandscapeLock(enabled = true): void {
         locked = true;
       } catch {
         locked = false;
-        /* A browser that refuses either half leaves the phone as it is held. */
+        // Fullscreen without a working orientation lock is desktop / DevTools
+        // noise: exit and do not ask again on every pointerdown.
+        if (enteredFullscreen || document.fullscreenElement) {
+          unsupported = true;
+          if (document.fullscreenElement) {
+            void document.exitFullscreen().catch(() => undefined);
+          }
+        }
       } finally {
         inflight = false;
       }
     }
 
     function retryFromGesture(): void {
-      if (!locked) {
+      if (!locked && !unsupported) {
         void lockLandscape();
       }
     }

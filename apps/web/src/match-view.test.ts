@@ -37,6 +37,7 @@ describe('match-view', () => {
         joinCode: 'ABCD',
         status: 'open',
         gameMode: 'commander',
+        rulesFormat: 'commander',
         allowThreePods: true,
         allowFivePods: false,
         preferredPodSize: 4,

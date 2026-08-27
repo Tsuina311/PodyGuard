@@ -4,6 +4,7 @@ import {
   type PublicParticipant,
   type PublicTable,
 } from '@podyguard/shared';
+import i18n from './i18n';
 
 export function tableForParticipant(
   snapshot: EventSnapshot | null,
@@ -22,7 +23,7 @@ export function assignedDeckLine(participant: PublicParticipant): string {
   if (participant.assignedPoolId) {
     return poolLabel(participant.assignedPoolId);
   }
-  return 'Assigned at the table';
+  return i18n.t('common.assignedAtTable');
 }
 
 export function countByStatus(participants: PublicParticipant[]) {

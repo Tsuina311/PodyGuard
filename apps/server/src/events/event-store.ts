@@ -8,6 +8,7 @@ import type {
   PublicPod,
   PublicTable,
   PublicChallengeCompletion,
+  RulesFormat,
   TreacheryRole,
 } from '@podyguard/shared';
 
@@ -89,6 +90,7 @@ export type StoredEvent = {
   joinCode: string;
   status: PublicEvent['status'];
   gameMode: GameMode;
+  rulesFormat: RulesFormat;
   hostCredentialHash: string;
   allowThreePods: boolean;
   allowFivePods: boolean;
@@ -218,6 +220,7 @@ export type NewStoredEvent = {
   joinCode: string;
   hostCredentialHash: string;
   gameMode?: GameMode;
+  rulesFormat?: RulesFormat;
   allowThreePods?: boolean;
   allowFivePods?: boolean;
   preferredPodSize?: number;

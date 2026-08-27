@@ -52,6 +52,7 @@ export class MemoryEventStore implements EventStore {
       joinCode: input.joinCode,
       status: 'open',
       gameMode: input.gameMode ?? 'commander',
+      rulesFormat: input.rulesFormat ?? 'commander',
       hostCredentialHash: input.hostCredentialHash,
       allowThreePods: input.allowThreePods !== false,
       allowFivePods: Boolean(input.allowFivePods),

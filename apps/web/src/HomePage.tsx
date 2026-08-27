@@ -1,33 +1,40 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, type ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   ASSASSIN_POD_SIZES,
   TREACHERY_POD_SIZES,
   type AssassinPodSize,
   type GameMode,
+  type GameModeFamily,
   type TreacheryPodSize,
 } from '@podyguard/shared';
-import { Play, QrCode, Radio } from 'lucide-react';
+import { ChevronDown, Play, QrCode, Radio } from 'lucide-react';
 import { ApiError, createEvent, saveHostToken } from './api';
 import { activeMatchPath } from './active-match';
 import {
+  defaultSeatNames,
   loadMatchConfig,
+  modeUsesFamily,
+  modesForFamily,
   saveMatchConfig,
   seatCountForMode,
   seatCountsForMode,
-  STANDALONE_GAME_MODES,
   type StandaloneGameMode,
 } from './match-config';
 import { Brand } from './ui/Brand';
 import { Button } from './ui/Button';
 import { Field } from './ui/Field';
+import { LanguageSwitcherCorner } from './ui/LanguageSwitcher';
 import { Panel } from './ui/Panel';
 import { QrScannerDialog } from './ui/QrScannerDialog';
 import { ThemeToggleCorner } from './ui/ThemeToggle';
+import { cx } from './ui/cx';
 
 type ExpandedSection = 'play' | 'host' | null;
 
 export function HomePage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const staleJoin =
     (useLocation().state as { staleJoin?: boolean } | null)?.staleJoin === true;
@@ -40,10 +47,14 @@ export function HomePage() {
   const [hostPin, setHostPin] = useState('');
   const [tableCount, setTableCount] = useState('8');
   const [gameMode, setGameMode] = useState<GameMode>('commander');
+  const [hostFamily, setHostFamily] = useState<GameModeFamily | null>(
+    'commander',
+  );
   const [allowThreePods, setAllowThreePods] = useState(true);
   const [allowFivePods, setAllowFivePods] = useState(false);
   const [preferredPodSize, setPreferredPodSize] = useState<TreacheryPodSize>(4);
   const [assassinPodSize, setAssassinPodSize] = useState<AssassinPodSize>(5);
+  const [multiplayerPodSize, setMultiplayerPodSize] = useState(4);
   const [lifetimeHours, setLifetimeHours] = useState('24');
   const [joinCode, setJoinCode] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -51,13 +62,13 @@ export function HomePage() {
   const [trackerMode, setTrackerMode] = useState<StandaloneGameMode>(
     () => loadMatchConfig().gameMode,
   );
+  const [playFamily, setPlayFamily] = useState<GameModeFamily | null>(() =>
+    loadMatchConfig().rulesFormat,
+  );
   const [trackerSeats, setTrackerSeats] = useState(
     () => loadMatchConfig().seatCount,
   );
   const trackerSeatOptions = seatCountsForMode(trackerMode);
-  const trackerHint = STANDALONE_GAME_MODES.find(
-    (mode) => mode.id === trackerMode,
-  );
 
   function toggle(section: ExpandedSection) {
     setExpanded((current) => (current === section ? null : section));
@@ -69,12 +80,38 @@ export function HomePage() {
     setTrackerSeats((seats) => seatCountForMode(mode, seats));
   }
 
+  function pickPlayFamily(family: GameModeFamily) {
+    setPlayFamily((current) => (current === family ? null : family));
+    const modes = modesForFamily(family);
+    if (!modes.some((mode) => mode.id === trackerMode)) {
+      const first = modes[0];
+      if (first) {
+        pickTrackerMode(first.id);
+      }
+    }
+  }
+
+  function pickHostFamily(family: GameModeFamily) {
+    setHostFamily((current) => (current === family ? null : family));
+    const modes = modesForFamily(family);
+    if (!modes.some((mode) => mode.id === gameMode)) {
+      const first = modes[0];
+      if (first) {
+        setGameMode(first.id);
+      }
+    }
+  }
+
   function startTracker() {
     const config = loadMatchConfig();
+    const seatCount = trackerSeats;
+    const rulesFormat = playFamily ?? config.rulesFormat;
     saveMatchConfig({
       ...config,
       gameMode: trackerMode,
-      seatCount: trackerSeats,
+      rulesFormat,
+      seatCount,
+      names: defaultSeatNames(Math.max(seatCount, 8)),
       resetCount: config.resetCount + 1,
     });
     void navigate('/match');
@@ -85,27 +122,43 @@ export function HomePage() {
     setError(null);
     setBusy(true);
     try {
+      const rulesFormat = hostFamily ?? 'commander';
       const result = await createEvent(name, hostPin, Number(tableCount), {
         gameMode,
-        allowThreePods: gameMode === 'commander' && allowThreePods,
-        allowFivePods,
+        rulesFormat,
+        allowThreePods:
+          gameMode === 'commander'
+            ? allowThreePods
+            : gameMode === 'multiplayer' || gameMode === 'assassin',
+        allowFivePods:
+          gameMode === 'commander'
+            ? allowFivePods
+            : gameMode === 'multiplayer'
+              ? multiplayerPodSize >= 5
+              : undefined,
         preferredPodSize:
           gameMode === 'treachery'
             ? preferredPodSize
             : gameMode === 'assassin'
               ? assassinPodSize
-              : gameMode === 'emperor'
-                ? 6
-                : gameMode === 'star'
-                  ? 5
-                  : 4,
+              : gameMode === 'multiplayer'
+                ? multiplayerPodSize
+                : gameMode === 'duel'
+                  ? 2
+                  : gameMode === 'emperor'
+                    ? 6
+                    : gameMode === 'star'
+                      ? 5
+                      : 4,
         lifetimeHours: Number(lifetimeHours),
       });
       saveHostToken(result.event.joinCode, result.hostToken);
       void navigate(`/host/${result.event.joinCode}`);
     } catch (caught) {
       setError(
-        caught instanceof ApiError ? caught.message : 'Could not create event.',
+        caught instanceof ApiError
+          ? caught.message
+          : t('common.errors.createEvent'),
       );
     } finally {
       setBusy(false);
@@ -116,7 +169,7 @@ export function HomePage() {
     event.preventDefault();
     const code = joinCode.trim();
     if (!code) {
-      setError('Enter a join code.');
+      setError(t('common.errors.enterJoinCode'));
       return;
     }
     void navigate(`/e/${code}`);
@@ -124,15 +177,16 @@ export function HomePage() {
 
   return (
     <>
+      <LanguageSwitcherCorner />
       <ThemeToggleCorner />
       <header className="mb-1">
         <Brand className="mb-3" />
         <h1 className="font-display text-3xl leading-[1.05] font-bold tracking-tight text-balance sm:text-4xl">
-          Your next{' '}
+          {t('home.taglineBefore')}{' '}
           <span className="from-beam via-neon to-plasma bg-gradient-to-r bg-clip-text text-transparent">
-            pod
+            {t('home.taglineHighlight')}
           </span>
-          , sorted.
+          {t('home.taglineAfter')}
         </h1>
       </header>
 
@@ -141,65 +195,63 @@ export function HomePage() {
           title={
             <span className="inline-flex items-center gap-2">
               <Play size={18} aria-hidden />
-              Start playing
+              {t('home.startPlaying')}
             </span>
           }
-          aside={ongoingMatch ? 'ongoing game' : 'no event needed'}
+          aside={
+            ongoingMatch ? t('home.ongoingGame') : t('home.noEventNeeded')
+          }
           expanded={expanded === 'play'}
           onToggle={() => toggle('play')}
         >
-            <p className="text-muted mb-3 text-sm">
-              Open a battle screen on this device. Leave and come back without
-              losing an unfinished game.
-            </p>
-            <p className="text-muted mb-2 text-xs font-medium tracking-[0.14em] uppercase">
-              Game
-            </p>
-            <div className="mb-2 grid grid-cols-2 gap-2">
-              {STANDALONE_GAME_MODES.map((mode) => (
-                <label
-                  key={mode.id}
-                  className={`cursor-pointer rounded-xl border p-2.5 text-center text-sm font-semibold transition ${
-                    trackerMode === mode.id
-                      ? 'border-neon bg-neon/10 text-neon'
-                      : 'border-muted/20 text-muted hover:border-muted/40'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="trackerMode"
-                    value={mode.id}
-                    checked={trackerMode === mode.id}
-                    onChange={() => pickTrackerMode(mode.id)}
-                    className="sr-only"
-                  />
-                  {mode.label}
-                </label>
-              ))}
-            </div>
-            <p className="text-muted mb-3 text-xs">{trackerHint?.hint}</p>
-            <p className="text-muted mb-2 text-xs font-medium tracking-[0.14em] uppercase">
-              Players
-            </p>
-            {trackerSeatOptions.length > 1 ? (
-              <div className="mb-4 flex flex-wrap gap-1.5">
-                {trackerSeatOptions.map((count) => (
-                  <Button
-                    key={count}
-                    size="sm"
-                    variant={trackerSeats === count ? 'neon' : 'glass'}
-                    onClick={() => setTrackerSeats(count)}
-                  >
-                    {count}
-                  </Button>
-                ))}
-              </div>
-            ) : (
-              <p className="text-muted mb-4 text-xs">
-                Always {trackerSeatOptions[0]} players in this mode.
-              </p>
+          <p className="text-muted mb-3 text-sm">{t('home.startPlayingHint')}</p>
+          <FormatFamilyPicker
+            selected={playFamily}
+            onSelect={pickPlayFamily}
+            modesFor={(family) => (
+              <>
+                <ModeGrid
+                  modes={modesForFamily(family)}
+                  value={trackerMode}
+                  name="trackerMode"
+                  onChange={pickTrackerMode}
+                />
+                {playFamily === family &&
+                modeUsesFamily(trackerMode, family) ? (
+                  <>
+                    <p className="text-muted mb-3 text-xs">
+                      {t(modeHintKey(trackerMode, family))}
+                    </p>
+                    <p className="text-muted mb-2 text-xs font-medium tracking-[0.14em] uppercase">
+                      {t('common.players')}
+                    </p>
+                    {trackerSeatOptions.length > 1 ? (
+                      <div className="mb-4 flex flex-wrap gap-1.5">
+                        {trackerSeatOptions.map((count) => (
+                          <Button
+                            key={count}
+                            size="sm"
+                            variant={trackerSeats === count ? 'neon' : 'glass'}
+                            onClick={() => setTrackerSeats(count)}
+                          >
+                            {count}
+                          </Button>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-muted mb-4 text-xs">
+                        {t('home.alwaysPlayers', {
+                          count: trackerSeatOptions[0],
+                        })}
+                      </p>
+                    )}
+                  </>
+                ) : null}
+              </>
             )}
-            {ongoingMatch ? (
+          />
+          {playFamily ? (
+            ongoingMatch ? (
               <>
                 <Button
                   type="button"
@@ -208,7 +260,7 @@ export function HomePage() {
                   block
                   onClick={() => void navigate(ongoingMatch)}
                 >
-                  Resume game
+                  {t('home.resumeGame')}
                 </Button>
                 <Button
                   type="button"
@@ -218,7 +270,7 @@ export function HomePage() {
                   className="mt-2"
                   onClick={startTracker}
                 >
-                  Start a new game
+                  {t('home.startNewGame')}
                 </Button>
               </>
             ) : (
@@ -229,249 +281,227 @@ export function HomePage() {
                 block
                 onClick={startTracker}
               >
-                Start a game
+                {t('home.startGame')}
               </Button>
-            )}
-            <p className="text-muted/70 mt-3 text-xs">
-              <Link className="hover:text-ink" to="/match-config">
-                Advanced match config
-              </Link>
-            </p>
+            )
+          ) : null}
+          <p className="text-muted/70 mt-3 text-xs">
+            <Link className="hover:text-ink" to="/match-config">
+              {t('home.advancedMatchConfig')}
+            </Link>
+          </p>
         </Panel>
 
         <Panel
           title={
             <span className="inline-flex items-center gap-2">
               <Radio size={18} aria-hidden />
-              Host event
+              {t('home.hostEvent')}
             </span>
           }
-          aside="new"
+          aside={t('home.new')}
           expanded={expanded === 'host'}
           onToggle={() => toggle('host')}
           onSubmit={onCreate}
-        >            <fieldset className="mb-4">
-              <legend className="text-muted mb-2 text-sm">Game</legend>
-              <div className="grid grid-cols-2 gap-2">
-                {(
-                  [
-                    ['commander', 'Commander'],
-                    ['treachery', 'Treachery'],
-                    ['two-headed-giant', 'Two-Headed Giant'],
-                    ['archenemy-commander', 'Archenemy Commander'],
-                    ['emperor', 'Emperor'],
-                    ['star', 'Star'],
-                    ['assassin', 'Assassin'],
-                  ] as const
-                ).map(([value, label]) => (
-                  <label
-                    key={value}
-                    className={`cursor-pointer rounded-xl border p-2.5 text-center text-sm font-semibold transition ${
-                      gameMode === value
-                        ? 'border-neon bg-neon/10 text-neon'
-                        : 'border-muted/20 text-muted hover:border-muted/40'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="gameMode"
-                      value={value}
-                      checked={gameMode === value}
-                      onChange={() => setGameMode(value)}
-                      className="sr-only"
-                    />
-                    {label}
-                  </label>
-                ))}
-              </div>
-              {gameMode === 'treachery' ? (
-                <p className="text-muted mt-2 text-xs">
-                  Secret roles for Commander pods. Matching fills your chosen
-                  table size first; leftovers can sit as small as four.
-                </p>
-              ) : gameMode === 'two-headed-giant' ? (
-                <p className="text-muted mt-2 text-xs">
-                  Strict 4-player Commander pods. Two teams share 60 life and
-                  take their turns together.
-                </p>
-              ) : gameMode === 'archenemy-commander' ? (
-                <p className="text-muted mt-2 text-xs">
-                  Strict 4-player Commander pods. One 60-life Archenemy faces a
-                  three-player team with 60 shared life and a 40-card scheme
-                  deck.
-                </p>
-              ) : gameMode === 'emperor' ? (
-                <p className="text-muted mt-2 text-xs">
-                  Strict 6-player Commander pods. Two teams each place an
-                  Emperor between two Generals and play with limited range of
-                  influence.
-                </p>
-              ) : gameMode === 'star' ? (
-                <p className="text-muted mt-2 text-xs">
-                  Strict 5-player Commander pods. Adjacent players are allies;
-                  each player wins by outlasting both opponents across the
-                  circle.
-                </p>
-              ) : gameMode === 'assassin' ? (
-                <p className="text-muted mt-2 text-xs">
-                  Secret contracts for 3–8 players. Score by eliminating your
-                  mark, then inherit their target.
-                </p>
-              ) : null}
-            </fieldset>
-            <Field
-              label="Event name"
-              value={name}
-              onChange={(change) => setName(change.target.value)}
-              placeholder="Friday Commander"
-              autoComplete="off"
-              required
+        >
+          <fieldset className="mb-4">
+            <legend className="text-muted mb-2 text-sm">{t('common.game')}</legend>
+            <FormatFamilyPicker
+              selected={hostFamily}
+              onSelect={pickHostFamily}
+              modesFor={(family) => (
+                <>
+                  <ModeGrid
+                    modes={modesForFamily(family)}
+                    value={gameMode}
+                    name="gameMode"
+                    onChange={setGameMode}
+                  />
+                  {hostFamily === family &&
+                  modeUsesFamily(gameMode, family) ? (
+                    <p className="text-muted mt-2 text-xs">
+                      {t(modeHostHintKey(gameMode, family))}
+                    </p>
+                  ) : null}
+                </>
+              )}
             />
-            <Field
-              label="Tables"
-              hint="How many physical tables are free for this event."
-              value={tableCount}
-              onChange={(change) => setTableCount(change.target.value)}
-              type="number"
-              inputMode="numeric"
-              min={1}
-              max={40}
-              required
-            />
-            {gameMode === 'commander' ? (
+          </fieldset>
+          <Field
+            label={t('home.eventName')}
+            value={name}
+            onChange={(change) => setName(change.target.value)}
+            placeholder={t('home.eventNamePlaceholder')}
+            autoComplete="off"
+            required
+          />
+          <Field
+            label={t('home.tables')}
+            hint={t('home.tablesHint')}
+            value={tableCount}
+            onChange={(change) => setTableCount(change.target.value)}
+            type="number"
+            inputMode="numeric"
+            min={1}
+            max={40}
+            required
+          />
+          {gameMode === 'commander' ? (
+            <>
               <label className="text-muted mb-3 flex items-center gap-2 text-sm">
                 <input
                   type="checkbox"
                   checked={allowThreePods}
                   onChange={(change) => setAllowThreePods(change.target.checked)}
                 />
-                Allow 3-player pods
+                {t('home.allowThreePods')}
               </label>
-            ) : gameMode === 'treachery' ? (
-              <fieldset className="mb-4">
-                <legend className="text-muted mb-2 text-sm">
-                  Target table size
-                </legend>
-                <div className="grid grid-cols-5 gap-2">
-                  {TREACHERY_POD_SIZES.map((size) => (
-                    <label
-                      key={size}
-                      className={`cursor-pointer rounded-xl border p-2 text-center text-sm font-semibold transition ${
-                        preferredPodSize === size
-                          ? 'border-neon bg-neon/10 text-neon'
-                          : 'border-muted/20 text-muted hover:border-muted/40'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="preferredPodSize"
-                        value={size}
-                        checked={preferredPodSize === size}
-                        onChange={() => setPreferredPodSize(size)}
-                        className="sr-only"
-                      />
-                      {size}
-                    </label>
-                  ))}
-                </div>
-                <p className="text-muted mt-2 text-xs">
-                  {preferredPodSize >= 5
-                    ? `Matchmaking prefers ${String(preferredPodSize)}-player tables.`
-                    : 'Matchmaking prefers 4-player tables.'}
-                </p>
-              </fieldset>
-            ) : gameMode === 'assassin' ? (
-              <fieldset className="mb-4">
-                <legend className="text-muted mb-2 text-sm">
-                  Target table size
-                </legend>
-                <div className="grid grid-cols-6 gap-2">
-                  {ASSASSIN_POD_SIZES.map((size) => (
-                    <label
-                      key={size}
-                      className={`cursor-pointer rounded-xl border p-2 text-center text-sm font-semibold transition ${
-                        assassinPodSize === size
-                          ? 'border-neon bg-neon/10 text-neon'
-                          : 'border-muted/20 text-muted hover:border-muted/40'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="assassinPodSize"
-                        value={size}
-                        checked={assassinPodSize === size}
-                        onChange={() => setAssassinPodSize(size)}
-                        className="sr-only"
-                      />
-                      {size}
-                    </label>
-                  ))}
-                </div>
-                <p className="text-muted mt-2 text-xs">
-                  Matching prefers {assassinPodSize}-player tables; leftovers
-                  can form contracts with as few as three.
-                </p>
-              </fieldset>
-            ) : gameMode === 'emperor' ? (
-              <p className="text-muted mb-4 text-sm">
-                Emperor games always seat exactly six players.
-              </p>
-            ) : gameMode === 'star' ? (
-              <p className="text-muted mb-4 text-sm">
-                Star games always seat exactly five players.
-              </p>
-            ) : gameMode === 'archenemy-commander' ? (
-              <p className="text-muted mb-4 text-sm">
-                Archenemy Commander games always seat exactly four players.
-              </p>
-            ) : (
-              <p className="text-muted mb-4 text-sm">
-                Two-Headed Giant games always seat exactly four players.
-              </p>
-            )}
-            {gameMode === 'commander' ? (
               <label className="text-muted mb-4 flex items-center gap-2 text-sm">
                 <input
                   type="checkbox"
                   checked={allowFivePods}
                   onChange={(change) => setAllowFivePods(change.target.checked)}
                 />
-                Allow 5-player pods
+                {t('home.allowFivePods')}
               </label>
-            ) : null}
-            <Field
-              label="Event lasts"
-              hint="Join code dies after this many hours. Use 48 or 72 for a weekend."
-              value={lifetimeHours}
-              onChange={(change) => setLifetimeHours(change.target.value)}
-              type="number"
-              inputMode="numeric"
-              min={1}
-              max={168}
-              required
-            />
-            <Field
-              label="Host PIN"
-              hint="4 to 8 digits — reopens the host desk later."
-              value={hostPin}
-              onChange={(change) => setHostPin(change.target.value)}
-              inputMode="numeric"
-              autoComplete="off"
-              required
-            />
-            <Button type="submit" size="lg" block disabled={busy}>
-              {busy ? 'Creating…' : 'Create event'}
-            </Button>
+            </>
+          ) : gameMode === 'multiplayer' ? (
+            <fieldset className="mb-4">
+              <legend className="text-muted mb-2 text-sm">
+                {t('home.targetTableSize')}
+              </legend>
+              <div className="grid grid-cols-4 gap-2">
+                {[3, 4, 5, 6].map((size) => (
+                  <label
+                    key={size}
+                    className={cx(
+                      'cursor-pointer rounded-xl border p-2 text-center text-sm font-semibold transition',
+                      multiplayerPodSize === size
+                        ? 'border-neon bg-neon/10 text-neon'
+                        : 'border-muted/20 text-muted hover:border-muted/40',
+                    )}
+                  >
+                    <input
+                      type="radio"
+                      name="multiplayerPodSize"
+                      value={size}
+                      checked={multiplayerPodSize === size}
+                      onChange={() => setMultiplayerPodSize(size)}
+                      className="sr-only"
+                    />
+                    {size}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ) : gameMode === 'treachery' ? (
+            <fieldset className="mb-4">
+              <legend className="text-muted mb-2 text-sm">
+                {t('home.targetTableSize')}
+              </legend>
+              <div className="grid grid-cols-5 gap-2">
+                {TREACHERY_POD_SIZES.map((size) => (
+                  <label
+                    key={size}
+                    className={cx(
+                      'cursor-pointer rounded-xl border p-2 text-center text-sm font-semibold transition',
+                      preferredPodSize === size
+                        ? 'border-neon bg-neon/10 text-neon'
+                        : 'border-muted/20 text-muted hover:border-muted/40',
+                    )}
+                  >
+                    <input
+                      type="radio"
+                      name="preferredPodSize"
+                      value={size}
+                      checked={preferredPodSize === size}
+                      onChange={() => setPreferredPodSize(size)}
+                      className="sr-only"
+                    />
+                    {size}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ) : gameMode === 'assassin' ? (
+            <fieldset className="mb-4">
+              <legend className="text-muted mb-2 text-sm">
+                {t('home.targetTableSize')}
+              </legend>
+              <div className="grid grid-cols-6 gap-2">
+                {ASSASSIN_POD_SIZES.map((size) => (
+                  <label
+                    key={size}
+                    className={cx(
+                      'cursor-pointer rounded-xl border p-2 text-center text-sm font-semibold transition',
+                      assassinPodSize === size
+                        ? 'border-neon bg-neon/10 text-neon'
+                        : 'border-muted/20 text-muted hover:border-muted/40',
+                    )}
+                  >
+                    <input
+                      type="radio"
+                      name="assassinPodSize"
+                      value={size}
+                      checked={assassinPodSize === size}
+                      onChange={() => setAssassinPodSize(size)}
+                      className="sr-only"
+                    />
+                    {size}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ) : gameMode === 'duel' ? (
+            <p className="text-muted mb-4 text-sm">{t('home.duelFixedSeats')}</p>
+          ) : gameMode === 'emperor' ? (
+            <p className="text-muted mb-4 text-sm">
+              {t('home.emperorFixedSeats')}
+            </p>
+          ) : gameMode === 'star' ? (
+            <p className="text-muted mb-4 text-sm">{t('home.starFixedSeats')}</p>
+          ) : gameMode === 'archenemy-commander' ? (
+            <p className="text-muted mb-4 text-sm">
+              {t('home.archenemyFixedSeats')}
+            </p>
+          ) : gameMode === 'two-headed-giant' ? (
+            <p className="text-muted mb-4 text-sm">
+              {t('home.twoHeadedFixedSeats')}
+            </p>
+          ) : null}
+          <Field
+            label={t('home.eventLasts')}
+            hint={t('home.eventLastsHint')}
+            value={lifetimeHours}
+            onChange={(change) => setLifetimeHours(change.target.value)}
+            type="number"
+            inputMode="numeric"
+            min={1}
+            max={168}
+            required
+          />
+          <Field
+            label={t('home.hostPin')}
+            hint={t('home.hostPinHint')}
+            value={hostPin}
+            onChange={(change) => setHostPin(change.target.value)}
+            inputMode="numeric"
+            autoComplete="off"
+            required
+          />
+          <Button type="submit" size="lg" block disabled={busy || !hostFamily}>
+            {busy ? t('common.creating') : t('home.createEvent')}
+          </Button>
         </Panel>
       </div>
 
-      <Panel title="Join with a code" aside="player">
+      <Panel title={t('home.joinWithCode')} aside={t('home.playerAside')}>
         <form onSubmit={onLookup}>
           <Field
-            label="Join code"
+            label={t('home.joinCode')}
             value={joinCode}
             onChange={(change) => setJoinCode(change.target.value)}
-            placeholder="AB23CD"
+            placeholder={t('home.joinCodePlaceholder')}
             autoComplete="off"
             className="font-mono tracking-[0.3em] uppercase"
             required
@@ -479,7 +509,7 @@ export function HomePage() {
           />
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <Button type="submit" variant="neon" size="lg" block>
-              Join
+              {t('home.join')}
             </Button>
             <Button
               type="button"
@@ -492,30 +522,123 @@ export function HomePage() {
               }}
             >
               <QrCode size={18} aria-hidden />
-              Scan QR
+              {t('home.scanQr')}
             </Button>
           </div>
         </form>
       </Panel>
 
       {staleJoin ? (
-        <p className="text-muted text-sm">
-          That event is gone. Join with a new code, or host a new night.
-        </p>
+        <p className="text-muted text-sm">{t('home.staleJoin')}</p>
       ) : null}
       {error ? <p className="text-danger text-sm">{error}</p> : null}
 
-      {scannerOpen
-        ? (
-            <QrScannerDialog
-              onClose={() => setScannerOpen(false)}
-              onDetect={(code) => {
-                setScannerOpen(false);
-                void navigate(`/e/${code}`);
-              }}
-            />
-          )
-        : null}
+      {scannerOpen ? (
+        <QrScannerDialog
+          onClose={() => setScannerOpen(false)}
+          onDetect={(code) => {
+            setScannerOpen(false);
+            void navigate(`/e/${code}`);
+          }}
+        />
+      ) : null}
     </>
+  );
+}
+
+function modeHintKey(mode: GameMode, family: GameModeFamily): string {
+  if (family === 'normal' && mode !== 'duel' && mode !== 'multiplayer') {
+    return `modes.${mode}.normal.hint`;
+  }
+  return `modes.${mode}.hint`;
+}
+
+function modeHostHintKey(mode: GameMode, family: GameModeFamily): string {
+  if (family === 'normal' && mode !== 'duel' && mode !== 'multiplayer') {
+    return `modes.${mode}.normal.hostHint`;
+  }
+  return `modes.${mode}.hostHint`;
+}
+
+function FormatFamilyPicker({
+  selected,
+  onSelect,
+  modesFor,
+}: {
+  selected: GameModeFamily | null;
+  onSelect: (family: GameModeFamily) => void;
+  modesFor: (family: GameModeFamily) => ReactNode;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="mb-3 flex flex-col gap-2">
+      {(['normal', 'commander'] as const).map((family) => {
+        const open = selected === family;
+        return (
+          <div key={family} className="border-muted/20 overflow-hidden rounded-xl border">
+            <button
+              type="button"
+              onClick={() => onSelect(family)}
+              className={cx(
+                'flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left text-sm font-semibold transition',
+                open
+                  ? 'bg-neon/10 text-neon'
+                  : 'text-muted hover:bg-ink/5 hover:text-ink',
+              )}
+              aria-expanded={open}
+            >
+              {t(`families.${family}`)}
+              <ChevronDown
+                size={16}
+                className={cx('shrink-0 transition', open && 'rotate-180')}
+                aria-hidden
+              />
+            </button>
+            {open ? <div className="border-muted/15 border-t p-3">{modesFor(family)}</div> : null}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function ModeGrid({
+  modes,
+  value,
+  name,
+  onChange,
+}: {
+  modes: ReadonlyArray<{ id: StandaloneGameMode }>;
+  value: StandaloneGameMode;
+  name: string;
+  onChange: (mode: StandaloneGameMode) => void;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="mb-2 grid grid-cols-2 gap-2">
+      {modes.map((mode) => (
+        <label
+          key={mode.id}
+          className={cx(
+            'cursor-pointer rounded-xl border p-2.5 text-center text-sm font-semibold transition',
+            value === mode.id
+              ? 'border-neon bg-neon/10 text-neon'
+              : 'border-muted/20 text-muted hover:border-muted/40',
+          )}
+        >
+          <input
+            type="radio"
+            name={name}
+            value={mode.id}
+            checked={value === mode.id}
+            onChange={() => onChange(mode.id)}
+            className="sr-only"
+          />
+          {t(`modes.${mode.id}.label`)}
+        </label>
+      ))}
+    </div>
   );
 }

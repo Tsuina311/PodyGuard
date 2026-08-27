@@ -81,6 +81,8 @@ export function allowedPodSizes(flags: {
 
 export function eventMatchOptions(input: {
   gameMode:
+    | 'duel'
+    | 'multiplayer'
     | 'commander'
     | 'treachery'
     | 'two-headed-giant'
@@ -92,6 +94,12 @@ export function eventMatchOptions(input: {
   allowFivePods: boolean;
   preferredPodSize?: number;
 }): MatchOptions {
+  if (input.gameMode === 'duel') {
+    return {
+      preferredSize: 2,
+      allowedSizes: [2],
+    };
+  }
   if (
     input.gameMode === 'two-headed-giant' ||
     input.gameMode === 'archenemy-commander'
@@ -111,6 +119,20 @@ export function eventMatchOptions(input: {
     return {
       preferredSize: STAR_POD_SIZE,
       allowedSizes: [STAR_POD_SIZE],
+    };
+  }
+  if (input.gameMode === 'multiplayer') {
+    const preferredSize = Math.min(
+      6,
+      Math.max(3, input.preferredPodSize ?? PREFERRED_POD_SIZE),
+    );
+    return {
+      preferredSize,
+      allowedSizes: allowedPodSizes({
+        preferredSize,
+        minSize: FALLBACK_POD_SIZE,
+        maxSize: preferredSize,
+      }),
     };
   }
   if (input.gameMode === 'assassin') {

@@ -120,6 +120,20 @@
       "when": 1787766000000,
       "tag": "0016_assassin",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1787770000000,
+      "tag": "0017_normal_modes",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1787774000000,
+      "tag": "0018_rules_format",
+      "breakpoints": true
     }
   ]
 }

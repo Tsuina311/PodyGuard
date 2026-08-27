@@ -1,5 +1,6 @@
 import { ArrowLeft, BookOpen, X } from 'lucide-react';
-import type { GameMode } from '@podyguard/shared';
+import { useTranslation } from 'react-i18next';
+import type { GameMode, RulesFormat } from '@podyguard/shared';
 import { Button } from '../ui/Button';
 import { rulesForMode } from './mode-rules';
 
@@ -9,12 +10,15 @@ import { rulesForMode } from './mode-rules';
  */
 export function ModeRulesSheet({
   gameMode,
+  rulesFormat = null,
   onClose,
 }: {
   gameMode: GameMode;
+  rulesFormat?: RulesFormat | null;
   onClose: () => void;
 }) {
-  const rules = rulesForMode(gameMode);
+  const { t } = useTranslation();
+  const rules = rulesForMode(gameMode, t, rulesFormat);
   return (
     <section className="border-muted/25 bg-hull flex max-h-[min(80dvh,34rem)] w-full max-w-md flex-col overflow-hidden rounded-2xl border shadow-[0_18px_50px_-24px_var(--color-void)]">
       <header className="border-muted/15 flex shrink-0 items-center justify-between gap-3 border-b px-4 py-3">
@@ -26,7 +30,7 @@ export function ModeRulesSheet({
         </div>
         <button
           type="button"
-          aria-label="Close rules"
+          aria-label={t('modeRulesSheet.closeRules')}
           onClick={onClose}
           className="border-muted/25 text-muted hover:text-ink hover:border-muted/50 flex size-8 shrink-0 items-center justify-center rounded-full border transition"
         >
@@ -51,7 +55,7 @@ export function ModeRulesSheet({
       <div className="border-muted/15 shrink-0 border-t p-3">
         <Button variant="glass" block onClick={onClose}>
           <ArrowLeft size={16} aria-hidden />
-          Back to the game
+          {t('modeRulesSheet.backToGame')}
         </Button>
       </div>
     </section>

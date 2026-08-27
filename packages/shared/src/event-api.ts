@@ -12,6 +12,7 @@ export type PublicEvent = {
   joinCode: string;
   status: EventStatus;
   gameMode: GameMode;
+  rulesFormat: 'normal' | 'commander';
   allowThreePods: boolean;
   allowFivePods: boolean;
   /** Target table size. Flexible modes may form smaller leftover pods. */

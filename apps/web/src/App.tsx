@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, Route, Routes, useMatch } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { checkHealth } from './api';
 import {
   KEEP_ALIVE_INTERVAL_MS,
@@ -17,6 +18,7 @@ import { cx } from './ui/cx';
 import { ServerWakeScreen } from './ui/ServerWakeScreen';
 
 export function App() {
+  const { t } = useTranslation();
   // `/match` deliberately shares the player layout so it matches a real phone.
   const wide = Boolean(useMatch('/host/:joinCode'));
   // Both routes are probed on every render: `||` would skip the second hook.
@@ -47,9 +49,9 @@ export function App() {
             path="*"
             element={
               <p className="text-muted text-sm">
-                Not found.{' '}
+                {t('app.notFound')}{' '}
                 <Link className="text-neon hover:underline" to="/">
-                  Home
+                  {t('common.home')}
                 </Link>
               </p>
             }

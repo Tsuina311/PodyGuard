@@ -1,9 +1,17 @@
-import { TREACHERY_POD_SIZES } from '@podyguard/shared';
+import {
+  MODES_BY_FAMILY,
+  TREACHERY_POD_SIZES,
+  resolveRulesFormat,
+  usesCommanderRules,
+  type GameMode,
+  type GameModeFamily,
+  type RulesFormat,
+} from '@podyguard/shared';
 import { randomSandboxCommanders } from './sandbox-commanders';
 import type { CommanderSelection } from './scryfall';
 
 /**
- * Shared state for the two dev-only match routes. `/match-config` writes it and
+ * Shared state for the two local match routes. `/match-config` writes it and
  * `/match` reads it, which keeps every knob off the battle screen so it can be
  * checked on a phone exactly as a seated player sees it.
  */
@@ -11,6 +19,7 @@ export type MatchConfig = {
   eventName: string;
   joinCode: string;
   gameMode: StandaloneGameMode;
+  rulesFormat: RulesFormat;
   seatCount: number;
   poolId: string;
   tableLabel: string;
@@ -21,58 +30,108 @@ export type MatchConfig = {
   resetCount: number;
 };
 
-export type StandaloneGameMode =
-  | 'commander'
-  | 'treachery'
-  | 'two-headed-giant'
-  | 'archenemy-commander'
-  | 'emperor'
-  | 'star'
-  | 'assassin';
+export type StandaloneGameMode = GameMode;
+
+/** Distinct seat colours for “I'm red / I'm player 2” on a shared phone. */
+export const SEAT_COLORS = [
+  '#ef4444',
+  '#3b82f6',
+  '#22c55e',
+  '#eab308',
+  '#06b6d4',
+  '#a855f7',
+  '#ec4899',
+  '#a3a3a3',
+] as const;
+
+export function seatColor(index: number): string {
+  return SEAT_COLORS[index % SEAT_COLORS.length]!;
+}
+
+export function defaultSeatNames(count: number): string[] {
+  return Array.from(
+    { length: count },
+    (_, index) => `Player ${String(index + 1)}`,
+  );
+}
 
 export const STANDALONE_GAME_MODES: ReadonlyArray<{
   id: StandaloneGameMode;
   label: string;
   hint: string;
+  family: GameModeFamily;
 }> = [
+  {
+    id: 'duel',
+    label: 'Duel',
+    hint: 'Two players. Each starts on 20 life.',
+    family: 'normal',
+  },
+  {
+    id: 'multiplayer',
+    label: 'Multiplayer',
+    hint: 'Free-for-all without commanders. Everyone starts on 20 life.',
+    family: 'normal',
+  },
   {
     id: 'commander',
     label: 'Commander',
     hint: 'Free-for-all. Everyone starts on 40 life.',
+    family: 'commander',
   },
   {
     id: 'treachery',
     label: 'Treachery',
     hint: 'Secret identities dealt on this device. Pass it around so everyone reads their own in private.',
+    family: 'commander',
   },
   {
     id: 'two-headed-giant',
     label: 'Two-Headed Giant',
     hint: 'Two teams of two, 60 shared life each, turns taken together.',
+    family: 'commander',
   },
   {
     id: 'archenemy-commander',
     label: 'Archenemy',
     hint: 'One Archenemy on 60 life with a 40-card scheme deck against three heroes sharing 60 life.',
+    family: 'commander',
   },
   {
     id: 'emperor',
     label: 'Emperor',
     hint: 'Two teams of three. Protect your Emperor using limited range of influence and deploy creatures.',
+    family: 'commander',
   },
   {
     id: 'star',
     label: 'Star',
     hint: 'Five players in a circle. Your neighbors are allies; eliminate both players across from you.',
+    family: 'commander',
   },
   {
     id: 'assassin',
     label: 'Assassin',
     hint: 'Secret contracts in a free-for-all. Eliminate your mark, score, and inherit their target.',
+    family: 'commander',
   },
 ];
 
+export function modesForFamily(family: GameModeFamily): ReadonlyArray<{
+  id: StandaloneGameMode;
+}> {
+  return MODES_BY_FAMILY[family].map((id) => ({ id }));
+}
+
+export function modeUsesFamily(
+  mode: GameMode,
+  family: GameModeFamily,
+): boolean {
+  return MODES_BY_FAMILY[family].includes(mode);
+}
+
 export const SEAT_COUNTS = [2, 3, 4, 5, 6];
+const MULTIPLAYER_SEAT_COUNTS = [3, 4, 5, 6] as const;
 const TEAM_SEAT_COUNT = 4;
 const EMPEROR_SEAT_COUNT = 6;
 const STAR_SEAT_COUNT = 5;
@@ -81,6 +140,12 @@ const ASSASSIN_SEAT_COUNTS = [3, 4, 5, 6, 7, 8] as const;
 export function seatCountsForMode(
   gameMode: StandaloneGameMode,
 ): readonly number[] {
+  if (gameMode === 'duel') {
+    return [2];
+  }
+  if (gameMode === 'multiplayer') {
+    return MULTIPLAYER_SEAT_COUNTS;
+  }
   if (gameMode === 'commander') {
     return SEAT_COUNTS;
   }
@@ -107,7 +172,7 @@ export function seatCountForMode(
   return allowed.includes(seatCount) ? seatCount : allowed[0]!;
 }
 
-const DEFAULT_NAMES = ['Ana', 'Ben', 'Cleo', 'Dev', 'Eli', 'Fay'];
+const DEFAULT_NAMES = defaultSeatNames(8);
 const CONFIG_KEY = 'podyguard.match.config';
 
 export function defaultMatchConfig(): MatchConfig {
@@ -115,11 +180,12 @@ export function defaultMatchConfig(): MatchConfig {
     eventName: 'Friday Commander',
     joinCode: 'AB23CD',
     gameMode: 'commander',
+    rulesFormat: 'commander',
     seatCount: 4,
     poolId: 'b3',
     tableLabel: 'Table 3',
     deckName: 'Atraxa Superfriends',
-    names: DEFAULT_NAMES,
+    names: defaultSeatNames(8),
     commanders: randomSandboxCommanders(DEFAULT_NAMES.length),
     resetCount: 0,
   };
@@ -141,16 +207,23 @@ export function loadMatchConfig(): MatchConfig {
     )
       ? parsed.gameMode!
       : defaults.gameMode;
+    const rulesFormat = resolveRulesFormat(
+      gameMode,
+      parsed.rulesFormat ?? defaults.rulesFormat,
+    );
     return {
       ...defaults,
       ...parsed,
       gameMode,
+      rulesFormat,
       seatCount: seatCountForMode(
         gameMode,
         parsed.seatCount ?? defaults.seatCount,
       ),
       names: parsed.names ?? DEFAULT_NAMES,
-      commanders: stored,
+      commanders: usesCommanderRules(gameMode, rulesFormat)
+        ? stored
+        : Array.from({ length: DEFAULT_NAMES.length }, () => []),
     };
   } catch {
     return defaults;
@@ -168,13 +241,14 @@ export function matchPlayers(
   name: string;
   commanders: CommanderSelection[];
 }> {
+  const withCommanders = usesCommanderRules(config.gameMode, config.rulesFormat);
   return Array.from({ length: config.seatCount }, (_, index) => ({
     id: `sandbox-${String(index + 1)}`,
     name: config.names[index]?.trim() || `Player ${String(index + 1)}`,
-    commanders: config.commanders[index] ?? [],
+    commanders: withCommanders ? (config.commanders[index] ?? []) : [],
   }));
 }
 
 export function trackerStorageKey(config: MatchConfig): string {
-  return `podyguard.tracker.sandbox.${config.gameMode}.${String(config.seatCount)}.${String(config.resetCount)}`;
+  return `podyguard.tracker.sandbox.${config.gameMode}.${config.rulesFormat}.${String(config.seatCount)}.${String(config.resetCount)}`;
 }

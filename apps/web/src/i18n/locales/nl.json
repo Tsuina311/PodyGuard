@@ -1,0 +1,1049 @@
+{
+  "common": {
+    "home": "Home",
+    "cancel": "Annuleren",
+    "close": "Sluiten",
+    "save": "Opslaan",
+    "loading": "Laden…",
+    "players": "Spelers",
+    "game": "Spel",
+    "language": "Taal",
+    "yes": "Ja",
+    "no": "Nee",
+    "reset": "Resetten",
+    "random": "Willekeurig",
+    "remove": "Verwijderen",
+    "empty": "Leeg",
+    "bot": "bot",
+    "dev": "dev",
+    "official": "officieel",
+    "open": "Open",
+    "preferred": "voorkeur",
+    "player": "Speler {{number}}",
+    "versus": "tegen",
+    "teamA": "Team A",
+    "teamB": "Team B",
+    "working": "Bezig…",
+    "creating": "Aanmaken…",
+    "checking": "Controleren…",
+    "joining": "Deelnemen…",
+    "updating": "Bijwerken…",
+    "submitting": "Verzenden…",
+    "saving": "Opslaan…",
+    "searching": "Zoeken…",
+    "unveiling": "Onthullen…",
+    "copied": "Gekopieerd",
+    "noneYet": "nog geen",
+    "dash": "—",
+    "errors": {
+      "generic": "Er ging iets mis.",
+      "createEvent": "Kon event niet aanmaken.",
+      "unlockHost": "Kon hostconsole niet ontgrendelen.",
+      "updateTable": "Kon tafel niet bijwerken.",
+      "startGame": "Kon het spel niet starten.",
+      "startAllGames": "Kon niet alle klaarstaande spellen starten.",
+      "finishTable": "Kon tafel niet afronden.",
+      "cancelPod": "Kon pod niet annuleren.",
+      "updateSettings": "Kon instellingen niet bijwerken.",
+      "matchTables": "Kon tafels niet matchen.",
+      "fillBots": "Kon tafels niet vullen met bots.",
+      "clipboard": "Klembord geblokkeerd — kopieer de link handmatig.",
+      "eventNotFound": "Event niet gevonden.",
+      "joinEvent": "Kon niet deelnemen aan event.",
+      "saveDecks": "Kon decks niet opslaan.",
+      "updateReady": "Kon gereed-status niet bijwerken.",
+      "updatePause": "Kon pauze niet bijwerken.",
+      "leaveEvent": "Kon event niet verlaten.",
+      "trackerChoice": "Kon trackerkeuze niet opslaan.",
+      "saveRating": "Kon die beoordeling niet opslaan.",
+      "chooseCommander": "Kies een commander voor elk deck.",
+      "enterJoinCode": "Voer een toegangscode in.",
+      "sessionUnavailable": "Je eventsessie is niet meer beschikbaar.",
+      "savePack": "Kon pack niet opslaan.",
+      "searchScryfall": "Kon Scryfall niet doorzoeken.",
+      "loadArtwork": "Kon alternatieve artwork niet laden.",
+      "submitResult": "Kon resultaat niet verzenden.",
+      "saveChallenge": "Kon challenge-voortgang niet opslaan.",
+      "unveilIdentity": "Kon je identiteit niet onthullen.",
+      "apiWaking": "De host wordt wakker. Houd deze pagina open — meestal duurt het minder dan een minuut.",
+      "apiUnreachable": "API niet bereikbaar. Draait de server (yarn dev:server)?"
+    },
+    "assignedAtTable": "Toegewezen aan tafel",
+    "scanToJoin": "Scan om deel te nemen aan dit event"
+  },
+  "language": {
+    "en": "English",
+    "de": "Deutsch",
+    "fr": "Français",
+    "es": "Español",
+    "it": "Italiano",
+    "pt": "Português",
+    "nl": "Nederlands",
+    "pl": "Polski"
+  },
+  "families": {
+    "normal": "Normaal",
+    "commander": "Commander"
+  },
+  "modes": {
+    "shared": {
+      "commanderCombat": "Een speler verliest na {{commanderDamage}} gevechtsschade van één commander.",
+      "commanderTax": "Elke keer dat een commander opnieuw wordt gespeeld vanuit de command zone, kost het 2 mana meer.",
+      "lifeAndLoss": "Levenspunten en verlies",
+      "turns": "Beurten",
+      "commanders": "Commanders",
+      "eachPlayerLife": "Elke speler begint met {{life}} levenspunten.",
+      "loseAtZero": "Een speler verliest bij 0 levenspunten.",
+      "loseAtPoison": "Een speler verliest bij {{poison}} poison counters.",
+      "startingPlayerRandom": "De startspeler wordt willekeurig gekozen.",
+      "startingPlayerSkipDraw": "De startspeler wordt willekeurig gekozen en slaat de draw-stap over in de eerste beurt.",
+      "multiplayerFirstTurnDraw": "In multiplayer trekt die speler in de eerste beurt.",
+      "commanderFirstTurnDraw": "In multiplayer Commander trekt die speler in de eerste beurt.",
+      "commandersInZone": "Commanders beginnen in de command zone en kunnen daar opnieuw worden gespeeld.",
+      "commanderRulesApply": "Commander-regels blijven gelden: {{life}} startleven, {{poison}} poison en {{commanderDamage}} gevechtsschade van één commander zijn dodelijk."
+    },
+    "duel": {
+      "label": "Duel",
+      "hint": "Twee spelers. Ieder begint met 20 levenspunten.",
+      "hostHint": "Strikte 2-spelerstafels. Elke speler begint met 20 levenspunten.",
+      "hostFixedSeats": "Duel-events hebben altijd precies twee spelers.",
+      "title": "Duel",
+      "summary": "Magic voor twee. Geen commanders — alleen leven en het bord.",
+      "sections": {
+        "life": {
+          "heading": "Levenspunten en verlies",
+          "bullets": [
+            "Elke speler begint met {{life}} levenspunten.",
+            "Een speler verliest bij 0 levenspunten.",
+            "Een speler verliest bij {{poison}} poison counters."
+          ]
+        },
+        "turns": {
+          "heading": "Beurten",
+          "bullets": [
+            "De startspeler wordt willekeurig gekozen en slaat de draw-stap over in de eerste beurt."
+          ]
+        }
+      }
+    },
+    "multiplayer": {
+      "label": "Multiplayer",
+      "hint": "Ieder voor zich zonder commanders. Iedereen begint met 20 levenspunten.",
+      "hostHint": "Ieder voor zich zonder commanders. Matching vult je gekozen tafelgrootte; restgroepen kunnen vanaf drie.",
+      "title": "Multiplayer",
+      "summary": "Ieder voor zich zonder het Commander-formaat. Handig voor casual multiplayer, Planechase of elke tafel met 20 leven.",
+      "sections": {
+        "life": {
+          "heading": "Levenspunten en verlies",
+          "bullets": [
+            "Elke speler begint met {{life}} levenspunten.",
+            "Een speler verliest bij 0 levenspunten.",
+            "Een speler verliest bij {{poison}} poison counters."
+          ]
+        },
+        "turns": {
+          "heading": "Beurten",
+          "bullets": [
+            "De startspeler wordt willekeurig gekozen.",
+            "In multiplayer trekt die speler in de eerste beurt."
+          ]
+        }
+      }
+    },
+    "commander": {
+      "label": "Klassiek",
+      "hint": "Ieder voor zich. Iedereen begint met 40 levenspunten.",
+      "hostHint": "Commander ieder voor zich. Matching geeft de voorkeur aan vier; resterende pods kunnen drie of vijf zijn indien toegestaan.",
+      "title": "Klassiek",
+      "summary": "Multiplayer ieder voor zich. Elke speler vecht voor zichzelf.",
+      "sections": {
+        "life": {
+          "heading": "Levenspunten en verlies",
+          "bullets": [
+            "Elke speler begint met {{life}} levenspunten.",
+            "Een speler verliest bij 0 levenspunten.",
+            "Een speler verliest bij {{poison}} poison counters.",
+            "Een speler verliest na {{commanderDamage}} gevechtsschade van één commander."
+          ]
+        },
+        "turns": {
+          "heading": "Beurten",
+          "bullets": [
+            "De startspeler wordt willekeurig gekozen.",
+            "In multiplayer Commander trekt die speler in de eerste beurt."
+          ]
+        },
+        "commanders": {
+          "heading": "Commanders",
+          "bullets": [
+            "Commanders beginnen in de command zone en kunnen daar opnieuw worden gespeeld.",
+            "Elke keer dat een commander opnieuw wordt gespeeld vanuit de command zone, kost het 2 mana meer."
+          ]
+        }
+      }
+    },
+    "treachery": {
+      "label": "Treachery",
+      "hint": "Geheime identiteiten op dit apparaat. Geef het rond zodat iedereen de zijne privé kan lezen.",
+      "hostHint": "Geheime rollen voor Commander-pods. Matching vult eerst je gekozen tafelgrootte; restgroepen kunnen vanaf vier.",
+      "title": "Treachery",
+      "summary": "Commander met geheime identiteiten. De Leider is openbaar; de rest blijft verborgen.",
+      "sections": {
+        "commander": {
+          "heading": "Commander-regels blijven gelden",
+          "bullets": [
+            "Elke speler begint met {{life}} levenspunten.",
+            "Een speler verliest bij 0 levenspunten, {{poison}} poison of {{commanderDamage}} gevechtsschade van één commander.",
+            "De Leider speelt als eerste en trekt in die beurt.",
+            "Elke keer dat een commander opnieuw wordt gespeeld vanuit de command zone, kost het 2 mana meer."
+          ]
+        },
+        "identities": {
+          "heading": "Identiteiten",
+          "bullets": [
+            "Open Mijn rol bekijken in het timermenu. Alleen jij ziet die kaart.",
+            "Op één tracker: deel identiteiten uit bij setup en geef het apparaat rond zodat iedereen de zijne alleen leest.",
+            "Leider: Overleef tot elke Sluipmoordenaar en Verrader is geëlimineerd. Onthul jezelf aan de tafel. De Bewakers delen je overwinning, maar je weet niet wie ze zijn.",
+            "Bewaker: Houd de Leider in leven en elimineer zijn vijanden. Je identiteit is geheim. Je wint en verliest met de Leider, ook als je als eerste wordt geëlimineerd.",
+            "Sluipmoordenaar: Elimineer de Leider. Je identiteit is geheim. Sluipmoordenaars delen hetzelfde doel, maar je weet niet wie de anderen zijn.",
+            "Verrader: Wees de laatste overlevende speler. Je identiteit is geheim. Houd de Leider in leven tot de andere bedreigingen weg zijn en grijp dan zelf de troon.",
+            "Volg alle extra abilities op je identiteitskaart."
+          ]
+        }
+      },
+      "roles": {
+        "leader": {
+          "name": "Leider",
+          "objective": "Overleef tot elke Sluipmoordenaar en Verrader is geëlimineerd.",
+          "guidance": "Onthul jezelf aan de tafel. De Bewakers delen je overwinning, maar je weet niet wie ze zijn.",
+          "publicNote": "Je rol is openbaar. Vertel de tafel dat je de Leider bent."
+        },
+        "guardian": {
+          "name": "Bewaker",
+          "objective": "Houd de Leider in leven en elimineer zijn vijanden.",
+          "guidance": "Je identiteit is geheim. Je wint en verliest met de Leider, ook als je als eerste wordt geëlimineerd.",
+          "publicNote": "Houd deze rol geheim."
+        },
+        "assassin": {
+          "name": "Sluipmoordenaar",
+          "objective": "Elimineer de Leider.",
+          "guidance": "Je identiteit is geheim. Sluipmoordenaars delen hetzelfde doel, maar je weet niet wie de anderen zijn.",
+          "publicNote": "Houd deze rol geheim."
+        },
+        "traitor": {
+          "name": "Verrader",
+          "objective": "Wees de laatste overlevende speler.",
+          "guidance": "Je identiteit is geheim. Houd de Leider in leven tot de andere bedreigingen weg zijn en grijp dan zelf de troon.",
+          "publicNote": "Houd deze rol geheim."
+        }
+      },
+      "normal": {
+        "hint": "Secret identities on a shared phone. Everyone starts on 20 life — no commanders.",
+        "hostHint": "Secret roles without commanders. Matching fills your chosen table size first; leftovers can sit as small as four.",
+        "summary": "Secret identities without the Commander format. The Leader is public; everyone else stays hidden.",
+        "sections": {
+          "life": {
+            "heading": "Life and loss",
+            "bullets": [
+              "Each player starts at {{life}} life.",
+              "A player loses at 0 life.",
+              "A player loses at {{poison}} poison counters.",
+              "The Leader takes the first turn and draws on that turn."
+            ]
+          },
+          "identities": null
+        }
+      }
+    },
+    "two-headed-giant": {
+      "label": "Two-Headed Giant",
+      "hint": "Twee teams van twee, elk 60 gedeeld leven, beurten samen.",
+      "hostHint": "Strikte 4-speler Commander-pods. Twee teams delen 60 leven en spelen hun beurten samen.",
+      "hostFixedSeats": "Two-Headed Giant-spellen hebben altijd precies vier spelers.",
+      "title": "Two-Headed Giant",
+      "summary": "Twee teams van twee. Teamgenoten delen levenspunten en een beurt.",
+      "sections": {
+        "teams": {
+          "heading": "Teams",
+          "bullets": [
+            "Kies twee bondgenoten of laat de tafel de paren willekeurig bepalen.",
+            "Elk team begint met {{sharedLife}} gedeeld leven.",
+            "Teamgenoten spelen hun beurt samen. Elke speler houdt eigen hand, library en commanders."
+          ]
+        },
+        "life": {
+          "heading": "Levenspunten en verlies",
+          "bullets": [
+            "Een team verliest wanneer het gedeelde leven 0 bereikt.",
+            "Een team verliest bij {{sharedPoison}} gedeelde poison counters.",
+            "Een team verliest na {{commanderDamage}} gedeelde gevechtsschade van één commander."
+          ]
+        },
+        "turns": {
+          "heading": "Beurten",
+          "bullets": [
+            "Het startteam wordt willekeurig gekozen en slaat de draw-stap over in de eerste beurt.",
+            "Elke keer dat een commander opnieuw wordt gespeeld vanuit de command zone, kost het 2 mana meer."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Two teams of two, 40 shared life each, turns taken together.",
+        "hostHint": "Strict 4-player tables. Two teams share 40 life and take their turns together — no commanders.",
+        "summary": "Two teams of two. Teammates share a life total and a turn — standard decks, 20 life each in team terms.",
+        "sections": {
+          "teams": {
+            "heading": "Teams",
+            "bullets": [
+              "Kies twee bondgenoten of laat de tafel de paren willekeurig bepalen.",
+              "Elk team begint met {{sharedLife}} gedeeld leven.",
+              "Teamgenoten spelen hun beurt samen. Elke speler houdt eigen hand, library en commanders."
+            ]
+          },
+          "life": {
+            "heading": "Levenspunten en verlies",
+            "bullets": [
+              "Een team verliest wanneer het gedeelde leven 0 bereikt.",
+              "Een team verliest bij {{sharedPoison}} gedeelde poison counters.",
+              "Een team verliest na {{commanderDamage}} gedeelde gevechtsschade van één commander."
+            ]
+          },
+          "turns": {
+            "heading": "Beurten",
+            "bullets": [
+              "Het startteam wordt willekeurig gekozen en slaat de draw-stap over in de eerste beurt.",
+              "Elke keer dat een commander opnieuw wordt gespeeld vanuit de command zone, kost het 2 mana meer."
+            ]
+          }
+        }
+      }
+    },
+    "archenemy-commander": {
+      "label": "Archenemy",
+      "hint": "Eén Archenemy met 60 leven en een 40-kaarten scheme deck tegen drie helden met 60 gedeeld leven.",
+      "hostHint": "Strikte 4-speler Commander-pods. Eén Archenemy met 60 leven tegen een team van drie met 60 gedeeld leven en een 40-kaarten scheme deck.",
+      "hostFixedSeats": "Archenemy Commander-spellen hebben altijd precies vier spelers.",
+      "title": "Archenemy Commander",
+      "summary": "Eén Archenemy tegen een team van drie, met een scheme deck in het spel.",
+      "sections": {
+        "sides": {
+          "heading": "Kanten",
+          "bullets": [
+            "Kies de Archenemy of wijs er willekeurig een toe. De andere drie spelers zijn de helden.",
+            "Beide kanten beginnen met {{life}} levenspunten.",
+            "De helden delen dat leven en spelen hun beurt samen.",
+            "De Archenemy speelt als eerste en trekt in die beurt."
+          ]
+        },
+        "schemes": {
+          "heading": "Schemes",
+          "bullets": [
+            "De 40 Duskmourn Commander schemes worden aan het begin geschud.",
+            "Tijdens elke eerste main phase van de Archenemy: open het timermenu en tik Volgend scheme om er één in werking te zetten.",
+            "Een niet-ongoing scheme resolveert en gaat dan onder het scheme deck.",
+            "Een ongoing scheme blijft face-up tot de tafel het als abandoned markeert; dan gaat het onder het deck.",
+            "Face-up schemes en het graveyard van afgeronde liggen als miniaturen onder de kaart; tik erop om groot te lezen."
+          ]
+        },
+        "life": {
+          "heading": "Levenspunten en verlies",
+          "bullets": [
+            "De Archenemy verliest bij 0 levenspunten of wanneer de gebruikelijke poison- en commander damage-limieten zijn bereikt.",
+            "De helden verliezen samen wanneer hun gedeelde leven 0 bereikt, en delen poison en commander damage op dezelfde manier.",
+            "Een speler verliest na {{commanderDamage}} gevechtsschade van één commander.",
+            "Elke keer dat een commander opnieuw wordt gespeeld vanuit de command zone, kost het 2 mana meer."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "One Archenemy on 20 life with schemes against three heroes sharing 40 life.",
+        "hostHint": "Strict 4-player tables. One Archenemy with a scheme deck against a three-player team — no commanders.",
+        "summary": "One Archenemy against a team of three, with a scheme deck in motion — standard 20-life tables.",
+        "sections": {
+          "sides": {
+            "heading": "Kanten",
+            "bullets": [
+              "Kies de Archenemy of wijs er willekeurig een toe. De andere drie spelers zijn de helden.",
+              "Beide kanten beginnen met {{life}} levenspunten.",
+              "De helden delen dat leven en spelen hun beurt samen.",
+              "De Archenemy speelt als eerste en trekt in die beurt."
+            ]
+          },
+          "schemes": {
+            "heading": "Schemes",
+            "bullets": [
+              "De 40 Duskmourn Commander schemes worden aan het begin geschud.",
+              "Tijdens elke eerste main phase van de Archenemy: open het timermenu en tik Volgend scheme om er één in werking te zetten.",
+              "Een niet-ongoing scheme resolveert en gaat dan onder het scheme deck.",
+              "Een ongoing scheme blijft face-up tot de tafel het als abandoned markeert; dan gaat het onder het deck.",
+              "Face-up schemes en het graveyard van afgeronde liggen als miniaturen onder de kaart; tik erop om groot te lezen."
+            ]
+          },
+          "life": {
+            "heading": "Levenspunten en verlies",
+            "bullets": [
+              "De Archenemy verliest bij 0 levenspunten of wanneer de gebruikelijke poison- en commander damage-limieten zijn bereikt.",
+              "De helden verliezen samen wanneer hun gedeelde leven 0 bereikt, en delen poison en commander damage op dezelfde manier.",
+              "Een speler verliest na {{commanderDamage}} gevechtsschade van één commander."
+            ]
+          }
+        }
+      }
+    },
+    "emperor": {
+      "label": "Emperor",
+      "hint": "Twee teams van drie. Bescherm je Keizer met beperkt bereik van invloed en zet creatures in.",
+      "hostHint": "Strikte 6-speler Commander-pods. Twee teams plaatsen een Keizer tussen twee Generaals met beperkt bereik van invloed.",
+      "hostFixedSeats": "Emperor-spellen hebben altijd precies zes spelers.",
+      "title": "Emperor",
+      "summary": "Twee teams van drie. Elke Keizer zit tussen twee Generaals — een Keizer elimineren wint het spel.",
+      "sections": {
+        "teams": {
+          "heading": "Teams en beurten",
+          "bullets": [
+            "Kies beide teams en elke Keizer, of randomiseer een van beide keuzes.",
+            "Elke speler begint met {{life}} levenspunten en houdt eigen hand, mana, permanents, poison en beurt.",
+            "Teamgenoten mogen elkaars handen bekijken en strategie bespreken, maar geen kaarten van elkaar manipuleren.",
+            "Kies willekeurig welke Keizer de eerste beurt neemt. Die Keizer trekt in de eerste beurt."
+          ]
+        },
+        "range": {
+          "heading": "Bereik en combat",
+          "bullets": [
+            "Generaals hebben bereik van invloed 1. Keizers hebben bereik van invloed 2.",
+            "Spells, abilities, effects en informatie kunnen alleen spelers en objecten binnen het bereik van hun controller raken.",
+            "Een speler mag alleen een tegenstander direct naast zich aanvallen, of diens planeswalkers en protected battles.",
+            "Als spelers vertrekken, tellen lege stoelen niet meer mee en komen overlevenden binnen bereik."
+          ]
+        },
+        "deploy": {
+          "heading": "Creatures inzetten",
+          "bullets": [
+            "Elke creature heeft \"Tap: een teamgenoot krijgt het beheer van deze creature. Activeer alleen als sorcery.\"",
+            "Zo kunnen creatures door het team bewegen wanneer de frontlinies verschuiven."
+          ]
+        },
+        "winning": {
+          "heading": "Winnen en Commander-regels",
+          "bullets": [
+            "Een team wint als zijn Keizer wint en verliest direct als zijn Keizer verliest. Een Generaal kan worden geëlimineerd zonder het spel te beëindigen.",
+            "Een speler verliest bij 0 levenspunten, {{poison}} poison of {{commanderDamage}} gevechtsschade van één commander.",
+            "Elke keer dat een commander opnieuw wordt gespeeld vanuit de command zone, kost het 2 mana meer."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Two teams of three on 20 life. Protect your Emperor with limited range of influence.",
+        "hostHint": "Strict 6-player tables. Two Emperors between Generals — standard 20-life decks, no commanders.",
+        "summary": "Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.",
+        "sections": {
+          "teams": {
+            "heading": "Teams en beurten",
+            "bullets": [
+              "Kies beide teams en elke Keizer, of randomiseer een van beide keuzes.",
+              "Elke speler begint met {{life}} levenspunten en houdt eigen hand, mana, permanents, poison en beurt.",
+              "Teamgenoten mogen elkaars handen bekijken en strategie bespreken, maar geen kaarten van elkaar manipuleren.",
+              "Kies willekeurig welke Keizer de eerste beurt neemt. Die Keizer trekt in de eerste beurt."
+            ]
+          },
+          "range": {
+            "heading": "Bereik en combat",
+            "bullets": [
+              "Generaals hebben bereik van invloed 1. Keizers hebben bereik van invloed 2.",
+              "Spells, abilities, effects en informatie kunnen alleen spelers en objecten binnen het bereik van hun controller raken.",
+              "Een speler mag alleen een tegenstander direct naast zich aanvallen, of diens planeswalkers en protected battles.",
+              "Als spelers vertrekken, tellen lege stoelen niet meer mee en komen overlevenden binnen bereik."
+            ]
+          },
+          "deploy": {
+            "heading": "Creatures inzetten",
+            "bullets": [
+              "Elke creature heeft \"Tap: een teamgenoot krijgt het beheer van deze creature. Activeer alleen als sorcery.\"",
+              "Zo kunnen creatures door het team bewegen wanneer de frontlinies verschuiven."
+            ]
+          },
+          "winning": {
+            "heading": "Winnen en Commander-regels",
+            "bullets": [
+              "Een team wint als zijn Keizer wint en verliest direct als zijn Keizer verliest. Een Generaal kan worden geëlimineerd zonder het spel te beëindigen.",
+              "Een speler verliest bij 0 levenspunten, {{poison}} poison of {{commanderDamage}} gevechtsschade van één commander."
+            ]
+          }
+        }
+      }
+    },
+    "star": {
+      "label": "Star",
+      "hint": "Vijf spelers in een cirkel. Je buren zijn bondgenoten; elimineer beide spelers tegenover je.",
+      "hostHint": "Strikte 5-speler Commander-pods. Aangrenzende spelers zijn bondgenoten; iedereen wint door beide tegenstanders tegenover te overleven.",
+      "hostFixedSeats": "Star-spellen hebben altijd precies vijf spelers.",
+      "title": "Star",
+      "summary": "Vijf spelers in een cirkel. Je buren zijn bondgenoten en de twee tegenover je zijn vijanden.",
+      "sections": {
+        "positions": {
+          "heading": "Posities en bondgenoten",
+          "bullets": [
+            "Kies posities door twee spelers te wisselen of randomiseer alle vijf posities.",
+            "De spelers direct links en rechts van je zijn je bondgenoten.",
+            "De twee niet-aangrenzende spelers tegenover in de cirkel zijn je vijanden.",
+            "Posities blijven vast wanneer een speler wordt geëlimineerd; bondgenoten en vijanden veranderen niet."
+          ]
+        },
+        "combat": {
+          "heading": "Combat en interactie",
+          "bullets": [
+            "Spelers kunnen hun bondgenoten standaard niet aanvallen.",
+            "Spells en abilities mogen nog steeds iedereen helpen of raken, tenzij de tafel een strengere variant afspreekt.",
+            "Beurten gaan met de klok mee. Kies willekeurig de startspeler; die speler trekt in de eerste beurt."
+          ]
+        },
+        "winning": {
+          "heading": "Winnen",
+          "bullets": [
+            "De eerste overlevende wiens twee vijanden zijn geëlimineerd wint, ongeacht wie ze elimineerde.",
+            "Een geëlimineerde speler kan later niet meer winnen.",
+            "Elke speler begint met {{life}} levenspunten en verliest bij 0 levenspunten, {{poison}} poison of {{commanderDamage}} gevechtsschade van één commander.",
+            "Elke keer dat een commander opnieuw wordt gespeeld vanuit de command zone, kost het 2 mana meer."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Five players in a circle on 20 life. Neighbors are allies; eliminate both players across from you.",
+        "hostHint": "Strict 5-player tables. Adjacent players ally; each player wins by outlasting both opponents across the circle.",
+        "summary": "Five players sit in a circle on 20 life. Your neighbors are allies and the two players across from you are enemies.",
+        "sections": {
+          "positions": {
+            "heading": "Posities en bondgenoten",
+            "bullets": [
+              "Kies posities door twee spelers te wisselen of randomiseer alle vijf posities.",
+              "De spelers direct links en rechts van je zijn je bondgenoten.",
+              "De twee niet-aangrenzende spelers tegenover in de cirkel zijn je vijanden.",
+              "Posities blijven vast wanneer een speler wordt geëlimineerd; bondgenoten en vijanden veranderen niet."
+            ]
+          },
+          "combat": {
+            "heading": "Combat en interactie",
+            "bullets": [
+              "Spelers kunnen hun bondgenoten standaard niet aanvallen.",
+              "Spells en abilities mogen nog steeds iedereen helpen of raken, tenzij de tafel een strengere variant afspreekt.",
+              "Beurten gaan met de klok mee. Kies willekeurig de startspeler; die speler trekt in de eerste beurt."
+            ]
+          },
+          "winning": {
+            "heading": "Winnen",
+            "bullets": [
+              "De eerste overlevende wiens twee vijanden zijn geëlimineerd wint, ongeacht wie ze elimineerde.",
+              "Een geëlimineerde speler kan later niet meer winnen.",
+              "Elke speler begint met {{life}} levenspunten en verliest bij 0 levenspunten, {{poison}} poison of {{commanderDamage}} gevechtsschade van één commander."
+            ]
+          }
+        }
+      }
+    },
+    "assassin": {
+      "label": "Assassin",
+      "hint": "Geheime contracten in ieder voor zich. Elimineer je doelwit, scoor punten en erf het volgende doel.",
+      "hostHint": "Geheime contracten voor 3–8 spelers. Scoor door je doelwit te elimineren en erf daarna het zijne.",
+      "title": "Assassin",
+      "summary": "Ieder voor zich met geheime contracten. Scoor doelwitten, erf nieuwe targets en eindig met de hoogste score.",
+      "sections": {
+        "contracts": {
+          "heading": "Geheime contracten",
+          "bullets": [
+            "Elke speler krijgt privé één doelwit. Contracten vormen een cirkel — niemand target zichzelf en iedereen wordt één keer gejaagd.",
+            "Geef het apparaat rond bij setup. Open Doelwit bekijken in het timermenu wanneer je je contract opnieuw moet lezen.",
+            "Spelers mogen iedereen aanvallen en raken; het contract bepaalt de score, niet legale targets."
+          ]
+        },
+        "elimination": {
+          "heading": "Eliminatie en overerving",
+          "bullets": [
+            "Wanneer een speler wordt geëlimineerd, noteer wie de finishing blow gaf.",
+            "Als je persoonlijk je toegewezen doelwit elimineert, scoor je één punt.",
+            "Wie het geëlimineerde doelwit jaagde, erft diens contract — ook als iemand anders de finishing blow gaf. Eén actief contract per overlevende."
+          ]
+        },
+        "winning": {
+          "heading": "Winnen",
+          "bullets": [
+            "Speel tot er nog één speler over is. De laatste overlevende scoort één extra punt.",
+            "De speler met de meeste punten wint; bij gelijkspel wint de laatste overlevende.",
+            "Commander-regels blijven gelden: {{life}} startleven, {{poison}} poison en {{commanderDamage}} gevechtsschade van één commander zijn dodelijk.",
+            "Elke keer dat een commander opnieuw wordt gespeeld vanuit de command zone, kost het 2 mana meer."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Secret contracts for 3–8 players on 20 life. Score by eliminating your mark.",
+        "hostHint": "Secret contracts without commanders. Matching fills your chosen table size; leftovers can sit as small as three.",
+        "summary": "A free-for-all with secret contracts on 20 life. Score marks, inherit new targets, and finish with the highest score.",
+        "sections": {
+          "contracts": {
+            "heading": "Geheime contracten",
+            "bullets": [
+              "Elke speler krijgt privé één doelwit. Contracten vormen een cirkel — niemand target zichzelf en iedereen wordt één keer gejaagd.",
+              "Geef het apparaat rond bij setup. Open Doelwit bekijken in het timermenu wanneer je je contract opnieuw moet lezen.",
+              "Spelers mogen iedereen aanvallen en raken; het contract bepaalt de score, niet legale targets."
+            ]
+          },
+          "elimination": {
+            "heading": "Eliminatie en overerving",
+            "bullets": [
+              "Wanneer een speler wordt geëlimineerd, noteer wie de finishing blow gaf.",
+              "Als je persoonlijk je toegewezen doelwit elimineert, scoor je één punt.",
+              "Wie het geëlimineerde doelwit jaagde, erft diens contract — ook als iemand anders de finishing blow gaf. Eén actief contract per overlevende."
+            ]
+          },
+          "winning": {
+            "heading": "Winnen",
+            "bullets": [
+              "Speel tot er nog één speler over is. De laatste overlevende scoort één extra punt.",
+              "De speler met de meeste punten wint; bij gelijkspel wint de laatste overlevende.",
+              "Commander-regels blijven gelden: {{life}} startleven, {{poison}} poison en {{commanderDamage}} gevechtsschade van één commander zijn dodelijk."
+            ]
+          }
+        }
+      }
+    }
+  },
+  "home": {
+    "taglineBefore": "Je volgende",
+    "taglineHighlight": "pod",
+    "taglineAfter": ", geregeld.",
+    "startPlaying": "Begin met spelen",
+    "ongoingGame": "lopend spel",
+    "noEventNeeded": "geen event nodig",
+    "startPlayingHint": "Open een gevechtsscherm op dit apparaat. Verlaat en kom terug zonder een onafgemaakt spel te verliezen.",
+    "alwaysPlayers": "Altijd {{count}} spelers in deze modus.",
+    "resumeGame": "Spel hervatten",
+    "startNewGame": "Nieuw spel starten",
+    "startGame": "Spel starten",
+    "advancedMatchConfig": "Geavanceerde matchconfig",
+    "hostEvent": "Event hosten",
+    "new": "nieuw",
+    "targetTableSize": "Gewenste tafelgrootte",
+    "allowThreePods": "3-speler pods toestaan",
+    "allowFivePods": "5-speler pods toestaan",
+    "duelFixedSeats": "Duel-events hebben altijd precies twee spelers.",
+    "emperorFixedSeats": "Emperor-spellen hebben altijd precies zes spelers.",
+    "starFixedSeats": "Star-spellen hebben altijd precies vijf spelers.",
+    "archenemyFixedSeats": "Archenemy Commander-spellen hebben altijd precies vier spelers.",
+    "twoHeadedFixedSeats": "Two-Headed Giant-spellen hebben altijd precies vier spelers.",
+    "eventName": "Eventnaam",
+    "eventNamePlaceholder": "Vrijdag Commander",
+    "tables": "Tafels",
+    "tablesHint": "Hoeveel fysieke tafels vrij zijn voor dit event.",
+    "eventLasts": "Event duurt",
+    "eventLastsHint": "Toegangscode verloopt na dit aantal uren. Gebruik 48 of 72 voor een weekend.",
+    "hostPin": "Host-PIN",
+    "hostPinHint": "4 tot 8 cijfers — opent de hostconsole later weer.",
+    "createEvent": "Event aanmaken",
+    "joinWithCode": "Deelnemen met code",
+    "playerAside": "speler",
+    "joinCode": "Toegangscode",
+    "joinCodePlaceholder": "AB23CD",
+    "join": "Deelnemen",
+    "scanQr": "QR scannen",
+    "staleJoin": "Dat event bestaat niet meer. Doe mee met een nieuwe code of host een nieuwe avond."
+  },
+  "host": {
+    "desk": "Hostconsole",
+    "locked": "Vergrendeld",
+    "hostOnly": "alleen host",
+    "unlockHostDesk": "Hostconsole ontgrendelen",
+    "playerCount": "{{count}} speler",
+    "playerCount_plural": "{{count}} spelers",
+    "ready": "{{count}} gereed",
+    "matched": "{{count}} gematcht",
+    "playing": "{{count}} aan het spelen",
+    "paused": "{{count}} gepauzeerd",
+    "ends": "eindigt {{date}}",
+    "podSizes": "Podgroottes",
+    "matching": "matching",
+    "allowLeftoverThree": "Resterende 3-speler pods toestaan",
+    "allowFivePods": "5-speler pods toestaan",
+    "treacheryTargetHint": "Gewenste tafelgrootte. Resterende pods kunnen vanaf vier.",
+    "matchingPrefers": "Matching geeft de voorkeur aan {{size}}-spelerstafels.",
+    "matchingPrefersFour": "Matching geeft de voorkeur aan 4-spelerstafels.",
+    "assassinTargetHint": "Gewenste tafelgrootte. Resterende contractcirkels kunnen vanaf drie.",
+    "multiplayerTargetHint": "Gewenste tafelgrootte. Resterende tafels kunnen vanaf drie.",
+    "duelMatchmaking": "Duel-matching plaatst precies twee spelers per spel.",
+    "twoHeadedMatchmaking": "Two-Headed Giant-matching plaatst precies vier spelers per spel.",
+    "archenemyMatchmaking": "Archenemy Commander-matching plaatst precies vier spelers: één Archenemy tegen een team van drie.",
+    "emperorMatchmaking": "Emperor-matching plaatst precies zes spelers: twee teams met een Keizer en twee Generaals elk.",
+    "starMatchmaking": "Star-matching plaatst precies vijf spelers in cirkelvolgorde.",
+    "eventLength": "Eventduur",
+    "joinCodeDies": "toegangscode verloopt",
+    "hoursFromStart": "Uren vanaf start",
+    "hoursFromStartHint": "Pas dit aan voor een meerdaags event. Daarna opent de QR de homepagina.",
+    "joinCodeTitle": "Toegangscode",
+    "share": "delen",
+    "noLanAddress": "Geen LAN-adres gevonden — deze link werkt alleen op deze computer.",
+    "copyPlayerLink": "Spelerslink kopiëren",
+    "queue": "Wachtrij",
+    "nobodyWaiting": "Niemand wacht.",
+    "flex": "flex {{count}}",
+    "challengePts": "{{count}} challenge-pt",
+    "pts": "{{count}} pt",
+    "notReady": "Niet gereed",
+    "pausedTitle": "Gepauzeerd",
+    "seated": "Gezeten",
+    "atTables": "{{count}} aan tafels",
+    "tablesTitle": "Tafels",
+    "total": "{{count}} totaal",
+    "noTables": "Dit event is aangemaakt zonder tafels.",
+    "startingGames": "Spellen starten…",
+    "startAllReady": "Alle gereedstaande spellen starten ({{count}})",
+    "startGame": "Spel starten",
+    "finishTable": "Tafel afronden",
+    "cancelPod": "Pod annuleren",
+    "enable": "Inschakelen",
+    "disable": "Uitschakelen",
+    "trackerUsed": "tracker",
+    "noTracker": "geen tracker",
+    "matchNow": "Nu matchen",
+    "fillBots": "Tafels vullen met bots",
+    "playerJoinPage": "Spelersdeelnamepagina"
+  },
+  "join": {
+    "joinEvent": "Deelnemen aan event",
+    "takeSeat": "Plaats nemen",
+    "displayName": "Weergavenaam",
+    "displayNamePlaceholder": "Alex",
+    "joinEventButton": "Deelnemen aan event",
+    "saveDecks": "Decks opslaan",
+    "matchFound": "Match gevonden",
+    "yourDeck": "Je deck",
+    "checkMyRole": "Mijn rol bekijken",
+    "playingWithoutTracker": "Spelen zonder tracker. De host kan de tafel afronden.",
+    "chooseTracker": "Kies hoe deze pod het spel vastlegt.",
+    "useGameTracker": "Speltracker gebruiken",
+    "playWithoutTracker": "Spelen zonder tracker",
+    "atTableMarked": "Je staat als aan tafel gemarkeerd op deze telefoon. De host start het spel nog steeds vanaf de console.",
+    "imAtTable": "Ik zit aan tafel",
+    "leftEvent": "Je hebt dit event verlaten. Scan de QR opnieuw als je terug wilt.",
+    "openPool": "Open pool — elke tafel.",
+    "ready": "Gereed",
+    "waiting": "wachtend",
+    "holdTight": "Even geduld — er komt een tafel.",
+    "flex": "Flex: {{flex}} · Challenge Points: {{points}}",
+    "howWasPod": "Hoe was je pod?",
+    "pause": "Pauze",
+    "leave": "Verlaten",
+    "pausedMessage": "Je bent gepauzeerd. Hervat wanneer je kunt gaan zitten of verlaat het event.",
+    "imReady": "Ik ben gereed",
+    "leaveEvent": "Event verlaten",
+    "markReady": "Markeer gereed wanneer je kunt gaan zitten voor een spel.",
+    "matchingShortly": "Matching stuurt je zo naar een tafel.",
+    "imTheHost": "Ik ben de host",
+    "offlineSaved": "Opgeslagen op deze telefoon. Wordt verzonden zodra je weer online bent.",
+    "stayAtTable": "Blijf aan tafel tot de host het spel start."
+  },
+  "matchConfig": {
+    "title": "Matchconfig",
+    "description": "Stelt de nep-pod achter /match in. Niets hier raakt de server en niets verschijnt op het gevechtsscherm — die route kan zo op een telefoon worden getest.",
+    "podSetup": "Pod-setup",
+    "seats": "Stoelen",
+    "seatsCount": "{{count}} stoelen",
+    "bracket": "Bracket",
+    "header": "Kop",
+    "eventNamePlaceholder": "Eventnaam",
+    "joinCodePlaceholder": "Toegangscode",
+    "matchCard": "Matchkaart",
+    "tableLabelPlaceholder": "Tafellabel",
+    "assignedDeckPlaceholder": "Toegewezen deck",
+    "openBattleScreen": "Gevechtsscherm openen",
+    "resetGameState": "Spelstatus resetten",
+    "commander": "Commander",
+    "secondCommander": "Tweede commander"
+  },
+  "app": {
+    "notFound": "Niet gevonden."
+  },
+  "wake": {
+    "title": "Tafels worden wakker",
+    "message": "De gratis host ging slapen. Houd deze pagina open — het duurt meestal minder dan een minuut."
+  },
+  "scanner": {
+    "title": "QR scannen",
+    "ariaLabel": "Toegang-QR-code scannen",
+    "hint": "Richt op de code op de hostconsole.",
+    "closeScanner": "Scanner sluiten",
+    "openingCamera": "Camera openen…",
+    "noCamera": "Deze browser kan de camera niet openen. Voer de toegangscode handmatig in.",
+    "permissionDenied": "Cameratoegang geweigerd. Voer de code in of sta de camera toe en probeer opnieuw."
+  },
+  "theme": {
+    "switchToLight": "Naar lichte modus",
+    "switchToDark": "Naar donkere modus"
+  },
+  "hostMetrics": {
+    "title": "Eventoverzicht",
+    "aside": "pilot",
+    "players": "Spelers",
+    "games": "Spellen",
+    "gamesPerPlayer": "Spellen / speler",
+    "waitAvg": "Wachttijd gem.",
+    "waitP95": "Wachttijd p95",
+    "waitMax": "Wachttijd max.",
+    "rematchPairs": "Rematch-paren",
+    "flexEarned": "Flex verdiend",
+    "flexSeats": "Flex-stoelen",
+    "durationAvg": "Duur gem.",
+    "tablesOccupied": "Tafels bezet",
+    "trackerUsed": "Tracker gebruikt",
+    "trackerUsedValue": "{{used}} gebruikt · {{skipped}} overgeslagen",
+    "challenges": "Challenges",
+    "challengePts": "Challenge-pt",
+    "podRating": "Pod-beoordeling",
+    "podSizes": "Podgroottes:",
+    "pools": "Pools:"
+  },
+  "deckEditor": {
+    "title": "Commander-decks",
+    "deckNamePlaceholder": "Decknaam (optioneel)",
+    "commander": "Commander",
+    "secondCommander": "Tweede commander",
+    "markPreferred": "Als voorkeur markeren",
+    "addAcceptedDeck": "Geaccepteerd deck toevoegen",
+    "hint": "Alleen pods uit dezelfde pool. Extra decks laten matching je flexen naar een ander bracket."
+  },
+  "commanderPicker": {
+    "searchCommander": "Commander zoeken",
+    "searchPartner": "Commander die kan pairen met {{name}}",
+    "removeCommander": "{{name}} verwijderen",
+    "artworkFor": "Artwork voor",
+    "loadingArtwork": "Artwork laden…"
+  },
+  "challengePack": {
+    "title": "Challenge-pack",
+    "description": "Alleen vooraf gedefinieerde primitives. Opslaan schrijft een nieuwe versie en wijzigt nooit een pack dat dit event al gebruikt.",
+    "copyOfficial": "Officieel kopiëren",
+    "startBlank": "Leeg beginnen",
+    "saveNewVersion": "Nieuwe versie opslaan",
+    "editHint": "Kopieer het officiële pack of begin leeg voordat je bewerkt.",
+    "packName": "Packnaam",
+    "descriptionLabel": "Beschrijving",
+    "addChallenge": "Challenge toevoegen",
+    "id": "Id",
+    "name": "Naam",
+    "category": "Categorie",
+    "points": "Punten",
+    "primitive": "Primitive",
+    "threshold": "Drempel",
+    "confirmationQuestion": "Bevestigingsvraag",
+    "defaultConfirmation": "Is dit aan tafel gebeurd?",
+    "newClaimName": "Nieuwe claim",
+    "newClaimDescription": "Ken dit toe aan tafel."
+  },
+  "treacheryRole": {
+    "treachery": "Treachery",
+    "receivedRole": "Je hebt een rol ontvangen",
+    "handDeviceTo": "Geef het apparaat aan {{name}}",
+    "lookAwayIdentity": "Iedereen anders moet wegkijken voordat de identiteit wordt onthuld.",
+    "lookAwayScreen": "Zorg dat niemand je scherm kan zien voordat je onthult.",
+    "reveal": "Onthullen",
+    "yourRole": "Je rol",
+    "identityAlt": "{{name}}, {{role}}-identiteit",
+    "illustratedBy": "Geïllustreerd door {{artist}}",
+    "yourObjective": "Je doel",
+    "unveiledToTable": "Onthuld aan tafel",
+    "unveilWarning": "Iedereen aan je tafel ziet deze identiteit. De ability moet in het spel worden opgelost.",
+    "confirmUnveil": "Onthulling bevestigen",
+    "unveilToTable": "Onthullen aan tafel",
+    "hideAndPass": "Verbergen & doorgeven",
+    "hideIdentity": "Mijn identiteit verbergen"
+  },
+  "modeRulesSheet": {
+    "closeRules": "Regels sluiten",
+    "backToGame": "Terug naar het spel"
+  },
+  "assassinTargets": {
+    "title": "Geheime contracten",
+    "chooseOwnName": "Kies alleen je eigen naam.",
+    "closeContracts": "Contracten sluiten",
+    "handDeviceTo": "Geef het apparaat aan {{name}}",
+    "lookAway": "Iedereen anders moet wegkijken voordat het contract wordt onthuld.",
+    "revealTarget": "Mijn doelwit onthullen",
+    "yourTarget": "Je doelwit",
+    "noActiveTarget": "Geen actief doelwit",
+    "marksScored": "Punten gescoord: {{count}}",
+    "hideAndPass": "Verbergen & doorgeven",
+    "allContractsChecked": "Alle contracten gecontroleerd"
+  },
+  "scheme": {
+    "ongoingScheme": "Ongoing scheme",
+    "scheme": "Scheme",
+    "pastScheme": "Afgelopen scheme",
+    "abandon": "{{name}} opgeven",
+    "ongoingSchemes": "Ongoing schemes",
+    "graveyard": "Graveyard · {{count}}",
+    "nextScheme": "Volgend scheme",
+    "remainingInDeck": "{{count}} over in het deck",
+    "scryfallCredit": "Kaartafbeelding via Scryfall. Magic: The Gathering is © Wizards of the Coast."
+  },
+  "dungeon": {
+    "takeInitiativeTitle": "Initiative nemen?",
+    "takeInitiativeEnter": "Dit betreedt ook de Undercity. Neem het alleen wanneer de tafel deze stoel net de initiative gaf.",
+    "takeInitiativeWait": "Rond de huidige dungeon af of verlaat die voordat de Undercity kan openen. Neem initiative alleen wanneer de tafel die net aan deze stoel gaf.",
+    "takeInitiativeAndEnter": "Initiative nemen & Undercity betreden",
+    "takeInitiative": "Initiative nemen",
+    "alreadyHoldInitiative": "Je hebt al de initiative",
+    "takeAndEnterUndercity": "Initiative nemen en Undercity betreden",
+    "completed": "{{name}} (voltooid)",
+    "ventureInto": "Avontuur in {{name}}",
+    "done": "Klaar",
+    "ventureTo": "Ga naar {{room}}: {{effect}}",
+    "releaseInitiative": "Initiative vrijgeven",
+    "undoRoom": "Kamer ongedaan maken",
+    "closeDungeon": "Dungeon sluiten"
+  },
+  "treacheryRolesSheet": {
+    "title": "Geheime identiteiten",
+    "chooseOwnName": "Kies alleen je eigen naam.",
+    "closeIdentities": "Identiteiten sluiten",
+    "allIdentitiesChecked": "Alle identiteiten gecontroleerd"
+  },
+  "tracker": {
+    "gameRules": "Spelregels",
+    "loadingRoles": "Rollen laden…",
+    "start": "Start",
+    "readRules": "Regels lezen",
+    "readyToBegin": "Klaar om te beginnen",
+    "readyToBeginHint": "Start de match wanneer iedereen zit, of lees eerst de regels.",
+    "dealContracts": "Contracten uitdelen",
+    "dealContractsTitle": "Geheime contracten uitdelen",
+    "dealContractsHint": "Elke speler krijgt één privé doelwit. Het apparaat wordt rondgegeven zodat elk contract geheim kan worden gecontroleerd.",
+    "dealIdentities": "Identiteiten uitdelen",
+    "dealIdentitiesTitle": "Geheime identiteiten uitdelen",
+    "dealIdentitiesHint": "Elke speler krijgt één verborgen identiteit. Het apparaat wordt rondgegeven zodat elk geheim kan worden gelezen.",
+    "chooseStarPositions": "Star-posities kiezen",
+    "starPositionsHint": "Spelers naast elkaar zijn bondgenoten. Tik twee spelers om posities te wisselen of randomiseer de hele cirkel.",
+    "randomPositions": "Willekeurige posities",
+    "confirmPositions": "Posities bevestigen",
+    "adjacentPlayersAlly": "Aangrenzende\nspelers bondgenoten",
+    "buildEmperorTeams": "Emperor-teams samenstellen",
+    "chooseTeamA": "Kies drie spelers voor Team A.",
+    "randomTeams": "Willekeurige teams",
+    "resetTeams": "Teams resetten",
+    "teamEmperor": "Team {{team}} Keizer",
+    "randomEmperors": "Willekeurige Keizers",
+    "confirmTeams": "Teams bevestigen",
+    "chooseArchenemy": "Archenemy kiezen",
+    "chooseArchenemyHint": "De Archenemy neemt het op tegen de andere drie. Beide kanten delen 60 leven. De Archenemy speelt eerst, trekt in die beurt en zet elk eerste main phase een scheme in werking.",
+    "confirmArchenemy": "Archenemy bevestigen",
+    "chooseAllies": "Bondgenoten kiezen",
+    "chooseAlliesHint": "Selecteer twee spelers voor het eerste team. De andere twee vormen het tegenstanderteam. Teams delen 60 leven en beurten; de rest blijft gescheiden.",
+    "emperor": "Keizer",
+    "emperorRange": "Keizer · bereik 2",
+    "leader": "Leider",
+    "general": "Generaal",
+    "generalRange": "Generaal · bereik 1",
+    "marks": "{{count}} punten",
+    "winner": "Winnaar",
+    "turnPhone": "Draai je telefoon voor het volledige bord",
+    "matchMenu": "Matchmenu",
+    "matchMenuElapsed": "Matchmenu. {{clock}} verstreken",
+    "matchMenuPaused": ", gepauzeerd",
+    "matchMenuDayNight": ", het is {{phase}}",
+    "day": "dag",
+    "night": "nacht",
+    "closeMatchMenu": "Matchmenu sluiten",
+    "match": "Match",
+    "firstScheme": "Eerste scheme",
+    "nextScheme": "Volgend scheme",
+    "resume": "Hervatten",
+    "pause": "Pauze",
+    "undo": "Ongedaan maken",
+    "challenges": "Challenges",
+    "checkTarget": "Doelwit bekijken",
+    "checkMyRole": "Mijn rol bekijken",
+    "dayButton": "Dag",
+    "nightButton": "Nacht",
+    "playerLost": "Speler verloren",
+    "gameWonBy": "Spel gewonnen door",
+    "won": "{{name}} heeft gewonnen",
+    "doneRequeue": "Klaar & opnieuw in wachtrij",
+    "savingChallenges": "Challenges opslaan…",
+    "quitToHome": "Naar home",
+    "quitHint": "Het spel blijft bewaard — open het opnieuw vanaf het startscherm.",
+    "secretContracts": "Geheime contracten",
+    "secretIdentities": "Geheime identiteiten",
+    "whoEliminated": "Wie elimineerde {{name}}?",
+    "whoEliminatedHint": "Een speler scoort alleen als dit hun toegewezen doelwit was. De contractketen gaat hoe dan ook verder.",
+    "noPlayerUnknown": "Geen speler / onbekend",
+    "revealedIdentity": "Onthulde Treachery-identiteit",
+    "closeRevealedIdentity": "Onthulde identiteit sluiten",
+    "commanderChallenges": "Commander-challenges",
+    "challengeCompleted": "{{name}} voltooid",
+    "challengeFallback": "Challenge",
+    "matchResult": "Matchresultaat",
+    "wins": "{{name}} wint",
+    "reviewBoard": "Bord bekijken",
+    "yes": "Ja",
+    "no": "Nee",
+    "yesTheyLost": "Ja, verloren",
+    "noStillIn": "Nee, nog in het spel",
+    "openCounters": "Counters openen voor {{name}}",
+    "commanderDamageOn": "Commander damage op {{name}}",
+    "countersFor": "Counters voor {{name}}",
+    "countersTitle": "Counters voor {{name}}",
+    "closeCounters": "Counters sluiten",
+    "closeChallenges": "Challenges sluiten",
+    "sharedCommanderDamage": "Gedeelde commander damage",
+    "closeCommanderDamage": "Commander damage sluiten",
+    "highestCommanderDamage": "Hoogste commander damage op {{name}}: {{value}} van {{commander}}",
+    "noCommanderDamage": "Geen commander damage op {{name}}",
+    "removeCommanderDamage": "Commander damage verwijderen van {{owner}}s {{name}}",
+    "addCommanderDamage": "Commander damage toevoegen van {{owner}}s {{name}}",
+    "isMonarch": "{{name}} is de monarch",
+    "makeMonarch": "Maak {{name}} de monarch",
+    "enduringStory": "{{name}} {{has}} een enduring story",
+    "cityBlessing": "{{name}} {{has}} de city's blessing",
+    "has": "heeft",
+    "doesNotHave": "heeft niet",
+    "didLose": "Heeft {{name}} het spel verloren?",
+    "thisTeam": "Dit team",
+    "didTheyLose": "Hebben ze verloren?",
+    "poisonPrompt": "{{name}} heeft {{count}} poison counters. Heeft hij/zij verloren?",
+    "sharedPoisonPrompt": "{{subject}} heeft {{count}} gedeelde poison counters. {{lose}}",
+    "hitPrompt": "{{name}} bezit {{count}} geëxileerde kaarten met hit counters. Heeft hij/zij verloren?",
+    "commanderPrompt": "{{name}} heeft {{damage}} commander damage van {{from}} gekregen. Heeft hij/zij verloren?",
+    "sharedCommanderPrompt": "{{subject}} heeft {{damage}} commander damage van {{from}} gekregen. {{lose}}",
+    "lifePrompt": "{{name}} staat op {{life}} levenspunten. Heeft hij/zij verloren?",
+    "sharedLifePrompt": "{{subject}} staat op {{life}} levenspunten. {{lose}}",
+    "anotherCommander": "een andere commander",
+    "addLife": "1 leven toevoegen. Lang indrukken voor een groter bedrag.",
+    "removeLife": "1 leven verwijderen. Lang indrukken voor een groter bedrag.",
+    "addLifeFor": "Leven toevoegen voor {{name}}",
+    "removeLifeFor": "Leven verwijderen voor {{name}}",
+    "addLifeLabel": "Leven toevoegen · {{name}}",
+    "removeLifeLabel": "Leven verwijderen · {{name}}",
+    "deleteDigit": "Cijfer verwijderen",
+    "add": "Toevoegen",
+    "removeVerb": "Verwijderen",
+    "lower": "{{label}} verlagen",
+    "raise": "{{label}} verhogen",
+    "seatColour": "Stoelkleur voor {{name}}",
+    "dungeonFor": "Dungeon voor {{name}}",
+    "dungeonInitiative": "Dungeon en initiative voor {{name}}. {{title}}",
+    "dungeonInitiativeActive": "{{name}} heeft de initiative · {{filled}} van {{total}} unieke dungeons",
+    "dungeonInitiativeCompleted": "{{name}} heeft {{filled}} van {{total}} unieke dungeons voltooid",
+    "counterOn": "{{label}} op {{name}}: {{value}}",
+    "counterFor": "{{label}} voor {{name}}",
+    "claimFor": "Claim voor {{name}}",
+    "challengesSubtitle": "Dezelfde challenges voor elke speler · punten beïnvloeden nooit matching",
+    "counters": {
+      "poison": "Poison",
+      "tax": "Commander tax",
+      "acorn": "Eikels",
+      "energy": "Energy",
+      "experience": "Experience",
+      "hit": "Etrata hits",
+      "rad": "Radiation",
+      "ring": "Ring temptation",
+      "speed": "Speed",
+      "ticket": "Tickets"
+    }
+  }
+}

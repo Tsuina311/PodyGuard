@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   OFFICIAL_COMMANDER_CHALLENGES,
   poolLabel,
+  usesCommanderRules,
   type ChallengeDetectionMode,
   type EventSnapshot,
   type PodRating,
@@ -35,6 +37,7 @@ import { Badge, statusTone } from './ui/Badge';
 import { Brand } from './ui/Brand';
 import { Button } from './ui/Button';
 import { Field } from './ui/Field';
+import { LanguageSwitcherCorner } from './ui/LanguageSwitcher';
 import { Panel } from './ui/Panel';
 import { ThemeToggleCorner } from './ui/ThemeToggle';
 import { WaitTime } from './ui/WaitTime';
@@ -51,6 +54,7 @@ import {
 } from './offline-queue';
 
 export function JoinPage() {
+  const { t } = useTranslation();
   const { joinCode = '' } = useParams();
   const navigate = useNavigate();
   const [event, setEvent] = useState<PublicEvent | null>(null);
@@ -125,7 +129,9 @@ export function JoinPage() {
           return;
         }
         setError(
-          caught instanceof ApiError ? caught.message : 'Event not found.',
+          caught instanceof ApiError
+            ? caught.message
+            : t('common.errors.eventNotFound'),
         );
       });
     return () => {
@@ -251,8 +257,8 @@ export function JoinPage() {
     if (!event || !displayName.trim()) {
       return;
     }
-    if (decks.some((deck) => deck.commanders.length === 0)) {
-      setError('Choose a commander for every deck.');
+    if (commanderRules && decks.some((deck) => deck.commanders.length === 0)) {
+      setError(t('common.errors.chooseCommander'));
       return;
     }
     setBusy(true);
@@ -277,7 +283,9 @@ export function JoinPage() {
       }
     } catch (caught) {
       setError(
-        caught instanceof ApiError ? caught.message : 'Could not join event.',
+        caught instanceof ApiError
+          ? caught.message
+          : t('common.errors.joinEvent'),
       );
     } finally {
       setBusy(false);
@@ -288,8 +296,8 @@ export function JoinPage() {
     if (!event || !token) {
       return;
     }
-    if (decks.some((deck) => deck.commanders.length === 0)) {
-      setError('Choose a commander for every deck.');
+    if (commanderRules && decks.some((deck) => deck.commanders.length === 0)) {
+      setError(t('common.errors.chooseCommander'));
       return;
     }
     setBusy(true);
@@ -299,7 +307,9 @@ export function JoinPage() {
       setParticipant(result.participant);
     } catch (caught) {
       setError(
-        caught instanceof ApiError ? caught.message : 'Could not save decks.',
+        caught instanceof ApiError
+          ? caught.message
+          : t('common.errors.saveDecks'),
       );
     } finally {
       setBusy(false);
@@ -317,7 +327,9 @@ export function JoinPage() {
       setParticipant(result.participant);
     } catch (caught) {
       setError(
-        caught instanceof ApiError ? caught.message : 'Could not update ready.',
+        caught instanceof ApiError
+          ? caught.message
+          : t('common.errors.updateReady'),
       );
     } finally {
       setBusy(false);
@@ -335,7 +347,9 @@ export function JoinPage() {
       setParticipant(result.participant);
     } catch (caught) {
       setError(
-        caught instanceof ApiError ? caught.message : 'Could not update pause.',
+        caught instanceof ApiError
+          ? caught.message
+          : t('common.errors.updatePause'),
       );
     } finally {
       setBusy(false);
@@ -353,7 +367,9 @@ export function JoinPage() {
       setParticipant(result.participant);
     } catch (caught) {
       setError(
-        caught instanceof ApiError ? caught.message : 'Could not leave event.',
+        caught instanceof ApiError
+          ? caught.message
+          : t('common.errors.leaveEvent'),
       );
     } finally {
       setBusy(false);
@@ -385,13 +401,13 @@ export function JoinPage() {
         if (trackerUsed) {
           setShowTracker(true);
         }
-        setError('Saved on this phone. It will send when you are back online.');
+        setError(t('join.offlineSaved'));
         return;
       }
       setError(
         caught instanceof ApiError
           ? caught.message
-          : 'Could not save the tracker choice.',
+          : t('common.errors.trackerChoice'),
       );
     } finally {
       setBusy(false);
@@ -400,7 +416,7 @@ export function JoinPage() {
 
   async function onUnveilIdentity() {
     if (!event || !token) {
-      throw new Error('Your event session is no longer available.');
+      throw new Error(t('common.errors.sessionUnavailable'));
     }
     const result = await unveilMyTreacheryIdentity(event.joinCode, token);
     setTreacheryRole(result.assignment);
@@ -411,7 +427,7 @@ export function JoinPage() {
     durationSeconds: number,
   ) {
     if (!event || !token) {
-      throw new Error('Your event session is no longer available.');
+      throw new Error(t('common.errors.sessionUnavailable'));
     }
     try {
       const result = await reportGameResult(
@@ -436,12 +452,19 @@ export function JoinPage() {
     forgetActiveMatch(`/e/${event.joinCode}`);
   }
 
+  const commanderRules = usesCommanderRules(
+    event?.gameMode ?? 'commander',
+    event?.rulesFormat,
+  );
   const isReady = participant?.status === 'ready';
   const isPaused = participant?.status === 'paused';
   const hasLeft = participant?.status === 'left';
   const seated = Boolean(participant?.tableLabel);
   const decksComplete =
-    decks.length > 0 && decks.every((deck) => deck.commanders.length > 0);
+    decks.length > 0 &&
+    (commanderRules
+      ? decks.every((deck) => deck.commanders.length > 0)
+      : decks.every((deck) => deck.poolId.trim().length > 0));
   const canJoin =
     Boolean(event) && displayName.trim().length > 0 && decksComplete;
   const matchTable = tableForParticipant(snapshot, participant);
@@ -464,7 +487,7 @@ export function JoinPage() {
     confirmed?: boolean,
   ): Promise<boolean> {
     if (!event || !token) {
-      throw new Error('Your event session is no longer available.');
+      throw new Error(t('common.errors.sessionUnavailable'));
     }
     try {
       const result = await completeChallenge(event.joinCode, token, challengeId, {
@@ -511,10 +534,15 @@ export function JoinPage() {
             }))}
           onFinish={onTrackerFinished}
           onQuit={() => void navigate('/')}
-          challengeProgress={challengeProgress}
-          onChallengeComplete={onChallengeComplete}
-          challengePack={event?.challengePack ?? OFFICIAL_COMMANDER_CHALLENGES}
+          {...(commanderRules
+            ? {
+                challengeProgress,
+                onChallengeComplete,
+                challengePack: event?.challengePack ?? OFFICIAL_COMMANDER_CHALLENGES,
+              }
+            : {})}
           gameMode={event?.gameMode}
+          rulesFormat={event?.rulesFormat}
           startingPlayerId={treacheryRole?.leaderParticipantId}
           revealedIdentities={Object.fromEntries(
             (snapshot?.participants ?? [])
@@ -553,11 +581,12 @@ export function JoinPage() {
 
   return (
     <>
+      <LanguageSwitcherCorner />
       <ThemeToggleCorner />
       <header>
         <Brand className="mb-6" />
         <h1 className="font-display mb-2 text-3xl font-bold tracking-tight">
-          {event?.name ?? 'Join event'}
+          {event?.name ?? t('join.joinEvent')}
         </h1>
         <p className="text-muted mb-8 font-mono text-sm tracking-[0.28em] uppercase">
           {event?.joinCode ?? joinCode.toUpperCase()}
@@ -575,6 +604,7 @@ export function JoinPage() {
                 decks={decks}
                 onChange={setDeckRows}
                 disabled={busy}
+                requireCommanders={commanderRules}
               />
               <Button
                 type="button"
@@ -583,14 +613,14 @@ export function JoinPage() {
                 disabled={busy || !decksComplete}
                 onClick={() => void onSaveDecks()}
               >
-                Save decks
+                {t('join.saveDecks')}
               </Button>
             </div>
           ) : null}
           {seated ? (
             <div className="border-neon/30 from-neon/10 mb-4 rounded-xl border bg-gradient-to-br to-transparent p-5">
               <p className="text-muted mb-1 text-center text-xs tracking-[0.2em] uppercase">
-                Match found
+                {t('join.matchFound')}
               </p>
               <p className="font-display text-neon mb-1 text-center text-3xl font-bold">
                 {participant.tableLabel}
@@ -607,7 +637,7 @@ export function JoinPage() {
                 ))}
               </ul>
               <p className="text-muted mb-1 text-center text-xs tracking-[0.16em] uppercase">
-                Your deck
+                {t('join.yourDeck')}
               </p>
               <p className="mb-4 text-center text-base font-medium">
                 {assignedDeckLine(participant)}
@@ -622,15 +652,15 @@ export function JoinPage() {
                     setRoleOpen(true);
                   }}
                 >
-                  Check my role
+                  {t('join.checkMyRole')}
                 </Button>
               ) : null}
               {participant.status === 'playing' ? (
                 <>
                   <p className="text-muted mb-3 text-center text-sm">
                     {participant.trackerUsed === false
-                      ? 'Playing without the tracker. The host can finish the table.'
-                      : 'Choose how this pod will record its game.'}
+                      ? t('join.playingWithoutTracker')
+                      : t('join.chooseTracker')}
                   </p>
                   <div className="flex flex-col gap-2">
                     <Button
@@ -640,7 +670,7 @@ export function JoinPage() {
                       disabled={busy}
                       onClick={() => void onChooseTracker(true)}
                     >
-                      Use game tracker
+                      {t('join.useGameTracker')}
                     </Button>
                     {participant.trackerUsed === undefined ? (
                       <Button
@@ -649,15 +679,14 @@ export function JoinPage() {
                         disabled={busy}
                         onClick={() => void onChooseTracker(false)}
                       >
-                        Play without tracker
+                        {t('join.playWithoutTracker')}
                       </Button>
                     ) : null}
                   </div>
                 </>
               ) : atTable ? (
                 <p className="text-muted text-center text-sm">
-                  You&apos;re marked as at the table on this phone. The host
-                  still starts the game from the desk.
+                  {t('join.atTableMarked')}
                 </p>
               ) : (
                 <Button
@@ -666,14 +695,12 @@ export function JoinPage() {
                   block
                   onClick={() => setAtTable(true)}
                 >
-                  I&apos;m at the table
+                  {t('join.imAtTable')}
                 </Button>
               )}
             </div>
           ) : hasLeft ? (
-            <p className="text-muted text-sm">
-              You left this event. Scan the QR again if you want back in.
-            </p>
+            <p className="text-muted text-sm">{t('join.leftEvent')}</p>
           ) : isReady ? (
             <>
               {participant.decks.length > 0 ? (
@@ -683,14 +710,16 @@ export function JoinPage() {
                       {deck.name || poolLabel(deck.poolId)}
                       <span className="text-muted">
                         {' '}
-                        — {poolLabel(deck.poolId)}
-                        {deck.preference === 'preferred' ? ' preferred' : ''}
+                        {t('common.dash')} {poolLabel(deck.poolId)}
+                        {deck.preference === 'preferred'
+                          ? ` ${t('common.preferred')}`
+                          : ''}
                       </span>
                     </li>
                   ))}
                 </ul>
               ) : (
-                <p className="text-muted mb-4 text-sm">Open pool — any table.</p>
+                <p className="text-muted mb-4 text-sm">{t('join.openPool')}</p>
               )}
               <div className="mb-4 flex items-center gap-2.5">
                 <span className="relative flex size-2">
@@ -698,24 +727,27 @@ export function JoinPage() {
                   <span className="bg-neon size-2 rounded-full" />
                 </span>
                 <p className="text-muted text-sm">
-                  Ready
+                  {t('join.ready')}
                   {participant.readyAt ? (
                     <>
                       {' '}
-                      · waiting <WaitTime since={participant.readyAt} />
+                      · {t('join.waiting')}{' '}
+                      <WaitTime since={participant.readyAt} />
                     </>
                   ) : (
-                    '. Hold tight — a table is coming.'
+                    `. ${t('join.holdTight')}`
                   )}
                 </p>
               </div>
               <p className="text-muted mb-4 text-sm">
-                Flex: {String(participant.flexCredits)} · Challenge Points:{' '}
-                {String(participant.challengePoints ?? 0)}
+                {t('join.flex', {
+                  flex: participant.flexCredits,
+                  points: participant.challengePoints ?? 0,
+                })}
               </p>
               {askRating ? (
                 <div className="mb-4">
-                  <p className="text-muted mb-2 text-sm">How was your pod?</p>
+                  <p className="text-muted mb-2 text-sm">{t('join.howWasPod')}</p>
                   <div className="flex flex-wrap gap-2">
                     {(
                       [
@@ -750,7 +782,7 @@ export function JoinPage() {
                               setError(
                                 caught instanceof ApiError
                                   ? caught.message
-                                  : 'Could not save that rating.',
+                                  : t('common.errors.saveRating'),
                               );
                             }
                           })();
@@ -769,7 +801,7 @@ export function JoinPage() {
                   disabled={busy}
                   onClick={() => void onPause(true)}
                 >
-                  Pause
+                  {t('join.pause')}
                 </Button>
                 <Button
                   variant="ghost"
@@ -777,15 +809,13 @@ export function JoinPage() {
                   disabled={busy}
                   onClick={() => void onLeave()}
                 >
-                  Leave
+                  {t('join.leave')}
                 </Button>
               </div>
             </>
           ) : isPaused ? (
             <>
-              <p className="text-muted mb-4 text-sm">
-                You are paused. Resume when you can sit, or leave the event.
-              </p>
+              <p className="text-muted mb-4 text-sm">{t('join.pausedMessage')}</p>
               <div className="flex flex-col gap-2">
                 <Button
                   variant="neon"
@@ -794,7 +824,7 @@ export function JoinPage() {
                   disabled={busy}
                   onClick={() => void onReady(true)}
                 >
-                  {busy ? 'Updating…' : "I'm ready"}
+                  {busy ? t('common.updating') : t('join.imReady')}
                 </Button>
                 <Button
                   variant="ghost"
@@ -802,15 +832,13 @@ export function JoinPage() {
                   disabled={busy}
                   onClick={() => void onLeave()}
                 >
-                  Leave event
+                  {t('join.leaveEvent')}
                 </Button>
               </div>
             </>
           ) : participant.status === 'joined' ? (
             <>
-              <p className="text-muted mb-4 text-sm">
-                Mark ready when you can sit down for a game.
-              </p>
+              <p className="text-muted mb-4 text-sm">{t('join.markReady')}</p>
               <div className="flex flex-col gap-2">
                 <Button
                   variant="neon"
@@ -819,7 +847,7 @@ export function JoinPage() {
                   disabled={busy}
                   onClick={() => void onReady(true)}
                 >
-                  {busy ? 'Updating…' : "I'm ready"}
+                  {busy ? t('common.updating') : t('join.imReady')}
                 </Button>
                 <div className="flex gap-2">
                   <Button
@@ -828,7 +856,7 @@ export function JoinPage() {
                     disabled={busy}
                     onClick={() => void onPause(true)}
                   >
-                    Pause
+                    {t('join.pause')}
                   </Button>
                   <Button
                     variant="ghost"
@@ -836,35 +864,38 @@ export function JoinPage() {
                     disabled={busy}
                     onClick={() => void onLeave()}
                   >
-                    Leave
+                    {t('join.leave')}
                   </Button>
                 </div>
               </div>
             </>
           ) : (
-            <p className="text-muted text-sm">
-              Matching will send you to a table shortly.
-            </p>
+            <p className="text-muted text-sm">{t('join.matchingShortly')}</p>
           )}
         </Panel>
       ) : (
-        <Panel title="Take a seat" onSubmit={onJoin}>
+        <Panel title={t('join.takeSeat')} onSubmit={onJoin}>
           <Field
-            label="Display name"
+            label={t('join.displayName')}
             value={displayName}
             onChange={(change) => setDisplayName(change.target.value)}
-            placeholder="Alex"
+            placeholder={t('join.displayNamePlaceholder')}
             autoComplete="nickname"
             required
           />
-          <DeckEditor decks={decks} onChange={setDeckRows} disabled={busy} />
+          <DeckEditor
+            decks={decks}
+            onChange={setDeckRows}
+            disabled={busy}
+            requireCommanders={commanderRules}
+          />
           <Button
             type="submit"
             size="lg"
             block
             disabled={busy || !canJoin}
           >
-            {busy ? 'Joining…' : 'Join event'}
+            {busy ? t('common.joining') : t('join.joinEventButton')}
           </Button>
         </Panel>
       )}
@@ -891,14 +922,14 @@ export function JoinPage() {
 
       <p className="text-muted/70 text-xs">
         <Link className="hover:text-ink" to="/">
-          Home
+          {t('common.home')}
         </Link>
         <span className="mx-2">·</span>
         <Link
           className="hover:text-ink"
           to={`/host/${event?.joinCode ?? joinCode}`}
         >
-          I&apos;m the host
+          {t('join.imTheHost')}
         </Link>
       </p>
     </>

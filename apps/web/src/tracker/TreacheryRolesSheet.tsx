@@ -1,5 +1,6 @@
 import { Check, Shield, X } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   treacheryIdentityById,
   type TreacheryRole,
@@ -27,6 +28,7 @@ export function TreacheryRolesSheet({
   onReady?: () => void;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [reviewed, setReviewed] = useState(() => new Set<string>());
@@ -71,13 +73,17 @@ export function TreacheryRolesSheet({
     <section className="flex h-full w-full flex-col">
       <header className="mb-3 flex items-center justify-between gap-3">
         <div>
-          <h4 className="font-display text-sm font-bold">Secret identities</h4>
-          <p className="text-muted text-xs">Choose only your own name.</p>
+          <h4 className="font-display text-sm font-bold">
+            {t('treacheryRolesSheet.title')}
+          </h4>
+          <p className="text-muted text-xs">
+            {t('treacheryRolesSheet.chooseOwnName')}
+          </p>
         </div>
         {!requireAllReviewed ? (
           <button
             type="button"
-            aria-label="Close identities"
+            aria-label={t('treacheryRolesSheet.closeIdentities')}
             onClick={onClose}
             className="border-muted/25 text-muted flex size-8 items-center justify-center rounded-full border"
           >
@@ -108,7 +114,7 @@ export function TreacheryRolesSheet({
           disabled={!allReviewed}
           onClick={onReady}
         >
-          All identities checked
+          {t('treacheryRolesSheet.allIdentitiesChecked')}
         </Button>
       ) : null}
     </section>

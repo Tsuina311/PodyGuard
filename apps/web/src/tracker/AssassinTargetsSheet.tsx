@@ -1,5 +1,6 @@
 import { Check, Crosshair, Eye, X } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '../ui/Button';
 import type { TrackerPlayer } from './engine';
 
@@ -18,6 +19,7 @@ export function AssassinTargetsSheet({
   onReady?: () => void;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [reviewed, setReviewed] = useState(() => new Set<string>());
@@ -36,26 +38,28 @@ export function AssassinTargetsSheet({
         {!revealed ? (
           <>
             <h4 className="font-display mb-2 text-xl font-bold">
-              Hand the device to {selected.name}
+              {t('assassinTargets.handDeviceTo', { name: selected.name })}
             </h4>
             <p className="text-muted mb-5 max-w-sm text-sm">
-              Everyone else should look away before the contract is revealed.
+              {t('assassinTargets.lookAway')}
             </p>
             <Button variant="neon" onClick={() => setRevealed(true)}>
               <Eye size={16} aria-hidden />
-              Reveal my target
+              {t('assassinTargets.revealTarget')}
             </Button>
           </>
         ) : (
           <>
             <p className="text-muted mb-1 text-xs tracking-widest uppercase">
-              Your target
+              {t('assassinTargets.yourTarget')}
             </p>
             <h4 className="font-display text-danger mb-2 text-3xl font-bold">
-              {target?.name ?? 'No active target'}
+              {target?.name ?? t('assassinTargets.noActiveTarget')}
             </h4>
             <p className="text-muted mb-5 text-sm">
-              Marks scored: {scores[selected.id] ?? 0}
+              {t('assassinTargets.marksScored', {
+                count: scores[selected.id] ?? 0,
+              })}
             </p>
             <Button
               variant="glass"
@@ -65,7 +69,7 @@ export function AssassinTargetsSheet({
                 setRevealed(false);
               }}
             >
-              Hide & pass
+              {t('assassinTargets.hideAndPass')}
             </Button>
           </>
         )}
@@ -80,13 +84,15 @@ export function AssassinTargetsSheet({
     <section className="flex h-full w-full flex-col">
       <header className="mb-3 flex items-center justify-between gap-3">
         <div>
-          <h4 className="font-display text-sm font-bold">Secret contracts</h4>
-          <p className="text-muted text-xs">Choose only your own name.</p>
+          <h4 className="font-display text-sm font-bold">
+            {t('assassinTargets.title')}
+          </h4>
+          <p className="text-muted text-xs">{t('assassinTargets.chooseOwnName')}</p>
         </div>
         {!requireAllReviewed ? (
           <button
             type="button"
-            aria-label="Close contracts"
+            aria-label={t('assassinTargets.closeContracts')}
             onClick={onClose}
             className="border-muted/25 text-muted flex size-8 items-center justify-center rounded-full border"
           >
@@ -117,7 +123,7 @@ export function AssassinTargetsSheet({
           disabled={!allReviewed}
           onClick={onReady}
         >
-          All contracts checked
+          {t('assassinTargets.allContractsChecked')}
         </Button>
       ) : null}
     </section>

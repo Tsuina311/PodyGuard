@@ -3,6 +3,7 @@ import {
   defaultMatchConfig,
   loadMatchConfig,
   saveMatchConfig,
+  seatColor,
   seatCountForMode,
   seatCountsForMode,
   trackerStorageKey,
@@ -28,6 +29,8 @@ describe('standalone match config', () => {
   });
 
   it('offers the correct seat count for every standalone mode', () => {
+    expect(seatCountsForMode('duel')).toEqual([2]);
+    expect(seatCountsForMode('multiplayer')).toEqual([3, 4, 5, 6]);
     expect(seatCountsForMode('commander')).toEqual([2, 3, 4, 5, 6]);
     expect(seatCountsForMode('treachery')).toEqual([4, 5, 6, 7, 8]);
     expect(seatCountsForMode('two-headed-giant')).toEqual([4]);
@@ -37,6 +40,7 @@ describe('standalone match config', () => {
     expect(seatCountsForMode('assassin')).toEqual([3, 4, 5, 6, 7, 8]);
     expect(seatCountForMode('archenemy-commander', 6)).toBe(4);
     expect(seatCountForMode('commander', 6)).toBe(6);
+    expect(seatCountForMode('duel', 4)).toBe(2);
   });
 
   it('repairs a stored seat count that the game mode does not allow', () => {
@@ -69,5 +73,16 @@ describe('standalone match config', () => {
     expect(trackerStorageKey(base)).not.toBe(
       trackerStorageKey({ ...base, gameMode: 'archenemy-commander' }),
     );
+  });
+
+  it('defaults seats to Player 1, Player 2, …', () => {
+    expect(defaultMatchConfig().names.slice(0, 4)).toEqual([
+      'Player 1',
+      'Player 2',
+      'Player 3',
+      'Player 4',
+    ]);
+    expect(seatColor(0)).toBe('#ef4444');
+    expect(seatColor(1)).toBe('#3b82f6');
   });
 });

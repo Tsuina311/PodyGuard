@@ -1,60 +1,78 @@
 import type { EventMetrics } from '@podyguard/shared';
+import { useTranslation } from 'react-i18next';
 import { Panel } from './ui/Panel';
 
 export function HostMetrics({ metrics }: { metrics: EventMetrics }) {
+  const { t } = useTranslation();
+
   return (
-    <Panel title="Event recap" aside="pilot">
+    <Panel title={t('hostMetrics.title')} aside={t('hostMetrics.aside')}>
       <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-3">
-        <Metric label="Players" value={metrics.participants} />
-        <Metric label="Games" value={metrics.games} />
+        <Metric label={t('hostMetrics.players')} value={metrics.participants} />
+        <Metric label={t('hostMetrics.games')} value={metrics.games} />
         <Metric
-          label="Games / player"
+          label={t('hostMetrics.gamesPerPlayer')}
           value={metrics.gamesPerPlayer.toFixed(1)}
         />
         <Metric
-          label="Wait avg"
-          value={seconds(metrics.waitSeconds?.average)}
-        />
-        <Metric label="Wait p95" value={seconds(metrics.waitSeconds?.p95)} />
-        <Metric label="Wait max" value={seconds(metrics.waitSeconds?.max)} />
-        <Metric label="Rematch pairs" value={metrics.rematches} />
-        <Metric label="Flex earned" value={metrics.flexEarned} />
-        <Metric label="Flex seats" value={metrics.flexCompensation} />
-        <Metric
-          label="Duration avg"
-          value={seconds(metrics.gameDurationSeconds?.average)}
+          label={t('hostMetrics.waitAvg')}
+          value={seconds(metrics.waitSeconds?.average, t('common.dash'))}
         />
         <Metric
-          label="Tables occupied"
+          label={t('hostMetrics.waitP95')}
+          value={seconds(metrics.waitSeconds?.p95, t('common.dash'))}
+        />
+        <Metric
+          label={t('hostMetrics.waitMax')}
+          value={seconds(metrics.waitSeconds?.max, t('common.dash'))}
+        />
+        <Metric label={t('hostMetrics.rematchPairs')} value={metrics.rematches} />
+        <Metric label={t('hostMetrics.flexEarned')} value={metrics.flexEarned} />
+        <Metric label={t('hostMetrics.flexSeats')} value={metrics.flexCompensation} />
+        <Metric
+          label={t('hostMetrics.durationAvg')}
+          value={seconds(metrics.gameDurationSeconds?.average, t('common.dash'))}
+        />
+        <Metric
+          label={t('hostMetrics.tablesOccupied')}
           value={`${String(metrics.tableUtilisation.occupied)}/${String(metrics.tableUtilisation.total)}`}
         />
         <Metric
-          label="Tracker used"
-          value={`${String(metrics.trackerUsage.used)} used · ${String(metrics.trackerUsage.skipped)} skipped`}
+          label={t('hostMetrics.trackerUsed')}
+          value={t('hostMetrics.trackerUsedValue', {
+            used: metrics.trackerUsage.used,
+            skipped: metrics.trackerUsage.skipped,
+          })}
         />
-        <Metric label="Challenges" value={metrics.challengeCompletions} />
-        <Metric label="Challenge pts" value={metrics.challengePoints} />
         <Metric
-          label="Pod rating"
+          label={t('hostMetrics.challenges')}
+          value={metrics.challengeCompletions}
+        />
+        <Metric
+          label={t('hostMetrics.challengePts')}
+          value={metrics.challengePoints}
+        />
+        <Metric
+          label={t('hostMetrics.podRating')}
           value={
             metrics.podRating
               ? `${metrics.podRating.average.toFixed(1)} (${String(metrics.podRating.count)})`
-              : '—'
+              : t('common.dash')
           }
         />
       </dl>
       <p className="text-muted mt-3 text-xs">
-        Pod sizes:{' '}
+        {t('hostMetrics.podSizes')}{' '}
         {Object.keys(metrics.podSizes).length === 0
-          ? 'none yet'
+          ? t('common.noneYet')
           : Object.entries(metrics.podSizes)
               .map(([size, count]) => `${size}p × ${String(count)}`)
               .join(' · ')}
       </p>
       <p className="text-muted mt-1 text-xs">
-        Pools:{' '}
+        {t('hostMetrics.pools')}{' '}
         {Object.keys(metrics.poolAssignments).length === 0
-          ? 'none yet'
+          ? t('common.noneYet')
           : Object.entries(metrics.poolAssignments)
               .map(([pool, count]) => `${pool} × ${String(count)}`)
               .join(' · ')}
@@ -74,9 +92,9 @@ function Metric({ label, value }: { label: string; value: string | number }) {
   );
 }
 
-function seconds(value: number | undefined): string {
+function seconds(value: number | undefined, dash: string): string {
   if (value === undefined) {
-    return '—';
+    return dash;
   }
   return `${Math.round(value)}s`;
 }

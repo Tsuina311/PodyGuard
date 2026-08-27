@@ -105,11 +105,26 @@ export function assertPreferredPodSize(
   gameMode: GameMode,
   value: unknown,
 ): number {
+  if (gameMode === 'duel') {
+    return 2;
+  }
   if (gameMode === 'emperor') {
     return 6;
   }
   if (gameMode === 'star') {
     return 5;
+  }
+  if (gameMode === 'multiplayer') {
+    if (value === undefined || value === null) {
+      return 4;
+    }
+    const size = typeof value === 'number' ? value : Number(value);
+    if (!Number.isInteger(size) || size < 3 || size > 6) {
+      throw new InvalidEventInputError(
+        'Choose a multiplayer table size from 3 to 6 players.',
+      );
+    }
+    return size;
   }
   if (gameMode === 'assassin') {
     if (value === undefined || value === null) {

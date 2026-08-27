@@ -1,0 +1,1053 @@
+{
+  "common": {
+    "home": "Start",
+    "cancel": "Anuluj",
+    "close": "Zamknij",
+    "save": "Zapisz",
+    "loading": "Ładowanie…",
+    "players": "Gracze",
+    "game": "Gra",
+    "language": "Język",
+    "yes": "Tak",
+    "no": "Nie",
+    "reset": "Resetuj",
+    "random": "Losowo",
+    "remove": "Usuń",
+    "empty": "Pusto",
+    "bot": "bot",
+    "dev": "dev",
+    "official": "oficjalny",
+    "open": "Open",
+    "preferred": "preferowany",
+    "player": "Gracz {{number}}",
+    "versus": "kontra",
+    "teamA": "Drużyna A",
+    "teamB": "Drużyna B",
+    "working": "Pracuję…",
+    "creating": "Tworzenie…",
+    "checking": "Sprawdzanie…",
+    "joining": "Dołączanie…",
+    "updating": "Aktualizacja…",
+    "submitting": "Wysyłanie…",
+    "saving": "Zapisywanie…",
+    "searching": "Szukanie…",
+    "unveiling": "Ujawnianie…",
+    "copied": "Skopiowano",
+    "noneYet": "jeszcze brak",
+    "dash": "—",
+    "errors": {
+      "generic": "Coś poszło nie tak.",
+      "createEvent": "Nie udało się utworzyć wydarzenia.",
+      "unlockHost": "Nie udało się odblokować panelu hosta.",
+      "updateTable": "Nie udało się zaktualizować stołu.",
+      "startGame": "Nie udało się rozpocząć gry.",
+      "startAllGames": "Nie udało się rozpocząć wszystkich gotowych gier.",
+      "finishTable": "Nie udało się zakończyć stołu.",
+      "cancelPod": "Nie udało się anulować poda.",
+      "updateSettings": "Nie udało się zaktualizować ustawień.",
+      "matchTables": "Nie udało się dopasować stołów.",
+      "fillBots": "Nie udało się wypełnić stołów botami.",
+      "clipboard": "Schowek zablokowany — skopiuj link ręcznie.",
+      "eventNotFound": "Nie znaleziono wydarzenia.",
+      "joinEvent": "Nie udało się dołączyć do wydarzenia.",
+      "saveDecks": "Nie udało się zapisać talii.",
+      "updateReady": "Nie udało się zaktualizować statusu gotowości.",
+      "updatePause": "Nie udało się zaktualizować pauzy.",
+      "leaveEvent": "Nie udało się opuścić wydarzenia.",
+      "trackerChoice": "Nie udało się zapisać wyboru trackera.",
+      "saveRating": "Nie udało się zapisać tej oceny.",
+      "chooseCommander": "Wybierz dowódcę dla każdej talii.",
+      "enterJoinCode": "Wpisz kod dołączenia.",
+      "sessionUnavailable": "Twoja sesja wydarzenia nie jest już dostępna.",
+      "savePack": "Nie udało się zapisać paczki.",
+      "searchScryfall": "Nie udało się przeszukać Scryfall.",
+      "loadArtwork": "Nie udało się wczytać alternatywnej ilustracji.",
+      "submitResult": "Nie udało się przesłać wyniku.",
+      "saveChallenge": "Nie udało się zapisać postępu wyzwania.",
+      "unveilIdentity": "Nie udało się ujawnić twojej tożsamości.",
+      "apiWaking": "Host się budzi. Nie zamykaj tej strony — zwykle zajmuje to mniej niż minutę.",
+      "apiUnreachable": "Nie można połączyć się z API. Czy serwer działa (yarn dev:server)?"
+    },
+    "assignedAtTable": "Przydzielone przy stole",
+    "scanToJoin": "Zeskanuj, aby dołączyć do wydarzenia"
+  },
+  "language": {
+    "en": "English",
+    "de": "Deutsch",
+    "fr": "Français",
+    "es": "Español",
+    "it": "Italiano",
+    "pt": "Português",
+    "nl": "Nederlands",
+    "pl": "Polski"
+  },
+  "families": {
+    "normal": "Normalny",
+    "commander": "Commander"
+  },
+  "modes": {
+    "shared": {
+      "commanderCombat": "Gracz przegrywa po otrzymaniu {{commanderDamage}} obrażeń bojowych od jednego dowódcy.",
+      "commanderTax": "Za każdym razem, gdy dowódca jest rzucany ponownie ze strefy dowódcy, kosztuje o 2 many więcej.",
+      "lifeAndLoss": "Punkty życia i przegrana",
+      "turns": "Tury",
+      "commanders": "Dowódcy",
+      "eachPlayerLife": "Każdy gracz zaczyna z {{life}} punktami życia.",
+      "loseAtZero": "Gracz przegrywa przy 0 punktach życia.",
+      "loseAtPoison": "Gracz przegrywa przy {{poison}} znacznikach trucizny.",
+      "startingPlayerRandom": "Gracz startowy jest losowany.",
+      "startingPlayerSkipDraw": "Gracz startowy jest losowany i pomija krok dobierania w pierwszej turze.",
+      "multiplayerFirstTurnDraw": "W grze wieloosobowej ten gracz dobiera w pierwszej turze.",
+      "commanderFirstTurnDraw": "W Commanderze wieloosobowym ten gracz dobiera w pierwszej turze.",
+      "commandersInZone": "Dowódcy zaczynają w strefie dowódcy i mogą być rzucani ponownie stamtąd.",
+      "commanderRulesApply": "Zasady Commander nadal obowiązują: {{life}} punktów życia na start, {{poison}} trucizny i {{commanderDamage}} obrażeń bojowych od jednego dowódcy są śmiertelne."
+    },
+    "duel": {
+      "label": "Pojedynek",
+      "hint": "Dwóch graczy. Każdy zaczyna z 20 punktami życia.",
+      "hostHint": "Ścisłe stoły dla 2 graczy. Każdy gracz zaczyna z 20 punktami życia.",
+      "hostFixedSeats": "Wydarzenia pojedynkowe zawsze mają dokładnie dwóch graczy.",
+      "title": "Pojedynek",
+      "summary": "Magic dla dwóch. Bez dowódców — tylko życie i plansza.",
+      "sections": {
+        "life": {
+          "heading": "Punkty życia i przegrana",
+          "bullets": [
+            "Każdy gracz zaczyna z {{life}} punktami życia.",
+            "Gracz przegrywa przy 0 punktach życia.",
+            "Gracz przegrywa przy {{poison}} znacznikach trucizny."
+          ]
+        },
+        "turns": {
+          "heading": "Tury",
+          "bullets": [
+            "Gracz startowy jest losowany i pomija krok dobierania w pierwszej turze."
+          ]
+        }
+      }
+    },
+    "multiplayer": {
+      "label": "Wieloosobowy",
+      "hint": "Każdy na każdego bez dowódców. Wszyscy zaczynają z 20 punktami życia.",
+      "hostHint": "Każdy na każdego bez dowódców. Dopasowanie wypełnia wybrany rozmiar stołu; resztki mogą mieć minimum trzech graczy.",
+      "title": "Wieloosobowy",
+      "summary": "Każdy na każdego bez formatu Commander. Przydatne do casualowego multiplayeru, Planechase lub każdego stołu na 20 życia.",
+      "sections": {
+        "life": {
+          "heading": "Punkty życia i przegrana",
+          "bullets": [
+            "Każdy gracz zaczyna z {{life}} punktami życia.",
+            "Gracz przegrywa przy 0 punktach życia.",
+            "Gracz przegrywa przy {{poison}} znacznikach trucizny."
+          ]
+        },
+        "turns": {
+          "heading": "Tury",
+          "bullets": [
+            "Gracz startowy jest losowany.",
+            "W grze wieloosobowej ten gracz dobiera w pierwszej turze."
+          ]
+        }
+      }
+    },
+    "commander": {
+      "label": "Klasyczny",
+      "hint": "Każdy na każdego. Wszyscy zaczynają z 40 punktami życia.",
+      "hostHint": "Commander każdy na każdego. Dopasowanie preferuje czwórkę; pozostałe pody mogą mieć trzech lub pięciu graczy, jeśli dozwolone.",
+      "title": "Klasyczny",
+      "summary": "Multiplayer każdy na każdego. Każdy walczy sam za siebie.",
+      "sections": {
+        "life": {
+          "heading": "Punkty życia i przegrana",
+          "bullets": [
+            "Każdy gracz zaczyna z {{life}} punktami życia.",
+            "Gracz przegrywa przy 0 punktach życia.",
+            "Gracz przegrywa przy {{poison}} znacznikach trucizny.",
+            "Gracz przegrywa po otrzymaniu {{commanderDamage}} obrażeń bojowych od jednego dowódcy."
+          ]
+        },
+        "turns": {
+          "heading": "Tury",
+          "bullets": [
+            "Gracz startowy jest losowany.",
+            "W Commanderze wieloosobowym ten gracz dobiera w pierwszej turze."
+          ]
+        },
+        "commanders": {
+          "heading": "Dowódcy",
+          "bullets": [
+            "Dowódcy zaczynają w strefie dowódcy i mogą być rzucani ponownie stamtąd.",
+            "Za każdym razem, gdy dowódca jest rzucany ponownie ze strefy dowódcy, kosztuje o 2 many więcej."
+          ]
+        }
+      }
+    },
+    "treachery": {
+      "label": "Treachery",
+      "hint": "Tajne tożsamości rozdane na tym urządzeniu. Przekazuj je, by każdy przeczytał swoją prywatnie.",
+      "hostHint": "Tajne role dla podów Commander. Dopasowanie najpierw wypełnia wybrany rozmiar stołu; resztki mogą mieć minimum czterech graczy.",
+      "title": "Treachery",
+      "summary": "Commander z tajnymi tożsamościami. Lider jest publiczny; reszta pozostaje ukryta.",
+      "sections": {
+        "commander": {
+          "heading": "Zasady Commander nadal obowiązują",
+          "bullets": [
+            "Każdy gracz zaczyna z {{life}} punktami życia.",
+            "Gracz przegrywa przy 0 punktach życia, {{poison}} trucizny lub {{commanderDamage}} obrażeń bojowych od jednego dowódcy.",
+            "Lider gra pierwszy i dobiera w tej turze.",
+            "Za każdym razem, gdy dowódca jest rzucany ponownie ze strefy dowódcy, kosztuje o 2 many więcej."
+          ]
+        },
+        "identities": {
+          "heading": "Tożsamości",
+          "bullets": [
+            "Otwórz Sprawdź moją rolę w menu timera. Tylko ty widzisz tę kartę.",
+            "Na jednym trackerze rozdej tożsamości przy setupie i przekazuj urządzenie, by każdy przeczytał swoją sam.",
+            "Lider: Przetrwaj, aż każdy Zabójca i Zdrajca zostanie wyeliminowany. Ujawnij się przy stole. Strażnicy dzielą twoje zwycięstwo, ale nie wiesz, kim są.",
+            "Strażnik: Utrzymuj Lidera przy życiu i eliminuj jego wrogów. Twoja tożsamość jest tajna. Wygrywasz i przegrywasz z Liderem, nawet jeśli zostaniesz wyeliminowany pierwszy.",
+            "Zabójca: Wyeliminuj Lidera. Twoja tożsamość jest tajna. Zabójcy mają ten sam cel, ale nie wiesz, kim są pozostali.",
+            "Zdrajca: Bądź ostatnim graczem przy stole. Twoja tożsamość jest tajna. Utrzymuj Lidera przy życiu, aż znikną inne zagrożenia, potem przejmij tron.",
+            "Stosuj się do dodatkowych zdolności na twojej karcie tożsamości."
+          ]
+        }
+      },
+      "roles": {
+        "leader": {
+          "name": "Lider",
+          "objective": "Przetrwaj, aż każdy Zabójca i Zdrajca zostanie wyeliminowany.",
+          "guidance": "Ujawnij się przy stole. Strażnicy dzielą twoje zwycięstwo, ale nie wiesz, kim są.",
+          "publicNote": "Twoja rola jest publiczna. Powiedz przy stole, że jesteś Liderem."
+        },
+        "guardian": {
+          "name": "Strażnik",
+          "objective": "Utrzymuj Lidera przy życiu i eliminuj jego wrogów.",
+          "guidance": "Twoja tożsamość jest tajna. Wygrywasz i przegrywasz z Liderem, nawet jeśli zostaniesz wyeliminowany pierwszy.",
+          "publicNote": "Zachowaj tę rolę w tajemnicy."
+        },
+        "assassin": {
+          "name": "Zabójca",
+          "objective": "Wyeliminuj Lidera.",
+          "guidance": "Twoja tożsamość jest tajna. Zabójcy mają ten sam cel, ale nie wiesz, kim są pozostali.",
+          "publicNote": "Zachowaj tę rolę w tajemnicy."
+        },
+        "traitor": {
+          "name": "Zdrajca",
+          "objective": "Bądź ostatnim graczem przy stole.",
+          "guidance": "Twoja tożsamość jest tajna. Utrzymuj Lidera przy życiu, aż znikną inne zagrożenia, potem przejmij tron.",
+          "publicNote": "Zachowaj tę rolę w tajemnicy."
+        }
+      },
+      "normal": {
+        "hint": "Secret identities on a shared phone. Everyone starts on 20 life — no commanders.",
+        "hostHint": "Secret roles without commanders. Matching fills your chosen table size first; leftovers can sit as small as four.",
+        "summary": "Secret identities without the Commander format. The Leader is public; everyone else stays hidden.",
+        "sections": {
+          "life": {
+            "heading": "Life and loss",
+            "bullets": [
+              "Each player starts at {{life}} life.",
+              "A player loses at 0 life.",
+              "A player loses at {{poison}} poison counters.",
+              "The Leader takes the first turn and draws on that turn."
+            ]
+          },
+          "identities": null
+        }
+      }
+    },
+    "two-headed-giant": {
+      "label": "Two-Headed Giant",
+      "hint": "Dwie drużyny po dwóch, po 60 wspólnych punktów życia, tury grane razem.",
+      "hostHint": "Ścisłe pody Commander na 4 graczy. Dwie drużyny dzielą 60 życia i grają tury razem.",
+      "hostFixedSeats": "Gry Two-Headed Giant zawsze mają dokładnie czterech graczy.",
+      "title": "Two-Headed Giant",
+      "summary": "Dwie drużyny po dwóch. Sojusznicy dzielą punkty życia i turę.",
+      "sections": {
+        "teams": {
+          "heading": "Drużyny",
+          "bullets": [
+            "Wybierz dwóch sojuszników lub pozwól stołowi wylosować pary.",
+            "Każda drużyna zaczyna z {{sharedLife}} wspólnymi punktami życia.",
+            "Sojusznicy grają turę razem. Każdy gracz zachowuje własną rękę, bibliotekę i dowódców."
+          ]
+        },
+        "life": {
+          "heading": "Punkty życia i przegrana",
+          "bullets": [
+            "Drużyna przegrywa, gdy jej wspólne życie spadnie do 0.",
+            "Drużyna przegrywa przy {{sharedPoison}} wspólnych znacznikach trucizny.",
+            "Drużyna przegrywa po otrzymaniu {{commanderDamage}} wspólnych obrażeń bojowych od jednego dowódcy."
+          ]
+        },
+        "turns": {
+          "heading": "Tury",
+          "bullets": [
+            "Drużyna startowa jest losowana i pomija krok dobierania w pierwszej turze.",
+            "Za każdym razem, gdy dowódca jest rzucany ponownie ze strefy dowódcy, kosztuje o 2 many więcej."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Two teams of two, 40 shared life each, turns taken together.",
+        "hostHint": "Strict 4-player tables. Two teams share 40 life and take their turns together — no commanders.",
+        "summary": "Two teams of two. Teammates share a life total and a turn — standard decks, 20 life each in team terms.",
+        "sections": {
+          "teams": {
+            "heading": "Drużyny",
+            "bullets": [
+              "Wybierz dwóch sojuszników lub pozwól stołowi wylosować pary.",
+              "Każda drużyna zaczyna z {{sharedLife}} wspólnymi punktami życia.",
+              "Sojusznicy grają turę razem. Każdy gracz zachowuje własną rękę, bibliotekę i dowódców."
+            ]
+          },
+          "life": {
+            "heading": "Punkty życia i przegrana",
+            "bullets": [
+              "Drużyna przegrywa, gdy jej wspólne życie spadnie do 0.",
+              "Drużyna przegrywa przy {{sharedPoison}} wspólnych znacznikach trucizny.",
+              "Drużyna przegrywa po otrzymaniu {{commanderDamage}} wspólnych obrażeń bojowych od jednego dowódcy."
+            ]
+          },
+          "turns": {
+            "heading": "Tury",
+            "bullets": [
+              "Drużyna startowa jest losowana i pomija krok dobierania w pierwszej turze.",
+              "Za każdym razem, gdy dowódca jest rzucany ponownie ze strefy dowódcy, kosztuje o 2 many więcej."
+            ]
+          }
+        }
+      }
+    },
+    "archenemy-commander": {
+      "label": "Archenemy",
+      "hint": "Jeden Archenemy z 60 punktami życia i talią spisków na 40 kart przeciw trzem bohaterom dzielącym 60 życia.",
+      "hostHint": "Ścisłe pody Commander na 4 graczy. Jeden Archenemy z 60 życiem przeciw drużynie trzech z 60 wspólnym życiem i talią spisków na 40 kart.",
+      "hostFixedSeats": "Gry Archenemy Commander zawsze mają dokładnie czterech graczy.",
+      "title": "Archenemy Commander",
+      "summary": "Jeden Archenemy przeciw drużynie trzech, ze talią spisków w grze.",
+      "sections": {
+        "sides": {
+          "heading": "Strony",
+          "bullets": [
+            "Wybierz Archenemy lub wyznacz go losowo. Pozostali trzej gracze to bohaterowie.",
+            "Obie strony zaczynają z {{life}} punktami życia.",
+            "Bohaterowie dzielą to życie i grają turę razem.",
+            "Archenemy gra pierwszy i dobiera w tej turze."
+          ]
+        },
+        "schemes": {
+          "heading": "Spiski",
+          "bullets": [
+            "40 spisków Commander z Duskmourn jest tasowanych na początku.",
+            "W każdej pierwszej fazie głównej Archenemy otwórz menu timera i wybierz Następny spisek, by uruchomić jeden.",
+            "Spisek nieciągły rozwiązuje się, a potem trafia na spód talii spisków.",
+            "Spisek ciągły pozostaje odkryty, dopóki stół nie oznaczy go jako porzucony; wtedy trafia na spód.",
+            "Odkryte spiski i cmentarz zakończonych są pod kartą jako miniatury; dotknij, by przeczytać na dużym ekranie."
+          ]
+        },
+        "life": {
+          "heading": "Punkty życia i przegrana",
+          "bullets": [
+            "Archenemy przegrywa przy 0 punktach życia lub po osiągnięciu zwykłych limitów trucizny i obrażeń od dowódcy.",
+            "Bohaterowie przegrywają razem, gdy ich wspólne życie spadnie do 0, i dzielą truciznę oraz obrażenia od dowódcy tak samo.",
+            "Gracz przegrywa po otrzymaniu {{commanderDamage}} obrażeń bojowych od jednego dowódcy.",
+            "Za każdym razem, gdy dowódca jest rzucany ponownie ze strefy dowódcy, kosztuje o 2 many więcej."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "One Archenemy on 20 life with schemes against three heroes sharing 40 life.",
+        "hostHint": "Strict 4-player tables. One Archenemy with a scheme deck against a three-player team — no commanders.",
+        "summary": "One Archenemy against a team of three, with a scheme deck in motion — standard 20-life tables.",
+        "sections": {
+          "sides": {
+            "heading": "Strony",
+            "bullets": [
+              "Wybierz Archenemy lub wyznacz go losowo. Pozostali trzej gracze to bohaterowie.",
+              "Obie strony zaczynają z {{life}} punktami życia.",
+              "Bohaterowie dzielą to życie i grają turę razem.",
+              "Archenemy gra pierwszy i dobiera w tej turze."
+            ]
+          },
+          "schemes": {
+            "heading": "Spiski",
+            "bullets": [
+              "40 spisków Commander z Duskmourn jest tasowanych na początku.",
+              "W każdej pierwszej fazie głównej Archenemy otwórz menu timera i wybierz Następny spisek, by uruchomić jeden.",
+              "Spisek nieciągły rozwiązuje się, a potem trafia na spód talii spisków.",
+              "Spisek ciągły pozostaje odkryty, dopóki stół nie oznaczy go jako porzucony; wtedy trafia na spód.",
+              "Odkryte spiski i cmentarz zakończonych są pod kartą jako miniatury; dotknij, by przeczytać na dużym ekranie."
+            ]
+          },
+          "life": {
+            "heading": "Punkty życia i przegrana",
+            "bullets": [
+              "Archenemy przegrywa przy 0 punktach życia lub po osiągnięciu zwykłych limitów trucizny i obrażeń od dowódcy.",
+              "Bohaterowie przegrywają razem, gdy ich wspólne życie spadnie do 0, i dzielą truciznę oraz obrażenia od dowódcy tak samo.",
+              "Gracz przegrywa po otrzymaniu {{commanderDamage}} obrażeń bojowych od jednego dowódcy.",
+              "Za każdym razem, gdy dowódca jest rzucany ponownie ze strefy dowódcy, kosztuje o 2 many więcej."
+            ]
+          }
+        }
+      }
+    },
+    "emperor": {
+      "label": "Emperor",
+      "hint": "Dwie drużyny po trzech. Chroń swojego Imperatora ograniczonym zasięgiem wpływu i rozmieszczaj stwory.",
+      "hostHint": "Ścisłe pody Commander na 6 graczy. Dwie drużyny ustawiają Imperatora między dwoma Generałami z ograniczonym zasięgiem wpływu.",
+      "hostFixedSeats": "Gry Emperor zawsze mają dokładnie sześciu graczy.",
+      "title": "Emperor",
+      "summary": "Dwie drużyny po trzech. Każdy Imperator siedzi między dwoma Generałami — eliminacja Imperatora kończy grę.",
+      "sections": {
+        "teams": {
+          "heading": "Drużyny i tury",
+          "bullets": [
+            "Wybierz obie drużyny i Imperatora każdej z nich lub wylosuj jedną z tych decyzji.",
+            "Każdy gracz zaczyna z {{life}} punktami życia i zachowuje własną rękę, manę, permanenty, truciznę i turę.",
+            "Sojusznicy mogą oglądać swoje ręce i omawiać strategię, ale nie manipulować kartami innych.",
+            "Losowo wybierz, który Imperator gra pierwszy. Ten Imperator dobiera w pierwszej turze."
+          ]
+        },
+        "range": {
+          "heading": "Zasięg i walka",
+          "bullets": [
+            "Generałowie mają zasięg wpływu 1. Imperatorzy mają zasięg wpływu 2.",
+            "Czary, zdolności, efekty i informacje mogą wpływać tylko na graczy i obiekty w zasięgu ich kontrolera.",
+            "Gracz może atakować tylko przeciwnika siedzącego bezpośrednio obok lub jego planeswalkery i chronione bitwy.",
+            "Gdy gracze wychodzą, puste miejsca przestają się liczyć, zbliżając ocalałych."
+          ]
+        },
+        "deploy": {
+          "heading": "Rozmieszczanie stworów",
+          "bullets": [
+            "Każde stworzenie ma: „Obróć: wskazany sojusznik z drużyny przejmuje kontrolę nad tym stworzeniem. Aktywuj tylko jako czar.”",
+            "To pozwala przesuwać stwory przez drużynę, gdy zmieniają się linie frontu."
+          ]
+        },
+        "winning": {
+          "heading": "Zwycięstwo i zasady Commander",
+          "bullets": [
+            "Drużyna wygrywa, jeśli jej Imperator wygrywa, i przegrywa natychmiast, jeśli jej Imperator przegrywa. Generał może zostać wyeliminowany bez kończenia gry.",
+            "Gracz przegrywa przy 0 punktach życia, {{poison}} trucizny lub {{commanderDamage}} obrażeń bojowych od jednego dowódcy.",
+            "Za każdym razem, gdy dowódca jest rzucany ponownie ze strefy dowódcy, kosztuje o 2 many więcej."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Two teams of three on 20 life. Protect your Emperor with limited range of influence.",
+        "hostHint": "Strict 6-player tables. Two Emperors between Generals — standard 20-life decks, no commanders.",
+        "summary": "Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.",
+        "sections": {
+          "teams": {
+            "heading": "Drużyny i tury",
+            "bullets": [
+              "Wybierz obie drużyny i Imperatora każdej z nich lub wylosuj jedną z tych decyzji.",
+              "Każdy gracz zaczyna z {{life}} punktami życia i zachowuje własną rękę, manę, permanenty, truciznę i turę.",
+              "Sojusznicy mogą oglądać swoje ręce i omawiać strategię, ale nie manipulować kartami innych.",
+              "Losowo wybierz, który Imperator gra pierwszy. Ten Imperator dobiera w pierwszej turze."
+            ]
+          },
+          "range": {
+            "heading": "Zasięg i walka",
+            "bullets": [
+              "Generałowie mają zasięg wpływu 1. Imperatorzy mają zasięg wpływu 2.",
+              "Czary, zdolności, efekty i informacje mogą wpływać tylko na graczy i obiekty w zasięgu ich kontrolera.",
+              "Gracz może atakować tylko przeciwnika siedzącego bezpośrednio obok lub jego planeswalkery i chronione bitwy.",
+              "Gdy gracze wychodzą, puste miejsca przestają się liczyć, zbliżając ocalałych."
+            ]
+          },
+          "deploy": {
+            "heading": "Rozmieszczanie stworów",
+            "bullets": [
+              "Każde stworzenie ma: „Obróć: wskazany sojusznik z drużyny przejmuje kontrolę nad tym stworzeniem. Aktywuj tylko jako czar.”",
+              "To pozwala przesuwać stwory przez drużynę, gdy zmieniają się linie frontu."
+            ]
+          },
+          "winning": {
+            "heading": "Zwycięstwo i zasady Commander",
+            "bullets": [
+              "Drużyna wygrywa, jeśli jej Imperator wygrywa, i przegrywa natychmiast, jeśli jej Imperator przegrywa. Generał może zostać wyeliminowany bez kończenia gry.",
+              "Gracz przegrywa przy 0 punktach życia, {{poison}} trucizny lub {{commanderDamage}} obrażeń bojowych od jednego dowódcy.",
+              "Za każdym razem, gdy dowódca jest rzucany ponownie ze strefy dowódcy, kosztuje o 2 many więcej."
+            ]
+          }
+        }
+      }
+    },
+    "star": {
+      "label": "Star",
+      "hint": "Pięciu graczy w kole. Twoi sąsiedzi to sojusznicy; wyeliminuj obu naprzeciwko.",
+      "hostHint": "Ścisłe pody Commander na 5 graczy. Sąsiedni gracze to sojusznicy; każdy wygrywa, przetrwawszy obu przeciwników naprzeciwko.",
+      "hostFixedSeats": "Gry Star zawsze mają dokładnie pięciu graczy.",
+      "title": "Star",
+      "summary": "Pięciu graczy w kole. Twoi sąsiedzi to sojusznicy, a dwóch naprzeciwko to wrogowie.",
+      "sections": {
+        "positions": {
+          "heading": "Pozycje i sojusznicy",
+          "bullets": [
+            "Ustaw pozycje, zamieniając dwóch graczy, lub wylosuj wszystkie pięć pozycji.",
+            "Gracze bezpośrednio po twojej lewej i prawej to twoi sojusznicy.",
+            "Dwóch niesąsiadujących graczy naprzeciwko w kole to twoi wrogowie.",
+            "Pozycje pozostają stałe po eliminacji gracza; sojusznicy i wrogowie się nie zmieniają."
+          ]
+        },
+        "combat": {
+          "heading": "Walka i interakcje",
+          "bullets": [
+            "Gracze domyślnie nie mogą atakować sojuszników.",
+            "Czary i zdolności nadal mogą pomagać lub wpływać na każdego, chyba że stół uzgodni bardziej restrykcyjną wariantę.",
+            "Tury idą zgodnie z ruchem wskazówek zegara. Losowo wybierz gracza startowego; ten gracz dobiera w pierwszej turze."
+          ]
+        },
+        "winning": {
+          "heading": "Zwycięstwo",
+          "bullets": [
+            "Wygrywa pierwszy ocalały, którego obaj wrogowie zostali wyeliminowani, niezależnie od tego, kto ich wyeliminował.",
+            "Wyeliminowany gracz nie może później wygrać.",
+            "Każdy gracz zaczyna z {{life}} punktami życia i przegrywa przy 0 punktach życia, {{poison}} trucizny lub {{commanderDamage}} obrażeń bojowych od jednego dowódcy.",
+            "Za każdym razem, gdy dowódca jest rzucany ponownie ze strefy dowódcy, kosztuje o 2 many więcej."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Five players in a circle on 20 life. Neighbors are allies; eliminate both players across from you.",
+        "hostHint": "Strict 5-player tables. Adjacent players ally; each player wins by outlasting both opponents across the circle.",
+        "summary": "Five players sit in a circle on 20 life. Your neighbors are allies and the two players across from you are enemies.",
+        "sections": {
+          "positions": {
+            "heading": "Pozycje i sojusznicy",
+            "bullets": [
+              "Ustaw pozycje, zamieniając dwóch graczy, lub wylosuj wszystkie pięć pozycji.",
+              "Gracze bezpośrednio po twojej lewej i prawej to twoi sojusznicy.",
+              "Dwóch niesąsiadujących graczy naprzeciwko w kole to twoi wrogowie.",
+              "Pozycje pozostają stałe po eliminacji gracza; sojusznicy i wrogowie się nie zmieniają."
+            ]
+          },
+          "combat": {
+            "heading": "Walka i interakcje",
+            "bullets": [
+              "Gracze domyślnie nie mogą atakować sojuszników.",
+              "Czary i zdolności nadal mogą pomagać lub wpływać na każdego, chyba że stół uzgodni bardziej restrykcyjną wariantę.",
+              "Tury idą zgodnie z ruchem wskazówek zegara. Losowo wybierz gracza startowego; ten gracz dobiera w pierwszej turze."
+            ]
+          },
+          "winning": {
+            "heading": "Zwycięstwo",
+            "bullets": [
+              "Wygrywa pierwszy ocalały, którego obaj wrogowie zostali wyeliminowani, niezależnie od tego, kto ich wyeliminował.",
+              "Wyeliminowany gracz nie może później wygrać.",
+              "Każdy gracz zaczyna z {{life}} punktami życia i przegrywa przy 0 punktach życia, {{poison}} trucizny lub {{commanderDamage}} obrażeń bojowych od jednego dowódcy.",
+              "Za każdym razem, gdy dowódca jest rzucany ponownie ze strefy dowódcy, kosztuje o 2 many więcej."
+            ]
+          }
+        }
+      }
+    },
+    "assassin": {
+      "label": "Assassin",
+      "hint": "Tajne kontrakty w grze każdy na każdego. Wyeliminuj cel, zdobądź punkt i przejmij jego następny cel.",
+      "hostHint": "Tajne kontrakty dla 3–8 graczy. Zdobywaj punkty, eliminując swój cel, potem przejmij jego cel.",
+      "title": "Assassin",
+      "summary": "Każdy na każdego z tajnymi kontraktami. Zdobywaj cele, przejmuj nowe i kończ z najwyższym wynikiem.",
+      "sections": {
+        "contracts": {
+          "heading": "Tajne kontrakty",
+          "bullets": [
+            "Każdy gracz otrzymuje prywatnie jeden cel. Kontrakty tworzą okrąg — nikt nie celuje w siebie i każdy jest polowany raz.",
+            "Przekazuj urządzenie przy setupie. Otwórz Sprawdź cel w menu timera, gdy musisz ponownie przeczytać kontrakt.",
+            "Gracze mogą atakować i wpływać na każdego; kontrakt decyduje o punktacji, nie legalne cele."
+          ]
+        },
+        "elimination": {
+          "heading": "Eliminacja i dziedziczenie",
+          "bullets": [
+            "Gdy gracz zostaje wyeliminowany, zapisz, kto zadał ostatnie obrażenia.",
+            "Jeśli osobiście wyeliminujesz przypisany cel, zdobywasz jeden punkt.",
+            "Gracz, który polował na wyeliminowany cel, przejmuje jego kontrakt — nawet jeśli ostatnie obrażenia zadał ktoś inny. Jeden aktywny kontrakt na ocalałego."
+          ]
+        },
+        "winning": {
+          "heading": "Zwycięstwo",
+          "bullets": [
+            "Graj, aż zostanie jeden gracz. Ostatni ocalały zdobywa dodatkowy punkt.",
+            "Wygrywa gracz z największą liczbą punktów; przy remisie wygrywa ostatni ocalały.",
+            "Zasady Commander nadal obowiązują: {{life}} punktów życia na start, {{poison}} trucizny i {{commanderDamage}} obrażeń bojowych od jednego dowódcy są śmiertelne.",
+            "Za każdym razem, gdy dowódca jest rzucany ponownie ze strefy dowódcy, kosztuje o 2 many więcej."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Secret contracts for 3–8 players on 20 life. Score by eliminating your mark.",
+        "hostHint": "Secret contracts without commanders. Matching fills your chosen table size; leftovers can sit as small as three.",
+        "summary": "A free-for-all with secret contracts on 20 life. Score marks, inherit new targets, and finish with the highest score.",
+        "sections": {
+          "contracts": {
+            "heading": "Tajne kontrakty",
+            "bullets": [
+              "Każdy gracz otrzymuje prywatnie jeden cel. Kontrakty tworzą okrąg — nikt nie celuje w siebie i każdy jest polowany raz.",
+              "Przekazuj urządzenie przy setupie. Otwórz Sprawdź cel w menu timera, gdy musisz ponownie przeczytać kontrakt.",
+              "Gracze mogą atakować i wpływać na każdego; kontrakt decyduje o punktacji, nie legalne cele."
+            ]
+          },
+          "elimination": {
+            "heading": "Eliminacja i dziedziczenie",
+            "bullets": [
+              "Gdy gracz zostaje wyeliminowany, zapisz, kto zadał ostatnie obrażenia.",
+              "Jeśli osobiście wyeliminujesz przypisany cel, zdobywasz jeden punkt.",
+              "Gracz, który polował na wyeliminowany cel, przejmuje jego kontrakt — nawet jeśli ostatnie obrażenia zadał ktoś inny. Jeden aktywny kontrakt na ocalałego."
+            ]
+          },
+          "winning": {
+            "heading": "Zwycięstwo",
+            "bullets": [
+              "Graj, aż zostanie jeden gracz. Ostatni ocalały zdobywa dodatkowy punkt.",
+              "Wygrywa gracz z największą liczbą punktów; przy remisie wygrywa ostatni ocalały.",
+              "Zasady Commander nadal obowiązują: {{life}} punktów życia na start, {{poison}} trucizny i {{commanderDamage}} obrażeń bojowych od jednego dowódcy są śmiertelne.",
+              "Za każdym razem, gdy dowódca jest rzucany ponownie ze strefy dowódcy, kosztuje o 2 many więcej."
+            ]
+          }
+        }
+      }
+    }
+  },
+  "home": {
+    "taglineBefore": "Twój następny",
+    "taglineHighlight": "pod",
+    "taglineAfter": ", ogarnięty.",
+    "startPlaying": "Zacznij grać",
+    "ongoingGame": "trwająca gra",
+    "noEventNeeded": "bez wydarzenia",
+    "startPlayingHint": "Otwórz ekran bitwy na tym urządzeniu. Wyjdź i wróć bez utraty niedokończonej gry.",
+    "alwaysPlayers": "Zawsze {{count}} graczy w tym trybie.",
+    "resumeGame": "Wznów grę",
+    "startNewGame": "Nowa gra",
+    "startGame": "Rozpocznij grę",
+    "advancedMatchConfig": "Zaawansowana konfiguracja",
+    "hostEvent": "Organizuj wydarzenie",
+    "new": "nowe",
+    "targetTableSize": "Docelowy rozmiar stołu",
+    "allowThreePods": "Zezwól na pody 3-osobowe",
+    "allowFivePods": "Zezwól na pody 5-osobowe",
+    "duelFixedSeats": "Wydarzenia pojedynkowe zawsze mają dokładnie dwóch graczy.",
+    "emperorFixedSeats": "Gry Emperor zawsze mają dokładnie sześciu graczy.",
+    "starFixedSeats": "Gry Star zawsze mają dokładnie pięciu graczy.",
+    "archenemyFixedSeats": "Gry Archenemy Commander zawsze mają dokładnie czterech graczy.",
+    "twoHeadedFixedSeats": "Gry Two-Headed Giant zawsze mają dokładnie czterech graczy.",
+    "eventName": "Nazwa wydarzenia",
+    "eventNamePlaceholder": "Piątkowy Commander",
+    "tables": "Stoły",
+    "tablesHint": "Ile fizycznych stołów jest wolnych na to wydarzenie.",
+    "eventLasts": "Czas trwania wydarzenia",
+    "eventLastsHint": "Kod wygasa po tylu godzinach. Użyj 48 lub 72 na weekend.",
+    "hostPin": "PIN hosta",
+    "hostPinHint": "4 do 8 cyfr — ponownie otwiera panel hosta później.",
+    "createEvent": "Utwórz wydarzenie",
+    "joinWithCode": "Dołącz kodem",
+    "playerAside": "gracz",
+    "joinCode": "Kod dołączenia",
+    "joinCodePlaceholder": "AB23CD",
+    "join": "Dołącz",
+    "scanQr": "Skanuj QR",
+    "staleJoin": "To wydarzenie już nie istnieje. Dołącz nowym kodem lub zorganizuj nowy wieczór."
+  },
+  "host": {
+    "desk": "Panel hosta",
+    "locked": "Zablokowany",
+    "hostOnly": "tylko host",
+    "unlockHostDesk": "Odblokuj panel hosta",
+    "playerCount": "{{count}} gracz",
+    "playerCount_plural": "{{count}} graczy",
+    "ready": "{{count}} gotowy",
+    "matched": "{{count}} dopasowany",
+    "playing": "{{count}} w grze",
+    "paused": "{{count}} w pauzie",
+    "ends": "kończy się {{date}}",
+    "podSizes": "Rozmiary podów",
+    "matching": "dopasowanie",
+    "allowLeftoverThree": "Zezwól na pozostałe pody 3-osobowe",
+    "allowFivePods": "Zezwól na pody 5-osobowe",
+    "treacheryTargetHint": "Docelowy rozmiar stołu. Pozostałe pody mogą mieć minimum czterech graczy.",
+    "matchingPrefers": "Dopasowanie preferuje stoły na {{size}} graczy.",
+    "matchingPrefersFour": "Dopasowanie preferuje stoły na 4 graczy.",
+    "assassinTargetHint": "Docelowy rozmiar stołu. Pozostałe kręgi kontraktów mogą mieć minimum trzech graczy.",
+    "multiplayerTargetHint": "Docelowy rozmiar stołu. Pozostałe stoły mogą mieć minimum trzech graczy.",
+    "duelMatchmaking": "Dopasowanie pojedynków ustawia dokładnie dwóch graczy na grę.",
+    "twoHeadedMatchmaking": "Dopasowanie Two-Headed Giant ustawia dokładnie czterech graczy na grę.",
+    "archenemyMatchmaking": "Dopasowanie Archenemy Commander ustawia dokładnie czterech graczy: jeden Archenemy przeciw drużynie trzech.",
+    "emperorMatchmaking": "Dopasowanie Emperor ustawia dokładnie sześciu graczy: dwie drużyny z Imperatorem i dwoma Generałami każda.",
+    "starMatchmaking": "Dopasowanie Star ustawia dokładnie pięciu graczy w kole.",
+    "eventLength": "Czas trwania wydarzenia",
+    "joinCodeDies": "kod wygasa",
+    "hoursFromStart": "Godziny od startu",
+    "hoursFromStartHint": "Zmień to dla wielodniowego wydarzenia. Po zakończeniu QR otwiera stronę główną.",
+    "joinCodeTitle": "Kod dołączenia",
+    "share": "udostępnij",
+    "noLanAddress": "Nie znaleziono adresu LAN — ten link działa tylko na tym komputerze.",
+    "copyPlayerLink": "Kopiuj link gracza",
+    "queue": "Kolejka",
+    "nobodyWaiting": "Nikt nie czeka.",
+    "flex": "flex {{count}}",
+    "challengePts": "{{count}} pkt wyzwania",
+    "pts": "{{count}} pkt",
+    "notReady": "Niegotowy",
+    "pausedTitle": "W pauzie",
+    "seated": "Przy stole",
+    "atTables": "{{count}} przy stołach",
+    "tablesTitle": "Stoły",
+    "total": "{{count}} łącznie",
+    "noTables": "To wydarzenie zostało utworzone bez stołów.",
+    "startingGames": "Uruchamianie gier…",
+    "startAllReady": "Uruchom wszystkie gotowe gry ({{count}})",
+    "startGame": "Rozpocznij grę",
+    "finishTable": "Zakończ stół",
+    "cancelPod": "Anuluj pod",
+    "enable": "Włącz",
+    "disable": "Wyłącz",
+    "trackerUsed": "tracker",
+    "noTracker": "bez trackera",
+    "matchNow": "Dopasuj teraz",
+    "fillBots": "Wypełnij stoły botami",
+    "playerJoinPage": "Strona dołączenia gracza"
+  },
+  "join": {
+    "joinEvent": "Dołącz do wydarzenia",
+    "takeSeat": "Zajmij miejsce",
+    "displayName": "Nazwa wyświetlana",
+    "displayNamePlaceholder": "Alex",
+    "joinEventButton": "Dołącz do wydarzenia",
+    "saveDecks": "Zapisz talie",
+    "matchFound": "Znaleziono mecz",
+    "yourDeck": "Twoja talia",
+    "checkMyRole": "Sprawdź moją rolę",
+    "playingWithoutTracker": "Gra bez trackera. Host może zakończyć stół.",
+    "chooseTracker": "Wybierz, jak ten pod będzie rejestrował grę.",
+    "useGameTracker": "Użyj trackera gry",
+    "playWithoutTracker": "Graj bez trackera",
+    "atTableMarked": "Jesteś oznaczony jako przy stole na tym telefonie. Host nadal uruchamia grę z panelu.",
+    "imAtTable": "Jestem przy stole",
+    "leftEvent": "Opuściłeś to wydarzenie. Zeskanuj QR ponownie, jeśli chcesz wrócić.",
+    "openPool": "Otwarta pula — dowolny stół.",
+    "ready": "Gotowy",
+    "waiting": "czeka",
+    "holdTight": "Trzymaj się — stół już idzie.",
+    "flex": "Flex: {{flex}} · Punkty wyzwania: {{points}}",
+    "howWasPod": "Jak był twój pod?",
+    "pause": "Pauza",
+    "leave": "Opuść",
+    "pausedMessage": "Jesteś w pauzie. Wznów, gdy możesz usiąść, lub opuść wydarzenie.",
+    "imReady": "Jestem gotowy",
+    "leaveEvent": "Opuść wydarzenie",
+    "markReady": "Oznacz gotowość, gdy możesz usiąść do gry.",
+    "matchingShortly": "Dopasowanie wkrótce wyśle cię do stołu.",
+    "imTheHost": "Jestem hostem",
+    "offlineSaved": "Zapisano na tym telefonie. Wyśle się, gdy wrócisz online.",
+    "stayAtTable": "Zostań przy stole, aż host rozpocznie grę."
+  },
+  "matchConfig": {
+    "title": "Konfiguracja meczu",
+    "description": "Konfiguruje fałszywy pod za /match. Nic stąd nie trafia na serwer i nic nie pojawia się na ekranie bitwy — tę trasę można testować na telefonie bez zmian.",
+    "podSetup": "Setup poda",
+    "seats": "Miejsca",
+    "seatsCount": "{{count}} miejsc",
+    "bracket": "Bracket",
+    "header": "Nagłówek",
+    "eventNamePlaceholder": "Nazwa wydarzenia",
+    "joinCodePlaceholder": "Kod dołączenia",
+    "matchCard": "Karta meczu",
+    "tableLabelPlaceholder": "Etykieta stołu",
+    "assignedDeckPlaceholder": "Przypisana talia",
+    "openBattleScreen": "Otwórz ekran bitwy",
+    "resetGameState": "Resetuj stan gry",
+    "commander": "Dowódca",
+    "secondCommander": "Drugi dowódca"
+  },
+  "app": {
+    "notFound": "Nie znaleziono."
+  },
+  "wake": {
+    "title": "Budzenie stołów",
+    "message": "Darmowy host przeszedł w tryb uśpienia. Zostaw tę stronę otwartą — zwykle trwa to mniej niż minutę."
+  },
+  "scanner": {
+    "title": "Skanuj QR",
+    "ariaLabel": "Skanuj kod QR dołączenia",
+    "hint": "Skieruj na kod z panelu hosta.",
+    "closeScanner": "Zamknij skaner",
+    "openingCamera": "Otwieranie aparatu…",
+    "noCamera": "Ta przeglądarka nie może otworzyć aparatu. Wpisz kod ręcznie.",
+    "permissionDenied": "Odmowa dostępu do aparatu. Wpisz kod lub zezwól na aparat i spróbuj ponownie."
+  },
+  "theme": {
+    "switchToLight": "Przełącz na jasny motyw",
+    "switchToDark": "Przełącz na ciemny motyw"
+  },
+  "hostMetrics": {
+    "title": "Podsumowanie wydarzenia",
+    "aside": "pilot",
+    "players": "Gracze",
+    "games": "Gry",
+    "gamesPerPlayer": "Gry / gracz",
+    "waitAvg": "Śr. oczekiwanie",
+    "waitP95": "Oczekiwanie p95",
+    "waitMax": "Maks. oczekiwanie",
+    "rematchPairs": "Pary rewanżowe",
+    "flexEarned": "Zdobyty flex",
+    "flexSeats": "Miejsca flex",
+    "durationAvg": "Śr. czas trwania",
+    "tablesOccupied": "Zajęte stoły",
+    "trackerUsed": "Użyty tracker",
+    "trackerUsedValue": "{{used}} użyty · {{skipped}} pominięty",
+    "challenges": "Wyzwania",
+    "challengePts": "Pkt wyzwania",
+    "podRating": "Ocena poda",
+    "podSizes": "Rozmiary podów:",
+    "pools": "Pule:"
+  },
+  "deckEditor": {
+    "title": "Talie Commander",
+    "deckNamePlaceholder": "Nazwa talii (opcjonalnie)",
+    "commander": "Dowódca",
+    "secondCommander": "Drugi dowódca",
+    "markPreferred": "Oznacz jako preferowany",
+    "addAcceptedDeck": "Dodaj akceptowaną talię",
+    "hint": "Tylko pody z tej samej puli. Dodatkowe talie pozwalają na flex do innego bracketu."
+  },
+  "commanderPicker": {
+    "searchCommander": "Szukaj dowódcy",
+    "searchPartner": "Dowódca, który może sparować z {{name}}",
+    "removeCommander": "Usuń {{name}}",
+    "artworkFor": "Ilustracja dla",
+    "loadingArtwork": "Ładowanie ilustracji…"
+  },
+  "challengePack": {
+    "title": "Paczka wyzwań",
+    "description": "Tylko predefiniowane prymitywy. Zapisanie tworzy nową wersję i nigdy nie zmienia paczki już używanej przez to wydarzenie.",
+    "copyOfficial": "Kopiuj oficjalną",
+    "startBlank": "Zacznij od pustej",
+    "saveNewVersion": "Zapisz nową wersję",
+    "editHint": "Skopiuj oficjalną paczkę lub zacznij od pustej przed edycją.",
+    "packName": "Nazwa paczki",
+    "descriptionLabel": "Opis",
+    "addChallenge": "Dodaj wyzwanie",
+    "id": "Id",
+    "name": "Nazwa",
+    "category": "Kategoria",
+    "points": "Punkty",
+    "primitive": "Prymityw",
+    "threshold": "Próg",
+    "confirmationQuestion": "Pytanie potwierdzające",
+    "defaultConfirmation": "Czy to się wydarzyło przy stole?",
+    "newClaimName": "Nowe roszczenie",
+    "newClaimDescription": "Przyznaj to przy stole."
+  },
+  "treacheryRole": {
+    "treachery": "Treachery",
+    "receivedRole": "Otrzymałeś rolę",
+    "handDeviceTo": "Przekaż urządzenie {{name}}",
+    "lookAwayIdentity": "Wszyscy inni powinni odwrócić wzrok, zanim tożsamość zostanie ujawniona.",
+    "lookAwayScreen": "Upewnij się, że nikt nie widzi twojego ekranu przed ujawnieniem.",
+    "reveal": "Ujawnij",
+    "yourRole": "Twoja rola",
+    "identityAlt": "{{name}}, tożsamość {{role}}",
+    "illustratedBy": "Ilustracja: {{artist}}",
+    "yourObjective": "Twój cel",
+    "unveiledToTable": "Ujawnione przy stole",
+    "unveilWarning": "Wszyscy przy twoim stole zobaczą tę tożsamość. Jej zdolność musi zostać rozwiązana w grze.",
+    "confirmUnveil": "Potwierdź ujawnienie",
+    "unveilToTable": "Ujawnij przy stole",
+    "hideAndPass": "Ukryj i przekaż",
+    "hideIdentity": "Ukryj moją tożsamość"
+  },
+  "modeRulesSheet": {
+    "closeRules": "Zamknij zasady",
+    "backToGame": "Wróć do gry"
+  },
+  "assassinTargets": {
+    "title": "Tajne kontrakty",
+    "chooseOwnName": "Wybierz tylko swoje imię.",
+    "closeContracts": "Zamknij kontrakty",
+    "handDeviceTo": "Przekaż urządzenie {{name}}",
+    "lookAway": "Wszyscy inni powinni odwrócić wzrok, zanim kontrakt zostanie ujawniony.",
+    "revealTarget": "Ujawnij mój cel",
+    "yourTarget": "Twój cel",
+    "noActiveTarget": "Brak aktywnego celu",
+    "marksScored": "Zdobyte punkty: {{count}}",
+    "hideAndPass": "Ukryj i przekaż",
+    "allContractsChecked": "Wszystkie kontrakty sprawdzone"
+  },
+  "scheme": {
+    "ongoingScheme": "Spisek ciągły",
+    "scheme": "Spisek",
+    "pastScheme": "Miniony spisek",
+    "abandon": "Porzuć {{name}}",
+    "ongoingSchemes": "Spiski ciągłe",
+    "graveyard": "Cmentarz · {{count}}",
+    "nextScheme": "Następny spisek",
+    "remainingInDeck": "{{count}} pozostało w talii",
+    "scryfallCredit": "Obraz karty przez Scryfall. Magic: The Gathering jest © Wizards of the Coast."
+  },
+  "dungeon": {
+    "takeInitiativeTitle": "Przejąć inicjatywę?",
+    "takeInitiativeEnter": "To również wchodzi do Undercity. Przejmij ją tylko wtedy, gdy stół właśnie dał ją temu miejscu.",
+    "takeInitiativeWait": "Zakończ lub opuść obecny dungeon, zanim otworzy się Undercity. Przejmij inicjatywę tylko wtedy, gdy stół właśnie dał ją temu miejscu.",
+    "takeInitiativeAndEnter": "Przejmij inicjatywę i wejdź do Undercity",
+    "takeInitiative": "Przejmij inicjatywę",
+    "alreadyHoldInitiative": "Masz już inicjatywę",
+    "takeAndEnterUndercity": "Przejmij inicjatywę i wejdź do Undercity",
+    "completed": "{{name}} (ukończone)",
+    "ventureInto": "Wejdź do {{name}}",
+    "done": "Gotowe",
+    "ventureTo": "Idź do {{room}}: {{effect}}",
+    "releaseInitiative": "Zwolnij inicjatywę",
+    "undoRoom": "Cofnij pokój",
+    "closeDungeon": "Zamknij dungeon"
+  },
+  "treacheryRolesSheet": {
+    "title": "Tajne tożsamości",
+    "chooseOwnName": "Wybierz tylko swoje imię.",
+    "closeIdentities": "Zamknij tożsamości",
+    "allIdentitiesChecked": "Wszystkie tożsamości sprawdzone"
+  },
+  "tracker": {
+    "gameRules": "Zasady gry",
+    "loadingRoles": "Ładowanie ról…",
+    "start": "Start",
+    "readRules": "Czytaj zasady",
+    "readyToBegin": "Gotowy do startu",
+    "readyToBeginHint": "Rozpocznij mecz, gdy wszyscy usiądą, lub najpierw przeczytaj zasady.",
+    "dealContracts": "Rozdaj kontrakty",
+    "dealContractsTitle": "Rozdaj tajne kontrakty",
+    "dealContractsHint": "Każdy gracz otrzymuje prywatny cel. Urządzenie będzie przekazywane, by każdy kontrakt sprawdzić w tajemnicy.",
+    "dealIdentities": "Rozdaj tożsamości",
+    "dealIdentitiesTitle": "Rozdaj tajne tożsamości",
+    "dealIdentitiesHint": "Każdy gracz otrzymuje ukrytą tożsamość. Urządzenie będzie przekazywane, by każdą przeczytać w tajemnicy.",
+    "chooseStarPositions": "Wybierz pozycje Star",
+    "starPositionsHint": "Gracze obok siebie to sojusznicy. Dotknij dwóch graczy, by zamienić pozycje, lub wylosuj cały krąg.",
+    "randomPositions": "Losowe pozycje",
+    "confirmPositions": "Potwierdź pozycje",
+    "adjacentPlayersAlly": "Sąsiedni\ngracze sojuszni",
+    "buildEmperorTeams": "Utwórz drużyny Emperor",
+    "chooseTeamA": "Wybierz trzech graczy do Drużyny A.",
+    "randomTeams": "Losowe drużyny",
+    "resetTeams": "Resetuj drużyny",
+    "teamEmperor": "Imperator drużyny {{team}}",
+    "randomEmperors": "Losowi Imperatorzy",
+    "confirmTeams": "Potwierdź drużyny",
+    "chooseArchenemy": "Wybierz Archenemy",
+    "chooseArchenemyHint": "Archenemy staje przeciw trzem pozostałym. Obie strony dzielą 60 życia. Archenemy gra pierwszy, dobiera w tej turze i uruchamia spisek w każdej pierwszej fazie głównej.",
+    "confirmArchenemy": "Potwierdź Archenemy",
+    "chooseAllies": "Wybierz sojuszników",
+    "chooseAlliesHint": "Wybierz dwóch graczy do pierwszej drużyny. Pozostali dwaj tworzą drużynę przeciwną. Drużyny dzielą 60 życia i tury; reszta pozostaje oddzielna.",
+    "emperor": "Imperator",
+    "emperorRange": "Imperator · zasięg 2",
+    "leader": "Lider",
+    "general": "Generał",
+    "generalRange": "Generał · zasięg 1",
+    "marks": "{{count}} punktów",
+    "winner": "Zwycięzca",
+    "turnPhone": "Obróć telefon, by zobaczyć całą planszę",
+    "matchMenu": "Menu meczu",
+    "matchMenuElapsed": "Menu meczu. {{clock}} upłynęło",
+    "matchMenuPaused": ", w pauzie",
+    "matchMenuDayNight": ", jest {{phase}}",
+    "day": "dzień",
+    "night": "noc",
+    "closeMatchMenu": "Zamknij menu meczu",
+    "match": "Mecz",
+    "firstScheme": "Pierwszy spisek",
+    "nextScheme": "Następny spisek",
+    "resume": "Wznów",
+    "pause": "Pauza",
+    "undo": "Cofnij",
+    "challenges": "Wyzwania",
+    "checkTarget": "Sprawdź cel",
+    "checkMyRole": "Sprawdź moją rolę",
+    "dayButton": "Dzień",
+    "nightButton": "Noc",
+    "playerLost": "Gracz przegrał",
+    "gameWonBy": "Grę wygrał",
+    "won": "{{name}} wygrał",
+    "doneRequeue": "Gotowe i wróć do kolejki",
+    "savingChallenges": "Zapisywanie wyzwań…",
+    "quitToHome": "Wyjdź na start",
+    "quitHint": "Gra jest zachowana — otwórz ją ponownie ze strony głównej.",
+    "secretContracts": "Tajne kontrakty",
+    "secretIdentities": "Tajne tożsamości",
+    "whoEliminated": "Kto wyeliminował {{name}}?",
+    "whoEliminatedHint": "Gracz zdobywa punkt tylko wtedy, gdy to był jego przypisany cel. Łańcuch kontraktów i tak postępuje.",
+    "noPlayerUnknown": "Brak gracza / nieznany",
+    "revealedIdentity": "Ujawniona tożsamość Treachery",
+    "closeRevealedIdentity": "Zamknij ujawnioną tożsamość",
+    "commanderChallenges": "Wyzwania Commander",
+    "challengeCompleted": "{{name}} ukończone",
+    "challengeFallback": "Wyzwanie",
+    "matchResult": "Wynik meczu",
+    "wins": "{{name}} wygrywa",
+    "reviewBoard": "Przejrzyj planszę",
+    "yes": "Tak",
+    "no": "Nie",
+    "yesTheyLost": "Tak, przegrał",
+    "noStillIn": "Nie, nadal w grze",
+    "openCounters": "Otwórz liczniki dla {{name}}",
+    "commanderDamageOn": "Obrażenia od dowódcy na {{name}}",
+    "countersFor": "Liczniki dla {{name}}",
+    "countersTitle": "Liczniki dla {{name}}",
+    "closeCounters": "Zamknij liczniki",
+    "closeChallenges": "Zamknij wyzwania",
+    "sharedCommanderDamage": "Wspólne obrażenia od dowódcy",
+    "closeCommanderDamage": "Zamknij obrażenia od dowódcy",
+    "highestCommanderDamage": "Najwyższe obrażenia od dowódcy na {{name}}: {{value}} od {{commander}}",
+    "noCommanderDamage": "Brak obrażeń od dowódcy na {{name}}",
+    "removeCommanderDamage": "Usuń obrażenia od dowódcy od {{name}} gracza {{owner}}",
+    "addCommanderDamage": "Dodaj obrażenia od dowódcy od {{name}} gracza {{owner}}",
+    "isMonarch": "{{name}} jest monarchą",
+    "makeMonarch": "Uczyń {{name}} monarchą",
+    "enduringStory": "{{name}} {{has}} trwałą historię",
+    "cityBlessing": "{{name}} {{has}} błogosławieństwo miasta",
+    "has": "ma",
+    "doesNotHave": "nie ma",
+    "didLose": "Czy {{name}} przegrał grę?",
+    "thisTeam": "Ta drużyna",
+    "didTheyLose": "Czy przegrali?",
+    "poisonPrompt": "{{name}} ma {{count}} znaczników trucizny. Czy przegrał?",
+    "sharedPoisonPrompt": "{{subject}} ma {{count}} wspólnych znaczników trucizny. {{lose}}",
+    "hitPrompt": "{{name}} posiada {{count}} wygnanych kart ze znacznikami hit. Czy przegrał?",
+    "commanderPrompt": "{{name}} otrzymał {{damage}} obrażeń od dowódcy od {{from}}. Czy przegrał?",
+    "sharedCommanderPrompt": "{{subject}} otrzymał {{damage}} obrażeń od dowódcy od {{from}}. {{lose}}",
+    "lifePrompt": "{{name}} ma {{life}} punktów życia. Czy przegrał?",
+    "sharedLifePrompt": "{{subject}} ma {{life}} punktów życia. {{lose}}",
+    "anotherCommander": "innego dowódcy",
+    "addLife": "Dodaj 1 punkt życia. Przytrzymaj, by dodać więcej.",
+    "removeLife": "Usuń 1 punkt życia. Przytrzymaj, by usunąć więcej.",
+    "addLifeFor": "Dodaj życie dla {{name}}",
+    "removeLifeFor": "Usuń życie dla {{name}}",
+    "addLifeLabel": "Dodaj życie · {{name}}",
+    "removeLifeLabel": "Usuń życie · {{name}}",
+    "deleteDigit": "Usuń cyfrę",
+    "add": "Dodaj",
+    "removeVerb": "Usuń",
+    "lower": "Obniż {{label}}",
+    "raise": "Podnieś {{label}}",
+    "seatColour": "Kolor miejsca dla {{name}}",
+    "dungeonFor": "Dungeon dla {{name}}",
+    "dungeonInitiative": "Dungeon i inicjatywa dla {{name}}. {{title}}",
+    "dungeonInitiativeActive": "{{name}} ma inicjatywę · {{filled}} z {{total}} unikalnych dungeonów",
+    "dungeonInitiativeCompleted": "{{name}} ukończył {{filled}} z {{total}} unikalnych dungeonów",
+    "counterOn": "{{label}} na {{name}}: {{value}}",
+    "counterFor": "{{label}} dla {{name}}",
+    "claimFor": "Roszczenie dla {{name}}",
+    "challengesSubtitle": "Te same wyzwania dla każdego gracza · punkty nigdy nie wpływają na dopasowanie",
+    "counters": {
+      "poison": "Trucizna",
+      "tax": "Podatek dowódcy",
+      "acorn": "Żołędzie",
+      "energy": "Energia",
+      "experience": "Doświadczenie",
+      "hit": "Trafienia Etraty",
+      "rad": "Radiacja",
+      "ring": "Pokusa Pierścienia",
+      "speed": "Prędkość",
+      "ticket": "Bilety"
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import { COMMANDER_POOLS } from '@podyguard/shared';
+import { useTranslation } from 'react-i18next';
 import { CommanderPicker } from './CommanderPicker';
 import {
   canHaveSecondCommander,
@@ -24,11 +25,15 @@ export function DeckEditor({
   decks,
   onChange,
   disabled,
+  requireCommanders = true,
 }: {
   decks: DeckFormRow[];
   onChange: (next: DeckFormRow[]) => void;
   disabled?: boolean;
+  requireCommanders?: boolean;
 }) {
+  const { t } = useTranslation();
+
   function update(index: number, patch: Partial<DeckFormRow>) {
     onChange(
       decks.map((row, rowIndex) =>
@@ -40,7 +45,7 @@ export function DeckEditor({
   return (
     <div className="mb-4 flex flex-col gap-3">
       <p className="text-xs font-medium tracking-[0.14em] text-muted uppercase">
-        Commander decks
+        {t('deckEditor.title')}
       </p>
       {decks.map((row, index) => (
         <div
@@ -69,38 +74,40 @@ export function DeckEditor({
             className="mb-2 h-10 w-full rounded-lg border border-muted/20 bg-void/70 px-3 text-sm outline-none placeholder:text-muted/50 focus:border-neon/70"
             value={row.name}
             disabled={disabled}
-            placeholder="Deck name (optional)"
+            placeholder={t('deckEditor.deckNamePlaceholder')}
             onChange={(change) => update(index, { name: change.target.value })}
           />
-          <div className="mb-2 space-y-2">
-            <CommanderPicker
-              label="Commander"
-              value={row.commanders[0] ?? null}
-              disabled={disabled}
-              onChange={(commander) =>
-                update(index, {
-                  commanders: commander ? [commander] : [],
-                })
-              }
-            />
-            {row.commanders[0] &&
-            (row.commanders[1] ||
-              canHaveSecondCommander(row.commanders[0])) ? (
+          {requireCommanders ? (
+            <div className="mb-2 space-y-2">
               <CommanderPicker
-                label="Second commander"
-                value={row.commanders[1] ?? null}
-                partnerFor={row.commanders[0]}
+                label={t('deckEditor.commander')}
+                value={row.commanders[0] ?? null}
                 disabled={disabled}
                 onChange={(commander) =>
                   update(index, {
-                    commanders: commander
-                      ? [row.commanders[0]!, commander]
-                      : [row.commanders[0]!],
+                    commanders: commander ? [commander] : [],
                   })
                 }
               />
-            ) : null}
-          </div>
+              {row.commanders[0] &&
+              (row.commanders[1] ||
+                canHaveSecondCommander(row.commanders[0])) ? (
+                <CommanderPicker
+                  label={t('deckEditor.secondCommander')}
+                  value={row.commanders[1] ?? null}
+                  partnerFor={row.commanders[0]}
+                  disabled={disabled}
+                  onChange={(commander) =>
+                    update(index, {
+                      commanders: commander
+                        ? [row.commanders[0]!, commander]
+                        : [row.commanders[0]!],
+                    })
+                  }
+                />
+              ) : null}
+            </div>
+          ) : null}
           <div className="flex items-center justify-between gap-2">
             <button
               type="button"
@@ -118,7 +125,9 @@ export function DeckEditor({
                 )
               }
             >
-              {row.preference === 'preferred' ? 'Preferred' : 'Mark preferred'}
+              {row.preference === 'preferred'
+                ? t('common.preferred')
+                : t('deckEditor.markPreferred')}
             </button>
             {decks.length > 1 ? (
               <Button
@@ -130,7 +139,7 @@ export function DeckEditor({
                   onChange(decks.filter((_, rowIndex) => rowIndex !== index))
                 }
               >
-                Remove
+                {t('common.remove')}
               </Button>
             ) : null}
           </div>
@@ -154,12 +163,10 @@ export function DeckEditor({
             ])
           }
         >
-          Add accepted deck
+          {t('deckEditor.addAcceptedDeck')}
         </Button>
       ) : null}
-      <p className="text-muted text-xs">
-        Same-pool pods only. Extra decks let matching flex you into another bracket.
-      </p>
+      <p className="text-muted text-xs">{t('deckEditor.hint')}</p>
     </div>
   );
 }

@@ -6,6 +6,8 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { createPortal } from 'react-dom';
 import {
   Award,
@@ -44,12 +46,14 @@ import {
 } from 'lucide-react';
 import {
   OFFICIAL_COMMANDER_CHALLENGES,
-  TREACHERY_ROLE_INFO,
   treacheryIdentityById,
+  usesCommanderRules,
   type ChallengeDetectionMode,
   type ChallengePack,
   type GameMode,
   type PublicTreacheryIdentity,
+  type RulesFormat,
+  resolveRulesFormat,
 } from '@podyguard/shared';
 import {
   applyTrackerAction,
@@ -62,7 +66,10 @@ import {
   POISON_LIMIT,
   pickFirstPlayer,
   primaryCommanderId,
+  STARTING_LIFE,
+  startingLifeForMode,
   teamForPlayer,
+  commanderOpponents,
   treacheryLeaderId,
   uniqueCompletedDungeonCount,
   worstCommanderDamage,
@@ -103,12 +110,15 @@ import {
   detectAutomaticChallenges,
   detectedConfirmation,
 } from './challenges';
+import i18n from '../i18n';
 import { forgetActiveMatch } from '../active-match';
+import { seatColor } from '../match-config';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { DungeonIcon } from '../ui/DungeonIcon';
 import { RingIcon } from '../ui/RingIcon';
 import { ThemeToggle, setAppTheme } from '../ui/ThemeToggle';
+import { LanguageSwitcher } from '../ui/LanguageSwitcher';
 import { cx } from '../ui/cx';
 
 type Props = {
@@ -136,6 +146,7 @@ type Props = {
   ) => Promise<boolean>;
   challengePack?: ChallengePack;
   gameMode?: GameMode;
+  rulesFormat?: RulesFormat | null;
   /** Treachery's public Leader replaces the normal random starting seat. */
   startingPlayerId?: string;
   onCheckRole?: () => void;
@@ -184,17 +195,18 @@ function PreGameScreen({
   contentClassName?: string;
   onCancel?: () => void;
 }) {
+  const { t } = useTranslation();
   /*
     Setup stays in the phone's natural orientation. Only the running life
     tracker locks or CSS-rotates into landscape.
   */
   return (
     <section className={boardScreenClass(false, 'roomy')}>
-      <div className="flex min-h-0 flex-1 flex-col gap-3 landscape:flex-row landscape:items-stretch">
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 landscape:flex-row landscape:items-center landscape:justify-center landscape:gap-6 landscape:px-4">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain landscape:flex-none landscape:max-h-full">
           <div
             className={cx(
-              'mx-auto flex min-h-full w-full flex-col justify-center py-1 landscape:h-full',
+              'mx-auto flex min-h-full w-full flex-col justify-center py-1',
               contentClassName,
             )}
           >
@@ -202,12 +214,12 @@ function PreGameScreen({
           </div>
         </div>
         {actions || onCancel ? (
-          <div className="mx-auto flex w-full max-w-xs shrink-0 flex-col justify-center gap-3 pb-2 [&>button]:w-full landscape:mr-6 landscape:w-56 landscape:max-w-none landscape:self-stretch landscape:pb-0">
+          <div className="mx-auto flex w-full max-w-xs shrink-0 flex-col gap-3 pb-2 [&>button]:w-full landscape:mx-0 landscape:w-52 landscape:max-w-none landscape:self-center landscape:pb-0">
             {actions}
             {onCancel ? (
               <Button variant="glass" onClick={onCancel}>
                 <LogOut size={16} aria-hidden />
-                Cancel
+                {t('common.cancel')}
               </Button>
             ) : null}
           </div>
@@ -411,12 +423,12 @@ function clockClearance(
     }
     const column = index % 3;
     if (column === 0) {
-      return 'landscape:pr-8';
+      return 'landscape:pr-0';
     }
     if (column === 1) {
-      return 'landscape:px-10';
+      return 'landscape:px-0';
     }
-    return 'landscape:pl-8';
+    return 'landscape:pl-0';
   }
   return '';
 }
@@ -451,14 +463,27 @@ export function TrackerView({
   onChallengeComplete,
   challengePack = OFFICIAL_COMMANDER_CHALLENGES,
   gameMode = 'commander',
+  rulesFormat: rulesFormatProp = null,
   startingPlayerId,
   onCheckRole,
   revealedIdentities = {},
   dealTreachery = false,
 }: Props) {
+  const { t } = useTranslation();
+  const rulesFormat = resolveRulesFormat(gameMode, rulesFormatProp);
   const initial = useMemo<TrackerHistory>(
-    () => ({ present: restore(storageKey, players, persist), past: [] }),
-    [storageKey, players, persist],
+    () => ({
+      present: restore(
+        storageKey,
+        players,
+        persist,
+        startingLifeForMode(gameMode, rulesFormat),
+        gameMode,
+        rulesFormat,
+      ),
+      past: [],
+    }),
+    [storageKey, players, persist, gameMode, rulesFormat],
   );
   const [{ present: state, past }, dispatch] = useReducer(
     reduceHistory,
@@ -554,6 +579,7 @@ export function TrackerView({
         .join(' & ')
     : null;
   const confirmation = detectedConfirmation(state, challengePack);
+  const commanderRules = usesCommanderRules(gameMode, rulesFormat);
   const archenemyBoard =
     gameMode === 'archenemy-commander' &&
     state.teamMode === 'archenemy-commander';
@@ -605,7 +631,7 @@ export function TrackerView({
   }, [revealedIdentities, state.treacheryIdentities, state.treacheryUnveiled]);
 
   useEffect(() => {
-    if (!onChallengeComplete) {
+    if (!commanderRules || !onChallengeComplete) {
       return;
     }
     for (const detected of detectAutomaticChallenges(state, challengePack)) {
@@ -634,12 +660,12 @@ export function TrackerView({
           setChallengeError(
             caught instanceof Error
               ? caught.message
-              : 'Could not save challenge progress.',
+              : t('common.errors.saveChallenge'),
           );
         })
         .finally(() => setChallengeSaving((count) => Math.max(0, count - 1)));
     }
-  }, [challengePack, challengeProgress, onChallengeComplete, state]);
+  }, [challengePack, challengeProgress, commanderRules, onChallengeComplete, state, t]);
 
   useEffect(() => {
     if (!challengeNotice) {
@@ -683,7 +709,7 @@ export function TrackerView({
       sessionStorage.removeItem(storageKey);
     } catch (caught) {
       setFinishError(
-        caught instanceof Error ? caught.message : 'Could not submit the result.',
+        caught instanceof Error ? caught.message : t('common.errors.submitResult'),
       );
       setFinishing(false);
     }
@@ -773,7 +799,7 @@ export function TrackerView({
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Game rules"
+          aria-label={t('tracker.gameRules')}
           className="bg-void/70 fixed inset-0 z-[70] flex items-center justify-center p-4 pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] backdrop-blur-md"
           onClick={(event) => {
             if (event.target === event.currentTarget) {
@@ -783,6 +809,7 @@ export function TrackerView({
         >
           <ModeRulesSheet
             gameMode={gameMode}
+            rulesFormat={rulesFormat}
             onClose={() => setRulesOpen(false)}
           />
         </div>,
@@ -802,7 +829,7 @@ export function TrackerView({
             <>
               <Button variant="glass" onClick={() => setRulesOpen(true)}>
                 <BookOpen size={16} aria-hidden />
-                Read rules
+                {t('tracker.readRules')}
               </Button>
               <Button
                 variant="neon"
@@ -819,7 +846,7 @@ export function TrackerView({
                 }
               >
                 <Shuffle size={16} aria-hidden />
-                Deal contracts
+                {t('tracker.dealContracts')}
               </Button>
             </>
           }
@@ -827,11 +854,10 @@ export function TrackerView({
           <div className="text-center">
             <Crosshair size={34} aria-hidden className="text-danger mx-auto mb-3" />
             <h2 className="font-display mb-2 text-2xl font-bold">
-              Deal secret contracts
+              {t('tracker.dealContractsTitle')}
             </h2>
             <p className="text-muted text-sm">
-              Every player receives one private target. The device will be
-              passed around so each contract can be checked in secret.
+              {t('tracker.dealContractsHint')}
             </p>
           </div>
         </PreGameScreen>
@@ -866,7 +892,7 @@ export function TrackerView({
             <>
               <Button variant="glass" onClick={() => setRulesOpen(true)}>
                 <BookOpen size={16} aria-hidden />
-                Read rules
+                {t('tracker.readRules')}
               </Button>
               <Button
                 variant="neon"
@@ -883,7 +909,7 @@ export function TrackerView({
                 }
               >
                 <Shuffle size={16} aria-hidden />
-                Deal identities
+                {t('tracker.dealIdentities')}
               </Button>
             </>
           }
@@ -891,11 +917,10 @@ export function TrackerView({
           <div className="text-center">
             <Shield size={34} aria-hidden className="text-plasma mx-auto mb-3" />
             <h2 className="font-display mb-2 text-2xl font-bold">
-              Deal secret identities
+              {t('tracker.dealIdentitiesTitle')}
             </h2>
             <p className="text-muted text-sm">
-              Every player receives one hidden identity. The device will be
-              passed around so each one can be read in secret.
+              {t('tracker.dealIdentitiesHint')}
             </p>
           </div>
         </PreGameScreen>
@@ -935,8 +960,7 @@ export function TrackerView({
           actions={
             <>
               <p className="text-muted hidden text-center text-sm landscape:block">
-                Players beside each other are allies. Tap two players to
-                exchange their positions, or randomise the whole circle.
+                {t('tracker.starPositionsHint')}
               </p>
               <Button
                 variant="glass"
@@ -950,11 +974,11 @@ export function TrackerView({
                 }}
               >
                 <Shuffle size={16} aria-hidden />
-                Random positions
+                {t('tracker.randomPositions')}
               </Button>
               <Button variant="glass" onClick={() => setRulesOpen(true)}>
                 <BookOpen size={16} aria-hidden />
-                Read rules
+                {t('tracker.readRules')}
               </Button>
               <Button
                 variant="neon"
@@ -965,17 +989,16 @@ export function TrackerView({
                   })
                 }
               >
-                Confirm positions
+                {t('tracker.confirmPositions')}
               </Button>
             </>
           }
         >
           <h2 className="font-display mb-2 text-center text-2xl font-bold">
-            Choose Star positions
+            {t('tracker.chooseStarPositions')}
           </h2>
           <p className="text-muted mb-3 text-center text-sm landscape:hidden">
-            Players beside each other are allies. Tap two players to exchange
-            their positions, or randomise the whole circle.
+            {t('tracker.starPositionsHint')}
           </p>
           <div className="relative mx-auto aspect-square w-full max-w-[min(22rem,70dvh)] landscape:max-w-[min(24rem,78dvh)]">
             <svg
@@ -1022,14 +1045,15 @@ export function TrackerView({
                       : 'border-neon/40 bg-void/95 text-ink',
                   )}
                 >
-                  {player?.name}
+                  <SeatLabel
+                    index={playerSeatIndex(state.players, playerId)}
+                    name={player?.name ?? playerId}
+                  />
                 </button>
               );
             })}
-            <p className="text-muted absolute top-1/2 left-1/2 w-24 -translate-x-1/2 -translate-y-1/2 text-center text-[0.65rem] font-semibold tracking-wide uppercase">
-              Adjacent
-              <br />
-              players ally
+            <p className="text-muted absolute top-1/2 left-1/2 w-24 -translate-x-1/2 -translate-y-1/2 text-center text-[0.65rem] font-semibold tracking-wide uppercase whitespace-pre-line">
+              {t('tracker.adjacentPlayersAlly')}
             </p>
           </div>
         </PreGameScreen>
@@ -1073,11 +1097,11 @@ export function TrackerView({
                   onClick={() => setSelectedEmperors(randomEmperors(teams))}
                 >
                   <Crown size={16} aria-hidden />
-                  Random Emperors
+                  {t('tracker.randomEmperors')}
                 </Button>
                 <Button variant="glass" onClick={() => setRulesOpen(true)}>
                   <BookOpen size={16} aria-hidden />
-                  Read rules
+                  {t('tracker.readRules')}
                 </Button>
                 <Button
                   variant="neon"
@@ -1103,26 +1127,25 @@ export function TrackerView({
                     });
                   }}
                 >
-                  Confirm teams
+                  {t('tracker.confirmTeams')}
                 </Button>
               </>
             ) : (
               <Button variant="glass" onClick={() => setRulesOpen(true)}>
                 <BookOpen size={16} aria-hidden />
-                Read rules
+                {t('tracker.readRules')}
               </Button>
             )
           }
         >
           <h2 className="font-display mb-2 text-center text-2xl font-bold">
-            Build the Emperor teams
+            {t('tracker.buildEmperorTeams')}
           </h2>
           <p className="text-muted mb-4 text-center text-sm">
-            Choose three players for Team A. The other three become Team B,
-            then choose the Emperor in the middle of each team.
+            {t('tracker.chooseTeamA')}
           </p>
           <div className="mb-3 grid grid-cols-3 gap-2">
-            {state.players.map((player) => {
+            {state.players.map((player, index) => {
               const teamA = selectedEmperorTeam.includes(player.id);
               return (
                 <button
@@ -1146,7 +1169,7 @@ export function TrackerView({
                         : 'border-muted/25 bg-void/70 text-ink',
                   )}
                 >
-                  {player.name}
+                  <SeatLabel index={index} name={player.name} />
                 </button>
               );
             })}
@@ -1164,7 +1187,7 @@ export function TrackerView({
               }}
             >
               <Shuffle size={15} aria-hidden />
-              Random teams
+              {t('tracker.randomTeams')}
             </Button>
             <Button
               size="sm"
@@ -1175,7 +1198,7 @@ export function TrackerView({
                 setSelectedEmperors([null, null]);
               }}
             >
-              Reset teams
+              {t('tracker.resetTeams')}
             </Button>
           </div>
           {teamsReady ? (
@@ -1186,30 +1209,36 @@ export function TrackerView({
                   className="border-muted/20 rounded-xl border p-3"
                 >
                   <legend className="text-muted px-1 text-xs font-bold tracking-wide uppercase">
-                    Team {teamIndex === 0 ? 'A' : 'B'} Emperor
+                    {t('tracker.teamEmperor', {
+                      team: teamIndex === 0 ? 'A' : 'B',
+                    })}
                   </legend>
                   <div className="grid grid-cols-3 gap-2">
-                    {team.map((playerId) => (
-                      <button
-                        key={playerId}
-                        type="button"
-                        onClick={() =>
-                          setEmperor(teamIndex as 0 | 1, playerId)
-                        }
-                        className={cx(
-                          'rounded-lg border p-2 text-xs font-semibold transition',
-                          selectedEmperors[teamIndex] === playerId
-                            ? 'border-warning bg-warning/15 text-warning'
-                            : 'border-muted/25 bg-void/70 text-ink',
-                        )}
-                      >
-                        {
-                          state.players.find(
-                            (player) => player.id === playerId,
-                          )?.name
-                        }
-                      </button>
-                    ))}
+                    {team.map((playerId) => {
+                      const seat = state.players.find(
+                        (player) => player.id === playerId,
+                      );
+                      return (
+                        <button
+                          key={playerId}
+                          type="button"
+                          onClick={() =>
+                            setEmperor(teamIndex as 0 | 1, playerId)
+                          }
+                          className={cx(
+                            'rounded-lg border p-2 text-xs font-semibold transition',
+                            selectedEmperors[teamIndex] === playerId
+                              ? 'border-warning bg-warning/15 text-warning'
+                              : 'border-muted/25 bg-void/70 text-ink',
+                          )}
+                        >
+                          <SeatLabel
+                            index={playerSeatIndex(state.players, playerId)}
+                            name={seat?.name ?? playerId}
+                          />
+                        </button>
+                      );
+                    })}
                   </div>
                 </fieldset>
               ))}
@@ -1234,7 +1263,7 @@ export function TrackerView({
             <>
               <Button variant="glass" onClick={() => setRulesOpen(true)}>
                 <BookOpen size={16} aria-hidden />
-                Read rules
+                {t('tracker.readRules')}
               </Button>
               <Button
                 variant="glass"
@@ -1246,7 +1275,7 @@ export function TrackerView({
                 }
               >
                 <Shuffle size={16} aria-hidden />
-                Random
+                {t('common.random')}
               </Button>
               <Button
                 variant="neon"
@@ -1271,21 +1300,19 @@ export function TrackerView({
                   });
                 }}
               >
-                Confirm Archenemy
+                {t('tracker.confirmArchenemy')}
               </Button>
             </>
           }
         >
           <h2 className="font-display mb-2 text-center text-2xl font-bold">
-            Choose the Archenemy
+            {t('tracker.chooseArchenemy')}
           </h2>
           <p className="text-muted mb-5 text-center text-sm">
-            The Archenemy faces the other three players. Both sides share 60
-            life. The Archenemy goes first, draws on that turn, and sets a
-            scheme in motion during each first main phase.
+            {t('tracker.chooseArchenemyHint')}
           </p>
           <div className="grid grid-cols-2 gap-3">
-            {state.players.map((player) => (
+            {state.players.map((player, index) => (
               <button
                 key={player.id}
                 type="button"
@@ -1297,7 +1324,7 @@ export function TrackerView({
                     : 'border-muted/25 bg-void/70 text-ink',
                 )}
               >
-                {player.name}
+                <SeatLabel index={index} name={player.name} />
               </button>
             ))}
           </div>
@@ -1324,7 +1351,7 @@ export function TrackerView({
             <>
               <Button variant="glass" onClick={() => setRulesOpen(true)}>
                 <BookOpen size={16} aria-hidden />
-                Read rules
+                {t('tracker.readRules')}
               </Button>
               <Button
                 variant="glass"
@@ -1337,14 +1364,14 @@ export function TrackerView({
                 }
               >
                 <Shuffle size={16} aria-hidden />
-                Random
+                {t('common.random')}
               </Button>
               <Button
                 variant="glass"
                 disabled={selectedAllies.length === 0}
                 onClick={() => setSelectedAllies([])}
               >
-                Reset
+                {t('common.reset')}
               </Button>
               <Button
                 variant="neon"
@@ -1362,21 +1389,19 @@ export function TrackerView({
                   })
                 }
               >
-                Confirm teams
+                {t('tracker.confirmTeams')}
               </Button>
             </>
           }
         >
           <h2 className="font-display mb-2 text-center text-2xl font-bold">
-            Choose the allies
+            {t('tracker.chooseAllies')}
           </h2>
           <p className="text-muted mb-5 text-center text-sm">
-            Select two players for the first team. The other two players become
-            the opposing team. Teams share 60 life and turns; all other
-            player controls stay separate.
+            {t('tracker.chooseAlliesHint')}
           </p>
           <div className="mb-5 grid grid-cols-2 gap-3">
-            {state.players.map((player) => {
+            {state.players.map((player, index) => {
               const ally = selectedAllies.includes(player.id);
               return (
                 <button
@@ -1399,7 +1424,7 @@ export function TrackerView({
                         : 'border-muted/25 bg-void/70 text-ink',
                   )}
                 >
-                  {player.name}
+                  <SeatLabel index={index} name={player.name} />
                 </button>
               );
             })}
@@ -1411,7 +1436,7 @@ export function TrackerView({
                   .map((id) => state.players.find((row) => row.id === id)?.name)
                   .join(' & ')}
               </span>{' '}
-              versus{' '}
+              {t('common.versus')}{' '}
               <span className="text-warning">
                 {remaining.map((player) => player.name).join(' & ')}
               </span>
@@ -1437,7 +1462,7 @@ export function TrackerView({
                 onClick={() => setRulesOpen(true)}
               >
                 <BookOpen size={20} aria-hidden />
-                Read rules
+                {t('tracker.readRules')}
               </Button>
               <Button
                 variant="neon"
@@ -1447,18 +1472,18 @@ export function TrackerView({
                 onClick={() => send({ type: 'first', playerId: firstSeatId })}
               >
                 {gameMode === 'treachery' && !firstSeatId
-                  ? 'Loading roles…'
-                  : 'Start'}
+                  ? t('tracker.loadingRoles')
+                  : t('tracker.start')}
               </Button>
             </>
           }
         >
           <div className="text-center">
             <h2 className="font-display mb-2 text-2xl font-bold">
-              Ready to begin
+              {t('tracker.readyToBegin')}
             </h2>
             <p className="text-muted text-sm">
-              Start the match when everyone is seated, or read the rules first.
+              {t('tracker.readyToBeginHint')}
             </p>
           </div>
         </PreGameScreen>
@@ -1506,6 +1531,22 @@ export function TrackerView({
             {spotlightIds.has(player.id) ? (
               <span aria-hidden className={spotlightWash} />
             ) : null}
+            {emperorBoard && state.emperorIds.includes(player.id) ? (
+              <span className="absolute top-2 right-2 z-20">
+                <Badge tone="crown" title={t('tracker.emperorRange')}>
+                  <Star size={12} aria-hidden />
+                  <span className="sr-only">{t('tracker.emperor')}</span>
+                </Badge>
+              </span>
+            ) : null}
+            {leaderId === player.id ? (
+              <span className="absolute top-2 right-2 z-20">
+                <Badge tone="crown" title={t('tracker.leader')}>
+                  <Star size={12} aria-hidden />
+                  <span className="sr-only">{t('tracker.leader')}</span>
+                </Badge>
+              </span>
+            ) : null}
             <div
               className={cx(
                 'relative z-10 flex shrink-0 items-start justify-between gap-2',
@@ -1526,6 +1567,7 @@ export function TrackerView({
                   player={player}
                   disabled={Boolean(state.winnerId)}
                   hidePoison={sharedLifeBoard}
+                  hideTax={!commanderRules}
                   onOpen={() => setCounterPlayerId(player.id)}
                 />
               </span>
@@ -1533,27 +1575,15 @@ export function TrackerView({
                 {gameMode === 'assassin' ? (
                   <Badge tone="crown">
                     <Crosshair size={12} aria-hidden />
-                    {state.assassinScores[player.id] ?? 0} marks
+                    {t('tracker.marks', {
+                      count: state.assassinScores[player.id] ?? 0,
+                    })}
                   </Badge>
                 ) : null}
-                {emperorBoard ? (
-                  state.emperorIds.includes(player.id) ? (
-                    <Badge tone="crown" title="Emperor · range 2">
-                      <Star size={12} aria-hidden />
-                      <span className="sr-only">Emperor</span>
-                    </Badge>
-                  ) : (
-                    <Badge tone="idle" title="General · range 1">
-                      <span className="sr-only">General</span>
-                      G
-                    </Badge>
-                  )
-                ) : null}
-                {/* The Leader is public knowledge, so the seat can say so. */}
-                {leaderId === player.id ? (
-                  <Badge tone="crown" title="Leader">
-                    <Star size={12} aria-hidden />
-                    <span className="sr-only">Leader</span>
+                {emperorBoard && !state.emperorIds.includes(player.id) ? (
+                  <Badge tone="idle" title={t('tracker.generalRange')}>
+                    <span className="sr-only">{t('tracker.general')}</span>
+                    G
                   </Badge>
                 ) : null}
                 {publicIdentities[player.id] ? (
@@ -1566,7 +1596,7 @@ export function TrackerView({
                   </button>
                 ) : null}
                 {winnerIds.has(player.id) ? (
-                  <Badge tone="live">Winner</Badge>
+                  <Badge tone="live">{t('tracker.winner')}</Badge>
                 ) : null}
               </span>
             </div>
@@ -1583,6 +1613,7 @@ export function TrackerView({
                 flash={
                   lifeDelta?.playerId === player.id ? lifeDelta.amount : null
                 }
+                color={seatColor(index)}
                 disabled={Boolean(state.winnerId)}
                 onStep={(delta) =>
                   send({
@@ -1617,13 +1648,13 @@ export function TrackerView({
             >
               <div className="flex min-w-0 shrink-0 gap-1 overflow-x-auto [scrollbar-width:none] landscape:flex-1 [&::-webkit-scrollbar]:hidden">
                 <IconButton
-                  title={`Open counters for ${player.name}`}
+                  title={t('tracker.openCounters', { name: player.name })}
                   disabled={Boolean(state.winnerId)}
                   onClick={() => setCounterPlayerId(player.id)}
                 >
                   <SlidersHorizontal size={18} aria-hidden />
                 </IconButton>
-                {!sharedLifeBoard ? (
+                {!sharedLifeBoard && commanderRules ? (
                   <CommanderDamageChip
                     state={state}
                     player={player}
@@ -1644,8 +1675,8 @@ export function TrackerView({
                 <IconButton
                   title={
                     player.id === state.monarchId
-                      ? `${player.name} is the monarch`
-                      : `Make ${player.name} the monarch`
+                      ? t('tracker.isMonarch', { name: player.name })
+                      : t('tracker.makeMonarch', { name: player.name })
                   }
                   active={player.id === state.monarchId}
                   disabled={Boolean(state.winnerId)}
@@ -1668,7 +1699,12 @@ export function TrackerView({
                   onClick={() => setDungeonPlayerId(player.id)}
                 />
                 <IconButton
-                  title={`${player.name} ${player.enduringStory ? 'has' : 'does not have'} an enduring story`}
+                  title={t('tracker.enduringStory', {
+                    name: player.name,
+                    has: t(
+                      player.enduringStory ? 'tracker.has' : 'tracker.doesNotHave',
+                    ),
+                  })}
                   active={player.enduringStory}
                   disabled={Boolean(state.winnerId)}
                   onClick={() =>
@@ -1686,7 +1722,12 @@ export function TrackerView({
                   <BookOpen size={18} aria-hidden />
                 </IconButton>
                 <IconButton
-                  title={`${player.name} ${player.cityBlessing ? 'has' : 'does not have'} the city's blessing`}
+                  title={t('tracker.cityBlessing', {
+                    name: player.name,
+                    has: t(
+                      player.cityBlessing ? 'tracker.has' : 'tracker.doesNotHave',
+                    ),
+                  })}
                   active={player.cityBlessing}
                   disabled={Boolean(state.winnerId)}
                   onClick={() =>
@@ -1709,11 +1750,11 @@ export function TrackerView({
               <div
                 role="dialog"
                 aria-modal="true"
-                aria-label={`Did ${player.name} lose the game?`}
+                aria-label={t('tracker.didLose', { name: player.name })}
                 className="bg-void/90 absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 overflow-auto rounded-xl p-4 text-center backdrop-blur-sm"
               >
                 <p className="font-display text-base font-semibold">
-                  {lossPrompt(player, state)}
+                  {lossPrompt(player, state, t)}
                 </p>
                 <div className="flex flex-wrap justify-center gap-2">
                   <Button
@@ -1730,7 +1771,7 @@ export function TrackerView({
                       });
                     }}
                   >
-                    Yes, they lost
+                    {t('tracker.yesTheyLost')}
                   </Button>
                   <Button
                     size="sm"
@@ -1742,7 +1783,7 @@ export function TrackerView({
                       })
                     }
                   >
-                    No, still in
+                    {t('tracker.noStillIn')}
                   </Button>
                 </div>
               </div>
@@ -1772,10 +1813,10 @@ export function TrackerView({
                 <div
                   key={team.join(':')}
                   className={cx(
-                    'absolute left-1/2 z-20 flex h-16 w-[min(34rem,78vw)] -translate-x-1/2 items-center gap-1.5 px-2',
-                    index === 0
-                      ? 'top-1/4 -translate-y-1/2'
-                      : 'top-3/4 -translate-y-1/2',
+                    'absolute left-1/2 z-20 flex w-[min(34rem,78vw)] -translate-x-1/2 -translate-y-[58%] flex-col items-stretch gap-0 px-1',
+                    // Both sides shift toward the bottom of their row so the
+                    // total clears the ally mark above (not mirrored about centre).
+                    index === 0 ? 'top-[30%]' : 'top-[80%]',
                   )}
                 >
                   <LifeRow
@@ -1785,6 +1826,10 @@ export function TrackerView({
                         ? lifeDelta.amount
                         : null
                     }
+                    compact
+                    colors={team.map((id) =>
+                      seatColor(playerSeatIndex(state.players, id)),
+                    )}
                     disabled={Boolean(state.winnerId)}
                     onStep={(delta) =>
                       send({
@@ -1801,22 +1846,25 @@ export function TrackerView({
                     }
                   />
                   {/*
-                    Poison and commander damage ride the shared life total: the
-                    side has one of each, so the seats do not each carry a copy.
+                    Shared poison and commander damage sit under the life total.
+                    Poison only appears when the side has any; it sits to the
+                    left and nudges the damage chip off centre.
                   */}
-                  <div className="flex shrink-0 items-center gap-1">
+                  <div className="flex items-center justify-center gap-3 translate-x-1.5">
                     <CounterBadges
                       player={first}
                       disabled={Boolean(state.winnerId)}
                       onlyPoison
                       onOpen={() => setCounterPlayerId(first.id)}
                     />
-                    <CommanderDamageChip
-                      state={state}
-                      player={first}
-                      disabled={Boolean(state.winnerId)}
-                      onOpen={() => setCommanderPlayerId(first.id)}
-                    />
+                    {commanderRules ? (
+                      <CommanderDamageChip
+                        state={state}
+                        player={first}
+                        disabled={Boolean(state.winnerId)}
+                        onOpen={() => setCommanderPlayerId(first.id)}
+                      />
+                    ) : null}
                   </div>
                 </div>
               );
@@ -1831,8 +1879,8 @@ export function TrackerView({
       */}
       <button
         type="button"
-        title="Match menu"
-        aria-label={`Match menu. ${formatClock(elapsed)} elapsed${state.pausedAt ? ', paused' : ''}${state.dayNight ? `, it is ${state.dayNight}` : ''}`}
+        title={t('tracker.matchMenu')}
+        aria-label={`${t('tracker.matchMenuElapsed', { clock: formatClock(elapsed) })}${state.pausedAt ? t('tracker.matchMenuPaused') : ''}${state.dayNight ? t('tracker.matchMenuDayNight', { phase: t(state.dayNight === 'day' ? 'tracker.day' : 'tracker.night') }) : ''}`}
         onClick={() => {
           setMenuOpen(true);
         }}
@@ -1939,7 +1987,7 @@ export function TrackerView({
       {landscape ? null : (
         <p className="text-muted bg-void/70 pointer-events-none absolute inset-x-0 bottom-1 z-30 mx-auto flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.65rem]">
           <RotateCw size={12} aria-hidden />
-          Turn your phone for the full board
+          {t('tracker.turnPhone')}
         </p>
       )}
       {/*
@@ -1951,7 +1999,8 @@ export function TrackerView({
         they stay rendered and decoded out of sight. Columns are laid out the
         same in every sheet, so each crop is decoded once and shared.
       */}
-      {state.players.map((seat) => {
+      {commanderRules
+        ? state.players.map((seat) => {
         const open = commanderPlayerId === seat.id;
         return createPortal(
           <div
@@ -1959,7 +2008,7 @@ export function TrackerView({
             aria-modal={open}
             aria-hidden={!open}
             inert={!open}
-            aria-label={`Commander damage on ${seat.name}`}
+            aria-label={t('tracker.commanderDamageOn', { name: seat.name })}
             className={cx(
               'bg-void/95 fixed inset-x-0 top-0 flex h-[100dvh] p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm',
               open ? 'z-50' : 'pointer-events-none z-30',
@@ -1981,13 +2030,14 @@ export function TrackerView({
           document.body,
           seat.id,
         );
-      })}
+      })
+        : null}
       {counterPlayer
         ? createPortal(
             <div
               role="dialog"
               aria-modal="true"
-              aria-label={`Counters for ${counterPlayer.name}`}
+              aria-label={t('tracker.countersFor', { name: counterPlayer.name })}
               className="bg-void/95 fixed inset-x-0 top-0 z-50 flex h-[100dvh] p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm"
               onClick={(event) => {
                 if (event.target === event.currentTarget) {
@@ -1998,6 +2048,7 @@ export function TrackerView({
               <CounterSheet
                 player={counterPlayer}
                 disabled={Boolean(state.winnerId)}
+                includeCommanderTax={commanderRules}
                 dispatch={(action) => send({ type: 'action', action })}
                 onClose={() => setCounterPlayerId(null)}
               />
@@ -2010,7 +2061,7 @@ export function TrackerView({
             <div
               role="dialog"
               aria-modal="true"
-              aria-label="Match menu"
+              aria-label={t('tracker.matchMenu')}
               className="bg-void/95 fixed inset-x-0 top-0 z-50 flex h-[100dvh] p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm"
               onClick={(event) => {
                 if (event.target === event.currentTarget) {
@@ -2033,10 +2084,14 @@ export function TrackerView({
                     ? () => setTreacheryRolesOpen(true)
                     : onCheckRole
                 }
-                onChallenges={() => {
-                  setMenuOpen(false);
-                  setChallengesOpen(true);
-                }}
+                onChallenges={
+                  commanderRules && onChallengeComplete
+                    ? () => {
+                        setMenuOpen(false);
+                        setChallengesOpen(true);
+                      }
+                    : undefined
+                }
                 onRules={() => {
                   setMenuOpen(false);
                   setRulesOpen(true);
@@ -2078,7 +2133,7 @@ export function TrackerView({
             <div
               role="dialog"
               aria-modal="true"
-              aria-label="Secret contracts"
+              aria-label={t('tracker.secretContracts')}
               className="bg-void/95 fixed inset-x-0 top-0 z-[70] flex h-[100dvh] p-2 backdrop-blur-sm"
             >
               <AssassinTargetsSheet
@@ -2096,7 +2151,7 @@ export function TrackerView({
             <div
               role="dialog"
               aria-modal="true"
-              aria-label="Secret identities"
+              aria-label={t('tracker.secretIdentities')}
               className="bg-void/95 fixed inset-x-0 top-0 z-[70] flex h-[100dvh] p-2 backdrop-blur-sm"
             >
               <TreacheryRolesSheet
@@ -2121,7 +2176,7 @@ export function TrackerView({
             <div
               role="dialog"
               aria-modal="true"
-              aria-label={`Who eliminated ${assassinVictim.name}?`}
+              aria-label={t('tracker.whoEliminated', { name: assassinVictim.name })}
               className="bg-void/95 fixed inset-0 z-[75] flex items-center justify-center p-4 backdrop-blur-sm"
             >
               <section className="border-muted/25 bg-hull w-full max-w-md rounded-2xl border p-5 text-center">
@@ -2131,11 +2186,10 @@ export function TrackerView({
                   className="text-danger mx-auto mb-2"
                 />
                 <h4 className="font-display mb-1 text-lg font-bold">
-                  Who eliminated {assassinVictim.name}?
+                  {t('tracker.whoEliminated', { name: assassinVictim.name })}
                 </h4>
                 <p className="text-muted mb-4 text-sm">
-                  A player scores only if this was their assigned mark. The
-                  contract chain advances either way.
+                  {t('tracker.whoEliminatedHint')}
                 </p>
                 <div className="mb-3 grid grid-cols-2 gap-2">
                   {state.players
@@ -2177,7 +2231,7 @@ export function TrackerView({
                     setAssassinVictimId(null);
                   }}
                 >
-                  No player / unknown
+                  {t('tracker.noPlayerUnknown')}
                 </Button>
               </section>
             </div>,
@@ -2189,7 +2243,7 @@ export function TrackerView({
             <div
               role="dialog"
               aria-modal="true"
-              aria-label="Revealed Treachery identity"
+              aria-label={t('tracker.revealedIdentity')}
               className="bg-void/90 fixed inset-0 z-[80] flex items-center justify-center p-4 backdrop-blur-md"
               onClick={(event) => {
                 if (event.target === event.currentTarget) {
@@ -2205,7 +2259,7 @@ export function TrackerView({
                 />
                 <button
                   type="button"
-                  aria-label="Close revealed identity"
+                  aria-label={t('tracker.closeRevealedIdentity')}
                   className="bg-void/90 text-ink absolute top-2 right-2 flex size-9 items-center justify-center rounded-full"
                   onClick={() => setPublicIdentityPlayerId(null)}
                 >
@@ -2221,7 +2275,7 @@ export function TrackerView({
             <div
               role="dialog"
               aria-modal="true"
-              aria-label="Commander challenges"
+              aria-label={t('tracker.commanderChallenges')}
               className="bg-void/95 fixed inset-x-0 top-0 z-50 flex h-[100dvh] p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm"
             >
               <ChallengeSheet
@@ -2244,14 +2298,17 @@ export function TrackerView({
                         (row) => row.id === challengeId,
                       );
                       setChallengeNotice(
-                        `${challenge?.name ?? 'Challenge'} completed`,
+                        t('tracker.challengeCompleted', {
+                          name:
+                            challenge?.name ?? t('tracker.challengeFallback'),
+                        }),
                       );
                     }
                   } catch (caught) {
                     setChallengeError(
                       caught instanceof Error
                         ? caught.message
-                        : 'Could not save challenge progress.',
+                        : t('common.errors.saveChallenge'),
                     );
                   }
                 }}
@@ -2266,7 +2323,7 @@ export function TrackerView({
             <div
               role="dialog"
               aria-modal="true"
-              aria-label={`Dungeon for ${dungeonPlayer.name}`}
+              aria-label={t('tracker.dungeonFor', { name: dungeonPlayer.name })}
               /*
                 Height is what a dungeon card is short of, so the frame keeps
                 only a hairline top and bottom. Width it has to spare, so the
@@ -2300,7 +2357,7 @@ export function TrackerView({
             <div
               role="dialog"
               aria-modal="true"
-              aria-label="Match result"
+              aria-label={t('tracker.matchResult')}
               className="bg-void/70 fixed inset-x-0 top-0 z-[60] flex h-[100dvh] items-center justify-center p-3 backdrop-blur-sm"
             >
               <section className="border-warning/40 bg-hull/95 w-full max-w-xs rounded-2xl border p-4 text-center shadow-[0_18px_50px_-24px_var(--color-void)]">
@@ -2310,7 +2367,7 @@ export function TrackerView({
                   className="text-warning fill-warning/30 mx-auto mb-2"
                 />
                 <h2 className="font-display truncate text-lg leading-tight font-bold">
-                  {winnerName} wins
+                  {t('tracker.wins', { name: winnerName })}
                 </h2>
                 <p className="text-muted mb-3 font-mono text-sm tabular-nums">
                   {formatClock(elapsed)}
@@ -2330,7 +2387,7 @@ export function TrackerView({
                         >
                           <span className="truncate">{player.name}</span>
                           <span className="shrink-0 font-semibold">
-                            {TREACHERY_ROLE_INFO[role].name}
+                            {t(`modes.treachery.roles.${role}.name`)}
                           </span>
                         </li>
                       ) : null;
@@ -2369,7 +2426,9 @@ export function TrackerView({
                             .then((created) => {
                               if (created) {
                                 setChallengeNotice(
-                                  `${confirmation.challenge.name} completed`,
+                                  t('tracker.challengeCompleted', {
+                                    name: confirmation.challenge.name,
+                                  }),
                                 );
                               }
                             })
@@ -2378,7 +2437,7 @@ export function TrackerView({
                               setChallengeError(
                                 caught instanceof Error
                                   ? caught.message
-                                  : 'Could not save challenge progress.',
+                                  : t('common.errors.saveChallenge'),
                               );
                             })
                             .finally(() =>
@@ -2388,7 +2447,7 @@ export function TrackerView({
                             );
                         }}
                       >
-                        Yes
+                        {t('tracker.yes')}
                       </Button>
                       <Button
                         size="sm"
@@ -2400,7 +2459,7 @@ export function TrackerView({
                           setConfirmationDismissed(true);
                         }}
                       >
-                        No
+                        {t('tracker.no')}
                       </Button>
                     </div>
                   </div>
@@ -2413,10 +2472,10 @@ export function TrackerView({
                     onClick={() => void finish()}
                   >
                     {finishing
-                      ? 'Submitting…'
+                      ? t('common.submitting')
                       : challengeSaving > 0
-                        ? 'Saving challenges…'
-                        : 'Done & requeue'}
+                        ? t('tracker.savingChallenges')
+                        : t('tracker.doneRequeue')}
                   </Button>
                   {past.length > 0 ? (
                     <Button
@@ -2427,7 +2486,7 @@ export function TrackerView({
                       }}
                     >
                       <Undo2 size={14} aria-hidden />
-                      Undo
+                      {t('tracker.undo')}
                     </Button>
                   ) : null}
                   <Button
@@ -2435,7 +2494,7 @@ export function TrackerView({
                     size="sm"
                     onClick={() => setResultHidden(true)}
                   >
-                    Review board
+                    {t('tracker.reviewBoard')}
                   </Button>
                 </div>
                 {finishError ? (
@@ -2640,13 +2699,14 @@ function MatchMenu({
   onFinish: () => Promise<void>;
   onQuit: () => void;
   onCheckRole?: () => void;
-  onChallenges: () => void;
+  onChallenges?: () => void;
   onRules: () => void;
   onScheme?: () => void;
   onTargets?: () => void;
   onPlayerLost?: (playerId: string) => void;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const paused = Boolean(state.pausedAt);
   const decided = Boolean(state.winnerId);
   const winner = state.players.find((row) => row.id === state.winnerId) ?? null;
@@ -2657,13 +2717,14 @@ function MatchMenu({
     <section className="flex h-full w-full flex-col">
       <header className="mb-1 flex shrink-0 items-center justify-between gap-3">
         <h4 className="font-display truncate text-sm leading-tight font-bold">
-          Match
+          {t('tracker.match')}
         </h4>
         <div className="flex items-center gap-2">
+          <LanguageSwitcher />
           <ThemeToggle />
           <button
             type="button"
-            aria-label="Close match menu"
+            aria-label={t('tracker.closeMatchMenu')}
             onClick={onClose}
             className="border-muted/25 text-muted hover:text-ink hover:border-muted/50 flex size-8 shrink-0 items-center justify-center rounded-full border transition"
           >
@@ -2694,7 +2755,9 @@ function MatchMenu({
               onClick={onScheme}
             >
               <Sparkles size={14} aria-hidden />
-              {state.currentSchemeId ? 'Next scheme' : 'First scheme'}
+              {state.currentSchemeId
+                ? t('tracker.nextScheme')
+                : t('tracker.firstScheme')}
             </Button>
           ) : null}
           <Button
@@ -2709,24 +2772,26 @@ function MatchMenu({
             ) : (
               <Pause size={14} aria-hidden />
             )}
-            {paused ? 'Resume' : 'Pause'}
+            {paused ? t('tracker.resume') : t('tracker.pause')}
           </Button>
           <Button size="sm" variant="glass" disabled={!canUndo} onClick={onUndo}>
             <Undo2 size={14} aria-hidden />
-            Undo
+            {t('tracker.undo')}
           </Button>
-          <Button size="sm" variant="glass" onClick={onChallenges}>
-            <Sparkles size={14} aria-hidden />
-            Challenges
-          </Button>
+          {onChallenges ? (
+            <Button size="sm" variant="glass" onClick={onChallenges}>
+              <Sparkles size={14} aria-hidden />
+              {t('tracker.challenges')}
+            </Button>
+          ) : null}
           <Button size="sm" variant="glass" onClick={onRules}>
             <BookOpen size={14} aria-hidden />
-            Read rules
+            {t('tracker.readRules')}
           </Button>
           {onTargets ? (
             <Button size="sm" variant="glass" onClick={onTargets}>
               <Crosshair size={14} aria-hidden />
-              Check target
+              {t('tracker.checkTarget')}
             </Button>
           ) : null}
           {onCheckRole ? (
@@ -2739,7 +2804,7 @@ function MatchMenu({
               }}
             >
               <Eye size={14} aria-hidden />
-              Check my role
+              {t('tracker.checkMyRole')}
             </Button>
           ) : null}
           {/*
@@ -2755,7 +2820,7 @@ function MatchMenu({
             }}
           >
             <Sun size={14} aria-hidden />
-            Day
+            {t('tracker.dayButton')}
           </Button>
           <Button
             size="sm"
@@ -2766,7 +2831,7 @@ function MatchMenu({
             }}
           >
             <Moon size={14} aria-hidden />
-            Night
+            {t('tracker.nightButton')}
           </Button>
         </div>
         {/*
@@ -2777,7 +2842,7 @@ function MatchMenu({
         */}
         <div className="flex flex-wrap items-center justify-center gap-2 border-t border-muted/15 pt-3">
           <span className="text-muted font-mono text-[0.68rem] tracking-wide uppercase">
-            Player lost
+            {t('tracker.playerLost')}
           </span>
           {state.players.map((seat) => (
             <Button
@@ -2805,7 +2870,9 @@ function MatchMenu({
         */}
         <div className="flex flex-wrap items-center justify-center gap-2 border-t border-muted/15 pt-3">
           <span className="text-muted font-mono text-[0.68rem] tracking-wide uppercase">
-            {menuWinnerName ? `${menuWinnerName} won` : 'Game won by'}
+            {menuWinnerName
+              ? t('tracker.won', { name: menuWinnerName })
+              : t('tracker.gameWonBy')}
           </span>
           {state.players.map((seat) => (
             <Button
@@ -2828,7 +2895,7 @@ function MatchMenu({
               variant="neon"
               onClick={() => void onFinish()}
             >
-              Done & requeue
+              {t('tracker.doneRequeue')}
             </Button>
           ) : null}
         </div>
@@ -2840,15 +2907,45 @@ function MatchMenu({
         <div className="border-danger/25 flex w-full flex-col items-center gap-1.5 border-t pt-3">
           <Button size="sm" variant="danger" onClick={onQuit}>
             <LogOut size={14} aria-hidden />
-            Quit to home
+            {t('tracker.quitToHome')}
           </Button>
           <p className="text-muted text-center text-[0.65rem]">
-            The game is kept — reopen it from the home screen.
+            {t('tracker.quitHint')}
           </p>
         </div>
       </div>
     </section>
   );
+}
+
+/** Colour bubble + name on setup pickers so the table can claim a seat early. */
+function SeatLabel({
+  index,
+  name,
+}: {
+  index: number;
+  name: string;
+}) {
+  const { t } = useTranslation();
+  return (
+    <span className="inline-flex items-center justify-center gap-1.5">
+      <span
+        className="size-2.5 shrink-0 rounded-full shadow-[0_0_0_1px_rgba(0,0,0,0.25)]"
+        style={{ backgroundColor: seatColor(index) }}
+        title={t('tracker.seatColour', { name })}
+        aria-hidden
+      />
+      <span>{name}</span>
+    </span>
+  );
+}
+
+function playerSeatIndex(
+  players: Array<{ id: string }>,
+  playerId: string,
+): number {
+  const index = players.findIndex((player) => player.id === playerId);
+  return index < 0 ? 0 : index;
 }
 
 function LifeRow({
@@ -2857,27 +2954,60 @@ function LifeRow({
   disabled,
   onStep,
   onEnter,
+  compact = false,
+  color,
+  colors,
 }: {
   life: number;
   flash: number | null;
   disabled: boolean;
   onStep: (delta: number) => void;
   onEnter: (sign: 1 | -1) => void;
+  /** Shared-life chrome: no spare vertical padding around the total. */
+  compact?: boolean;
+  /** Seat colour for a single life total. */
+  color?: string;
+  /** Shared-life sides: blend every teammate’s colour across the total. */
+  colors?: string[];
 }) {
   // Slot is always five tabular digits wide; denser totals shrink to fit it.
   const digits = String(Math.abs(life)).length;
+  const palette = colors?.length ? colors : color ? [color] : [];
+  const lifeStyle =
+    palette.length > 1
+      ? {
+          backgroundImage: `linear-gradient(90deg, ${palette.join(', ')})`,
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text' as const,
+          color: 'transparent',
+        }
+      : palette[0]
+        ? { color: palette[0] }
+        : undefined;
   return (
-    <div className="relative z-10 flex min-h-0 flex-1 items-center gap-1.5 py-1">
+    <div
+      className={cx(
+        'relative z-10 flex min-h-0 items-center',
+        compact ? 'gap-1' : 'flex-1 gap-1.5 py-1',
+      )}
+    >
       <LifeButton
         delta={-1}
         disabled={disabled}
+        compact={compact}
         onClick={() => onStep(-1)}
         onLongPress={() => onEnter(-1)}
       />
-      <div className="relative flex min-w-0 flex-1 flex-col items-center justify-center self-stretch">
+      <div
+        className={cx(
+          'relative flex min-w-0 flex-1 flex-col items-center justify-center',
+          !compact && 'self-stretch',
+        )}
+      >
         <p
           className={cx(
-            'font-display text-neon w-[6.5rem] shrink-0 text-center leading-none font-bold tabular-nums landscape:w-[7.5rem]',
+            'font-display w-[6.5rem] shrink-0 text-center leading-none font-bold tabular-nums landscape:w-[7.5rem]',
+            !lifeStyle && 'text-neon',
             digits >= 5
               ? 'text-[clamp(0.85rem,3.2vh,1.35rem)] landscape:text-[clamp(0.85rem,5vh,1.35rem)]'
               : digits >= 4
@@ -2887,6 +3017,7 @@ function LifeRow({
                   : 'text-[clamp(1.75rem,6.5vh,3.25rem)] landscape:text-[clamp(1.75rem,11vh,3.25rem)]',
             onArt,
           )}
+          style={lifeStyle}
         >
           {life}
         </p>
@@ -2905,6 +3036,7 @@ function LifeRow({
       <LifeButton
         delta={1}
         disabled={disabled}
+        compact={compact}
         onClick={() => onStep(1)}
         onLongPress={() => onEnter(1)}
       />
@@ -2917,12 +3049,15 @@ function LifeButton({
   disabled,
   onClick,
   onLongPress,
+  compact = false,
 }: {
   delta: number;
   disabled: boolean;
   onClick: () => void;
   onLongPress: () => void;
+  compact?: boolean;
 }) {
+  const { t } = useTranslation();
   const timer = useRef<number | null>(null);
   const longPressed = useRef(false);
 
@@ -2937,7 +3072,9 @@ function LifeButton({
     <button
       type="button"
       disabled={disabled}
-      aria-label={`${delta > 0 ? 'Add' : 'Remove'} 1 life. Long press for a larger amount.`}
+      aria-label={
+        delta > 0 ? t('tracker.addLife') : t('tracker.removeLife')
+      }
       onPointerDown={(event) => {
         if (disabled || event.button !== 0) {
           return;
@@ -2971,7 +3108,8 @@ function LifeButton({
       onContextMenu={(event) => event.preventDefault()}
       className={cx(
         plateAccent,
-        'font-display border-neon/50 text-neon flex h-full max-h-16 min-h-9 w-14 shrink-0 items-center justify-center rounded-xl border text-lg font-bold transition select-none disabled:opacity-40',
+        'font-display border-neon/50 text-neon flex w-14 shrink-0 items-center justify-center rounded-xl border text-lg font-bold transition select-none disabled:opacity-40',
+        compact ? 'h-9' : 'h-full max-h-16 min-h-9',
       )}
     >
       {delta > 0 ? '+1' : '-1'}
@@ -2990,16 +3128,21 @@ function LifeAmountPad({
   onConfirm: (amount: number) => void;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const [digits, setDigits] = useState('');
   const amount = Number(digits);
   const ready = digits.length > 0 && amount > 0;
-  const verb = sign > 0 ? 'Add' : 'Remove';
+  const verb = sign > 0 ? t('tracker.add') : t('tracker.removeVerb');
 
   return (
     <div
       role="dialog"
       aria-modal="true"
-      aria-label={`${verb} life for ${playerName}`}
+      aria-label={
+        sign > 0
+          ? t('tracker.addLifeFor', { name: playerName })
+          : t('tracker.removeLifeFor', { name: playerName })
+      }
       className="bg-void/95 fixed inset-0 z-[80] flex items-center justify-center p-4 backdrop-blur-md"
       onClick={(event) => {
         if (event.target === event.currentTarget) {
@@ -3011,7 +3154,9 @@ function LifeAmountPad({
         <header className="mb-3 flex items-start justify-between gap-3">
           <div>
             <p className="text-muted text-xs font-bold tracking-wider uppercase">
-              {verb} life · {playerName}
+              {sign > 0
+                ? t('tracker.addLifeLabel', { name: playerName })
+                : t('tracker.removeLifeLabel', { name: playerName })}
             </p>
             <p
               className={cx(
@@ -3025,7 +3170,7 @@ function LifeAmountPad({
           </div>
           <button
             type="button"
-            aria-label="Close"
+            aria-label={t('common.close')}
             onClick={onClose}
             className="border-muted/25 text-muted flex size-8 items-center justify-center rounded-full border"
           >
@@ -3055,7 +3200,7 @@ function LifeAmountPad({
           )}
           <button
             type="button"
-            aria-label="Delete digit"
+            aria-label={t('tracker.deleteDigit')}
             onClick={() => setDigits((current) => current.slice(0, -1))}
             className={cx(
               plate,
@@ -3133,6 +3278,7 @@ function Counter({
   onChange: (delta: number) => void;
   children: React.ReactNode;
 }) {
+  const { t } = useTranslation();
   return (
     <div
       role="group"
@@ -3144,8 +3290,8 @@ function Counter({
     >
       <button
         type="button"
-        title={`Lower ${label}`}
-        aria-label={`Lower ${label}`}
+        title={t('tracker.lower', { label })}
+        aria-label={t('tracker.lower', { label })}
         disabled={disabled || value <= 0}
         onClick={() => onChange(-step)}
         className="hover:text-neon flex items-center px-1.5 py-1 transition disabled:opacity-30"
@@ -3158,8 +3304,8 @@ function Counter({
       </span>
       <button
         type="button"
-        title={`Raise ${label}`}
-        aria-label={`Raise ${label}`}
+        title={t('tracker.raise', { label })}
+        aria-label={t('tracker.raise', { label })}
         disabled={disabled || (maximum !== undefined && value >= maximum)}
         onClick={() => onChange(step)}
         className="hover:text-neon flex items-center px-1.5 py-1 transition disabled:opacity-30"
@@ -3180,69 +3326,70 @@ type CounterDefinition = {
   icon: (size: number) => React.ReactNode;
 };
 
+type CounterSpec = Omit<CounterDefinition, 'label'>;
+
 /*
   Poison and the commander tax have fields of their own, but on screen they are
   counters like any other, so one table feeds both the sheet and the badges and
   the two cannot drift apart.
 */
-const PLAYER_COUNTERS: CounterDefinition[] = [
+const COUNTER_SPECS: CounterSpec[] = [
   {
     id: 'poison',
-    label: 'Poison',
     danger: { warn: POISON_LIMIT - 3, alert: POISON_LIMIT },
     icon: (size) => <Skull size={size} aria-hidden />,
   },
   {
     id: 'tax',
-    label: 'Commander tax',
     step: COMMANDER_TAX_STEP,
     icon: (size) => <Coins size={size} aria-hidden />,
   },
   {
     id: 'acorn',
-    label: 'Acorns',
     icon: (size) => <Nut size={size} aria-hidden />,
   },
   {
     id: 'energy',
-    label: 'Energy',
     icon: (size) => <Zap size={size} aria-hidden />,
   },
   {
     id: 'experience',
-    label: 'Experience',
     icon: (size) => <Award size={size} aria-hidden />,
   },
   {
     id: 'hit',
-    label: 'Etrata hits',
     maximum: HIT_LIMIT,
     danger: { warn: HIT_LIMIT - 1, alert: HIT_LIMIT },
     icon: (size) => <Crosshair size={size} aria-hidden />,
   },
   {
     id: 'rad',
-    label: 'Radiation',
     icon: (size) => <Radiation size={size} aria-hidden />,
   },
   {
     id: 'ring',
-    label: 'Ring temptation',
     maximum: 4,
     icon: (size) => <RingIcon size={size} />,
   },
   {
     id: 'speed',
-    label: 'Speed',
     maximum: 4,
     icon: (size) => <Gauge size={size} aria-hidden />,
   },
   {
     id: 'ticket',
-    label: 'Tickets',
     icon: (size) => <Ticket size={size} aria-hidden />,
   },
 ];
+
+function counterDefinitions(
+  translate: TFunction = i18n.t.bind(i18n),
+): CounterDefinition[] {
+  return COUNTER_SPECS.map((spec) => ({
+    ...spec,
+    label: translate(`tracker.counters.${spec.id}`),
+  }));
+}
 
 function counterValue(
   player: TrackerPlayer,
@@ -3287,8 +3434,9 @@ function counterTone(definition: CounterDefinition, value: number): string {
 /** The counters a seat actually holds, in the order the sheet lists them. */
 export function heldCounters(
   player: TrackerPlayer,
+  definitions: CounterDefinition[] = counterDefinitions(),
 ): { definition: CounterDefinition; value: number; tone: string }[] {
-  return PLAYER_COUNTERS.map((definition) => ({
+  return definitions.map((definition) => ({
     definition,
     value: counterValue(player, definition.id),
   }))
@@ -3307,6 +3455,7 @@ function CounterBadges({
   disabled,
   onOpen,
   hidePoison = false,
+  hideTax = false,
   onlyPoison = false,
 }: {
   player: TrackerPlayer;
@@ -3314,15 +3463,21 @@ function CounterBadges({
   onOpen: () => void;
   /** Shared-life seats keep poison on the team chrome instead. */
   hidePoison?: boolean;
+  /** Normal Magic formats have no commander tax. */
+  hideTax?: boolean;
   /** Team chrome: only the shared poison pill. */
   onlyPoison?: boolean;
 }) {
+  const { t } = useTranslation();
   const rows = heldCounters(player).filter((row) => {
     if (onlyPoison) {
       return row.definition.id === 'poison';
     }
-    if (hidePoison) {
-      return row.definition.id !== 'poison';
+    if (hidePoison && row.definition.id === 'poison') {
+      return false;
+    }
+    if (hideTax && row.definition.id === 'tax') {
+      return false;
     }
     return true;
   });
@@ -3332,8 +3487,16 @@ function CounterBadges({
         <button
           key={definition.id}
           type="button"
-          title={`${definition.label} on ${player.name}: ${String(value)}`}
-          aria-label={`${definition.label} on ${player.name}: ${String(value)}`}
+          title={t('tracker.counterOn', {
+            label: definition.label,
+            name: player.name,
+            value,
+          })}
+          aria-label={t('tracker.counterOn', {
+            label: definition.label,
+            name: player.name,
+            value,
+          })}
           disabled={disabled}
           onClick={onOpen}
           /*
@@ -3370,6 +3533,7 @@ function ChallengeSheet({
   onClaim: (challengeId: string, participantId: string) => Promise<void>;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <section className="flex h-full w-full flex-col">
       <header className="mb-2 flex shrink-0 items-center justify-between gap-3">
@@ -3378,12 +3542,12 @@ function ChallengeSheet({
             {pack.name}
           </h4>
           <p className="text-muted truncate text-[0.65rem]">
-            Same challenges for every player · points never affect matching
+            {t('tracker.challengesSubtitle')}
           </p>
         </div>
         <button
           type="button"
-          aria-label="Close challenges"
+          aria-label={t('tracker.closeChallenges')}
           onClick={onClose}
           className="border-muted/25 text-muted hover:text-ink flex size-8 shrink-0 items-center justify-center rounded-full border"
         >
@@ -3393,7 +3557,7 @@ function ChallengeSheet({
       <div className="mb-2 flex shrink-0 flex-wrap gap-1.5">
         {players.map((player) => (
           <Badge key={player.id}>
-            {player.name} · {String(progress[player.id]?.points ?? 0)} pts
+            {player.name} · {t('host.pts', { count: progress[player.id]?.points ?? 0 })}
           </Badge>
         ))}
       </div>
@@ -3442,7 +3606,7 @@ function ChallengeSheet({
                     variant="glass"
                     onClick={() => void onClaim(challenge.id, player.id)}
                   >
-                    Claim for {player.name}
+                    {t('tracker.claimFor', { name: player.name })}
                   </Button>
                 );
               })}
@@ -3459,21 +3623,27 @@ function CounterSheet({
   disabled,
   dispatch,
   onClose,
+  includeCommanderTax = true,
 }: {
   player: TrackerPlayer;
   disabled: boolean;
   dispatch: (action: TrackerAction) => void;
   onClose: () => void;
+  includeCommanderTax?: boolean;
 }) {
+  const { t } = useTranslation();
+  const counters = counterDefinitions(t).filter(
+    (counter) => includeCommanderTax || counter.id !== 'tax',
+  );
   return (
     <section className="flex h-full w-full flex-col">
       <header className="mb-2 flex shrink-0 items-center justify-between gap-3">
         <h4 className="font-display truncate text-sm leading-tight font-bold">
-          Counters for {player.name}
+          {t('tracker.countersTitle', { name: player.name })}
         </h4>
         <button
           type="button"
-          aria-label="Close counters"
+          aria-label={t('tracker.closeCounters')}
           onClick={onClose}
           className="border-muted/25 text-muted hover:text-ink hover:border-muted/50 flex size-8 shrink-0 items-center justify-center rounded-full border transition"
         >
@@ -3481,10 +3651,13 @@ function CounterSheet({
         </button>
       </header>
       <div className="grid min-h-0 flex-1 grid-cols-2 content-center gap-2 overflow-y-auto landscape:grid-cols-4">
-        {PLAYER_COUNTERS.map((counter) => (
+        {counters.map((counter) => (
           <CounterCard key={counter.id} label={counter.label}>
             <Counter
-              label={`${counter.label.toLowerCase()} for ${player.name}`}
+              label={t('tracker.counterFor', {
+                label: counter.label,
+                name: player.name,
+              })}
               value={counterValue(player, counter.id)}
               step={counter.step}
               maximum={counter.maximum}
@@ -3536,14 +3709,19 @@ function CommanderDamageChip({
   disabled: boolean;
   onOpen: () => void;
 }) {
+  const { t } = useTranslation();
   const worst = worstCommanderDamage(state, player);
   const value = worst?.value ?? 0;
   return (
     <Chip
       title={
         worst
-          ? `Highest commander damage on ${player.name}: ${String(value)} from ${worst.commander}`
-          : `No commander damage on ${player.name}`
+          ? t('tracker.highestCommanderDamage', {
+              name: player.name,
+              value,
+              commander: worst.commander,
+            })
+          : t('tracker.noCommanderDamage', { name: player.name })
       }
       disabled={disabled}
       onClick={onOpen}
@@ -3660,15 +3838,24 @@ function DungeonButton({
   disabled: boolean;
   onClick: () => void;
 }) {
+  const { t } = useTranslation();
   const filled = Math.min(completed, DUNGEON_COUNT);
   const title = active
-    ? `${name} has the initiative · ${String(filled)} of ${String(DUNGEON_COUNT)} unique dungeons`
-    : `${name} has completed ${String(filled)} of ${String(DUNGEON_COUNT)} unique dungeons`;
+    ? t('tracker.dungeonInitiativeActive', {
+        name,
+        filled,
+        total: DUNGEON_COUNT,
+      })
+    : t('tracker.dungeonInitiativeCompleted', {
+        name,
+        filled,
+        total: DUNGEON_COUNT,
+      });
   return (
     <button
       type="button"
       title={title}
-      aria-label={`Dungeon and initiative for ${name}. ${title}`}
+      aria-label={t('tracker.dungeonInitiative', { name, title })}
       aria-pressed={active}
       disabled={disabled}
       onClick={onClick}
@@ -3702,38 +3889,60 @@ function DungeonButton({
   );
 }
 
-function lossPrompt(player: TrackerPlayer, state: TrackerState): string {
+function lossPrompt(
+  player: TrackerPlayer,
+  state: TrackerState,
+  t: TFunction,
+): string {
   const cause = player.pendingLoss;
   const shared =
     (state.teamMode === 'two-headed-giant' ||
       state.teamMode === 'archenemy-commander') &&
     teamForPlayer(state, player.id).length > 1;
-  const subject = shared ? 'This team' : player.name;
-  const lose = shared ? 'Did they lose?' : `Did ${player.name} lose?`;
+  const subject = shared ? t('tracker.thisTeam') : player.name;
+  const lose = shared
+    ? t('tracker.didTheyLose')
+    : t('tracker.didLose', { name: player.name });
   if (cause?.type === 'poison') {
     return shared
-      ? `${subject} has ${String(player.poison)} shared poison counters. ${lose}`
-      : `${player.name} has ${String(player.poison)} poison counters. Did they lose?`;
+      ? t('tracker.sharedPoisonPrompt', {
+          subject,
+          count: player.poison,
+          lose,
+        })
+      : t('tracker.poisonPrompt', { name: player.name, count: player.poison });
   }
   if (cause?.type === 'hit') {
-    return `${player.name} owns ${String(player.counters.hit)} exiled cards with hit counters. Did they lose?`;
+    return t('tracker.hitPrompt', {
+      name: player.name,
+      count: player.counters.hit,
+    });
   }
   if (cause?.type === 'commander') {
     const source = commanderById(state, cause.commanderId);
     const damage = player.commanderDamage[cause.commanderId] ?? 0;
     const from =
       source == null
-        ? 'another commander'
+        ? t('tracker.anotherCommander')
         : source.commander.name === source.owner.name
           ? source.owner.name
           : `${source.owner.name}'s ${source.commander.name}`;
     return shared
-      ? `${subject} has taken ${String(damage)} commander damage from ${from}. ${lose}`
-      : `${player.name} has taken ${String(damage)} commander damage from ${from}. Did they lose?`;
+      ? t('tracker.sharedCommanderPrompt', {
+          subject,
+          damage,
+          from,
+          lose,
+        })
+      : t('tracker.commanderPrompt', {
+          name: player.name,
+          damage,
+          from,
+        });
   }
   return shared
-    ? `${subject} is at ${String(player.life)} life. ${lose}`
-    : `${player.name} is at ${String(player.life)} life. Did they lose?`;
+    ? t('tracker.sharedLifePrompt', { subject, life: player.life, lose })
+    : t('tracker.lifePrompt', { name: player.name, life: player.life });
 }
 
 /**
@@ -3770,20 +3979,20 @@ function CommanderSheet({
   dispatch: (action: TrackerAction) => void;
   onClose: () => void;
 }) {
-  const teammates = new Set(teamForPlayer(state, player.id).map((row) => row.id));
-  const opponents = state.players.filter((other) => !teammates.has(other.id));
-  const shared = teammates.size > 1;
+  const { t } = useTranslation();
+  const opponents = commanderOpponents(state, player.id);
+  const shared = teamForPlayer(state, player.id).length > 1;
   return (
     <section className="flex h-full w-full flex-col">
       <header className="mb-2 flex shrink-0 items-center justify-between gap-3">
         <h4 className="font-display truncate text-sm leading-tight font-bold">
           {shared
-            ? 'Shared commander damage'
-            : `Commander damage on ${player.name}`}
+            ? t('tracker.sharedCommanderDamage')
+            : t('tracker.commanderDamageOn', { name: player.name })}
         </h4>
         <button
           type="button"
-          aria-label="Close commander damage"
+          aria-label={t('tracker.closeCommanderDamage')}
           onClick={onClose}
           className="border-muted/25 text-muted hover:text-ink hover:border-muted/50 flex size-8 shrink-0 items-center justify-center rounded-full border transition"
         >
@@ -3848,6 +4057,7 @@ function CommanderTile({
   disabled: boolean;
   onChange: (delta: number) => void;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="border-muted/20 bg-void/60 relative min-h-16 flex-1 overflow-hidden rounded-xl border">
       {artCropUri ? (
@@ -3866,7 +4076,7 @@ function CommanderTile({
       <div className="absolute inset-0 flex items-stretch">
         <button
           type="button"
-          aria-label={`Remove commander damage from ${owner}'s ${name}`}
+          aria-label={t('tracker.removeCommanderDamage', { owner, name })}
           disabled={disabled || value <= 0}
           onClick={() => onChange(-1)}
           className="from-void/80 text-ink flex flex-1 items-center justify-center bg-gradient-to-r to-transparent transition active:from-void disabled:opacity-30"
@@ -3883,7 +4093,7 @@ function CommanderTile({
         </span>
         <button
           type="button"
-          aria-label={`Add commander damage from ${owner}'s ${name}`}
+          aria-label={t('tracker.addCommanderDamage', { owner, name })}
           disabled={disabled}
           onClick={() => onChange(1)}
           className="from-void/80 text-ink flex flex-1 items-center justify-center bg-gradient-to-l to-transparent transition active:from-void disabled:opacity-30"
@@ -3943,18 +4153,27 @@ function restore(
   storageKey: string,
   players: Array<{ id: string; name: string }>,
   persist: boolean,
+  startingLife = STARTING_LIFE,
+  gameMode: GameMode = 'commander',
+  rulesFormat: RulesFormat = 'commander',
 ): TrackerState {
   if (!persist) {
     sessionStorage.removeItem(storageKey);
-    return createTracker(players);
+    return createTracker(players, Date.now(), {
+      startingLife,
+      gameMode,
+      rulesFormat,
+    });
   }
   const raw = sessionStorage.getItem(storageKey);
   if (raw) {
     try {
       const parsed = JSON.parse(raw) as TrackerState;
       if (parsed.players?.length === players.length) {
+        const resolvedFormat = parsed.rulesFormat ?? rulesFormat;
         return {
           ...parsed,
+          rulesFormat: resolvedFormat,
           teams: parsed.teams ?? null,
           teamMode: parsed.teamMode ?? null,
           archenemyId: parsed.archenemyId ?? null,
@@ -3978,7 +4197,7 @@ function restore(
           ),
           eliminations: parsed.eliminations ?? [],
           players: parsed.players.map((player) =>
-            normalizePlayer(player, parsed.players),
+            normalizePlayer(player, parsed.players, resolvedFormat),
           ),
         };
       }
@@ -3986,17 +4205,25 @@ function restore(
       /* start fresh */
     }
   }
-  return createTracker(players);
+  return createTracker(players, Date.now(), {
+    startingLife,
+    gameMode,
+    rulesFormat,
+  });
 }
 
 function normalizePlayer(
   player: TrackerPlayer,
   roster: TrackerPlayer[],
+  rulesFormat: RulesFormat,
 ): TrackerPlayer {
+  const withCommanders = rulesFormat === 'commander';
   const commanders =
-    player.commanders?.length > 0
+    withCommanders && player.commanders?.length > 0
       ? player.commanders
-      : defaultCommanders(player.id, player.name);
+      : withCommanders
+        ? defaultCommanders(player.id, player.name)
+        : [];
   const commanderDamage: Record<string, number> = {};
   for (const [key, value] of Object.entries(player.commanderDamage ?? {})) {
     if (typeof value !== 'number') {

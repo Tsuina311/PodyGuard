@@ -44,6 +44,8 @@ export const podStatusEnum = pgEnum('pod_status', [
 ]);
 
 export const gameModeEnum = pgEnum('game_mode', [
+  'duel',
+  'multiplayer',
   'commander',
   'treachery',
   'two-headed-giant',
@@ -52,6 +54,8 @@ export const gameModeEnum = pgEnum('game_mode', [
   'star',
   'assassin',
 ]);
+
+export const rulesFormatEnum = pgEnum('rules_format', ['normal', 'commander']);
 
 export const treacheryRoleEnum = pgEnum('treachery_role', [
   'leader',
@@ -79,6 +83,7 @@ export const events = pgTable('events', {
   name: text('name').notNull(),
   status: eventStatusEnum('status').notNull().default('open'),
   gameMode: gameModeEnum('game_mode').notNull().default('commander'),
+  rulesFormat: rulesFormatEnum('rules_format').notNull().default('commander'),
   /** Event-local host PIN hash. Not a Neon Auth account. */
   hostCredentialHash: text('host_credential_hash').notNull(),
   allowThreePods: boolean('allow_three_pods').notNull().default(true),

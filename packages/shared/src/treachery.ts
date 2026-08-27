@@ -1,6 +1,8 @@
 import identityData from './treachery-identities.json';
 
 export const GAME_MODES = [
+  'duel',
+  'multiplayer',
   'commander',
   'treachery',
   'two-headed-giant',
@@ -10,6 +12,77 @@ export const GAME_MODES = [
   'assassin',
 ] as const;
 export type GameMode = (typeof GAME_MODES)[number];
+
+export type GameModeFamily = 'normal' | 'commander';
+export type RulesFormat = GameModeFamily;
+
+export function isGameMode(value: unknown): value is GameMode {
+  return (
+    typeof value === 'string' &&
+    (GAME_MODES as readonly string[]).includes(value)
+  );
+}
+
+export function parseGameMode(value: unknown): GameMode {
+  return isGameMode(value) ? value : 'commander';
+}
+
+export function isRulesFormat(value: unknown): value is RulesFormat {
+  return value === 'normal' || value === 'commander';
+}
+
+export function parseRulesFormat(value: unknown): RulesFormat | undefined {
+  return isRulesFormat(value) ? value : undefined;
+}
+
+/** Legacy default when an event or match config has no explicit format stored. */
+export function defaultRulesFormat(mode: GameMode): RulesFormat {
+  return mode === 'duel' || mode === 'multiplayer' ? 'normal' : 'commander';
+}
+
+export function resolveRulesFormat(
+  mode: GameMode,
+  format?: RulesFormat | null,
+): RulesFormat {
+  return format ?? defaultRulesFormat(mode);
+}
+
+export function gameModeFamily(mode: GameMode): GameModeFamily {
+  return defaultRulesFormat(mode);
+}
+
+/** Commander damage, tax, and related chrome only apply in Commander format. */
+export function usesCommanderRules(
+  mode: GameMode,
+  format?: RulesFormat | null,
+): boolean {
+  return resolveRulesFormat(mode, format) === 'commander';
+}
+
+export const MODES_BY_FAMILY: Record<
+  GameModeFamily,
+  readonly GameMode[]
+> = {
+  normal: [
+    'duel',
+    'multiplayer',
+    'treachery',
+    'two-headed-giant',
+    'archenemy-commander',
+    'emperor',
+    'star',
+    'assassin',
+  ],
+  commander: [
+    'commander',
+    'treachery',
+    'two-headed-giant',
+    'archenemy-commander',
+    'emperor',
+    'star',
+    'assassin',
+  ],
+};
 
 export const TREACHERY_ROLES = [
   'leader',

@@ -78,6 +78,7 @@ export type {
 
 export {
   GAME_MODES,
+  MODES_BY_FAMILY,
   ASSASSIN_POD_SIZES,
   TREACHERY_POD_SIZES,
   TREACHERY_ROLES,
@@ -88,10 +89,19 @@ export {
   treacheryIdentityById,
   treacheryDistribution,
   treacheryRolesForSize,
+  isGameMode,
+  parseGameMode,
+  parseRulesFormat,
+  defaultRulesFormat,
+  resolveRulesFormat,
+  gameModeFamily,
+  usesCommanderRules,
 } from './treachery';
 
 export type {
   GameMode,
+  GameModeFamily,
+  RulesFormat,
   AssassinPodSize,
   TreacheryPodSize,
   TreacheryRole,

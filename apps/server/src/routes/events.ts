@@ -1,5 +1,10 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { normalizeJoinCode, type CommanderSelection } from '@podyguard/shared';
+import {
+  normalizeJoinCode,
+  parseGameMode,
+  parseRulesFormat,
+  type CommanderSelection,
+} from '@podyguard/shared';
 import {
   EventNotFoundError,
   EventNotJoinableError,
@@ -41,6 +46,7 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
       hostPin?: unknown;
       tableCount?: unknown;
       gameMode?: unknown;
+      rulesFormat?: unknown;
       allowThreePods?: unknown;
       allowFivePods?: unknown;
       preferredPodSize?: unknown;
@@ -51,15 +57,8 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
         name: typeof body.name === 'string' ? body.name : '',
         hostPin: typeof body.hostPin === 'string' ? body.hostPin : '',
         tableCount: parseTableCount(body.tableCount),
-        gameMode:
-          body.gameMode === 'treachery' ||
-          body.gameMode === 'two-headed-giant' ||
-          body.gameMode === 'archenemy-commander' ||
-          body.gameMode === 'emperor' ||
-          body.gameMode === 'star' ||
-          body.gameMode === 'assassin'
-            ? body.gameMode
-            : 'commander',
+        gameMode: parseGameMode(body.gameMode),
+        rulesFormat: parseRulesFormat(body.rulesFormat),
         allowThreePods: body.allowThreePods === undefined ? undefined : Boolean(body.allowThreePods),
         allowFivePods: body.allowFivePods === undefined ? undefined : Boolean(body.allowFivePods),
         preferredPodSize:
