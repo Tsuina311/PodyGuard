@@ -1,4 +1,11 @@
-import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import { createPortal } from 'react-dom';
 import {
   Award,
@@ -8,8 +15,8 @@ import {
   Crosshair,
   Check,
   Crown,
+  Delete,
   Eye,
-  Flag,
   Gauge,
   Minus,
   Moon,
@@ -26,6 +33,7 @@ import {
   Sparkles,
   Skull,
   SlidersHorizontal,
+  Star,
   Sun,
   Ticket,
   Trophy,
@@ -79,9 +87,9 @@ import {
 } from './emperor';
 import {
   randomStarOrder,
-  starAllies,
   swapStarSeats,
 } from './star';
+import { AllyArrows, allySeatPairs } from './ally-arrows';
 import { dealAssassinContracts } from './assassin';
 import { dealTreacheryIdentities } from './treachery';
 import { planFirstPlayerReveal, type RevealHop } from './first-player-reveal';
@@ -99,6 +107,7 @@ import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { DungeonIcon } from '../ui/DungeonIcon';
 import { RingIcon } from '../ui/RingIcon';
+import { ThemeToggle } from '../ui/ThemeToggle';
 import { cx } from '../ui/cx';
 
 type Props = {
@@ -144,6 +153,51 @@ type Props = {
 */
 const screenClass =
   'bg-deep-space fixed inset-x-0 top-0 z-40 flex h-[100dvh] touch-manipulation flex-col overflow-hidden pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))]';
+
+/**
+ * Pre-game setup screens: content on the left, actions in a right-hand column
+ * in landscape (stacked under the content in portrait) so Confirm never falls
+ * off the viewport and wide setups are not crushed. Cancel returns home.
+ */
+function PreGameScreen({
+  children,
+  actions,
+  contentClassName = 'max-w-lg',
+  onCancel,
+}: {
+  children: ReactNode;
+  actions?: ReactNode;
+  contentClassName?: string;
+  onCancel?: () => void;
+}) {
+  return (
+    <section className={screenClass}>
+      <div className="flex min-h-0 flex-1 flex-col gap-3 landscape:flex-row landscape:items-stretch">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+          <div
+            className={cx(
+              'mx-auto flex min-h-full w-full flex-col justify-center py-1 landscape:h-full',
+              contentClassName,
+            )}
+          >
+            {children}
+          </div>
+        </div>
+        {actions || onCancel ? (
+          <div className="mx-auto flex w-full shrink-0 flex-wrap justify-center gap-3 landscape:mr-6 landscape:w-56 landscape:flex-col landscape:flex-nowrap landscape:justify-center landscape:self-stretch landscape:[&>button]:w-full">
+            {actions}
+            {onCancel ? (
+              <Button variant="glass" onClick={onCancel}>
+                <LogOut size={16} aria-hidden />
+                Cancel
+              </Button>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
+    </section>
+  );
+}
 
 /*
   Every control sits on top of commander art, so it needs its own plate. A
@@ -214,6 +268,78 @@ function seatGridClass(count: number): string {
   return 'grid-cols-2 landscape:grid-cols-3';
 }
 
+/**
+ * Bottom seats slide toward the empty centre cell. The nudge is a share of the
+ * seat's own width so a dial-sized gap (~5.5rem) stays open on every phone —
+ * a fixed rem that looked right on a Pixel closed the gap on an SE.
+ */
+const bottomSeatNudge =
+  'landscape:translate-x-[clamp(0rem,calc((100%-5.5rem)/2),7rem)]';
+const bottomSeatNudgeLeft =
+  'landscape:-translate-x-[clamp(0rem,calc((100%-5.5rem)/2),7rem)]';
+
+/**
+ * Where a seat lands on the board. Star keeps the circular table order so each
+ * seat sits beside its two allies (empty bottom-centre holds the match dial):
+ *
+ *   4  0  1
+ *   3  .  2
+ *
+ * Other five-player modes keep a simple fill with the fifth seat on the bottom
+ * right, and nudge the bottom pair in toward the dial.
+ */
+function seatPlacementClass(
+  count: number,
+  index: number,
+  layout: 'default' | 'star' = 'default',
+): string {
+  if (layout === 'star' && count === 5) {
+    switch (index) {
+      case 0:
+        return 'landscape:col-start-2 landscape:row-start-1';
+      case 1:
+        return 'landscape:col-start-3 landscape:row-start-1';
+      case 2:
+        return cx(
+          'landscape:col-start-3 landscape:row-start-2',
+          bottomSeatNudgeLeft,
+        );
+      case 3:
+        return cx(
+          'landscape:col-start-1 landscape:row-start-2',
+          bottomSeatNudge,
+        );
+      case 4:
+        return 'landscape:col-start-1 landscape:row-start-1';
+      default:
+        return '';
+    }
+  }
+  if (count === 5 && index === 3) {
+    return bottomSeatNudge;
+  }
+  if (count === 5 && index === 4) {
+    return cx('landscape:col-start-3', bottomSeatNudgeLeft);
+  }
+  return '';
+}
+
+/**
+ * Where the dial sits on the board. Most pods meet in the middle; five- and
+ * six-player boards need it off that seam so it does not cover the chrome.
+ */
+function clockPositionClass(count: number): string {
+  if (count === 5) {
+    // Sit high in the empty bottom-centre cell so the ally arrow between the
+    // bottom seats can clear underneath it.
+    return 'top-1/2 left-1/2 landscape:top-[62%]';
+  }
+  if (count === 6) {
+    return 'top-1/2 left-1/2 landscape:top-[56.5%]';
+  }
+  return 'top-1/2 left-1/2';
+}
+
 const starPositionClasses = [
   'top-0 left-1/2 -translate-x-1/2',
   'top-[30%] right-0',
@@ -227,26 +353,54 @@ const starPositionClasses = [
  *
  * Four seats laid flat form a two by two board, so the middle of the screen is
  * the inner corner of every card and the dial covers whatever sits there. Each
- * seat pushes the row that owns that corner clear of it. Held upright the seats
- * stack into one column and the corner is nowhere near the middle, so the
- * clearance is landscape-only.
+ * seat pushes the row that owns that corner clear of it. Five parks the dial in
+ * the empty bottom-centre cell; six keeps it on the seam and clears both rows.
+ * Held upright the seats stack into one column and the corner is nowhere near
+ * the middle, so the clearance is landscape-only.
  */
 function clockClearance(
   count: number,
   index: number,
   row: 'top' | 'bottom',
+  layout: 'default' | 'star' = 'default',
 ): string {
-  if (count !== 4) {
-    return '';
+  if (count === 4) {
+    // The two seats along the top of the board meet the dial with their bottom
+    // corners, the two along the bottom with their top ones.
+    const meets = index < 2 ? 'bottom' : 'top';
+    if (row !== meets) {
+      return '';
+    }
+    // Left-hand seats meet it on their right, right-hand seats on their left.
+    return index % 2 === 0 ? 'landscape:pr-7' : 'landscape:pl-7';
   }
-  // The two seats along the top of the board meet the dial with their bottom
-  // corners, the two along the bottom with their top ones.
-  const meets = index < 2 ? 'bottom' : 'top';
-  if (row !== meets) {
-    return '';
+  if (count === 5) {
+    // Bottom pair flanks the dial: Star uses seats 3 and 2, other modes 3 and 4.
+    const left = 3;
+    const right = layout === 'star' ? 2 : 4;
+    if (row !== 'top' || (index !== left && index !== right)) {
+      return '';
+    }
+    return index === left ? 'landscape:pr-7' : 'landscape:pl-7';
   }
-  // Left-hand seats meet it on their right, right-hand seats on their left.
-  return index % 2 === 0 ? 'landscape:pr-7' : 'landscape:pl-7';
+  if (count === 6) {
+    // Dial sits on the seam: top seats meet it with their bottom chrome, bottom
+    // seats with their top chrome. The middle column needs the widest shove.
+    const topRow = index < 3;
+    const meets = topRow ? 'bottom' : 'top';
+    if (row !== meets) {
+      return '';
+    }
+    const column = index % 3;
+    if (column === 0) {
+      return 'landscape:pr-8';
+    }
+    if (column === 1) {
+      return 'landscape:px-10';
+    }
+    return 'landscape:pl-8';
+  }
+  return '';
 }
 
 /*
@@ -292,6 +446,24 @@ export function TrackerView({
     reduceHistory,
     initial,
   );
+  /*
+    Consecutive life taps accumulate into a single flash under the total. Any
+    other tracker action clears it, so the figure always describes the burst
+    that just happened and not the whole game.
+  */
+  function send(message: Msg) {
+    if (message.type === 'action' && message.action.type === 'life') {
+      const { playerId, delta } = message.action;
+      setLifeDelta((current) =>
+        current?.playerId === playerId
+          ? { playerId, amount: current.amount + delta }
+          : { playerId, amount: delta },
+      );
+    } else {
+      setLifeDelta(null);
+    }
+    dispatch(message);
+  }
   const [dungeonPlayerId, setDungeonPlayerId] = useState<string | null>(null);
   const [commanderPlayerId, setCommanderPlayerId] = useState<string | null>(
     null,
@@ -328,6 +500,14 @@ export function TrackerView({
   const [treacheryRolesOpen, setTreacheryRolesOpen] = useState(false);
   const [schemeOpen, setSchemeOpen] = useState(false);
   const [rulesOpen, setRulesOpen] = useState(false);
+  const [lifeDelta, setLifeDelta] = useState<{
+    playerId: string;
+    amount: number;
+  } | null>(null);
+  const [lifeEntry, setLifeEntry] = useState<{
+    playerId: string;
+    sign: 1 | -1;
+  } | null>(null);
   const attemptedChallenges = useRef(new Set<string>());
   const landscape = useLandscape();
   useLandscapeLock();
@@ -350,24 +530,21 @@ export function TrackerView({
         .map((player) => player.name)
         .join(' & ')
     : null;
-  const startingTeamName =
-    state.teams && state.firstPlayerId
-      ? state.teamMode === 'emperor'
-        ? state.players.find((player) => player.id === state.firstPlayerId)
-            ?.name ?? null
-        : teamForPlayer(state, state.firstPlayerId)
-            .map((player) => player.name)
-            .join(' & ')
-      : null;
   const confirmation = detectedConfirmation(state, challengePack);
   const archenemyBoard =
     gameMode === 'archenemy-commander' &&
     state.teamMode === 'archenemy-commander';
   const emperorBoard = gameMode === 'emperor' && state.teamMode === 'emperor';
   const starBoard = gameMode === 'star' && state.starOrder.length === 5;
+  const seatLayout = starBoard ? 'star' : 'default';
   const sharedLifeBoard =
     state.teamMode === 'two-headed-giant' ||
     state.teamMode === 'archenemy-commander';
+  const allyPairs = useMemo(
+    () => allySeatPairs(state, gameMode),
+    [state, gameMode],
+  );
+  const boardRef = useRef<HTMLDivElement>(null);
   const currentScheme = state.currentSchemeId
     ? schemeById(state.currentSchemeId)
     : undefined;
@@ -489,6 +666,12 @@ export function TrackerView({
     }
   }
 
+  /** Abandon setup and leave the tracker; drop any half-built snapshot. */
+  function leaveSetup() {
+    sessionStorage.removeItem(storageKey);
+    onQuit();
+  }
+
   useEffect(() => {
     if (!persist) {
       sessionStorage.removeItem(storageKey);
@@ -514,7 +697,8 @@ export function TrackerView({
       !rulesOpen &&
       !assassinTargetsOpen &&
       !assassinVictimId &&
-      !treacheryRolesOpen
+      !treacheryRolesOpen &&
+      !lifeEntry
     ) {
       return;
     }
@@ -530,6 +714,7 @@ export function TrackerView({
         setAssassinTargetsOpen(false);
         setAssassinVictimId(null);
         setTreacheryRolesOpen(false);
+        setLifeEntry(null);
       }
     }
     window.addEventListener('keydown', onKey);
@@ -547,6 +732,7 @@ export function TrackerView({
     rulesOpen,
     schemeOpen,
     treacheryRolesOpen,
+    lifeEntry,
   ]);
 
   const rulesSheet = rulesOpen
@@ -577,17 +763,10 @@ export function TrackerView({
   ) {
     return (
       <>
-        <section className={cx(screenClass, 'items-center justify-center')}>
-          <div className="w-full max-w-lg text-center">
-            <Crosshair size={34} aria-hidden className="text-danger mx-auto mb-3" />
-            <h2 className="font-display mb-2 text-2xl font-bold">
-              Deal secret contracts
-            </h2>
-            <p className="text-muted mb-5 text-sm">
-              Every player receives one private target. The device will be
-              passed around so each contract can be checked in secret.
-            </p>
-            <div className="flex flex-wrap justify-center gap-3">
+        <PreGameScreen
+          onCancel={leaveSetup}
+          actions={
+            <>
               <Button variant="glass" onClick={() => setRulesOpen(true)}>
                 <BookOpen size={16} aria-hidden />
                 Read rules
@@ -595,7 +774,7 @@ export function TrackerView({
               <Button
                 variant="neon"
                 onClick={() =>
-                  dispatch({
+                  send({
                     type: 'action',
                     action: {
                       type: 'assassinContracts',
@@ -609,9 +788,20 @@ export function TrackerView({
                 <Shuffle size={16} aria-hidden />
                 Deal contracts
               </Button>
-            </div>
+            </>
+          }
+        >
+          <div className="text-center">
+            <Crosshair size={34} aria-hidden className="text-danger mx-auto mb-3" />
+            <h2 className="font-display mb-2 text-2xl font-bold">
+              Deal secret contracts
+            </h2>
+            <p className="text-muted text-sm">
+              Every player receives one private target. The device will be
+              passed around so each contract can be checked in secret.
+            </p>
           </div>
-        </section>
+        </PreGameScreen>
         {rulesSheet}
       </>
     );
@@ -619,35 +809,28 @@ export function TrackerView({
 
   if (gameMode === 'assassin' && !state.assassinContractsReady) {
     return (
-      <section className={screenClass}>
+      <PreGameScreen onCancel={leaveSetup} contentClassName="max-w-2xl">
         <AssassinTargetsSheet
           players={state.players}
           targets={state.assassinTargets}
           scores={state.assassinScores}
           requireAllReviewed
           onReady={() =>
-            dispatch({ type: 'action', action: { type: 'assassinReady' } })
+            send({ type: 'action', action: { type: 'assassinReady' } })
           }
           onClose={() => undefined}
         />
-      </section>
+      </PreGameScreen>
     );
   }
 
   if (deviceTreachery && Object.keys(state.treacheryRoles).length === 0) {
     return (
       <>
-        <section className={cx(screenClass, 'items-center justify-center')}>
-          <div className="w-full max-w-lg text-center">
-            <Shield size={34} aria-hidden className="text-plasma mx-auto mb-3" />
-            <h2 className="font-display mb-2 text-2xl font-bold">
-              Deal secret identities
-            </h2>
-            <p className="text-muted mb-5 text-sm">
-              Every player receives one hidden identity. The device will be
-              passed around so each one can be read in secret.
-            </p>
-            <div className="flex flex-wrap justify-center gap-3">
+        <PreGameScreen
+          onCancel={leaveSetup}
+          actions={
+            <>
               <Button variant="glass" onClick={() => setRulesOpen(true)}>
                 <BookOpen size={16} aria-hidden />
                 Read rules
@@ -655,7 +838,7 @@ export function TrackerView({
               <Button
                 variant="neon"
                 onClick={() =>
-                  dispatch({
+                  send({
                     type: 'action',
                     action: {
                       type: 'treacheryIdentities',
@@ -669,9 +852,20 @@ export function TrackerView({
                 <Shuffle size={16} aria-hidden />
                 Deal identities
               </Button>
-            </div>
+            </>
+          }
+        >
+          <div className="text-center">
+            <Shield size={34} aria-hidden className="text-plasma mx-auto mb-3" />
+            <h2 className="font-display mb-2 text-2xl font-bold">
+              Deal secret identities
+            </h2>
+            <p className="text-muted text-sm">
+              Every player receives one hidden identity. The device will be
+              passed around so each one can be read in secret.
+            </p>
           </div>
-        </section>
+        </PreGameScreen>
         {rulesSheet}
       </>
     );
@@ -679,7 +873,7 @@ export function TrackerView({
 
   if (deviceTreachery && !state.treacheryRolesReady) {
     return (
-      <section className={screenClass}>
+      <PreGameScreen onCancel={leaveSetup} contentClassName="max-w-2xl">
         <TreacheryRolesSheet
           players={state.players}
           roles={state.treacheryRoles}
@@ -687,11 +881,11 @@ export function TrackerView({
           unveiled={state.treacheryUnveiled}
           requireAllReviewed
           onReady={() =>
-            dispatch({ type: 'action', action: { type: 'treacheryReady' } })
+            send({ type: 'action', action: { type: 'treacheryReady' } })
           }
           onClose={() => undefined}
         />
-      </section>
+      </PreGameScreen>
     );
   }
 
@@ -702,71 +896,15 @@ export function TrackerView({
   ) {
     return (
       <>
-        <section className={cx(screenClass, 'items-center justify-center')}>
-          <div className="w-full max-w-lg">
-            <h2 className="font-display mb-2 text-center text-2xl font-bold">
-              Choose Star positions
-            </h2>
-            <p className="text-muted mb-3 text-center text-sm">
-              Players beside each other are allies. Tap two players to exchange
-              their positions, or randomise the whole circle.
-            </p>
-            <div className="relative mx-auto mb-3 h-72 w-72 max-w-[80vw]">
-              <svg
-                aria-hidden
-                viewBox="0 0 100 100"
-                className="text-neon/30 absolute inset-[12%] h-[76%] w-[76%]"
-              >
-                <polygon
-                  points="50,3 79,94 3,37 97,37 21,94"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
-              </svg>
-              {starOrder.map((playerId, index) => {
-                const player = state.players.find(
-                  (row) => row.id === playerId,
-                );
-                return (
-                  <button
-                    key={playerId}
-                    type="button"
-                    onClick={() => {
-                      if (!selectedStarPlayer) {
-                        setSelectedStarPlayer(playerId);
-                      } else if (selectedStarPlayer === playerId) {
-                        setSelectedStarPlayer(null);
-                      } else {
-                        setStarOrder((current) =>
-                          swapStarSeats(
-                            current,
-                            selectedStarPlayer,
-                            playerId,
-                          ),
-                        );
-                        setSelectedStarPlayer(null);
-                      }
-                    }}
-                    className={cx(
-                      'absolute z-10 flex h-14 w-24 items-center justify-center rounded-xl border px-2 text-center text-xs font-semibold shadow-lg transition',
-                      starPositionClasses[index],
-                      selectedStarPlayer === playerId
-                        ? 'border-warning bg-warning/20 text-warning'
-                        : 'border-neon/40 bg-void/95 text-ink',
-                    )}
-                  >
-                    {player?.name}
-                  </button>
-                );
-              })}
-              <p className="text-muted absolute top-1/2 left-1/2 w-24 -translate-x-1/2 -translate-y-1/2 text-center text-[0.65rem] font-semibold tracking-wide uppercase">
-                Adjacent
-                <br />
-                players ally
+        <PreGameScreen
+          onCancel={leaveSetup}
+          contentClassName="max-w-xl"
+          actions={
+            <>
+              <p className="text-muted hidden text-center text-sm landscape:block">
+                Players beside each other are allies. Tap two players to
+                exchange their positions, or randomise the whole circle.
               </p>
-            </div>
-            <div className="flex flex-wrap justify-center gap-3">
               <Button
                 variant="glass"
                 onClick={() => {
@@ -788,7 +926,7 @@ export function TrackerView({
               <Button
                 variant="neon"
                 onClick={() =>
-                  dispatch({
+                  send({
                     type: 'action',
                     action: { type: 'starSeats', order: starOrder },
                   })
@@ -796,9 +934,72 @@ export function TrackerView({
               >
                 Confirm positions
               </Button>
-            </div>
+            </>
+          }
+        >
+          <h2 className="font-display mb-2 text-center text-2xl font-bold">
+            Choose Star positions
+          </h2>
+          <p className="text-muted mb-3 text-center text-sm landscape:hidden">
+            Players beside each other are allies. Tap two players to exchange
+            their positions, or randomise the whole circle.
+          </p>
+          <div className="relative mx-auto aspect-square w-full max-w-[min(22rem,70dvh)] landscape:max-w-[min(24rem,78dvh)]">
+            <svg
+              aria-hidden
+              viewBox="0 0 100 100"
+              className="text-neon/30 absolute inset-[12%] h-[76%] w-[76%]"
+            >
+              <polygon
+                points="50,3 79,94 3,37 97,37 21,94"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              />
+            </svg>
+            {starOrder.map((playerId, index) => {
+              const player = state.players.find(
+                (row) => row.id === playerId,
+              );
+              return (
+                <button
+                  key={playerId}
+                  type="button"
+                  onClick={() => {
+                    if (!selectedStarPlayer) {
+                      setSelectedStarPlayer(playerId);
+                    } else if (selectedStarPlayer === playerId) {
+                      setSelectedStarPlayer(null);
+                    } else {
+                      setStarOrder((current) =>
+                        swapStarSeats(
+                          current,
+                          selectedStarPlayer,
+                          playerId,
+                        ),
+                      );
+                      setSelectedStarPlayer(null);
+                    }
+                  }}
+                  className={cx(
+                    'absolute z-10 flex h-14 w-24 items-center justify-center rounded-xl border px-2 text-center text-xs font-semibold shadow-lg transition',
+                    starPositionClasses[index],
+                    selectedStarPlayer === playerId
+                      ? 'border-warning bg-warning/20 text-warning'
+                      : 'border-neon/40 bg-void/95 text-ink',
+                  )}
+                >
+                  {player?.name}
+                </button>
+              );
+            })}
+            <p className="text-muted absolute top-1/2 left-1/2 w-24 -translate-x-1/2 -translate-y-1/2 text-center text-[0.65rem] font-semibold tracking-wide uppercase">
+              Adjacent
+              <br />
+              players ally
+            </p>
           </div>
-        </section>
+        </PreGameScreen>
         {rulesSheet}
       </>
     );
@@ -828,167 +1029,160 @@ export function TrackerView({
     };
     return (
       <>
-        <section
-          className={cx(
-            screenClass,
-            'items-center justify-center overflow-y-auto',
-          )}
-        >
-          <div className="w-full max-w-2xl py-3">
-            <h2 className="font-display mb-2 text-center text-2xl font-bold">
-              Build the Emperor teams
-            </h2>
-            <p className="text-muted mb-4 text-center text-sm">
-              Choose three players for Team A. The other three become Team B,
-              then choose the Emperor in the middle of each team.
-            </p>
-            <div className="mb-3 grid grid-cols-3 gap-2">
-              {state.players.map((player) => {
-                const teamA = selectedEmperorTeam.includes(player.id);
-                return (
-                  <button
-                    key={player.id}
-                    type="button"
-                    disabled={!teamA && selectedEmperorTeam.length >= 3}
-                    onClick={() => {
-                      setSelectedEmperorTeam((current) =>
-                        current.includes(player.id)
-                          ? current.filter((id) => id !== player.id)
-                          : [...current, player.id],
-                      );
-                      setSelectedEmperors([null, null]);
-                    }}
-                    className={cx(
-                      'rounded-xl border p-3 text-center text-sm font-semibold transition',
-                      teamA
-                        ? 'border-neon bg-neon/15 text-neon'
-                        : teamsReady
-                          ? 'border-warning bg-warning/15 text-warning'
-                          : 'border-muted/25 bg-void/70 text-ink',
-                    )}
-                  >
-                    {player.name}
-                  </button>
-                );
-              })}
-            </div>
-            <div className="mb-4 flex flex-wrap justify-center gap-2">
-              <Button
-                size="sm"
-                variant="glass"
-                onClick={() => {
-                  const [teamA] = randomEmperorTeams(
-                    state.players.map((player) => player.id),
-                  );
-                  setSelectedEmperorTeam(teamA);
-                  setSelectedEmperors([null, null]);
-                }}
-              >
-                <Shuffle size={15} aria-hidden />
-                Random teams
-              </Button>
-              <Button
-                size="sm"
-                variant="glass"
-                disabled={selectedEmperorTeam.length === 0}
-                onClick={() => {
-                  setSelectedEmperorTeam([]);
-                  setSelectedEmperors([null, null]);
-                }}
-              >
-                Reset teams
-              </Button>
-            </div>
-            {teamsReady ? (
+        <PreGameScreen
+          onCancel={leaveSetup}
+          contentClassName="max-w-2xl"
+          actions={
+            teamsReady ? (
               <>
-                <div className="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  {teams.map((team, teamIndex) => (
-                    <fieldset
-                      key={teamIndex}
-                      className="border-muted/20 rounded-xl border p-3"
-                    >
-                      <legend className="text-muted px-1 text-xs font-bold tracking-wide uppercase">
-                        Team {teamIndex === 0 ? 'A' : 'B'} Emperor
-                      </legend>
-                      <div className="grid grid-cols-3 gap-2">
-                        {team.map((playerId) => (
-                          <button
-                            key={playerId}
-                            type="button"
-                            onClick={() =>
-                              setEmperor(
-                                teamIndex as 0 | 1,
-                                playerId,
-                              )
-                            }
-                            className={cx(
-                              'rounded-lg border p-2 text-xs font-semibold transition',
-                              selectedEmperors[teamIndex] === playerId
-                                ? 'border-warning bg-warning/15 text-warning'
-                                : 'border-muted/25 bg-void/70 text-ink',
-                            )}
-                          >
-                            {
-                              state.players.find(
-                                (player) => player.id === playerId,
-                              )?.name
-                            }
-                          </button>
-                        ))}
-                      </div>
-                    </fieldset>
-                  ))}
-                </div>
-                <div className="flex flex-wrap justify-center gap-3">
-                  <Button
-                    variant="glass"
-                    onClick={() => setSelectedEmperors(randomEmperors(teams))}
-                  >
-                    <Crown size={16} aria-hidden />
-                    Random Emperors
-                  </Button>
-                  <Button variant="glass" onClick={() => setRulesOpen(true)}>
-                    <BookOpen size={16} aria-hidden />
-                    Read rules
-                  </Button>
-                  <Button
-                    variant="neon"
-                    disabled={!emperorsReady}
-                    onClick={() => {
-                      if (!selectedEmperors[0] || !selectedEmperors[1]) {
-                        return;
-                      }
-                      dispatch({
-                        type: 'action',
-                        action: {
-                          type: 'teams',
-                          mode: 'emperor',
-                          teams: [
-                            seatEmperorTeam(teams[0], selectedEmperors[0]),
-                            seatEmperorTeam(teams[1], selectedEmperors[1]),
-                          ],
-                          emperorIds: [
-                            selectedEmperors[0],
-                            selectedEmperors[1],
-                          ],
-                        },
-                      });
-                    }}
-                  >
-                    Confirm teams
-                  </Button>
-                </div>
-              </>
-            ) : (
-              <div className="flex justify-center">
+                <Button
+                  variant="glass"
+                  onClick={() => setSelectedEmperors(randomEmperors(teams))}
+                >
+                  <Crown size={16} aria-hidden />
+                  Random Emperors
+                </Button>
                 <Button variant="glass" onClick={() => setRulesOpen(true)}>
                   <BookOpen size={16} aria-hidden />
                   Read rules
                 </Button>
-              </div>
-            )}
+                <Button
+                  variant="neon"
+                  disabled={!emperorsReady}
+                  onClick={() => {
+                    if (!selectedEmperors[0] || !selectedEmperors[1]) {
+                      return;
+                    }
+                    send({
+                      type: 'action',
+                      action: {
+                        type: 'teams',
+                        mode: 'emperor',
+                        teams: [
+                          seatEmperorTeam(teams[0], selectedEmperors[0]),
+                          seatEmperorTeam(teams[1], selectedEmperors[1]),
+                        ],
+                        emperorIds: [
+                          selectedEmperors[0],
+                          selectedEmperors[1],
+                        ],
+                      },
+                    });
+                  }}
+                >
+                  Confirm teams
+                </Button>
+              </>
+            ) : (
+              <Button variant="glass" onClick={() => setRulesOpen(true)}>
+                <BookOpen size={16} aria-hidden />
+                Read rules
+              </Button>
+            )
+          }
+        >
+          <h2 className="font-display mb-2 text-center text-2xl font-bold">
+            Build the Emperor teams
+          </h2>
+          <p className="text-muted mb-4 text-center text-sm">
+            Choose three players for Team A. The other three become Team B,
+            then choose the Emperor in the middle of each team.
+          </p>
+          <div className="mb-3 grid grid-cols-3 gap-2">
+            {state.players.map((player) => {
+              const teamA = selectedEmperorTeam.includes(player.id);
+              return (
+                <button
+                  key={player.id}
+                  type="button"
+                  disabled={!teamA && selectedEmperorTeam.length >= 3}
+                  onClick={() => {
+                    setSelectedEmperorTeam((current) =>
+                      current.includes(player.id)
+                        ? current.filter((id) => id !== player.id)
+                        : [...current, player.id],
+                    );
+                    setSelectedEmperors([null, null]);
+                  }}
+                  className={cx(
+                    'rounded-xl border p-3 text-center text-sm font-semibold transition',
+                    teamA
+                      ? 'border-neon bg-neon/15 text-neon'
+                      : teamsReady
+                        ? 'border-warning bg-warning/15 text-warning'
+                        : 'border-muted/25 bg-void/70 text-ink',
+                  )}
+                >
+                  {player.name}
+                </button>
+              );
+            })}
           </div>
-        </section>
+          <div className="mb-4 flex flex-wrap justify-center gap-2">
+            <Button
+              size="sm"
+              variant="glass"
+              onClick={() => {
+                const [teamA] = randomEmperorTeams(
+                  state.players.map((player) => player.id),
+                );
+                setSelectedEmperorTeam(teamA);
+                setSelectedEmperors([null, null]);
+              }}
+            >
+              <Shuffle size={15} aria-hidden />
+              Random teams
+            </Button>
+            <Button
+              size="sm"
+              variant="glass"
+              disabled={selectedEmperorTeam.length === 0}
+              onClick={() => {
+                setSelectedEmperorTeam([]);
+                setSelectedEmperors([null, null]);
+              }}
+            >
+              Reset teams
+            </Button>
+          </div>
+          {teamsReady ? (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {teams.map((team, teamIndex) => (
+                <fieldset
+                  key={teamIndex}
+                  className="border-muted/20 rounded-xl border p-3"
+                >
+                  <legend className="text-muted px-1 text-xs font-bold tracking-wide uppercase">
+                    Team {teamIndex === 0 ? 'A' : 'B'} Emperor
+                  </legend>
+                  <div className="grid grid-cols-3 gap-2">
+                    {team.map((playerId) => (
+                      <button
+                        key={playerId}
+                        type="button"
+                        onClick={() =>
+                          setEmperor(teamIndex as 0 | 1, playerId)
+                        }
+                        className={cx(
+                          'rounded-lg border p-2 text-xs font-semibold transition',
+                          selectedEmperors[teamIndex] === playerId
+                            ? 'border-warning bg-warning/15 text-warning'
+                            : 'border-muted/25 bg-void/70 text-ink',
+                        )}
+                      >
+                        {
+                          state.players.find(
+                            (player) => player.id === playerId,
+                          )?.name
+                        }
+                      </button>
+                    ))}
+                  </div>
+                </fieldset>
+              ))}
+            </div>
+          ) : null}
+        </PreGameScreen>
         {rulesSheet}
       </>
     );
@@ -1001,8 +1195,54 @@ export function TrackerView({
   ) {
     return (
       <>
-      <section className={cx(screenClass, 'items-center justify-center')}>
-        <div className="w-full max-w-lg">
+        <PreGameScreen
+          onCancel={leaveSetup}
+          actions={
+            <>
+              <Button variant="glass" onClick={() => setRulesOpen(true)}>
+                <BookOpen size={16} aria-hidden />
+                Read rules
+              </Button>
+              <Button
+                variant="glass"
+                onClick={() =>
+                  setSelectedArchenemy(
+                    randomPlayerId(state.players.map((player) => player.id)) ??
+                      null,
+                  )
+                }
+              >
+                <Shuffle size={16} aria-hidden />
+                Random
+              </Button>
+              <Button
+                variant="neon"
+                disabled={!selectedArchenemy}
+                onClick={() => {
+                  if (!selectedArchenemy) {
+                    return;
+                  }
+                  send({
+                    type: 'action',
+                    action: {
+                      type: 'teams',
+                      mode: 'archenemy-commander',
+                      teams: [
+                        [selectedArchenemy],
+                        state.players
+                          .filter((player) => player.id !== selectedArchenemy)
+                          .map((player) => player.id),
+                      ],
+                      schemeOrder: shuffleSchemeIds(),
+                    },
+                  });
+                }}
+              >
+                Confirm Archenemy
+              </Button>
+            </>
+          }
+        >
           <h2 className="font-display mb-2 text-center text-2xl font-bold">
             Choose the Archenemy
           </h2>
@@ -1011,7 +1251,7 @@ export function TrackerView({
             life. The Archenemy goes first, draws on that turn, and sets a
             scheme in motion during each first main phase.
           </p>
-          <div className="mb-5 grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             {state.players.map((player) => (
               <button
                 key={player.id}
@@ -1028,53 +1268,9 @@ export function TrackerView({
               </button>
             ))}
           </div>
-          <div className="flex flex-wrap justify-center gap-3">
-            <Button variant="glass" onClick={() => setRulesOpen(true)}>
-              <BookOpen size={16} aria-hidden />
-              Read rules
-            </Button>
-            <Button
-              variant="glass"
-              onClick={() =>
-                setSelectedArchenemy(
-                  randomPlayerId(state.players.map((player) => player.id)) ??
-                    null,
-                )
-              }
-            >
-              <Shuffle size={16} aria-hidden />
-              Random
-            </Button>
-            <Button
-              variant="neon"
-              disabled={!selectedArchenemy}
-              onClick={() => {
-                if (!selectedArchenemy) {
-                  return;
-                }
-                dispatch({
-                  type: 'action',
-                  action: {
-                    type: 'teams',
-                    mode: 'archenemy-commander',
-                    teams: [
-                      [selectedArchenemy],
-                      state.players
-                        .filter((player) => player.id !== selectedArchenemy)
-                        .map((player) => player.id),
-                    ],
-                    schemeOrder: shuffleSchemeIds(),
-                  },
-                });
-              }}
-            >
-              Confirm Archenemy
-            </Button>
-          </div>
-        </div>
-      </section>
-      {rulesSheet}
-    </>
+        </PreGameScreen>
+        {rulesSheet}
+      </>
     );
   }
 
@@ -1089,8 +1285,55 @@ export function TrackerView({
     const teamsReady = selectedAllies.length === 2;
     return (
       <>
-      <section className={cx(screenClass, 'items-center justify-center')}>
-        <div className="w-full max-w-lg">
+        <PreGameScreen
+          onCancel={leaveSetup}
+          actions={
+            <>
+              <Button variant="glass" onClick={() => setRulesOpen(true)}>
+                <BookOpen size={16} aria-hidden />
+                Read rules
+              </Button>
+              <Button
+                variant="glass"
+                onClick={() =>
+                  setSelectedAllies(
+                    randomTwoHeadedTeam(
+                      state.players.map((player) => player.id),
+                    ),
+                  )
+                }
+              >
+                <Shuffle size={16} aria-hidden />
+                Random
+              </Button>
+              <Button
+                variant="glass"
+                disabled={selectedAllies.length === 0}
+                onClick={() => setSelectedAllies([])}
+              >
+                Reset
+              </Button>
+              <Button
+                variant="neon"
+                disabled={!teamsReady}
+                onClick={() =>
+                  send({
+                    type: 'action',
+                    action: {
+                      type: 'teams',
+                      teams: [
+                        selectedAllies,
+                        remaining.map((player) => player.id),
+                      ],
+                    },
+                  })
+                }
+              >
+                Confirm teams
+              </Button>
+            </>
+          }
+        >
           <h2 className="font-display mb-2 text-center text-2xl font-bold">
             Choose the allies
           </h2>
@@ -1129,7 +1372,7 @@ export function TrackerView({
             })}
           </div>
           {teamsReady ? (
-            <p className="text-muted mb-4 text-center text-sm">
+            <p className="text-muted text-center text-sm">
               <span className="text-neon">
                 {selectedAllies
                   .map((id) => state.players.find((row) => row.id === id)?.name)
@@ -1141,86 +1384,53 @@ export function TrackerView({
               </span>
             </p>
           ) : null}
-          <div className="flex flex-wrap justify-center gap-3">
-            <Button variant="glass" onClick={() => setRulesOpen(true)}>
-              <BookOpen size={16} aria-hidden />
-              Read rules
-            </Button>
-            <Button
-              variant="glass"
-              onClick={() =>
-                setSelectedAllies(
-                  randomTwoHeadedTeam(
-                    state.players.map((player) => player.id),
-                  ),
-                )
-              }
-            >
-              <Shuffle size={16} aria-hidden />
-              Random
-            </Button>
-            <Button
-              variant="glass"
-              disabled={selectedAllies.length === 0}
-              onClick={() => setSelectedAllies([])}
-            >
-              Reset
-            </Button>
-            <Button
-              variant="neon"
-              disabled={!teamsReady}
-              onClick={() =>
-                dispatch({
-                  type: 'action',
-                  action: {
-                    type: 'teams',
-                    teams: [
-                      selectedAllies,
-                      remaining.map((player) => player.id),
-                    ],
-                  },
-                })
-              }
-            >
-              Confirm teams
-            </Button>
-          </div>
-        </div>
-      </section>
-      {rulesSheet}
-    </>
+        </PreGameScreen>
+        {rulesSheet}
+      </>
     );
   }
 
   if (!state.firstPlayerId) {
     return (
       <>
-      <section className={cx(screenClass, 'items-center justify-center')}>
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          <Button
-            variant="glass"
-            size="lg"
-            className="h-16 min-w-40 text-xl"
-            onClick={() => setRulesOpen(true)}
-          >
-            <BookOpen size={20} aria-hidden />
-            Read rules
-          </Button>
-          <Button
-            variant="neon"
-            size="lg"
-            className="h-16 min-w-48 text-xl"
-            disabled={gameMode === 'treachery' && !firstSeatId}
-            onClick={() => dispatch({ type: 'first', playerId: firstSeatId })}
-          >
-            {gameMode === 'treachery' && !firstSeatId
-              ? 'Loading roles…'
-              : 'Start'}
-          </Button>
-        </div>
-      </section>
-      {rulesSheet}
-    </>
+        <PreGameScreen
+          onCancel={leaveSetup}
+          actions={
+            <>
+              <Button
+                variant="glass"
+                size="lg"
+                className="h-16 min-w-40 text-xl landscape:h-12 landscape:min-w-0 landscape:text-base"
+                onClick={() => setRulesOpen(true)}
+              >
+                <BookOpen size={20} aria-hidden />
+                Read rules
+              </Button>
+              <Button
+                variant="neon"
+                size="lg"
+                className="h-16 min-w-48 text-xl landscape:h-12 landscape:min-w-0 landscape:text-base"
+                disabled={gameMode === 'treachery' && !firstSeatId}
+                onClick={() => send({ type: 'first', playerId: firstSeatId })}
+              >
+                {gameMode === 'treachery' && !firstSeatId
+                  ? 'Loading roles…'
+                  : 'Start'}
+              </Button>
+            </>
+          }
+        >
+          <div className="text-center">
+            <h2 className="font-display mb-2 text-2xl font-bold">
+              Ready to begin
+            </h2>
+            <p className="text-muted text-sm">
+              Start the match when everyone is seated, or read the rules first.
+            </p>
+          </div>
+        </PreGameScreen>
+        {rulesSheet}
+      </>
     );
   }
 
@@ -1232,6 +1442,7 @@ export function TrackerView({
     <section className={screenClass}>
       {/* auto-rows-fr splits the leftover height evenly between the seats. */}
       <div
+        ref={boardRef}
         className={cx(
           'relative grid min-h-0 flex-1 auto-rows-fr gap-2',
           archenemyBoard
@@ -1242,10 +1453,12 @@ export function TrackerView({
         {state.players.map((player, index) => (
           <article
             key={player.id}
+            data-seat-id={player.id}
             className={cx(
               'border-muted/20 relative flex min-h-0 flex-col overflow-hidden rounded-xl border p-2 transition-transform duration-200',
               player.eliminated ? 'opacity-50' : 'bg-ink/[0.03]',
               archenemyBoard && index === 0 && 'landscape:col-span-3',
+              seatPlacementClass(state.players.length, index, seatLayout),
               spotlightIds.has(player.id) && spotlightCard,
               spotlightIds.has(player.id) &&
                 (spotlight.phase === 'sweep'
@@ -1265,7 +1478,7 @@ export function TrackerView({
                 'relative z-10 flex shrink-0 items-start justify-between gap-2',
                 archenemyBoard
                   ? ''
-                  : clockClearance(state.players.length, index, 'top'),
+                  : clockClearance(state.players.length, index, 'top', seatLayout),
               )}
             >
               {/*
@@ -1289,32 +1502,24 @@ export function TrackerView({
                     {state.assassinScores[player.id] ?? 0} marks
                   </Badge>
                 ) : null}
-                {starBoard ? (
-                  <Badge tone="ready">
-                    Allies:{' '}
-                    {starAllies(state.starOrder, player.id)
-                      .map(
-                        (id) =>
-                          state.players.find((row) => row.id === id)?.name,
-                      )
-                      .join(' · ')}
-                  </Badge>
-                ) : null}
                 {emperorBoard ? (
                   state.emperorIds.includes(player.id) ? (
-                    <Badge tone="crown">
-                      <Crown size={12} aria-hidden />
-                      Emperor · range 2
+                    <Badge tone="crown" title="Emperor · range 2">
+                      <Star size={12} aria-hidden />
+                      <span className="sr-only">Emperor</span>
                     </Badge>
                   ) : (
-                    <Badge tone="idle">General · range 1</Badge>
+                    <Badge tone="idle" title="General · range 1">
+                      <span className="sr-only">General</span>
+                      G
+                    </Badge>
                   )
                 ) : null}
                 {/* The Leader is public knowledge, so the seat can say so. */}
                 {leaderId === player.id ? (
-                  <Badge tone="crown">
-                    <Crown size={12} aria-hidden />
-                    Leader
+                  <Badge tone="crown" title="Leader">
+                    <Star size={12} aria-hidden />
+                    <span className="sr-only">Leader</span>
                   </Badge>
                 ) : null}
                 {publicIdentities[player.id] ? (
@@ -1325,11 +1530,6 @@ export function TrackerView({
                   >
                     {publicIdentities[player.id]?.name}
                   </button>
-                ) : null}
-                {player.id === state.initiativeId ? (
-                  <Badge tone="dev">
-                    <Flag size={12} aria-hidden />
-                  </Badge>
                 ) : null}
                 {winnerIds.has(player.id) ? (
                   <Badge tone="live">Winner</Badge>
@@ -1344,42 +1544,22 @@ export function TrackerView({
               leaving them hanging from the top.
             */}
             {!sharedLifeBoard ? (
-              <div className="relative z-10 flex min-h-0 flex-1 items-center gap-1.5 py-1">
-                {[-5, -1].map((delta) => (
-                  <LifeButton
-                    key={`life-${String(delta)}`}
-                    delta={delta}
-                    disabled={Boolean(state.winnerId)}
-                    onClick={() =>
-                      dispatch({
-                        type: 'action',
-                        action: { type: 'life', playerId: player.id, delta },
-                      })
-                    }
-                  />
-                ))}
-                <p
-                  className={cx(
-                    'font-display text-neon flex min-w-0 flex-1 items-center justify-center self-stretch text-center text-[clamp(1.75rem,6.5vh,3.25rem)] leading-none font-bold tabular-nums landscape:text-[clamp(1.75rem,11vh,3.25rem)]',
-                    onArt,
-                  )}
-                >
-                  {player.life}
-                </p>
-                {[1, 5].map((delta) => (
-                  <LifeButton
-                    key={`life-${String(delta)}`}
-                    delta={delta}
-                    disabled={Boolean(state.winnerId)}
-                    onClick={() =>
-                      dispatch({
-                        type: 'action',
-                        action: { type: 'life', playerId: player.id, delta },
-                      })
-                    }
-                  />
-                ))}
-              </div>
+              <LifeRow
+                life={player.life}
+                flash={
+                  lifeDelta?.playerId === player.id ? lifeDelta.amount : null
+                }
+                disabled={Boolean(state.winnerId)}
+                onStep={(delta) =>
+                  send({
+                    type: 'action',
+                    action: { type: 'life', playerId: player.id, delta },
+                  })
+                }
+                onEnter={(sign) =>
+                  setLifeEntry({ playerId: player.id, sign })
+                }
+              />
             ) : (
               <div className="min-h-0 flex-1" aria-hidden />
             )}
@@ -1393,7 +1573,12 @@ export function TrackerView({
                 'relative z-10 flex shrink-0 flex-col landscape:flex-row landscape:items-center landscape:gap-2',
                 archenemyBoard
                   ? ''
-                  : clockClearance(state.players.length, index, 'bottom'),
+                  : clockClearance(
+                      state.players.length,
+                      index,
+                      'bottom',
+                      seatLayout,
+                    ),
               )}
             >
               <div className="flex min-w-0 shrink-0 gap-1 overflow-x-auto [scrollbar-width:none] landscape:flex-1 [&::-webkit-scrollbar]:hidden">
@@ -1429,7 +1614,7 @@ export function TrackerView({
                   active={player.id === state.monarchId}
                   disabled={Boolean(state.winnerId)}
                   onClick={() =>
-                    dispatch({
+                    send({
                       type: 'action',
                       action: { type: 'monarch', playerId: player.id },
                     })
@@ -1451,7 +1636,7 @@ export function TrackerView({
                   active={player.enduringStory}
                   disabled={Boolean(state.winnerId)}
                   onClick={() =>
-                    dispatch({
+                    send({
                       type: 'action',
                       action: {
                         type: 'designation',
@@ -1469,7 +1654,7 @@ export function TrackerView({
                   active={player.cityBlessing}
                   disabled={Boolean(state.winnerId)}
                   onClick={() =>
-                    dispatch({
+                    send({
                       type: 'action',
                       action: {
                         type: 'designation',
@@ -1507,7 +1692,7 @@ export function TrackerView({
                         setAssassinVictimId(player.id);
                         return;
                       }
-                      dispatch({
+                      send({
                         type: 'action',
                         action: { type: 'confirmLoss', playerId: player.id },
                       });
@@ -1519,7 +1704,7 @@ export function TrackerView({
                     size="sm"
                     variant="glass"
                     onClick={() =>
-                      dispatch({
+                      send({
                         type: 'action',
                         action: { type: 'declineLoss', playerId: player.id },
                       })
@@ -1532,6 +1717,7 @@ export function TrackerView({
             ) : null}
           </article>
         ))}
+        <AllyArrows pairs={allyPairs} containerRef={boardRef} />
         {/*
           A team's life reads like a single seat's: the total in the middle of
           the row with the buttons around it. It floats over the row rather than
@@ -1556,62 +1742,33 @@ export function TrackerView({
                       : 'top-3/4 -translate-y-1/2',
                   )}
                 >
-                  {[-5, -1].map((delta) => (
-                    <LifeButton
-                      key={delta}
-                      delta={delta}
-                      disabled={Boolean(state.winnerId)}
-                      onClick={() =>
-                        dispatch({
-                          type: 'action',
-                          action: {
-                            type: 'life',
-                            playerId: first.id,
-                            delta,
-                          },
-                        })
-                      }
-                    />
-                  ))}
-                  <p
-                    className={cx(
-                      'font-display text-neon flex min-w-0 flex-1 items-center justify-center self-stretch text-center text-[clamp(1.75rem,6.5vh,3.25rem)] leading-none font-bold tabular-nums landscape:text-[clamp(1.75rem,11vh,3.25rem)]',
-                      onArt,
-                    )}
-                  >
-                    {first.life}
-                  </p>
-                  {[1, 5].map((delta) => (
-                    <LifeButton
-                      key={delta}
-                      delta={delta}
-                      disabled={Boolean(state.winnerId)}
-                      onClick={() =>
-                        dispatch({
-                          type: 'action',
-                          action: {
-                            type: 'life',
-                            playerId: first.id,
-                            delta,
-                          },
-                        })
-                      }
-                    />
-                  ))}
+                  <LifeRow
+                    life={first.life}
+                    flash={
+                      lifeDelta?.playerId === first.id
+                        ? lifeDelta.amount
+                        : null
+                    }
+                    disabled={Boolean(state.winnerId)}
+                    onStep={(delta) =>
+                      send({
+                        type: 'action',
+                        action: {
+                          type: 'life',
+                          playerId: first.id,
+                          delta,
+                        },
+                      })
+                    }
+                    onEnter={(sign) =>
+                      setLifeEntry({ playerId: first.id, sign })
+                    }
+                  />
                 </div>
               );
             })
           : null}
       </div>
-      {startingTeamName && spotlight.playerId ? (
-        <p className="border-neon/40 bg-void/95 text-neon fixed top-[max(0.75rem,env(safe-area-inset-top))] left-1/2 z-[65] -translate-x-1/2 rounded-full border px-4 py-2 text-center text-xs font-semibold shadow-lg">
-          {archenemyBoard
-            ? `${startingTeamName} is the Archenemy — goes first and draws`
-            : emperorBoard
-              ? `${startingTeamName} is the starting Emperor — goes first and draws`
-              : `${startingTeamName} start — skip the first draw`}
-        </p>
-      ) : null}
       {/*
         The clock rides the seam between the seats, which is the one piece of
         the board no seat owns and the one place every player can reach. It is
@@ -1627,7 +1784,8 @@ export function TrackerView({
         }}
         className={cx(
           plate,
-          'hover:border-neon/50 absolute top-1/2 left-1/2 z-20 flex size-16 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-full border font-mono shadow-[0_10px_30px_-8px_var(--color-void)] transition',
+          'hover:border-neon/50 absolute z-20 flex size-16 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-full border font-mono shadow-[0_10px_30px_-8px_var(--color-void)] transition',
+          clockPositionClass(state.players.length),
           state.pausedAt ? 'text-warning border-warning/50' : 'text-ink',
           state.pausedAt ? '' : dayNightRing(state.dayNight),
         )}
@@ -1682,10 +1840,10 @@ export function TrackerView({
             remaining={state.schemeOrder.length}
             disabled={Boolean(state.winnerId)}
             onNext={() =>
-              dispatch({ type: 'action', action: { type: 'scheme' } })
+              send({ type: 'action', action: { type: 'scheme' } })
             }
             onAbandon={(schemeId) =>
-              dispatch({
+              send({
                 type: 'action',
                 action: { type: 'abandonScheme', schemeId },
               })
@@ -1694,6 +1852,30 @@ export function TrackerView({
           />
         </div>
       ) : null}
+      {lifeEntry
+        ? createPortal(
+            <LifeAmountPad
+              sign={lifeEntry.sign}
+              playerName={
+                state.players.find((player) => player.id === lifeEntry.playerId)
+                  ?.name ?? 'player'
+              }
+              onConfirm={(amount) => {
+                send({
+                  type: 'action',
+                  action: {
+                    type: 'life',
+                    playerId: lifeEntry.playerId,
+                    delta: lifeEntry.sign * amount,
+                  },
+                });
+                setLifeEntry(null);
+              }}
+              onClose={() => setLifeEntry(null)}
+            />,
+            document.body,
+          )
+        : null}
       {/*
         Where the browser lets go of the orientation the board turns itself, so
         this only ever shows on a phone that refused — every iPhone, which has
@@ -1738,7 +1920,7 @@ export function TrackerView({
               state={state}
               player={seat}
               disabled={Boolean(state.winnerId)}
-              dispatch={(action) => dispatch({ type: 'action', action })}
+              dispatch={(action) => send({ type: 'action', action })}
               onClose={() => setCommanderPlayerId(null)}
             />
           </div>,
@@ -1762,7 +1944,7 @@ export function TrackerView({
               <CounterSheet
                 player={counterPlayer}
                 disabled={Boolean(state.winnerId)}
-                dispatch={(action) => dispatch({ type: 'action', action })}
+                dispatch={(action) => send({ type: 'action', action })}
                 onClose={() => setCounterPlayerId(null)}
               />
             </div>,
@@ -1786,9 +1968,9 @@ export function TrackerView({
                 state={state}
                 elapsed={elapsed}
                 canUndo={past.length > 0}
-                dispatch={(action) => dispatch({ type: 'action', action })}
+                dispatch={(action) => send({ type: 'action', action })}
                 onUndo={() => {
-                  dispatch({ type: 'undo' });
+                  send({ type: 'undo' });
                 }}
                 onFinish={finish}
                 onQuit={onQuit}
@@ -1809,7 +1991,7 @@ export function TrackerView({
                   archenemyBoard
                     ? () => {
                         setMenuOpen(false);
-                        dispatch({ type: 'action', action: { type: 'scheme' } });
+                        send({ type: 'action', action: { type: 'scheme' } });
                         setSchemeOpen(true);
                       }
                     : undefined
@@ -1869,7 +2051,7 @@ export function TrackerView({
                 identities={state.treacheryIdentities}
                 unveiled={state.treacheryUnveiled}
                 onUnveil={(playerId) =>
-                  dispatch({
+                  send({
                     type: 'action',
                     action: { type: 'unveilTreachery', playerId },
                   })
@@ -1912,7 +2094,7 @@ export function TrackerView({
                         key={player.id}
                         variant="glass"
                         onClick={() => {
-                          dispatch({
+                          send({
                             type: 'action',
                             action: {
                               type: 'assassinate',
@@ -1930,7 +2112,7 @@ export function TrackerView({
                 <Button
                   variant="ghost"
                   onClick={() => {
-                    dispatch({
+                    send({
                       type: 'action',
                       action: {
                         type: 'assassinate',
@@ -2046,7 +2228,7 @@ export function TrackerView({
               <DungeonTracker
                 state={state}
                 playerId={dungeonPlayer.id}
-                dispatch={(action) => dispatch({ type: 'action', action })}
+                dispatch={(action) => send({ type: 'action', action })}
                 onClose={() => setDungeonPlayerId(null)}
               />
             </div>,
@@ -2187,7 +2369,7 @@ export function TrackerView({
                       variant="glass"
                       size="sm"
                       onClick={() => {
-                        dispatch({ type: 'undo' });
+                        send({ type: 'undo' });
                       }}
                     >
                       <Undo2 size={14} aria-hidden />
@@ -2255,10 +2437,10 @@ const SPOTLIGHT_FLASH_MS = 450;
  * Runs the draw for the starting seat and holds the result.
  *
  * The spotlight sweeps the board, strobes on the seat the engine drew, then
- * holds steady until the pod touches anything, on the grounds that the first tap
- * means the table has read it and the board has better uses for the light.
- * `moves` is the history depth, which is the cheapest signal that something on
- * the board actually changed.
+ * holds until the pod touches the screen (or any accepted action lands). The
+ * first tap means the table has read it and the board has better uses for the
+ * light. `moves` is the history depth, which is the cheapest signal that
+ * something on the board actually changed.
  */
 function useFirstPlayerSpotlight(
   state: TrackerState,
@@ -2336,6 +2518,20 @@ function useFirstPlayerSpotlight(
     }
   }, [moves, plan]);
 
+  // A bare touch or key also clears it — the table has seen the result.
+  useEffect(() => {
+    if (!plan) {
+      return;
+    }
+    const dismiss = () => setPlan(null);
+    window.addEventListener('pointerdown', dismiss, true);
+    window.addEventListener('keydown', dismiss, true);
+    return () => {
+      window.removeEventListener('pointerdown', dismiss, true);
+      window.removeEventListener('keydown', dismiss, true);
+    };
+  }, [plan]);
+
   return {
     playerId: plan?.[hop]?.playerId ?? null,
     phase: landed ? (held ? 'hold' : 'flash') : 'sweep',
@@ -2409,14 +2605,17 @@ function MatchMenu({
         <h4 className="font-display truncate text-sm leading-tight font-bold">
           Match
         </h4>
-        <button
-          type="button"
-          aria-label="Close match menu"
-          onClick={onClose}
-          className="border-muted/25 text-muted hover:text-ink hover:border-muted/50 flex size-8 shrink-0 items-center justify-center rounded-full border transition"
-        >
-          <X size={18} aria-hidden />
-        </button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <button
+            type="button"
+            aria-label="Close match menu"
+            onClick={onClose}
+            className="border-muted/25 text-muted hover:text-ink hover:border-muted/50 flex size-8 shrink-0 items-center justify-center rounded-full border transition"
+          >
+            <X size={18} aria-hidden />
+          </button>
+        </div>
       </header>
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 overflow-y-auto">
         <p
@@ -2598,31 +2797,227 @@ function MatchMenu({
   );
 }
 
+function LifeRow({
+  life,
+  flash,
+  disabled,
+  onStep,
+  onEnter,
+}: {
+  life: number;
+  flash: number | null;
+  disabled: boolean;
+  onStep: (delta: number) => void;
+  onEnter: (sign: 1 | -1) => void;
+}) {
+  // Three-digit totals keep the same slot as two-digit ones by shrinking the type.
+  const compact = Math.abs(life) >= 100;
+  return (
+    <div className="relative z-10 flex min-h-0 flex-1 items-center gap-1.5 py-1">
+      <LifeButton
+        delta={-1}
+        disabled={disabled}
+        onClick={() => onStep(-1)}
+        onLongPress={() => onEnter(-1)}
+      />
+      <div className="relative flex min-w-0 flex-1 flex-col items-center justify-center self-stretch">
+        <p
+          className={cx(
+            'font-display text-neon w-[4.75rem] text-center leading-none font-bold tabular-nums landscape:w-[5.5rem]',
+            compact
+              ? 'text-[clamp(1.2rem,4.6vh,2.2rem)] landscape:text-[clamp(1.2rem,7.5vh,2.2rem)]'
+              : 'text-[clamp(1.75rem,6.5vh,3.25rem)] landscape:text-[clamp(1.75rem,11vh,3.25rem)]',
+            onArt,
+          )}
+        >
+          {life}
+        </p>
+        {flash && flash !== 0 ? (
+          <p
+            className={cx(
+              'font-display absolute top-[calc(50%+1.45em)] text-sm leading-none font-bold tabular-nums',
+              flash > 0 ? 'text-gain' : 'text-danger',
+              onArt,
+            )}
+          >
+            {flash > 0 ? `+${String(flash)}` : String(flash)}
+          </p>
+        ) : null}
+      </div>
+      <LifeButton
+        delta={1}
+        disabled={disabled}
+        onClick={() => onStep(1)}
+        onLongPress={() => onEnter(1)}
+      />
+    </div>
+  );
+}
+
 function LifeButton({
   delta,
   disabled,
   onClick,
+  onLongPress,
 }: {
   delta: number;
   disabled: boolean;
   onClick: () => void;
+  onLongPress: () => void;
 }) {
-  const single = Math.abs(delta) === 1;
+  const timer = useRef<number | null>(null);
+  const longPressed = useRef(false);
+
+  function clearTimer() {
+    if (timer.current !== null) {
+      window.clearTimeout(timer.current);
+      timer.current = null;
+    }
+  }
+
   return (
     <button
       type="button"
       disabled={disabled}
-      onClick={onClick}
-      aria-label={`${delta > 0 ? 'Add' : 'Remove'} ${String(Math.abs(delta))} life`}
+      aria-label={`${delta > 0 ? 'Add' : 'Remove'} 1 life. Long press for a larger amount.`}
+      onPointerDown={(event) => {
+        if (disabled || event.button !== 0) {
+          return;
+        }
+        longPressed.current = false;
+        clearTimer();
+        event.currentTarget.setPointerCapture(event.pointerId);
+        timer.current = window.setTimeout(() => {
+          longPressed.current = true;
+          onLongPress();
+        }, 420);
+      }}
+      onPointerUp={(event) => {
+        const wasLong = longPressed.current;
+        clearTimer();
+        if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+          event.currentTarget.releasePointerCapture(event.pointerId);
+        }
+        if (!wasLong && !disabled) {
+          onClick();
+        }
+        longPressed.current = false;
+      }}
+      onPointerCancel={(event) => {
+        clearTimer();
+        longPressed.current = false;
+        if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+          event.currentTarget.releasePointerCapture(event.pointerId);
+        }
+      }}
+      onContextMenu={(event) => event.preventDefault()}
       className={cx(
-        'font-display flex h-full max-h-16 min-h-9 shrink-0 items-center justify-center rounded-xl border font-bold transition select-none disabled:opacity-40',
-        single
-          ? cx(plateAccent, 'border-neon/50 text-neon w-12 text-lg')
-          : cx(plate, 'border-muted/25 text-muted hover:text-ink hover:border-muted/45 w-10 text-sm'),
+        plateAccent,
+        'font-display border-neon/50 text-neon flex h-full max-h-16 min-h-9 w-14 shrink-0 items-center justify-center rounded-xl border text-lg font-bold transition select-none disabled:opacity-40',
       )}
     >
-      {delta > 0 ? `+${String(delta)}` : String(delta)}
+      {delta > 0 ? '+1' : '-1'}
     </button>
+  );
+}
+
+function LifeAmountPad({
+  sign,
+  playerName,
+  onConfirm,
+  onClose,
+}: {
+  sign: 1 | -1;
+  playerName: string;
+  onConfirm: (amount: number) => void;
+  onClose: () => void;
+}) {
+  const [digits, setDigits] = useState('');
+  const amount = Number(digits);
+  const ready = digits.length > 0 && amount > 0;
+  const verb = sign > 0 ? 'Add' : 'Remove';
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${verb} life for ${playerName}`}
+      className="bg-void/95 fixed inset-0 z-[80] flex items-center justify-center p-4 backdrop-blur-md"
+      onClick={(event) => {
+        if (event.target === event.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <section className="border-muted/25 bg-hull w-full max-w-sm rounded-2xl border p-4 shadow-2xl">
+        <header className="mb-3 flex items-start justify-between gap-3">
+          <div>
+            <p className="text-muted text-xs font-bold tracking-wider uppercase">
+              {verb} life · {playerName}
+            </p>
+            <p
+              className={cx(
+                'font-display text-4xl font-bold tabular-nums',
+                sign > 0 ? 'text-gain' : 'text-danger',
+              )}
+            >
+              {sign > 0 ? '+' : '−'}
+              {digits || '0'}
+            </p>
+          </div>
+          <button
+            type="button"
+            aria-label="Close"
+            onClick={onClose}
+            className="border-muted/25 text-muted flex size-8 items-center justify-center rounded-full border"
+          >
+            <X size={16} aria-hidden />
+          </button>
+        </header>
+        <div className="mb-3 grid grid-cols-3 gap-2">
+          {['1', '2', '3', '4', '5', '6', '7', '8', '9', '00', '0'].map(
+            (key) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() =>
+                  setDigits((current) => {
+                    const next = `${current}${key}`.replace(/^0+(?=\d)/, '');
+                    return next.slice(0, 3);
+                  })
+                }
+                className={cx(
+                  plate,
+                  'border-muted/25 hover:border-neon/40 font-display h-12 rounded-xl border text-xl font-bold transition',
+                )}
+              >
+                {key}
+              </button>
+            ),
+          )}
+          <button
+            type="button"
+            aria-label="Delete digit"
+            onClick={() => setDigits((current) => current.slice(0, -1))}
+            className={cx(
+              plate,
+              'border-muted/25 hover:border-neon/40 flex h-12 items-center justify-center rounded-xl border transition',
+            )}
+          >
+            <Delete size={18} aria-hidden />
+          </button>
+        </div>
+        <Button
+          variant={sign > 0 ? 'neon' : 'danger'}
+          size="lg"
+          block
+          disabled={!ready}
+          onClick={() => onConfirm(amount)}
+        >
+          {verb} {ready ? String(amount) : ''}
+        </Button>
+      </section>
+    </div>
   );
 }
 
@@ -3193,7 +3588,9 @@ function DungeonButton({
   onClick: () => void;
 }) {
   const filled = Math.min(completed, DUNGEON_COUNT);
-  const title = `${name} has completed ${String(filled)} of ${String(DUNGEON_COUNT)} unique dungeons`;
+  const title = active
+    ? `${name} has the initiative · ${String(filled)} of ${String(DUNGEON_COUNT)} unique dungeons`
+    : `${name} has completed ${String(filled)} of ${String(DUNGEON_COUNT)} unique dungeons`;
   return (
     <button
       type="button"
@@ -3205,7 +3602,10 @@ function DungeonButton({
       className={cx(
         'flex min-h-9 w-9 flex-col items-center justify-center gap-0.5 rounded-lg border py-0.5 transition disabled:opacity-40',
         active
-          ? cx(plateAccent, 'border-neon/60 text-neon')
+          ? cx(
+              plateGold,
+              'border-warning/60 text-warning shadow-[0_0_14px_-4px_var(--color-warning)] [&>svg]:fill-warning',
+            )
           : cx(plate, 'border-muted/25 text-muted hover:border-muted/45 hover:text-ink'),
       )}
     >
@@ -3216,7 +3616,11 @@ function DungeonButton({
             key={index}
             className={cx(
               'size-1 rounded-full',
-              index < filled ? 'bg-neon' : 'bg-muted/35',
+              index < filled
+                ? active
+                  ? 'bg-warning'
+                  : 'bg-neon'
+                : 'bg-muted/35',
             )}
           />
         ))}

@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Flag, Undo2, X } from 'lucide-react';
 import {
   DUNGEONS,
@@ -8,6 +8,7 @@ import {
 } from './dungeons';
 import type { TrackerAction, TrackerState } from './engine';
 import { useLandscape } from './orientation';
+import { Button } from '../ui/Button';
 import { cx } from '../ui/cx';
 
 type Props = {
@@ -36,68 +37,124 @@ export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
   const stepBack = canStepBack
     ? () => dispatch({ type: 'stepBackDungeon', playerId })
     : undefined;
-  const initiative = {
-    active: state.initiativeId === playerId,
-    onTake: () => dispatch({ type: 'initiative', playerId }),
+  const holdsInitiative = state.initiativeId === playerId;
+  /*
+    Taking the initiative also opens Undercity when this seat is free to enter
+    a dungeon. Ask first so a fat-finger tap does not silently seize it.
+  */
+  const [confirmInitiative, setConfirmInitiative] = useState(false);
+  const willEnterUndercity = !progress || progress.completed;
+
+  const takeInitiative = () => {
+    dispatch({ type: 'initiative', playerId });
+    setConfirmInitiative(false);
   };
+
+  const initiative = {
+    active: holdsInitiative,
+    onToggle: () => {
+      if (holdsInitiative) {
+        dispatch({ type: 'initiative', playerId: null });
+        return;
+      }
+      setConfirmInitiative(true);
+    },
+  };
+
+  const confirmOverlay = confirmInitiative ? (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Take the initiative?"
+      className="bg-void/90 absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 overflow-auto rounded-xl p-4 text-center backdrop-blur-sm"
+    >
+      <Flag
+        size={28}
+        aria-hidden
+        className="text-warning fill-warning/35"
+      />
+      <p className="font-display text-base font-semibold">
+        Take the initiative?
+      </p>
+      <p className="text-muted max-w-sm text-xs">
+        {willEnterUndercity
+          ? 'This also ventures into Undercity. Only take it when the table just gave this seat the initiative.'
+          : 'Finish or leave the current dungeon before Undercity can open. Only take the initiative when the table just gave it to this seat.'}
+      </p>
+      <div className="flex flex-wrap justify-center gap-2">
+        <Button size="sm" variant="neon" onClick={takeInitiative}>
+          Take initiative
+          {willEnterUndercity ? ' & enter Undercity' : ''}
+        </Button>
+        <Button
+          size="sm"
+          variant="glass"
+          onClick={() => setConfirmInitiative(false)}
+        >
+          Cancel
+        </Button>
+      </div>
+    </div>
+  ) : null;
 
   if (!progress || progress.completed) {
     return (
       <Shell initiative={initiative} onClose={onClose} onStepBack={stepBack}>
-        {/*
-          Laid flat the cards sit in one row. Width is the scarce axis either
-          way, so a second row would only halve the height the cards already
-          have to spare and shrink them. The gap and the frame stay hairline
-          because every pixel taken from them is width the cards get back.
-        */}
-        <div className="grid min-h-0 flex-1 grid-cols-2 place-items-center gap-1 landscape:grid-cols-4">
-          {DUNGEONS.map((dungeon) => (
-            <button
-              key={dungeon.id}
-              type="button"
-              disabled={dungeon.initiativeOnly}
-              title={
-                dungeon.initiativeOnly
-                  ? 'Entered only by taking the initiative'
-                  : completedIds.has(dungeon.id)
-                    ? `${dungeon.name} (completed)`
-                    : `Venture into ${dungeon.name}`
-              }
-              /*
-                The button carries the card's own proportions, so it ends where
-                the art ends instead of framing it in an empty panel. The cells
-                are always narrower than they are tall, so width is what is
-                pinned and the height follows.
-              */
-              className={cx(
-                'border-muted/20 relative aspect-[488/680] h-auto max-h-full w-full max-w-full min-h-0 overflow-hidden rounded-lg border transition',
-                dungeon.initiativeOnly
-                  ? 'cursor-not-allowed opacity-40'
-                  : 'hover:border-neon/60 hover:shadow-[0_0_22px_-8px_var(--color-neon)]',
-                completedIds.has(dungeon.id) && 'border-amber-400/50',
-              )}
-              onClick={() =>
-                dispatch({
-                  type: 'enterDungeon',
-                  playerId,
-                  dungeonId: dungeon.id,
-                })
-              }
-            >
-              {/* The button already matches the scan, so this fills it exactly. */}
-              <img
-                src={dungeon.image}
-                alt={dungeon.name}
-                loading="lazy"
-                className="size-full object-cover"
-              />
-              {completedIds.has(dungeon.id) ? (
-                <span className="absolute top-1.5 right-1.5 rounded-full bg-amber-400/90 px-1.5 py-0.5 font-mono text-[0.6rem] font-bold text-void">
-                  Done
-                </span>
-              ) : null}
-            </button>
-          ))}
+        <div className="relative grid min-h-0 flex-1 grid-cols-2 place-items-center gap-1 landscape:grid-cols-4">
+          {DUNGEONS.map((dungeon) => {
+            const isUndercity = dungeon.initiativeOnly;
+            const lockedOut = isUndercity && holdsInitiative;
+            return (
+              <button
+                key={dungeon.id}
+                type="button"
+                title={
+                  isUndercity
+                    ? holdsInitiative
+                      ? 'You already hold the initiative'
+                      : 'Take the initiative and enter Undercity'
+                    : completedIds.has(dungeon.id)
+                      ? `${dungeon.name} (completed)`
+                      : `Venture into ${dungeon.name}`
+                }
+                className={cx(
+                  'border-muted/20 relative aspect-[488/680] h-auto max-h-full w-full max-w-full min-h-0 overflow-hidden rounded-lg border transition',
+                  isUndercity && !holdsInitiative
+                    ? 'hover:border-warning/70 hover:shadow-[0_0_22px_-8px_var(--color-warning)]'
+                    : lockedOut
+                      ? 'cursor-default opacity-55'
+                      : 'hover:border-neon/60 hover:shadow-[0_0_22px_-8px_var(--color-neon)]',
+                  completedIds.has(dungeon.id) && 'border-amber-400/50',
+                )}
+                onClick={() => {
+                  if (isUndercity) {
+                    if (!holdsInitiative) {
+                      setConfirmInitiative(true);
+                    }
+                    return;
+                  }
+                  dispatch({
+                    type: 'enterDungeon',
+                    playerId,
+                    dungeonId: dungeon.id,
+                  });
+                }}
+              >
+                <img
+                  src={dungeon.image}
+                  alt={dungeon.name}
+                  loading="lazy"
+                  className="size-full object-cover"
+                />
+                {completedIds.has(dungeon.id) ? (
+                  <span className="absolute top-1.5 right-1.5 rounded-full bg-amber-400/90 px-1.5 py-0.5 font-mono text-[0.6rem] font-bold text-void">
+                    Done
+                  </span>
+                ) : null}
+              </button>
+            );
+          })}
+          {confirmOverlay}
         </div>
       </Shell>
     );
@@ -109,113 +166,116 @@ export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
 
   return (
     <Shell initiative={initiative} onClose={onClose} onStepBack={stepBack}>
-      {/*
-        Card art and overlay share one viewBox, so the map stays aligned at any
-        size and simply letterboxes into whatever space is available.
-      */}
-      <svg
-        className="min-h-0 w-full min-w-0 flex-1"
-        viewBox={
-          landscape
-            ? `0 0 ${String(CARD_H)} ${String(CARD_W)}`
-            : `0 0 ${String(CARD_W)} ${String(CARD_H)}`
-        }
-        preserveAspectRatio="xMidYMid meet"
-      >
+      <div className="relative flex min-h-0 min-w-0 flex-1">
         {/*
-          Turned anticlockwise so the rooms still run in reading order: the top
-          of the card becomes the left edge, and the dungeon flows rightwards.
+          Card art and overlay share one viewBox, so the map stays aligned at any
+          size and simply letterboxes into whatever space is available.
         */}
-        <g
-          transform={
+        <svg
+          className="min-h-0 w-full min-w-0 flex-1"
+          viewBox={
             landscape
-              ? `translate(0 ${String(CARD_W)}) rotate(-90)`
-              : undefined
+              ? `0 0 ${String(CARD_H)} ${String(CARD_W)}`
+              : `0 0 ${String(CARD_W)} ${String(CARD_H)}`
           }
+          preserveAspectRatio="xMidYMid meet"
         >
-          <image
-            href={dungeon.image}
-            x="0"
-            y="0"
-            width={CARD_W}
-            height={CARD_H}
-          />
+          {/*
+            Turned anticlockwise so the rooms still run in reading order: the top
+            of the card becomes the left edge, and the dungeon flows rightwards.
+          */}
+          <g
+            transform={
+              landscape
+                ? `translate(0 ${String(CARD_W)}) rotate(-90)`
+                : undefined
+            }
+          >
+            <image
+              href={dungeon.image}
+              x="0"
+              y="0"
+              width={CARD_W}
+              height={CARD_H}
+            />
 
-          {dungeon.rooms.map((room) => {
-            const isCurrent = room.id === progress.roomId;
-            const isLegal = legal.has(room.id);
-            const wasVisited = visited.has(room.id);
-            const box = pixelRect(room);
-            return (
-              <rect
-                key={room.id}
-                x={box.x}
-                y={box.y}
-                width={box.w}
-                height={box.h}
-                rx="8"
-                fill={
-                  isCurrent
-                    ? '#fcd34d'
-                    : isLegal
-                      ? 'var(--color-neon)'
-                      : wasVisited
-                        ? 'var(--color-void)'
+            {dungeon.rooms.map((room) => {
+              const isCurrent = room.id === progress.roomId;
+              const isLegal = legal.has(room.id);
+              const wasVisited = visited.has(room.id);
+              const box = pixelRect(room);
+              return (
+                <rect
+                  key={room.id}
+                  x={box.x}
+                  y={box.y}
+                  width={box.w}
+                  height={box.h}
+                  rx="8"
+                  fill={
+                    isCurrent
+                      ? '#fcd34d'
+                      : isLegal
+                        ? 'var(--color-neon)'
+                        : wasVisited
+                          ? 'var(--color-void)'
+                          : 'transparent'
+                  }
+                  fillOpacity={
+                    isCurrent ? 0.28 : isLegal ? 0.26 : wasVisited ? 0.35 : 0
+                  }
+                  stroke={
+                    isCurrent
+                      ? '#fde68a'
+                      : isLegal
+                        ? 'var(--color-neon)'
                         : 'transparent'
-                }
-                fillOpacity={
-                  isCurrent ? 0.28 : isLegal ? 0.26 : wasVisited ? 0.35 : 0
-                }
-                stroke={
-                  isCurrent
-                    ? '#fde68a'
-                    : isLegal
-                      ? 'var(--color-neon)'
-                      : 'transparent'
-                }
-                strokeWidth="3"
-                className={
-                  isLegal
-                    ? 'cursor-pointer outline-none focus-visible:stroke-[6px]'
-                    : undefined
-                }
-                role={isLegal ? 'button' : undefined}
-                tabIndex={isLegal ? 0 : undefined}
-                aria-label={
-                  isLegal
-                    ? `Venture to ${room.name}: ${room.effect}`
-                    : undefined
-                }
-                aria-current={isCurrent ? 'step' : undefined}
-                onClick={
-                  isLegal
-                    ? () =>
-                        dispatch({
-                          type: 'advanceDungeon',
-                          playerId,
-                          roomId: room.id,
-                        })
-                    : undefined
-                }
-                onKeyDown={
-                  isLegal
-                    ? (event) => {
-                        if (event.key === 'Enter' || event.key === ' ') {
-                          event.preventDefault();
+                  }
+                  strokeWidth="3"
+                  className={
+                    isLegal
+                      ? 'cursor-pointer outline-none focus-visible:stroke-[6px]'
+                      : undefined
+                  }
+                  role={isLegal ? 'button' : undefined}
+                  tabIndex={isLegal ? 0 : undefined}
+                  aria-label={
+                    isLegal
+                      ? `Venture to ${room.name}: ${room.effect}`
+                      : undefined
+                  }
+                  aria-current={isCurrent ? 'step' : undefined}
+                  onClick={
+                    isLegal
+                      ? () =>
                           dispatch({
                             type: 'advanceDungeon',
                             playerId,
                             roomId: room.id,
-                          });
+                          })
+                      : undefined
+                  }
+                  onKeyDown={
+                    isLegal
+                      ? (event) => {
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            dispatch({
+                              type: 'advanceDungeon',
+                              playerId,
+                              roomId: room.id,
+                            });
+                          }
                         }
-                      }
-                    : undefined
-                }
-              />
-            );
-          })}
-        </g>
-      </svg>
+                      : undefined
+                  }
+                />
+              );
+            })}
+          </g>
+        </svg>
+        {confirmOverlay}
+      </div>
     </Shell>
   );
 }
@@ -231,7 +291,7 @@ function Shell({
   onStepBack,
   children,
 }: {
-  initiative: { active: boolean; onTake: () => void };
+  initiative: { active: boolean; onToggle: () => void };
   onClose: () => void;
   onStepBack?: () => void;
   children: ReactNode;
@@ -247,12 +307,16 @@ function Shell({
       <div className="flex shrink-0 flex-col justify-end gap-2">
         <ControlButton
           label={
-            initiative.active ? 'Has the initiative' : 'Take the initiative'
+            initiative.active ? 'Release the initiative' : 'Take the initiative'
           }
           active={initiative.active}
-          onClick={initiative.onTake}
+          onClick={initiative.onToggle}
         >
-          <Flag size={18} aria-hidden />
+          <Flag
+            size={18}
+            aria-hidden
+            className={initiative.active ? 'fill-warning' : undefined}
+          />
         </ControlButton>
         {onStepBack ? (
           <ControlButton label="Undo room" onClick={onStepBack}>
@@ -288,7 +352,7 @@ function ControlButton({
       className={cx(
         'flex size-10 shrink-0 items-center justify-center rounded-xl border transition',
         active
-          ? 'border-neon/60 bg-[color-mix(in_oklab,var(--color-neon)_18%,var(--color-void))] text-neon'
+          ? 'border-warning/60 bg-[color-mix(in_oklab,var(--color-warning)_18%,var(--color-void))] text-warning shadow-[0_0_14px_-4px_var(--color-warning)]'
           : 'border-muted/25 bg-void/85 text-muted hover:border-muted/45 hover:text-ink',
       )}
     >

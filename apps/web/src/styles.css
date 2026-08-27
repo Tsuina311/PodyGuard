@@ -15,6 +15,7 @@
   --color-plasma: #6366f1;
   --color-danger: #fda4af;
   --color-warning: #fcd34d;
+  --color-gain: #4ade80;
 }
 
 @layer base {
@@ -35,6 +36,7 @@
     --color-plasma: #4f46e5;
     --color-danger: #e11d48;
     --color-warning: #b45309;
+    --color-gain: #15803d;
   }
 
   body {

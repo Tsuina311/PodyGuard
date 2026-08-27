@@ -14,15 +14,18 @@ const tones: Record<BadgeTone, string> = {
 
 export function Badge({
   tone = 'idle',
+  title,
   children,
 }: {
   tone?: BadgeTone;
+  title?: string;
   children: ReactNode;
 }) {
   return (
     <span
+      title={title}
       className={cx(
-        'inline-flex items-center rounded-full border px-2 py-0.5 font-mono text-[0.68rem] tracking-wide uppercase',
+        'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 font-mono text-[0.68rem] tracking-wide uppercase',
         tones[tone],
       )}
     >

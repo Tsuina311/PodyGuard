@@ -17,8 +17,8 @@ function applyTheme(theme: Theme): void {
 }
 
 /**
- * Pages opt into the toggle individually. The tracker deliberately leaves it
- * out so a running game owns the whole phone screen.
+ * Pages opt into the corner toggle individually. The tracker exposes the same
+ * control from the match menu instead, so a running game still owns the screen.
  */
 export function ThemeToggleCorner() {
   return (
