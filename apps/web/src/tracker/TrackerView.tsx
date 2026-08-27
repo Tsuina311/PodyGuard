@@ -98,16 +98,17 @@ import { ModeRulesSheet } from './ModeRulesSheet';
 import { SchemeSheet } from './SchemeSheet';
 import { AssassinTargetsSheet } from './AssassinTargetsSheet';
 import { TreacheryRolesSheet } from './TreacheryRolesSheet';
-import { useLandscape, useLandscapeLock } from './orientation';
+import { useBoardLandscape, useLandscapeLock } from './orientation';
 import {
   detectAutomaticChallenges,
   detectedConfirmation,
 } from './challenges';
+import { forgetActiveMatch } from '../active-match';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { DungeonIcon } from '../ui/DungeonIcon';
 import { RingIcon } from '../ui/RingIcon';
-import { ThemeToggle } from '../ui/ThemeToggle';
+import { ThemeToggle, setAppTheme } from '../ui/ThemeToggle';
 import { cx } from '../ui/cx';
 
 type Props = {
@@ -149,11 +150,24 @@ type Props = {
 /*
   Fixed to the dynamic viewport so mobile browser chrome cannot push the last
   card out of reach. The side padding honours landscape notch insets, which is
-  the orientation a phone sits in on the table.
+  the orientation a phone sits in on the table. When the OS will not lock
+  landscape (every iPhone), the shell is rotated instead so the board still
+  reads as a table layout.
 */
-const screenClass =
-  'bg-deep-space fixed inset-x-0 top-0 z-40 flex h-[100dvh] touch-manipulation flex-col overflow-hidden pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))]';
-
+function boardScreenClass(
+  forceRotate: boolean,
+  bottom: 'tight' | 'roomy' = 'tight',
+): string {
+  return cx(
+    'bg-deep-space fixed z-40 flex touch-manipulation flex-col overflow-hidden pt-2 pl-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))]',
+    bottom === 'roomy'
+      ? 'pb-[max(1.25rem,env(safe-area-inset-bottom))]'
+      : 'pb-[max(0.5rem,env(safe-area-inset-bottom))]',
+    forceRotate
+      ? 'top-1/2 left-1/2 h-[100dvw] w-[100dvh] -translate-x-1/2 -translate-y-1/2 rotate-90'
+      : 'inset-x-0 top-0 h-[100dvh]',
+  );
+}
 /**
  * Pre-game setup screens: content on the left, actions in a right-hand column
  * in landscape (stacked under the content in portrait) so Confirm never falls
@@ -170,8 +184,12 @@ function PreGameScreen({
   contentClassName?: string;
   onCancel?: () => void;
 }) {
+  /*
+    Setup stays in the phone's natural orientation. Only the running life
+    tracker locks or CSS-rotates into landscape.
+  */
   return (
-    <section className={screenClass}>
+    <section className={boardScreenClass(false, 'roomy')}>
       <div className="flex min-h-0 flex-1 flex-col gap-3 landscape:flex-row landscape:items-stretch">
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
           <div
@@ -184,7 +202,7 @@ function PreGameScreen({
           </div>
         </div>
         {actions || onCancel ? (
-          <div className="mx-auto flex w-full shrink-0 flex-wrap justify-center gap-3 landscape:mr-6 landscape:w-56 landscape:flex-col landscape:flex-nowrap landscape:justify-center landscape:self-stretch landscape:[&>button]:w-full">
+          <div className="mx-auto flex w-full max-w-xs shrink-0 flex-col justify-center gap-3 pb-2 [&>button]:w-full landscape:mr-6 landscape:w-56 landscape:max-w-none landscape:self-stretch landscape:pb-0">
             {actions}
             {onCancel ? (
               <Button variant="glass" onClick={onCancel}>
@@ -509,8 +527,13 @@ export function TrackerView({
     sign: 1 | -1;
   } | null>(null);
   const attemptedChallenges = useRef(new Set<string>());
-  const landscape = useLandscape();
-  useLandscapeLock();
+  const { landscape, forceRotate } = useBoardLandscape();
+  const boardLive = Boolean(state.firstPlayerId);
+  useLandscapeLock(boardLive);
+  const screenClass = cx(
+    boardScreenClass(boardLive && forceRotate),
+    boardLive && forceRotate && 'board-landscape',
+  );
   usePreloadedEliminatedArt();
   const elapsed = useMatchClock(state);
   const spotlight = useFirstPlayerSpotlight(state, past.length);
@@ -669,8 +692,18 @@ export function TrackerView({
   /** Abandon setup and leave the tracker; drop any half-built snapshot. */
   function leaveSetup() {
     sessionStorage.removeItem(storageKey);
+    forgetActiveMatch();
     onQuit();
   }
+
+  // Day / night on the table drives the app chrome: day is light mode, night is dark.
+  useEffect(() => {
+    if (state.dayNight === 'day') {
+      setAppTheme('light');
+    } else if (state.dayNight === 'night') {
+      setAppTheme('dark');
+    }
+  }, [state.dayNight]);
 
   useEffect(() => {
     if (!persist) {
@@ -1492,6 +1525,7 @@ export function TrackerView({
                 <CounterBadges
                   player={player}
                   disabled={Boolean(state.winnerId)}
+                  hidePoison={sharedLifeBoard}
                   onOpen={() => setCounterPlayerId(player.id)}
                 />
               </span>
@@ -1589,12 +1623,14 @@ export function TrackerView({
                 >
                   <SlidersHorizontal size={18} aria-hidden />
                 </IconButton>
-                <CommanderDamageChip
-                  state={state}
-                  player={player}
-                  disabled={Boolean(state.winnerId)}
-                  onOpen={() => setCommanderPlayerId(player.id)}
-                />
+                {!sharedLifeBoard ? (
+                  <CommanderDamageChip
+                    state={state}
+                    player={player}
+                    disabled={Boolean(state.winnerId)}
+                    onOpen={() => setCommanderPlayerId(player.id)}
+                  />
+                ) : null}
               </div>
 
               {/*
@@ -1679,10 +1715,6 @@ export function TrackerView({
                 <p className="font-display text-base font-semibold">
                   {lossPrompt(player, state)}
                 </p>
-                <p className="text-muted text-xs">
-                  Effects like Platinum Angel or Phyrexian Unlife can keep a
-                  player in the game.
-                </p>
                 <div className="flex flex-wrap justify-center gap-2">
                   <Button
                     size="sm"
@@ -1717,7 +1749,11 @@ export function TrackerView({
             ) : null}
           </article>
         ))}
-        <AllyArrows pairs={allyPairs} containerRef={boardRef} />
+        <AllyArrows
+          pairs={allyPairs}
+          containerRef={boardRef}
+          layoutKey={`${landscape ? 'l' : 'p'}:${forceRotate ? 'r' : 'n'}:${String(state.players.length)}`}
+        />
         {/*
           A team's life reads like a single seat's: the total in the middle of
           the row with the buttons around it. It floats over the row rather than
@@ -1764,6 +1800,24 @@ export function TrackerView({
                       setLifeEntry({ playerId: first.id, sign })
                     }
                   />
+                  {/*
+                    Poison and commander damage ride the shared life total: the
+                    side has one of each, so the seats do not each carry a copy.
+                  */}
+                  <div className="flex shrink-0 items-center gap-1">
+                    <CounterBadges
+                      player={first}
+                      disabled={Boolean(state.winnerId)}
+                      onlyPoison
+                      onOpen={() => setCounterPlayerId(first.id)}
+                    />
+                    <CommanderDamageChip
+                      state={state}
+                      player={first}
+                      disabled={Boolean(state.winnerId)}
+                      onOpen={() => setCommanderPlayerId(first.id)}
+                    />
+                  </div>
                 </div>
               );
             })
@@ -2810,8 +2864,8 @@ function LifeRow({
   onStep: (delta: number) => void;
   onEnter: (sign: 1 | -1) => void;
 }) {
-  // Three-digit totals keep the same slot as two-digit ones by shrinking the type.
-  const compact = Math.abs(life) >= 100;
+  // Slot is always five tabular digits wide; denser totals shrink to fit it.
+  const digits = String(Math.abs(life)).length;
   return (
     <div className="relative z-10 flex min-h-0 flex-1 items-center gap-1.5 py-1">
       <LifeButton
@@ -2823,10 +2877,14 @@ function LifeRow({
       <div className="relative flex min-w-0 flex-1 flex-col items-center justify-center self-stretch">
         <p
           className={cx(
-            'font-display text-neon w-[4.75rem] text-center leading-none font-bold tabular-nums landscape:w-[5.5rem]',
-            compact
-              ? 'text-[clamp(1.2rem,4.6vh,2.2rem)] landscape:text-[clamp(1.2rem,7.5vh,2.2rem)]'
-              : 'text-[clamp(1.75rem,6.5vh,3.25rem)] landscape:text-[clamp(1.75rem,11vh,3.25rem)]',
+            'font-display text-neon w-[6.5rem] shrink-0 text-center leading-none font-bold tabular-nums landscape:w-[7.5rem]',
+            digits >= 5
+              ? 'text-[clamp(0.85rem,3.2vh,1.35rem)] landscape:text-[clamp(0.85rem,5vh,1.35rem)]'
+              : digits >= 4
+                ? 'text-[clamp(1rem,3.8vh,1.65rem)] landscape:text-[clamp(1rem,6vh,1.65rem)]'
+                : digits >= 3
+                  ? 'text-[clamp(1.2rem,4.6vh,2.2rem)] landscape:text-[clamp(1.2rem,7.5vh,2.2rem)]'
+                  : 'text-[clamp(1.75rem,6.5vh,3.25rem)] landscape:text-[clamp(1.75rem,11vh,3.25rem)]',
             onArt,
           )}
         >
@@ -3248,14 +3306,29 @@ function CounterBadges({
   player,
   disabled,
   onOpen,
+  hidePoison = false,
+  onlyPoison = false,
 }: {
   player: TrackerPlayer;
   disabled: boolean;
   onOpen: () => void;
+  /** Shared-life seats keep poison on the team chrome instead. */
+  hidePoison?: boolean;
+  /** Team chrome: only the shared poison pill. */
+  onlyPoison?: boolean;
 }) {
+  const rows = heldCounters(player).filter((row) => {
+    if (onlyPoison) {
+      return row.definition.id === 'poison';
+    }
+    if (hidePoison) {
+      return row.definition.id !== 'poison';
+    }
+    return true;
+  });
   return (
     <>
-      {heldCounters(player).map(({ definition, value, tone }) => (
+      {rows.map(({ definition, value, tone }) => (
         <button
           key={definition.id}
           type="button"
@@ -3631,8 +3704,16 @@ function DungeonButton({
 
 function lossPrompt(player: TrackerPlayer, state: TrackerState): string {
   const cause = player.pendingLoss;
+  const shared =
+    (state.teamMode === 'two-headed-giant' ||
+      state.teamMode === 'archenemy-commander') &&
+    teamForPlayer(state, player.id).length > 1;
+  const subject = shared ? 'This team' : player.name;
+  const lose = shared ? 'Did they lose?' : `Did ${player.name} lose?`;
   if (cause?.type === 'poison') {
-    return `${player.name} has ${String(player.poison)} poison counters. Did they lose?`;
+    return shared
+      ? `${subject} has ${String(player.poison)} shared poison counters. ${lose}`
+      : `${player.name} has ${String(player.poison)} poison counters. Did they lose?`;
   }
   if (cause?.type === 'hit') {
     return `${player.name} owns ${String(player.counters.hit)} exiled cards with hit counters. Did they lose?`;
@@ -3646,9 +3727,13 @@ function lossPrompt(player: TrackerPlayer, state: TrackerState): string {
         : source.commander.name === source.owner.name
           ? source.owner.name
           : `${source.owner.name}'s ${source.commander.name}`;
-    return `${player.name} has taken ${String(damage)} commander damage from ${from}. Did they lose?`;
+    return shared
+      ? `${subject} has taken ${String(damage)} commander damage from ${from}. ${lose}`
+      : `${player.name} has taken ${String(damage)} commander damage from ${from}. Did they lose?`;
   }
-  return `${player.name} is at ${String(player.life)} life. Did they lose?`;
+  return shared
+    ? `${subject} is at ${String(player.life)} life. ${lose}`
+    : `${player.name} is at ${String(player.life)} life. Did they lose?`;
 }
 
 /**
@@ -3685,12 +3770,16 @@ function CommanderSheet({
   dispatch: (action: TrackerAction) => void;
   onClose: () => void;
 }) {
-  const opponents = state.players.filter((other) => other.id !== player.id);
+  const teammates = new Set(teamForPlayer(state, player.id).map((row) => row.id));
+  const opponents = state.players.filter((other) => !teammates.has(other.id));
+  const shared = teammates.size > 1;
   return (
     <section className="flex h-full w-full flex-col">
       <header className="mb-2 flex shrink-0 items-center justify-between gap-3">
         <h4 className="font-display truncate text-sm leading-tight font-bold">
-          Commander damage on {player.name}
+          {shared
+            ? 'Shared commander damage'
+            : `Commander damage on ${player.name}`}
         </h4>
         <button
           type="button"

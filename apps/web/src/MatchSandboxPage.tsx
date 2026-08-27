@@ -63,10 +63,7 @@ export function MatchSandboxPage() {
           forgetActiveMatch('/match');
           setShowTracker(false);
         }}
-        onQuit={() => {
-          forgetActiveMatch('/match');
-          void navigate('/');
-        }}
+        onQuit={() => void navigate('/')}
         challengeProgress={challengeProgress}
         onChallengeComplete={async (challengeId, participantId) => {
           const challenge = challengeById(challengeId);

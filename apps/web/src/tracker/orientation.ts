@@ -5,7 +5,8 @@ import { useEffect, useState } from 'react';
  *
  * Some of the board is geometry rather than styling — a rotated card's viewBox,
  * for one — so the orientation has to be readable from JavaScript and not only
- * from a `landscape:` class.
+ * from a `landscape:` class. Re-checks on focus/visibility because returning
+ * from another app can leave a stale matchMedia result.
  */
 export function useLandscape(): boolean {
   const [landscape, setLandscape] = useState(
@@ -14,50 +15,85 @@ export function useLandscape(): boolean {
 
   useEffect(() => {
     const query = window.matchMedia('(orientation: landscape)');
-    function update(event: MediaQueryListEvent) {
-      setLandscape(event.matches);
+    function sync() {
+      setLandscape(query.matches);
     }
-    setLandscape(query.matches);
-    query.addEventListener('change', update);
+    sync();
+    query.addEventListener('change', sync);
+    document.addEventListener('visibilitychange', sync);
+    window.addEventListener('pageshow', sync);
+    window.addEventListener('focus', sync);
     return () => {
-      query.removeEventListener('change', update);
+      query.removeEventListener('change', sync);
+      document.removeEventListener('visibilitychange', sync);
+      window.removeEventListener('pageshow', sync);
+      window.removeEventListener('focus', sync);
     };
   }, []);
 
   return landscape;
 }
 
+function useCoarsePointer(): boolean {
+  const [coarse, setCoarse] = useState(
+    () => window.matchMedia('(pointer: coarse)').matches,
+  );
+
+  useEffect(() => {
+    const query = window.matchMedia('(pointer: coarse)');
+    function sync() {
+      setCoarse(query.matches);
+    }
+    sync();
+    query.addEventListener('change', sync);
+    return () => query.removeEventListener('change', sync);
+  }, []);
+
+  return coarse;
+}
+
 /**
- * Turns the phone on its side for as long as the board is up, where the browser
- * allows it.
+ * Board layout orientation. On a phone held upright, WebKit cannot lock the
+ * OS orientation, so the board pretends it is landscape and CSS rotates the
+ * shell — `forceRotate` is the signal for that transform.
+ */
+export function useBoardLandscape(): {
+  landscape: boolean;
+  forceRotate: boolean;
+} {
+  const natural = useLandscape();
+  const coarse = useCoarsePointer();
+  const forceRotate = coarse && !natural;
+  return {
+    landscape: natural || forceRotate,
+    forceRotate,
+  };
+}
+
+/**
+ * Turns the phone on its side for as long as the life tracker board is up,
+ * where the browser allows it. Pass `enabled` false during pre-game deal /
+ * seating screens so those stay portrait.
  *
  * Chrome only grants the lock to a document in element-level fullscreen, and
  * fullscreen only off a user gesture, so the two are asked for together. The
- * gesture that opened the board pays for the first attempt; if it has already
- * been spent by the time this runs, the next tap pays for a retry. Hiding the
- * browser chrome is the other half of what fullscreen buys, which is worth
- * having on its own.
+ * gesture that opened the board pays for the first attempt; later taps retry
+ * until it sticks. Coming back from another app unlocks the phone, so
+ * visibility/focus also re-arms the lock.
  *
- * WebKit has neither this lock nor the manifest's orientation, so on an iPhone
- * nothing here fires and the board asks to be turned by hand instead.
+ * WebKit has neither this lock nor a per-page manifest orientation, so on an
+ * iPhone nothing here fires and `useBoardLandscape` rotates the board instead.
  */
-export function useLandscapeLock(): void {
+export function useLandscapeLock(enabled = true): void {
   useEffect(() => {
-    /*
-      The lock is absent from the DOM types this project builds against and from
-      WebKit at runtime, so it is described here and looked for before it is
-      called.
-    */
+    if (!enabled) {
+      return;
+    }
     type LockableOrientation = ScreenOrientation & {
       lock?: (orientation: 'landscape') => Promise<void>;
       unlock?: () => void;
     };
 
-    /*
-      A desktop browser would honour the fullscreen half and refuse the lock,
-      leaving a developer staring at a fullscreen window they never asked for.
-      Only a touch device is trying to be a game board.
-    */
     if (!window.matchMedia('(pointer: coarse)').matches) {
       return;
     }
@@ -69,8 +105,13 @@ export function useLandscapeLock(): void {
 
     let cancelled = false;
     let locked = false;
+    let inflight = false;
 
     async function lockLandscape(): Promise<void> {
+      if (cancelled || locked || inflight) {
+        return;
+      }
+      inflight = true;
       try {
         if (!document.fullscreenElement) {
           await document.documentElement.requestFullscreen({
@@ -82,34 +123,44 @@ export function useLandscapeLock(): void {
         }
         await lockLandscapeOrientation('landscape');
         locked = true;
-        window.removeEventListener('pointerdown', retry);
       } catch {
+        locked = false;
         /* A browser that refuses either half leaves the phone as it is held. */
+      } finally {
+        inflight = false;
       }
     }
 
-    /*
-      One retry, and only from a tap, which always carries a gesture: if the
-      browser refuses that too it is never going to agree, and every later tap
-      would pay for a rejected promise to learn the same thing.
-    */
-    function retry(): void {
-      window.removeEventListener('pointerdown', retry);
+    function retryFromGesture(): void {
       if (!locked) {
         void lockLandscape();
       }
     }
 
+    function onVisible(): void {
+      if (document.visibilityState !== 'visible') {
+        locked = false;
+        return;
+      }
+      void lockLandscape();
+    }
+
     void lockLandscape();
-    window.addEventListener('pointerdown', retry);
+    window.addEventListener('pointerdown', retryFromGesture);
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('pageshow', onVisible);
+    window.addEventListener('focus', onVisible);
 
     return () => {
       cancelled = true;
-      window.removeEventListener('pointerdown', retry);
+      window.removeEventListener('pointerdown', retryFromGesture);
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('pageshow', onVisible);
+      window.removeEventListener('focus', onVisible);
       orientation.unlock?.();
       if (document.fullscreenElement) {
         void document.exitFullscreen().catch(() => undefined);
       }
     };
-  }, []);
+  }, [enabled]);
 }

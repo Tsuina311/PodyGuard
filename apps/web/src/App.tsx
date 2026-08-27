@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link, Route, Routes, useMatch } from 'react-router-dom';
 import { checkHealth } from './api';
-import { shouldShowWakeScreen } from './server-wake';
+import {
+  KEEP_ALIVE_INTERVAL_MS,
+  readLastKeepAlivePingAt,
+  shouldSendKeepAlivePing,
+  shouldShowWakeScreen,
+  writeLastKeepAlivePingAt,
+} from './server-wake';
 import { HomePage } from './HomePage';
 import { HostPage } from './HostPage';
 import { JoinPage } from './JoinPage';
@@ -54,6 +60,11 @@ export function App() {
   );
 }
 
+/**
+ * Cold-start wake screen, then a light shared keepalive while the tab is
+ * visible. GitHub Actions also pings on a schedule; phones only fill the gaps
+ * and never each open their own hammer.
+ */
 function useServerWake(): boolean {
   const isProd = import.meta.env.PROD;
   const [healthOk, setHealthOk] = useState<boolean | null>(isProd ? null : true);
@@ -65,28 +76,72 @@ function useServerWake(): boolean {
     }
     const started = Date.now();
     let cancelled = false;
-    let timer = 0;
-    const tick = async () => {
+    let retryTimer = 0;
+    let intervalTimer = 0;
+    let waking = true;
+
+    const markWaited = () => {
+      if (!cancelled) {
+        setWaitedMs(Date.now() - started);
+      }
+    };
+
+    const probe = async (force: boolean) => {
+      if (cancelled) {
+        return;
+      }
+      if (
+        !force &&
+        !shouldSendKeepAlivePing({
+          now: Date.now(),
+          lastPingAt: readLastKeepAlivePingAt(),
+        })
+      ) {
+        return;
+      }
+      // Claim the slot before awaiting so sibling tabs skip this beat.
+      writeLastKeepAlivePingAt(Date.now());
       const ok = await checkHealth();
       if (cancelled) {
         return;
       }
-      setWaitedMs(Date.now() - started);
+      markWaited();
       setHealthOk(ok);
+      waking = !ok;
       if (!ok) {
-        timer = window.setTimeout(() => void tick(), 2500);
+        retryTimer = window.setTimeout(() => void probe(true), 2500);
       }
     };
-    const delay = window.setTimeout(() => {
-      setWaitedMs(Date.now() - started);
-    }, 800);
-    void tick();
+
+    const onVisible = () => {
+      if (document.visibilityState !== 'visible') {
+        return;
+      }
+      // Force only while the host is down; otherwise honour the shared gap so
+      // flipping between apps does not stampede /health.
+      void probe(waking);
+    };
+
+    const delay = window.setTimeout(markWaited, 800);
+    void probe(true);
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onVisible);
+    intervalTimer = window.setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        void probe(false);
+      }
+    }, KEEP_ALIVE_INTERVAL_MS);
+
     return () => {
       cancelled = true;
-      window.clearTimeout(timer);
+      window.clearTimeout(retryTimer);
       window.clearTimeout(delay);
+      window.clearInterval(intervalTimer);
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onVisible);
     };
   }, [isProd]);
 
   return shouldShowWakeScreen({ isProd, healthOk, waitedMs });
 }
+

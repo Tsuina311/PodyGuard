@@ -1,0 +1,28 @@
+# Render free instances sleep after ~15 minutes without HTTP traffic.
+# One scheduled ping keeps the API warm without every phone doing it.
+name: Keep API awake
+
+on:
+  schedule:
+    # Every 10 minutes. GitHub may delay cron jobs when the runner pool is busy.
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render /health
+        env:
+          API_ORIGIN: ${{ vars.API_ORIGIN }}
+        run: |
+          if [ -z "$API_ORIGIN" ]; then
+            echo "Set repository variable API_ORIGIN (same as the Pages workflow)."
+            exit 1
+          fi
+          origin="${API_ORIGIN%/}"
+          echo "GET ${origin}/health"
+          curl -fsS --retry 2 --retry-delay 5 --max-time 90 "${origin}/health"

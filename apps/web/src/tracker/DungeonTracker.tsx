@@ -7,7 +7,7 @@ import {
   type DungeonRoom,
 } from './dungeons';
 import type { TrackerAction, TrackerState } from './engine';
-import { useLandscape } from './orientation';
+import { useBoardLandscape } from './orientation';
 import { Button } from '../ui/Button';
 import { cx } from '../ui/cx';
 
@@ -30,7 +30,7 @@ const CARD_H = 680;
   the wasted margins for roughly double the map.
 */
 export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
-  const landscape = useLandscape();
+  const { landscape } = useBoardLandscape();
   const progress = state.dungeons[playerId];
   const completedIds = new Set(state.completedDungeons[playerId] ?? []);
   const canStepBack = (progress?.visitedRoomIds.length ?? 0) > 1;

@@ -96,7 +96,7 @@ export const MODE_RULES: Record<GameMode, ModeRules> = {
         bullets: [
           'A team loses when its shared life reaches 0.',
           `A team loses at ${String(TWO_HEADED_GIANT_POISON_LIMIT)} shared poison counters.`,
-          commanderCombat,
+          `A team loses after taking ${String(COMMANDER_DAMAGE_LIMIT)} shared combat damage from one commander.`,
         ],
       },
       {
@@ -136,7 +136,7 @@ export const MODE_RULES: Record<GameMode, ModeRules> = {
         heading: 'Life and loss',
         bullets: [
           'The Archenemy loses at 0 life, or when the usual poison and commander-damage limits are reached.',
-          'The heroes lose together when their shared life reaches 0.',
+          'The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.',
           commanderCombat,
           commanderTax,
         ],

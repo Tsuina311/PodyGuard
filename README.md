@@ -55,6 +55,11 @@ The player-facing site is a static build on **GitHub Pages** (always on). The
 API, database, and live updates stay on **Render** (free instances sleep when
 idle). Phones open Pages immediately and see a wake message while Render boots.
 
+A scheduled GitHub Action (`Keep API awake`) pings `/health` about every ten
+minutes so the free instance stays warm when nobody has the app open. Open
+phones also share one keepalive among themselves (localStorage), so a full
+table does not multiply the traffic.
+
 Share and print the GitHub Pages URL, not the Render URL. Event links look like
 `https://<user>.github.io/PodyGuard/#/e/ABC123`.
 

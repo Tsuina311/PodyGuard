@@ -59,7 +59,7 @@ describe('Two-Headed Giant tracker', () => {
     ).toEqual([60, 60]);
   });
 
-  it('applies commander damage to shared life but tracks it per player', () => {
+  it('applies commander damage to the shared life and shared damage totals', () => {
     const state = applyTrackerAction(twoHeadedGiant(), {
       type: 'commander',
       commanderId: 'c:1',
@@ -77,7 +77,7 @@ describe('Two-Headed Giant tracker', () => {
       state.players.find((player) => player.id === 'b')?.commanderDamage[
         'c:1'
       ],
-    ).toBeUndefined();
+    ).toBe(7);
   });
 
   it('randomly chooses a starting team', () => {
@@ -85,18 +85,15 @@ describe('Two-Headed Giant tracker', () => {
     expect(state.firstPlayerId).toBe('c');
   });
 
-  it('uses the Commander team poison limit of 20', () => {
+  it('uses the Commander team poison limit of 20 on the shared total', () => {
     let state = twoHeadedGiant();
     state = applyTrackerAction(state, {
       type: 'poison',
       playerId: 'a',
-      delta: 10,
+      delta: 20,
     });
-    state = applyTrackerAction(state, {
-      type: 'poison',
-      playerId: 'b',
-      delta: 10,
-    });
+    expect(state.players.find((player) => player.id === 'a')?.poison).toBe(20);
+    expect(state.players.find((player) => player.id === 'b')?.poison).toBe(20);
     expect(
       state.players.find((player) => player.id === 'a')?.pendingLoss,
     ).toEqual({ type: 'poison' });
@@ -192,18 +189,24 @@ describe('Archenemy Commander tracker', () => {
     expect(state.pastSchemeIds).toEqual(['328', '332']);
   });
 
-  it('uses individual poison but wins and loses as a team', () => {
+  it('shares poison across the hero team and wins and loses as a team', () => {
     let state = applyTrackerAction(archenemy(), {
       type: 'poison',
       playerId: 'c',
       delta: 10,
     });
-    expect(state.players.find((player) => player.id === 'c')?.pendingLoss).toEqual(
+    expect(
+      state.players
+        .filter((player) => ['b', 'c', 'd'].includes(player.id))
+        .every((player) => player.poison === 10),
+    ).toBe(true);
+    expect(state.players.find((player) => player.id === 'b')?.pendingLoss).toEqual(
       { type: 'poison' },
     );
+    expect(state.players.find((player) => player.id === 'c')?.pendingLoss).toBeNull();
     state = applyTrackerAction(state, {
       type: 'confirmLoss',
-      playerId: 'c',
+      playerId: 'b',
     });
     expect(
       state.players

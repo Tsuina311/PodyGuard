@@ -1,19 +1,32 @@
 import { useEffect, useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
 
-type Theme = 'light' | 'dark';
+export type Theme = 'light' | 'dark';
 
 const STORAGE_KEY = 'podyguard-theme';
+const THEME_EVENT = 'podyguard-theme';
 
 function preferredTheme(): Theme {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored === 'light' || stored === 'dark') return stored;
-  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  return window.matchMedia('(prefers-color-scheme: light)').matches
+    ? 'light'
+    : 'dark';
 }
 
 function applyTheme(theme: Theme): void {
   document.documentElement.dataset.theme = theme;
   document.documentElement.style.colorScheme = theme;
+  document
+    .querySelector('meta[name="theme-color"]')
+    ?.setAttribute('content', theme === 'light' ? '#f7f9fc' : '#03060e');
+}
+
+/** Sets light/dark for the whole app and keeps any open ThemeToggle in sync. */
+export function setAppTheme(theme: Theme): void {
+  applyTheme(theme);
+  localStorage.setItem(STORAGE_KEY, theme);
+  document.dispatchEvent(new CustomEvent(THEME_EVENT, { detail: theme }));
 }
 
 /**
@@ -38,6 +51,17 @@ export function ThemeToggle() {
       .querySelector('meta[name="theme-color"]')
       ?.setAttribute('content', theme === 'light' ? '#f7f9fc' : '#03060e');
   }, [theme]);
+
+  useEffect(() => {
+    function onExternal(event: Event) {
+      const next = (event as CustomEvent<Theme>).detail;
+      if (next === 'light' || next === 'dark') {
+        setTheme(next);
+      }
+    }
+    document.addEventListener(THEME_EVENT, onExternal);
+    return () => document.removeEventListener(THEME_EVENT, onExternal);
+  }, []);
 
   const nextTheme = theme === 'dark' ? 'light' : 'dark';
 

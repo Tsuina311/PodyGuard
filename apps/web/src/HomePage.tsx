@@ -7,7 +7,7 @@ import {
   type GameMode,
   type TreacheryPodSize,
 } from '@podyguard/shared';
-import { ChevronDown, Play, QrCode, Radio } from 'lucide-react';
+import { Play, QrCode, Radio } from 'lucide-react';
 import { ApiError, createEvent, saveHostToken } from './api';
 import { activeMatchPath } from './active-match';
 import {
@@ -24,7 +24,6 @@ import { Field } from './ui/Field';
 import { Panel } from './ui/Panel';
 import { QrScannerDialog } from './ui/QrScannerDialog';
 import { ThemeToggleCorner } from './ui/ThemeToggle';
-import { cx } from './ui/cx';
 
 type ExpandedSection = 'play' | 'host' | null;
 
@@ -32,7 +31,10 @@ export function HomePage() {
   const navigate = useNavigate();
   const staleJoin =
     (useLocation().state as { staleJoin?: boolean } | null)?.staleJoin === true;
-  const [expanded, setExpanded] = useState<ExpandedSection>(null);
+  const ongoingMatch = activeMatchPath();
+  const [expanded, setExpanded] = useState<ExpandedSection>(() =>
+    ongoingMatch ? 'play' : null,
+  );
   const [scannerOpen, setScannerOpen] = useState(false);
   const [name, setName] = useState('');
   const [hostPin, setHostPin] = useState('');
@@ -46,7 +48,6 @@ export function HomePage() {
   const [joinCode, setJoinCode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const ongoingMatch = activeMatchPath();
   const [trackerMode, setTrackerMode] = useState<StandaloneGameMode>(
     () => loadMatchConfig().gameMode,
   );
@@ -136,34 +137,17 @@ export function HomePage() {
       </header>
 
       <div className="grid gap-2">
-        <Button
-          type="button"
-          variant={expanded === 'play' ? 'neon' : 'primary'}
-          size="lg"
-          block
-          className="justify-between"
-          onClick={() => toggle('play')}
-          aria-expanded={expanded === 'play'}
+        <Panel
+          title={
+            <span className="inline-flex items-center gap-2">
+              <Play size={18} aria-hidden />
+              Start playing
+            </span>
+          }
+          aside={ongoingMatch ? 'ongoing game' : 'no event needed'}
+          expanded={expanded === 'play'}
+          onToggle={() => toggle('play')}
         >
-          <span className="inline-flex items-center gap-2">
-            <Play size={18} aria-hidden />
-            Start playing
-          </span>
-          <ChevronDown
-            size={16}
-            aria-hidden
-            className={cx(
-              'transition',
-              expanded === 'play' && 'rotate-180',
-            )}
-          />
-        </Button>
-        {expanded === 'play' ? (
-          <Panel
-            title="Life tracker"
-            aside={ongoingMatch ? 'ongoing game' : 'no event needed'}
-            className="mt-1"
-          >
             <p className="text-muted mb-3 text-sm">
               Open a battle screen on this device. Leave and come back without
               losing an unfinished game.
@@ -253,34 +237,20 @@ export function HomePage() {
                 Advanced match config
               </Link>
             </p>
-          </Panel>
-        ) : null}
+        </Panel>
 
-        <Button
-          type="button"
-          variant={expanded === 'host' ? 'neon' : 'glass'}
-          size="lg"
-          block
-          className="justify-between"
-          onClick={() => toggle('host')}
-          aria-expanded={expanded === 'host'}
-        >
-          <span className="inline-flex items-center gap-2">
-            <Radio size={18} aria-hidden />
-            Host event
-          </span>
-          <ChevronDown
-            size={16}
-            aria-hidden
-            className={cx(
-              'transition',
-              expanded === 'host' && 'rotate-180',
-            )}
-          />
-        </Button>
-        {expanded === 'host' ? (
-          <Panel title="Host an event" aside="new" className="mt-1" onSubmit={onCreate}>
-            <fieldset className="mb-4">
+        <Panel
+          title={
+            <span className="inline-flex items-center gap-2">
+              <Radio size={18} aria-hidden />
+              Host event
+            </span>
+          }
+          aside="new"
+          expanded={expanded === 'host'}
+          onToggle={() => toggle('host')}
+          onSubmit={onCreate}
+        >            <fieldset className="mb-4">
               <legend className="text-muted mb-2 text-sm">Game</legend>
               <div className="grid grid-cols-2 gap-2">
                 {(
@@ -492,8 +462,7 @@ export function HomePage() {
             <Button type="submit" size="lg" block disabled={busy}>
               {busy ? 'Creating…' : 'Create event'}
             </Button>
-          </Panel>
-        ) : null}
+        </Panel>
       </div>
 
       <Panel title="Join with a code" aside="player">

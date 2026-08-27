@@ -1,5 +1,21 @@
 @import 'tailwindcss';
 
+/*
+  Board landscape matches a sideways phone, or a phone shell that CSS-rotated
+  itself when the OS would not lock orientation (every iPhone).
+*/
+@custom-variant landscape {
+  @media (orientation: landscape) {
+    @slot;
+  }
+  &.board-landscape {
+    @slot;
+  }
+  .board-landscape & {
+    @slot;
+  }
+}
+
 @theme {
   --font-display: 'Space Grotesk', 'Avenir Next', 'Segoe UI', sans-serif;
   --font-sans: 'Space Grotesk', 'Avenir Next', 'Segoe UI', sans-serif;

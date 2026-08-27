@@ -440,7 +440,7 @@ export function applyTrackerAction(
     }
     case 'poison': {
       const player = playerById(next, action.playerId);
-      player.poison = Math.max(0, player.poison + action.delta);
+      setSharedPoison(next, player.id, player.poison + action.delta);
       break;
     }
     case 'tax': {
@@ -478,7 +478,7 @@ export function applyTrackerAction(
       const nextDamage = Math.max(0, current + action.delta);
       // Commander damage is combat damage, so life changes by the same amount.
       setSharedLife(next, target.id, target.life - (nextDamage - current));
-      target.commanderDamage[action.commanderId] = nextDamage;
+      setSharedCommanderDamage(next, target.id, action.commanderId, nextDamage);
       break;
     }
     case 'dayNight':
@@ -711,12 +711,26 @@ function raiseLossPrompts(state: TrackerState): void {
     const team = state.teams?.find((row) => row.includes(player.id));
     const teamRepresentative =
       state.teamMode === 'emperor' || !team || team[0] === player.id;
-    const active = activeLossCauses(state, player).filter(
-      (cause) =>
-        teamRepresentative ||
-        (cause.type !== 'life' &&
-          (state.teamMode !== 'two-headed-giant' || cause.type !== 'poison')),
-    );
+    // Shared-life sides (2HG, Archenemy heroes) keep one prompt for life,
+    // poison, and commander damage on the seat that owns the shared chrome.
+    const sharedSide =
+      state.teamMode === 'two-headed-giant' ||
+      state.teamMode === 'archenemy-commander';
+    const active = activeLossCauses(state, player).filter((cause) => {
+      if (teamRepresentative) {
+        return true;
+      }
+      if (cause.type === 'life') {
+        return false;
+      }
+      if (
+        sharedSide &&
+        (cause.type === 'poison' || cause.type === 'commander')
+      ) {
+        return false;
+      }
+      return true;
+    });
     const activeKeys = new Set(active.map(causeKey));
     player.answeredCauses = player.answeredCauses.filter((key) =>
       activeKeys.has(key),
@@ -746,14 +760,10 @@ function activeLossCauses(
   if (player.life <= 0) {
     causes.push({ type: 'life' });
   }
-  const poison = state.teamMode === 'two-headed-giant'
-    ? teamForPlayer(state, player.id).reduce(
-        (total, member) => total + member.poison,
-        0,
-      )
-    : player.poison;
+  // 2HG mirrors poison onto every teammate like life, so the seat value is the
+  // team total — do not sum or the limit trips at half.
   if (
-    poison >=
+    player.poison >=
     (state.teamMode === 'two-headed-giant'
       ? TWO_HEADED_GIANT_POISON_LIMIT
       : POISON_LIMIT)
@@ -1009,18 +1019,47 @@ function playersEliminatedWith(
   return [playerById(state, playerId)];
 }
 
+/** Sides that share one life total also share poison and commander damage. */
+function sharedLifeSide(state: TrackerState, playerId: string): TrackerPlayer[] {
+  if (
+    state.teamMode === 'two-headed-giant' ||
+    state.teamMode === 'archenemy-commander'
+  ) {
+    return teamForPlayer(state, playerId);
+  }
+  return [playerById(state, playerId)];
+}
+
 function setSharedLife(
   state: TrackerState,
   playerId: string,
   life: number,
 ): void {
-  const players =
-    state.teamMode === 'emperor'
-      ? [playerById(state, playerId)]
-      : teamForPlayer(state, playerId);
-  for (const player of players) {
+  for (const player of sharedLifeSide(state, playerId)) {
     player.life = life;
     player.minimumLife = Math.min(player.minimumLife ?? life, life);
+  }
+}
+
+function setSharedPoison(
+  state: TrackerState,
+  playerId: string,
+  poison: number,
+): void {
+  const next = Math.max(0, poison);
+  for (const player of sharedLifeSide(state, playerId)) {
+    player.poison = next;
+  }
+}
+
+function setSharedCommanderDamage(
+  state: TrackerState,
+  playerId: string,
+  commanderId: string,
+  damage: number,
+): void {
+  for (const player of sharedLifeSide(state, playerId)) {
+    player.commanderDamage[commanderId] = damage;
   }
 }
 

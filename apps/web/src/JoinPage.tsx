@@ -510,12 +510,7 @@ export function JoinPage() {
               commanders: row.assignedCommanders ?? [],
             }))}
           onFinish={onTrackerFinished}
-          onQuit={() => {
-            if (event) {
-              forgetActiveMatch(`/e/${event.joinCode}`);
-            }
-            void navigate('/');
-          }}
+          onQuit={() => void navigate('/')}
           challengeProgress={challengeProgress}
           onChallengeComplete={onChallengeComplete}
           challengePack={event?.challengePack ?? OFFICIAL_COMMANDER_CHALLENGES}
