@@ -21,6 +21,7 @@ import {
   Eye,
   Gauge,
   Minus,
+  MessageSquare,
   Moon,
   MoreHorizontal,
   Nut,
@@ -48,6 +49,7 @@ import {
   OFFICIAL_COMMANDER_CHALLENGES,
   treacheryIdentityById,
   usesCommanderRules,
+  usesCommanderDamage,
   type ChallengeDetectionMode,
   type ChallengePack,
   type GameMode,
@@ -112,6 +114,7 @@ import {
 } from './challenges';
 import i18n from '../i18n';
 import { forgetActiveMatch } from '../active-match';
+import { useFeedback } from '../feedback/FeedbackContext';
 import { seatColor } from '../match-config';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
@@ -580,6 +583,7 @@ export function TrackerView({
     : null;
   const confirmation = detectedConfirmation(state, challengePack);
   const commanderRules = usesCommanderRules(gameMode, rulesFormat);
+  const commanderDamageRules = usesCommanderDamage(gameMode, rulesFormat);
   const archenemyBoard =
     gameMode === 'archenemy-commander' &&
     state.teamMode === 'archenemy-commander';
@@ -1547,6 +1551,26 @@ export function TrackerView({
                 </Badge>
               </span>
             ) : null}
+            {gameMode === 'assassin' ? (
+              <span className="absolute top-2 left-2 z-20">
+                <Badge
+                  tone="dev"
+                  title={t('tracker.marks', {
+                    count: state.assassinScores[player.id] ?? 0,
+                  })}
+                >
+                  <Crosshair size={12} aria-hidden />
+                  <span aria-hidden className="text-[0.65rem] font-semibold tabular-nums">
+                    {state.assassinScores[player.id] ?? 0}
+                  </span>
+                  <span className="sr-only">
+                    {t('tracker.marks', {
+                      count: state.assassinScores[player.id] ?? 0,
+                    })}
+                  </span>
+                </Badge>
+              </span>
+            ) : null}
             <div
               className={cx(
                 'relative z-10 flex shrink-0 items-start justify-between gap-2',
@@ -1572,14 +1596,6 @@ export function TrackerView({
                 />
               </span>
               <span className="flex shrink-0 flex-wrap justify-end gap-1">
-                {gameMode === 'assassin' ? (
-                  <Badge tone="crown">
-                    <Crosshair size={12} aria-hidden />
-                    {t('tracker.marks', {
-                      count: state.assassinScores[player.id] ?? 0,
-                    })}
-                  </Badge>
-                ) : null}
                 {emperorBoard && !state.emperorIds.includes(player.id) ? (
                   <Badge tone="idle" title={t('tracker.generalRange')}>
                     <span className="sr-only">{t('tracker.general')}</span>
@@ -1654,7 +1670,7 @@ export function TrackerView({
                 >
                   <SlidersHorizontal size={18} aria-hidden />
                 </IconButton>
-                {!sharedLifeBoard && commanderRules ? (
+                {!sharedLifeBoard && commanderDamageRules ? (
                   <CommanderDamageChip
                     state={state}
                     player={player}
@@ -1857,7 +1873,7 @@ export function TrackerView({
                       onlyPoison
                       onOpen={() => setCounterPlayerId(first.id)}
                     />
-                    {commanderRules ? (
+                    {commanderDamageRules ? (
                       <CommanderDamageChip
                         state={state}
                         player={first}
@@ -1999,7 +2015,7 @@ export function TrackerView({
         they stay rendered and decoded out of sight. Columns are laid out the
         same in every sheet, so each crop is decoded once and shared.
       */}
-      {commanderRules
+      {commanderDamageRules
         ? state.players.map((seat) => {
         const open = commanderPlayerId === seat.id;
         return createPortal(
@@ -2707,6 +2723,7 @@ function MatchMenu({
   onClose: () => void;
 }) {
   const { t } = useTranslation();
+  const { openFeedback } = useFeedback();
   const paused = Boolean(state.pausedAt);
   const decided = Boolean(state.winnerId);
   const winner = state.players.find((row) => row.id === state.winnerId) ?? null;
@@ -2720,7 +2737,7 @@ function MatchMenu({
           {t('tracker.match')}
         </h4>
         <div className="flex items-center gap-2">
-          <LanguageSwitcher />
+          <LanguageSwitcher align="end" />
           <ThemeToggle />
           <button
             type="button"
@@ -2787,6 +2804,19 @@ function MatchMenu({
           <Button size="sm" variant="glass" onClick={onRules}>
             <BookOpen size={14} aria-hidden />
             {t('tracker.readRules')}
+          </Button>
+          <Button
+            size="sm"
+            variant="glass"
+            onClick={() =>
+              openFeedback({
+                participantStatus: 'playing',
+                gameMode: state.gameMode,
+              })
+            }
+          >
+            <MessageSquare size={14} aria-hidden />
+            {t('feedback.open')}
           </Button>
           {onTargets ? (
             <Button size="sm" variant="glass" onClick={onTargets}>
@@ -4173,6 +4203,7 @@ function restore(
         const resolvedFormat = parsed.rulesFormat ?? rulesFormat;
         return {
           ...parsed,
+          gameMode: parsed.gameMode ?? gameMode,
           rulesFormat: resolvedFormat,
           teams: parsed.teams ?? null,
           teamMode: parsed.teamMode ?? null,

@@ -1,4 +1,4 @@
-import type { CommanderSelection } from '@podyguard/shared';
+import type { CommanderSearchProfile, CommanderSelection } from '@podyguard/shared';
 
 const DEFAULT_BASE_URL = 'https://api.scryfall.com';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1_000;
@@ -97,17 +97,16 @@ export class ScryfallClient {
   async searchCommanders(
     query: string,
     pairedWithCardId?: string,
+    profile: CommanderSearchProfile = 'commander',
   ): Promise<CommanderSelection[]> {
     const normalizedQuery = query.trim();
-    const cacheKey = `commanders:${normalizedQuery}:${pairedWithCardId ?? ''}`;
+    const cacheKey = `commanders:${profile}:${normalizedQuery}:${pairedWithCardId ?? ''}`;
     const cached = this.getCached<CommanderSelection[]>(cacheKey);
     if (cached) {
       return cached;
     }
 
-    const terms = [normalizedQuery, 'is:commander', 'legal:commander'].filter(
-      Boolean,
-    );
+    const terms = [normalizedQuery, ...legalityTerms(profile)].filter(Boolean);
     if (pairedWithCardId) {
       const selected = await this.cardById(pairedWithCardId);
       terms.push(pairingConstraint(selected));
@@ -310,6 +309,17 @@ export class ScryfallClient {
       expiresAt: this.now() + CACHE_TTL_MS,
       value,
     });
+  }
+}
+
+function legalityTerms(profile: CommanderSearchProfile): string[] {
+  switch (profile) {
+    case 'duel-commander':
+      return ['is:duelcommander', 'legal:duel'];
+    case 'brawl':
+      return ['is:brawler', 'f:brawl'];
+    default:
+      return ['is:commander', 'legal:commander'];
   }
 }
 

@@ -25,7 +25,6 @@ import {
 import { Brand } from './ui/Brand';
 import { Button } from './ui/Button';
 import { Field } from './ui/Field';
-import { LanguageSwitcherCorner } from './ui/LanguageSwitcher';
 import { Panel } from './ui/Panel';
 import { QrScannerDialog } from './ui/QrScannerDialog';
 import { ThemeToggleCorner } from './ui/ThemeToggle';
@@ -103,6 +102,7 @@ export function HomePage() {
   }
 
   function startTracker() {
+    setError(null);
     const config = loadMatchConfig();
     const seatCount = trackerSeats;
     const rulesFormat = playFamily ?? config.rulesFormat;
@@ -112,9 +112,8 @@ export function HomePage() {
       rulesFormat,
       seatCount,
       names: defaultSeatNames(Math.max(seatCount, 8)),
-      resetCount: config.resetCount + 1,
     });
-    void navigate('/match');
+    void navigate('/match-config');
   }
 
   async function onCreate(event: FormEvent) {
@@ -143,7 +142,9 @@ export function HomePage() {
               ? assassinPodSize
               : gameMode === 'multiplayer'
                 ? multiplayerPodSize
-                : gameMode === 'duel'
+                : gameMode === 'duel' ||
+                    gameMode === 'duel-commander' ||
+                    gameMode === 'brawl'
                   ? 2
                   : gameMode === 'emperor'
                     ? 6
@@ -177,7 +178,6 @@ export function HomePage() {
 
   return (
     <>
-      <LanguageSwitcherCorner />
       <ThemeToggleCorner />
       <header className="mb-1">
         <Brand className="mb-3" />
@@ -285,11 +285,6 @@ export function HomePage() {
               </Button>
             )
           ) : null}
-          <p className="text-muted/70 mt-3 text-xs">
-            <Link className="hover:text-ink" to="/match-config">
-              {t('home.advancedMatchConfig')}
-            </Link>
-          </p>
         </Panel>
 
         <Panel
@@ -452,8 +447,16 @@ export function HomePage() {
                 ))}
               </div>
             </fieldset>
-          ) : gameMode === 'duel' ? (
-            <p className="text-muted mb-4 text-sm">{t('home.duelFixedSeats')}</p>
+          ) : gameMode === 'duel' ||
+            gameMode === 'duel-commander' ||
+            gameMode === 'brawl' ? (
+            <p className="text-muted mb-4 text-sm">
+              {gameMode === 'duel'
+                ? t('home.duelFixedSeats')
+                : gameMode === 'duel-commander'
+                  ? t('home.duelCommanderFixedSeats')
+                  : t('home.brawlFixedSeats')}
+            </p>
           ) : gameMode === 'emperor' ? (
             <p className="text-muted mb-4 text-sm">
               {t('home.emperorFixedSeats')}

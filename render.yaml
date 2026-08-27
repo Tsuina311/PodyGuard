@@ -17,3 +17,7 @@ services:
         sync: false
       - key: PARTICIPANT_SESSION_SECRET
         generateValue: true
+      - key: GITHUB_FEEDBACK_TOKEN
+        sync: false
+      - key: GITHUB_FEEDBACK_REPO
+        sync: false

@@ -1,0 +1,1079 @@
+{
+  "common": {
+    "home": "Inici",
+    "cancel": "Cancel·la",
+    "close": "Tanca",
+    "save": "Desa",
+    "loading": "Carregant…",
+    "players": "Jugadors",
+    "game": "Partida",
+    "language": "Idioma",
+    "yes": "Sí",
+    "no": "No",
+    "reset": "Reinicia",
+    "random": "Aleatori",
+    "remove": "Elimina",
+    "empty": "Buit",
+    "bot": "bot",
+    "dev": "dev",
+    "official": "oficial",
+    "open": "Obert",
+    "preferred": "preferit",
+    "player": "Jugador {{number}}",
+    "versus": "contra",
+    "teamA": "Equip A",
+    "teamB": "Equip B",
+    "working": "Processant…",
+    "creating": "Creant…",
+    "checking": "Comprovant…",
+    "joining": "Entrant…",
+    "updating": "Actualitzant…",
+    "submitting": "Enviant…",
+    "saving": "Desant…",
+    "searching": "Cercant…",
+    "unveiling": "Revelant…",
+    "copied": "Copiat",
+    "noneYet": "encara cap",
+    "dash": "—",
+    "errors": {
+      "generic": "Alguna cosa ha anat malament.",
+      "createEvent": "No s'ha pogut crear l'esdeveniment.",
+      "unlockHost": "No s'ha pogut desbloquejar el tauler de l'organitzador.",
+      "updateTable": "No s'ha pogut actualitzar la taula.",
+      "startGame": "No s'ha pogut iniciar la partida.",
+      "startAllGames": "No s'han pogut iniciar totes les partides preparades.",
+      "finishTable": "No s'ha pogut finalitzar la partida de la taula.",
+      "cancelPod": "No s'ha pogut cancel·lar el pod.",
+      "updateSettings": "No s'han pogut actualitzar els paràmetres.",
+      "matchTables": "No s'han pogut formar les taules.",
+      "fillBots": "No s'han pogut omplir les taules amb bots.",
+      "clipboard": "El porta-retalls està bloquejat — copia l'enllaç manualment.",
+      "eventNotFound": "No s'ha trobat l'esdeveniment.",
+      "joinEvent": "No s'ha pogut entrar a l'esdeveniment.",
+      "saveDecks": "No s'han pogut desar les baralles.",
+      "updateReady": "No s'ha pogut actualitzar l'estat de preparació.",
+      "updatePause": "No s'ha pogut actualitzar la pausa.",
+      "leaveEvent": "No s'ha pogut abandonar l'esdeveniment.",
+      "trackerChoice": "No s'ha pogut desar l'elecció del marcador.",
+      "saveRating": "No s'ha pogut desar aquesta valoració.",
+      "chooseCommander": "Tria un commander per a cada baralla.",
+      "enterJoinCode": "Introdueix un codi d'accés.",
+      "sessionUnavailable": "La teva sessió de l'esdeveniment ja no està disponible.",
+      "savePack": "No s'ha pogut desar el paquet.",
+      "searchScryfall": "No s'ha pogut cercar a Scryfall.",
+      "loadArtwork": "No s'ha pogut carregar la il·lustració alternativa.",
+      "submitResult": "No s'ha pogut enviar el resultat.",
+      "saveChallenge": "No s'ha pogut desar el progrés del repte.",
+      "unveilIdentity": "No s'ha pogut revelar la teva identitat.",
+      "apiWaking": "El servidor s'està despertant. Mantén aquesta pàgina oberta — normalment triga menys d'un minut.",
+      "apiUnreachable": "No es pot contactar amb l'API. El servidor està en execució (yarn dev:server)?"
+    },
+    "assignedAtTable": "Assignat a la taula",
+    "scanToJoin": "Escaneja per entrar a aquest esdeveniment"
+  },
+  "language": {
+    "en": "English",
+    "de": "Deutsch",
+    "fr": "Français",
+    "es": "Español",
+    "it": "Italiano",
+    "pt": "Português",
+    "nl": "Nederlands",
+    "pl": "Polski",
+    "sv": "Svenska",
+    "da": "Dansk",
+    "no": "Norsk",
+    "fi": "Suomi",
+    "cs": "Čeština",
+    "sk": "Slovenčina",
+    "hu": "Magyar",
+    "ro": "Română",
+    "el": "Ελληνικά",
+    "hr": "Hrvatski",
+    "sl": "Slovenščina",
+    "bg": "Български",
+    "uk": "Українська",
+    "lt": "Lietuvių",
+    "lv": "Latviešu",
+    "et": "Eesti",
+    "is": "Íslenska",
+    "ga": "Gaeilge",
+    "mt": "Malti",
+    "sr": "Srpski",
+    "sq": "Shqip",
+    "bs": "Bosanski",
+    "mk": "Македонски",
+    "be": "Беларуская",
+    "ca": "Català",
+    "eu": "Euskara",
+    "cy": "Cymraeg"
+  },
+  "families": {
+    "normal": "Normal",
+    "commander": "Commander"
+  },
+  "modes": {
+    "shared": {
+      "commanderCombat": "Un jugador perd després de rebre {{commanderDamage}} punts de dany de combat d'un sol commander.",
+      "commanderTax": "Cada vegada que un commander es torna a jugar des de la zona de comandament, costa 2 manes més.",
+      "lifeAndLoss": "Vides i derrota",
+      "turns": "Torns",
+      "commanders": "Commanders",
+      "eachPlayerLife": "Cada jugador comença amb {{life}} vides.",
+      "loseAtZero": "Un jugador perd quan arriba a 0 vides.",
+      "loseAtPoison": "Un jugador perd quan arriba a {{poison}} comptadors de verí.",
+      "startingPlayerRandom": "El jugador inicial es determina aleatòriament.",
+      "startingPlayerSkipDraw": "El jugador inicial es determina aleatòriament i se salta el pas de robar del seu primer torn.",
+      "multiplayerFirstTurnDraw": "En multijugador, aquest jugador roba durant el seu primer torn.",
+      "commanderFirstTurnDraw": "En Commander multijugador, aquest jugador roba durant el seu primer torn.",
+      "commandersInZone": "Els commanders comencen a la zona de comandament i es poden tornar a jugar des d'allà.",
+      "commanderRulesApply": "Les regles de Commander continuen aplicant-se: {{life}} vides inicials, {{poison}} de verí i {{commanderDamage}} punts de dany de combat d'un sol commander són letals."
+    },
+    "duel": {
+      "label": "Duel",
+      "hint": "Dos jugadors. Cadascun comença amb 20 vides.",
+      "hostHint": "Taules estrictes de 2 jugadors. Cadascun comença amb 20 vides.",
+      "hostFixedSeats": "Els duels sempre tenen exactament dos jugadors.",
+      "title": "Duel",
+      "summary": "Magic per a dos jugadors. Sense commanders — només les vides i el camp de batalla.",
+      "sections": {
+        "life": {
+          "heading": "Vides i derrota",
+          "bullets": [
+            "Cada jugador comença amb {{life}} vides.",
+            "Un jugador perd quan arriba a 0 vides.",
+            "Un jugador perd quan arriba a {{poison}} comptadors de verí."
+          ]
+        },
+        "turns": {
+          "heading": "Torns",
+          "bullets": [
+            "El jugador inicial es determina aleatòriament i se salta el pas de robar del seu primer torn."
+          ]
+        }
+      }
+    },
+    "multiplayer": {
+      "label": "Multijugador",
+      "hint": "Tots contra tots sense commanders. Tothom comença amb 20 vides.",
+      "hostHint": "Tots contra tots sense commanders. L'emparellament omple primer la mida de taula escollida; les taules sobrants poden tenir un mínim de tres jugadors.",
+      "title": "Multijugador",
+      "summary": "Multijugador sense el format Commander. Útil per a multijugador casual, Planechase o qualsevol taula de 20 vides.",
+      "sections": {
+        "life": {
+          "heading": "Vides i derrota",
+          "bullets": [
+            "Cada jugador comença amb {{life}} vides.",
+            "Un jugador perd quan arriba a 0 vides.",
+            "Un jugador perd quan arriba a {{poison}} comptadors de verí."
+          ]
+        },
+        "turns": {
+          "heading": "Torns",
+          "bullets": [
+            "El jugador inicial es determina aleatòriament.",
+            "En multijugador, aquest jugador roba durant el seu primer torn."
+          ]
+        }
+      }
+    },
+    "commander": {
+      "label": "Clàssic",
+      "hint": "Tots contra tots. Tothom comença amb 40 vides.",
+      "hostHint": "Commander tots contra tots. L'emparellament prefereix grups de quatre; els pods sobrants poden tenir tres o cinc jugadors quan estigui permès.",
+      "title": "Clàssic",
+      "summary": "Multijugador tots contra tots. Cada jugador lluita per si mateix.",
+      "sections": {
+        "life": {
+          "heading": "Vides i derrota",
+          "bullets": [
+            "Cada jugador comença amb {{life}} vides.",
+            "Un jugador perd quan arriba a 0 vides.",
+            "Un jugador perd quan arriba a {{poison}} comptadors de verí.",
+            "Un jugador perd després de rebre {{commanderDamage}} punts de dany de combat d'un sol commander."
+          ]
+        },
+        "turns": {
+          "heading": "Torns",
+          "bullets": [
+            "El jugador inicial es determina aleatòriament.",
+            "En Commander multijugador, aquest jugador roba durant el seu primer torn."
+          ]
+        },
+        "commanders": {
+          "heading": "Commanders",
+          "bullets": [
+            "Els commanders comencen a la zona de comandament i es poden tornar a jugar des d'allà.",
+            "Cada vegada que un commander es torna a jugar des de la zona de comandament, costa 2 manes més."
+          ]
+        }
+      }
+    },
+    "treachery": {
+      "label": "Traïció",
+      "hint": "Les identitats secretes es reparteixen en aquest dispositiu. Passeu-lo perquè cadascú pugui llegir la seva en privat.",
+      "hostHint": "Rols secrets per a pods de Commander. L'emparellament omple primer la mida de taula escollida; els pods sobrants poden tenir un mínim de quatre jugadors.",
+      "title": "Traïció",
+      "summary": "Commander amb identitats secretes. El Líder és públic; tots els altres romanen ocults.",
+      "sections": {
+        "commander": {
+          "heading": "Les regles de Commander continuen aplicant-se",
+          "bullets": [
+            "Cada jugador comença amb {{life}} vides.",
+            "Un jugador perd amb 0 vides, {{poison}} de verí o {{commanderDamage}} punts de dany de combat d'un sol commander.",
+            "El Líder juga primer i roba en aquest torn.",
+            "Cada vegada que un commander es torna a jugar des de la zona de comandament, costa 2 manes més."
+          ]
+        },
+        "identities": {
+          "heading": "Identitats",
+          "bullets": [
+            "Obre Comprova el meu rol des del menú del cronòmetre. Només tu veuràs aquesta carta.",
+            "Amb un únic marcador, reparteix les identitats durant la preparació i passa el dispositiu perquè cada jugador pugui llegir la seva en privat.",
+            "Líder: Sobreviu fins que tots els Assassins i el Traïdor hagin estat eliminats. Revela't a la taula. Els Guardians comparteixen la teva victòria, però no saps qui són.",
+            "Guardià: Mantén el Líder amb vida i elimina els seus enemics. La teva identitat és secreta. Guanyes i perds amb el Líder, encara que siguis eliminat abans.",
+            "Assassí: Elimina el Líder. La teva identitat és secreta. Els Assassins comparteixen el mateix objectiu, però no saps qui són els altres Assassins.",
+            "Traïdor: Sigues l'últim jugador que queda en peu. La teva identitat és secreta. Mantén el Líder amb vida fins que les altres amenaces hagin desaparegut i després pren el tron.",
+            "Segueix qualsevol habilitat addicional impresa a la teva carta d'identitat."
+          ]
+        }
+      },
+      "roles": {
+        "leader": {
+          "name": "Líder",
+          "objective": "Sobreviu fins que tots els Assassins i el Traïdor hagin estat eliminats.",
+          "guidance": "Revela't a la taula. Els Guardians comparteixen la teva victòria, però no saps qui són.",
+          "publicNote": "El teu rol és públic. Digues a la taula que ets el Líder."
+        },
+        "guardian": {
+          "name": "Guardià",
+          "objective": "Mantén el Líder amb vida i elimina els seus enemics.",
+          "guidance": "La teva identitat és secreta. Guanyes i perds amb el Líder, encara que siguis eliminat abans.",
+          "publicNote": "Mantén aquest rol en secret."
+        },
+        "assassin": {
+          "name": "Assassí",
+          "objective": "Elimina el Líder.",
+          "guidance": "La teva identitat és secreta. Els Assassins comparteixen el mateix objectiu, però no saps qui són els altres Assassins.",
+          "publicNote": "Mantén aquest rol en secret."
+        },
+        "traitor": {
+          "name": "Traïdor",
+          "objective": "Sigues l'últim jugador que queda en peu.",
+          "guidance": "La teva identitat és secreta. Mantén el Líder amb vida fins que les altres amenaces hagin desaparegut i després pren el tron.",
+          "publicNote": "Mantén aquest rol en secret."
+        }
+      },
+      "normal": {
+        "hint": "Identitats secretes en un telèfon compartit. Tothom comença amb 20 vides — sense commanders.",
+        "hostHint": "Rols secrets sense commanders. L'emparellament omple primer la mida de taula escollida; els pods sobrants poden tenir un mínim de quatre jugadors.",
+        "summary": "Identitats secretes sense el format Commander. El Líder és públic; tots els altres romanen ocults.",
+        "sections": {
+          "life": {
+            "heading": "Vides i derrota",
+            "bullets": [
+              "Cada jugador comença amb {{life}} vides.",
+              "Un jugador perd quan arriba a 0 vides.",
+              "Un jugador perd quan arriba a {{poison}} comptadors de verí.",
+              "El Líder juga primer i roba en aquest torn."
+            ]
+          },
+          "identities": null
+        }
+      }
+    },
+    "two-headed-giant": {
+      "label": "Gegant de Dos Caps",
+      "hint": "Dos equips de dos, amb 60 vides compartides cadascun, i torns jugats conjuntament.",
+      "hostHint": "Pods estrictes de Commander de 4 jugadors. Dos equips comparteixen 60 vides cadascun i fan els seus torns junts.",
+      "hostFixedSeats": "Les partides de Gegant de Dos Caps sempre tenen exactament quatre jugadors.",
+      "title": "Gegant de Dos Caps",
+      "summary": "Dos equips de dos. Els companys comparteixen el total de vides i el torn.",
+      "sections": {
+        "teams": {
+          "heading": "Equips",
+          "bullets": [
+            "Tria dos aliats o deixa que les parelles es decideixin aleatòriament.",
+            "Cada equip comença amb {{sharedLife}} vides compartides.",
+            "Els companys fan el seu torn junts. Cada jugador continua tenint la seva pròpia mà, biblioteca i commanders."
+          ]
+        },
+        "life": {
+          "heading": "Vides i derrota",
+          "bullets": [
+            "Un equip perd quan les seves vides compartides arriben a 0.",
+            "Un equip perd quan arriba a {{sharedPoison}} comptadors de verí compartits.",
+            "Un equip perd després de rebre {{commanderDamage}} punts de dany de combat compartit d'un sol commander."
+          ]
+        },
+        "turns": {
+          "heading": "Torns",
+          "bullets": [
+            "L'equip inicial es determina aleatòriament i se salta el pas de robar del seu primer torn.",
+            "Cada vegada que un commander es torna a jugar des de la zona de comandament, costa 2 manes més."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Dos equips de dos, amb 40 vides compartides cadascun, i torns jugats conjuntament.",
+        "hostHint": "Taules estrictes de 4 jugadors. Dos equips comparteixen 40 vides cadascun i fan els seus torns junts — sense commanders.",
+        "summary": "Dos equips de dos. Els companys comparteixen el total de vides i el torn — baralles estàndard, amb 20 vides per jugador en termes d'equip.",
+        "sections": {
+          "teams": {
+            "heading": "Equips",
+            "bullets": [
+              "Tria dos aliats o deixa que les parelles es decideixin aleatòriament.",
+              "Cada equip comença amb {{sharedLife}} vides compartides.",
+              "Els companys fan el seu torn junts. Cada jugador continua tenint la seva pròpia mà, biblioteca i commanders."
+            ]
+          },
+          "life": {
+            "heading": "Vides i derrota",
+            "bullets": [
+              "Un equip perd quan les seves vides compartides arriben a 0.",
+              "Un equip perd quan arriba a {{sharedPoison}} comptadors de verí compartits.",
+              "Un equip perd després de rebre {{commanderDamage}} punts de dany de combat compartit d'un sol commander."
+            ]
+          },
+          "turns": {
+            "heading": "Torns",
+            "bullets": [
+              "L'equip inicial es determina aleatòriament i se salta el pas de robar del seu primer torn.",
+              "Cada vegada que un commander es torna a jugar des de la zona de comandament, costa 2 manes més."
+            ]
+          }
+        }
+      }
+    },
+    "archenemy-commander": {
+      "label": "Archenemy",
+      "hint": "Un Archenemy amb 60 vides i una baralla de 40 schemes contra tres herois amb 60 vides compartides.",
+      "hostHint": "Pods estrictes de Commander de 4 jugadors. Un Archenemy amb 60 vides s'enfronta a un equip de tres jugadors amb 60 vides compartides i una baralla de 40 schemes.",
+      "hostFixedSeats": "Les partides d'Archenemy Commander sempre tenen exactament quatre jugadors.",
+      "title": "Archenemy Commander",
+      "summary": "Un Archenemy contra un equip de tres, amb una baralla de schemes en joc.",
+      "sections": {
+        "sides": {
+          "heading": "Bàndols",
+          "bullets": [
+            "Tria l'Archenemy o assigna'l aleatòriament. Els altres tres jugadors són els herois.",
+            "Tots dos bàndols comencen amb {{life}} vides.",
+            "Els herois comparteixen aquest total de vides i fan el seu torn junts.",
+            "L'Archenemy juga primer i roba en aquest torn."
+          ]
+        },
+        "schemes": {
+          "heading": "Schemes",
+          "bullets": [
+            "Les 40 schemes de Duskmourn Commander es barregen al començament.",
+            "Durant cadascuna de les primeres fases principals de l'Archenemy, obre el menú del cronòmetre i prem Següent scheme per posar-ne una en marxa.",
+            "Una scheme que no sigui ongoing es resol i després va al fons de la baralla de schemes.",
+            "Una scheme ongoing es queda boca amunt fins que la taula la marca com a abandonada; després va al fons de la baralla.",
+            "Les schemes boca amunt i el cementiri de les ja acabades apareixen sota la carta com a miniatures; toca'n una per veure-la en gran."
+          ]
+        },
+        "life": {
+          "heading": "Vides i derrota",
+          "bullets": [
+            "L'Archenemy perd quan arriba a 0 vides o quan s'assoleixen els límits habituals de verí o dany de commander.",
+            "Els herois perden junts quan les seves vides compartides arriben a 0, i també comparteixen el verí i el dany de commander.",
+            "Un jugador perd després de rebre {{commanderDamage}} punts de dany de combat d'un sol commander.",
+            "Cada vegada que un commander es torna a jugar des de la zona de comandament, costa 2 manes més."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Un Archenemy amb 20 vides i schemes contra tres herois amb 40 vides compartides.",
+        "hostHint": "Taules estrictes de 4 jugadors. Un Archenemy amb una baralla de schemes contra un equip de tres jugadors — sense commanders.",
+        "summary": "Un Archenemy contra un equip de tres, amb una baralla de schemes en joc — taules estàndard de 20 vides.",
+        "sections": {
+          "sides": {
+            "heading": "Bàndols",
+            "bullets": [
+              "Tria l'Archenemy o assigna'l aleatòriament. Els altres tres jugadors són els herois.",
+              "Tots dos bàndols comencen amb {{life}} vides.",
+              "Els herois comparteixen aquest total de vides i fan el seu torn junts.",
+              "L'Archenemy juga primer i roba en aquest torn."
+            ]
+          },
+          "schemes": {
+            "heading": "Schemes",
+            "bullets": [
+              "Les 40 schemes de Duskmourn Commander es barregen al començament.",
+              "Durant cadascuna de les primeres fases principals de l'Archenemy, obre el menú del cronòmetre i prem Següent scheme per posar-ne una en marxa.",
+              "Una scheme que no sigui ongoing es resol i després va al fons de la baralla de schemes.",
+              "Una scheme ongoing es queda boca amunt fins que la taula la marca com a abandonada; després va al fons de la baralla.",
+              "Les schemes boca amunt i el cementiri de les ja acabades apareixen sota la carta com a miniatures; toca'n una per veure-la en gran."
+            ]
+          },
+          "life": {
+            "heading": "Vides i derrota",
+            "bullets": [
+              "L'Archenemy perd quan arriba a 0 vides o quan s'assoleixen els límits habituals de verí.",
+              "Els herois perden junts quan les seves vides compartides arriben a 0, i també comparteixen el verí i el dany de commander.",
+              "Un jugador perd després de rebre {{poison}} comptadors de verí."
+            ]
+          }
+        }
+      }
+    },
+    "emperor": {
+      "label": "Emperador",
+      "hint": "Dos equips de tres. Protegeix el teu Emperador amb un abast d'influència limitat i desplega criatures.",
+      "hostHint": "Pods estrictes de Commander de 6 jugadors. Cada equip col·loca un Emperador entre dos Generals i juga amb un abast d'influència limitat.",
+      "hostFixedSeats": "Les partides d'Emperador sempre tenen exactament sis jugadors.",
+      "title": "Emperador",
+      "summary": "Dos equips de tres. Cada Emperador seu entre dos Generals, i eliminar un Emperador guanya la partida.",
+      "sections": {
+        "teams": {
+          "heading": "Equips i torns",
+          "bullets": [
+            "Tria tots dos equips i l'Emperador de cada equip, o aleatoritza una o totes dues coses.",
+            "Cada jugador comença amb {{life}} vides i conserva la seva pròpia mà, mana, permanents, verí i torn.",
+            "Els companys poden mirar-se les mans i parlar d'estratègia, però no poden manipular les cartes dels altres.",
+            "Determina aleatòriament quin Emperador juga primer. Aquest Emperador roba durant el primer torn."
+          ]
+        },
+        "range": {
+          "heading": "Abast i combat",
+          "bullets": [
+            "Els Generals tenen un abast d'influència d'1. Els Emperadors tenen un abast d'influència de 2.",
+            "Els encanteris, habilitats, efectes i informació només poden afectar jugadors i objectes dins l'abast del seu controlador.",
+            "Un jugador només pot atacar un oponent assegut immediatament al seu costat, o els planeswalkers i battles protegides d'aquest oponent.",
+            "Quan els jugadors abandonen la partida, els seients buits deixen de comptar i els jugadors supervivents entren dins de l'abast."
+          ]
+        },
+        "deploy": {
+          "heading": "Desplegar criatures",
+          "bullets": [
+            "Cada criatura té \"Gira: El company d'equip objectiu guanya el control d'aquesta criatura. Activa-ho només com un conjur.\"",
+            "Això permet moure criatures a través de l'equip a mesura que canvien les línies de batalla."
+          ]
+        },
+        "winning": {
+          "heading": "Victòria i regles de Commander",
+          "bullets": [
+            "Un equip guanya si el seu Emperador guanya i perd immediatament si el seu Emperador perd. Un General pot ser eliminat sense acabar la partida.",
+            "Un jugador perd amb 0 vides, {{poison}} de verí o {{commanderDamage}} punts de dany de combat d'un sol commander.",
+            "Cada vegada que un commander es torna a jugar des de la zona de comandament, costa 2 manes més."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Dos equips de tres amb 20 vides. Protegeix el teu Emperador amb un abast d'influència limitat.",
+        "hostHint": "Taules estrictes de 6 jugadors. Dos Emperadors entre Generals — baralles estàndard de 20 vides, sense commanders.",
+        "summary": "Dos equips de tres. Cada Emperador seu entre dos Generals, i eliminar un Emperador guanya la partida.",
+        "sections": {
+          "teams": {
+            "heading": "Equips i torns",
+            "bullets": [
+              "Tria tots dos equips i l'Emperador de cada equip, o aleatoritza una o totes dues coses.",
+              "Cada jugador comença amb {{life}} vides i conserva la seva pròpia mà, mana, permanents, verí i torn.",
+              "Els companys poden mirar-se les mans i parlar d'estratègia, però no poden manipular les cartes dels altres.",
+              "Determina aleatòriament quin Emperador juga primer. Aquest Emperador roba durant el primer torn."
+            ]
+          },
+          "range": {
+            "heading": "Abast i combat",
+            "bullets": [
+              "Els Generals tenen un abast d'influència d'1. Els Emperadors tenen un abast d'influència de 2.",
+              "Els encanteris, habilitats, efectes i informació només poden afectar jugadors i objectes dins l'abast del seu controlador.",
+              "Un jugador només pot atacar un oponent assegut immediatament al seu costat, o els planeswalkers i battles protegides d'aquest oponent.",
+              "Quan els jugadors abandonen la partida, els seients buits deixen de comptar i els jugadors supervivents entren dins de l'abast."
+            ]
+          },
+          "deploy": {
+            "heading": "Desplegar criatures",
+            "bullets": [
+              "Cada criatura té \"Gira: El company d'equip objectiu guanya el control d'aquesta criatura. Activa-ho només com un conjur.\"",
+              "Això permet moure criatures a través de l'equip a mesura que canvien les línies de batalla."
+            ]
+          },
+          "winning": {
+            "heading": "Victòria i regles de Commander",
+            "bullets": [
+              "Un equip guanya si el seu Emperador guanya i perd immediatament si el seu Emperador perd. Un General pot ser eliminat sense acabar la partida.",
+              "Un jugador perd amb 0 vides o {{poison}} comptadors de verí."
+            ]
+          }
+        }
+      }
+    },
+    "star": {
+      "label": "Estrella",
+      "hint": "Cinc jugadors en cercle. Els teus veïns són aliats; elimina els dos jugadors que tens al davant.",
+      "hostHint": "Pods estrictes de Commander de 5 jugadors. Els jugadors adjacents són aliats; cada jugador guanya sobrevivint als dos oponents que té al davant.",
+      "hostFixedSeats": "Les partides d'Estrella sempre tenen exactament cinc jugadors.",
+      "title": "Estrella",
+      "summary": "Cinc jugadors seuen en cercle. Els teus veïns són aliats i els dos jugadors que tens al davant són enemics.",
+      "sections": {
+        "positions": {
+          "heading": "Posicions i aliats",
+          "bullets": [
+            "Tria les posicions circulars manualment intercanviant dos jugadors o aleatoritza les cinc posicions.",
+            "Els jugadors immediatament a la teva esquerra i dreta són els teus aliats.",
+            "Els dos jugadors no adjacents que tens al davant són els teus enemics.",
+            "Les posicions es mantenen fixes quan un jugador és eliminat; els teus aliats i enemics no canvien."
+          ]
+        },
+        "combat": {
+          "heading": "Combat i interacció",
+          "bullets": [
+            "Per defecte, els jugadors no poden atacar els seus aliats.",
+            "Els encanteris i habilitats encara poden ajudar o afectar qualsevol jugador tret que la taula acordi una variant més estricta.",
+            "Els torns avancen en sentit horari. Determina aleatòriament el jugador inicial; aquest jugador roba durant el primer torn."
+          ]
+        },
+        "winning": {
+          "heading": "Victòria",
+          "bullets": [
+            "Guanya el primer jugador supervivent els dos enemics del qual hagin estat eliminats, independentment de qui els hagi eliminat.",
+            "Un jugador eliminat no pot guanyar més endavant.",
+            "Cada jugador comença amb {{life}} vides i perd amb 0 vides, {{poison}} de verí o {{commanderDamage}} punts de dany de combat d'un sol commander.",
+            "Cada vegada que un commander es torna a jugar des de la zona de comandament, costa 2 manes més."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Cinc jugadors en cercle amb 20 vides. Els veïns són aliats; elimina els dos jugadors que tens al davant.",
+        "hostHint": "Taules estrictes de 5 jugadors. Els jugadors adjacents són aliats; cada jugador guanya sobrevivint als dos oponents que té al davant.",
+        "summary": "Cinc jugadors seuen en cercle amb 20 vides. Els teus veïns són aliats i els dos jugadors que tens al davant són enemics.",
+        "sections": {
+          "positions": {
+            "heading": "Posicions i aliats",
+            "bullets": [
+              "Tria les posicions circulars manualment intercanviant dos jugadors o aleatoritza les cinc posicions.",
+              "Els jugadors immediatament a la teva esquerra i dreta són els teus aliats.",
+              "Els dos jugadors no adjacents que tens al davant són els teus enemics.",
+              "Les posicions es mantenen fixes quan un jugador és eliminat; els teus aliats i enemics no canvien."
+            ]
+          },
+          "combat": {
+            "heading": "Combat i interacció",
+            "bullets": [
+              "Per defecte, els jugadors no poden atacar els seus aliats.",
+              "Els encanteris i habilitats encara poden ajudar o afectar qualsevol jugador tret que la taula acordi una variant més estricta.",
+              "Els torns avancen en sentit horari. Determina aleatòriament el jugador inicial; aquest jugador roba durant el primer torn."
+            ]
+          },
+          "winning": {
+            "heading": "Victòria",
+            "bullets": [
+              "Guanya el primer jugador supervivent els dos enemics del qual hagin estat eliminats, independentment de qui els hagi eliminat.",
+              "Un jugador eliminat no pot guanyar més endavant.",
+              "Cada jugador comença amb {{life}} vides i perd amb 0 vides o {{poison}} comptadors de verí."
+            ]
+          }
+        }
+      }
+    },
+    "assassin": {
+      "label": "Assassí",
+      "hint": "Contractes secrets en un tots contra tots. Elimina el teu objectiu, puntua i hereta el seu objectiu.",
+      "hostHint": "Contractes secrets per a 3–8 jugadors. Puntua eliminant el teu objectiu i després hereta el seu contracte.",
+      "title": "Assassí",
+      "summary": "Un tots contra tots amb contractes secrets. Elimina objectius, hereta'n de nous i acaba amb la puntuació més alta.",
+      "sections": {
+        "contracts": {
+          "heading": "Contractes secrets",
+          "bullets": [
+            "Cada jugador rep en privat un objectiu. Els contractes formen un cercle, de manera que ningú s'apunta a si mateix i tothom és perseguit una vegada.",
+            "Passa el dispositiu durant la preparació. Obre Comprova l'objectiu des del menú del cronòmetre sempre que necessitis tornar a veure el teu contracte actual.",
+            "Els jugadors poden atacar i afectar qualsevol persona; el contracte determina la puntuació, no els objectius legals."
+          ]
+        },
+        "elimination": {
+          "heading": "Eliminació i herència",
+          "bullets": [
+            "Quan un jugador és eliminat, registra qui ha donat el cop final.",
+            "Si elimines personalment l'objectiu que tens assignat, obtens una marca.",
+            "El jugador que perseguia l'objectiu eliminat hereta el contracte d'aquest objectiu, encara que una altra persona hagi donat el cop final. Això manté un contracte actiu per a cada jugador supervivent."
+          ]
+        },
+        "winning": {
+          "heading": "Victòria",
+          "bullets": [
+            "Juga fins que només quedi un jugador. L'últim supervivent obté una marca addicional.",
+            "Guanya el jugador amb més marques; si hi ha un empat en la puntuació més alta, l'últim supervivent guanya el desempat.",
+            "Les regles de Commander continuen aplicant-se: {{life}} vides inicials, {{poison}} de verí i {{commanderDamage}} punts de dany de combat d'un sol commander són letals.",
+            "Cada vegada que un commander es torna a jugar des de la zona de comandament, costa 2 manes més."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Contractes secrets per a 3–8 jugadors amb 20 vides. Puntua eliminant el teu objectiu.",
+        "hostHint": "Contractes secrets sense commanders. L'emparellament omple la mida de taula escollida; els cercles sobrants poden tenir un mínim de tres jugadors.",
+        "summary": "Un tots contra tots amb contractes secrets i 20 vides. Elimina objectius, hereta'n de nous i acaba amb la puntuació més alta.",
+        "sections": {
+          "contracts": {
+            "heading": "Contractes secrets",
+            "bullets": [
+              "Cada jugador rep en privat un objectiu. Els contractes formen un cercle, de manera que ningú s'apunta a si mateix i tothom és perseguit una vegada.",
+              "Passa el dispositiu durant la preparació. Obre Comprova l'objectiu des del menú del cronòmetre sempre que necessitis tornar a veure el teu contracte actual.",
+              "Els jugadors poden atacar i afectar qualsevol persona; el contracte determina la puntuació, no els objectius legals."
+            ]
+          },
+          "elimination": {
+            "heading": "Eliminació i herència",
+            "bullets": [
+              "Quan un jugador és eliminat, registra qui ha donat el cop final.",
+              "Si elimines personalment l'objectiu que tens assignat, obtens una marca.",
+              "El jugador que perseguia l'objectiu eliminat hereta el contracte d'aquest objectiu, encara que una altra persona hagi donat el cop final. Això manté un contracte actiu per a cada jugador supervivent."
+            ]
+          },
+          "winning": {
+            "heading": "Victòria",
+            "bullets": [
+              "Juga fins que només quedi un jugador. L'últim supervivent obté una marca addicional.",
+              "Guanya el jugador amb més marques; si hi ha un empat en la puntuació més alta, l'últim supervivent guanya el desempat.",
+              "{{life}} vides inicials i {{poison}} comptadors de verí són límits letals."
+            ]
+          }
+        }
+      }
+    }
+  },
+  "home": {
+    "taglineBefore": "El teu pròxim",
+    "taglineHighlight": "pod",
+    "taglineAfter": ", resolt.",
+    "startPlaying": "Comença a jugar",
+    "ongoingGame": "partida en curs",
+    "noEventNeeded": "no cal cap esdeveniment",
+    "startPlayingHint": "Obre una pantalla de partida en aquest dispositiu. Pots sortir i tornar-hi sense perdre una partida inacabada.",
+    "alwaysPlayers": "Aquest mode sempre té {{count}} jugadors.",
+    "resumeGame": "Continua la partida",
+    "startNewGame": "Comença una partida nova",
+    "startGame": "Comença una partida",
+    "commanderSetup": "Commanders",
+    "commanderSetupHint": "Cerca a Scryfall el commander de cada jugador. Les parelles Partner necessiten tots dos commanders.",
+    "chooseAllCommanders": "Tria un commander per a cada jugador.",
+    "advancedMatchConfig": "Configuració avançada de la partida",
+    "hostEvent": "Organitza un esdeveniment",
+    "new": "nou",
+    "targetTableSize": "Mida objectiu de la taula",
+    "allowThreePods": "Permet pods de 3 jugadors",
+    "allowFivePods": "Permet pods de 5 jugadors",
+    "duelFixedSeats": "Els esdeveniments de Duel sempre tenen exactament dos jugadors.",
+    "emperorFixedSeats": "Les partides d'Emperador sempre tenen exactament sis jugadors.",
+    "starFixedSeats": "Les partides d'Estrella sempre tenen exactament cinc jugadors.",
+    "archenemyFixedSeats": "Les partides d'Archenemy Commander sempre tenen exactament quatre jugadors.",
+    "twoHeadedFixedSeats": "Les partides de Gegant de Dos Caps sempre tenen exactament quatre jugadors.",
+    "eventName": "Nom de l'esdeveniment",
+    "eventNamePlaceholder": "Commander de divendres",
+    "tables": "Taules",
+    "tablesHint": "Quantes taules físiques estan disponibles per a aquest esdeveniment.",
+    "eventLasts": "Durada de l'esdeveniment",
+    "eventLastsHint": "El codi d'accés caduca després d'aquest nombre d'hores. Utilitza 48 o 72 per a un cap de setmana.",
+    "hostPin": "PIN de l'organitzador",
+    "hostPinHint": "De 4 a 8 dígits — permet tornar a obrir el tauler de l'organitzador més tard.",
+    "createEvent": "Crea l'esdeveniment",
+    "joinWithCode": "Entra amb un codi",
+    "playerAside": "jugador",
+    "joinCode": "Codi d'accés",
+    "joinCodePlaceholder": "AB23CD",
+    "join": "Entra",
+    "scanQr": "Escaneja el QR",
+    "staleJoin": "Aquest esdeveniment ja no existeix. Entra amb un codi nou o organitza una nova sessió."
+  },
+  "host": {
+    "desk": "Tauler de l'organitzador",
+    "locked": "Bloquejat",
+    "hostOnly": "només organitzador",
+    "unlockHostDesk": "Desbloqueja el tauler de l'organitzador",
+    "playerCount": "{{count}} jugador",
+    "playerCount_plural": "{{count}} jugadors",
+    "ready": "{{count}} preparats",
+    "matched": "{{count}} emparellats",
+    "playing": "{{count}} jugant",
+    "paused": "{{count}} en pausa",
+    "ends": "acaba {{date}}",
+    "podSizes": "Mides dels pods",
+    "matching": "emparellament",
+    "allowLeftoverThree": "Permet pods sobrants de 3 jugadors",
+    "allowFivePods": "Permet pods de 5 jugadors",
+    "treacheryTargetHint": "Mida objectiu de la taula. Els pods sobrants poden tenir un mínim de quatre jugadors.",
+    "matchingPrefers": "L'emparellament prefereix taules de {{size}} jugadors.",
+    "matchingPrefersFour": "L'emparellament prefereix taules de 4 jugadors.",
+    "assassinTargetHint": "Mida objectiu de la taula. Els cercles de contractes sobrants poden tenir un mínim de tres jugadors.",
+    "multiplayerTargetHint": "Mida objectiu de la taula. Les taules sobrants poden tenir un mínim de tres jugadors.",
+    "duelMatchmaking": "L'emparellament de Duel assigna exactament dos jugadors a cada partida.",
+    "twoHeadedMatchmaking": "L'emparellament de Gegant de Dos Caps assigna exactament quatre jugadors a cada partida.",
+    "archenemyMatchmaking": "L'emparellament d'Archenemy Commander assigna exactament quatre jugadors a cada partida: un Archenemy contra un equip de tres.",
+    "emperorMatchmaking": "L'emparellament d'Emperador assigna exactament sis jugadors a cada partida: dos equips amb un Emperador i dos Generals cadascun.",
+    "starMatchmaking": "L'emparellament d'Estrella assigna exactament cinc jugadors en ordre circular.",
+    "eventLength": "Durada de l'esdeveniment",
+    "joinCodeDies": "el codi d'accés caduca",
+    "hoursFromStart": "Hores des de l'inici",
+    "hoursFromStartHint": "Canvia-ho per a un esdeveniment de diversos dies. Quan acabi, el QR obrirà la pàgina d'inici.",
+    "joinCodeTitle": "Codi d'accés",
+    "share": "comparteix",
+    "noLanAddress": "No s'ha trobat cap adreça LAN — aquest enllaç només funciona en aquest ordinador.",
+    "copyPlayerLink": "Copia l'enllaç dels jugadors",
+    "queue": "Cua",
+    "nobodyWaiting": "No hi ha ningú esperant.",
+    "flex": "flex {{count}}",
+    "challengePts": "{{count}} punts de repte",
+    "pts": "{{count}} punts",
+    "notReady": "No preparat",
+    "pausedTitle": "En pausa",
+    "seated": "Assegut",
+    "atTables": "{{count}} a les taules",
+    "tablesTitle": "Taules",
+    "total": "{{count}} en total",
+    "noTables": "Aquest esdeveniment s'ha creat sense taules.",
+    "startingGames": "Iniciant partides…",
+    "startAllReady": "Inicia totes les partides preparades ({{count}})",
+    "startGame": "Inicia la partida",
+    "finishTable": "Finalitza la taula",
+    "cancelPod": "Cancel·la el pod",
+    "enable": "Activa",
+    "disable": "Desactiva",
+    "trackerUsed": "marcador",
+    "noTracker": "sense marcador",
+    "matchNow": "Emparella ara",
+    "fillBots": "Omple les taules amb bots",
+    "playerJoinPage": "Pàgina d'accés dels jugadors"
+  },
+  "join": {
+    "joinEvent": "Entra a l'esdeveniment",
+    "takeSeat": "Seu",
+    "displayName": "Nom visible",
+    "displayNamePlaceholder": "Alex",
+    "joinEventButton": "Entra a l'esdeveniment",
+    "saveDecks": "Desa les baralles",
+    "matchFound": "Partida trobada",
+    "yourDeck": "La teva baralla",
+    "checkMyRole": "Comprova el meu rol",
+    "playingWithoutTracker": "Jugant sense marcador. L'organitzador pot finalitzar la taula.",
+    "chooseTracker": "Tria com registrarà la partida aquest pod.",
+    "useGameTracker": "Utilitza el marcador de partida",
+    "playWithoutTracker": "Juga sense marcador",
+    "atTableMarked": "En aquest telèfon estàs marcat com a present a la taula. L'organitzador encara ha d'iniciar la partida des del seu tauler.",
+    "imAtTable": "Ja soc a la taula",
+    "leftEvent": "Has abandonat aquest esdeveniment. Torna a escanejar el QR si vols tornar-hi.",
+    "openPool": "Pool obert — qualsevol taula.",
+    "ready": "Preparat",
+    "waiting": "esperant",
+    "holdTight": "Un moment — aviat tindràs taula.",
+    "flex": "Flex: {{flex}} · Punts de repte: {{points}}",
+    "howWasPod": "Com ha anat el teu pod?",
+    "pause": "Pausa",
+    "leave": "Surt",
+    "pausedMessage": "Estàs en pausa. Reprèn quan puguis seure o abandona l'esdeveniment.",
+    "imReady": "Estic preparat",
+    "leaveEvent": "Abandona l'esdeveniment",
+    "markReady": "Marca't com a preparat quan puguis seure a jugar.",
+    "matchingShortly": "L'emparellament t'enviarà aviat a una taula.",
+    "imTheHost": "Soc l'organitzador",
+    "offlineSaved": "Desat en aquest telèfon. S'enviarà quan tornis a tenir connexió.",
+    "stayAtTable": "Queda't a la taula fins que l'organitzador doni la partida per acabada."
+  },
+  "matchConfig": {
+    "title": "Configuració de partida",
+    "description": "Configura el pod simulat assegut darrere de /match. Res d'aquí modifica el servidor ni apareix a la pantalla de batalla, així que aquesta ruta es pot comprovar en un telèfon tal com està.",
+    "podSetup": "Configuració del pod",
+    "seats": "Seients",
+    "seatsCount": "{{count}} seients",
+    "bracket": "Bracket",
+    "header": "Capçalera",
+    "eventNamePlaceholder": "Nom de l'esdeveniment",
+    "joinCodePlaceholder": "Codi d'accés",
+    "matchCard": "Targeta de partida",
+    "tableLabelPlaceholder": "Nom de la taula",
+    "assignedDeckPlaceholder": "Baralla assignada",
+    "openBattleScreen": "Obre la pantalla de batalla",
+    "resetGameState": "Reinicia l'estat de la partida",
+    "commander": "Commander",
+    "secondCommander": "Segon commander"
+  },
+  "app": {
+    "notFound": "No s'ha trobat."
+  },
+  "wake": {
+    "title": "Despertant les taules",
+    "message": "El servidor gratuït s'ha adormit. Mantén aquesta pàgina oberta — normalment triga menys d'un minut."
+  },
+  "scanner": {
+    "title": "Escaneja el QR",
+    "ariaLabel": "Escaneja el codi QR d'accés",
+    "hint": "Apunta al codi del tauler de l'organitzador.",
+    "closeScanner": "Tanca l'escàner",
+    "openingCamera": "Obrint la càmera…",
+    "noCamera": "Aquest navegador no pot obrir la càmera. Introdueix el codi d'accés manualment.",
+    "permissionDenied": "S'ha denegat el permís de la càmera. Introdueix el codi d'accés o permet l'accés a la càmera i torna-ho a provar."
+  },
+  "theme": {
+    "switchToLight": "Canvia al mode clar",
+    "switchToDark": "Canvia al mode fosc"
+  },
+  "hostMetrics": {
+    "title": "Resum de l'esdeveniment",
+    "aside": "pilot",
+    "players": "Jugadors",
+    "games": "Partides",
+    "gamesPerPlayer": "Partides / jugador",
+    "waitAvg": "Espera mitjana",
+    "waitP95": "Espera p95",
+    "waitMax": "Espera màxima",
+    "rematchPairs": "Parelles repetides",
+    "flexEarned": "Flex guanyat",
+    "flexSeats": "Assignacions flexibles",
+    "durationAvg": "Durada mitjana",
+    "tablesOccupied": "Taules ocupades",
+    "trackerUsed": "Marcador utilitzat",
+    "trackerUsedValue": "{{used}} utilitzats · {{skipped}} omesos",
+    "challenges": "Reptes",
+    "challengePts": "Punts de repte",
+    "podRating": "Valoració del pod",
+    "podSizes": "Mides dels pods:",
+    "pools": "Pools:"
+  },
+  "deckEditor": {
+    "title": "Baralles de Commander",
+    "deckNamePlaceholder": "Nom de la baralla (opcional)",
+    "commander": "Commander",
+    "secondCommander": "Segon commander",
+    "markPreferred": "Marca com a preferida",
+    "addAcceptedDeck": "Afegeix una baralla acceptada",
+    "hint": "Només pods del mateix pool. Les baralles addicionals permeten que l'emparellament et mogui a un altre bracket."
+  },
+  "commanderPicker": {
+    "searchCommander": "Cerca commander",
+    "searchPartner": "Commander que pot fer parella amb {{name}}",
+    "removeCommander": "Elimina {{name}}",
+    "artworkFor": "Il·lustració de",
+    "loadingArtwork": "Carregant la il·lustració…"
+  },
+  "challengePack": {
+    "title": "Paquet de reptes",
+    "description": "Només primitives predefinides. Desar crea una versió nova i mai modifica un paquet que ja hagi utilitzat aquest esdeveniment.",
+    "copyOfficial": "Copia l'oficial",
+    "startBlank": "Comença de zero",
+    "saveNewVersion": "Desa una versió nova",
+    "editHint": "Copia el paquet oficial o comença de zero abans d'editar.",
+    "packName": "Nom del paquet",
+    "descriptionLabel": "Descripció",
+    "addChallenge": "Afegeix un repte",
+    "id": "ID",
+    "name": "Nom",
+    "category": "Categoria",
+    "points": "Punts",
+    "primitive": "Primitiva",
+    "threshold": "Llindar",
+    "confirmationQuestion": "Pregunta de confirmació",
+    "defaultConfirmation": "Això ha passat a la taula?",
+    "newClaimName": "Nou assoliment",
+    "newClaimDescription": "Atorga-ho a la taula."
+  },
+  "treacheryRole": {
+    "treachery": "Traïció",
+    "receivedRole": "Has rebut un rol",
+    "handDeviceTo": "Passa el dispositiu a {{name}}",
+    "lookAwayIdentity": "Tothom més ha de mirar cap a una altra banda abans de revelar la identitat.",
+    "lookAwayScreen": "Assegura't que ningú més pugui veure la pantalla abans de revelar-la.",
+    "reveal": "Revela",
+    "yourRole": "El teu rol",
+    "identityAlt": "{{name}}, identitat {{role}}",
+    "illustratedBy": "Il·lustració de {{artist}}",
+    "yourObjective": "El teu objectiu",
+    "unveiledToTable": "Revelat a la taula",
+    "unveilWarning": "Tothom a la teva taula veurà aquesta identitat. La seva habilitat s'ha de resoldre durant la partida.",
+    "confirmUnveil": "Confirma la revelació",
+    "unveilToTable": "Revela a la taula",
+    "hideAndPass": "Amaga i passa",
+    "hideIdentity": "Amaga la meva identitat"
+  },
+  "modeRulesSheet": {
+    "closeRules": "Tanca les regles",
+    "backToGame": "Torna a la partida"
+  },
+  "assassinTargets": {
+    "title": "Contractes secrets",
+    "chooseOwnName": "Tria només el teu propi nom.",
+    "closeContracts": "Tanca els contractes",
+    "handDeviceTo": "Passa el dispositiu a {{name}}",
+    "lookAway": "Tothom més ha de mirar cap a una altra banda abans de revelar el contracte.",
+    "revealTarget": "Revela el meu objectiu",
+    "yourTarget": "El teu objectiu",
+    "noActiveTarget": "Cap objectiu actiu",
+    "marksScored": "Marques aconseguides: {{count}}",
+    "hideAndPass": "Amaga i passa",
+    "allContractsChecked": "Tots els contractes comprovats"
+  },
+  "scheme": {
+    "ongoingScheme": "Scheme ongoing",
+    "scheme": "Scheme",
+    "pastScheme": "Scheme anterior",
+    "abandon": "Abandona {{name}}",
+    "ongoingSchemes": "Schemes ongoing",
+    "graveyard": "Cementiri · {{count}}",
+    "nextScheme": "Següent scheme",
+    "remainingInDeck": "En queden {{count}} a la baralla",
+    "scryfallCredit": "Imatge de la carta via Scryfall. Magic: The Gathering és © Wizards of the Coast."
+  },
+  "dungeon": {
+    "takeInitiativeTitle": "Prendre la iniciativa?",
+    "takeInitiativeEnter": "Això també et fa aventurar-te a Undercity. Pren-la només quan la taula acabi de donar la iniciativa a aquest seient.",
+    "takeInitiativeWait": "Acaba o abandona la masmorra actual abans de poder obrir Undercity. Pren la iniciativa només quan la taula acabi de donar-la a aquest seient.",
+    "takeInitiativeAndEnter": "Pren la iniciativa i entra a Undercity",
+    "takeInitiative": "Pren la iniciativa",
+    "alreadyHoldInitiative": "Ja tens la iniciativa",
+    "takeAndEnterUndercity": "Pren la iniciativa i entra a Undercity",
+    "completed": "{{name}} (completada)",
+    "ventureInto": "Aventura't a {{name}}",
+    "done": "Fet",
+    "ventureTo": "Aventura't a {{room}}: {{effect}}",
+    "releaseInitiative": "Deixa la iniciativa",
+    "undoRoom": "Desfés la sala",
+    "closeDungeon": "Tanca la masmorra"
+  },
+  "treacheryRolesSheet": {
+    "title": "Identitats secretes",
+    "chooseOwnName": "Tria només el teu propi nom.",
+    "closeIdentities": "Tanca les identitats",
+    "allIdentitiesChecked": "Totes les identitats comprovades"
+  },
+  "tracker": {
+    "gameRules": "Regles de la partida",
+    "loadingRoles": "Carregant els rols…",
+    "start": "Comença",
+    "readRules": "Llegeix les regles",
+    "readyToBegin": "Preparats per començar",
+    "readyToBeginHint": "Comença la partida quan tothom sigui a la taula o llegeix primer les regles.",
+    "dealContracts": "Reparteix els contractes",
+    "dealContractsTitle": "Reparteix els contractes secrets",
+    "dealContractsHint": "Cada jugador rep un objectiu privat. El dispositiu es passarà perquè cada contracte pugui ser comprovat en secret.",
+    "dealIdentities": "Reparteix les identitats",
+    "dealIdentitiesTitle": "Reparteix les identitats secretes",
+    "dealIdentitiesHint": "Cada jugador rep una identitat oculta. El dispositiu es passarà perquè cadascú pugui llegir la seva en secret.",
+    "chooseStarPositions": "Tria les posicions d'Estrella",
+    "starPositionsHint": "Els jugadors asseguts l'un al costat de l'altre són aliats. Toca dos jugadors per intercanviar-ne les posicions o aleatoritza tot el cercle.",
+    "randomPositions": "Posicions aleatòries",
+    "confirmPositions": "Confirma les posicions",
+    "adjacentPlayersAlly": "Jugadors\nadjacents aliats",
+    "buildEmperorTeams": "Forma els equips d'Emperador",
+    "chooseTeamA": "Tria tres jugadors per a l'Equip A.",
+    "randomTeams": "Equips aleatoris",
+    "resetTeams": "Reinicia els equips",
+    "teamEmperor": "Emperador de l'equip {{team}}",
+    "randomEmperors": "Emperadors aleatoris",
+    "confirmTeams": "Confirma els equips",
+    "chooseArchenemy": "Tria l'Archenemy",
+    "chooseArchenemyHint": "L'Archenemy s'enfronta als altres tres jugadors. Tots dos bàndols comparteixen 60 vides. L'Archenemy juga primer, roba en aquest torn i posa una scheme en marxa durant cadascuna de les seves primeres fases principals.",
+    "confirmArchenemy": "Confirma l'Archenemy",
+    "chooseAllies": "Tria els aliats",
+    "chooseAlliesHint": "Selecciona dos jugadors per al primer equip. Els altres dos formen l'equip rival. Els equips comparteixen 60 vides i els torns; la resta de controls dels jugadors continuen separats.",
+    "emperor": "Emperador",
+    "emperorRange": "Emperador · abast 2",
+    "leader": "Líder",
+    "general": "General",
+    "generalRange": "General · abast 1",
+    "marks": "{{count}} marques",
+    "winner": "Guanyador",
+    "turnPhone": "Gira el telèfon per veure tot el camp",
+    "matchMenu": "Menú de partida",
+    "matchMenuElapsed": "Menú de partida. {{clock}} transcorregut",
+    "matchMenuPaused": ", en pausa",
+    "matchMenuDayNight": ", ara és {{phase}}",
+    "day": "dia",
+    "night": "nit",
+    "closeMatchMenu": "Tanca el menú de partida",
+    "match": "Partida",
+    "firstScheme": "Primera scheme",
+    "nextScheme": "Següent scheme",
+    "resume": "Continua",
+    "pause": "Pausa",
+    "undo": "Desfés",
+    "challenges": "Reptes",
+    "checkTarget": "Comprova l'objectiu",
+    "checkMyRole": "Comprova el meu rol",
+    "dayButton": "Dia",
+    "nightButton": "Nit",
+    "playerLost": "Jugador eliminat",
+    "gameWonBy": "Partida guanyada per",
+    "won": "{{name}} ha guanyat",
+    "doneRequeue": "Fet i torna a la cua",
+    "savingChallenges": "Desant els reptes…",
+    "quitToHome": "Surt a l'inici",
+    "quitHint": "La partida es conserva — torna-la a obrir des de la pantalla d'inici.",
+    "secretContracts": "Contractes secrets",
+    "secretIdentities": "Identitats secretes",
+    "whoEliminated": "Qui ha eliminat {{name}}?",
+    "whoEliminatedHint": "Un jugador només puntua si aquest era el seu objectiu assignat. La cadena de contractes avança igualment.",
+    "noPlayerUnknown": "Cap jugador / desconegut",
+    "revealedIdentity": "Identitat de Treachery revelada",
+    "closeRevealedIdentity": "Tanca la identitat revelada",
+    "commanderChallenges": "Reptes de Commander",
+    "challengeCompleted": "{{name}} completat",
+    "challengeFallback": "Repte",
+    "matchResult": "Resultat de la partida",
+    "wins": "{{name}} guanya",
+    "reviewBoard": "Revisa el camp",
+    "yes": "Sí",
+    "no": "No",
+    "yesTheyLost": "Sí, ha perdut",
+    "noStillIn": "No, continua en joc",
+    "openCounters": "Obre els comptadors de {{name}}",
+    "commanderDamageOn": "Dany de commander sobre {{name}}",
+    "countersFor": "Comptadors de {{name}}",
+    "countersTitle": "Comptadors de {{name}}",
+    "closeCounters": "Tanca els comptadors",
+    "closeChallenges": "Tanca els reptes",
+    "sharedCommanderDamage": "Dany de commander compartit",
+    "closeCommanderDamage": "Tanca el dany de commander",
+    "highestCommanderDamage": "Dany de commander més alt sobre {{name}}: {{value}} de {{commander}}",
+    "noCommanderDamage": "Cap dany de commander sobre {{name}}",
+    "removeCommanderDamage": "Elimina dany del {{name}} de {{owner}}",
+    "addCommanderDamage": "Afegeix dany del {{name}} de {{owner}}",
+    "isMonarch": "{{name}} és el monarca",
+    "makeMonarch": "Fes {{name}} monarca",
+    "enduringStory": "{{name}} {{has}} una història perdurable",
+    "cityBlessing": "{{name}} {{has}} la benedicció de la ciutat",
+    "has": "té",
+    "doesNotHave": "no té",
+    "didLose": "{{name}} ha perdut la partida?",
+    "thisTeam": "Aquest equip",
+    "didTheyLose": "Han perdut?",
+    "poisonPrompt": "{{name}} té {{count}} comptadors de verí. Ha perdut?",
+    "sharedPoisonPrompt": "{{subject}} té {{count}} comptadors de verí compartits. {{lose}}",
+    "hitPrompt": "{{name}} té {{count}} cartes exiliades amb comptadors de hit. Ha perdut?",
+    "commanderPrompt": "{{name}} ha rebut {{damage}} punts de dany de commander de {{from}}. Ha perdut?",
+    "sharedCommanderPrompt": "{{subject}} ha rebut {{damage}} punts de dany de commander compartit de {{from}}. {{lose}}",
+    "lifePrompt": "{{name}} té {{life}} vides. Ha perdut?",
+    "sharedLifePrompt": "{{subject}} té {{life}} vides compartides. {{lose}}",
+    "anotherCommander": "un altre commander",
+    "addLife": "Afegeix 1 vida. Mantén premut per a una quantitat més gran.",
+    "removeLife": "Elimina 1 vida. Mantén premut per a una quantitat més gran.",
+    "addLifeFor": "Afegeix vides a {{name}}",
+    "removeLifeFor": "Elimina vides de {{name}}",
+    "addLifeLabel": "Afegeix vides · {{name}}",
+    "removeLifeLabel": "Elimina vides · {{name}}",
+    "deleteDigit": "Elimina el dígit",
+    "add": "Afegeix",
+    "removeVerb": "Elimina",
+    "lower": "Redueix {{label}}",
+    "raise": "Augmenta {{label}}",
+    "seatColour": "Color del seient de {{name}}",
+    "dungeonFor": "Masmorra de {{name}}",
+    "dungeonInitiative": "Masmorra i iniciativa de {{name}}. {{title}}",
+    "dungeonInitiativeActive": "{{name}} té la iniciativa · {{filled}} de {{total}} masmorres úniques",
+    "dungeonInitiativeCompleted": "{{name}} ha completat {{filled}} de {{total}} masmorres úniques",
+    "counterOn": "{{label}} sobre {{name}}: {{value}}",
+    "counterFor": "{{label}} per a {{name}}",
+    "claimFor": "Reclama per a {{name}}",
+    "challengesSubtitle": "Els mateixos reptes per a tots els jugadors · els punts mai afecten l'emparellament",
+    "counters": {
+      "poison": "Verí",
+      "tax": "Impost de commander",
+      "acorn": "Glans",
+      "energy": "Energia",
+      "experience": "Experiència",
+      "hit": "Impactes d'Etrata",
+      "rad": "Radiació",
+      "ring": "Temptació de l'Anell",
+      "speed": "Velocitat",
+      "ticket": "Tiquets"
+    }
+  }
+}

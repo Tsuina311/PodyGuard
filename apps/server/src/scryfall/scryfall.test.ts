@@ -72,6 +72,27 @@ describe('ScryfallClient commander search', () => {
   });
 
   it.each([
+    ['duel-commander', 'tymna is:duelcommander legal:duel'],
+    ['brawl', 'tymna is:brawler f:brawl'],
+  ] as const)(
+    'uses the %s legality filter',
+    async (profile, expectedQuery) => {
+      const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(
+        jsonResponse({ data: [commander()], has_more: false }),
+      );
+      const client = new ScryfallClient({
+        fetch: fetchMock,
+        sleep: async () => undefined,
+      });
+
+      await client.searchCommanders('tymna', undefined, profile);
+
+      const url = new URL(String(fetchMock.mock.calls[0]?.[0]));
+      expect(url.searchParams.get('q')).toBe(expectedQuery);
+    },
+  );
+
+  it.each([
     ['Partner', 'Legendary Creature — Human', 'keyword:partner'],
     [
       'Partner with Haldan, Avid Arcanist',

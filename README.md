@@ -72,9 +72,14 @@ The included `render.yaml` is the shortest API path:
 2. In Render, create a **Blueprint** from this repository.
 3. Enter `DATABASE_URL` when prompted. Render generates and preserves
    `PARTICIPANT_SESSION_SECRET`.
-4. Deploy. The start command applies committed migrations before accepting
+4. Create a private GitHub repository for in-app feedback. Give a fine-grained
+   token access only to that repository with **Issues: Read and write**, then
+   enter it as `GITHUB_FEEDBACK_TOKEN` and enter `OWNER/REPOSITORY` as
+   `GITHUB_FEEDBACK_REPO`. Add the issue labels `type:bug`, `type:ux`,
+   `type:idea`, `type:question`, and `source:in-app` to that repository.
+5. Deploy. The start command applies committed migrations before accepting
    traffic (Render reserves its dedicated pre-deploy command for paid services).
-5. Open `/health` on the Render URL and confirm `ok` and `database: "up"`.
+6. Open `/health` on the Render URL and confirm `ok` and `database: "up"`.
 
 Render still serves a copy of the web app as a fallback. That copy sleeps with
 the API, so it is the wrong link for players.
@@ -96,6 +101,9 @@ Required production variables on the API host:
 
 - `DATABASE_URL`: production PostgreSQL connection string.
 - `PARTICIPANT_SESSION_SECRET`: a long random value, stable across deploys.
+- `GITHUB_FEEDBACK_TOKEN`: server-only fine-grained token for the private
+  feedback repository.
+- `GITHUB_FEEDBACK_REPO`: private repository in `OWNER/REPOSITORY` form.
 - `NODE_ENV=production`.
 
 ### 2. Always-on site on GitHub Pages

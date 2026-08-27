@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, Route, Routes, useMatch } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { checkHealth } from './api';
+import { FeedbackProvider } from './feedback/FeedbackContext';
 import {
   KEEP_ALIVE_INTERVAL_MS,
   readLastKeepAlivePingAt,
@@ -28,37 +29,42 @@ export function App() {
   const localOnly = Boolean(sandbox || sandboxConfig);
   const waking = useServerWake() && !localOnly;
   return (
-    <div className="bg-deep-space relative min-h-screen overflow-hidden">
-      <div aria-hidden className="bg-grid pointer-events-none absolute inset-0" />
-      {waking ? <ServerWakeScreen /> : null}
-      <main
-        className={cx(
-          'relative mx-auto flex min-h-screen w-full flex-col gap-5 px-5',
-          home ? 'justify-start py-8' : 'py-14',
-          wide ? 'max-w-4xl justify-start' : 'max-w-2xl',
-          !wide && !home && 'justify-center',
-        )}
-      >
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/e/:joinCode" element={<JoinPage />} />
-          <Route path="/host/:joinCode" element={<HostPage />} />
-          <Route path="/match" element={<MatchSandboxPage />} />
-          <Route path="/match-config" element={<MatchConfigPage />} />
-          <Route
-            path="*"
-            element={
-              <p className="text-muted text-sm">
-                {t('app.notFound')}{' '}
-                <Link className="text-neon hover:underline" to="/">
-                  {t('common.home')}
-                </Link>
-              </p>
-            }
-          />
-        </Routes>
-      </main>
-    </div>
+    <FeedbackProvider>
+      <div className="bg-deep-space relative min-h-screen overflow-hidden">
+        <div
+          aria-hidden
+          className="bg-grid pointer-events-none absolute inset-0"
+        />
+        {waking ? <ServerWakeScreen /> : null}
+        <main
+          className={cx(
+            'relative mx-auto flex min-h-screen w-full flex-col gap-5 px-5',
+            home ? 'justify-start py-8' : 'py-14',
+            wide ? 'max-w-4xl justify-start' : 'max-w-2xl',
+            !wide && !home && 'justify-center',
+          )}
+        >
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/e/:joinCode" element={<JoinPage />} />
+            <Route path="/host/:joinCode" element={<HostPage />} />
+            <Route path="/match" element={<MatchSandboxPage />} />
+            <Route path="/match-config" element={<MatchConfigPage />} />
+            <Route
+              path="*"
+              element={
+                <p className="text-muted text-sm">
+                  {t('app.notFound')}{' '}
+                  <Link className="text-neon hover:underline" to="/">
+                    {t('common.home')}
+                  </Link>
+                </p>
+              }
+            />
+          </Routes>
+        </main>
+      </div>
+    </FeedbackProvider>
   );
 }
 

@@ -31,7 +31,9 @@ describe('standalone match config', () => {
   it('offers the correct seat count for every standalone mode', () => {
     expect(seatCountsForMode('duel')).toEqual([2]);
     expect(seatCountsForMode('multiplayer')).toEqual([3, 4, 5, 6]);
-    expect(seatCountsForMode('commander')).toEqual([2, 3, 4, 5, 6]);
+    expect(seatCountsForMode('commander')).toEqual([3, 4, 5, 6]);
+    expect(seatCountsForMode('duel-commander')).toEqual([2]);
+    expect(seatCountsForMode('brawl')).toEqual([2]);
     expect(seatCountsForMode('treachery')).toEqual([4, 5, 6, 7, 8]);
     expect(seatCountsForMode('two-headed-giant')).toEqual([4]);
     expect(seatCountsForMode('archenemy-commander')).toEqual([4]);
@@ -40,7 +42,7 @@ describe('standalone match config', () => {
     expect(seatCountsForMode('assassin')).toEqual([3, 4, 5, 6, 7, 8]);
     expect(seatCountForMode('archenemy-commander', 6)).toBe(4);
     expect(seatCountForMode('commander', 6)).toBe(6);
-    expect(seatCountForMode('duel', 4)).toBe(2);
+    expect(seatCountForMode('commander', 2)).toBe(3);
   });
 
   it('repairs a stored seat count that the game mode does not allow', () => {

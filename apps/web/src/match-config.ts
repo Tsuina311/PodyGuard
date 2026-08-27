@@ -1,14 +1,16 @@
 import {
   MODES_BY_FAMILY,
   TREACHERY_POD_SIZES,
+  commanderSearchProfile,
   resolveRulesFormat,
   usesCommanderRules,
   type GameMode,
   type GameModeFamily,
   type RulesFormat,
+  type CommanderSearchProfile,
 } from '@podyguard/shared';
-import { randomSandboxCommanders } from './sandbox-commanders';
 import type { CommanderSelection } from './scryfall';
+import { emptySeatCommanders } from './CommanderSeatPickers';
 
 /**
  * Shared state for the two local match routes. `/match-config` writes it and
@@ -76,7 +78,19 @@ export const STANDALONE_GAME_MODES: ReadonlyArray<{
   {
     id: 'commander',
     label: 'Commander',
-    hint: 'Free-for-all. Everyone starts on 40 life.',
+    hint: 'Free-for-all for 3–6 players. Everyone starts on 40 life.',
+    family: 'commander',
+  },
+  {
+    id: 'duel-commander',
+    label: 'Duel Commander',
+    hint: '1v1 Commander at 20 life. No commander damage; only one partner cast from the zone per game.',
+    family: 'commander',
+  },
+  {
+    id: 'brawl',
+    label: 'Brawl',
+    hint: '1v1 Arena Brawl at 25 life. Planeswalkers and vehicles can lead.',
     family: 'commander',
   },
   {
@@ -131,6 +145,8 @@ export function modeUsesFamily(
 }
 
 export const SEAT_COUNTS = [2, 3, 4, 5, 6];
+export const CLASSIC_COMMANDER_SEAT_COUNTS = [3, 4, 5, 6] as const;
+const DUEL_SEAT_COUNT = 2;
 const MULTIPLAYER_SEAT_COUNTS = [3, 4, 5, 6] as const;
 const TEAM_SEAT_COUNT = 4;
 const EMPEROR_SEAT_COUNT = 6;
@@ -140,14 +156,14 @@ const ASSASSIN_SEAT_COUNTS = [3, 4, 5, 6, 7, 8] as const;
 export function seatCountsForMode(
   gameMode: StandaloneGameMode,
 ): readonly number[] {
-  if (gameMode === 'duel') {
-    return [2];
+  if (gameMode === 'duel' || gameMode === 'duel-commander' || gameMode === 'brawl') {
+    return [DUEL_SEAT_COUNT];
   }
   if (gameMode === 'multiplayer') {
     return MULTIPLAYER_SEAT_COUNTS;
   }
   if (gameMode === 'commander') {
-    return SEAT_COUNTS;
+    return CLASSIC_COMMANDER_SEAT_COUNTS;
   }
   if (gameMode === 'assassin') {
     return ASSASSIN_SEAT_COUNTS;
@@ -186,7 +202,7 @@ export function defaultMatchConfig(): MatchConfig {
     tableLabel: 'Table 3',
     deckName: 'Atraxa Superfriends',
     names: defaultSeatNames(8),
-    commanders: randomSandboxCommanders(DEFAULT_NAMES.length),
+    commanders: emptySeatCommanders(DEFAULT_NAMES.length),
     resetCount: 0,
   };
 }
@@ -232,6 +248,15 @@ export function loadMatchConfig(): MatchConfig {
 
 export function saveMatchConfig(config: MatchConfig): void {
   sessionStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+}
+
+export function commanderSearchProfileForConfig(
+  config: Pick<MatchConfig, 'gameMode' | 'rulesFormat'>,
+): CommanderSearchProfile {
+  if (!usesCommanderRules(config.gameMode, config.rulesFormat)) {
+    return 'commander';
+  }
+  return commanderSearchProfile(config.gameMode);
 }
 
 export function matchPlayers(

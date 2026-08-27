@@ -201,44 +201,4 @@
   html[data-theme='light'] .theme-toggle__thumb {
     transform: translateX(2rem);
   }
-
-  .language-switcher {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    height: 2.25rem;
-    padding: 0 0.65rem 0 0.55rem;
-    border: 1px solid color-mix(in oklab, var(--color-muted) 24%, transparent);
-    border-radius: 999px;
-    color: var(--color-muted);
-    background: color-mix(in oklab, var(--color-hull) 82%, transparent);
-    box-shadow:
-      0 8px 24px color-mix(in oklab, var(--color-void) 38%, transparent),
-      inset 0 1px color-mix(in oklab, var(--color-ink) 9%, transparent);
-    backdrop-filter: blur(16px);
-  }
-
-  .language-switcher__icon {
-    flex-shrink: 0;
-    opacity: 0.85;
-  }
-
-  .language-switcher__select {
-    appearance: none;
-    border: 0;
-    padding: 0 1.1rem 0 0;
-    font: inherit;
-    font-size: 0.8125rem;
-    font-weight: 600;
-    color: inherit;
-    background: transparent;
-    cursor: pointer;
-  }
-
-  .language-switcher__select:focus-visible {
-    outline: 2px solid var(--color-neon);
-    outline-offset: 3px;
-    border-radius: 0.25rem;
-  }
 }

@@ -47,6 +47,8 @@ export const gameModeEnum = pgEnum('game_mode', [
   'duel',
   'multiplayer',
   'commander',
+  'duel-commander',
+  'brawl',
   'treachery',
   'two-headed-giant',
   'archenemy-commander',

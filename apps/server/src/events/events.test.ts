@@ -1152,6 +1152,54 @@ describe('event HTTP api', () => {
     await app.close();
   });
 
+  it('creates duel commander events as strict 2-player tables', async () => {
+    const app = await buildTestApp();
+    const created = await app.inject({
+      method: 'POST',
+      url: '/events',
+      payload: {
+        name: 'DC Night',
+        hostPin: '2468',
+        tableCount: 4,
+        gameMode: 'duel-commander',
+      },
+    });
+
+    expect(created.statusCode).toBe(201);
+    expect((created.json() as { event: object }).event).toMatchObject({
+      gameMode: 'duel-commander',
+      rulesFormat: 'commander',
+      allowThreePods: false,
+      allowFivePods: false,
+      preferredPodSize: 2,
+    });
+    await app.close();
+  });
+
+  it('creates brawl events as strict 2-player tables', async () => {
+    const app = await buildTestApp();
+    const created = await app.inject({
+      method: 'POST',
+      url: '/events',
+      payload: {
+        name: 'Brawl Night',
+        hostPin: '2468',
+        tableCount: 4,
+        gameMode: 'brawl',
+      },
+    });
+
+    expect(created.statusCode).toBe(201);
+    expect((created.json() as { event: object }).event).toMatchObject({
+      gameMode: 'brawl',
+      rulesFormat: 'commander',
+      allowThreePods: false,
+      allowFivePods: false,
+      preferredPodSize: 2,
+    });
+    await app.close();
+  });
+
   it('creates multiplayer events with a chosen table size', async () => {
     const app = await buildTestApp();
     const created = await app.inject({

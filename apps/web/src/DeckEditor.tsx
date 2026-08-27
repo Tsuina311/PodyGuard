@@ -1,4 +1,5 @@
 import { COMMANDER_POOLS } from '@podyguard/shared';
+import type { CommanderSearchProfile } from '@podyguard/shared';
 import { useTranslation } from 'react-i18next';
 import { CommanderPicker } from './CommanderPicker';
 import {
@@ -26,11 +27,13 @@ export function DeckEditor({
   onChange,
   disabled,
   requireCommanders = true,
+  searchProfile = 'commander',
 }: {
   decks: DeckFormRow[];
   onChange: (next: DeckFormRow[]) => void;
   disabled?: boolean;
   requireCommanders?: boolean;
+  searchProfile?: CommanderSearchProfile;
 }) {
   const { t } = useTranslation();
 
@@ -83,6 +86,7 @@ export function DeckEditor({
                 label={t('deckEditor.commander')}
                 value={row.commanders[0] ?? null}
                 disabled={disabled}
+                searchProfile={searchProfile}
                 onChange={(commander) =>
                   update(index, {
                     commanders: commander ? [commander] : [],
@@ -97,6 +101,7 @@ export function DeckEditor({
                   value={row.commanders[1] ?? null}
                   partnerFor={row.commanders[0]}
                   disabled={disabled}
+                  searchProfile={searchProfile}
                   onChange={(commander) =>
                     update(index, {
                       commanders: commander

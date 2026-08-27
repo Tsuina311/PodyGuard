@@ -1,0 +1,1154 @@
+{
+  "common": {
+    "home": "Kotiin",
+    "cancel": "Peruuta",
+    "close": "Sulje",
+    "save": "Tallenna",
+    "loading": "Ladataan…",
+    "players": "Pelaajat",
+    "game": "Peli",
+    "language": "Kieli",
+    "yes": "Kyllä",
+    "no": "Ei",
+    "reset": "Nollaa",
+    "random": "Satunnainen",
+    "remove": "Poista",
+    "empty": "Tyhjä",
+    "bot": "bot",
+    "dev": "kehittäjä",
+    "official": "virkamies",
+    "open": "Avaa",
+    "preferred": "mieluummin",
+    "player": "Pelaaja {{number}}",
+    "versus": "vastaan",
+    "teamA": "Joukkue A",
+    "teamB": "Joukkue B",
+    "working": "Työskentely…",
+    "creating": "Luodaan…",
+    "checking": "Tarkistetaan…",
+    "joining": "Liitytään…",
+    "updating": "Päivitetään…",
+    "submitting": "Lähetetään…",
+    "saving": "Tallennetaan…",
+    "searching": "Haetaan…",
+    "unveiling": "Paljastetaan…",
+    "copied": "Kopioitu",
+    "noneYet": "ei vielä yhtään",
+    "dash": "—",
+    "errors": {
+      "generic": "Jotain meni pieleen.",
+      "createEvent": "Tapahtumaa ei voitu luoda.",
+      "unlockHost": "Isännän lukitusta ei voitu avata.",
+      "updateTable": "Taulukkoa ei voitu päivittää.",
+      "startGame": "Peliä ei voitu aloittaa.",
+      "startAllGames": "Kaikkia valmiita pelejä ei voitu käynnistää.",
+      "finishTable": "Taulukkoa ei voitu viimeistellä.",
+      "cancelPod": "Podoria ei voitu peruuttaa.",
+      "updateSettings": "Asetuksia ei voitu päivittää.",
+      "matchTables": "Taulukoita ei voitu yhdistää.",
+      "fillBots": "Pöytiä ei voitu täyttää roboteilla.",
+      "clipboard": "Leikepöytä estetty — kopioi linkki manuaalisesti.",
+      "eventNotFound": "Tapahtumaa ei löydy.",
+      "joinEvent": "Tapahtumaan ei voitu liittyä.",
+      "saveDecks": "Dekkejä ei voitu tallentaa.",
+      "updateReady": "Ei voitu päivittää valmiina.",
+      "updatePause": "Taukoa ei voitu päivittää.",
+      "leaveEvent": "Tapahtumasta ei voitu poistua.",
+      "trackerChoice": "Seurantavalintaa ei voitu tallentaa.",
+      "saveRating": "Arvosanaa ei voitu tallentaa.",
+      "chooseCommander": "Valitse jokaiselle palle komentaja.",
+      "enterJoinCode": "Anna liittymiskoodi.",
+      "sessionUnavailable": "Tapahtuma-istunto ei ole enää käytettävissä.",
+      "savePack": "Pakkausta ei voitu tallentaa.",
+      "searchScryfall": "Scryfallista ei voitu hakea.",
+      "loadArtwork": "Vaihtoehtoista taideteosta ei voitu ladata.",
+      "submitResult": "Tulosta ei voitu lähettää.",
+      "saveChallenge": "Haasteen edistymistä ei voitu tallentaa.",
+      "unveilIdentity": "Henkilöllisyyttäsi ei voitu paljastaa.",
+      "apiWaking": "Isäntä herää. Pidä tämä sivu auki – se kestää yleensä alle minuutin.",
+      "apiUnreachable": "Sovellusliittymään ei saada yhteyttä. Onko palvelin käynnissä (yarn dev:server)?"
+    },
+    "assignedAtTable": "Määrätty pöydässä",
+    "scanToJoin": "Skannaa liittyäksesi tähän tapahtumaan"
+  },
+  "language": {
+    "en": "English",
+    "de": "Deutsch",
+    "fr": "Français",
+    "es": "Español",
+    "it": "Italiano",
+    "pt": "Português",
+    "nl": "Nederlands",
+    "pl": "Polski",
+    "sv": "Svenska",
+    "da": "Dansk",
+    "no": "Norsk",
+    "fi": "Suomi",
+    "cs": "Čeština",
+    "sk": "Slovenčina",
+    "hu": "Magyar",
+    "ro": "Română",
+    "el": "Ελληνικά",
+    "hr": "Hrvatski",
+    "sl": "Slovenščina",
+    "bg": "Български",
+    "uk": "Українська",
+    "lt": "Lietuvių",
+    "lv": "Latviešu",
+    "et": "Eesti",
+    "is": "Íslenska",
+    "ga": "Gaeilge",
+    "mt": "Malti",
+    "sr": "Srpski",
+    "sq": "Shqip",
+    "bs": "Bosanski",
+    "mk": "Македонски",
+    "be": "Беларуская",
+    "ca": "Català",
+    "eu": "Euskara",
+    "cy": "Cymraeg"
+  },
+  "families": {
+    "normal": "Normaali",
+    "commander": "komentaja"
+  },
+  "modes": {
+    "shared": {
+      "commanderCombat": "Pelaaja häviää saatuaan {{commanderDamage}} taisteluvaurion yhdeltä komentajalta.",
+      "commanderTax": "Joka kerta kun komentaja muutetaan komentoalueelta, se maksaa 2 manaa lisää.",
+      "lifeAndLoss": "Elämä ja menetys",
+      "turns": "Käännöksiä",
+      "commanders": "komentajat",
+      "eachPlayerLife": "Jokainen pelaaja alkaa {{life}} elämästä.",
+      "loseAtZero": "Pelaaja häviää 0 elämällä.",
+      "loseAtPoison": "Pelaaja häviää {{poison}} myrkkymittarilla.",
+      "startingPlayerRandom": "Aloittava pelaaja arvotaan satunnaisesti.",
+      "startingPlayerSkipDraw": "Aloittava pelaaja arvotaan satunnaisesti ja ohittaa arvonnan ensimmäisellä kierroksella.",
+      "multiplayerFirstTurnDraw": "Moninpelissä kyseinen pelaaja arvostaa ensimmäisellä kierroksellaan.",
+      "commanderFirstTurnDraw": "Moninpeli Commanderissa kyseinen pelaaja arvostaa ensimmäisellä kierroksellaan.",
+      "commandersInZone": "Komentajat alkavat komentoalueelta, ja ne voidaan muotoilla uudelleen sieltä.",
+      "commanderRulesApply": "Komentajan säännöt ovat edelleen voimassa: {{life}} elämän aloittaminen, {{poison}} myrkky ja {{commanderDamage}} taisteluvauriot yhdeltä komentajalta ovat tappavia."
+    },
+    "duel": {
+      "label": "Kaksintaistelu",
+      "hint": "Kaksi pelaajaa. Jokainen alkaa 20 elämästä.",
+      "hostHint": "Tiukat 2 pelaajan pöydät. Jokainen pelaaja alkaa 20 elämästä.",
+      "hostFixedSeats": "Kaksintaistelutapahtumissa istuu aina tasan kaksi pelaajaa.",
+      "title": "Kaksintaistelu",
+      "summary": "Kahden pelaajan Magic. Ei komentajia - vain elämä ja hallitus.",
+      "sections": {
+        "life": {
+          "heading": "Elämä ja menetys",
+          "bullets": [
+            "Each player starts at {{life}} life.",
+            "A player loses at 0 life.",
+            "A player loses at {{poison}} poison counters."
+          ]
+        },
+        "turns": {
+          "heading": "Käännöksiä",
+          "bullets": [
+            "The starting player is drawn at random and skips the draw step on the first turn."
+          ]
+        }
+      }
+    },
+    "multiplayer": {
+      "label": "Moninpeli",
+      "hint": "Kaikille ilmainen ilman komentajia. Kaikki aloittavat 20-vuotiaana.",
+      "hostHint": "Kaikille ilmainen ilman komentajia. Vastaaminen täyttää valitsemasi pöytäkoon; jäämiä mahtuu niinkin pieneksi kuin kolme.",
+      "title": "Moninpeli",
+      "summary": "Kaikille ilmainen ilman Commander-muotoa. Hyödyllinen satunnaisessa moninpelissä, Planechasessa tai missä tahansa 20 hengen pöydässä.",
+      "sections": {
+        "life": {
+          "heading": "Elämä ja menetys",
+          "bullets": [
+            "Each player starts at {{life}} life.",
+            "A player loses at 0 life.",
+            "A player loses at {{poison}} poison counters."
+          ]
+        },
+        "turns": {
+          "heading": "Käännöksiä",
+          "bullets": [
+            "The starting player is drawn at random.",
+            "In multiplayer, that player draws on their first turn."
+          ]
+        }
+      }
+    },
+    "commander": {
+      "label": "Klassinen",
+      "hint": "Kaikille ilmainen kolmesta kuuteen pelaajalle. Jokainen aloittaa 40-vuotiaasta elämästä.",
+      "hostHint": "Classic Commander tarvitsee vähintään kolme pelaajaa. Matching suosii neljää; ylijääneitä paloja voi olla kolme tai viisi, kun se on sallittua.",
+      "title": "Klassinen",
+      "summary": "Kaikille ilmainen moninpeli. Jokainen pelaaja taistelee itsensä puolesta.",
+      "sections": {
+        "life": {
+          "heading": "Elämä ja menetys",
+          "bullets": [
+            "Each player starts at {{life}} life.",
+            "A player loses at 0 life.",
+            "A player loses at {{poison}} poison counters.",
+            "A player loses after taking {{commanderDamage}} combat damage from one commander."
+          ]
+        },
+        "turns": {
+          "heading": "Käännöksiä",
+          "bullets": [
+            "The starting player is drawn at random.",
+            "In multiplayer Commander, that player draws on their first turn."
+          ]
+        },
+        "commanders": {
+          "heading": "komentajat",
+          "bullets": [
+            "Commanders begin in the command zone and may be recast from there.",
+            "Each time a commander is recast from the command zone, it costs 2 more mana."
+          ]
+        }
+      }
+    },
+    "duel-commander": {
+      "label": "Kaksintaistelun komentaja",
+      "hint": "1v1 klo 20 elämää. Ei komentajan vaurioita; kumppanit rekisteröivät edelleen molemmat komentajat.",
+      "hostHint": "Tiukat kahden pelaajan Duel Commander -pöydät.",
+      "title": "Kaksintaistelun komentaja",
+      "summary": "Kilpailukykyinen 1v1 komentaja. Nopeampi käyttöikä ja ilman komentajan vahinkoa.",
+      "sections": {
+        "life": {
+          "heading": "Elämä ja menetys",
+          "bullets": [
+            "Each player starts at {{life}} life.",
+            "A player loses at 0 life.",
+            "A player loses at {{poison}} poison counters.",
+            "There is no commander-damage win condition."
+          ]
+        },
+        "turns": {
+          "heading": "Käännöksiä",
+          "bullets": [
+            "The starting player is drawn at random.",
+            "The starting player draws on their first turn."
+          ]
+        },
+        "commanders": {
+          "heading": "komentajat",
+          "bullets": [
+            "Commanders begin in the command zone and may be recast from there.",
+            "Each time a commander is recast from the command zone, it costs 2 more mana.",
+            "If you have two commanders, only one may be cast from the command zone each game. The other can still be cast from your hand or elsewhere."
+          ]
+        }
+      }
+    },
+    "brawl": {
+      "label": "Tappelu",
+      "hint": "1v1 at 25 elämää. Legendaariset olennot, lentokonekävelyt, ajoneuvot ja avaruusalukset voivat johtaa.",
+      "hostHint": "Tiukkoja kahden pelaajan Brawl-pöytiä käyttämällä Arena-korttipoolia.",
+      "title": "Tappelu",
+      "summary": "Arena-tyylinen 1v1-komentaja. Singleton-kannet, joissa on laajempi joukko laillisia johtajia ilman komentajan vaurioita.",
+      "sections": {
+        "life": {
+          "heading": "Elämä ja menetys",
+          "bullets": [
+            "Each player starts at {{life}} life.",
+            "A player loses at 0 life.",
+            "A player loses at {{poison}} poison counters.",
+            "There is no commander-damage win condition."
+          ]
+        },
+        "turns": {
+          "heading": "Käännöksiä",
+          "bullets": [
+            "The starting player is drawn at random.",
+            "The starting player draws on their first turn."
+          ]
+        },
+        "commanders": {
+          "heading": "komentajat",
+          "bullets": [
+            "Your commander can be a legendary creature, planeswalker, vehicle, or spacecraft with a power and toughness.",
+            "Deck cards must stay within your commander's color identity.",
+            "Commanders begin in the command zone and may be recast from there.",
+            "Each time a commander is recast from the command zone, it costs 2 more mana."
+          ]
+        }
+      }
+    },
+    "treachery": {
+      "label": "Petos",
+      "hint": "Tällä laitteella käsiteltiin salaisia henkilöllisyyksiä. Vie se ympärille, jotta jokainen lukee omansa yksityisesti.",
+      "hostHint": "Salaiset roolit Commander podille. Vastaaminen täyttää valitsemasi pöytäkoon ensin; ylijääneet mahtuvat niinkin pieneksi kuin neljä.",
+      "title": "Petos",
+      "summary": "Komentaja, jolla on salaiset henkilöllisyydet. Johtaja on julkinen; kaikki muut jäävät piiloon.",
+      "sections": {
+        "commander": {
+          "heading": "Komentajan säännöt ovat edelleen voimassa",
+          "bullets": [
+            "Each player starts at {{life}} life.",
+            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
+            "The Leader takes the first turn and draws on that turn.",
+            "Each time a commander is recast from the command zone, it costs 2 more mana."
+          ]
+        },
+        "identities": {
+          "heading": "Identiteetit",
+          "bullets": [
+            "Open Check my role from the timer menu. Only you see that card.",
+            "On a single tracker, deal the identities at setup and pass the device around so each player reads theirs alone.",
+            "Leader: Survive until every Assassin and Traitor is eliminated. Reveal yourself to the table. The Guardians share your victory, but you do not know who they are.",
+            "Guardian: Keep the Leader alive and eliminate the Leader's enemies. Your identity is secret. You win and lose with the Leader, even if you are eliminated first.",
+            "Assassin: Eliminate the Leader. Your identity is secret. Assassins share the same objective, but you do not know who the other Assassins are.",
+            "Traitor: Be the last player standing. Your identity is secret. Keep the Leader alive until the other threats are gone, then take the throne for yourself.",
+            "Follow any extra abilities printed on your identity card."
+          ]
+        }
+      },
+      "roles": {
+        "leader": {
+          "name": "Johtaja",
+          "objective": "Selviydy, kunnes jokainen salamurhaaja ja petturi on eliminoitu.",
+          "guidance": "Paljasta itsesi pöytään. Suojelijat jakavat voittosi, mutta et tiedä keitä he ovat.",
+          "publicNote": "Roolisi on julkinen. Kerro pöydälle, että olet johtaja."
+        },
+        "guardian": {
+          "name": "Suojelija",
+          "objective": "Pidä johtaja hengissä ja eliminoi johtajan viholliset.",
+          "guidance": "Henkilöllisyytesi on salainen. Voitat ja häviät johtajan kanssa, vaikka putoaisitkin ensimmäisenä.",
+          "publicNote": "Pidä tämä rooli salassa."
+        },
+        "assassin": {
+          "name": "Salamurhaaja",
+          "objective": "Eliminoi johtaja.",
+          "guidance": "Henkilöllisyytesi on salainen. Salamurhaajilla on sama tavoite, mutta et tiedä keitä muut salamurhaajat ovat.",
+          "publicNote": "Pidä tämä rooli salassa."
+        },
+        "traitor": {
+          "name": "Petturi",
+          "objective": "Ole viimeinen seisova pelaaja.",
+          "guidance": "Henkilöllisyytesi on salainen. Pidä johtaja hengissä, kunnes muut uhat ovat poissa, ja ota sitten valtaistuin itsellesi.",
+          "publicNote": "Pidä tämä rooli salassa."
+        }
+      },
+      "normal": {
+        "hint": "Salaiset henkilöllisyydet jaetussa puhelimessa. Kaikki aloittavat 20 elämästä – ei komentajia.",
+        "hostHint": "Salaiset roolit ilman komentajia. Vastaaminen täyttää valitsemasi pöytäkoon ensin; ylijääneet mahtuvat niinkin pieneksi kuin neljä.",
+        "summary": "Salaiset henkilöllisyydet ilman Commander-muotoa. Johtaja on julkinen; kaikki muut jäävät piiloon.",
+        "sections": {
+          "life": {
+            "heading": "Elämä ja menetys",
+            "bullets": [
+              "Each player starts at {{life}} life.",
+              "A player loses at 0 life.",
+              "A player loses at {{poison}} poison counters.",
+              "The Leader takes the first turn and draws on that turn."
+            ]
+          },
+          "identities": null
+        }
+      }
+    },
+    "two-headed-giant": {
+      "label": "Kaksipäinen jättiläinen",
+      "hint": "Kaksi kahden hengen joukkuetta, 60 jakavat elämän, vuoroja yhdessä.",
+      "hostHint": "Tiukat 4 pelaajan Commander podit. Kaksi joukkuetta jakavat 60 elämää ja vuorollaan yhdessä.",
+      "hostFixedSeats": "Two-Head Giant -peleissä on aina neljä pelaajaa.",
+      "title": "Kaksipäinen jättiläinen",
+      "summary": "Kaksi kahden hengen joukkuetta. Joukkuekaverit jakavat elämän kokonaisuuden ja käänteen.",
+      "sections": {
+        "teams": {
+          "heading": "Joukkueet",
+          "bullets": [
+            "Pick two allies, or let the table randomise the pairs.",
+            "Each team starts at {{sharedLife}} shared life.",
+            "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+          ]
+        },
+        "life": {
+          "heading": "Elämä ja menetys",
+          "bullets": [
+            "A team loses when its shared life reaches 0.",
+            "A team loses at {{sharedPoison}} shared poison counters.",
+            "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+          ]
+        },
+        "turns": {
+          "heading": "Käännöksiä",
+          "bullets": [
+            "The starting team is drawn at random and skips the draw step on its first turn.",
+            "Each time a commander is recast from the command zone, it costs 2 more mana."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Kaksi kahden hengen joukkuetta, 40 yhteistä elämää, vuoroja yhdessä.",
+        "hostHint": "Tiukat 4 pelaajan pöydät. Kaksi joukkuetta jakavat 40 elämää ja vuorottelevat yhdessä – ei komentajia.",
+        "summary": "Kaksi kahden hengen joukkuetta. Joukkuekaverit jakavat elämän kokonaisuuden ja vuoron – vakiopakit, 20 elämää kumpikin joukkueehdoin.",
+        "sections": {
+          "teams": {
+            "heading": "Joukkueet",
+            "bullets": [
+              "Pick two allies, or let the table randomise the pairs.",
+              "Each team starts at {{sharedLife}} shared life.",
+              "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+            ]
+          },
+          "life": {
+            "heading": "Elämä ja menetys",
+            "bullets": [
+              "A team loses when its shared life reaches 0.",
+              "A team loses at {{sharedPoison}} shared poison counters.",
+              "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+            ]
+          },
+          "turns": {
+            "heading": "Käännöksiä",
+            "bullets": [
+              "The starting team is drawn at random and skips the draw step on its first turn.",
+              "Each time a commander is recast from the command zone, it costs 2 more mana."
+            ]
+          }
+        }
+      }
+    },
+    "archenemy-commander": {
+      "label": "arkkivihollinen",
+      "hint": "Yksi arkkivihollinen 60 hengen päällä 40 kortin pakassa kolmea sankaria, jotka jakavat 60 henkeä.",
+      "hostHint": "Tiukat 4 pelaajan Commander podit. Yksi 60 hengen arkkivihollinen kohtaa kolmen pelaajan joukkueen, jolla on 60 jaettua elämää ja 40 kortin pelipakka.",
+      "hostFixedSeats": "Archenemy Commander -peleissä on aina neljä pelaajaa.",
+      "title": "Arkkivihollisen komentaja",
+      "summary": "Yksi arkkivihollinen kolmen hengen joukkuetta vastaan, suunnitelmapakka liikkeessä.",
+      "sections": {
+        "sides": {
+          "heading": "Sivut",
+          "bullets": [
+            "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
+            "Both sides start at {{life}} life.",
+            "The heroes share that life total and take their turn together.",
+            "The Archenemy goes first and draws on that turn."
+          ]
+        },
+        "schemes": {
+          "heading": "Järjestelmät",
+          "bullets": [
+            "The 40 Duskmourn Commander schemes are shuffled at the start.",
+            "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
+            "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
+            "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
+            "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+          ]
+        },
+        "life": {
+          "heading": "Elämä ja menetys",
+          "bullets": [
+            "The Archenemy loses at 0 life, or when the usual poison and commander-damage limits are reached.",
+            "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
+            "A player loses after taking {{commanderDamage}} combat damage from one commander.",
+            "Each time a commander is recast from the command zone, it costs 2 more mana."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Yksi arkkivihollinen 20 hengen päällä suunnitelmissa kolmea sankaria vastaan, jotka jakavat 40 elämää.",
+        "hostHint": "Tiukat 4 pelaajan pöydät. Yksi arkkivihollinen, jossa on pelipaketti kolmen pelaajan joukkuetta vastaan ​​– ei komentajia.",
+        "summary": "Yksi arkkivihollinen kolmen hengen joukkuetta vastaan, pelipakka liikkeessä – tavalliset 20 hengen pöydät.",
+        "sections": {
+          "sides": {
+            "heading": "Sivut",
+            "bullets": [
+              "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
+              "Both sides start at {{life}} life.",
+              "The heroes share that life total and take their turn together.",
+              "The Archenemy goes first and draws on that turn."
+            ]
+          },
+          "schemes": {
+            "heading": "Järjestelmät",
+            "bullets": [
+              "The 40 Duskmourn Commander schemes are shuffled at the start.",
+              "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
+              "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
+              "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
+              "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+            ]
+          },
+          "life": {
+            "heading": "Elämä ja menetys",
+            "bullets": [
+              "The Archenemy loses at 0 life, or when the usual poison and poison limits are reached.",
+              "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
+              "A player loses after taking {{poison}} poison counters."
+            ]
+          }
+        }
+      }
+    },
+    "emperor": {
+      "label": "Keisari",
+      "hint": "Kaksi kolmen hengen joukkuetta. Suojaa keisariasi rajoitetulla vaikutusalueella ja ota käyttöön olentoja.",
+      "hostHint": "Tiukat 6 pelaajan Commander podit. Kaksi joukkuetta asettaa kukin keisarin kahden kenraalin väliin ja pelaa rajoitetulla vaikutusalueella.",
+      "hostFixedSeats": "Keisaripeleihin mahtuu aina kuusi pelaajaa.",
+      "title": "Keisari",
+      "summary": "Kaksi kolmen hengen joukkuetta. Jokainen keisari istuu kahden kenraalin välissä, ja keisarin eliminoiminen voittaa pelin.",
+      "sections": {
+        "teams": {
+          "heading": "Joukkueet ja vuorot",
+          "bullets": [
+            "Choose both teams and each team's Emperor, or randomise either choice.",
+            "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
+            "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
+            "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+          ]
+        },
+        "range": {
+          "heading": "Kantama ja taistelu",
+          "bullets": [
+            "Generals have range of influence 1. Emperors have range of influence 2.",
+            "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
+            "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
+            "As players leave, the empty seats stop counting, bringing surviving players into range."
+          ]
+        },
+        "deploy": {
+          "heading": "Ota käyttöön olentoja",
+          "bullets": [
+            "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
+            "This can move creatures through the team as the battle lines change."
+          ]
+        },
+        "winning": {
+          "heading": "Voittajan ja komentajan säännöt",
+          "bullets": [
+            "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
+            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
+            "Each time a commander is recast from the command zone, it costs 2 more mana."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Kaksi kolmen hengen joukkuetta 20 elämään. Suojaa keisariasi rajoitetulla vaikutusvallalla.",
+        "hostHint": "Tiukat 6 pelaajan pöydät. Kaksi keisaria kenraalien välillä – tavalliset 20 hengen pakat, ei komentajia.",
+        "summary": "Kaksi kolmen hengen joukkuetta. Jokainen keisari istuu kahden kenraalin välissä, ja keisarin eliminoiminen voittaa pelin.",
+        "sections": {
+          "teams": {
+            "heading": "Joukkueet ja vuorot",
+            "bullets": [
+              "Choose both teams and each team's Emperor, or randomise either choice.",
+              "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
+              "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
+              "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+            ]
+          },
+          "range": {
+            "heading": "Kantama ja taistelu",
+            "bullets": [
+              "Generals have range of influence 1. Emperors have range of influence 2.",
+              "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
+              "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
+              "As players leave, the empty seats stop counting, bringing surviving players into range."
+            ]
+          },
+          "deploy": {
+            "heading": "Ota käyttöön olentoja",
+            "bullets": [
+              "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
+              "This can move creatures through the team as the battle lines change."
+            ]
+          },
+          "winning": {
+            "heading": "Voittajan ja komentajan säännöt",
+            "bullets": [
+              "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
+              "A player loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+            ]
+          }
+        }
+      }
+    },
+    "star": {
+      "label": "Tähti",
+      "hint": "Viisi pelaajaa ympyrässä. Naapurisi ovat liittolaisia; poista molemmat pelaajat sinua vastapäätä.",
+      "hostHint": "Tiukat 5 pelaajan Commander podit. Viereiset pelaajat ovat liittolaisia; jokainen pelaaja voittaa kestäen molemmat vastustajat ympyrän poikki.",
+      "hostFixedSeats": "Tähtipeleihin mahtuu aina tasan viisi pelaajaa.",
+      "title": "Tähti",
+      "summary": "Viisi pelaajaa istuu ympyrässä. Naapurisi ovat liittolaisia ​​ja kaksi sinua vastapäätä olevaa pelaajaa ovat vihollisia.",
+      "sections": {
+        "positions": {
+          "heading": "Asemat ja liittolaiset",
+          "bullets": [
+            "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
+            "The players immediately to your left and right are your allies.",
+            "The two nonadjacent players across the circle are your enemies.",
+            "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+          ]
+        },
+        "combat": {
+          "heading": "Taistelu ja vuorovaikutus",
+          "bullets": [
+            "Players cannot attack their allies by default.",
+            "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
+            "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+          ]
+        },
+        "winning": {
+          "heading": "Voitto",
+          "bullets": [
+            "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
+            "An eliminated player cannot win later.",
+            "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
+            "Each time a commander is recast from the command zone, it costs 2 more mana."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Viisi pelaajaa piirissä 20 elämää. Naapurit ovat liittolaisia; poista molemmat pelaajat sinua vastapäätä.",
+        "hostHint": "Tiukat 5 pelaajan pöydät. Vierekkäisten pelaajien liittolainen; jokainen pelaaja voittaa kestäen molemmat vastustajat ympyrän poikki.",
+        "summary": "Viisi pelaajaa istuu ympyrässä 20 elämän päällä. Naapurisi ovat liittolaisia ​​ja kaksi sinua vastapäätä olevaa pelaajaa ovat vihollisia.",
+        "sections": {
+          "positions": {
+            "heading": "Asemat ja liittolaiset",
+            "bullets": [
+              "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
+              "The players immediately to your left and right are your allies.",
+              "The two nonadjacent players across the circle are your enemies.",
+              "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+            ]
+          },
+          "combat": {
+            "heading": "Taistelu ja vuorovaikutus",
+            "bullets": [
+              "Players cannot attack their allies by default.",
+              "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
+              "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+            ]
+          },
+          "winning": {
+            "heading": "Voitto",
+            "bullets": [
+              "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
+              "An eliminated player cannot win later.",
+              "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+            ]
+          }
+        }
+      }
+    },
+    "assassin": {
+      "label": "Salamurhaaja",
+      "hint": "Salaiset sopimukset kaikille ilmaiseksi. Eliminoi pisteesi, pisteet ja peri heidän kohteensa.",
+      "hostHint": "Salaiset sopimukset 3-8 pelaajalle. Tee pisteet poistamalla pisteesi ja peri sitten heidän tavoitteensa.",
+      "title": "Salamurhaaja",
+      "summary": "Kaikille ilmainen salaiset sopimukset. Tee pisteitä, peri uusia tavoitteita ja päätä korkeimmalla pisteellä.",
+      "sections": {
+        "contracts": {
+          "heading": "Salaisia sopimuksia",
+          "bullets": [
+            "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
+            "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
+            "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+          ]
+        },
+        "elimination": {
+          "heading": "Eliminaatio ja periytyminen",
+          "bullets": [
+            "When a player is eliminated, record who dealt the finishing blow.",
+            "If you personally eliminate your assigned target, you score one mark.",
+            "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+          ]
+        },
+        "winning": {
+          "heading": "Voitto",
+          "bullets": [
+            "Play until only one player remains. The last survivor scores one additional mark.",
+            "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
+            "Commander rules still apply: {{life}} starting life, {{poison}} poison, and {{commanderDamage}} combat damage from one commander are lethal.",
+            "Each time a commander is recast from the command zone, it costs 2 more mana."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Salaiset sopimukset 3-8 pelaajalle 20 elämään. Tee pisteet poistamalla pisteesi.",
+        "hostHint": "Salaiset sopimukset ilman komentajia. Vastaaminen täyttää valitsemasi pöytäkoon; jäämiä mahtuu niinkin pieneksi kuin kolme.",
+        "summary": "Kaikille ilmainen salaiset sopimukset 20 elämästä. Tee pisteitä, peri uusia tavoitteita ja päätä korkeimmalla pisteellä.",
+        "sections": {
+          "contracts": {
+            "heading": "Salaisia sopimuksia",
+            "bullets": [
+              "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
+              "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
+              "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+            ]
+          },
+          "elimination": {
+            "heading": "Eliminaatio ja periytyminen",
+            "bullets": [
+              "When a player is eliminated, record who dealt the finishing blow.",
+              "If you personally eliminate your assigned target, you score one mark.",
+              "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+            ]
+          },
+          "winning": {
+            "heading": "Voitto",
+            "bullets": [
+              "Play until only one player remains. The last survivor scores one additional mark.",
+              "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
+              "{{life}} starting life, {{poison}} poison, and {{poison}} poison counters are lethal."
+            ]
+          }
+        }
+      }
+    }
+  },
+  "home": {
+    "taglineBefore": "Sinun seuraava",
+    "taglineHighlight": "pod",
+    "taglineAfter": ", lajiteltu.",
+    "startPlaying": "Aloita pelaaminen",
+    "ongoingGame": "käynnissä oleva peli",
+    "noEventNeeded": "tapahtumaa ei tarvita",
+    "startPlayingHint": "Avaa taistelunäyttö tällä laitteella. Lähde ja tule takaisin menettämättä keskeneräistä peliä.",
+    "alwaysPlayers": "Aina {{count}} pelaajaa tässä tilassa.",
+    "resumeGame": "Jatka peliä",
+    "startNewGame": "Aloita uusi peli",
+    "startGame": "Aloita peli",
+    "commanderSetup": "komentajat",
+    "commanderSetupHint": "Etsi Scryfallista jokaisen pelaajan komentaja. Kumppaniparit tarvitsevat molemmat komentajat.",
+    "chooseAllCommanders": "Valitse jokaiselle pelaajalle komentaja.",
+    "advancedMatchConfig": "Advanced match config",
+    "hostEvent": "Isäntätapahtuma",
+    "new": "uusi",
+    "targetTableSize": "Pöydän tavoitekoko",
+    "allowThreePods": "Salli 3 pelaajan podit",
+    "allowFivePods": "Salli 5 pelaajan podit",
+    "duelFixedSeats": "Kaksintaistelutapahtumissa istuu aina tasan kaksi pelaajaa.",
+    "duelCommanderFixedSeats": "Duel Commander -tapahtumiin mahtuu aina tasan kaksi pelaajaa.",
+    "brawlFixedSeats": "Tappelutapahtumiin mahtuu aina tasan kaksi pelaajaa.",
+    "emperorFixedSeats": "Keisaripeleihin mahtuu aina kuusi pelaajaa.",
+    "starFixedSeats": "Tähtipeleihin mahtuu aina tasan viisi pelaajaa.",
+    "archenemyFixedSeats": "Archenemy Commander -peleissä on aina neljä pelaajaa.",
+    "twoHeadedFixedSeats": "Two-Head Giant -peleissä on aina neljä pelaajaa.",
+    "eventName": "Tapahtuman nimi",
+    "eventNamePlaceholder": "Perjantain komentaja",
+    "tables": "Taulukot",
+    "tablesHint": "Kuinka monta fyysistä pöytää on vapaa tähän tapahtumaan.",
+    "eventLasts": "Tapahtuma kestää",
+    "eventLastsHint": "Liittymiskoodi kuolee tämän monen tunnin jälkeen. Käytä 48 tai 72 viikonloppuna.",
+    "hostPin": "Isännän PIN-koodi",
+    "hostPinHint": "4–8 numeroa — avaa isäntätyöpöydän uudelleen myöhemmin.",
+    "createEvent": "Luo tapahtuma",
+    "joinWithCode": "Liity koodilla",
+    "playerAside": "pelaaja",
+    "joinCode": "Liity koodi",
+    "joinCodePlaceholder": "AB23CD",
+    "join": "Liity",
+    "scanQr": "Skannaa QR",
+    "staleJoin": "Se tapahtuma on poissa. Liity uudella koodilla tai järjestä uusi ilta."
+  },
+  "host": {
+    "desk": "Isäntäpöytä",
+    "locked": "Lukittu",
+    "hostOnly": "vain isäntä",
+    "unlockHostDesk": "Avaa isäntätyöpöytä",
+    "playerCount": "{{count}} pelaaja",
+    "playerCount_plural": "{{count}} pelaajaa",
+    "ready": "{{count}} valmis",
+    "matched": "{{count}} osui",
+    "playing": "{{count}} pelissä",
+    "paused": "{{count}} keskeytetty",
+    "ends": "päättyy {{date}}",
+    "podSizes": "Palojen koot",
+    "matching": "yhteensopivuus",
+    "allowLeftoverThree": "Salli jäljellä olevat 3 pelaajan podit",
+    "allowFivePods": "Salli 5 pelaajan podit",
+    "treacheryTargetHint": "Pöydän tavoitekoko. Jäljelle jääviä paloja voi olla jopa neljä.",
+    "matchingPrefers": "Matching suosii {{size}}-pelaajan pöytiä.",
+    "matchingPrefersFour": "Matching suosii 4 pelaajan pöytiä.",
+    "assassinTargetHint": "Pöydän tavoitekoko. Jäljellä olevat sopimuspiirit voivat olla niin pieniä kuin kolme.",
+    "multiplayerTargetHint": "Pöydän tavoitekoko. Jäljellä olevia pöytiä voi olla jopa kolme.",
+    "duelMatchmaking": "Duel matchmaking istui tasan kaksi pelaajaa per peli.",
+    "duelCommanderMatchmaking": "Duel Commander matchmakingille mahtuu tasan kaksi pelaajaa per peli.",
+    "brawlMatchmaking": "Brawl matchmaking istui tasan kaksi pelaajaa per peli.",
+    "twoHeadedMatchmaking": "Two-Headed Giant matchmaking istuu täsmälleen neljä pelaajaa per peli.",
+    "archenemyMatchmaking": "Archenemy Commander matchmakingille mahtuu tasan neljä pelaajaa per peli: yksi arkkivihollinen kolmen hengen joukkuetta vastaan.",
+    "emperorMatchmaking": "Keisarin matchmakingille mahtuu tasan kuusi pelaajaa per peli: kaksi joukkuetta, joissa kummassakin on keisari ja kaksi kenraalia.",
+    "starMatchmaking": "Star matchmakingiin mahtuu tasan viisi pelaajaa pyöreässä järjestyksessä.",
+    "eventLength": "Tapahtuman pituus",
+    "joinCodeDies": "liittymiskoodi kuolee",
+    "hoursFromStart": "Tunteja alusta",
+    "hoursFromStartHint": "Muuta tämä monipäiväiseksi tapahtumaksi. Sen päätyttyä QR avaa kotisivun.",
+    "joinCodeTitle": "Liity koodi",
+    "share": "jakaa",
+    "noLanAddress": "Lähiverkko-osoitetta ei löydy – tämä linkki toimii vain tässä tietokoneessa.",
+    "copyPlayerLink": "Kopioi soittimen linkki",
+    "queue": "Jono",
+    "nobodyWaiting": "Kukaan ei odota.",
+    "flex": "flex {{count}}",
+    "challengePts": "{{count}} haaste pistettä",
+    "pts": "{{count}} pistettä",
+    "notReady": "Ei valmis",
+    "pausedTitle": "Keskeytetty",
+    "seated": "Istuva",
+    "atTables": "{{count}} pöydissä",
+    "tablesTitle": "Taulukot",
+    "total": "{{count}} yhteensä",
+    "noTables": "Tämä tapahtuma luotiin ilman pöytiä.",
+    "startingGames": "Pelit alkavat…",
+    "startAllReady": "Aloita kaikki valmiit pelit ({{count}})",
+    "startGame": "Aloita peli",
+    "finishTable": "Viimeistele pöytä",
+    "cancelPod": "Peruuta pod",
+    "enable": "Ota käyttöön",
+    "disable": "Poista käytöstä",
+    "trackerUsed": "jäljitin",
+    "noTracker": "ei seurantaa",
+    "matchNow": "Ottelu nyt",
+    "fillBots": "Täytä taulukot roboteilla",
+    "playerJoinPage": "Pelaajan liittymissivu"
+  },
+  "join": {
+    "joinEvent": "Liity tapahtumaan",
+    "takeSeat": "Istu",
+    "displayName": "Näyttönimi",
+    "displayNamePlaceholder": "Alex",
+    "joinEventButton": "Liity tapahtumaan",
+    "saveDecks": "Tallenna kansia",
+    "matchFound": "Ottelu löytyi",
+    "yourDeck": "Sinun kansisi",
+    "checkMyRole": "Tarkista roolini",
+    "playingWithoutTracker": "Pelaa ilman trackeria. Isäntä voi viimeistellä pöydän.",
+    "chooseTracker": "Valitse, kuinka tämä pod tallentaa pelinsä.",
+    "useGameTracker": "Käytä pelin seurantaa",
+    "playWithoutTracker": "Pelaa ilman trackeria",
+    "atTableMarked": "Sinut on merkitty tässä puhelimessa olevaksi pöydäksi. Isäntä aloittaa pelin silti pöydältä.",
+    "imAtTable": "Olen pöydässä",
+    "leftEvent": "Poistuit tästä tapahtumasta. Skannaa QR uudelleen, jos haluat palata sisään.",
+    "openPool": "Avoin allas - mikä tahansa pöytä.",
+    "ready": "Valmis",
+    "waiting": "odottaa",
+    "holdTight": "Pidä kiinni - pöytä on tulossa.",
+    "flex": "Jousto: {{flex}} · Haastepisteet: {{points}}",
+    "howWasPod": "Millainen oli kotelosi?",
+    "pause": "Tauko",
+    "leave": "Lähde",
+    "pausedMessage": "Olet keskeytetty. Jatka, kun voit istua tai poistua tapahtumasta.",
+    "imReady": "Olen valmis",
+    "leaveEvent": "Poistu tapahtumasta",
+    "markReady": "Merkitse valmiiksi, kun voit istua alas peliin.",
+    "matchingShortly": "Matching lähettää sinut pian pöytään.",
+    "imTheHost": "Olen isäntä",
+    "offlineSaved": "Tallennettu tähän puhelimeen. Se lähetetään, kun olet taas online-tilassa.",
+    "stayAtTable": "Pysy pöydässä, kunnes isäntä kutsuu pelin."
+  },
+  "matchConfig": {
+    "title": "Pelin asetukset",
+    "description": "Nimeä pelaajat ja valitse komentajat ennen elämänseurantaohjelman käynnistymistä.",
+    "changeMode": "Vaihda tila tai istuimet",
+    "podSetup": "Pod-asetukset",
+    "seats": "Istuimet",
+    "seatsCount": "{{count}} paikkaa",
+    "bracket": "Kiinnike",
+    "header": "Otsikko",
+    "eventNamePlaceholder": "Tapahtuman nimi",
+    "joinCodePlaceholder": "Liity koodi",
+    "matchCard": "Ottelukortti",
+    "tableLabelPlaceholder": "Taulukon etiketti",
+    "assignedDeckPlaceholder": "Määrätty kansi",
+    "startGame": "Aloita peli",
+    "openBattleScreen": "Avaa taistelunäyttö",
+    "resetGameState": "Reset game state",
+    "sandboxTitle": "Sandbox options",
+    "sandboxHint": "Väärennetty tapahtumakromi testaukseen/otteluun ilman isännöintiä. Elämänseurantaan ei näy tässä mitään.",
+    "commander": "komentaja",
+    "secondCommander": "Second commander"
+  },
+  "app": {
+    "notFound": "Ei löytynyt."
+  },
+  "wake": {
+    "title": "Waking the tables",
+    "message": "Vapaa isäntä meni nukkumaan. Pidä tämä sivu auki – se kestää yleensä alle minuutin."
+  },
+  "scanner": {
+    "title": "Skannaa QR",
+    "ariaLabel": "Scan join QR code",
+    "hint": "Osoita isäntätyöpöydän koodia.",
+    "closeScanner": "Close scanner",
+    "openingCamera": "Avataan kameraa…",
+    "noCamera": "Tämä selain ei voi avata kameraa. Kirjoita sen sijaan liittymiskoodi.",
+    "permissionDenied": "Kameran lupa evättiin. Kirjoita liittymiskoodi tai salli kamera ja yritä uudelleen."
+  },
+  "theme": {
+    "switchToLight": "Vaihda valotilaan",
+    "switchToDark": "Vaihda pimeään tilaan"
+  },
+  "hostMetrics": {
+    "title": "Event recap",
+    "aside": "pilot",
+    "players": "Pelaajat",
+    "games": "Pelit",
+    "gamesPerPlayer": "Games / player",
+    "waitAvg": "Wait avg",
+    "waitP95": "Wait p95",
+    "waitMax": "Wait max",
+    "rematchPairs": "Otteluparit uusiksi",
+    "flexEarned": "Flex ansainnut",
+    "flexSeats": "Flex-istuimet",
+    "durationAvg": "Kesto keskim",
+    "tablesOccupied": "Pöydät varattu",
+    "trackerUsed": "Tracker käytetty",
+    "trackerUsedValue": "{{used}} käytetty · {{skipped}} ohitettu",
+    "challenges": "Haasteet",
+    "challengePts": "Haaste pisteet",
+    "podRating": "Pod-luokitus",
+    "podSizes": "Palojen koot:",
+    "pools": "Altaat:"
+  },
+  "deckEditor": {
+    "title": "Komentajan kannet",
+    "deckNamePlaceholder": "Kannen nimi (valinnainen)",
+    "commander": "komentaja",
+    "secondCommander": "Toinen komentaja",
+    "markPreferred": "Mark mieluummin",
+    "addAcceptedDeck": "Lisää hyväksytty kansi",
+    "hint": "Vain saman altaan tyynyt. Ylimääräisten dekkien ansiosta matching joustaa sinut toiseen kiinnikkeeseen."
+  },
+  "commanderPicker": {
+    "searchCommander": "Etsi komentaja",
+    "searchPartner": "Komentaja, joka voi muodostaa pariliitoksen {{name}}:n kanssa",
+    "removeCommander": "Poista {{name}}",
+    "artworkFor": "Taidetta varten",
+    "loadingArtwork": "Ladataan taidetta…"
+  },
+  "challengePack": {
+    "title": "Haastepaketti",
+    "description": "Vain ennalta määritetyt primitiivit. Tallentaminen kirjoittaa uuden version eikä koskaan mutatoi tämän tapahtuman jo käyttämää pakkausta.",
+    "copyOfficial": "Kopioi virallinen",
+    "startBlank": "Aloita tyhjästä",
+    "saveNewVersion": "Tallenna uusi versio",
+    "editHint": "Kopioi virallinen paketti tai aloita tyhjästä ennen muokkaamista.",
+    "packName": "Pakkauksen nimi",
+    "descriptionLabel": "Kuvaus",
+    "addChallenge": "Lisää haaste",
+    "id": "Id",
+    "name": "Nimi",
+    "category": "Luokka",
+    "points": "Pisteet",
+    "primitive": "Alkukantainen",
+    "threshold": "Kynnys",
+    "confirmationQuestion": "Vahvistuskysymys",
+    "defaultConfirmation": "Tapahtuiko tämä pöydässä?",
+    "newClaimName": "Uusi väite",
+    "newClaimDescription": "Myönnä tämä pöydässä."
+  },
+  "treacheryRole": {
+    "treachery": "Petos",
+    "receivedRole": "Sait roolin",
+    "handDeviceTo": "Anna laite {{name}}",
+    "lookAwayIdentity": "Kaikkien muiden tulee katsoa pois ennen kuin henkilöllisyys paljastetaan.",
+    "lookAwayScreen": "Varmista, että kukaan muu ei näe näyttöäsi ennen sen paljastamista.",
+    "reveal": "Paljasta",
+    "yourRole": "Sinun roolisi",
+    "identityAlt": "{{name}}, {{role}}-identiteetti",
+    "illustratedBy": "Kuvittanut {{artist}}",
+    "yourObjective": "Sinun tavoitteesi",
+    "unveiledToTable": "Paljastettu pöydälle",
+    "unveilWarning": "Kaikki pöydässäsi olevat näkevät tämän henkilöllisyyden. Sen kyky on ratkaistava pelissä.",
+    "confirmUnveil": "Vahvista paljastaminen",
+    "unveilToTable": "Paljasta pöydälle",
+    "hideAndPass": "Piilota ja ohita",
+    "hideIdentity": "Piilota henkilöllisyyteni"
+  },
+  "modeRulesSheet": {
+    "closeRules": "Sulje säännöt",
+    "backToGame": "Takaisin peliin"
+  },
+  "assassinTargets": {
+    "title": "Salaisia sopimuksia",
+    "chooseOwnName": "Valitse vain oma nimesi.",
+    "closeContracts": "Sulje sopimukset",
+    "handDeviceTo": "Anna laite {{name}}",
+    "lookAway": "Kaikkien muiden tulee katsoa pois ennen kuin sopimus paljastetaan.",
+    "revealTarget": "Paljasta tavoitteeni",
+    "yourTarget": "Sinun tavoitteesi",
+    "noActiveTarget": "Ei aktiivista kohdetta",
+    "marksScored": "Pisteet: {{count}}",
+    "hideAndPass": "Piilota ja ohita",
+    "allContractsChecked": "Kaikki sopimukset tarkistettu"
+  },
+  "scheme": {
+    "ongoingScheme": "Meneillään oleva suunnitelma",
+    "scheme": "Kaavio",
+    "pastScheme": "Mennyt kaava",
+    "abandon": "Hylkää {{name}}",
+    "ongoingSchemes": "Meneillään olevat suunnitelmat",
+    "graveyard": "Hautausmaa · {{count}}",
+    "nextScheme": "Seuraava kaava",
+    "remainingInDeck": "{{count}} jäi pakkaan",
+    "scryfallCredit": "Korttikuva Scryfallin kautta. Magic: The Gathering on © Wizards of the Coast."
+  },
+  "dungeon": {
+    "takeInitiativeTitle": "Tee aloite?",
+    "takeInitiativeEnter": "Tämä uskaltaa myös Undercityyn. Ota se vain, kun pöytä antoi juuri tälle istuimelle aloitteen.",
+    "takeInitiativeWait": "Lopeta tai jätä nykyinen luolasto ennen kuin Undercity voi avautua. Tee aloite vasta, kun pöytä antoi sen tälle paikalle.",
+    "takeInitiativeAndEnter": "Tee aloite ja astu Undercityyn",
+    "takeInitiative": "Ota aloite",
+    "alreadyHoldInitiative": "Sinulla on jo aloite",
+    "takeAndEnterUndercity": "Tee aloite ja astu Undercityyn",
+    "completed": "{{name}} (valmis)",
+    "ventureInto": "Mene kohteeseen {{name}}",
+    "done": "Valmis",
+    "ventureTo": "Pääset kohteeseen {{room}}: {{effect}}",
+    "releaseInitiative": "Vapauta aloite",
+    "undoRoom": "Kumoa huone",
+    "closeDungeon": "Sulje vankityrmä"
+  },
+  "treacheryRolesSheet": {
+    "title": "Salaiset henkilöllisyydet",
+    "chooseOwnName": "Valitse vain oma nimesi.",
+    "closeIdentities": "Sulje identiteetit",
+    "allIdentitiesChecked": "Kaikki henkilöllisyydet tarkistettu"
+  },
+  "tracker": {
+    "gameRules": "Pelin säännöt",
+    "loadingRoles": "Ladataan rooleja…",
+    "start": "Aloita",
+    "readRules": "Lue säännöt",
+    "readyToBegin": "Valmiina aloittamaan",
+    "readyToBeginHint": "Aloita ottelu, kun kaikki ovat istuneet, tai lue säännöt ensin.",
+    "dealContracts": "Sopivat sopimukset",
+    "dealContractsTitle": "Tee salaisia sopimuksia",
+    "dealContractsHint": "Jokainen pelaaja saa yhden yksityisen maalin. Laite välitetään, jotta jokainen sopimus voidaan tarkistaa salassa.",
+    "dealIdentities": "Kaupan identiteetit",
+    "dealIdentitiesTitle": "Kaupat salaiset henkilöllisyydet",
+    "dealIdentitiesHint": "Jokainen pelaaja saa yhden piilotetun identiteetin. Laite välitetään ympäriinsä, jotta jokainen voidaan lukea salassa.",
+    "chooseStarPositions": "Valitse Tähtien paikat",
+    "starPositionsHint": "Vierekkäiset pelaajat ovat liittolaisia. Napauta kahta pelaajaa vaihtaaksesi asemaansa tai satunnaista koko ympyrä.",
+    "randomPositions": "Satunnaiset asennot",
+    "confirmPositions": "Vahvista asemat",
+    "adjacentPlayersAlly": "Vieressä\npelaajien liittolainen",
+    "buildEmperorTeams": "Rakenna keisariryhmiä",
+    "chooseTeamA": "Valitse kolme pelaajaa joukkueeseen A.",
+    "randomTeams": "Satunnaiset joukkueet",
+    "resetTeams": "Nollaa joukkueet",
+    "teamEmperor": "Joukkue {{team}} Keisari",
+    "randomEmperors": "Satunnaiset keisarit",
+    "confirmTeams": "Vahvista joukkueet",
+    "chooseArchenemy": "Valitse arkkivihollinen",
+    "chooseArchenemyHint": "Arkkivihollinen kohtaa kolme muuta pelaajaa. Molemmat osapuolet jakavat 60 elämää. Arkkivihollinen menee ensin, vetää vuorollaan ja käynnistää suunnitelman jokaisen ensimmäisen päävaiheen aikana.",
+    "confirmArchenemy": "Vahvista arkkivihollinen",
+    "chooseAllies": "Valitse liittolaiset",
+    "chooseAlliesHint": "Valitse ensimmäiseen joukkueeseen kaksi pelaajaa. Kahdesta muusta pelaajasta tulee vastustajajoukkue. Joukkueet jakavat 60 elämää ja vuoroa; kaikki muut pelaajaohjaimet pysyvät erillään.",
+    "emperor": "Keisari",
+    "emperorRange": "Keisari · alue 2",
+    "leader": "Johtaja",
+    "general": "Kenraali",
+    "generalRange": "Yleistä · alue 1",
+    "marks": "{{count}} merkkiä",
+    "winner": "Voittaja",
+    "turnPhone": "Käännä puhelimesi täysihoitoon",
+    "matchMenu": "Match-valikko",
+    "matchMenuElapsed": "Match-valikko. {{clock}} kulunut",
+    "matchMenuPaused": ", keskeytetty",
+    "matchMenuDayNight": ", se on {{phase}}",
+    "day": "päivä",
+    "night": "yö",
+    "closeMatchMenu": "Sulje otteluvalikko",
+    "match": "Ottelu",
+    "firstScheme": "Ensimmäinen kaava",
+    "nextScheme": "Seuraava kaava",
+    "resume": "Jatka",
+    "pause": "Tauko",
+    "undo": "Kumoa",
+    "challenges": "Haasteet",
+    "checkTarget": "Tarkista kohde",
+    "checkMyRole": "Tarkista roolini",
+    "dayButton": "päivä",
+    "nightButton": "Yö",
+    "playerLost": "Pelaaja hävisi",
+    "gameWonBy": "Peli voitti",
+    "won": "{{name}} voitti",
+    "doneRequeue": "Valmis ja jonoon",
+    "savingChallenges": "Tallennetaan haasteita…",
+    "quitToHome": "Poistu kotiin",
+    "quitHint": "Peli säilytetään – avaa se uudelleen aloitusnäytöltä.",
+    "secretContracts": "Salaisia sopimuksia",
+    "secretIdentities": "Salaiset henkilöllisyydet",
+    "whoEliminated": "Kuka eliminoi {{name}}?",
+    "whoEliminatedHint": "Pelaaja tekee maalin vain, jos tämä oli hänelle annettu piste. Sopimusketju etenee kumpaankin suuntaan.",
+    "noPlayerUnknown": "Ei pelaajaa / tuntematon",
+    "revealedIdentity": "Paljastettu petollisuuden henkilöllisyys",
+    "closeRevealedIdentity": "Sulje paljastettu henkilöllisyys",
+    "commanderChallenges": "Komentajan haasteita",
+    "challengeCompleted": "{{name}} valmis",
+    "challengeFallback": "Haaste",
+    "matchResult": "Ottelun tulos",
+    "wins": "{{name}} voittaa",
+    "reviewBoard": "Arvostelutaulu",
+    "yes": "Kyllä",
+    "no": "Ei",
+    "yesTheyLost": "Kyllä, he hävisivät",
+    "noStillIn": "Ei, vielä sisällä",
+    "openCounters": "Avaa laskurit kohteelle {{name}}",
+    "commanderDamageOn": "Commander-vaurio {{name}}",
+    "countersFor": "Laskurit kohteelle {{name}}",
+    "countersTitle": "Laskurit kohteelle {{name}}",
+    "closeCounters": "Sulje laskurit",
+    "closeChallenges": "Sulje haasteet",
+    "sharedCommanderDamage": "Jaettu komentajan vahinko",
+    "closeCommanderDamage": "Sulje komentaja vahinko",
+    "highestCommanderDamage": "Suurin komentajan vahinko {{name}}: {{value}} alkaen {{commander}}",
+    "noCommanderDamage": "Ei komentajavaurioita {{name}}",
+    "removeCommanderDamage": "Poista komentovaurio {{owner}}:sta {{name}}",
+    "addCommanderDamage": "Lisää komentovaurioita {{owner}}:sta {{name}}",
+    "isMonarch": "{{name}} on hallitsija",
+    "makeMonarch": "Tee {{name}} hallitsijaksi",
+    "enduringStory": "{{name}} {{has}} kestävä tarina",
+    "cityBlessing": "{{name}} {{has}} kaupungin siunaus",
+    "has": "on",
+    "doesNotHave": "ei ole",
+    "didLose": "Hävisikö {{name}} pelin?",
+    "thisTeam": "Tämä joukkue",
+    "didTheyLose": "Hävisivätkö he?",
+    "poisonPrompt": "{{name}} sisältää {{count}} myrkytyslaskuria. Hävisivätkö he?",
+    "sharedPoisonPrompt": "{{subject}} sisältää {{count}} jaettua myrkkylaskuria. {{lose}}",
+    "hitPrompt": "{{name}} omistaa {{count}} karkotettua korttia, joissa on osumalaskuri. Hävisivätkö he?",
+    "commanderPrompt": "{{name}} on tehnyt {{damage}} komentovaurion kohteesta {{from}}. Hävisivätkö he?",
+    "sharedCommanderPrompt": "{{subject}} on tehnyt {{damage}} komentovaurion kohteesta {{from}}. {{lose}}",
+    "lifePrompt": "{{name}} on {{life}} elämässä. Hävisivätkö he?",
+    "sharedLifePrompt": "{{subject}} on {{life}} elämässä. {{lose}}",
+    "anotherCommander": "toinen komentaja",
+    "addLife": "Lisää 1 elämä. Paina pitkään saadaksesi isomman määrän.",
+    "removeLife": "Poista 1 elämä. Paina pitkään saadaksesi isomman määrän.",
+    "addLifeFor": "Lisää elämä kohteelle {{name}}",
+    "removeLifeFor": "Poista elämä {{name}}",
+    "addLifeLabel": "Lisää elämä · {{name}}",
+    "removeLifeLabel": "Poista elämä · {{name}}",
+    "deleteDigit": "Poista numero",
+    "add": "Lisää",
+    "removeVerb": "Poista",
+    "lower": "Alempi {{label}}",
+    "raise": "Nosta {{label}}",
+    "seatColour": "Istuimen väri {{name}}",
+    "dungeonFor": "Dungeon for {{name}}",
+    "dungeonInitiative": "Dungeon ja aloite {{name}}. {{title}}",
+    "dungeonInitiativeActive": "{{name}} on aloitteentekijä · {{filled}} {{total}} ainutlaatuisesta vankityrmistä",
+    "dungeonInitiativeCompleted": "{{name}} on suorittanut {{filled}} / {{total}} ainutlaatuista vankityrmää",
+    "counterOn": "{{label}} {{name}}: {{value}}",
+    "counterFor": "{{label}} kohteelle {{name}}",
+    "claimFor": "Hae {{name}}",
+    "challengesSubtitle": "Samat haasteet jokaiselle pelaajalle · pisteet eivät koskaan vaikuta otteluun",
+    "counters": {
+      "poison": "Myrkkyä",
+      "tax": "Komentajan vero",
+      "acorn": "Tammmenterhot",
+      "energy": "Energiaa",
+      "experience": "Kokemus",
+      "hit": "Etrata osuu",
+      "rad": "Säteily",
+      "ring": "Soita houkutus",
+      "speed": "Nopeus",
+      "ticket": "Liput"
+    }
+  }
+}

@@ -2,9 +2,11 @@ import type { GameMode, RulesFormat, TreacheryRole } from '@podyguard/shared';
 import {
   TREACHERY_ROLES,
   resolveRulesFormat,
+  startingLifeForGameMode,
   treacheryDistribution,
   treacheryIdentityById,
   treacheryRolesForSize,
+  usesCommanderDamage,
 } from '@podyguard/shared';
 import {
   dungeonById,
@@ -52,14 +54,9 @@ export function startingLifeForMode(
   gameMode: GameMode | string,
   format?: RulesFormat | null,
 ): number {
-  const resolved = resolveRulesFormat(gameMode as GameMode, format);
-  if (resolved === 'normal') {
-    return NORMAL_STARTING_LIFE;
-  }
-  if (gameMode === 'duel' || gameMode === 'multiplayer') {
-    return NORMAL_STARTING_LIFE;
-  }
-  return STARTING_LIFE;
+  return (
+    startingLifeForGameMode(gameMode as GameMode, format) ?? STARTING_LIFE
+  );
 }
 
 export type SecondaryCounter =
@@ -134,6 +131,8 @@ export type TrackerPlayer = {
 
 export type TrackerState = {
   players: TrackerPlayer[];
+  /** Rules variant for life totals and commander chrome. */
+  gameMode: GameMode;
   /** Normal (20 life) vs Commander (40 life, commander damage, tax). */
   rulesFormat: RulesFormat;
   /** Two sides in board order for team variants. */
@@ -234,6 +233,7 @@ export function createTracker(
     options.startingLife ?? startingLifeForMode(gameMode, rulesFormat);
   const withCommanders = rulesFormat === 'commander';
   return {
+    gameMode,
     rulesFormat,
     players: names.map((row) => ({
       id: row.id,
@@ -305,6 +305,7 @@ export function applyTrackerAction(
   next.completedDungeons ??= {};
   next.eliminations ??= [];
   next.rulesFormat ??= 'commander';
+  next.gameMode ??= 'commander';
   next.teamMode ??= null;
   next.archenemyId ??= null;
   next.emperorIds ??= [];
@@ -829,7 +830,10 @@ function activeLossCauses(
   if ((player.counters?.hit ?? 0) >= HIT_LIMIT) {
     causes.push({ type: 'hit' });
   }
-  if (state.rulesFormat === 'commander') {
+  if (
+    state.rulesFormat === 'commander' &&
+    usesCommanderDamage(state.gameMode, state.rulesFormat)
+  ) {
     for (const [commanderId, damage] of Object.entries(player.commanderDamage)) {
       if (damage < COMMANDER_DAMAGE_LIMIT) {
         continue;

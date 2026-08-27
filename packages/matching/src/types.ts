@@ -84,6 +84,8 @@ export function eventMatchOptions(input: {
     | 'duel'
     | 'multiplayer'
     | 'commander'
+    | 'duel-commander'
+    | 'brawl'
     | 'treachery'
     | 'two-headed-giant'
     | 'archenemy-commander'
@@ -94,7 +96,7 @@ export function eventMatchOptions(input: {
   allowFivePods: boolean;
   preferredPodSize?: number;
 }): MatchOptions {
-  if (input.gameMode === 'duel') {
+  if (input.gameMode === 'duel' || input.gameMode === 'duel-commander' || input.gameMode === 'brawl') {
     return {
       preferredSize: 2,
       allowedSizes: [2],
@@ -172,6 +174,7 @@ export function eventMatchOptions(input: {
     allowedSizes: allowedPodSizes({
       allowThree: input.allowThreePods,
       allowFive: input.allowFivePods,
+      minSize: 3,
     }),
   };
 }

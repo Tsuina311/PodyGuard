@@ -105,7 +105,7 @@ export function assertPreferredPodSize(
   gameMode: GameMode,
   value: unknown,
 ): number {
-  if (gameMode === 'duel') {
+  if (gameMode === 'duel' || gameMode === 'duel-commander' || gameMode === 'brawl') {
     return 2;
   }
   if (gameMode === 'emperor') {

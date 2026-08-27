@@ -1,0 +1,1079 @@
+{
+  "common": {
+    "home": "Domů",
+    "cancel": "Zrušit",
+    "close": "Zavřít",
+    "save": "Uložit",
+    "loading": "Načítání…",
+    "players": "Hráči",
+    "game": "Hra",
+    "language": "Jazyk",
+    "yes": "Ano",
+    "no": "Ne",
+    "reset": "Resetovat",
+    "random": "Náhodně",
+    "remove": "Odebrat",
+    "empty": "Prázdné",
+    "bot": "bot",
+    "dev": "dev",
+    "official": "oficiální",
+    "open": "Otevřené",
+    "preferred": "preferované",
+    "player": "Hráč {{number}}",
+    "versus": "proti",
+    "teamA": "Tým A",
+    "teamB": "Tým B",
+    "working": "Probíhá…",
+    "creating": "Vytváření…",
+    "checking": "Kontrola…",
+    "joining": "Připojování…",
+    "updating": "Aktualizace…",
+    "submitting": "Odesílání…",
+    "saving": "Ukládání…",
+    "searching": "Vyhledávání…",
+    "unveiling": "Odhalování…",
+    "copied": "Zkopírováno",
+    "noneYet": "zatím nic",
+    "dash": "—",
+    "errors": {
+      "generic": "Něco se pokazilo.",
+      "createEvent": "Událost se nepodařilo vytvořit.",
+      "unlockHost": "Panel organizátora se nepodařilo odemknout.",
+      "updateTable": "Stůl se nepodařilo aktualizovat.",
+      "startGame": "Hru se nepodařilo spustit.",
+      "startAllGames": "Nepodařilo se spustit všechny připravené hry.",
+      "finishTable": "Hru u stolu se nepodařilo ukončit.",
+      "cancelPod": "Pod se nepodařilo zrušit.",
+      "updateSettings": "Nastavení se nepodařilo aktualizovat.",
+      "matchTables": "Stoly se nepodařilo spárovat.",
+      "fillBots": "Stoly se nepodařilo doplnit boty.",
+      "clipboard": "Schránka je blokována — zkopírujte odkaz ručně.",
+      "eventNotFound": "Událost nebyla nalezena.",
+      "joinEvent": "K události se nepodařilo připojit.",
+      "saveDecks": "Balíčky se nepodařilo uložit.",
+      "updateReady": "Stav připravenosti se nepodařilo aktualizovat.",
+      "updatePause": "Stav pauzy se nepodařilo aktualizovat.",
+      "leaveEvent": "Událost se nepodařilo opustit.",
+      "trackerChoice": "Volbu trackeru se nepodařilo uložit.",
+      "saveRating": "Hodnocení se nepodařilo uložit.",
+      "chooseCommander": "Vyberte commandera pro každý balíček.",
+      "enterJoinCode": "Zadejte přístupový kód.",
+      "sessionUnavailable": "Vaše relace události již není dostupná.",
+      "savePack": "Balíček výzev se nepodařilo uložit.",
+      "searchScryfall": "Vyhledávání ve Scryfall se nezdařilo.",
+      "loadArtwork": "Alternativní ilustraci se nepodařilo načíst.",
+      "submitResult": "Výsledek se nepodařilo odeslat.",
+      "saveChallenge": "Postup výzvy se nepodařilo uložit.",
+      "unveilIdentity": "Vaši identitu se nepodařilo odhalit.",
+      "apiWaking": "Server se probouzí. Nechte tuto stránku otevřenou — obvykle to trvá méně než minutu.",
+      "apiUnreachable": "Nelze se spojit s API. Je server spuštěný (yarn dev:server)?"
+    },
+    "assignedAtTable": "Přiřazen ke stolu",
+    "scanToJoin": "Naskenujte pro připojení k této události"
+  },
+  "language": {
+    "en": "English",
+    "de": "Deutsch",
+    "fr": "Français",
+    "es": "Español",
+    "it": "Italiano",
+    "pt": "Português",
+    "nl": "Nederlands",
+    "pl": "Polski",
+    "sv": "Svenska",
+    "da": "Dansk",
+    "no": "Norsk",
+    "fi": "Suomi",
+    "cs": "Čeština",
+    "sk": "Slovenčina",
+    "hu": "Magyar",
+    "ro": "Română",
+    "el": "Ελληνικά",
+    "hr": "Hrvatski",
+    "sl": "Slovenščina",
+    "bg": "Български",
+    "uk": "Українська",
+    "lt": "Lietuvių",
+    "lv": "Latviešu",
+    "et": "Eesti",
+    "is": "Íslenska",
+    "ga": "Gaeilge",
+    "mt": "Malti",
+    "sr": "Srpski",
+    "sq": "Shqip",
+    "bs": "Bosanski",
+    "mk": "Македонски",
+    "be": "Беларуская",
+    "ca": "Català",
+    "eu": "Euskara",
+    "cy": "Cymraeg"
+  },
+  "families": {
+    "normal": "Normální",
+    "commander": "Commander"
+  },
+  "modes": {
+    "shared": {
+      "commanderCombat": "Hráč prohrává po obdržení {{commanderDamage}} bodů bojového zranění od jednoho commandera.",
+      "commanderTax": "Pokaždé, když je commander znovu seslán z command zone, stojí o 2 many více.",
+      "lifeAndLoss": "Životy a prohra",
+      "turns": "Kola",
+      "commanders": "Commandeři",
+      "eachPlayerLife": "Každý hráč začíná s {{life}} životy.",
+      "loseAtZero": "Hráč prohrává při 0 životech.",
+      "loseAtPoison": "Hráč prohrává při {{poison}} poison counterech.",
+      "startingPlayerRandom": "Začínající hráč je vybrán náhodně.",
+      "startingPlayerSkipDraw": "Začínající hráč je vybrán náhodně a ve svém prvním kole přeskočí draw step.",
+      "multiplayerFirstTurnDraw": "V multiplayeru tento hráč ve svém prvním kole kartu lízne.",
+      "commanderFirstTurnDraw": "V multiplayer Commanderu tento hráč ve svém prvním kole kartu lízne.",
+      "commandersInZone": "Commandeři začínají v command zone a mohou být znovu sesíláni odtud.",
+      "commanderRulesApply": "Pravidla Commanderu stále platí: {{life}} počátečních životů, {{poison}} poisonu a {{commanderDamage}} bodů bojového zranění od jednoho commandera jsou smrtící."
+    },
+    "duel": {
+      "label": "Duel",
+      "hint": "Dva hráči. Každý začíná s 20 životy.",
+      "hostHint": "Přesně 2 hráči u každého stolu. Každý začíná s 20 životy.",
+      "hostFixedSeats": "Duel vždy usazuje přesně dva hráče.",
+      "title": "Duel",
+      "summary": "Magic pro dva hráče. Bez commanderů — jen životy a bojiště.",
+      "sections": {
+        "life": {
+          "heading": "Životy a prohra",
+          "bullets": [
+            "Každý hráč začíná s {{life}} životy.",
+            "Hráč prohrává při 0 životech.",
+            "Hráč prohrává při {{poison}} poison counterech."
+          ]
+        },
+        "turns": {
+          "heading": "Kola",
+          "bullets": [
+            "Začínající hráč je vybrán náhodně a ve svém prvním kole přeskočí draw step."
+          ]
+        }
+      }
+    },
+    "multiplayer": {
+      "label": "Multiplayer",
+      "hint": "Každý proti každému bez commanderů. Všichni začínají s 20 životy.",
+      "hostHint": "Každý proti každému bez commanderů. Párování nejprve naplní zvolenou velikost stolu; zbývající stoly mohou mít nejméně tři hráče.",
+      "title": "Multiplayer",
+      "summary": "Multiplayer bez formátu Commander. Vhodné pro běžný multiplayer, Planechase nebo jakýkoli stůl s 20 životy.",
+      "sections": {
+        "life": {
+          "heading": "Životy a prohra",
+          "bullets": [
+            "Každý hráč začíná s {{life}} životy.",
+            "Hráč prohrává při 0 životech.",
+            "Hráč prohrává při {{poison}} poison counterech."
+          ]
+        },
+        "turns": {
+          "heading": "Kola",
+          "bullets": [
+            "Začínající hráč je vybrán náhodně.",
+            "V multiplayeru tento hráč ve svém prvním kole kartu lízne."
+          ]
+        }
+      }
+    },
+    "commander": {
+      "label": "Klasický",
+      "hint": "Každý proti každému. Všichni začínají se 40 životy.",
+      "hostHint": "Commander každý proti každému. Párování preferuje čtyři hráče; zbývající pody mohou mít tři nebo pět hráčů, pokud je to povoleno.",
+      "title": "Klasický",
+      "summary": "Multiplayer každý proti každému. Každý hráč bojuje sám za sebe.",
+      "sections": {
+        "life": {
+          "heading": "Životy a prohra",
+          "bullets": [
+            "Každý hráč začíná s {{life}} životy.",
+            "Hráč prohrává při 0 životech.",
+            "Hráč prohrává při {{poison}} poison counterech.",
+            "Hráč prohrává po obdržení {{commanderDamage}} bodů bojového zranění od jednoho commandera."
+          ]
+        },
+        "turns": {
+          "heading": "Kola",
+          "bullets": [
+            "Začínající hráč je vybrán náhodně.",
+            "V multiplayer Commanderu tento hráč ve svém prvním kole kartu lízne."
+          ]
+        },
+        "commanders": {
+          "heading": "Commandeři",
+          "bullets": [
+            "Commandeři začínají v command zone a mohou být znovu sesíláni odtud.",
+            "Pokaždé, když je commander znovu seslán z command zone, stojí o 2 many více."
+          ]
+        }
+      }
+    },
+    "treachery": {
+      "label": "Zrada",
+      "hint": "Tajné identity se rozdávají na tomto zařízení. Předávejte ho dál, aby si každý mohl svou identitu přečíst soukromě.",
+      "hostHint": "Tajné role pro Commander pody. Párování nejprve naplní zvolenou velikost stolu; zbývající pody mohou mít nejméně čtyři hráče.",
+      "title": "Zrada",
+      "summary": "Commander s tajnými identitami. Vůdce je veřejný; všichni ostatní zůstávají skrytí.",
+      "sections": {
+        "commander": {
+          "heading": "Pravidla Commanderu stále platí",
+          "bullets": [
+            "Každý hráč začíná s {{life}} životy.",
+            "Hráč prohrává při 0 životech, {{poison}} poisonu nebo {{commanderDamage}} bodech bojového zranění od jednoho commandera.",
+            "Vůdce hraje jako první a v tomto kole si lízne kartu.",
+            "Pokaždé, když je commander znovu seslán z command zone, stojí o 2 many více."
+          ]
+        },
+        "identities": {
+          "heading": "Identity",
+          "bullets": [
+            "V menu časomíry otevřete Zkontrolovat moji roli. Tuto kartu uvidíte pouze vy.",
+            "Při použití jednoho trackeru rozdejte identity během přípravy a zařízení předávejte, aby si každý hráč svou identitu přečetl o samotě.",
+            "Vůdce: Přežijte, dokud nejsou všichni Zabijáci a Zrádce vyřazeni. Odhalte se ostatním u stolu. Strážci sdílejí vaše vítězství, ale nevíte, kdo jsou.",
+            "Strážce: Udržte Vůdce naživu a vyřaďte jeho nepřátele. Vaše identita je tajná. Vyhráváte a prohráváte společně s Vůdcem, i když jste vyřazeni dříve.",
+            "Zabiják: Vyřaďte Vůdce. Vaše identita je tajná. Zabijáci mají stejný cíl, ale nevíte, kdo jsou ostatní Zabijáci.",
+            "Zrádce: Zůstaňte posledním hráčem ve hře. Vaše identita je tajná. Udržte Vůdce naživu, dokud ostatní hrozby nezmizí, a poté si vezměte trůn pro sebe.",
+            "Řiďte se všemi dalšími schopnostmi vytištěnými na kartě vaší identity."
+          ]
+        }
+      },
+      "roles": {
+        "leader": {
+          "name": "Vůdce",
+          "objective": "Přežijte, dokud nejsou všichni Zabijáci a Zrádce vyřazeni.",
+          "guidance": "Odhalte se ostatním u stolu. Strážci sdílejí vaše vítězství, ale nevíte, kdo jsou.",
+          "publicNote": "Vaše role je veřejná. Řekněte ostatním u stolu, že jste Vůdce."
+        },
+        "guardian": {
+          "name": "Strážce",
+          "objective": "Udržte Vůdce naživu a vyřaďte jeho nepřátele.",
+          "guidance": "Vaše identita je tajná. Vyhráváte a prohráváte společně s Vůdcem, i když jste vyřazeni dříve.",
+          "publicNote": "Tuto roli udržujte v tajnosti."
+        },
+        "assassin": {
+          "name": "Zabiják",
+          "objective": "Vyřaďte Vůdce.",
+          "guidance": "Vaše identita je tajná. Zabijáci mají stejný cíl, ale nevíte, kdo jsou ostatní Zabijáci.",
+          "publicNote": "Tuto roli udržujte v tajnosti."
+        },
+        "traitor": {
+          "name": "Zrádce",
+          "objective": "Zůstaňte posledním hráčem ve hře.",
+          "guidance": "Vaše identita je tajná. Udržte Vůdce naživu, dokud ostatní hrozby nezmizí, a poté si vezměte trůn pro sebe.",
+          "publicNote": "Tuto roli udržujte v tajnosti."
+        }
+      },
+      "normal": {
+        "hint": "Tajné identity na sdíleném telefonu. Všichni začínají s 20 životy — bez commanderů.",
+        "hostHint": "Tajné role bez commanderů. Párování nejprve naplní zvolenou velikost stolu; zbývající pody mohou mít nejméně čtyři hráče.",
+        "summary": "Tajné identity bez formátu Commander. Vůdce je veřejný; všichni ostatní zůstávají skrytí.",
+        "sections": {
+          "life": {
+            "heading": "Životy a prohra",
+            "bullets": [
+              "Každý hráč začíná s {{life}} životy.",
+              "Hráč prohrává při 0 životech.",
+              "Hráč prohrává při {{poison}} poison counterech.",
+              "Vůdce hraje jako první a v tomto kole si lízne kartu."
+            ]
+          },
+          "identities": null
+        }
+      }
+    },
+    "two-headed-giant": {
+      "label": "Dvouhlavý obr",
+      "hint": "Dva týmy po dvou, každý se 60 společnými životy, tahy se odehrávají společně.",
+      "hostHint": "Přesně 4 hráči v Commander podu. Dva týmy sdílejí po 60 životech a své tahy hrají společně.",
+      "hostFixedSeats": "Hry Dvouhlavého obra vždy usazují přesně čtyři hráče.",
+      "title": "Dvouhlavý obr",
+      "summary": "Dva týmy po dvou. Spoluhráči sdílejí počet životů a tah.",
+      "sections": {
+        "teams": {
+          "heading": "Týmy",
+          "bullets": [
+            "Vyberte dvojice spojenců nebo je nechte určit náhodně.",
+            "Každý tým začíná s {{sharedLife}} společnými životy.",
+            "Spoluhráči odehrávají svůj tah společně. Každý hráč má stále vlastní ruku, knihovnu a commandery."
+          ]
+        },
+        "life": {
+          "heading": "Životy a prohra",
+          "bullets": [
+            "Tým prohrává, když jeho společné životy klesnou na 0.",
+            "Tým prohrává při {{sharedPoison}} společných poison counterech.",
+            "Tým prohrává po obdržení {{commanderDamage}} bodů společného bojového zranění od jednoho commandera."
+          ]
+        },
+        "turns": {
+          "heading": "Kola",
+          "bullets": [
+            "Začínající tým je vybrán náhodně a ve svém prvním tahu přeskočí draw step.",
+            "Pokaždé, když je commander znovu seslán z command zone, stojí o 2 many více."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Dva týmy po dvou, každý se 40 společnými životy, tahy se odehrávají společně.",
+        "hostHint": "Přesně 4 hráči u stolu. Dva týmy sdílejí po 40 životech a své tahy hrají společně — bez commanderů.",
+        "summary": "Dva týmy po dvou. Spoluhráči sdílejí počet životů a tah — standardní balíčky, v týmovém pojetí 20 životů na hráče.",
+        "sections": {
+          "teams": {
+            "heading": "Týmy",
+            "bullets": [
+              "Vyberte dvojice spojenců nebo je nechte určit náhodně.",
+              "Každý tým začíná s {{sharedLife}} společnými životy.",
+              "Spoluhráči odehrávají svůj tah společně. Každý hráč má stále vlastní ruku, knihovnu a commandery."
+            ]
+          },
+          "life": {
+            "heading": "Životy a prohra",
+            "bullets": [
+              "Tým prohrává, když jeho společné životy klesnou na 0.",
+              "Tým prohrává při {{sharedPoison}} společných poison counterech.",
+              "Tým prohrává po obdržení {{commanderDamage}} bodů společného bojového zranění od jednoho commandera."
+            ]
+          },
+          "turns": {
+            "heading": "Kola",
+            "bullets": [
+              "Začínající tým je vybrán náhodně a ve svém prvním tahu přeskočí draw step.",
+              "Pokaždé, když je commander znovu seslán z command zone, stojí o 2 many více."
+            ]
+          }
+        }
+      }
+    },
+    "archenemy-commander": {
+      "label": "Archenemy",
+      "hint": "Jeden Archenemy s 60 životy a balíčkem 40 scheme karet proti třem hrdinům se 60 společnými životy.",
+      "hostHint": "Přesně 4 hráči v Commander podu. Jeden Archenemy se 60 životy čelí tříčlennému týmu se 60 společnými životy a balíčkem 40 scheme karet.",
+      "hostFixedSeats": "Hry Archenemy Commander vždy usazují přesně čtyři hráče.",
+      "title": "Archenemy Commander",
+      "summary": "Jeden Archenemy proti tříčlennému týmu se scheme balíčkem ve hře.",
+      "sections": {
+        "sides": {
+          "heading": "Strany",
+          "bullets": [
+            "Vyberte Archenemyho nebo ho určete náhodně. Ostatní tři hráči jsou hrdinové.",
+            "Obě strany začínají s {{life}} životy.",
+            "Hrdinové tento počet životů sdílejí a svůj tah hrají společně.",
+            "Archenemy hraje první a v tomto tahu si lízne kartu."
+          ]
+        },
+        "schemes": {
+          "heading": "Scheme karty",
+          "bullets": [
+            "Na začátku se zamíchá 40 scheme karet z Duskmourn Commander.",
+            "Během každé první hlavní fáze Archenemyho otevřete menu časomíry a klepněte na Další scheme, abyste jednu uvedli do pohybu.",
+            "Scheme, která není ongoing, se vyhodnotí a poté jde na spodek scheme balíčku.",
+            "Ongoing scheme zůstává lícem nahoru, dokud ji stůl neoznačí jako opuštěnou; potom jde na spodek balíčku.",
+            "Otočené scheme karty a hřbitov dokončených scheme se zobrazují pod kartou jako miniatury; klepnutím jednu otevřete ve velkém."
+          ]
+        },
+        "life": {
+          "heading": "Životy a prohra",
+          "bullets": [
+            "Archenemy prohrává při 0 životech nebo při dosažení obvyklých limitů poisonu či commander damage.",
+            "Hrdinové prohrávají společně, když jejich společné životy klesnou na 0, a společně sdílejí také poison a commander damage.",
+            "Hráč prohrává po obdržení {{commanderDamage}} bodů bojového zranění od jednoho commandera.",
+            "Pokaždé, když je commander znovu seslán z command zone, stojí o 2 many více."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Jeden Archenemy s 20 životy a scheme kartami proti třem hrdinům se 40 společnými životy.",
+        "hostHint": "Přesně 4 hráči u stolu. Jeden Archenemy se scheme balíčkem proti tříčlennému týmu — bez commanderů.",
+        "summary": "Jeden Archenemy proti tříčlennému týmu se scheme balíčkem ve hře — standardní stoly s 20 životy.",
+        "sections": {
+          "sides": {
+            "heading": "Strany",
+            "bullets": [
+              "Vyberte Archenemyho nebo ho určete náhodně. Ostatní tři hráči jsou hrdinové.",
+              "Obě strany začínají s {{life}} životy.",
+              "Hrdinové tento počet životů sdílejí a svůj tah hrají společně.",
+              "Archenemy hraje první a v tomto tahu si lízne kartu."
+            ]
+          },
+          "schemes": {
+            "heading": "Scheme karty",
+            "bullets": [
+              "Na začátku se zamíchá 40 scheme karet z Duskmourn Commander.",
+              "Během každé první hlavní fáze Archenemyho otevřete menu časomíry a klepněte na Další scheme, abyste jednu uvedli do pohybu.",
+              "Scheme, která není ongoing, se vyhodnotí a poté jde na spodek scheme balíčku.",
+              "Ongoing scheme zůstává lícem nahoru, dokud ji stůl neoznačí jako opuštěnou; potom jde na spodek balíčku.",
+              "Otočené scheme karty a hřbitov dokončených scheme se zobrazují pod kartou jako miniatury; klepnutím jednu otevřete ve velkém."
+            ]
+          },
+          "life": {
+            "heading": "Životy a prohra",
+            "bullets": [
+              "Archenemy prohrává při 0 životech nebo při dosažení obvyklých limitů poisonu.",
+              "Hrdinové prohrávají společně, když jejich společné životy klesnou na 0, a společně sdílejí také poison a commander damage.",
+              "Hráč prohrává po obdržení {{poison}} poison counterů."
+            ]
+          }
+        }
+      }
+    },
+    "emperor": {
+      "label": "Císař",
+      "hint": "Dva týmy po třech. Chraňte svého Císaře pomocí omezeného dosahu vlivu a přesouvejte bytosti.",
+      "hostHint": "Přesně 6 hráčů v Commander podu. Každý tým umístí Císaře mezi dva Generály a hraje s omezeným dosahem vlivu.",
+      "hostFixedSeats": "Hry Císaře vždy usazují přesně šest hráčů.",
+      "title": "Císař",
+      "summary": "Dva týmy po třech. Každý Císař sedí mezi dvěma Generály a vyřazení Císaře znamená vítězství.",
+      "sections": {
+        "teams": {
+          "heading": "Týmy a tahy",
+          "bullets": [
+            "Vyberte oba týmy a Císaře každého týmu nebo jednu či obě volby určete náhodně.",
+            "Každý hráč začíná s {{life}} životy a ponechává si vlastní ruku, manu, permanenty, poison a tah.",
+            "Spoluhráči si mohou navzájem prohlížet ruce a diskutovat o strategii, ale nesmějí manipulovat s kartami spoluhráče.",
+            "Náhodně určete, který Císař začne. Tento Císař si v prvním tahu lízne kartu."
+          ]
+        },
+        "range": {
+          "heading": "Dosah a boj",
+          "bullets": [
+            "Generálové mají dosah vlivu 1. Císaři mají dosah vlivu 2.",
+            "Kouzla, schopnosti, efekty a informace mohou ovlivnit pouze hráče a objekty v dosahu jejich kontrolera.",
+            "Hráč může útočit pouze na soupeře sedícího bezprostředně vedle něj nebo na planeswalkery a chráněné battles tohoto soupeře.",
+            "Jak hráči opouštějí hru, prázdná místa se přestávají počítat a přeživší hráči se dostávají do vzájemného dosahu."
+          ]
+        },
+        "deploy": {
+          "heading": "Přesouvání bytostí",
+          "bullets": [
+            "Každá bytost má \"Tap: Cílový spoluhráč získá kontrolu nad touto bytostí. Aktivujte pouze jako sorcery.\"",
+            "To umožňuje přesouvat bytosti v rámci týmu podle toho, jak se mění bojová linie."
+          ]
+        },
+        "winning": {
+          "heading": "Vítězství a pravidla Commanderu",
+          "bullets": [
+            "Tým vyhrává, pokud vyhraje jeho Císař, a okamžitě prohrává, pokud jeho Císař prohraje. Generál může být vyřazen, aniž by hra skončila.",
+            "Hráč prohrává při 0 životech, {{poison}} poisonu nebo {{commanderDamage}} bodech bojového zranění od jednoho commandera.",
+            "Pokaždé, když je commander znovu seslán z command zone, stojí o 2 many více."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Dva týmy po třech s 20 životy. Chraňte svého Císaře pomocí omezeného dosahu vlivu.",
+        "hostHint": "Přesně 6 hráčů u stolu. Dva Císaři mezi Generály — standardní balíčky s 20 životy, bez commanderů.",
+        "summary": "Dva týmy po třech. Každý Císař sedí mezi dvěma Generály a vyřazení Císaře znamená vítězství.",
+        "sections": {
+          "teams": {
+            "heading": "Týmy a tahy",
+            "bullets": [
+              "Vyberte oba týmy a Císaře každého týmu nebo jednu či obě volby určete náhodně.",
+              "Každý hráč začíná s {{life}} životy a ponechává si vlastní ruku, manu, permanenty, poison a tah.",
+              "Spoluhráči si mohou navzájem prohlížet ruce a diskutovat o strategii, ale nesmějí manipulovat s kartami spoluhráče.",
+              "Náhodně určete, který Císař začne. Tento Císař si v prvním tahu lízne kartu."
+            ]
+          },
+          "range": {
+            "heading": "Dosah a boj",
+            "bullets": [
+              "Generálové mají dosah vlivu 1. Císaři mají dosah vlivu 2.",
+              "Kouzla, schopnosti, efekty a informace mohou ovlivnit pouze hráče a objekty v dosahu jejich kontrolera.",
+              "Hráč může útočit pouze na soupeře sedícího bezprostředně vedle něj nebo na planeswalkery a chráněné battles tohoto soupeře.",
+              "Jak hráči opouštějí hru, prázdná místa se přestávají počítat a přeživší hráči se dostávají do vzájemného dosahu."
+            ]
+          },
+          "deploy": {
+            "heading": "Přesouvání bytostí",
+            "bullets": [
+              "Každá bytost má \"Tap: Cílový spoluhráč získá kontrolu nad touto bytostí. Aktivujte pouze jako sorcery.\"",
+              "To umožňuje přesouvat bytosti v rámci týmu podle toho, jak se mění bojová linie."
+            ]
+          },
+          "winning": {
+            "heading": "Vítězství",
+            "bullets": [
+              "Tým vyhrává, pokud vyhraje jeho Císař, a okamžitě prohrává, pokud jeho Císař prohraje. Generál může být vyřazen, aniž by hra skončila.",
+              "Hráč prohrává při 0 životech nebo {{poison}} poison counterech."
+            ]
+          }
+        }
+      }
+    },
+    "star": {
+      "label": "Hvězda",
+      "hint": "Pět hráčů v kruhu. Vaši sousedé jsou spojenci; vyřaďte oba hráče naproti vám.",
+      "hostHint": "Přesně 5 hráčů v Commander podu. Sousední hráči jsou spojenci; každý hráč vyhrává tím, že přežije oba soupeře naproti sobě.",
+      "hostFixedSeats": "Hry Hvězdy vždy usazují přesně pět hráčů.",
+      "title": "Hvězda",
+      "summary": "Pět hráčů sedí v kruhu. Vaši sousedé jsou spojenci a dva hráči naproti vám jsou nepřátelé.",
+      "sections": {
+        "positions": {
+          "heading": "Pozice a spojenci",
+          "bullets": [
+            "Vyberte kruhové pozice ručně výměnou dvou hráčů nebo náhodně rozmístěte všech pět.",
+            "Hráči bezprostředně nalevo a napravo od vás jsou vaši spojenci.",
+            "Dva nesousedící hráči naproti vám jsou vaši nepřátelé.",
+            "Pozice po vyřazení hráče zůstávají stejné; vaši spojenci a nepřátelé se nemění."
+          ]
+        },
+        "combat": {
+          "heading": "Boj a interakce",
+          "bullets": [
+            "Ve výchozím nastavení hráči nemohou útočit na své spojence.",
+            "Kouzla a schopnosti mohou stále pomáhat nebo ovlivňovat kteréhokoli hráče, pokud se stůl nedohodne na přísnější variantě.",
+            "Tahy pokračují po směru hodinových ručiček. Začínající hráč je vybrán náhodně; tento hráč si v prvním tahu lízne kartu."
+          ]
+        },
+        "winning": {
+          "heading": "Vítězství",
+          "bullets": [
+            "Vyhrává první přeživší hráč, jehož oba nepřátelé byli vyřazeni, bez ohledu na to, kdo je vyřadil.",
+            "Vyřazený hráč už později nemůže vyhrát.",
+            "Každý hráč začíná s {{life}} životy a prohrává při 0 životech, {{poison}} poisonu nebo {{commanderDamage}} bodech bojového zranění od jednoho commandera.",
+            "Pokaždé, když je commander znovu seslán z command zone, stojí o 2 many více."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Pět hráčů v kruhu s 20 životy. Sousedé jsou spojenci; vyřaďte oba hráče naproti vám.",
+        "hostHint": "Přesně 5 hráčů u stolu. Sousední hráči jsou spojenci; každý hráč vyhrává tím, že přežije oba soupeře naproti sobě.",
+        "summary": "Pět hráčů sedí v kruhu s 20 životy. Vaši sousedé jsou spojenci a dva hráči naproti vám jsou nepřátelé.",
+        "sections": {
+          "positions": {
+            "heading": "Pozice a spojenci",
+            "bullets": [
+              "Vyberte kruhové pozice ručně výměnou dvou hráčů nebo náhodně rozmístěte všech pět.",
+              "Hráči bezprostředně nalevo a napravo od vás jsou vaši spojenci.",
+              "Dva nesousedící hráči naproti vám jsou vaši nepřátelé.",
+              "Pozice po vyřazení hráče zůstávají stejné; vaši spojenci a nepřátelé se nemění."
+            ]
+          },
+          "combat": {
+            "heading": "Boj a interakce",
+            "bullets": [
+              "Ve výchozím nastavení hráči nemohou útočit na své spojence.",
+              "Kouzla a schopnosti mohou stále pomáhat nebo ovlivňovat kteréhokoli hráče, pokud se stůl nedohodne na přísnější variantě.",
+              "Tahy pokračují po směru hodinových ručiček. Začínající hráč je vybrán náhodně; tento hráč si v prvním tahu lízne kartu."
+            ]
+          },
+          "winning": {
+            "heading": "Vítězství",
+            "bullets": [
+              "Vyhrává první přeživší hráč, jehož oba nepřátelé byli vyřazeni, bez ohledu na to, kdo je vyřadil.",
+              "Vyřazený hráč už později nemůže vyhrát.",
+              "Každý hráč začíná s {{life}} životy a prohrává při 0 životech nebo {{poison}} poison counterech."
+            ]
+          }
+        }
+      }
+    },
+    "assassin": {
+      "label": "Zabiják",
+      "hint": "Tajné kontrakty ve hře každý proti každému. Vyřaďte svůj cíl, získejte bod a zděďte jeho cíl.",
+      "hostHint": "Tajné kontrakty pro 3–8 hráčů. Získávejte body za vyřazení svého cíle a poté zděďte jeho kontrakt.",
+      "title": "Zabiják",
+      "summary": "Hra každý proti každému s tajnými kontrakty. Vyřazujte cíle, děďte nové a skončete s nejvyšším skóre.",
+      "sections": {
+        "contracts": {
+          "heading": "Tajné kontrakty",
+          "bullets": [
+            "Každý hráč tajně obdrží jeden cíl. Kontrakty tvoří kruh, takže nikdo necílí sám na sebe a každý hráč je loven právě jednou.",
+            "Při přípravě zařízení předávejte. V menu časomíry otevřete Zkontrolovat cíl, kdykoli potřebujete znovu zobrazit svůj aktuální kontrakt.",
+            "Hráči mohou útočit a působit na kohokoli; kontrakt určuje bodování, nikoli povolené cíle."
+          ]
+        },
+        "elimination": {
+          "heading": "Vyřazení a dědění",
+          "bullets": [
+            "Když je hráč vyřazen, zaznamenejte, kdo mu zasadil poslední úder.",
+            "Pokud osobně vyřadíte svůj přidělený cíl, získáte jeden bod.",
+            "Hráč, který lovil vyřazený cíl, zdědí kontrakt tohoto cíle, i když poslední úder zasadil někdo jiný. Každý přeživší hráč tak má stále jeden aktivní kontrakt."
+          ]
+        },
+        "winning": {
+          "heading": "Vítězství",
+          "bullets": [
+            "Hrajte, dokud nezůstane pouze jeden hráč. Poslední přeživší získá jeden dodatečný bod.",
+            "Vyhrává hráč s nejvyšším počtem bodů; při remíze na nejvyšším skóre rozhoduje poslední přeživší.",
+            "Pravidla Commanderu stále platí: {{life}} počátečních životů, {{poison}} poisonu a {{commanderDamage}} bodů bojového zranění od jednoho commandera jsou smrtící.",
+            "Pokaždé, když je commander znovu seslán z command zone, stojí o 2 many více."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Tajné kontrakty pro 3–8 hráčů s 20 životy. Získávejte body vyřazením svého cíle.",
+        "hostHint": "Tajné kontrakty bez commanderů. Párování naplní zvolenou velikost stolu; zbývající kruhy mohou mít nejméně tři hráče.",
+        "summary": "Hra každý proti každému s tajnými kontrakty a 20 životy. Vyřazujte cíle, děďte nové a skončete s nejvyšším skóre.",
+        "sections": {
+          "contracts": {
+            "heading": "Tajné kontrakty",
+            "bullets": [
+              "Každý hráč tajně obdrží jeden cíl. Kontrakty tvoří kruh, takže nikdo necílí sám na sebe a každý hráč je loven právě jednou.",
+              "Při přípravě zařízení předávejte. V menu časomíry otevřete Zkontrolovat cíl, kdykoli potřebujete znovu zobrazit svůj aktuální kontrakt.",
+              "Hráči mohou útočit a působit na kohokoli; kontrakt určuje bodování, nikoli povolené cíle."
+            ]
+          },
+          "elimination": {
+            "heading": "Vyřazení a dědění",
+            "bullets": [
+              "Když je hráč vyřazen, zaznamenejte, kdo mu zasadil poslední úder.",
+              "Pokud osobně vyřadíte svůj přidělený cíl, získáte jeden bod.",
+              "Hráč, který lovil vyřazený cíl, zdědí kontrakt tohoto cíle, i když poslední úder zasadil někdo jiný. Každý přeživší hráč tak má stále jeden aktivní kontrakt."
+            ]
+          },
+          "winning": {
+            "heading": "Vítězství",
+            "bullets": [
+              "Hrajte, dokud nezůstane pouze jeden hráč. Poslední přeživší získá jeden dodatečný bod.",
+              "Vyhrává hráč s nejvyšším počtem bodů; při remíze na nejvyšším skóre rozhoduje poslední přeživší.",
+              "{{life}} počátečních životů a {{poison}} poison counterů jsou smrtící limity."
+            ]
+          }
+        }
+      }
+    }
+  },
+  "home": {
+    "taglineBefore": "Váš další",
+    "taglineHighlight": "pod",
+    "taglineAfter": ", vyřešen.",
+    "startPlaying": "Začít hrát",
+    "ongoingGame": "probíhající hra",
+    "noEventNeeded": "událost není potřeba",
+    "startPlayingHint": "Otevřete herní obrazovku na tomto zařízení. Můžete odejít a vrátit se bez ztráty rozehrané hry.",
+    "alwaysPlayers": "V tomto režimu je vždy {{count}} hráčů.",
+    "resumeGame": "Pokračovat ve hře",
+    "startNewGame": "Začít novou hru",
+    "startGame": "Začít hru",
+    "commanderSetup": "Commandeři",
+    "commanderSetupHint": "Vyhledejte na Scryfall commander každého hráče. Partner dvojice potřebují oba commandery.",
+    "chooseAllCommanders": "Vyberte commandera pro každého hráče.",
+    "advancedMatchConfig": "Pokročilé nastavení hry",
+    "hostEvent": "Pořádat událost",
+    "new": "nové",
+    "targetTableSize": "Cílová velikost stolu",
+    "allowThreePods": "Povolit pody se 3 hráči",
+    "allowFivePods": "Povolit pody s 5 hráči",
+    "duelFixedSeats": "Duel vždy usazuje přesně dva hráče.",
+    "emperorFixedSeats": "Hry Císaře vždy usazují přesně šest hráčů.",
+    "starFixedSeats": "Hry Hvězdy vždy usazují přesně pět hráčů.",
+    "archenemyFixedSeats": "Hry Archenemy Commander vždy usazují přesně čtyři hráče.",
+    "twoHeadedFixedSeats": "Hry Dvouhlavého obra vždy usazují přesně čtyři hráče.",
+    "eventName": "Název události",
+    "eventNamePlaceholder": "Páteční Commander",
+    "tables": "Stoly",
+    "tablesHint": "Kolik fyzických stolů je pro tuto událost k dispozici.",
+    "eventLasts": "Délka události",
+    "eventLastsHint": "Přístupový kód přestane fungovat po tomto počtu hodin. Pro víkend použijte 48 nebo 72.",
+    "hostPin": "PIN organizátora",
+    "hostPinHint": "4 až 8 číslic — později znovu otevře panel organizátora.",
+    "createEvent": "Vytvořit událost",
+    "joinWithCode": "Připojit se pomocí kódu",
+    "playerAside": "hráč",
+    "joinCode": "Přístupový kód",
+    "joinCodePlaceholder": "AB23CD",
+    "join": "Připojit se",
+    "scanQr": "Naskenovat QR",
+    "staleJoin": "Tato událost už neexistuje. Připojte se pomocí nového kódu nebo uspořádejte novou herní akci."
+  },
+  "host": {
+    "desk": "Panel organizátora",
+    "locked": "Zamčeno",
+    "hostOnly": "pouze organizátor",
+    "unlockHostDesk": "Odemknout panel organizátora",
+    "playerCount": "{{count}} hráč",
+    "playerCount_plural": "{{count}} hráčů",
+    "ready": "{{count}} připraveno",
+    "matched": "{{count}} spárováno",
+    "playing": "{{count}} hraje",
+    "paused": "{{count}} pozastaveno",
+    "ends": "končí {{date}}",
+    "podSizes": "Velikosti podů",
+    "matching": "párování",
+    "allowLeftoverThree": "Povolit zbývající pody se 3 hráči",
+    "allowFivePods": "Povolit pody s 5 hráči",
+    "treacheryTargetHint": "Cílová velikost stolu. Zbývající pody mohou mít nejméně čtyři hráče.",
+    "matchingPrefers": "Párování preferuje stoly s {{size}} hráči.",
+    "matchingPrefersFour": "Párování preferuje stoly se 4 hráči.",
+    "assassinTargetHint": "Cílová velikost stolu. Zbývající kruhy kontraktů mohou mít nejméně tři hráče.",
+    "multiplayerTargetHint": "Cílová velikost stolu. Zbývající stoly mohou mít nejméně tři hráče.",
+    "duelMatchmaking": "Párování v Duelu usazuje přesně dva hráče do každé hry.",
+    "twoHeadedMatchmaking": "Párování Dvouhlavého obra usazuje přesně čtyři hráče do každé hry.",
+    "archenemyMatchmaking": "Párování Archenemy Commander usazuje přesně čtyři hráče do každé hry: jednoho Archenemyho proti tříčlennému týmu.",
+    "emperorMatchmaking": "Párování Císaře usazuje přesně šest hráčů do každé hry: dva týmy, každý s Císařem a dvěma Generály.",
+    "starMatchmaking": "Párování Hvězdy usazuje přesně pět hráčů v kruhovém pořadí.",
+    "eventLength": "Délka události",
+    "joinCodeDies": "přístupový kód přestane fungovat",
+    "hoursFromStart": "Hodiny od začátku",
+    "hoursFromStartHint": "Upravte pro vícedenní událost. Po jejím skončení QR kód otevře domovskou stránku.",
+    "joinCodeTitle": "Přístupový kód",
+    "share": "sdílet",
+    "noLanAddress": "Nebyla nalezena LAN adresa — tento odkaz funguje pouze na tomto počítači.",
+    "copyPlayerLink": "Kopírovat odkaz pro hráče",
+    "queue": "Fronta",
+    "nobodyWaiting": "Nikdo nečeká.",
+    "flex": "flex {{count}}",
+    "challengePts": "{{count}} bodů výzev",
+    "pts": "{{count}} bodů",
+    "notReady": "Nepřipraven",
+    "pausedTitle": "Pozastaveno",
+    "seated": "Usazen",
+    "atTables": "{{count}} u stolů",
+    "tablesTitle": "Stoly",
+    "total": "{{count}} celkem",
+    "noTables": "Tato událost byla vytvořena bez stolů.",
+    "startingGames": "Spouštění her…",
+    "startAllReady": "Spustit všechny připravené hry ({{count}})",
+    "startGame": "Spustit hru",
+    "finishTable": "Ukončit stůl",
+    "cancelPod": "Zrušit pod",
+    "enable": "Povolit",
+    "disable": "Zakázat",
+    "trackerUsed": "tracker",
+    "noTracker": "bez trackeru",
+    "matchNow": "Spárovat nyní",
+    "fillBots": "Doplnit stoly boty",
+    "playerJoinPage": "Stránka pro připojení hráčů"
+  },
+  "join": {
+    "joinEvent": "Připojit se k události",
+    "takeSeat": "Posadit se",
+    "displayName": "Zobrazované jméno",
+    "displayNamePlaceholder": "Alex",
+    "joinEventButton": "Připojit se k události",
+    "saveDecks": "Uložit balíčky",
+    "matchFound": "Hra nalezena",
+    "yourDeck": "Váš balíček",
+    "checkMyRole": "Zkontrolovat moji roli",
+    "playingWithoutTracker": "Hrajete bez trackeru. Organizátor může hru u stolu ukončit.",
+    "chooseTracker": "Vyberte, jak bude tento pod zaznamenávat hru.",
+    "useGameTracker": "Použít herní tracker",
+    "playWithoutTracker": "Hrát bez trackeru",
+    "atTableMarked": "Na tomto telefonu jste označeni jako přítomní u stolu. Organizátor stále spouští hru ze svého panelu.",
+    "imAtTable": "Jsem u stolu",
+    "leftEvent": "Opustili jste tuto událost. Pokud se chcete vrátit, znovu naskenujte QR kód.",
+    "openPool": "Otevřený pool — jakýkoli stůl.",
+    "ready": "Připraven",
+    "waiting": "čekání",
+    "holdTight": "Vydržte — stůl se brzy najde.",
+    "flex": "Flex: {{flex}} · Body výzev: {{points}}",
+    "howWasPod": "Jaký byl váš pod?",
+    "pause": "Pauza",
+    "leave": "Odejít",
+    "pausedMessage": "Jste pozastaveni. Pokračujte, až budete moci usednout, nebo událost opusťte.",
+    "imReady": "Jsem připraven",
+    "leaveEvent": "Opustit událost",
+    "markReady": "Označte se jako připravení, až budete moci usednout ke hře.",
+    "matchingShortly": "Párování vás brzy pošle ke stolu.",
+    "imTheHost": "Jsem organizátor",
+    "offlineSaved": "Uloženo v tomto telefonu. Odešle se, až budete znovu online.",
+    "stayAtTable": "Zůstaňte u stolu, dokud organizátor hru neukončí."
+  },
+  "matchConfig": {
+    "title": "Nastavení hry",
+    "description": "Nastaví falešný usazený pod za /match. Nic zde neovlivňuje server ani se nezobrazuje na herní obrazovce, takže tuto trasu lze na telefonu otestovat tak, jak je.",
+    "podSetup": "Nastavení podu",
+    "seats": "Místa",
+    "seatsCount": "{{count}} míst",
+    "bracket": "Bracket",
+    "header": "Záhlaví",
+    "eventNamePlaceholder": "Název události",
+    "joinCodePlaceholder": "Přístupový kód",
+    "matchCard": "Karta hry",
+    "tableLabelPlaceholder": "Označení stolu",
+    "assignedDeckPlaceholder": "Přiřazený balíček",
+    "openBattleScreen": "Otevřít herní obrazovku",
+    "resetGameState": "Resetovat stav hry",
+    "commander": "Commander",
+    "secondCommander": "Druhý commander"
+  },
+  "app": {
+    "notFound": "Nenalezeno."
+  },
+  "wake": {
+    "title": "Probouzení stolů",
+    "message": "Bezplatný server usnul. Nechte tuto stránku otevřenou — obvykle to trvá méně než minutu."
+  },
+  "scanner": {
+    "title": "Naskenovat QR",
+    "ariaLabel": "Naskenovat QR kód pro připojení",
+    "hint": "Namiřte fotoaparát na kód organizátora.",
+    "closeScanner": "Zavřít skener",
+    "openingCamera": "Otevírání kamery…",
+    "noCamera": "Tento prohlížeč nemůže otevřít kameru. Zadejte místo toho přístupový kód.",
+    "permissionDenied": "Přístup ke kameře byl zamítnut. Zadejte přístupový kód nebo povolte kameru a zkuste to znovu."
+  },
+  "theme": {
+    "switchToLight": "Přepnout na světlý režim",
+    "switchToDark": "Přepnout na tmavý režim"
+  },
+  "hostMetrics": {
+    "title": "Souhrn události",
+    "aside": "pilot",
+    "players": "Hráči",
+    "games": "Hry",
+    "gamesPerPlayer": "Hry / hráč",
+    "waitAvg": "Prům. čekání",
+    "waitP95": "Čekání p95",
+    "waitMax": "Max. čekání",
+    "rematchPairs": "Opakované dvojice",
+    "flexEarned": "Získaný Flex",
+    "flexSeats": "Flexibilní usazení",
+    "durationAvg": "Prům. délka",
+    "tablesOccupied": "Obsazené stoly",
+    "trackerUsed": "Použití trackeru",
+    "trackerUsedValue": "{{used}} použito · {{skipped}} přeskočeno",
+    "challenges": "Výzvy",
+    "challengePts": "Body výzev",
+    "podRating": "Hodnocení podu",
+    "podSizes": "Velikosti podů:",
+    "pools": "Pooly:"
+  },
+  "deckEditor": {
+    "title": "Commander balíčky",
+    "deckNamePlaceholder": "Název balíčku (volitelné)",
+    "commander": "Commander",
+    "secondCommander": "Druhý commander",
+    "markPreferred": "Označit jako preferovaný",
+    "addAcceptedDeck": "Přidat přijatelný balíček",
+    "hint": "V jednom podu pouze stejný pool. Další balíčky umožní párování přesunout vás do jiného bracketu."
+  },
+  "commanderPicker": {
+    "searchCommander": "Vyhledat commandera",
+    "searchPartner": "Commander, který může být partnerem {{name}}",
+    "removeCommander": "Odebrat {{name}}",
+    "artworkFor": "Ilustrace pro",
+    "loadingArtwork": "Načítání ilustrace…"
+  },
+  "challengePack": {
+    "title": "Balíček výzev",
+    "description": "Pouze předdefinované primitivy. Uložení vytvoří novou verzi a nikdy nezmění balíček, který již tato událost použila.",
+    "copyOfficial": "Kopírovat oficiální",
+    "startBlank": "Začít od nuly",
+    "saveNewVersion": "Uložit novou verzi",
+    "editHint": "Před úpravami zkopírujte oficiální balíček nebo začněte od nuly.",
+    "packName": "Název balíčku",
+    "descriptionLabel": "Popis",
+    "addChallenge": "Přidat výzvu",
+    "id": "ID",
+    "name": "Název",
+    "category": "Kategorie",
+    "points": "Body",
+    "primitive": "Primitiva",
+    "threshold": "Práh",
+    "confirmationQuestion": "Potvrzovací otázka",
+    "defaultConfirmation": "Stalo se to u stolu?",
+    "newClaimName": "Nové splnění",
+    "newClaimDescription": "Udělit toto u stolu."
+  },
+  "treacheryRole": {
+    "treachery": "Zrada",
+    "receivedRole": "Obdrželi jste roli",
+    "handDeviceTo": "Předejte zařízení hráči {{name}}",
+    "lookAwayIdentity": "Všichni ostatní by se měli před odhalením identity dívat jinam.",
+    "lookAwayScreen": "Před odhalením se ujistěte, že nikdo jiný nevidí vaši obrazovku.",
+    "reveal": "Odhalit",
+    "yourRole": "Vaše role",
+    "identityAlt": "{{name}}, identita {{role}}",
+    "illustratedBy": "Ilustrace: {{artist}}",
+    "yourObjective": "Váš cíl",
+    "unveiledToTable": "Odhaleno stolu",
+    "unveilWarning": "Všichni u vašeho stolu tuto identitu uvidí. Její schopnost musí být ve hře vyřešena.",
+    "confirmUnveil": "Potvrdit odhalení",
+    "unveilToTable": "Odhalit stolu",
+    "hideAndPass": "Skrýt a předat",
+    "hideIdentity": "Skrýt mou identitu"
+  },
+  "modeRulesSheet": {
+    "closeRules": "Zavřít pravidla",
+    "backToGame": "Zpět do hry"
+  },
+  "assassinTargets": {
+    "title": "Tajné kontrakty",
+    "chooseOwnName": "Vyberte pouze své vlastní jméno.",
+    "closeContracts": "Zavřít kontrakty",
+    "handDeviceTo": "Předejte zařízení hráči {{name}}",
+    "lookAway": "Všichni ostatní by se měli před odhalením kontraktu dívat jinam.",
+    "revealTarget": "Odhalit můj cíl",
+    "yourTarget": "Váš cíl",
+    "noActiveTarget": "Žádný aktivní cíl",
+    "marksScored": "Získané body: {{count}}",
+    "hideAndPass": "Skrýt a předat",
+    "allContractsChecked": "Všechny kontrakty zkontrolovány"
+  },
+  "scheme": {
+    "ongoingScheme": "Probíhající scheme",
+    "scheme": "Scheme",
+    "pastScheme": "Předchozí scheme",
+    "abandon": "Opustit {{name}}",
+    "ongoingSchemes": "Probíhající scheme",
+    "graveyard": "Hřbitov · {{count}}",
+    "nextScheme": "Další scheme",
+    "remainingInDeck": "V balíčku zbývá {{count}}",
+    "scryfallCredit": "Obrázek karty přes Scryfall. Magic: The Gathering je © Wizards of the Coast."
+  },
+  "dungeon": {
+    "takeInitiativeTitle": "Převzít iniciativu?",
+    "takeInitiativeEnter": "Tím se také vydáte do Undercity. Převzít iniciativu byste měli pouze tehdy, když ji právě stůl předal tomuto místu.",
+    "takeInitiativeWait": "Než se může otevřít Undercity, dokončete nebo opusťte aktuální dungeon. Převzít iniciativu byste měli pouze tehdy, když ji právě stůl předal tomuto místu.",
+    "takeInitiativeAndEnter": "Převzít iniciativu a vstoupit do Undercity",
+    "takeInitiative": "Převzít iniciativu",
+    "alreadyHoldInitiative": "Iniciativu už máte",
+    "takeAndEnterUndercity": "Převzít iniciativu a vstoupit do Undercity",
+    "completed": "{{name}} (dokončeno)",
+    "ventureInto": "Vydat se do {{name}}",
+    "done": "Hotovo",
+    "ventureTo": "Vydat se do {{room}}: {{effect}}",
+    "releaseInitiative": "Vzdát se iniciativy",
+    "undoRoom": "Vrátit místnost",
+    "closeDungeon": "Zavřít dungeon"
+  },
+  "treacheryRolesSheet": {
+    "title": "Tajné identity",
+    "chooseOwnName": "Vyberte pouze své vlastní jméno.",
+    "closeIdentities": "Zavřít identity",
+    "allIdentitiesChecked": "Všechny identity zkontrolovány"
+  },
+  "tracker": {
+    "gameRules": "Pravidla hry",
+    "loadingRoles": "Načítání rolí…",
+    "start": "Začít",
+    "readRules": "Přečíst pravidla",
+    "readyToBegin": "Připraveno začít",
+    "readyToBeginHint": "Spusťte hru, až budou všichni usazeni, nebo si nejprve přečtěte pravidla.",
+    "dealContracts": "Rozdat kontrakty",
+    "dealContractsTitle": "Rozdat tajné kontrakty",
+    "dealContractsHint": "Každý hráč dostane jeden soukromý cíl. Zařízení se bude předávat, aby každý mohl svůj kontrakt tajně zkontrolovat.",
+    "dealIdentities": "Rozdat identity",
+    "dealIdentitiesTitle": "Rozdat tajné identity",
+    "dealIdentitiesHint": "Každý hráč dostane jednu skrytou identitu. Zařízení se bude předávat, aby si ji každý mohl tajně přečíst.",
+    "chooseStarPositions": "Vybrat pozice Hvězdy",
+    "starPositionsHint": "Hráči vedle sebe jsou spojenci. Klepnutím na dva hráče jejich pozice vyměníte nebo náhodně rozmístíte celý kruh.",
+    "randomPositions": "Náhodné pozice",
+    "confirmPositions": "Potvrdit pozice",
+    "adjacentPlayersAlly": "Sousední\nhráči jsou spojenci",
+    "buildEmperorTeams": "Sestavit týmy Císaře",
+    "chooseTeamA": "Vyberte tři hráče pro Tým A.",
+    "randomTeams": "Náhodné týmy",
+    "resetTeams": "Resetovat týmy",
+    "teamEmperor": "Císař týmu {{team}}",
+    "randomEmperors": "Náhodní Císaři",
+    "confirmTeams": "Potvrdit týmy",
+    "chooseArchenemy": "Vybrat Archenemyho",
+    "chooseArchenemyHint": "Archenemy stojí proti ostatním třem hráčům. Obě strany sdílejí 60 životů. Archenemy hraje první, v tomto tahu si lízne kartu a během každé své první hlavní fáze uvede do pohybu scheme.",
+    "confirmArchenemy": "Potvrdit Archenemyho",
+    "chooseAllies": "Vybrat spojence",
+    "chooseAlliesHint": "Vyberte dva hráče do prvního týmu. Zbývající dva vytvoří soupeřící tým. Týmy sdílejí 60 životů a tahy; všechny ostatní ovládací prvky hráčů zůstávají oddělené.",
+    "emperor": "Císař",
+    "emperorRange": "Císař · dosah 2",
+    "leader": "Vůdce",
+    "general": "Generál",
+    "generalRange": "Generál · dosah 1",
+    "marks": "{{count}} bodů",
+    "winner": "Vítěz",
+    "turnPhone": "Otočte telefon pro zobrazení celého bojiště",
+    "matchMenu": "Menu hry",
+    "matchMenuElapsed": "Menu hry. Uplynulo {{clock}}",
+    "matchMenuPaused": ", pozastaveno",
+    "matchMenuDayNight": ", nyní je {{phase}}",
+    "day": "den",
+    "night": "noc",
+    "closeMatchMenu": "Zavřít menu hry",
+    "match": "Hra",
+    "firstScheme": "První scheme",
+    "nextScheme": "Další scheme",
+    "resume": "Pokračovat",
+    "pause": "Pauza",
+    "undo": "Zpět",
+    "challenges": "Výzvy",
+    "checkTarget": "Zkontrolovat cíl",
+    "checkMyRole": "Zkontrolovat moji roli",
+    "dayButton": "Den",
+    "nightButton": "Noc",
+    "playerLost": "Hráč prohrál",
+    "gameWonBy": "Hru vyhrál",
+    "won": "{{name}} vyhrál/a",
+    "doneRequeue": "Hotovo a zpět do fronty",
+    "savingChallenges": "Ukládání výzev…",
+    "quitToHome": "Ukončit a přejít domů",
+    "quitHint": "Hra zůstane uložená — znovu ji otevřete z domovské obrazovky.",
+    "secretContracts": "Tajné kontrakty",
+    "secretIdentities": "Tajné identity",
+    "whoEliminated": "Kdo vyřadil hráče {{name}}?",
+    "whoEliminatedHint": "Hráč získá bod pouze tehdy, pokud šlo o jeho přidělený cíl. Řetězec kontraktů se posune tak jako tak.",
+    "noPlayerUnknown": "Žádný hráč / neznámé",
+    "revealedIdentity": "Odhalená Treachery identita",
+    "closeRevealedIdentity": "Zavřít odhalenou identitu",
+    "commanderChallenges": "Commander výzvy",
+    "challengeCompleted": "{{name}} splněno",
+    "challengeFallback": "Výzva",
+    "matchResult": "Výsledek hry",
+    "wins": "{{name}} vítězí",
+    "reviewBoard": "Prohlédnout bojiště",
+    "yes": "Ano",
+    "no": "Ne",
+    "yesTheyLost": "Ano, prohrál/a",
+    "noStillIn": "Ne, stále ve hře",
+    "openCounters": "Otevřít countery pro {{name}}",
+    "commanderDamageOn": "Commander damage na {{name}}",
+    "countersFor": "Countery pro {{name}}",
+    "countersTitle": "Countery pro {{name}}",
+    "closeCounters": "Zavřít countery",
+    "closeChallenges": "Zavřít výzvy",
+    "sharedCommanderDamage": "Společný commander damage",
+    "closeCommanderDamage": "Zavřít commander damage",
+    "highestCommanderDamage": "Nejvyšší commander damage na {{name}}: {{value}} od {{commander}}",
+    "noCommanderDamage": "Žádný commander damage na {{name}}",
+    "removeCommanderDamage": "Odebrat commander damage od {{name}} hráče {{owner}}",
+    "addCommanderDamage": "Přidat commander damage od {{name}} hráče {{owner}}",
+    "isMonarch": "{{name}} je monarch",
+    "makeMonarch": "Nastavit {{name}} jako monarcha",
+    "enduringStory": "{{name}} {{has}} enduring story",
+    "cityBlessing": "{{name}} {{has}} city's blessing",
+    "has": "má",
+    "doesNotHave": "nemá",
+    "didLose": "Prohrál/a {{name}} hru?",
+    "thisTeam": "Tento tým",
+    "didTheyLose": "Prohráli?",
+    "poisonPrompt": "{{name}} má {{count}} poison counterů. Prohrál/a?",
+    "sharedPoisonPrompt": "{{subject}} má {{count}} společných poison counterů. {{lose}}",
+    "hitPrompt": "{{name}} má {{count}} exilovaných karet s hit countery. Prohrál/a?",
+    "commanderPrompt": "{{name}} obdržel/a {{damage}} commander damage od {{from}}. Prohrál/a?",
+    "sharedCommanderPrompt": "{{subject}} obdržel/a {{damage}} společného commander damage od {{from}}. {{lose}}",
+    "lifePrompt": "{{name}} má {{life}} životů. Prohrál/a?",
+    "sharedLifePrompt": "{{subject}} má {{life}} společných životů. {{lose}}",
+    "anotherCommander": "jiného commandera",
+    "addLife": "Přidat 1 život. Dlouhým stiskem zadáte větší hodnotu.",
+    "removeLife": "Odebrat 1 život. Dlouhým stiskem zadáte větší hodnotu.",
+    "addLifeFor": "Přidat životy hráči {{name}}",
+    "removeLifeFor": "Odebrat životy hráči {{name}}",
+    "addLifeLabel": "Přidat životy · {{name}}",
+    "removeLifeLabel": "Odebrat životy · {{name}}",
+    "deleteDigit": "Smazat číslici",
+    "add": "Přidat",
+    "removeVerb": "Odebrat",
+    "lower": "Snížit {{label}}",
+    "raise": "Zvýšit {{label}}",
+    "seatColour": "Barva místa pro {{name}}",
+    "dungeonFor": "Dungeon pro {{name}}",
+    "dungeonInitiative": "Dungeon a iniciativa pro {{name}}. {{title}}",
+    "dungeonInitiativeActive": "{{name}} má iniciativu · {{filled}} z {{total}} unikátních dungeonů",
+    "dungeonInitiativeCompleted": "{{name}} dokončil/a {{filled}} z {{total}} unikátních dungeonů",
+    "counterOn": "{{label}} na {{name}}: {{value}}",
+    "counterFor": "{{label}} pro {{name}}",
+    "claimFor": "Připsat hráči {{name}}",
+    "challengesSubtitle": "Stejné výzvy pro každého hráče · body nikdy neovlivňují párování",
+    "counters": {
+      "poison": "Poison",
+      "tax": "Commander tax",
+      "acorn": "Žaludy",
+      "energy": "Energie",
+      "experience": "Zkušenosti",
+      "hit": "Etrata zásahy",
+      "rad": "Radiace",
+      "ring": "Pokušení Prstenu",
+      "speed": "Rychlost",
+      "ticket": "Vstupenky"
+    }
+  }
+}

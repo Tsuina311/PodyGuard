@@ -12,7 +12,6 @@ import { TrackerView } from './tracker/TrackerView';
 import { Badge, statusTone } from './ui/Badge';
 import { Brand } from './ui/Brand';
 import { Button } from './ui/Button';
-import { LanguageSwitcherCorner } from './ui/LanguageSwitcher';
 import { Panel } from './ui/Panel';
 import { ThemeToggleCorner } from './ui/ThemeToggle';
 import { forgetActiveMatch, rememberActiveMatch } from './active-match';
@@ -96,8 +95,12 @@ export function MatchSandboxPage() {
 
   return (
     <>
-      <LanguageSwitcherCorner />
-      <ThemeToggleCorner />
+      <ThemeToggleCorner
+        feedbackContext={{
+          participantStatus: participant.status,
+          gameMode: config.gameMode,
+        }}
+      />
       <header>
         <Brand className="mb-6" />
         <h1 className="font-display mb-2 text-3xl font-bold tracking-tight">

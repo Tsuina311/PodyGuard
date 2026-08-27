@@ -16,6 +16,7 @@ import type {
   CommanderCandidate,
   CommanderSelection,
 } from './scryfall';
+import type { FeedbackPayload } from './feedback/types';
 
 type DeckDraft = {
   name?: string;
@@ -99,6 +100,13 @@ export async function checkHealth(): Promise<boolean> {
   }
 }
 
+export async function submitFeedback(payload: FeedbackPayload): Promise<void> {
+  await request<{ ok: true }>('/feedback', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
 export function createEvent(
   name: string,
   hostPin: string,
@@ -175,8 +183,12 @@ export function setDecks(
   );
 }
 
-export function searchCommanders(query: string, partnerFor?: string) {
-  const params = new URLSearchParams({ q: query });
+export function searchCommanders(
+  query: string,
+  partnerFor?: string,
+  profile: 'commander' | 'duel-commander' | 'brawl' = 'commander',
+) {
+  const params = new URLSearchParams({ q: query, profile });
   if (partnerFor) {
     params.set('pairedWith', partnerFor);
   }

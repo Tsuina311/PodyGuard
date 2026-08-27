@@ -96,12 +96,19 @@ export {
   resolveRulesFormat,
   gameModeFamily,
   usesCommanderRules,
+  usesCommanderDamage,
+  commanderSearchProfile,
+  startingLifeForGameMode,
+  DUEL_COMMANDER_STARTING_LIFE,
+  BRAWL_STARTING_LIFE,
+  CLASSIC_COMMANDER_MIN_PLAYERS,
 } from './treachery';
 
 export type {
   GameMode,
   GameModeFamily,
   RulesFormat,
+  CommanderSearchProfile,
   AssassinPodSize,
   TreacheryPodSize,
   TreacheryRole,

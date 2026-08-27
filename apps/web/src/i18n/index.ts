@@ -1,31 +1,29 @@
 import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
+import { isAppLocale } from './locales';
 
-import de from './locales/de.json';
-import en from './locales/en.json';
-import es from './locales/es.json';
-import fr from './locales/fr.json';
-import it from './locales/it.json';
-import nl from './locales/nl.json';
-import pl from './locales/pl.json';
-import pt from './locales/pt.json';
+const localeModules = import.meta.glob<Record<string, unknown>>(
+  './locales/*.json',
+  { eager: true },
+);
+
+const resources = Object.fromEntries(
+  Object.entries(localeModules).flatMap(([path, translation]) => {
+    const code = path.match(/\/([a-z]{2})\.json$/)?.[1];
+    return code ? [[code, { translation }]] : [];
+  }),
+);
 
 void i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    resources: {
-      en: { translation: en },
-      de: { translation: de },
-      fr: { translation: fr },
-      es: { translation: es },
-      it: { translation: it },
-      pt: { translation: pt },
-      nl: { translation: nl },
-      pl: { translation: pl },
-    },
+    resources,
     fallbackLng: 'en',
+    supportedLngs: Object.keys(resources),
+    nonExplicitSupportedLngs: true,
+    load: 'languageOnly',
     interpolation: {
       escapeValue: false,
     },
@@ -33,6 +31,10 @@ void i18n
       order: ['localStorage', 'navigator'],
       lookupLocalStorage: 'podyguard-lang',
       caches: ['localStorage'],
+      convertDetectedLanguage: (lng) => {
+        const code = lng.slice(0, 2);
+        return isAppLocale(code) ? code : 'en';
+      },
     },
   })
   .then(() => {

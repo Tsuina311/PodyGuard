@@ -1,0 +1,1079 @@
+{
+  "common": {
+    "home": "Hafan",
+    "cancel": "Canslo",
+    "close": "Cau",
+    "save": "Cadw",
+    "loading": "Yn llwytho…",
+    "players": "Chwaraewyr",
+    "game": "Gêm",
+    "language": "Iaith",
+    "yes": "Ie",
+    "no": "Na",
+    "reset": "Ailosod",
+    "random": "Ar hap",
+    "remove": "Tynnu",
+    "empty": "Gwag",
+    "bot": "bot",
+    "dev": "dev",
+    "official": "swyddogol",
+    "open": "Agored",
+    "preferred": "dewisol",
+    "player": "Chwaraewr {{number}}",
+    "versus": "yn erbyn",
+    "teamA": "Tîm A",
+    "teamB": "Tîm B",
+    "working": "Yn gweithio…",
+    "creating": "Yn creu…",
+    "checking": "Yn gwirio…",
+    "joining": "Yn ymuno…",
+    "updating": "Yn diweddaru…",
+    "submitting": "Yn cyflwyno…",
+    "saving": "Yn cadw…",
+    "searching": "Yn chwilio…",
+    "unveiling": "Yn datgelu…",
+    "copied": "Wedi copïo",
+    "noneYet": "dim eto",
+    "dash": "—",
+    "errors": {
+      "generic": "Aeth rhywbeth o'i le.",
+      "createEvent": "Methu creu'r digwyddiad.",
+      "unlockHost": "Methu datgloi desg y trefnydd.",
+      "updateTable": "Methu diweddaru'r bwrdd.",
+      "startGame": "Methu dechrau'r gêm.",
+      "startAllGames": "Methu dechrau'r holl gemau parod.",
+      "finishTable": "Methu gorffen y gêm wrth y bwrdd.",
+      "cancelPod": "Methu canslo'r pod.",
+      "updateSettings": "Methu diweddaru'r gosodiadau.",
+      "matchTables": "Methu paru'r byrddau.",
+      "fillBots": "Methu llenwi'r byrddau â bots.",
+      "clipboard": "Mae'r clipfwrdd wedi'i rwystro — copïwch y ddolen â llaw.",
+      "eventNotFound": "Heb ddod o hyd i'r digwyddiad.",
+      "joinEvent": "Methu ymuno â'r digwyddiad.",
+      "saveDecks": "Methu cadw'r deciau.",
+      "updateReady": "Methu diweddaru'r statws parod.",
+      "updatePause": "Methu diweddaru'r saib.",
+      "leaveEvent": "Methu gadael y digwyddiad.",
+      "trackerChoice": "Methu cadw'r dewis traciwr.",
+      "saveRating": "Methu cadw'r sgôr honno.",
+      "chooseCommander": "Dewiswch commander ar gyfer pob dec.",
+      "enterJoinCode": "Rhowch god ymuno.",
+      "sessionUnavailable": "Nid yw eich sesiwn digwyddiad ar gael mwyach.",
+      "savePack": "Methu cadw'r pecyn.",
+      "searchScryfall": "Methu chwilio Scryfall.",
+      "loadArtwork": "Methu llwytho'r gwaith celf amgen.",
+      "submitResult": "Methu cyflwyno'r canlyniad.",
+      "saveChallenge": "Methu cadw cynnydd yr her.",
+      "unveilIdentity": "Methu datgelu eich hunaniaeth.",
+      "apiWaking": "Mae'r gweinydd yn deffro. Cadwch y dudalen hon ar agor — fel arfer mae'n cymryd llai na munud.",
+      "apiUnreachable": "Methu cysylltu â'r API. Ydy'r gweinydd yn rhedeg (yarn dev:server)?"
+    },
+    "assignedAtTable": "Wedi'i neilltuo i'r bwrdd",
+    "scanToJoin": "Sganiwch i ymuno â'r digwyddiad hwn"
+  },
+  "language": {
+    "en": "English",
+    "de": "Deutsch",
+    "fr": "Français",
+    "es": "Español",
+    "it": "Italiano",
+    "pt": "Português",
+    "nl": "Nederlands",
+    "pl": "Polski",
+    "sv": "Svenska",
+    "da": "Dansk",
+    "no": "Norsk",
+    "fi": "Suomi",
+    "cs": "Čeština",
+    "sk": "Slovenčina",
+    "hu": "Magyar",
+    "ro": "Română",
+    "el": "Ελληνικά",
+    "hr": "Hrvatski",
+    "sl": "Slovenščina",
+    "bg": "Български",
+    "uk": "Українська",
+    "lt": "Lietuvių",
+    "lv": "Latviešu",
+    "et": "Eesti",
+    "is": "Íslenska",
+    "ga": "Gaeilge",
+    "mt": "Malti",
+    "sr": "Srpski",
+    "sq": "Shqip",
+    "bs": "Bosanski",
+    "mk": "Македонски",
+    "be": "Беларуская",
+    "ca": "Català",
+    "eu": "Euskara",
+    "cy": "Cymraeg"
+  },
+  "families": {
+    "normal": "Arferol",
+    "commander": "Commander"
+  },
+  "modes": {
+    "shared": {
+      "commanderCombat": "Mae chwaraewr yn colli ar ôl derbyn {{commanderDamage}} o ddifrod ymladd gan un commander.",
+      "commanderTax": "Bob tro y caiff commander ei chwarae eto o'r command zone, mae'n costio 2 mana yn fwy.",
+      "lifeAndLoss": "Bywyd a cholli",
+      "turns": "Troeon",
+      "commanders": "Commanders",
+      "eachPlayerLife": "Mae pob chwaraewr yn dechrau gyda {{life}} o fywyd.",
+      "loseAtZero": "Mae chwaraewr yn colli ar 0 bywyd.",
+      "loseAtPoison": "Mae chwaraewr yn colli ar {{poison}} o gownteri poison.",
+      "startingPlayerRandom": "Dewisir y chwaraewr sy'n dechrau ar hap.",
+      "startingPlayerSkipDraw": "Dewisir y chwaraewr sy'n dechrau ar hap ac mae'n hepgor y draw step ar ei dro cyntaf.",
+      "multiplayerFirstTurnDraw": "Mewn multiplayer, mae'r chwaraewr hwnnw'n tynnu cerdyn ar ei dro cyntaf.",
+      "commanderFirstTurnDraw": "Mewn Commander multiplayer, mae'r chwaraewr hwnnw'n tynnu cerdyn ar ei dro cyntaf.",
+      "commandersInZone": "Mae commanders yn dechrau yn y command zone a gellir eu chwarae eto oddi yno.",
+      "commanderRulesApply": "Mae rheolau Commander yn dal yn berthnasol: mae {{life}} o fywyd cychwynnol, {{poison}} poison, a {{commanderDamage}} o ddifrod ymladd gan un commander yn angheuol."
+    },
+    "duel": {
+      "label": "Deuol",
+      "hint": "Dau chwaraewr. Mae pob un yn dechrau gyda 20 o fywyd.",
+      "hostHint": "Byrddau llym ar gyfer 2 chwaraewr. Mae pob chwaraewr yn dechrau gyda 20 o fywyd.",
+      "hostFixedSeats": "Mae gemau Deuol bob amser yn eistedd union ddau chwaraewr.",
+      "title": "Deuol",
+      "summary": "Magic i ddau chwaraewr. Dim commanders — dim ond bywyd a'r maes chwarae.",
+      "sections": {
+        "life": {
+          "heading": "Bywyd a cholli",
+          "bullets": [
+            "Mae pob chwaraewr yn dechrau gyda {{life}} o fywyd.",
+            "Mae chwaraewr yn colli ar 0 bywyd.",
+            "Mae chwaraewr yn colli ar {{poison}} o gownteri poison."
+          ]
+        },
+        "turns": {
+          "heading": "Troeon",
+          "bullets": [
+            "Dewisir y chwaraewr sy'n dechrau ar hap ac mae'n hepgor y draw step ar ei dro cyntaf."
+          ]
+        }
+      }
+    },
+    "multiplayer": {
+      "label": "Multiplayer",
+      "hint": "Pawb yn erbyn pawb heb commanders. Mae pawb yn dechrau gyda 20 o fywyd.",
+      "hostHint": "Pawb yn erbyn pawb heb commanders. Mae paru'n llenwi maint y bwrdd a ddewiswyd; gall byrddau dros ben fod mor fach â thri chwaraewr.",
+      "title": "Multiplayer",
+      "summary": "Multiplayer heb fformat Commander. Defnyddiol ar gyfer multiplayer hamddenol, Planechase, neu unrhyw fwrdd 20-bywyd.",
+      "sections": {
+        "life": {
+          "heading": "Bywyd a cholli",
+          "bullets": [
+            "Mae pob chwaraewr yn dechrau gyda {{life}} o fywyd.",
+            "Mae chwaraewr yn colli ar 0 bywyd.",
+            "Mae chwaraewr yn colli ar {{poison}} o gownteri poison."
+          ]
+        },
+        "turns": {
+          "heading": "Troeon",
+          "bullets": [
+            "Dewisir y chwaraewr sy'n dechrau ar hap.",
+            "Mewn multiplayer, mae'r chwaraewr hwnnw'n tynnu cerdyn ar ei dro cyntaf."
+          ]
+        }
+      }
+    },
+    "commander": {
+      "label": "Clasurol",
+      "hint": "Pawb yn erbyn pawb. Mae pawb yn dechrau gyda 40 o fywyd.",
+      "hostHint": "Commander pawb yn erbyn pawb. Mae paru'n ffafrio pedwar; gall pods dros ben fod yn dri neu bump pan ganiateir hynny.",
+      "title": "Clasurol",
+      "summary": "Multiplayer pawb yn erbyn pawb. Mae pob chwaraewr yn ymladd drosto'i hun.",
+      "sections": {
+        "life": {
+          "heading": "Bywyd a cholli",
+          "bullets": [
+            "Mae pob chwaraewr yn dechrau gyda {{life}} o fywyd.",
+            "Mae chwaraewr yn colli ar 0 bywyd.",
+            "Mae chwaraewr yn colli ar {{poison}} o gownteri poison.",
+            "Mae chwaraewr yn colli ar ôl derbyn {{commanderDamage}} o ddifrod ymladd gan un commander."
+          ]
+        },
+        "turns": {
+          "heading": "Troeon",
+          "bullets": [
+            "Dewisir y chwaraewr sy'n dechrau ar hap.",
+            "Mewn Commander multiplayer, mae'r chwaraewr hwnnw'n tynnu cerdyn ar ei dro cyntaf."
+          ]
+        },
+        "commanders": {
+          "heading": "Commanders",
+          "bullets": [
+            "Mae commanders yn dechrau yn y command zone a gellir eu chwarae eto oddi yno.",
+            "Bob tro y caiff commander ei chwarae eto o'r command zone, mae'n costio 2 mana yn fwy."
+          ]
+        }
+      }
+    },
+    "treachery": {
+      "label": "Brad",
+      "hint": "Rhoddir hunaniaethau cudd ar y ddyfais hon. Pasiwch hi o gwmpas fel y gall pawb ddarllen eu hunaniaeth yn breifat.",
+      "hostHint": "Rolau cudd ar gyfer pods Commander. Mae paru'n llenwi maint y bwrdd a ddewiswyd yn gyntaf; gall pods dros ben fod mor fach â phedwar.",
+      "title": "Brad",
+      "summary": "Commander gyda hunaniaethau cudd. Mae'r Arweinydd yn gyhoeddus; mae pawb arall yn aros yn gudd.",
+      "sections": {
+        "commander": {
+          "heading": "Mae rheolau Commander yn dal yn berthnasol",
+          "bullets": [
+            "Mae pob chwaraewr yn dechrau gyda {{life}} o fywyd.",
+            "Mae chwaraewr yn colli ar 0 bywyd, {{poison}} poison, neu {{commanderDamage}} o ddifrod ymladd gan un commander.",
+            "Mae'r Arweinydd yn cymryd y tro cyntaf ac yn tynnu cerdyn ar y tro hwnnw.",
+            "Bob tro y caiff commander ei chwarae eto o'r command zone, mae'n costio 2 mana yn fwy."
+          ]
+        },
+        "identities": {
+          "heading": "Hunaniaethau",
+          "bullets": [
+            "Agorwch Gwirio fy rôl o ddewislen yr amserydd. Dim ond chi fydd yn gweld y cerdyn hwnnw.",
+            "Ar un traciwr, rhannwch yr hunaniaethau wrth baratoi a phasiwch y ddyfais o gwmpas fel y gall pob chwaraewr ddarllen ei hunaniaeth ar ei ben ei hun.",
+            "Arweinydd: Goroeswch nes bod pob Llofrudd a'r Bradwr wedi'u dileu. Datgelwch eich hun i'r bwrdd. Mae'r Gwarchodwyr yn rhannu eich buddugoliaeth, ond nid ydych yn gwybod pwy ydynt.",
+            "Gwarchodwr: Cadwch yr Arweinydd yn fyw a dileuwch elynion yr Arweinydd. Mae eich hunaniaeth yn gyfrinachol. Rydych yn ennill ac yn colli gyda'r Arweinydd, hyd yn oed os cewch eich dileu'n gyntaf.",
+            "Llofrudd: Dileuwch yr Arweinydd. Mae eich hunaniaeth yn gyfrinachol. Mae'r Llofruddion yn rhannu'r un nod, ond nid ydych yn gwybod pwy yw'r Llofruddion eraill.",
+            "Bradwr: Byddwch y chwaraewr olaf sy'n sefyll. Mae eich hunaniaeth yn gyfrinachol. Cadwch yr Arweinydd yn fyw nes bod y bygythiadau eraill wedi diflannu, yna cymerwch yr orsedd i chi'ch hun.",
+            "Dilynwch unrhyw alluoedd ychwanegol sydd wedi'u hargraffu ar eich cerdyn hunaniaeth."
+          ]
+        }
+      },
+      "roles": {
+        "leader": {
+          "name": "Arweinydd",
+          "objective": "Goroeswch nes bod pob Llofrudd a'r Bradwr wedi'u dileu.",
+          "guidance": "Datgelwch eich hun i'r bwrdd. Mae'r Gwarchodwyr yn rhannu eich buddugoliaeth, ond nid ydych yn gwybod pwy ydynt.",
+          "publicNote": "Mae eich rôl yn gyhoeddus. Dywedwch wrth y bwrdd mai chi yw'r Arweinydd."
+        },
+        "guardian": {
+          "name": "Gwarchodwr",
+          "objective": "Cadwch yr Arweinydd yn fyw a dileuwch elynion yr Arweinydd.",
+          "guidance": "Mae eich hunaniaeth yn gyfrinachol. Rydych yn ennill ac yn colli gyda'r Arweinydd, hyd yn oed os cewch eich dileu'n gyntaf.",
+          "publicNote": "Cadwch y rôl hon yn gyfrinachol."
+        },
+        "assassin": {
+          "name": "Llofrudd",
+          "objective": "Dileuwch yr Arweinydd.",
+          "guidance": "Mae eich hunaniaeth yn gyfrinachol. Mae'r Llofruddion yn rhannu'r un nod, ond nid ydych yn gwybod pwy yw'r Llofruddion eraill.",
+          "publicNote": "Cadwch y rôl hon yn gyfrinachol."
+        },
+        "traitor": {
+          "name": "Bradwr",
+          "objective": "Byddwch y chwaraewr olaf sy'n sefyll.",
+          "guidance": "Mae eich hunaniaeth yn gyfrinachol. Cadwch yr Arweinydd yn fyw nes bod y bygythiadau eraill wedi diflannu, yna cymerwch yr orsedd i chi'ch hun.",
+          "publicNote": "Cadwch y rôl hon yn gyfrinachol."
+        }
+      },
+      "normal": {
+        "hint": "Hunaniaethau cudd ar ffôn a rennir. Mae pawb yn dechrau gyda 20 o fywyd — dim commanders.",
+        "hostHint": "Rolau cudd heb commanders. Mae paru'n llenwi maint y bwrdd a ddewiswyd yn gyntaf; gall pods dros ben fod mor fach â phedwar.",
+        "summary": "Hunaniaethau cudd heb fformat Commander. Mae'r Arweinydd yn gyhoeddus; mae pawb arall yn aros yn gudd.",
+        "sections": {
+          "life": {
+            "heading": "Bywyd a cholli",
+            "bullets": [
+              "Mae pob chwaraewr yn dechrau gyda {{life}} o fywyd.",
+              "Mae chwaraewr yn colli ar 0 bywyd.",
+              "Mae chwaraewr yn colli ar {{poison}} o gownteri poison.",
+              "Mae'r Arweinydd yn cymryd y tro cyntaf ac yn tynnu cerdyn ar y tro hwnnw."
+            ]
+          },
+          "identities": null
+        }
+      }
+    },
+    "two-headed-giant": {
+      "label": "Cawr Dau Ben",
+      "hint": "Dau dîm o ddau, 60 o fywyd a rennir i bob tîm, gyda'r troeon yn cael eu cymryd gyda'i gilydd.",
+      "hostHint": "Pods Commander llym o 4 chwaraewr. Mae dau dîm yn rhannu 60 o fywyd yr un ac yn cymryd eu troeon gyda'i gilydd.",
+      "hostFixedSeats": "Mae gemau Cawr Dau Ben bob amser yn eistedd union bedwar chwaraewr.",
+      "title": "Cawr Dau Ben",
+      "summary": "Dau dîm o ddau. Mae cyd-chwaraewyr yn rhannu cyfanswm bywyd a thro.",
+      "sections": {
+        "teams": {
+          "heading": "Timau",
+          "bullets": [
+            "Dewiswch ddau gynghreiriad, neu gadewch i'r parau gael eu dewis ar hap.",
+            "Mae pob tîm yn dechrau gyda {{sharedLife}} o fywyd a rennir.",
+            "Mae cyd-chwaraewyr yn cymryd eu tro gyda'i gilydd. Mae gan bob chwaraewr ei law, ei lyfrgell a'i commanders ei hun o hyd."
+          ]
+        },
+        "life": {
+          "heading": "Bywyd a cholli",
+          "bullets": [
+            "Mae tîm yn colli pan fydd ei fywyd a rennir yn cyrraedd 0.",
+            "Mae tîm yn colli ar {{sharedPoison}} o gownteri poison a rennir.",
+            "Mae tîm yn colli ar ôl derbyn {{commanderDamage}} o ddifrod ymladd a rennir gan un commander."
+          ]
+        },
+        "turns": {
+          "heading": "Troeon",
+          "bullets": [
+            "Dewisir y tîm sy'n dechrau ar hap ac mae'n hepgor y draw step ar ei dro cyntaf.",
+            "Bob tro y caiff commander ei chwarae eto o'r command zone, mae'n costio 2 mana yn fwy."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Dau dîm o ddau, 40 o fywyd a rennir i bob tîm, gyda'r troeon yn cael eu cymryd gyda'i gilydd.",
+        "hostHint": "Byrddau llym o 4 chwaraewr. Mae dau dîm yn rhannu 40 o fywyd yr un ac yn cymryd eu troeon gyda'i gilydd — dim commanders.",
+        "summary": "Dau dîm o ddau. Mae cyd-chwaraewyr yn rhannu cyfanswm bywyd a thro — deciau safonol, 20 o fywyd i bob chwaraewr yn nhermau tîm.",
+        "sections": {
+          "teams": {
+            "heading": "Timau",
+            "bullets": [
+              "Dewiswch ddau gynghreiriad, neu gadewch i'r parau gael eu dewis ar hap.",
+              "Mae pob tîm yn dechrau gyda {{sharedLife}} o fywyd a rennir.",
+              "Mae cyd-chwaraewyr yn cymryd eu tro gyda'i gilydd. Mae gan bob chwaraewr ei law, ei lyfrgell a'i commanders ei hun o hyd."
+            ]
+          },
+          "life": {
+            "heading": "Bywyd a cholli",
+            "bullets": [
+              "Mae tîm yn colli pan fydd ei fywyd a rennir yn cyrraedd 0.",
+              "Mae tîm yn colli ar {{sharedPoison}} o gownteri poison a rennir.",
+              "Mae tîm yn colli ar ôl derbyn {{commanderDamage}} o ddifrod ymladd a rennir gan un commander."
+            ]
+          },
+          "turns": {
+            "heading": "Troeon",
+            "bullets": [
+              "Dewisir y tîm sy'n dechrau ar hap ac mae'n hepgor y draw step ar ei dro cyntaf.",
+              "Bob tro y caiff commander ei chwarae eto o'r command zone, mae'n costio 2 mana yn fwy."
+            ]
+          }
+        }
+      }
+    },
+    "archenemy-commander": {
+      "label": "Archenemy",
+      "hint": "Un Archenemy ar 60 o fywyd gyda dec 40-card scheme yn erbyn tri arwr sy'n rhannu 60 o fywyd.",
+      "hostHint": "Pods Commander llym o 4 chwaraewr. Mae un Archenemy 60-bywyd yn wynebu tîm o dri gyda 60 o fywyd a rennir a dec 40-card scheme.",
+      "hostFixedSeats": "Mae gemau Archenemy Commander bob amser yn eistedd union bedwar chwaraewr.",
+      "title": "Archenemy Commander",
+      "summary": "Un Archenemy yn erbyn tîm o dri, gyda dec scheme ar waith.",
+      "sections": {
+        "sides": {
+          "heading": "Ochrau",
+          "bullets": [
+            "Dewiswch yr Archenemy, neu neilltuwch un ar hap. Y tri chwaraewr arall yw'r arwyr.",
+            "Mae'r ddwy ochr yn dechrau gyda {{life}} o fywyd.",
+            "Mae'r arwyr yn rhannu'r cyfanswm bywyd hwnnw ac yn cymryd eu tro gyda'i gilydd.",
+            "Mae'r Archenemy yn mynd gyntaf ac yn tynnu cerdyn ar y tro hwnnw."
+          ]
+        },
+        "schemes": {
+          "heading": "Schemes",
+          "bullets": [
+            "Mae'r 40 scheme Duskmourn Commander yn cael eu cymysgu ar ddechrau'r gêm.",
+            "Yn ystod pob first main phase yr Archenemy, agorwch ddewislen yr amserydd a thapiwch Next scheme i roi un ar waith.",
+            "Mae scheme nad yw'n ongoing yn cael ei datrys, yna'n mynd i waelod y dec scheme.",
+            "Mae ongoing scheme yn aros wyneb i fyny nes bod y bwrdd yn ei marcio fel abandoned, yna mae'n mynd i waelod y dec.",
+            "Mae schemes wyneb i fyny a mynwent y rhai gorffenedig yn ymddangos o dan y cerdyn fel lluniau bach; tapiwch un i'w ddarllen yn fawr."
+          ]
+        },
+        "life": {
+          "heading": "Bywyd a cholli",
+          "bullets": [
+            "Mae'r Archenemy yn colli ar 0 bywyd, neu pan gyrhaeddir y terfynau poison a commander damage arferol.",
+            "Mae'r arwyr yn colli gyda'i gilydd pan fydd eu bywyd a rennir yn cyrraedd 0, ac maent yn rhannu poison a commander damage yn yr un modd.",
+            "Mae chwaraewr yn colli ar ôl derbyn {{commanderDamage}} o ddifrod ymladd gan un commander.",
+            "Bob tro y caiff commander ei chwarae eto o'r command zone, mae'n costio 2 mana yn fwy."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Un Archenemy ar 20 o fywyd gyda schemes yn erbyn tri arwr sy'n rhannu 40 o fywyd.",
+        "hostHint": "Byrddau llym o 4 chwaraewr. Un Archenemy gyda dec scheme yn erbyn tîm o dri — dim commanders.",
+        "summary": "Un Archenemy yn erbyn tîm o dri, gyda dec scheme ar waith — byrddau safonol 20-bywyd.",
+        "sections": {
+          "sides": {
+            "heading": "Ochrau",
+            "bullets": [
+              "Dewiswch yr Archenemy, neu neilltuwch un ar hap. Y tri chwaraewr arall yw'r arwyr.",
+              "Mae'r ddwy ochr yn dechrau gyda {{life}} o fywyd.",
+              "Mae'r arwyr yn rhannu'r cyfanswm bywyd hwnnw ac yn cymryd eu tro gyda'i gilydd.",
+              "Mae'r Archenemy yn mynd gyntaf ac yn tynnu cerdyn ar y tro hwnnw."
+            ]
+          },
+          "schemes": {
+            "heading": "Schemes",
+            "bullets": [
+              "Mae'r 40 scheme Duskmourn Commander yn cael eu cymysgu ar ddechrau'r gêm.",
+              "Yn ystod pob first main phase yr Archenemy, agorwch ddewislen yr amserydd a thapiwch Next scheme i roi un ar waith.",
+              "Mae scheme nad yw'n ongoing yn cael ei datrys, yna'n mynd i waelod y dec scheme.",
+              "Mae ongoing scheme yn aros wyneb i fyny nes bod y bwrdd yn ei marcio fel abandoned, yna mae'n mynd i waelod y dec.",
+              "Mae schemes wyneb i fyny a mynwent y rhai gorffenedig yn ymddangos o dan y cerdyn fel lluniau bach; tapiwch un i'w ddarllen yn fawr."
+            ]
+          },
+          "life": {
+            "heading": "Bywyd a cholli",
+            "bullets": [
+              "Mae'r Archenemy yn colli ar 0 bywyd, neu pan gyrhaeddir y terfynau poison arferol.",
+              "Mae'r arwyr yn colli gyda'i gilydd pan fydd eu bywyd a rennir yn cyrraedd 0, ac maent yn rhannu poison a commander damage yn yr un modd.",
+              "Mae chwaraewr yn colli ar ôl derbyn {{poison}} o gownteri poison."
+            ]
+          }
+        }
+      }
+    },
+    "emperor": {
+      "label": "Ymerawdwr",
+      "hint": "Dau dîm o dri. Amddiffynnwch eich Ymerawdwr gan ddefnyddio ystod ddylanwad gyfyngedig a symud creaduriaid.",
+      "hostHint": "Pods Commander llym o 6 chwaraewr. Mae pob tîm yn gosod Ymerawdwr rhwng dau Gadfridog ac yn chwarae gydag ystod ddylanwad gyfyngedig.",
+      "hostFixedSeats": "Mae gemau Ymerawdwr bob amser yn eistedd union chwe chwaraewr.",
+      "title": "Ymerawdwr",
+      "summary": "Dau dîm o dri. Mae pob Ymerawdwr yn eistedd rhwng dau Gadfridog, ac mae dileu Ymerawdwr yn ennill y gêm.",
+      "sections": {
+        "teams": {
+          "heading": "Timau a throeon",
+          "bullets": [
+            "Dewiswch y ddau dîm ac Ymerawdwr pob tîm, neu gwnewch un neu'r ddau ddewis ar hap.",
+            "Mae pob chwaraewr yn dechrau gyda {{life}} o fywyd ac yn cadw ei law, mana, permanents, poison a thro ei hun.",
+            "Gall cyd-chwaraewyr edrych ar ddwylo ei gilydd a thrafod strategaeth, ond ni allant drin cardiau ei gilydd.",
+            "Dewiswch ar hap pa Ymerawdwr sy'n cymryd y tro cyntaf. Mae'r Ymerawdwr hwnnw'n tynnu cerdyn ar y tro cyntaf."
+          ]
+        },
+        "range": {
+          "heading": "Ystod ac ymladd",
+          "bullets": [
+            "Mae gan Gadfridogion ystod ddylanwad 1. Mae gan Ymerawdwyr ystod ddylanwad 2.",
+            "Gall swynion, galluoedd, effeithiau a gwybodaeth effeithio dim ond ar chwaraewyr a gwrthrychau sydd o fewn ystod eu rheolwr.",
+            "Gall chwaraewr ymosod dim ond ar wrthwynebydd sy'n eistedd yn union wrth ei ymyl, neu ar planeswalkers a battles gwarchodedig y gwrthwynebydd hwnnw.",
+            "Wrth i chwaraewyr adael, mae'r seddi gwag yn peidio â chyfrif, gan ddod â'r chwaraewyr sy'n goroesi o fewn ystod."
+          ]
+        },
+        "deploy": {
+          "heading": "Symud creaduriaid",
+          "bullets": [
+            "Mae gan bob creadur \"Tap: Mae cyd-chwaraewr targed yn ennill rheolaeth dros y creadur hwn. Activate only as a sorcery.\"",
+            "Mae hyn yn caniatáu symud creaduriaid drwy'r tîm wrth i linellau'r frwydr newid."
+          ]
+        },
+        "winning": {
+          "heading": "Ennill a rheolau Commander",
+          "bullets": [
+            "Mae tîm yn ennill os yw ei Ymerawdwr yn ennill ac yn colli ar unwaith os yw ei Ymerawdwr yn colli. Gellir dileu Cadfridog heb ddod â'r gêm i ben.",
+            "Mae chwaraewr yn colli ar 0 bywyd, {{poison}} poison, neu {{commanderDamage}} o ddifrod ymladd gan un commander.",
+            "Bob tro y caiff commander ei chwarae eto o'r command zone, mae'n costio 2 mana yn fwy."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Dau dîm o dri ar 20 o fywyd. Amddiffynnwch eich Ymerawdwr gydag ystod ddylanwad gyfyngedig.",
+        "hostHint": "Byrddau llym o 6 chwaraewr. Dau Ymerawdwr rhwng Cadfridogion — deciau safonol 20-bywyd, dim commanders.",
+        "summary": "Dau dîm o dri. Mae pob Ymerawdwr yn eistedd rhwng dau Gadfridog, ac mae dileu Ymerawdwr yn ennill y gêm.",
+        "sections": {
+          "teams": {
+            "heading": "Timau a throeon",
+            "bullets": [
+              "Dewiswch y ddau dîm ac Ymerawdwr pob tîm, neu gwnewch un neu'r ddau ddewis ar hap.",
+              "Mae pob chwaraewr yn dechrau gyda {{life}} o fywyd ac yn cadw ei law, mana, permanents, poison a thro ei hun.",
+              "Gall cyd-chwaraewyr edrych ar ddwylo ei gilydd a thrafod strategaeth, ond ni allant drin cardiau ei gilydd.",
+              "Dewiswch ar hap pa Ymerawdwr sy'n cymryd y tro cyntaf. Mae'r Ymerawdwr hwnnw'n tynnu cerdyn ar y tro cyntaf."
+            ]
+          },
+          "range": {
+            "heading": "Ystod ac ymladd",
+            "bullets": [
+              "Mae gan Gadfridogion ystod ddylanwad 1. Mae gan Ymerawdwyr ystod ddylanwad 2.",
+              "Gall swynion, galluoedd, effeithiau a gwybodaeth effeithio dim ond ar chwaraewyr a gwrthrychau sydd o fewn ystod eu rheolwr.",
+              "Gall chwaraewr ymosod dim ond ar wrthwynebydd sy'n eistedd yn union wrth ei ymyl, neu ar planeswalkers a battles gwarchodedig y gwrthwynebydd hwnnw.",
+              "Wrth i chwaraewyr adael, mae'r seddi gwag yn peidio â chyfrif, gan ddod â'r chwaraewyr sy'n goroesi o fewn ystod."
+            ]
+          },
+          "deploy": {
+            "heading": "Symud creaduriaid",
+            "bullets": [
+              "Mae gan bob creadur \"Tap: Mae cyd-chwaraewr targed yn ennill rheolaeth dros y creadur hwn. Activate only as a sorcery.\"",
+              "Mae hyn yn caniatáu symud creaduriaid drwy'r tîm wrth i linellau'r frwydr newid."
+            ]
+          },
+          "winning": {
+            "heading": "Ennill",
+            "bullets": [
+              "Mae tîm yn ennill os yw ei Ymerawdwr yn ennill ac yn colli ar unwaith os yw ei Ymerawdwr yn colli. Gellir dileu Cadfridog heb ddod â'r gêm i ben.",
+              "Mae chwaraewr yn colli ar 0 bywyd neu {{poison}} o gownteri poison."
+            ]
+          }
+        }
+      }
+    },
+    "star": {
+      "label": "Seren",
+      "hint": "Pum chwaraewr mewn cylch. Eich cymdogion yw eich cynghreiriaid; dileuwch y ddau chwaraewr gyferbyn â chi.",
+      "hostHint": "Pods Commander llym o 5 chwaraewr. Mae chwaraewyr cyfagos yn gynghreiriaid; mae pob chwaraewr yn ennill drwy oroesi'r ddau wrthwynebydd gyferbyn.",
+      "hostFixedSeats": "Mae gemau Seren bob amser yn eistedd union bum chwaraewr.",
+      "title": "Seren",
+      "summary": "Mae pum chwaraewr yn eistedd mewn cylch. Eich cymdogion yw eich cynghreiriaid ac mae'r ddau chwaraewr gyferbyn â chi yn elynion.",
+      "sections": {
+        "positions": {
+          "heading": "Safleoedd a chynghreiriaid",
+          "bullets": [
+            "Dewiswch y safleoedd cylchol â llaw drwy gyfnewid dau chwaraewr, neu trefnwch bob un o'r pump ar hap.",
+            "Y chwaraewyr yn union i'r chwith ac i'r dde ohonoch yw eich cynghreiriaid.",
+            "Y ddau chwaraewr nad ydynt yn gyfagos ac sydd gyferbyn â chi yw eich gelynion.",
+            "Mae'r safleoedd yn aros yr un fath pan gaiff chwaraewr ei ddileu; nid yw eich cynghreiriaid na'ch gelynion yn newid."
+          ]
+        },
+        "combat": {
+          "heading": "Ymladd a rhyngweithio",
+          "bullets": [
+            "Yn ddiofyn, ni all chwaraewyr ymosod ar eu cynghreiriaid.",
+            "Gall swynion a galluoedd barhau i helpu neu effeithio ar unrhyw chwaraewr oni bai bod y bwrdd yn cytuno ar amrywiad llymach.",
+            "Mae'r troeon yn symud gyda'r cloc. Dewiswch y chwaraewr sy'n dechrau ar hap; mae'r chwaraewr hwnnw'n tynnu cerdyn ar y tro cyntaf."
+          ]
+        },
+        "winning": {
+          "heading": "Ennill",
+          "bullets": [
+            "Mae'r chwaraewr cyntaf sy'n dal yn fyw ac y mae ei ddau elyn wedi'u dileu yn ennill, waeth pwy a'u dileodd.",
+            "Ni all chwaraewr sydd wedi'i ddileu ennill yn ddiweddarach.",
+            "Mae pob chwaraewr yn dechrau gyda {{life}} o fywyd ac yn colli ar 0 bywyd, {{poison}} poison, neu {{commanderDamage}} o ddifrod ymladd gan un commander.",
+            "Bob tro y caiff commander ei chwarae eto o'r command zone, mae'n costio 2 mana yn fwy."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Pum chwaraewr mewn cylch ar 20 o fywyd. Mae cymdogion yn gynghreiriaid; dileuwch y ddau chwaraewr gyferbyn â chi.",
+        "hostHint": "Byrddau llym o 5 chwaraewr. Mae chwaraewyr cyfagos yn gynghreiriaid; mae pob chwaraewr yn ennill drwy oroesi'r ddau wrthwynebydd gyferbyn.",
+        "summary": "Mae pum chwaraewr yn eistedd mewn cylch ar 20 o fywyd. Eich cymdogion yw eich cynghreiriaid ac mae'r ddau chwaraewr gyferbyn â chi yn elynion.",
+        "sections": {
+          "positions": {
+            "heading": "Safleoedd a chynghreiriaid",
+            "bullets": [
+              "Dewiswch y safleoedd cylchol â llaw drwy gyfnewid dau chwaraewr, neu trefnwch bob un o'r pump ar hap.",
+              "Y chwaraewyr yn union i'r chwith ac i'r dde ohonoch yw eich cynghreiriaid.",
+              "Y ddau chwaraewr nad ydynt yn gyfagos ac sydd gyferbyn â chi yw eich gelynion.",
+              "Mae'r safleoedd yn aros yr un fath pan gaiff chwaraewr ei ddileu; nid yw eich cynghreiriaid na'ch gelynion yn newid."
+            ]
+          },
+          "combat": {
+            "heading": "Ymladd a rhyngweithio",
+            "bullets": [
+              "Yn ddiofyn, ni all chwaraewyr ymosod ar eu cynghreiriaid.",
+              "Gall swynion a galluoedd barhau i helpu neu effeithio ar unrhyw chwaraewr oni bai bod y bwrdd yn cytuno ar amrywiad llymach.",
+              "Mae'r troeon yn symud gyda'r cloc. Dewiswch y chwaraewr sy'n dechrau ar hap; mae'r chwaraewr hwnnw'n tynnu cerdyn ar y tro cyntaf."
+            ]
+          },
+          "winning": {
+            "heading": "Ennill",
+            "bullets": [
+              "Mae'r chwaraewr cyntaf sy'n dal yn fyw ac y mae ei ddau elyn wedi'u dileu yn ennill, waeth pwy a'u dileodd.",
+              "Ni all chwaraewr sydd wedi'i ddileu ennill yn ddiweddarach.",
+              "Mae pob chwaraewr yn dechrau gyda {{life}} o fywyd ac yn colli ar 0 bywyd neu {{poison}} o gownteri poison."
+            ]
+          }
+        }
+      }
+    },
+    "assassin": {
+      "label": "Llofrudd",
+      "hint": "Contractau cudd mewn pawb yn erbyn pawb. Dileuwch eich targed, sgoriwch, ac etifeddwch ei darged.",
+      "hostHint": "Contractau cudd ar gyfer 3–8 chwaraewr. Sgoriwch drwy ddileu eich targed, yna etifeddwch ei gontract.",
+      "title": "Llofrudd",
+      "summary": "Pawb yn erbyn pawb gyda chontractau cudd. Sgoriwch dargedau, etifeddwch rai newydd, a gorffenwch gyda'r sgôr uchaf.",
+      "sections": {
+        "contracts": {
+          "heading": "Contractau cudd",
+          "bullets": [
+            "Mae pob chwaraewr yn derbyn un targed yn breifat. Mae'r contractau'n ffurfio cylch, felly nid oes neb yn targedu ei hun ac mae pawb yn cael eu hela unwaith.",
+            "Pasiwch y ddyfais o gwmpas wrth baratoi. Agorwch Gwirio targed o ddewislen yr amserydd pryd bynnag y bydd angen i chi ddarllen eich contract presennol eto.",
+            "Gall chwaraewyr ymosod ac effeithio ar unrhyw un; mae'r contract yn pennu'r sgorio, nid y targedau cyfreithlon."
+          ]
+        },
+        "elimination": {
+          "heading": "Dileu ac etifeddu",
+          "bullets": [
+            "Pan gaiff chwaraewr ei ddileu, cofnodwch pwy roddodd yr ergyd olaf.",
+            "Os ydych chi eich hun yn dileu eich targed penodedig, rydych yn sgorio un marc.",
+            "Mae'r chwaraewr a oedd yn hela'r targed a ddilewyd yn etifeddu contract y targed hwnnw, hyd yn oed os rhoddodd rhywun arall yr ergyd olaf. Mae hyn yn cadw un contract byw i bob chwaraewr sy'n goroesi."
+          ]
+        },
+        "winning": {
+          "heading": "Ennill",
+          "bullets": [
+            "Chwaraewch nes mai dim ond un chwaraewr sydd ar ôl. Mae'r goroeswr olaf yn sgorio un marc ychwanegol.",
+            "Mae'r chwaraewr â'r nifer fwyaf o farciau yn ennill; os oes cyfartal ar y sgôr uchaf, y goroeswr olaf sy'n ennill y gêm gyfartal.",
+            "Mae rheolau Commander yn dal yn berthnasol: mae {{life}} o fywyd cychwynnol, {{poison}} poison, a {{commanderDamage}} o ddifrod ymladd gan un commander yn angheuol.",
+            "Bob tro y caiff commander ei chwarae eto o'r command zone, mae'n costio 2 mana yn fwy."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Contractau cudd ar gyfer 3–8 chwaraewr ar 20 o fywyd. Sgoriwch drwy ddileu eich targed.",
+        "hostHint": "Contractau cudd heb commanders. Mae paru'n llenwi maint y bwrdd a ddewiswyd; gall cylchoedd dros ben fod mor fach â thri.",
+        "summary": "Pawb yn erbyn pawb gyda chontractau cudd ar 20 o fywyd. Sgoriwch dargedau, etifeddwch rai newydd, a gorffenwch gyda'r sgôr uchaf.",
+        "sections": {
+          "contracts": {
+            "heading": "Contractau cudd",
+            "bullets": [
+              "Mae pob chwaraewr yn derbyn un targed yn breifat. Mae'r contractau'n ffurfio cylch, felly nid oes neb yn targedu ei hun ac mae pawb yn cael eu hela unwaith.",
+              "Pasiwch y ddyfais o gwmpas wrth baratoi. Agorwch Gwirio targed o ddewislen yr amserydd pryd bynnag y bydd angen i chi ddarllen eich contract presennol eto.",
+              "Gall chwaraewyr ymosod ac effeithio ar unrhyw un; mae'r contract yn pennu'r sgorio, nid y targedau cyfreithlon."
+            ]
+          },
+          "elimination": {
+            "heading": "Dileu ac etifeddu",
+            "bullets": [
+              "Pan gaiff chwaraewr ei ddileu, cofnodwch pwy roddodd yr ergyd olaf.",
+              "Os ydych chi eich hun yn dileu eich targed penodedig, rydych yn sgorio un marc.",
+              "Mae'r chwaraewr a oedd yn hela'r targed a ddilewyd yn etifeddu contract y targed hwnnw, hyd yn oed os rhoddodd rhywun arall yr ergyd olaf. Mae hyn yn cadw un contract byw i bob chwaraewr sy'n goroesi."
+            ]
+          },
+          "winning": {
+            "heading": "Ennill",
+            "bullets": [
+              "Chwaraewch nes mai dim ond un chwaraewr sydd ar ôl. Mae'r goroeswr olaf yn sgorio un marc ychwanegol.",
+              "Mae'r chwaraewr â'r nifer fwyaf o farciau yn ennill; os oes cyfartal ar y sgôr uchaf, y goroeswr olaf sy'n ennill y gêm gyfartal.",
+              "Mae {{life}} o fywyd cychwynnol a {{poison}} o gownteri poison yn angheuol."
+            ]
+          }
+        }
+      }
+    }
+  },
+  "home": {
+    "taglineBefore": "Eich",
+    "taglineHighlight": "pod",
+    "taglineAfter": " nesaf, wedi'i drefnu.",
+    "startPlaying": "Dechrau chwarae",
+    "ongoingGame": "gêm ar y gweill",
+    "noEventNeeded": "dim digwyddiad angenrheidiol",
+    "startPlayingHint": "Agorwch sgrin frwydr ar y ddyfais hon. Gallwch adael a dychwelyd heb golli gêm anorffenedig.",
+    "alwaysPlayers": "Mae'r modd hwn bob amser yn cynnwys {{count}} chwaraewr.",
+    "resumeGame": "Parhau â'r gêm",
+    "startNewGame": "Dechrau gêm newydd",
+    "startGame": "Dechrau gêm",
+    "commanderSetup": "Commanders",
+    "commanderSetupHint": "Chwiliwch Scryfall am commander pob chwaraewr. Mae angen y ddau commander ar barau Partner.",
+    "chooseAllCommanders": "Dewiswch commander ar gyfer pob chwaraewr.",
+    "advancedMatchConfig": "Ffurfweddiad gêm uwch",
+    "hostEvent": "Trefnu digwyddiad",
+    "new": "newydd",
+    "targetTableSize": "Maint targed y bwrdd",
+    "allowThreePods": "Caniatáu pods 3 chwaraewr",
+    "allowFivePods": "Caniatáu pods 5 chwaraewr",
+    "duelFixedSeats": "Mae digwyddiadau Deuol bob amser yn eistedd union ddau chwaraewr.",
+    "emperorFixedSeats": "Mae gemau Ymerawdwr bob amser yn eistedd union chwe chwaraewr.",
+    "starFixedSeats": "Mae gemau Seren bob amser yn eistedd union bum chwaraewr.",
+    "archenemyFixedSeats": "Mae gemau Archenemy Commander bob amser yn eistedd union bedwar chwaraewr.",
+    "twoHeadedFixedSeats": "Mae gemau Cawr Dau Ben bob amser yn eistedd union bedwar chwaraewr.",
+    "eventName": "Enw'r digwyddiad",
+    "eventNamePlaceholder": "Commander Nos Wener",
+    "tables": "Byrddau",
+    "tablesHint": "Sawl bwrdd ffisegol sydd ar gael ar gyfer y digwyddiad hwn.",
+    "eventLasts": "Hyd y digwyddiad",
+    "eventLastsHint": "Bydd y cod ymuno'n dod i ben ar ôl y nifer hwn o oriau. Defnyddiwch 48 neu 72 ar gyfer penwythnos.",
+    "hostPin": "PIN y trefnydd",
+    "hostPinHint": "4 i 8 digid — yn ailagor desg y trefnydd yn ddiweddarach.",
+    "createEvent": "Creu digwyddiad",
+    "joinWithCode": "Ymuno gyda chod",
+    "playerAside": "chwaraewr",
+    "joinCode": "Cod ymuno",
+    "joinCodePlaceholder": "AB23CD",
+    "join": "Ymuno",
+    "scanQr": "Sganio QR",
+    "staleJoin": "Mae'r digwyddiad hwnnw wedi mynd. Ymunwch gyda chod newydd, neu drefnwch noson newydd."
+  },
+  "host": {
+    "desk": "Desg y trefnydd",
+    "locked": "Wedi cloi",
+    "hostOnly": "trefnydd yn unig",
+    "unlockHostDesk": "Datgloi desg y trefnydd",
+    "playerCount": "{{count}} chwaraewr",
+    "playerCount_plural": "{{count}} chwaraewr",
+    "ready": "{{count}} yn barod",
+    "matched": "{{count}} wedi'u paru",
+    "playing": "{{count}} yn chwarae",
+    "paused": "{{count}} wedi'u seibio",
+    "ends": "yn gorffen {{date}}",
+    "podSizes": "Meintiau pods",
+    "matching": "paru",
+    "allowLeftoverThree": "Caniatáu pods dros ben o 3 chwaraewr",
+    "allowFivePods": "Caniatáu pods o 5 chwaraewr",
+    "treacheryTargetHint": "Maint targed y bwrdd. Gall pods dros ben fod mor fach â phedwar.",
+    "matchingPrefers": "Mae paru'n ffafrio byrddau {{size}} chwaraewr.",
+    "matchingPrefersFour": "Mae paru'n ffafrio byrddau 4 chwaraewr.",
+    "assassinTargetHint": "Maint targed y bwrdd. Gall cylchoedd contract dros ben fod mor fach â thri.",
+    "multiplayerTargetHint": "Maint targed y bwrdd. Gall byrddau dros ben fod mor fach â thri.",
+    "duelMatchmaking": "Mae paru Deuol yn eistedd union ddau chwaraewr ym mhob gêm.",
+    "twoHeadedMatchmaking": "Mae paru Cawr Dau Ben yn eistedd union bedwar chwaraewr ym mhob gêm.",
+    "archenemyMatchmaking": "Mae paru Archenemy Commander yn eistedd union bedwar chwaraewr ym mhob gêm: un Archenemy yn erbyn tîm o dri.",
+    "emperorMatchmaking": "Mae paru Ymerawdwr yn eistedd union chwe chwaraewr ym mhob gêm: dau dîm gydag Ymerawdwr a dau Gadfridog yr un.",
+    "starMatchmaking": "Mae paru Seren yn eistedd union bum chwaraewr mewn trefn gylchol.",
+    "eventLength": "Hyd y digwyddiad",
+    "joinCodeDies": "cod ymuno yn dod i ben",
+    "hoursFromStart": "Oriau ers y dechrau",
+    "hoursFromStartHint": "Newidiwch hwn ar gyfer digwyddiad aml-ddiwrnod. Ar ôl iddo ddod i ben, bydd y QR yn agor y dudalen hafan.",
+    "joinCodeTitle": "Cod ymuno",
+    "share": "rhannu",
+    "noLanAddress": "Heb ddod o hyd i gyfeiriad LAN — dim ond ar y cyfrifiadur hwn y bydd y ddolen hon yn gweithio.",
+    "copyPlayerLink": "Copïo dolen y chwaraewyr",
+    "queue": "Ciw",
+    "nobodyWaiting": "Nid oes neb yn aros.",
+    "flex": "flex {{count}}",
+    "challengePts": "{{count}} pwynt her",
+    "pts": "{{count}} pwynt",
+    "notReady": "Ddim yn barod",
+    "pausedTitle": "Wedi seibio",
+    "seated": "Wedi eistedd",
+    "atTables": "{{count}} wrth fyrddau",
+    "tablesTitle": "Byrddau",
+    "total": "{{count}} i gyd",
+    "noTables": "Crëwyd y digwyddiad hwn heb fyrddau.",
+    "startingGames": "Yn dechrau gemau…",
+    "startAllReady": "Dechrau pob gêm barod ({{count}})",
+    "startGame": "Dechrau gêm",
+    "finishTable": "Gorffen y bwrdd",
+    "cancelPod": "Canslo'r pod",
+    "enable": "Galluogi",
+    "disable": "Analluogi",
+    "trackerUsed": "traciwr",
+    "noTracker": "dim traciwr",
+    "matchNow": "Paru nawr",
+    "fillBots": "Llenwi byrddau gyda bots",
+    "playerJoinPage": "Tudalen ymuno'r chwaraewr"
+  },
+  "join": {
+    "joinEvent": "Ymuno â digwyddiad",
+    "takeSeat": "Cymryd sedd",
+    "displayName": "Enw dangos",
+    "displayNamePlaceholder": "Alex",
+    "joinEventButton": "Ymuno â digwyddiad",
+    "saveDecks": "Cadw deciau",
+    "matchFound": "Gêm wedi'i chanfod",
+    "yourDeck": "Eich dec",
+    "checkMyRole": "Gwirio fy rôl",
+    "playingWithoutTracker": "Yn chwarae heb y traciwr. Gall y trefnydd orffen y bwrdd.",
+    "chooseTracker": "Dewiswch sut bydd y pod hwn yn cofnodi ei gêm.",
+    "useGameTracker": "Defnyddio traciwr gêm",
+    "playWithoutTracker": "Chwarae heb draciwr",
+    "atTableMarked": "Rydych wedi'ch marcio fel eich bod wrth y bwrdd ar y ffôn hwn. Mae'r trefnydd yn dal i ddechrau'r gêm o'r ddesg.",
+    "imAtTable": "Rydw i wrth y bwrdd",
+    "leftEvent": "Rydych wedi gadael y digwyddiad hwn. Sganiwch y QR eto os ydych am ddychwelyd.",
+    "openPool": "Pool agored — unrhyw fwrdd.",
+    "ready": "Parod",
+    "waiting": "yn aros",
+    "holdTight": "Arhoswch — mae bwrdd ar y ffordd.",
+    "flex": "Flex: {{flex}} · Pwyntiau Her: {{points}}",
+    "howWasPod": "Sut oedd eich pod?",
+    "pause": "Seibio",
+    "leave": "Gadael",
+    "pausedMessage": "Rydych wedi'ch seibio. Ailddechreuwch pan allwch eistedd, neu gadewch y digwyddiad.",
+    "imReady": "Rydw i'n barod",
+    "leaveEvent": "Gadael y digwyddiad",
+    "markReady": "Marciwch eich hun yn barod pan allwch eistedd i lawr am gêm.",
+    "matchingShortly": "Bydd paru'n eich anfon at fwrdd yn fuan.",
+    "imTheHost": "Fi yw'r trefnydd",
+    "offlineSaved": "Wedi'i gadw ar y ffôn hwn. Bydd yn cael ei anfon pan fyddwch yn ôl ar-lein.",
+    "stayAtTable": "Arhoswch wrth y bwrdd nes bod y trefnydd yn gorffen y gêm."
+  },
+  "matchConfig": {
+    "title": "Ffurfweddiad gêm",
+    "description": "Yn gosod y pod efelychiadol sydd wedi'i eistedd y tu ôl i /match. Nid oes dim yma'n cyffwrdd â'r gweinydd, ac nid oes dim ohono'n ymddangos ar y sgrin frwydr, felly gellir gwirio'r llwybr hwn ar ffôn fel y mae.",
+    "podSetup": "Gosod pod",
+    "seats": "Seddi",
+    "seatsCount": "{{count}} sedd",
+    "bracket": "Bracket",
+    "header": "Pennawd",
+    "eventNamePlaceholder": "Enw'r digwyddiad",
+    "joinCodePlaceholder": "Cod ymuno",
+    "matchCard": "Cerdyn gêm",
+    "tableLabelPlaceholder": "Label y bwrdd",
+    "assignedDeckPlaceholder": "Dec wedi'i neilltuo",
+    "openBattleScreen": "Agor sgrin frwydr",
+    "resetGameState": "Ailosod cyflwr y gêm",
+    "commander": "Commander",
+    "secondCommander": "Ail commander"
+  },
+  "app": {
+    "notFound": "Heb ddod o hyd iddo."
+  },
+  "wake": {
+    "title": "Yn deffro'r byrddau",
+    "message": "Mae'r gweinydd am ddim wedi mynd i gysgu. Cadwch y dudalen hon ar agor — fel arfer mae'n cymryd llai na munud."
+  },
+  "scanner": {
+    "title": "Sganio QR",
+    "ariaLabel": "Sganio cod QR ymuno",
+    "hint": "Anelwch at god desg y trefnydd.",
+    "closeScanner": "Cau'r sganiwr",
+    "openingCamera": "Yn agor y camera…",
+    "noCamera": "Ni all y porwr hwn agor y camera. Teipiwch y cod ymuno yn lle hynny.",
+    "permissionDenied": "Gwrthodwyd caniatâd i'r camera. Teipiwch y cod ymuno, neu ganiatáu'r camera a rhoi cynnig arall arni."
+  },
+  "theme": {
+    "switchToLight": "Newid i'r modd golau",
+    "switchToDark": "Newid i'r modd tywyll"
+  },
+  "hostMetrics": {
+    "title": "Crynodeb o'r digwyddiad",
+    "aside": "peilot",
+    "players": "Chwaraewyr",
+    "games": "Gemau",
+    "gamesPerPlayer": "Gemau / chwaraewr",
+    "waitAvg": "Aros cyfartalog",
+    "waitP95": "Aros p95",
+    "waitMax": "Aros mwyaf",
+    "rematchPairs": "Parau ailgêm",
+    "flexEarned": "Flex wedi'i ennill",
+    "flexSeats": "Seddi Flex",
+    "durationAvg": "Hyd cyfartalog",
+    "tablesOccupied": "Byrddau wedi'u meddiannu",
+    "trackerUsed": "Traciwr wedi'i ddefnyddio",
+    "trackerUsedValue": "{{used}} wedi defnyddio · {{skipped}} wedi hepgor",
+    "challenges": "Heriau",
+    "challengePts": "Pwyntiau her",
+    "podRating": "Sgôr pod",
+    "podSizes": "Meintiau pods:",
+    "pools": "Pools:"
+  },
+  "deckEditor": {
+    "title": "Deciau Commander",
+    "deckNamePlaceholder": "Enw'r dec (dewisol)",
+    "commander": "Commander",
+    "secondCommander": "Ail commander",
+    "markPreferred": "Marcio fel dewisol",
+    "addAcceptedDeck": "Ychwanegu dec derbyniol",
+    "hint": "Dim ond pods o'r un pool. Mae deciau ychwanegol yn caniatáu i baru eich symud i bracket arall."
+  },
+  "commanderPicker": {
+    "searchCommander": "Chwilio commander",
+    "searchPartner": "Commander sy'n gallu paru gyda {{name}}",
+    "removeCommander": "Tynnu {{name}}",
+    "artworkFor": "Gwaith celf ar gyfer",
+    "loadingArtwork": "Yn llwytho gwaith celf…"
+  },
+  "challengePack": {
+    "title": "Pecyn heriau",
+    "description": "Dim ond primitives wedi'u diffinio ymlaen llaw. Mae cadw'n ysgrifennu fersiwn newydd ac nid yw byth yn newid pecyn sydd eisoes wedi'i ddefnyddio gan y digwyddiad hwn.",
+    "copyOfficial": "Copïo'r swyddogol",
+    "startBlank": "Dechrau'n wag",
+    "saveNewVersion": "Cadw fersiwn newydd",
+    "editHint": "Copïwch y pecyn swyddogol neu dechreuwch yn wag cyn golygu.",
+    "packName": "Enw'r pecyn",
+    "descriptionLabel": "Disgrifiad",
+    "addChallenge": "Ychwanegu her",
+    "id": "ID",
+    "name": "Enw",
+    "category": "Categori",
+    "points": "Pwyntiau",
+    "primitive": "Primitive",
+    "threshold": "Trothwy",
+    "confirmationQuestion": "Cwestiwn cadarnhau",
+    "defaultConfirmation": "A ddigwyddodd hyn wrth y bwrdd?",
+    "newClaimName": "Hawliad newydd",
+    "newClaimDescription": "Dyfarnwch hwn wrth y bwrdd."
+  },
+  "treacheryRole": {
+    "treachery": "Brad",
+    "receivedRole": "Rydych wedi derbyn rôl",
+    "handDeviceTo": "Rhowch y ddyfais i {{name}}",
+    "lookAwayIdentity": "Dylai pawb arall edrych i ffwrdd cyn datgelu'r hunaniaeth.",
+    "lookAwayScreen": "Gwnewch yn siŵr na all neb arall weld eich sgrin cyn ei datgelu.",
+    "reveal": "Datgelu",
+    "yourRole": "Eich rôl",
+    "identityAlt": "{{name}}, hunaniaeth {{role}}",
+    "illustratedBy": "Darluniwyd gan {{artist}}",
+    "yourObjective": "Eich nod",
+    "unveiledToTable": "Wedi'i ddatgelu i'r bwrdd",
+    "unveilWarning": "Bydd pawb wrth eich bwrdd yn gweld yr hunaniaeth hon. Rhaid datrys ei gallu yn y gêm.",
+    "confirmUnveil": "Cadarnhau datgelu",
+    "unveilToTable": "Datgelu i'r bwrdd",
+    "hideAndPass": "Cuddio a phasio",
+    "hideIdentity": "Cuddio fy hunaniaeth"
+  },
+  "modeRulesSheet": {
+    "closeRules": "Cau'r rheolau",
+    "backToGame": "Yn ôl i'r gêm"
+  },
+  "assassinTargets": {
+    "title": "Contractau cudd",
+    "chooseOwnName": "Dewiswch eich enw eich hun yn unig.",
+    "closeContracts": "Cau contractau",
+    "handDeviceTo": "Rhowch y ddyfais i {{name}}",
+    "lookAway": "Dylai pawb arall edrych i ffwrdd cyn datgelu'r contract.",
+    "revealTarget": "Datgelu fy nharged",
+    "yourTarget": "Eich targed",
+    "noActiveTarget": "Dim targed gweithredol",
+    "marksScored": "Marciau wedi'u sgorio: {{count}}",
+    "hideAndPass": "Cuddio a phasio",
+    "allContractsChecked": "Pob contract wedi'i wirio"
+  },
+  "scheme": {
+    "ongoingScheme": "Ongoing scheme",
+    "scheme": "Scheme",
+    "pastScheme": "Scheme blaenorol",
+    "abandon": "Abandon {{name}}",
+    "ongoingSchemes": "Ongoing schemes",
+    "graveyard": "Mynwent · {{count}}",
+    "nextScheme": "Next scheme",
+    "remainingInDeck": "{{count}} ar ôl yn y dec",
+    "scryfallCredit": "Delwedd y cerdyn drwy Scryfall. Magic: The Gathering yw © Wizards of the Coast."
+  },
+  "dungeon": {
+    "takeInitiativeTitle": "Cymryd yr initiative?",
+    "takeInitiativeEnter": "Mae hyn hefyd yn venture i Undercity. Cymerwch hi dim ond pan fydd y bwrdd newydd roi'r initiative i'r sedd hon.",
+    "takeInitiativeWait": "Gorffennwch neu gadewch y dungeon presennol cyn y gall Undercity agor. Cymerwch yr initiative dim ond pan fydd y bwrdd newydd ei rhoi i'r sedd hon.",
+    "takeInitiativeAndEnter": "Cymryd yr initiative a mynd i Undercity",
+    "takeInitiative": "Cymryd yr initiative",
+    "alreadyHoldInitiative": "Mae gennych yr initiative eisoes",
+    "takeAndEnterUndercity": "Cymryd yr initiative a mynd i Undercity",
+    "completed": "{{name}} (wedi'i gwblhau)",
+    "ventureInto": "Venture i {{name}}",
+    "done": "Wedi gorffen",
+    "ventureTo": "Venture i {{room}}: {{effect}}",
+    "releaseInitiative": "Rhyddhau'r initiative",
+    "undoRoom": "Dadwneud yr ystafell",
+    "closeDungeon": "Cau'r dungeon"
+  },
+  "treacheryRolesSheet": {
+    "title": "Hunaniaethau cudd",
+    "chooseOwnName": "Dewiswch eich enw eich hun yn unig.",
+    "closeIdentities": "Cau hunaniaethau",
+    "allIdentitiesChecked": "Pob hunaniaeth wedi'i gwirio"
+  },
+  "tracker": {
+    "gameRules": "Rheolau'r gêm",
+    "loadingRoles": "Yn llwytho rolau…",
+    "start": "Dechrau",
+    "readRules": "Darllen rheolau",
+    "readyToBegin": "Yn barod i ddechrau",
+    "readyToBeginHint": "Dechreuwch y gêm pan fydd pawb wedi eistedd, neu darllenwch y rheolau yn gyntaf.",
+    "dealContracts": "Rhannu contractau",
+    "dealContractsTitle": "Rhannu contractau cudd",
+    "dealContractsHint": "Mae pob chwaraewr yn derbyn un targed preifat. Bydd y ddyfais yn cael ei phasio o gwmpas fel y gellir gwirio pob contract yn gyfrinachol.",
+    "dealIdentities": "Rhannu hunaniaethau",
+    "dealIdentitiesTitle": "Rhannu hunaniaethau cudd",
+    "dealIdentitiesHint": "Mae pob chwaraewr yn derbyn un hunaniaeth gudd. Bydd y ddyfais yn cael ei phasio o gwmpas fel y gall pob un gael ei ddarllen yn gyfrinachol.",
+    "chooseStarPositions": "Dewis safleoedd Seren",
+    "starPositionsHint": "Mae chwaraewyr sy'n eistedd wrth ymyl ei gilydd yn gynghreiriaid. Tapiwch ddau chwaraewr i gyfnewid eu safleoedd, neu trefnwch y cylch cyfan ar hap.",
+    "randomPositions": "Safleoedd ar hap",
+    "confirmPositions": "Cadarnhau safleoedd",
+    "adjacentPlayersAlly": "Chwaraewyr\ncyfagos yn gynghreiriaid",
+    "buildEmperorTeams": "Adeiladu timau'r Ymerawdwr",
+    "chooseTeamA": "Dewiswch dri chwaraewr ar gyfer Tîm A.",
+    "randomTeams": "Timau ar hap",
+    "resetTeams": "Ailosod timau",
+    "teamEmperor": "Ymerawdwr Tîm {{team}}",
+    "randomEmperors": "Ymerawdwyr ar hap",
+    "confirmTeams": "Cadarnhau timau",
+    "chooseArchenemy": "Dewis yr Archenemy",
+    "chooseArchenemyHint": "Mae'r Archenemy yn wynebu'r tri chwaraewr arall. Mae'r ddwy ochr yn rhannu 60 o fywyd. Mae'r Archenemy yn mynd gyntaf, yn tynnu cerdyn ar y tro hwnnw, ac yn rhoi scheme ar waith yn ystod pob first main phase.",
+    "confirmArchenemy": "Cadarnhau'r Archenemy",
+    "chooseAllies": "Dewis y cynghreiriaid",
+    "chooseAlliesHint": "Dewiswch ddau chwaraewr ar gyfer y tîm cyntaf. Mae'r ddau chwaraewr arall yn dod yn dîm gwrthwynebol. Mae timau'n rhannu 60 o fywyd a throeon; mae pob rheolaeth arall gan chwaraewyr yn aros ar wahân.",
+    "emperor": "Ymerawdwr",
+    "emperorRange": "Ymerawdwr · ystod 2",
+    "leader": "Arweinydd",
+    "general": "Cadfridog",
+    "generalRange": "Cadfridog · ystod 1",
+    "marks": "{{count}} marc",
+    "winner": "Enillydd",
+    "turnPhone": "Trowch eich ffôn ar gyfer y bwrdd llawn",
+    "matchMenu": "Dewislen gêm",
+    "matchMenuElapsed": "Dewislen gêm. {{clock}} wedi mynd heibio",
+    "matchMenuPaused": ", wedi seibio",
+    "matchMenuDayNight": ", mae'n {{phase}}",
+    "day": "dydd",
+    "night": "nos",
+    "closeMatchMenu": "Cau dewislen y gêm",
+    "match": "Gêm",
+    "firstScheme": "Scheme cyntaf",
+    "nextScheme": "Scheme nesaf",
+    "resume": "Parhau",
+    "pause": "Seibio",
+    "undo": "Dadwneud",
+    "challenges": "Heriau",
+    "checkTarget": "Gwirio targed",
+    "checkMyRole": "Gwirio fy rôl",
+    "dayButton": "Dydd",
+    "nightButton": "Nos",
+    "playerLost": "Chwaraewr wedi colli",
+    "gameWonBy": "Gêm wedi'i hennill gan",
+    "won": "{{name}} enillodd",
+    "doneRequeue": "Wedi gorffen ac yn ôl i'r ciw",
+    "savingChallenges": "Yn cadw heriau…",
+    "quitToHome": "Gadael i'r hafan",
+    "quitHint": "Cedwir y gêm — gallwch ei hailagor o'r sgrin hafan.",
+    "secretContracts": "Contractau cudd",
+    "secretIdentities": "Hunaniaethau cudd",
+    "whoEliminated": "Pwy ddileodd {{name}}?",
+    "whoEliminatedHint": "Dim ond os mai hwn oedd eu targed penodedig y mae chwaraewr yn sgorio. Mae'r gadwyn gontractau'n symud ymlaen beth bynnag.",
+    "noPlayerUnknown": "Dim chwaraewr / anhysbys",
+    "revealedIdentity": "Hunaniaeth Treachery wedi'i datgelu",
+    "closeRevealedIdentity": "Cau'r hunaniaeth a ddatgelwyd",
+    "commanderChallenges": "Heriau Commander",
+    "challengeCompleted": "{{name}} wedi'i gwblhau",
+    "challengeFallback": "Her",
+    "matchResult": "Canlyniad y gêm",
+    "wins": "{{name}} yn ennill",
+    "reviewBoard": "Adolygu'r bwrdd",
+    "yes": "Ie",
+    "no": "Na",
+    "yesTheyLost": "Ie, maent wedi colli",
+    "noStillIn": "Na, yn dal yn y gêm",
+    "openCounters": "Agor counters ar gyfer {{name}}",
+    "commanderDamageOn": "Commander damage ar {{name}}",
+    "countersFor": "Counters ar gyfer {{name}}",
+    "countersTitle": "Counters ar gyfer {{name}}",
+    "closeCounters": "Cau counters",
+    "closeChallenges": "Cau heriau",
+    "sharedCommanderDamage": "Commander damage a rennir",
+    "closeCommanderDamage": "Cau commander damage",
+    "highestCommanderDamage": "Commander damage uchaf ar {{name}}: {{value}} gan {{commander}}",
+    "noCommanderDamage": "Dim commander damage ar {{name}}",
+    "removeCommanderDamage": "Tynnu commander damage gan {{name}} {{owner}}",
+    "addCommanderDamage": "Ychwanegu commander damage gan {{name}} {{owner}}",
+    "isMonarch": "{{name}} yw'r monarch",
+    "makeMonarch": "Gwneud {{name}} yn monarch",
+    "enduringStory": "{{name}} {{has}} enduring story",
+    "cityBlessing": "{{name}} {{has}} city's blessing",
+    "has": "mae ganddo",
+    "doesNotHave": "nid oes ganddo",
+    "didLose": "A gollodd {{name}} y gêm?",
+    "thisTeam": "Y tîm hwn",
+    "didTheyLose": "A gollon nhw?",
+    "poisonPrompt": "Mae gan {{name}} {{count}} o gownteri poison. A gollon nhw?",
+    "sharedPoisonPrompt": "Mae gan {{subject}} {{count}} o gownteri poison a rennir. {{lose}}",
+    "hitPrompt": "Mae gan {{name}} {{count}} o gardiau exiled gyda hit counters. A gollon nhw?",
+    "commanderPrompt": "Mae {{name}} wedi derbyn {{damage}} commander damage gan {{from}}. A gollon nhw?",
+    "sharedCommanderPrompt": "Mae {{subject}} wedi derbyn {{damage}} commander damage a rennir gan {{from}}. {{lose}}",
+    "lifePrompt": "Mae {{name}} ar {{life}} o fywyd. A gollon nhw?",
+    "sharedLifePrompt": "Mae {{subject}} ar {{life}} o fywyd a rennir. {{lose}}",
+    "anotherCommander": "commander arall",
+    "addLife": "Ychwanegu 1 bywyd. Pwyswch yn hir am swm mwy.",
+    "removeLife": "Tynnu 1 bywyd. Pwyswch yn hir am swm mwy.",
+    "addLifeFor": "Ychwanegu bywyd i {{name}}",
+    "removeLifeFor": "Tynnu bywyd oddi wrth {{name}}",
+    "addLifeLabel": "Ychwanegu bywyd · {{name}}",
+    "removeLifeLabel": "Tynnu bywyd · {{name}}",
+    "deleteDigit": "Dileu digid",
+    "add": "Ychwanegu",
+    "removeVerb": "Tynnu",
+    "lower": "Gostwng {{label}}",
+    "raise": "Codi {{label}}",
+    "seatColour": "Lliw sedd {{name}}",
+    "dungeonFor": "Dungeon ar gyfer {{name}}",
+    "dungeonInitiative": "Dungeon ac initiative ar gyfer {{name}}. {{title}}",
+    "dungeonInitiativeActive": "Mae gan {{name}} yr initiative · {{filled}} o {{total}} dungeon unigryw",
+    "dungeonInitiativeCompleted": "Mae {{name}} wedi cwblhau {{filled}} o {{total}} dungeon unigryw",
+    "counterOn": "{{label}} ar {{name}}: {{value}}",
+    "counterFor": "{{label}} ar gyfer {{name}}",
+    "claimFor": "Hawlio ar gyfer {{name}}",
+    "challengesSubtitle": "Yr un heriau i bob chwaraewr · nid yw pwyntiau byth yn effeithio ar baru",
+    "counters": {
+      "poison": "Poison",
+      "tax": "Commander tax",
+      "acorn": "Mes",
+      "energy": "Egni",
+      "experience": "Profiad",
+      "hit": "Etrata hits",
+      "rad": "Ymbelydredd",
+      "ring": "Temtasiwn y Ring",
+      "speed": "Cyflymder",
+      "ticket": "Tocynnau"
+    }
+  }
+}

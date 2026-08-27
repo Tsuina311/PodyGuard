@@ -79,7 +79,34 @@
     "it": "Italiano",
     "pt": "Português",
     "nl": "Nederlands",
-    "pl": "Polski"
+    "pl": "Polski",
+    "sv": "Svenska",
+    "da": "Dansk",
+    "no": "Norsk",
+    "fi": "Suomi",
+    "cs": "Čeština",
+    "sk": "Slovenčina",
+    "hu": "Magyar",
+    "ro": "Română",
+    "el": "Ελληνικά",
+    "hr": "Hrvatski",
+    "sl": "Slovenščina",
+    "bg": "Български",
+    "uk": "Українська",
+    "lt": "Lietuvių",
+    "lv": "Latviešu",
+    "et": "Eesti",
+    "is": "Íslenska",
+    "ga": "Gaeilge",
+    "mt": "Malti",
+    "sr": "Srpski",
+    "sq": "Shqip",
+    "bs": "Bosanski",
+    "mk": "Македонски",
+    "be": "Беларуская",
+    "ca": "Català",
+    "eu": "Euskara",
+    "cy": "Cymraeg"
   },
   "families": {
     "normal": "Normal",
@@ -152,8 +179,8 @@
     },
     "commander": {
       "label": "Classic",
-      "hint": "Free-for-all. Everyone starts on 40 life.",
-      "hostHint": "Free-for-all Commander. Matching prefers four; leftover pods can be three or five when allowed.",
+      "hint": "Free-for-all for three to six players. Everyone starts on 40 life.",
+      "hostHint": "Classic Commander needs at least three players. Matching prefers four; leftover pods can be three or five when allowed.",
       "title": "Classic",
       "summary": "Free-for-all multiplayer. Each player fights for themselves.",
       "sections": {
@@ -176,6 +203,73 @@
         "commanders": {
           "heading": "Commanders",
           "bullets": [
+            "Commanders begin in the command zone and may be recast from there.",
+            "Each time a commander is recast from the command zone, it costs 2 more mana."
+          ]
+        }
+      }
+    },
+    "duel-commander": {
+      "label": "Duel Commander",
+      "hint": "1v1 at 20 life. No commander damage; partners still register both commanders.",
+      "hostHint": "Strict two-player Duel Commander tables.",
+      "title": "Duel Commander",
+      "summary": "Competitive 1v1 Commander. Faster life totals and no commander-damage win condition.",
+      "sections": {
+        "life": {
+          "heading": "Life and loss",
+          "bullets": [
+            "Each player starts at {{life}} life.",
+            "A player loses at 0 life.",
+            "A player loses at {{poison}} poison counters.",
+            "There is no commander-damage win condition."
+          ]
+        },
+        "turns": {
+          "heading": "Turns",
+          "bullets": [
+            "The starting player is drawn at random.",
+            "The starting player draws on their first turn."
+          ]
+        },
+        "commanders": {
+          "heading": "Commanders",
+          "bullets": [
+            "Commanders begin in the command zone and may be recast from there.",
+            "Each time a commander is recast from the command zone, it costs 2 more mana.",
+            "If you have two commanders, only one may be cast from the command zone each game. The other can still be cast from your hand or elsewhere."
+          ]
+        }
+      }
+    },
+    "brawl": {
+      "label": "Brawl",
+      "hint": "1v1 at 25 life. Legendary creatures, planeswalkers, vehicles, and spacecraft can lead.",
+      "hostHint": "Strict two-player Brawl tables using the Arena card pool.",
+      "title": "Brawl",
+      "summary": "Arena-style 1v1 Commander. Singleton decks with a wider set of legal leaders and no commander damage.",
+      "sections": {
+        "life": {
+          "heading": "Life and loss",
+          "bullets": [
+            "Each player starts at {{life}} life.",
+            "A player loses at 0 life.",
+            "A player loses at {{poison}} poison counters.",
+            "There is no commander-damage win condition."
+          ]
+        },
+        "turns": {
+          "heading": "Turns",
+          "bullets": [
+            "The starting player is drawn at random.",
+            "The starting player draws on their first turn."
+          ]
+        },
+        "commanders": {
+          "heading": "Commanders",
+          "bullets": [
+            "Your commander can be a legendary creature, planeswalker, vehicle, or spacecraft with a power and toughness.",
+            "Deck cards must stay within your commander's color identity.",
             "Commanders begin in the command zone and may be recast from there.",
             "Each time a commander is recast from the command zone, it costs 2 more mana."
           ]
@@ -618,6 +712,9 @@
     "resumeGame": "Resume game",
     "startNewGame": "Start a new game",
     "startGame": "Start a game",
+    "commanderSetup": "Commanders",
+    "commanderSetupHint": "Search Scryfall for each player's commander. Partner pairs need both commanders.",
+    "chooseAllCommanders": "Choose a commander for every player.",
     "advancedMatchConfig": "Advanced match config",
     "hostEvent": "Host event",
     "new": "new",
@@ -625,6 +722,8 @@
     "allowThreePods": "Allow 3-player pods",
     "allowFivePods": "Allow 5-player pods",
     "duelFixedSeats": "Duel events always seat exactly two players.",
+    "duelCommanderFixedSeats": "Duel Commander events always seat exactly two players.",
+    "brawlFixedSeats": "Brawl events always seat exactly two players.",
     "emperorFixedSeats": "Emperor games always seat exactly six players.",
     "starFixedSeats": "Star games always seat exactly five players.",
     "archenemyFixedSeats": "Archenemy Commander games always seat exactly four players.",
@@ -668,6 +767,8 @@
     "assassinTargetHint": "Target table size. Leftover contract circles can be as small as three.",
     "multiplayerTargetHint": "Target table size. Leftover tables can be as small as three.",
     "duelMatchmaking": "Duel matchmaking seats exactly two players per game.",
+    "duelCommanderMatchmaking": "Duel Commander matchmaking seats exactly two players per game.",
+    "brawlMatchmaking": "Brawl matchmaking seats exactly two players per game.",
     "twoHeadedMatchmaking": "Two-Headed Giant matchmaking seats exactly four players per game.",
     "archenemyMatchmaking": "Archenemy Commander matchmaking seats exactly four players per game: one Archenemy against a team of three.",
     "emperorMatchmaking": "Emperor matchmaking seats exactly six players per game: two teams with an Emperor and two Generals each.",
@@ -740,8 +841,9 @@
     "stayAtTable": "Stay at the table until the host calls the game."
   },
   "matchConfig": {
-    "title": "Match config",
-    "description": "Sets up the fake seated pod behind /match. Nothing here touches the server, and none of it appears on the battle screen, so that route can be checked on a phone as-is.",
+    "title": "Game setup",
+    "description": "Name players and pick commanders before the life tracker starts.",
+    "changeMode": "Change mode or seats",
     "podSetup": "Pod setup",
     "seats": "Seats",
     "seatsCount": "{{count}} seats",
@@ -752,8 +854,11 @@
     "matchCard": "Match card",
     "tableLabelPlaceholder": "Table label",
     "assignedDeckPlaceholder": "Assigned deck",
+    "startGame": "Start game",
     "openBattleScreen": "Open battle screen",
     "resetGameState": "Reset game state",
+    "sandboxTitle": "Sandbox options",
+    "sandboxHint": "Fake event chrome for testing /match without hosting. Nothing here appears on the life tracker.",
     "commander": "Commander",
     "secondCommander": "Second commander"
   },
@@ -1044,6 +1149,28 @@
       "ring": "Ring temptation",
       "speed": "Speed",
       "ticket": "Tickets"
+    }
+  },
+  "feedback": {
+    "open": "Send feedback",
+    "title": "Send feedback",
+    "type": "Feedback type",
+    "types": {
+      "bug": "Bug",
+      "confusing": "Something is confusing",
+      "idea": "Idea",
+      "other": "Other"
+    },
+    "description": "What happened?",
+    "descriptionPlaceholder": "Describe what you noticed and what you were doing.",
+    "expected": "Expected behaviour (optional)",
+    "expectedPlaceholder": "What did you expect to happen?",
+    "privacy": "App version, page, device/browser, viewport, participant status, and game mode may be attached. Authentication tokens, names, and screenshots are not included.",
+    "submit": "Send feedback",
+    "thanks": "Thank you",
+    "received": "Your feedback was received.",
+    "errors": {
+      "submit": "Could not send feedback. Please try again."
     }
   }
 }

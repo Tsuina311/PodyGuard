@@ -1,6 +1,10 @@
 import type { TFunction } from 'i18next';
 import type { GameMode, RulesFormat } from '@podyguard/shared';
-import { resolveRulesFormat } from '@podyguard/shared';
+import {
+  resolveRulesFormat,
+  BRAWL_STARTING_LIFE,
+  DUEL_COMMANDER_STARTING_LIFE,
+} from '@podyguard/shared';
 import {
   ARCHENEMY_STARTING_LIFE,
   COMMANDER_DAMAGE_LIMIT,
@@ -27,6 +31,8 @@ const MODE_SECTION_KEYS: Record<
   duel: { commander: ['life', 'turns'] },
   multiplayer: { commander: ['life', 'turns'] },
   commander: { commander: ['life', 'turns', 'commanders'] },
+  'duel-commander': { commander: ['life', 'turns', 'commanders'] },
+  brawl: { commander: ['life', 'turns', 'commanders'] },
   treachery: {
     commander: ['commander', 'identities'],
     normal: ['life', 'identities'],
@@ -69,6 +75,10 @@ function interpolationForMode(gameMode: GameMode, format: RulesFormat) {
     case 'duel':
     case 'multiplayer':
       return { ...shared, life: NORMAL_STARTING_LIFE };
+    case 'duel-commander':
+      return { ...shared, life: DUEL_COMMANDER_STARTING_LIFE, commanderDamage: 0 };
+    case 'brawl':
+      return { ...shared, life: BRAWL_STARTING_LIFE, commanderDamage: 0 };
     case 'archenemy-commander':
       return {
         ...shared,

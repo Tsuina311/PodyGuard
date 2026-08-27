@@ -50,6 +50,12 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   define: {
     __LAN_HOST__: JSON.stringify(lanHost()),
+    __APP_VERSION__: JSON.stringify(
+      process.env.VITE_APP_VERSION?.trim() ||
+        process.env.GITHUB_SHA?.slice(0, 7) ||
+        process.env.RENDER_GIT_COMMIT?.slice(0, 7) ||
+        'dev',
+    ),
   },
   server: {
     host: true,

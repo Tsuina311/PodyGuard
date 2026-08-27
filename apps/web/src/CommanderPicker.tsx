@@ -1,6 +1,7 @@
 import { useEffect, useId, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import type { CommanderSearchProfile } from '@podyguard/shared';
 import { ApiError, listCommanderArtwork, searchCommanders } from './api';
 import type {
   CommanderArtwork,
@@ -14,6 +15,7 @@ type Props = {
   value: CommanderSelection | null;
   partnerFor?: CommanderSelection;
   disabled?: boolean;
+  searchProfile?: CommanderSearchProfile;
   onChange: (commander: CommanderSelection | null) => void;
 };
 
@@ -22,6 +24,7 @@ export function CommanderPicker({
   value,
   partnerFor,
   disabled,
+  searchProfile = 'commander',
   onChange,
 }: Props) {
   const { t } = useTranslation();
@@ -49,7 +52,7 @@ export function CommanderPicker({
     const timer = window.setTimeout(() => {
       setSearching(true);
       setError(null);
-      void searchCommanders(trimmed, partnerFor?.cardId)
+      void searchCommanders(trimmed, partnerFor?.cardId, searchProfile)
         .then(({ commanders }) => {
           if (!cancelled) {
             setResults(commanders);
@@ -75,7 +78,7 @@ export function CommanderPicker({
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [partnerFor?.cardId, query, t, value?.name]);
+  }, [partnerFor?.cardId, query, searchProfile, t, value?.name]);
 
   async function chooseCard(card: CommanderCandidate) {
     setResults([]);

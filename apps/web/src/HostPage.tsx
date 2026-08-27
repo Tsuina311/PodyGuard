@@ -43,7 +43,6 @@ import { Button } from './ui/Button';
 import { Field } from './ui/Field';
 import { JoinQr } from './ui/JoinQr';
 import { Panel } from './ui/Panel';
-import { LanguageSwitcherCorner } from './ui/LanguageSwitcher';
 import { ThemeToggleCorner } from './ui/ThemeToggle';
 import { WaitTime } from './ui/WaitTime';
 import { useEventLive } from './useEventLive';
@@ -351,7 +350,6 @@ export function HostPage() {
   if (!event) {
     return (
       <>
-        <LanguageSwitcherCorner />
         <ThemeToggleCorner />
         <header>
           <Brand className="mb-6" />
@@ -391,8 +389,9 @@ export function HostPage() {
 
   return (
     <>
-      <LanguageSwitcherCorner />
-      <ThemeToggleCorner />
+      <ThemeToggleCorner
+        feedbackContext={{ gameMode: event.gameMode }}
+      />
       <header>
         <Brand className="mb-6" />
         <h1 className="font-display mb-2 text-3xl font-bold tracking-tight">
@@ -525,8 +524,16 @@ export function HostPage() {
               ))}
             </div>
           </>
-        ) : event.gameMode === 'duel' ? (
-          <p className="text-muted text-sm">{t('host.duelMatchmaking')}</p>
+        ) : event.gameMode === 'duel' ||
+          event.gameMode === 'duel-commander' ||
+          event.gameMode === 'brawl' ? (
+          <p className="text-muted text-sm">
+            {event.gameMode === 'duel'
+              ? t('host.duelMatchmaking')
+              : event.gameMode === 'duel-commander'
+                ? t('host.duelCommanderMatchmaking')
+                : t('host.brawlMatchmaking')}
+          </p>
         ) : event.gameMode === 'two-headed-giant' ? (
           <p className="text-muted text-sm">{t('host.twoHeadedMatchmaking')}</p>
         ) : event.gameMode === 'archenemy-commander' ? (

@@ -4,6 +4,8 @@ export const GAME_MODES = [
   'duel',
   'multiplayer',
   'commander',
+  'duel-commander',
+  'brawl',
   'treachery',
   'two-headed-giant',
   'archenemy-commander',
@@ -59,6 +61,55 @@ export function usesCommanderRules(
   return resolveRulesFormat(mode, format) === 'commander';
 }
 
+export type CommanderSearchProfile = 'commander' | 'duel-commander' | 'brawl';
+
+/** Scryfall legality filter for commander pickers in each mode. */
+export function commanderSearchProfile(mode: GameMode): CommanderSearchProfile {
+  if (mode === 'duel-commander') {
+    return 'duel-commander';
+  }
+  if (mode === 'brawl') {
+    return 'brawl';
+  }
+  return 'commander';
+}
+
+/** Classic Commander and similar formats track 21 commander damage; DC and Brawl do not. */
+export function usesCommanderDamage(
+  mode: GameMode,
+  format?: RulesFormat | null,
+): boolean {
+  if (!usesCommanderRules(mode, format)) {
+    return false;
+  }
+  return mode !== 'duel-commander' && mode !== 'brawl';
+}
+
+export const DUEL_COMMANDER_STARTING_LIFE = 20;
+export const BRAWL_STARTING_LIFE = 25;
+
+export const CLASSIC_COMMANDER_MIN_PLAYERS = 3;
+
+export function startingLifeForGameMode(
+  mode: GameMode,
+  format?: RulesFormat | null,
+): number | null {
+  const resolved = resolveRulesFormat(mode, format);
+  if (resolved === 'normal') {
+    return 20;
+  }
+  if (mode === 'duel' || mode === 'multiplayer') {
+    return 20;
+  }
+  if (mode === 'duel-commander') {
+    return DUEL_COMMANDER_STARTING_LIFE;
+  }
+  if (mode === 'brawl') {
+    return BRAWL_STARTING_LIFE;
+  }
+  return 40;
+}
+
 export const MODES_BY_FAMILY: Record<
   GameModeFamily,
   readonly GameMode[]
@@ -75,6 +126,8 @@ export const MODES_BY_FAMILY: Record<
   ],
   commander: [
     'commander',
+    'duel-commander',
+    'brawl',
     'treachery',
     'two-headed-giant',
     'archenemy-commander',

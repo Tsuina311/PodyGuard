@@ -1,0 +1,1079 @@
+{
+  "common": {
+    "home": "Hjem",
+    "cancel": "Avbryt",
+    "close": "Lukk",
+    "save": "Lagre",
+    "loading": "Laster inn …",
+    "players": "Spillere",
+    "game": "Spill",
+    "language": "Språk",
+    "yes": "Ja",
+    "no": "Nei",
+    "reset": "Tilbakestill",
+    "random": "Tilfeldig",
+    "remove": "Fjern",
+    "empty": "Tom",
+    "bot": "bot",
+    "dev": "dev",
+    "official": "offisiell",
+    "open": "Åpne",
+    "preferred": "foretrukket",
+    "player": "Spiller {{number}}",
+    "versus": "versus",
+    "teamA": "Team A",
+    "teamB": "Lag B",
+    "working": "Jobber …",
+    "creating": "Oppretter …",
+    "checking": "Sjekker …",
+    "joining": "Blir med …",
+    "updating": "Oppdaterer …",
+    "submitting": "Sender inn …",
+    "saving": "Lagrer …",
+    "searching": "Søker …",
+    "unveiling": "Avduker …",
+    "copied": "Kopiert",
+    "noneYet": "ingen ennå",
+    "dash": "—",
+    "errors": {
+      "generic": "Noe gikk galt.",
+      "createEvent": "Kunne ikke opprette arrangementet.",
+      "unlockHost": "Kunne ikke låse opp verten.",
+      "updateTable": "Kunne ikke oppdatere tabellen.",
+      "startGame": "Kunne ikke starte spillet.",
+      "startAllGames": "Kunne ikke starte alle ferdige spill.",
+      "finishTable": "Klarte ikke fullføre tabellen.",
+      "cancelPod": "Kunne ikke avbryte poden.",
+      "updateSettings": "Kunne ikke oppdatere innstillingene.",
+      "matchTables": "Kunne ikke matche tabeller.",
+      "fillBots": "Kunne ikke fylle tabeller med roboter.",
+      "clipboard": "Utklippstavle blokkert – kopier lenken manuelt.",
+      "eventNotFound": "Arrangementet ble ikke funnet.",
+      "joinEvent": "Kunne ikke bli med på arrangementet.",
+      "saveDecks": "Kunne ikke lagre kortstokker.",
+      "updateReady": "Kunne ikke oppdatere klar.",
+      "updatePause": "Kunne ikke oppdatere pause.",
+      "leaveEvent": "Kunne ikke forlate arrangementet.",
+      "trackerChoice": "Kunne ikke lagre sporingsvalget.",
+      "saveRating": "Kunne ikke lagre den vurderingen.",
+      "chooseCommander": "Velg en sjef for hvert dekk.",
+      "enterJoinCode": "Skriv inn en deltakelseskode.",
+      "sessionUnavailable": "Eventøkten din er ikke lenger tilgjengelig.",
+      "savePack": "Kunne ikke lagre pakken.",
+      "searchScryfall": "Kunne ikke søke i Scryfall.",
+      "loadArtwork": "Kunne ikke laste inn alternativ grafikk.",
+      "submitResult": "Kunne ikke sende inn resultatet.",
+      "saveChallenge": "Kunne ikke lagre utfordringsfremdriften.",
+      "unveilIdentity": "Kunne ikke avsløre identiteten din.",
+      "apiWaking": "Verten våkner. Hold denne siden åpen – det tar vanligvis under ett minutt.",
+      "apiUnreachable": "Kan ikke nå API. Kjører serveren (yarn dev:server)?"
+    },
+    "assignedAtTable": "Tildelt ved bordet",
+    "scanToJoin": "Skann for å bli med på dette arrangementet"
+  },
+  "language": {
+    "en": "English",
+    "de": "Deutsch",
+    "fr": "Français",
+    "es": "Español",
+    "it": "Italiano",
+    "pt": "Português",
+    "nl": "Nederlands",
+    "pl": "Polski",
+    "sv": "Svenska",
+    "da": "Dansk",
+    "no": "Norsk",
+    "fi": "Suomi",
+    "cs": "Čeština",
+    "sk": "Slovenčina",
+    "hu": "Magyar",
+    "ro": "Română",
+    "el": "Ελληνικά",
+    "hr": "Hrvatski",
+    "sl": "Slovenščina",
+    "bg": "Български",
+    "uk": "Українська",
+    "lt": "Lietuvių",
+    "lv": "Latviešu",
+    "et": "Eesti",
+    "is": "Íslenska",
+    "ga": "Gaeilge",
+    "mt": "Malti",
+    "sr": "Srpski",
+    "sq": "Shqip",
+    "bs": "Bosanski",
+    "mk": "Македонски",
+    "be": "Беларуская",
+    "ca": "Català",
+    "eu": "Euskara",
+    "cy": "Cymraeg"
+  },
+  "families": {
+    "normal": "Normal",
+    "commander": "Kommandør"
+  },
+  "modes": {
+    "shared": {
+      "commanderCombat": "En spiller taper etter å ha tatt {{commanderDamage}} kampskade fra en sjef.",
+      "commanderTax": "Hver gang en sjef blir omstøpt fra kommandosonen, koster det 2 mana til.",
+      "lifeAndLoss": "Liv og tap",
+      "turns": "Svinger",
+      "commanders": "Kommandører",
+      "eachPlayerLife": "Hver spiller starter ved {{life}} liv.",
+      "loseAtZero": "En spiller taper ved 0 liv.",
+      "loseAtPoison": "En spiller taper ved {{poison}} gifttellere.",
+      "startingPlayerRandom": "Startspilleren trekkes tilfeldig.",
+      "startingPlayerSkipDraw": "Startspilleren trekkes tilfeldig og hopper over trekningstrinnet i første tur.",
+      "multiplayerFirstTurnDraw": "I flerspiller trekker den spilleren på sin første tur.",
+      "commanderFirstTurnDraw": "I multiplayer Commander trekker den spilleren på sin første tur.",
+      "commandersInZone": "Kommandører begynner i kommandosonen og kan bli omstøpt derfra.",
+      "commanderRulesApply": "Kommandørreglene gjelder fortsatt: {{life}} påbegynt liv, {{poison}} gift og {{commanderDamage}} kampskade fra én befal er dødelige."
+    },
+    "duel": {
+      "label": "Duell",
+      "hint": "To spillere. Hver starter på 20 liv.",
+      "hostHint": "Strenge 2-spiller bord. Hver spiller starter på 20 liv.",
+      "hostFixedSeats": "Duellbegivenheter gir alltid plass til nøyaktig to spillere.",
+      "title": "Duell",
+      "summary": "To-spiller magi. Ingen befal - bare livet og styret.",
+      "sections": {
+        "life": {
+          "heading": "Liv og tap",
+          "bullets": [
+            "Each player starts at {{life}} life.",
+            "A player loses at 0 life.",
+            "A player loses at {{poison}} poison counters."
+          ]
+        },
+        "turns": {
+          "heading": "Svinger",
+          "bullets": [
+            "The starting player is drawn at random and skips the draw step on the first turn."
+          ]
+        }
+      }
+    },
+    "multiplayer": {
+      "label": "Flerspiller",
+      "hint": "Gratis for alle uten befal. Alle begynner på 20 liv.",
+      "hostHint": "Gratis for alle uten befal. Matchende fyller din valgte bordstørrelse; rester kan sitte så lite som tre.",
+      "title": "Flerspiller",
+      "summary": "Gratis for alle uten Commander-formatet. Nyttig for uformell flerspiller, Planechase eller et hvilket som helst bord med 20 liv.",
+      "sections": {
+        "life": {
+          "heading": "Liv og tap",
+          "bullets": [
+            "Each player starts at {{life}} life.",
+            "A player loses at 0 life.",
+            "A player loses at {{poison}} poison counters."
+          ]
+        },
+        "turns": {
+          "heading": "Svinger",
+          "bullets": [
+            "The starting player is drawn at random.",
+            "In multiplayer, that player draws on their first turn."
+          ]
+        }
+      }
+    },
+    "commander": {
+      "label": "Klassisk",
+      "hint": "Gratis for alle. Alle begynner på 40 liv.",
+      "hostHint": "Gratis-for-alle-kommandør. Matching foretrekker fire; gjenværende pods kan være tre eller fem når det er tillatt.",
+      "title": "Klassisk",
+      "summary": "Gratis for alle flerspiller. Hver spiller kjemper for seg selv.",
+      "sections": {
+        "life": {
+          "heading": "Liv og tap",
+          "bullets": [
+            "Each player starts at {{life}} life.",
+            "A player loses at 0 life.",
+            "A player loses at {{poison}} poison counters.",
+            "A player loses after taking {{commanderDamage}} combat damage from one commander."
+          ]
+        },
+        "turns": {
+          "heading": "Svinger",
+          "bullets": [
+            "The starting player is drawn at random.",
+            "In multiplayer Commander, that player draws on their first turn."
+          ]
+        },
+        "commanders": {
+          "heading": "Kommandører",
+          "bullets": [
+            "Commanders begin in the command zone and may be recast from there.",
+            "Each time a commander is recast from the command zone, it costs 2 more mana."
+          ]
+        }
+      }
+    },
+    "treachery": {
+      "label": "Forræderi",
+      "hint": "Hemmelige identiteter utdelt på denne enheten. Send det rundt slik at alle leser sitt eget privat.",
+      "hostHint": "Hemmelige roller for Commander pods. Matching fyller din valgte bordstørrelse først; rester kan sitte så lite som fire.",
+      "title": "Forræderi",
+      "summary": "Kommandør med hemmelige identiteter. Lederen er offentlig; alle andre holder seg skjult.",
+      "sections": {
+        "commander": {
+          "heading": "Kommandørreglene gjelder fortsatt",
+          "bullets": [
+            "Each player starts at {{life}} life.",
+            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
+            "The Leader takes the first turn and draws on that turn.",
+            "Each time a commander is recast from the command zone, it costs 2 more mana."
+          ]
+        },
+        "identities": {
+          "heading": "Identiteter",
+          "bullets": [
+            "Open Check my role from the timer menu. Only you see that card.",
+            "On a single tracker, deal the identities at setup and pass the device around so each player reads theirs alone.",
+            "Leader: Survive until every Assassin and Traitor is eliminated. Reveal yourself to the table. The Guardians share your victory, but you do not know who they are.",
+            "Guardian: Keep the Leader alive and eliminate the Leader's enemies. Your identity is secret. You win and lose with the Leader, even if you are eliminated first.",
+            "Assassin: Eliminate the Leader. Your identity is secret. Assassins share the same objective, but you do not know who the other Assassins are.",
+            "Traitor: Be the last player standing. Your identity is secret. Keep the Leader alive until the other threats are gone, then take the throne for yourself.",
+            "Follow any extra abilities printed on your identity card."
+          ]
+        }
+      },
+      "roles": {
+        "leader": {
+          "name": "Leder",
+          "objective": "Overlev til hver leiemorder og forræder er eliminert.",
+          "guidance": "Avslør deg selv til bordet. The Guardians deler seieren din, men du vet ikke hvem de er.",
+          "publicNote": "Din rolle er offentlig. Fortell bordet at du er leder."
+        },
+        "guardian": {
+          "name": "Verge",
+          "objective": "Hold lederen i live og eliminer lederens fiender.",
+          "guidance": "Din identitet er hemmelig. Du vinner og taper med lederen, selv om du blir eliminert først.",
+          "publicNote": "Hold denne rollen hemmelig."
+        },
+        "assassin": {
+          "name": "Assassin",
+          "objective": "Eliminer lederen.",
+          "guidance": "Din identitet er hemmelig. Assassins deler samme mål, men du vet ikke hvem de andre Assassins er.",
+          "publicNote": "Hold denne rollen hemmelig."
+        },
+        "traitor": {
+          "name": "Forræder",
+          "objective": "Vær den siste spilleren som står.",
+          "guidance": "Din identitet er hemmelig. Hold lederen i live til de andre truslene er borte, og ta deretter tronen for deg selv.",
+          "publicNote": "Hold denne rollen hemmelig."
+        }
+      },
+      "normal": {
+        "hint": "Hemmelige identiteter på en delt telefon. Alle starter på 20 liv — ingen befal.",
+        "hostHint": "Hemmelige roller uten befal. Matching fyller din valgte bordstørrelse først; rester kan sitte så lite som fire.",
+        "summary": "Hemmelige identiteter uten Commander-formatet. Lederen er offentlig; alle andre holder seg skjult.",
+        "sections": {
+          "life": {
+            "heading": "Liv og tap",
+            "bullets": [
+              "Each player starts at {{life}} life.",
+              "A player loses at 0 life.",
+              "A player loses at {{poison}} poison counters.",
+              "The Leader takes the first turn and draws on that turn."
+            ]
+          },
+          "identities": null
+        }
+      }
+    },
+    "two-headed-giant": {
+      "label": "Tohodet kjempe",
+      "hint": "To lag på to, 60 delte liv hver, svinger tatt sammen.",
+      "hostHint": "Strenge 4-spillers Commander pods. To lag deler 60 liv og går på tur sammen.",
+      "hostFixedSeats": "Two-Headed Giant-spill har alltid plass til nøyaktig fire spillere.",
+      "title": "Tohodet kjempe",
+      "summary": "To lag på to. Lagkamerater deler et liv totalt og en tur.",
+      "sections": {
+        "teams": {
+          "heading": "Lag",
+          "bullets": [
+            "Pick two allies, or let the table randomise the pairs.",
+            "Each team starts at {{sharedLife}} shared life.",
+            "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+          ]
+        },
+        "life": {
+          "heading": "Liv og tap",
+          "bullets": [
+            "A team loses when its shared life reaches 0.",
+            "A team loses at {{sharedPoison}} shared poison counters.",
+            "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+          ]
+        },
+        "turns": {
+          "heading": "Svinger",
+          "bullets": [
+            "The starting team is drawn at random and skips the draw step on its first turn.",
+            "Each time a commander is recast from the command zone, it costs 2 more mana."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "To lag på to, 40 delte liv hver, svinger tatt sammen.",
+        "hostHint": "Strenge 4-spiller bord. To lag deler 40 liv og går på tur sammen – ingen befal.",
+        "summary": "To lag på to. Lagkamerater deler et totalt liv og en tur – standard kortstokker, 20 liv hver i lag.",
+        "sections": {
+          "teams": {
+            "heading": "Lag",
+            "bullets": [
+              "Pick two allies, or let the table randomise the pairs.",
+              "Each team starts at {{sharedLife}} shared life.",
+              "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+            ]
+          },
+          "life": {
+            "heading": "Liv og tap",
+            "bullets": [
+              "A team loses when its shared life reaches 0.",
+              "A team loses at {{sharedPoison}} shared poison counters.",
+              "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+            ]
+          },
+          "turns": {
+            "heading": "Svinger",
+            "bullets": [
+              "The starting team is drawn at random and skips the draw step on its first turn.",
+              "Each time a commander is recast from the command zone, it costs 2 more mana."
+            ]
+          }
+        }
+      }
+    },
+    "archenemy-commander": {
+      "label": "Erkefiende",
+      "hint": "Én erkefiende på 60 liv med en 40-korts kortstokk mot tre helter som deler 60 liv.",
+      "hostHint": "Strenge 4-spillers Commander pods. Én 60-livs erkefiende møter et trespillerlag med 60 delte liv og en 40-korts kortstokk.",
+      "hostFixedSeats": "Archenemy Commander-spill har alltid plass til nøyaktig fire spillere.",
+      "title": "Erkefiendens sjef",
+      "summary": "Én erkefiende mot et lag på tre, med en plankortstokk i bevegelse.",
+      "sections": {
+        "sides": {
+          "heading": "Sider",
+          "bullets": [
+            "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
+            "Both sides start at {{life}} life.",
+            "The heroes share that life total and take their turn together.",
+            "The Archenemy goes first and draws on that turn."
+          ]
+        },
+        "schemes": {
+          "heading": "Ordninger",
+          "bullets": [
+            "The 40 Duskmourn Commander schemes are shuffled at the start.",
+            "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
+            "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
+            "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
+            "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+          ]
+        },
+        "life": {
+          "heading": "Liv og tap",
+          "bullets": [
+            "The Archenemy loses at 0 life, or when the usual poison and commander-damage limits are reached.",
+            "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
+            "A player loses after taking {{commanderDamage}} combat damage from one commander.",
+            "Each time a commander is recast from the command zone, it costs 2 more mana."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "En erkefiende på 20 liv med opplegg mot tre helter som deler 40 liv.",
+        "hostHint": "Strenge 4-spiller bord. En erkefiende med en plankortstokk mot et trespillerlag – ingen befal.",
+        "summary": "Én erkefiende mot et lag på tre, med en plankortstokk i bevegelse – standard 20-livsbord.",
+        "sections": {
+          "sides": {
+            "heading": "Sider",
+            "bullets": [
+              "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
+              "Both sides start at {{life}} life.",
+              "The heroes share that life total and take their turn together.",
+              "The Archenemy goes first and draws on that turn."
+            ]
+          },
+          "schemes": {
+            "heading": "Ordninger",
+            "bullets": [
+              "The 40 Duskmourn Commander schemes are shuffled at the start.",
+              "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
+              "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
+              "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
+              "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+            ]
+          },
+          "life": {
+            "heading": "Liv og tap",
+            "bullets": [
+              "The Archenemy loses at 0 life, or when the usual poison and poison limits are reached.",
+              "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
+              "A player loses after taking {{poison}} poison counters."
+            ]
+          }
+        }
+      }
+    },
+    "emperor": {
+      "label": "Keiser",
+      "hint": "To lag på tre. Beskytt keiseren din ved å bruke et begrenset utvalg av innflytelse og distribuer skapninger.",
+      "hostHint": "Strenge 6-spillers Commander pods. To lag plasserer hver en keiser mellom to generaler og spiller med begrenset innflytelse.",
+      "hostFixedSeats": "Emperor-spill har alltid plass til nøyaktig seks spillere.",
+      "title": "Keiser",
+      "summary": "To lag på tre. Hver keiser sitter mellom to generaler, og eliminering av en keiser vinner spillet.",
+      "sections": {
+        "teams": {
+          "heading": "Lag og svinger",
+          "bullets": [
+            "Choose both teams and each team's Emperor, or randomise either choice.",
+            "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
+            "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
+            "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+          ]
+        },
+        "range": {
+          "heading": "Rekkevidde og kamp",
+          "bullets": [
+            "Generals have range of influence 1. Emperors have range of influence 2.",
+            "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
+            "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
+            "As players leave, the empty seats stop counting, bringing surviving players into range."
+          ]
+        },
+        "deploy": {
+          "heading": "Distribuer skapninger",
+          "bullets": [
+            "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
+            "This can move creatures through the team as the battle lines change."
+          ]
+        },
+        "winning": {
+          "heading": "Vinner- og kommandørregler",
+          "bullets": [
+            "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
+            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
+            "Each time a commander is recast from the command zone, it costs 2 more mana."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "To lag på tre på 20 liv. Beskytt keiseren din med begrenset innflytelse.",
+        "hostHint": "Strenge 6-spillers bord. To keisere mellom generaler - standard dekk med 20 liv, ingen befal.",
+        "summary": "To lag på tre. Hver keiser sitter mellom to generaler, og eliminering av en keiser vinner spillet.",
+        "sections": {
+          "teams": {
+            "heading": "Lag og svinger",
+            "bullets": [
+              "Choose both teams and each team's Emperor, or randomise either choice.",
+              "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
+              "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
+              "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+            ]
+          },
+          "range": {
+            "heading": "Rekkevidde og kamp",
+            "bullets": [
+              "Generals have range of influence 1. Emperors have range of influence 2.",
+              "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
+              "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
+              "As players leave, the empty seats stop counting, bringing surviving players into range."
+            ]
+          },
+          "deploy": {
+            "heading": "Distribuer skapninger",
+            "bullets": [
+              "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
+              "This can move creatures through the team as the battle lines change."
+            ]
+          },
+          "winning": {
+            "heading": "Vinner- og kommandørregler",
+            "bullets": [
+              "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
+              "A player loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+            ]
+          }
+        }
+      }
+    },
+    "star": {
+      "label": "Stjerne",
+      "hint": "Fem spillere i en sirkel. Dine naboer er allierte; eliminere begge spillerne overfor deg.",
+      "hostHint": "Strenge 5-spiller Commander pods. Tilstøtende spillere er allierte; hver spiller vinner ved å overleve begge motstanderne over sirkelen.",
+      "hostFixedSeats": "Stjernespill har alltid plass til nøyaktig fem spillere.",
+      "title": "Stjerne",
+      "summary": "Fem spillere sitter i en sirkel. Naboene dine er allierte og de to spillerne overfor deg er fiender.",
+      "sections": {
+        "positions": {
+          "heading": "Posisjoner og allierte",
+          "bullets": [
+            "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
+            "The players immediately to your left and right are your allies.",
+            "The two nonadjacent players across the circle are your enemies.",
+            "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+          ]
+        },
+        "combat": {
+          "heading": "Kamp og samhandling",
+          "bullets": [
+            "Players cannot attack their allies by default.",
+            "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
+            "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+          ]
+        },
+        "winning": {
+          "heading": "Vinner",
+          "bullets": [
+            "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
+            "An eliminated player cannot win later.",
+            "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
+            "Each time a commander is recast from the command zone, it costs 2 more mana."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Fem spillere i en sirkel på 20 liv. Naboer er allierte; eliminere begge spillerne overfor deg.",
+        "hostHint": "Strenge 5-spillers bord. Tilstøtende spillere alliert; hver spiller vinner ved å overleve begge motstanderne over sirkelen.",
+        "summary": "Fem spillere sitter i en sirkel på 20 liv. Naboene dine er allierte og de to spillerne overfor deg er fiender.",
+        "sections": {
+          "positions": {
+            "heading": "Posisjoner og allierte",
+            "bullets": [
+              "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
+              "The players immediately to your left and right are your allies.",
+              "The two nonadjacent players across the circle are your enemies.",
+              "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+            ]
+          },
+          "combat": {
+            "heading": "Kamp og samhandling",
+            "bullets": [
+              "Players cannot attack their allies by default.",
+              "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
+              "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+            ]
+          },
+          "winning": {
+            "heading": "Vinner",
+            "bullets": [
+              "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
+              "An eliminated player cannot win later.",
+              "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+            ]
+          }
+        }
+      }
+    },
+    "assassin": {
+      "label": "Assassin",
+      "hint": "Hemmelige kontrakter i en gratis-for-alle. Eliminer merket ditt, score og arv målet deres.",
+      "hostHint": "Hemmelige kontrakter for 3–8 spillere. Score ved å eliminere merket ditt, og arv deretter målet deres.",
+      "title": "Assassin",
+      "summary": "En gratis for alle med hemmelige kontrakter. Score karakterer, arv nye mål og avslutt med høyest poengsum.",
+      "sections": {
+        "contracts": {
+          "heading": "Hemmelige kontrakter",
+          "bullets": [
+            "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
+            "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
+            "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+          ]
+        },
+        "elimination": {
+          "heading": "Eliminering og arv",
+          "bullets": [
+            "When a player is eliminated, record who dealt the finishing blow.",
+            "If you personally eliminate your assigned target, you score one mark.",
+            "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+          ]
+        },
+        "winning": {
+          "heading": "Vinner",
+          "bullets": [
+            "Play until only one player remains. The last survivor scores one additional mark.",
+            "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
+            "Commander rules still apply: {{life}} starting life, {{poison}} poison, and {{commanderDamage}} combat damage from one commander are lethal.",
+            "Each time a commander is recast from the command zone, it costs 2 more mana."
+          ]
+        }
+      },
+      "normal": {
+        "hint": "Hemmelige kontrakter for 3–8 spillere på 20 liv. Score ved å eliminere merket ditt.",
+        "hostHint": "Hemmelige kontrakter uten befal. Matchende fyller din valgte bordstørrelse; rester kan sitte så lite som tre.",
+        "summary": "En gratis for alle med hemmelige kontrakter på 20 liv. Score karakterer, arv nye mål og avslutt med høyest poengsum.",
+        "sections": {
+          "contracts": {
+            "heading": "Hemmelige kontrakter",
+            "bullets": [
+              "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
+              "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
+              "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+            ]
+          },
+          "elimination": {
+            "heading": "Eliminering og arv",
+            "bullets": [
+              "When a player is eliminated, record who dealt the finishing blow.",
+              "If you personally eliminate your assigned target, you score one mark.",
+              "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+            ]
+          },
+          "winning": {
+            "heading": "Vinner",
+            "bullets": [
+              "Play until only one player remains. The last survivor scores one additional mark.",
+              "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
+              "{{life}} starting life, {{poison}} poison, and {{poison}} poison counters are lethal."
+            ]
+          }
+        }
+      }
+    }
+  },
+  "home": {
+    "taglineBefore": "Din neste",
+    "taglineHighlight": "pod",
+    "taglineAfter": ", sortert.",
+    "startPlaying": "Begynn å spille",
+    "ongoingGame": "pågående spill",
+    "noEventNeeded": "ingen arrangement nødvendig",
+    "startPlayingHint": "Åpne en kampskjerm på denne enheten. Gå og kom tilbake uten å tape et uferdig spill.",
+    "alwaysPlayers": "Alltid {{count}} spillere i denne modusen.",
+    "resumeGame": "Fortsett spillet",
+    "startNewGame": "Start et nytt spill",
+    "startGame": "Start et spill",
+    "commanderSetup": "Kommandører",
+    "commanderSetupHint": "Søk i Scryfall etter hver spillers sjef. Partnerpar trenger begge befalene.",
+    "chooseAllCommanders": "Velg en sjef for hver spiller.",
+    "advancedMatchConfig": "Avansert matchkonfig",
+    "hostEvent": "Vertsarrangement",
+    "new": "nytt",
+    "targetTableSize": "Måltabellstørrelse",
+    "allowThreePods": "Tillat 3-spiller pods",
+    "allowFivePods": "Tillat 5-spiller pods",
+    "duelFixedSeats": "Duellbegivenheter gir alltid plass til nøyaktig to spillere.",
+    "emperorFixedSeats": "Emperor-spill har alltid plass til nøyaktig seks spillere.",
+    "starFixedSeats": "Stjernespill har alltid plass til nøyaktig fem spillere.",
+    "archenemyFixedSeats": "Archenemy Commander-spill har alltid plass til nøyaktig fire spillere.",
+    "twoHeadedFixedSeats": "Two-Headed Giant-spill har alltid plass til nøyaktig fire spillere.",
+    "eventName": "Navn på hendelsen",
+    "eventNamePlaceholder": "Fredagssjef",
+    "tables": "Tabeller",
+    "tablesHint": "Hvor mange fysiske bord er gratis for dette arrangementet.",
+    "eventLasts": "Arrangementet varer",
+    "eventLastsHint": "Koden dør etter disse mange timene. Bruk 48 eller 72 for en helg.",
+    "hostPin": "Verts-PIN",
+    "hostPinHint": "4 til 8 sifre — åpner vertspulten på nytt senere.",
+    "createEvent": "Opprett arrangement",
+    "joinWithCode": "Bli med med en kode",
+    "playerAside": "spiller",
+    "joinCode": "Bli med kode",
+    "joinCodePlaceholder": "AB23CD",
+    "join": "Bli med",
+    "scanQr": "Skann QR",
+    "staleJoin": "Den hendelsen er borte. Bli med med en ny kode, eller vert en ny natt."
+  },
+  "host": {
+    "desk": "Vertspult",
+    "locked": "Låst",
+    "hostOnly": "kun vert",
+    "unlockHostDesk": "Lås opp vertspulten",
+    "playerCount": "{{count}} spiller",
+    "playerCount_plural": "{{count}} spillere",
+    "ready": "{{count}} klar",
+    "matched": "{{count}} samsvarte",
+    "playing": "{{count}} spiller",
+    "paused": "{{count}} satt på pause",
+    "ends": "slutter {{date}}",
+    "podSizes": "Pod-størrelser",
+    "matching": "samsvarende",
+    "allowLeftoverThree": "Tillat resterende 3-spiller pods",
+    "allowFivePods": "Tillat 5-spiller pods",
+    "treacheryTargetHint": "Måltabellstørrelse. Rester av belger kan være så små som fire.",
+    "matchingPrefers": "Matching foretrekker {{size}}-spillerbord.",
+    "matchingPrefersFour": "Matching foretrekker 4-spillers bord.",
+    "assassinTargetHint": "Måltabellstørrelse. Resterende kontraktsirkler kan være så små som tre.",
+    "multiplayerTargetHint": "Måltabellstørrelse. Rester av bord kan være så små som tre.",
+    "duelMatchmaking": "Duell matchmaking seter nøyaktig to spillere per spill.",
+    "twoHeadedMatchmaking": "Two-Headed Giant matchmaking seter nøyaktig fire spillere per spill.",
+    "archenemyMatchmaking": "Erkefiendes matchmaking har plass til nøyaktig fire spillere per kamp: én erkefiende mot et lag på tre.",
+    "emperorMatchmaking": "Emperor matchmaking har plass til nøyaktig seks spillere per kamp: to lag med en keiser og to generaler hver.",
+    "starMatchmaking": "Star matchmaking plass til nøyaktig fem spillere i en sirkulær rekkefølge.",
+    "eventLength": "Arrangementets lengde",
+    "joinCodeDies": "bli med kode dør",
+    "hoursFromStart": "Timer fra start",
+    "hoursFromStartHint": "Endre dette for et flerdagers arrangement. Etter at den er ferdig, åpner QR-en hjemmesiden.",
+    "joinCodeTitle": "Bli med kode",
+    "share": "dele",
+    "noLanAddress": "Ingen LAN-adresse funnet — denne koblingen fungerer bare på denne datamaskinen.",
+    "copyPlayerLink": "Kopier spillerlink",
+    "queue": "Kø",
+    "nobodyWaiting": "Ingen som venter.",
+    "flex": "flex {{count}}",
+    "challengePts": "{{count}} utfordring poeng",
+    "pts": "{{count}} poeng",
+    "notReady": "Ikke klar",
+    "pausedTitle": "Pause",
+    "seated": "Sittende",
+    "atTables": "{{count}} ved bordene",
+    "tablesTitle": "Tabeller",
+    "total": "{{count}} totalt",
+    "noTables": "Denne hendelsen ble opprettet uten tabeller.",
+    "startingGames": "Starter spill …",
+    "startAllReady": "Start alle ferdige spill ({{count}})",
+    "startGame": "Start spillet",
+    "finishTable": "Avslutt bordet",
+    "cancelPod": "Avbryt pod",
+    "enable": "Aktiver",
+    "disable": "Deaktiver",
+    "trackerUsed": "sporer",
+    "noTracker": "ingen tracker",
+    "matchNow": "Match nå",
+    "fillBots": "Fyll tabeller med roboter",
+    "playerJoinPage": "Spiller med på siden"
+  },
+  "join": {
+    "joinEvent": "Bli med på arrangementet",
+    "takeSeat": "Ta plass",
+    "displayName": "Visningsnavn",
+    "displayNamePlaceholder": "Alex",
+    "joinEventButton": "Bli med på arrangementet",
+    "saveDecks": "Lagre kortstokker",
+    "matchFound": "Match funnet",
+    "yourDeck": "Dekket ditt",
+    "checkMyRole": "Sjekk rollen min",
+    "playingWithoutTracker": "Spiller uten tracker. Verten kan fullføre bordet.",
+    "chooseTracker": "Velg hvordan denne poden skal spille inn spillet.",
+    "useGameTracker": "Bruk spillsporing",
+    "playWithoutTracker": "Spill uten tracker",
+    "atTableMarked": "Du er merket som ved bordet på denne telefonen. Verten starter fortsatt spillet fra skrivebordet.",
+    "imAtTable": "Jeg er ved bordet",
+    "leftEvent": "Du forlot denne hendelsen. Skann QR-en på nytt hvis du vil inn igjen.",
+    "openPool": "Åpent basseng - hvilket som helst bord.",
+    "ready": "Klar",
+    "waiting": "venter",
+    "holdTight": "Hold godt fast - et bord kommer.",
+    "flex": "Flex: {{flex}} · Utfordringspoeng: {{points}}",
+    "howWasPod": "Hvordan var poden din?",
+    "pause": "Pause",
+    "leave": "Gå",
+    "pausedMessage": "Du er satt på pause. Fortsett når du kan sitte, eller forlat arrangementet.",
+    "imReady": "Jeg er klar",
+    "leaveEvent": "Forlat arrangementet",
+    "markReady": "Merk klar når du kan sette deg ned for en kamp.",
+    "matchingShortly": "Matching vil sende deg til et bord om kort tid.",
+    "imTheHost": "Jeg er verten",
+    "offlineSaved": "Lagret på denne telefonen. Den sendes når du er online igjen.",
+    "stayAtTable": "Bli ved bordet til verten kaller spillet."
+  },
+  "matchConfig": {
+    "title": "Match konfig",
+    "description": "Setter opp den falske sittende poden bak /match. Ingenting her berører serveren, og ingenting av det vises på kampskjermen, slik at ruten kan sjekkes på en telefon som den er.",
+    "podSetup": "Pod oppsett",
+    "seats": "Seter",
+    "seatsCount": "{{count}} seter",
+    "bracket": "Brakett",
+    "header": "Overskrift",
+    "eventNamePlaceholder": "Navn på hendelsen",
+    "joinCodePlaceholder": "Bli med kode",
+    "matchCard": "Match kort",
+    "tableLabelPlaceholder": "Bordetikett",
+    "assignedDeckPlaceholder": "Tildelt dekk",
+    "openBattleScreen": "Åpne kampskjermen",
+    "resetGameState": "Tilbakestill spillstatus",
+    "commander": "Kommandør",
+    "secondCommander": "Andre sjef"
+  },
+  "app": {
+    "notFound": "Ikke funnet."
+  },
+  "wake": {
+    "title": "Å vekke bordene",
+    "message": "Den ledige verten la seg i dvale. Hold denne siden åpen – det tar vanligvis under ett minutt."
+  },
+  "scanner": {
+    "title": "Skann QR",
+    "ariaLabel": "Skann delta QR-kode",
+    "hint": "Pek på vertspultens kode.",
+    "closeScanner": "Lukk skanneren",
+    "openingCamera": "Åpner kamera …",
+    "noCamera": "Denne nettleseren kan ikke åpne kameraet. Skriv inn deltakelseskoden i stedet.",
+    "permissionDenied": "Kameratillatelse ble nektet. Skriv inn deltakelseskoden, eller tillat kameraet og prøv igjen."
+  },
+  "theme": {
+    "switchToLight": "Bytt til lysmodus",
+    "switchToDark": "Bytt til mørk modus"
+  },
+  "hostMetrics": {
+    "title": "Oppsummering av hendelsen",
+    "aside": "pilot",
+    "players": "Spillere",
+    "games": "Spill",
+    "gamesPerPlayer": "Spill / spiller",
+    "waitAvg": "Vent gj.sn",
+    "waitP95": "Vent p95",
+    "waitMax": "Vent maks",
+    "rematchPairs": "Omkampspar",
+    "flexEarned": "Flex opptjent",
+    "flexSeats": "Flex seter",
+    "durationAvg": "Gj.sn. varighet",
+    "tablesOccupied": "Bord besatt",
+    "trackerUsed": "Tracker brukt",
+    "trackerUsedValue": "{{used}} brukt · {{skipped}} hoppet over",
+    "challenges": "Utfordringer",
+    "challengePts": "Utfordring poeng",
+    "podRating": "Pod-vurdering",
+    "podSizes": "Pod-størrelser:",
+    "pools": "Bassenger:"
+  },
+  "deckEditor": {
+    "title": "Kommandørdekk",
+    "deckNamePlaceholder": "Dekknavn (valgfritt)",
+    "commander": "Kommandør",
+    "secondCommander": "Andre sjef",
+    "markPreferred": "Mark foretrekkes",
+    "addAcceptedDeck": "Legg til akseptert dekk",
+    "hint": "Bare pods for samme basseng. Ekstra kortstokker lar matchende bøye deg inn i en annen brakett."
+  },
+  "commanderPicker": {
+    "searchCommander": "Søkekommandør",
+    "searchPartner": "Commander som kan pares med {{name}}",
+    "removeCommander": "Fjern {{name}}",
+    "artworkFor": "Kunstverk for",
+    "loadingArtwork": "Laster inn kunstverk …"
+  },
+  "challengePack": {
+    "title": "Utfordringspakke",
+    "description": "Kun forhåndsdefinerte primitiver. Saving skriver en ny versjon og muterer aldri en pakke som allerede er brukt av denne hendelsen.",
+    "copyOfficial": "Kopi offisiell",
+    "startBlank": "Start tomt",
+    "saveNewVersion": "Lagre ny versjon",
+    "editHint": "Kopier den offisielle pakken eller start tom før redigering.",
+    "packName": "Pakkenavn",
+    "descriptionLabel": "Beskrivelse",
+    "addChallenge": "Legg til utfordring",
+    "id": "ID",
+    "name": "Navn",
+    "category": "Kategori",
+    "points": "Poeng",
+    "primitive": "Primitivt",
+    "threshold": "Terskel",
+    "confirmationQuestion": "Bekreftelsesspørsmål",
+    "defaultConfirmation": "Skjedde dette ved bordet?",
+    "newClaimName": "Ny påstand",
+    "newClaimDescription": "Tildel dette ved bordet."
+  },
+  "treacheryRole": {
+    "treachery": "Forræderi",
+    "receivedRole": "Du fikk en rolle",
+    "handDeviceTo": "Gi enheten til {{name}}",
+    "lookAwayIdentity": "Alle andre bør se bort før identiteten avsløres.",
+    "lookAwayScreen": "Sørg for at ingen andre kan se skjermen din før du avslører den.",
+    "reveal": "Avsløre",
+    "yourRole": "Din rolle",
+    "identityAlt": "{{name}}, {{role}} identitet",
+    "illustratedBy": "Illustrert av {{artist}}",
+    "yourObjective": "Målet ditt",
+    "unveiledToTable": "Avduket til bordet",
+    "unveilWarning": "Alle ved bordet ditt vil se denne identiteten. Dens evne må løses i spillet.",
+    "confirmUnveil": "Bekreft avduking",
+    "unveilToTable": "Avduk til bordet",
+    "hideAndPass": "Gjem og pass",
+    "hideIdentity": "Skjul identiteten min"
+  },
+  "modeRulesSheet": {
+    "closeRules": "Lukke regler",
+    "backToGame": "Tilbake til spillet"
+  },
+  "assassinTargets": {
+    "title": "Hemmelige kontrakter",
+    "chooseOwnName": "Velg kun ditt eget navn.",
+    "closeContracts": "Lukk kontrakter",
+    "handDeviceTo": "Gi enheten til {{name}}",
+    "lookAway": "Alle andre bør se bort før kontrakten avsløres.",
+    "revealTarget": "Avslør målet mitt",
+    "yourTarget": "Målet ditt",
+    "noActiveTarget": "Ingen aktivt mål",
+    "marksScored": "Karakterer: {{count}}",
+    "hideAndPass": "Gjem og pass",
+    "allContractsChecked": "Alle kontrakter sjekket"
+  },
+  "scheme": {
+    "ongoingScheme": "Pågående ordning",
+    "scheme": "Opplegg",
+    "pastScheme": "Tidligere opplegg",
+    "abandon": "Forlat {{name}}",
+    "ongoingSchemes": "Løpende ordninger",
+    "graveyard": "Kirkegård · {{count}}",
+    "nextScheme": "Neste opplegg",
+    "remainingInDeck": "{{count}} igjen i kortstokken",
+    "scryfallCredit": "Kortbilde via Scryfall. Magic: The Gathering er © Wizards of the Coast."
+  },
+  "dungeon": {
+    "takeInitiativeTitle": "Ta initiativ?",
+    "takeInitiativeEnter": "Dette våger seg også inn i Undercity. Bare ta det når bordet nettopp ga dette setet initiativet.",
+    "takeInitiativeWait": "Fullfør eller forlat det nåværende fangehullet før Undercity kan åpne. Bare ta initiativet når bordet nettopp ga det til denne plassen.",
+    "takeInitiativeAndEnter": "Ta initiativ og gå inn i Undercity",
+    "takeInitiative": "Ta initiativ",
+    "alreadyHoldInitiative": "Du har allerede initiativet",
+    "takeAndEnterUndercity": "Ta initiativet og gå inn i Undercity",
+    "completed": "{{name}} (fullført)",
+    "ventureInto": "Våg deg inn i {{name}}",
+    "done": "Ferdig",
+    "ventureTo": "Våg deg til {{room}}: {{effect}}",
+    "releaseInitiative": "Slipp initiativet",
+    "undoRoom": "Angre rommet",
+    "closeDungeon": "Lukk fangehullet"
+  },
+  "treacheryRolesSheet": {
+    "title": "Hemmelige identiteter",
+    "chooseOwnName": "Velg kun ditt eget navn.",
+    "closeIdentities": "Nære identiteter",
+    "allIdentitiesChecked": "Alle identiteter sjekket"
+  },
+  "tracker": {
+    "gameRules": "Spilleregler",
+    "loadingRoles": "Laster inn roller …",
+    "start": "Start",
+    "readRules": "Les regler",
+    "readyToBegin": "Klar til å begynne",
+    "readyToBeginHint": "Start kampen når alle sitter, eller les reglene først.",
+    "dealContracts": "Deal kontrakter",
+    "dealContractsTitle": "Handle hemmelige kontrakter",
+    "dealContractsHint": "Hver spiller mottar ett privat mål. Enheten vil bli sendt rundt slik at hver kontrakt kan sjekkes i hemmelighet.",
+    "dealIdentities": "Avtale identiteter",
+    "dealIdentitiesTitle": "Handle hemmelige identiteter",
+    "dealIdentitiesHint": "Hver spiller mottar én skjult identitet. Enheten vil bli sendt rundt slik at hver enkelt kan leses i det skjulte.",
+    "chooseStarPositions": "Velg Stjerneposisjoner",
+    "starPositionsHint": "Spillere ved siden av hverandre er allierte. Trykk på to spillere for å bytte posisjoner, eller randomiser hele sirkelen.",
+    "randomPositions": "Tilfeldige posisjoner",
+    "confirmPositions": "Bekreft posisjoner",
+    "adjacentPlayersAlly": "Tilstøtende\nspillere alliert",
+    "buildEmperorTeams": "Bygg keiserlagene",
+    "chooseTeamA": "Velg tre spillere til lag A.",
+    "randomTeams": "Tilfeldige lag",
+    "resetTeams": "Tilbakestill team",
+    "teamEmperor": "Team {{team}} keiser",
+    "randomEmperors": "Tilfeldige keisere",
+    "confirmTeams": "Bekreft lag",
+    "chooseArchenemy": "Velg Erkefienden",
+    "chooseArchenemyHint": "Erkefienden møter de tre andre spillerne. Begge sider deler 60 liv. Erkefienden går først, trekker på den svingen og setter et opplegg i gang under hver første hovedfase.",
+    "confirmArchenemy": "Bekreft erkefiende",
+    "chooseAllies": "Velg de allierte",
+    "chooseAlliesHint": "Velg to spillere til førstelaget. De to andre spillerne blir motstanderlaget. Lag deler 60 liv og vendinger; alle andre spillerkontroller forblir separate.",
+    "emperor": "Keiser",
+    "emperorRange": "Keiser · rekkevidde 2",
+    "leader": "Leder",
+    "general": "Generelt",
+    "generalRange": "Generelt · område 1",
+    "marks": "{{count}} merker",
+    "winner": "Vinner",
+    "turnPhone": "Snu telefonen for helpensjon",
+    "matchMenu": "Matchmeny",
+    "matchMenuElapsed": "Matchmeny. {{clock}} har gått",
+    "matchMenuPaused": ", satt på pause",
+    "matchMenuDayNight": ", det er {{phase}}",
+    "day": "dag",
+    "night": "natt",
+    "closeMatchMenu": "Lukk kampmenyen",
+    "match": "Match",
+    "firstScheme": "Første opplegg",
+    "nextScheme": "Neste opplegg",
+    "resume": "Fortsett",
+    "pause": "Pause",
+    "undo": "Angre",
+    "challenges": "Utfordringer",
+    "checkTarget": "Sjekk målet",
+    "checkMyRole": "Sjekk rollen min",
+    "dayButton": "dag",
+    "nightButton": "Natt",
+    "playerLost": "Spiller tapt",
+    "gameWonBy": "Spill vunnet av",
+    "won": "{{name}} vant",
+    "doneRequeue": "Ferdig og kø",
+    "savingChallenges": "Lagrer utfordringer …",
+    "quitToHome": "Slutt hjem",
+    "quitHint": "Spillet beholdes - åpne det på nytt fra startskjermen.",
+    "secretContracts": "Hemmelige kontrakter",
+    "secretIdentities": "Hemmelige identiteter",
+    "whoEliminated": "Hvem eliminerte {{name}}?",
+    "whoEliminatedHint": "En spiller scorer bare hvis dette var deres tildelte karakter. Kontraktskjeden går videre uansett.",
+    "noPlayerUnknown": "Ingen spiller / ukjent",
+    "revealedIdentity": "Avslørt forræderi-identitet",
+    "closeRevealedIdentity": "Nær avslørt identitet",
+    "commanderChallenges": "Kommandørutfordringer",
+    "challengeCompleted": "{{name}} fullført",
+    "challengeFallback": "Utfordring",
+    "matchResult": "Kampresultat",
+    "wins": "{{name}} vinner",
+    "reviewBoard": "Gjennomgangstavle",
+    "yes": "Ja",
+    "no": "Nei",
+    "yesTheyLost": "Ja, de tapte",
+    "noStillIn": "Nei, fortsatt inne",
+    "openCounters": "Åpne tellere for {{name}}",
+    "commanderDamageOn": "Fartøysjef skade på {{name}}",
+    "countersFor": "Tellere for {{name}}",
+    "countersTitle": "Tellere for {{name}}",
+    "closeCounters": "Lukk skranker",
+    "closeChallenges": "Nære utfordringer",
+    "sharedCommanderDamage": "Delt sjefsskade",
+    "closeCommanderDamage": "Lukk sjefsskade",
+    "highestCommanderDamage": "Høyeste fartøysjefskade på {{name}}: {{value}} fra {{commander}}",
+    "noCommanderDamage": "Ingen fartøysjefskade på {{name}}",
+    "removeCommanderDamage": "Fjern sjefsskade fra {{owner}}s {{name}}",
+    "addCommanderDamage": "Legg til sjefsskade fra {{owner}}s {{name}}",
+    "isMonarch": "{{name}} er monarken",
+    "makeMonarch": "Gjør {{name}} til monarken",
+    "enduringStory": "{{name}} {{has}} en varig historie",
+    "cityBlessing": "{{name}} {{has}} byens velsignelse",
+    "has": "har",
+    "doesNotHave": "ikke har",
+    "didLose": "Tapte {{name}} spillet?",
+    "thisTeam": "Dette laget",
+    "didTheyLose": "Tapte de?",
+    "poisonPrompt": "{{name}} har {{count}} gifttellere. Tapte de?",
+    "sharedPoisonPrompt": "{{subject}} har {{count}} delte gifttellere. {{lose}}",
+    "hitPrompt": "{{name}} eier {{count}} eksilkort med trefftellere. Tapte de?",
+    "commanderPrompt": "{{name}} har tatt {{damage}} sjefsskade fra {{from}}. Tapte de?",
+    "sharedCommanderPrompt": "{{subject}} har tatt {{damage}} sjefsskade fra {{from}}. {{lose}}",
+    "lifePrompt": "{{name}} er på {{life}} liv. Tapte de?",
+    "sharedLifePrompt": "{{subject}} er på {{life}} liv. {{lose}}",
+    "anotherCommander": "en annen sjef",
+    "addLife": "Legg til 1 liv. Langt trykk for en større mengde.",
+    "removeLife": "Fjern 1 liv. Langt trykk for en større mengde.",
+    "addLifeFor": "Legg til liv for {{name}}",
+    "removeLifeFor": "Fjern levetid for {{name}}",
+    "addLifeLabel": "Legg til liv · {{name}}",
+    "removeLifeLabel": "Fjern liv · {{name}}",
+    "deleteDigit": "Slett siffer",
+    "add": "Legg til",
+    "removeVerb": "Fjern",
+    "lower": "Senk {{label}}",
+    "raise": "Hev {{label}}",
+    "seatColour": "Setefarge for {{name}}",
+    "dungeonFor": "Fangehull for {{name}}",
+    "dungeonInitiative": "Fangehull og initiativ for {{name}}. {{title}}",
+    "dungeonInitiativeActive": "{{name}} har initiativet · {{filled}} av {{total}} unike fangehull",
+    "dungeonInitiativeCompleted": "{{name}} har fullført {{filled}} av {{total}} unike fangehull",
+    "counterOn": "{{label}} på {{name}}: {{value}}",
+    "counterFor": "{{label}} for {{name}}",
+    "claimFor": "Gjør krav på {{name}}",
+    "challengesSubtitle": "Samme utfordringer for hver spiller · poeng påvirker aldri matching",
+    "counters": {
+      "poison": "Gift",
+      "tax": "Kommandørskatt",
+      "acorn": "Eikenøtter",
+      "energy": "Energi",
+      "experience": "Erfaring",
+      "hit": "Etrata treffer",
+      "rad": "Stråling",
+      "ring": "Ring fristelse",
+      "speed": "Hastighet",
+      "ticket": "Billetter"
+    }
+  }
+}

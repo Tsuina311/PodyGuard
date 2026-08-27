@@ -32,8 +32,10 @@ export const scryfallRoutes: FastifyPluginAsync<ScryfallRoutesOptions> = async (
       stringQuery(query.partnerId) ??
       stringQuery(query.selectedId);
 
+    const profile = parseSearchProfile(query.profile);
+
     try {
-      const cards = await client.searchCommanders(search, pairedWith);
+      const cards = await client.searchCommanders(search, pairedWith, profile);
       return { cards };
     } catch (error) {
       return sendScryfallError(reply, error);
@@ -79,6 +81,19 @@ function stringQuery(value: unknown): string | undefined {
   }
   const trimmed = value.trim();
   return trimmed || undefined;
+}
+
+function parseSearchProfile(
+  value: unknown,
+): 'commander' | 'duel-commander' | 'brawl' {
+  if (
+    value === 'commander' ||
+    value === 'duel-commander' ||
+    value === 'brawl'
+  ) {
+    return value;
+  }
+  return 'commander';
 }
 
 function sendScryfallError(reply: FastifyReply, error: unknown) {

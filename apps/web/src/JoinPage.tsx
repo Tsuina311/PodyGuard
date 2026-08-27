@@ -5,6 +5,7 @@ import {
   OFFICIAL_COMMANDER_CHALLENGES,
   poolLabel,
   usesCommanderRules,
+  commanderSearchProfile,
   type ChallengeDetectionMode,
   type EventSnapshot,
   type PodRating,
@@ -37,7 +38,6 @@ import { Badge, statusTone } from './ui/Badge';
 import { Brand } from './ui/Brand';
 import { Button } from './ui/Button';
 import { Field } from './ui/Field';
-import { LanguageSwitcherCorner } from './ui/LanguageSwitcher';
 import { Panel } from './ui/Panel';
 import { ThemeToggleCorner } from './ui/ThemeToggle';
 import { WaitTime } from './ui/WaitTime';
@@ -581,8 +581,12 @@ export function JoinPage() {
 
   return (
     <>
-      <LanguageSwitcherCorner />
-      <ThemeToggleCorner />
+      <ThemeToggleCorner
+        feedbackContext={{
+          ...(participant ? { participantStatus: participant.status } : {}),
+          ...(event ? { gameMode: event.gameMode } : {}),
+        }}
+      />
       <header>
         <Brand className="mb-6" />
         <h1 className="font-display mb-2 text-3xl font-bold tracking-tight">
@@ -605,6 +609,7 @@ export function JoinPage() {
                 onChange={setDeckRows}
                 disabled={busy}
                 requireCommanders={commanderRules}
+                searchProfile={commanderSearchProfile(event?.gameMode ?? 'commander')}
               />
               <Button
                 type="button"
@@ -888,6 +893,9 @@ export function JoinPage() {
             onChange={setDeckRows}
             disabled={busy}
             requireCommanders={commanderRules}
+            searchProfile={
+              event ? commanderSearchProfile(event.gameMode) : 'commander'
+            }
           />
           <Button
             type="submit"
