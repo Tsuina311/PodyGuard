@@ -43,7 +43,16 @@ export function CommanderPicker({
 
   useEffect(() => {
     const trimmed = query.trim();
-    if (trimmed.length < 2 || trimmed === value?.name) {
+    /*
+      Choosing a card writes its name into the box, so without the artwork guard
+      the box would search for the card whose printings are already on screen and
+      reopen the list over them.
+    */
+    if (
+      trimmed.length < 2 ||
+      trimmed === value?.name ||
+      trimmed === artCard?.name
+    ) {
       setResults([]);
       setSearching(false);
       return;
@@ -78,7 +87,7 @@ export function CommanderPicker({
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [partnerFor?.cardId, query, searchProfile, t, value?.name]);
+  }, [artCard?.name, partnerFor?.cardId, query, searchProfile, t, value?.name]);
 
   async function chooseCard(card: CommanderCandidate) {
     setResults([]);
@@ -168,37 +177,45 @@ export function CommanderPicker({
             className="h-10 w-full rounded-lg border border-muted/20 bg-void/70 pr-3 pl-9 text-sm outline-none placeholder:text-muted/50 focus:border-neon/70"
             onChange={(event) => setQuery(event.target.value)}
           />
+          {/*
+            The list hangs off the box it is filtering rather than off the whole
+            picker, so the artwork grid opening below can never push the results
+            down past the bottom of the screen.
+          */}
+          {searching || results.length > 0 || error ? (
+            <div className="border-muted/25 bg-void absolute top-full right-0 left-0 z-30 mt-1 max-h-[min(21rem,55dvh)] overflow-y-auto overscroll-contain rounded-xl border p-1 shadow-xl">
+              {searching ? (
+                <p className="text-muted px-3 py-2 text-xs">
+                  {t('common.searching')}
+                </p>
+              ) : null}
+              {results.map((card) => (
+                <button
+                  key={card.cardId}
+                  type="button"
+                  className="hover:bg-ink/5 flex w-full items-center gap-2 rounded-lg p-2 text-left"
+                  onClick={() => void chooseCard(card)}
+                >
+                  <img
+                    src={card.artCropUri}
+                    alt=""
+                    className="h-10 w-14 shrink-0 rounded object-[center_15%] object-cover"
+                  />
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm">{card.name}</span>
+                    <span className="text-muted block truncate text-xs">
+                      {card.typeLine}
+                    </span>
+                  </span>
+                </button>
+              ))}
+              {error ? (
+                <p className="text-danger px-3 py-2 text-xs">{error}</p>
+              ) : null}
+            </div>
+          ) : null}
         </div>
       )}
-
-      {!value && (searching || results.length > 0 || error) ? (
-        <div className="border-muted/25 bg-void absolute top-full right-0 left-0 z-30 mt-1 max-h-56 overflow-y-auto rounded-xl border p-1 shadow-xl">
-          {searching ? (
-            <p className="text-muted px-3 py-2 text-xs">{t('common.searching')}</p>
-          ) : null}
-          {results.map((card) => (
-            <button
-              key={card.cardId}
-              type="button"
-              className="hover:bg-ink/5 flex w-full items-center gap-2 rounded-lg p-2 text-left"
-              onClick={() => void chooseCard(card)}
-            >
-              <img
-                src={card.artCropUri}
-                alt=""
-                className="h-10 w-14 shrink-0 rounded object-[center_15%] object-cover"
-              />
-              <span className="min-w-0">
-                <span className="block truncate text-sm">{card.name}</span>
-                <span className="text-muted block truncate text-xs">
-                  {card.typeLine}
-                </span>
-              </span>
-            </button>
-          ))}
-          {error ? <p className="text-danger px-3 py-2 text-xs">{error}</p> : null}
-        </div>
-      ) : null}
 
       {/*
         Picking art is one step of filling in a deck, not a place of its own, so

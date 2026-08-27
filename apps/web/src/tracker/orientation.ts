@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 /**
  * True while the device is on its side.
@@ -70,16 +70,47 @@ export function useBoardLandscape(): {
   };
 }
 
+export type OrientationTarget = 'landscape' | 'portrait';
+
+type LockableOrientation = ScreenOrientation & {
+  lock?: (orientation: OrientationTarget) => Promise<void>;
+  unlock?: () => void;
+};
+
 /**
- * Turns the phone on its side for as long as the life tracker board is up,
- * where the browser allows it. Pass `enabled` false during pre-game deal /
- * seating screens so those stay portrait.
+ * The lock, when this browser has one to give. Desktop keeps its window: the
+ * coarse pointer is the closest thing to "this is a phone" the platform offers.
+ */
+function orientationLocker(): {
+  lock: (target: OrientationTarget) => Promise<void>;
+  unlock: () => void;
+} | null {
+  if (!window.matchMedia('(pointer: coarse)').matches) {
+    return null;
+  }
+  const orientation: LockableOrientation | undefined = screen.orientation;
+  if (!orientation || typeof orientation.lock !== 'function') {
+    return null;
+  }
+  const lock = orientation.lock.bind(orientation);
+  const unlock = orientation.unlock?.bind(orientation);
+  return { lock, unlock: unlock ?? (() => undefined) };
+}
+
+/**
+ * Holds the phone at `target` for as long as one is asked for, where the browser
+ * allows it. Pass null during pre-game deal / seating screens so those keep
+ * whichever way the phone is already held.
  *
  * Chrome only grants the lock to a document in element-level fullscreen, and
  * fullscreen only off a user gesture, so the two are asked for together. The
  * gesture that opened the board pays for the first attempt; later taps retry
  * until it sticks. Coming back from another app unlocks the phone, so
  * visibility/focus also re-arms the lock.
+ *
+ * Fullscreen is held across a change of target and only handed back on the way
+ * out, because re-entering it costs another gesture — turning the phone for a
+ * card and back again must not spend one.
  *
  * WebKit has neither this lock nor a per-page manifest orientation, so on an
  * iPhone nothing here fires and `useBoardLandscape` rotates the board instead.
@@ -89,32 +120,40 @@ export function useBoardLandscape(): {
  * click would keep toggling fullscreen. Once fullscreen is entered and lock
  * still fails, we stop and leave the window alone.
  */
-export function useLandscapeLock(enabled = true): void {
+export function useOrientationLock(target: OrientationTarget | null): void {
+  const unsupported = useRef(false);
+
+  useEffect(
+    () => () => {
+      orientationLocker()?.unlock();
+      if (document.fullscreenElement) {
+        void document.exitFullscreen().catch(() => undefined);
+      }
+    },
+    [],
+  );
+
   useEffect(() => {
-    if (!enabled) {
+    const locker = orientationLocker();
+    if (!locker) {
       return;
     }
-    type LockableOrientation = ScreenOrientation & {
-      lock?: (orientation: 'landscape') => Promise<void>;
-      unlock?: () => void;
-    };
+    if (!target) {
+      locker.unlock();
+      if (document.fullscreenElement) {
+        void document.exitFullscreen().catch(() => undefined);
+      }
+      return;
+    }
 
-    if (!window.matchMedia('(pointer: coarse)').matches) {
-      return;
-    }
-    const orientation: LockableOrientation | undefined = screen.orientation;
-    if (!orientation || typeof orientation.lock !== 'function') {
-      return;
-    }
-    const lockLandscapeOrientation = orientation.lock.bind(orientation);
-
+    const requested = target;
+    const { lock } = locker;
     let cancelled = false;
     let locked = false;
     let inflight = false;
-    let unsupported = false;
 
-    async function lockLandscape(): Promise<void> {
-      if (cancelled || locked || inflight || unsupported) {
+    async function lockOrientation(): Promise<void> {
+      if (cancelled || locked || inflight || unsupported.current) {
         return;
       }
       inflight = true;
@@ -129,14 +168,16 @@ export function useLandscapeLock(enabled = true): void {
         if (cancelled) {
           return;
         }
-        await lockLandscapeOrientation('landscape');
+        await lock(requested);
         locked = true;
       } catch {
         locked = false;
-        // Fullscreen without a working orientation lock is desktop / DevTools
-        // noise: exit and do not ask again on every pointerdown.
-        if (enteredFullscreen || document.fullscreenElement) {
-          unsupported = true;
+        // Entering fullscreen and still being refused the lock is desktop /
+        // DevTools noise: give the window back and do not ask again on every
+        // pointerdown. A refusal while already fullscreen is left to retry,
+        // since that is the path a target change takes.
+        if (enteredFullscreen) {
+          unsupported.current = true;
           if (document.fullscreenElement) {
             void document.exitFullscreen().catch(() => undefined);
           }
@@ -147,8 +188,8 @@ export function useLandscapeLock(enabled = true): void {
     }
 
     function retryFromGesture(): void {
-      if (!locked && !unsupported) {
-        void lockLandscape();
+      if (!locked && !unsupported.current) {
+        void lockOrientation();
       }
     }
 
@@ -157,10 +198,10 @@ export function useLandscapeLock(enabled = true): void {
         locked = false;
         return;
       }
-      void lockLandscape();
+      void lockOrientation();
     }
 
-    void lockLandscape();
+    void lockOrientation();
     window.addEventListener('pointerdown', retryFromGesture);
     document.addEventListener('visibilitychange', onVisible);
     window.addEventListener('pageshow', onVisible);
@@ -172,10 +213,6 @@ export function useLandscapeLock(enabled = true): void {
       document.removeEventListener('visibilitychange', onVisible);
       window.removeEventListener('pageshow', onVisible);
       window.removeEventListener('focus', onVisible);
-      orientation.unlock?.();
-      if (document.fullscreenElement) {
-        void document.exitFullscreen().catch(() => undefined);
-      }
     };
-  }, [enabled]);
+  }, [target]);
 }

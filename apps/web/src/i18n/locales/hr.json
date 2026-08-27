@@ -1,75 +1,75 @@
 {
   "common": {
-    "home": "Home",
-    "cancel": "Cancel",
-    "close": "Close",
-    "save": "Save",
-    "loading": "Loading…",
-    "players": "Players",
-    "game": "Game",
-    "language": "Language",
-    "yes": "Yes",
-    "no": "No",
-    "reset": "Reset",
-    "random": "Random",
-    "remove": "Remove",
-    "empty": "Empty",
+    "home": "Početna",
+    "cancel": "Odustani",
+    "close": "Zatvori",
+    "save": "Spremi",
+    "loading": "Učitavanje…",
+    "players": "Igrači",
+    "game": "Igra",
+    "language": "Jezik",
+    "yes": "Da",
+    "no": "Ne",
+    "reset": "Poništi",
+    "random": "Nasumično",
+    "remove": "Ukloni",
+    "empty": "Prazno",
     "bot": "bot",
     "dev": "dev",
-    "official": "official",
-    "open": "Open",
-    "preferred": "preferred",
-    "player": "Player {{number}}",
-    "versus": "versus",
-    "teamA": "Team A",
-    "teamB": "Team B",
-    "working": "Working…",
-    "creating": "Creating…",
-    "checking": "Checking…",
-    "joining": "Joining…",
-    "updating": "Updating…",
-    "submitting": "Submitting…",
-    "saving": "Saving…",
-    "searching": "Searching…",
-    "unveiling": "Unveiling…",
-    "copied": "Copied",
-    "noneYet": "none yet",
+    "official": "službeno",
+    "open": "Otvoreno",
+    "preferred": "preferirano",
+    "player": "Igrač {{number}}",
+    "versus": "protiv",
+    "teamA": "Tim A",
+    "teamB": "Tim B",
+    "working": "Obrada…",
+    "creating": "Stvaranje…",
+    "checking": "Provjera…",
+    "joining": "Pridruživanje…",
+    "updating": "Ažuriranje…",
+    "submitting": "Slanje…",
+    "saving": "Spremanje…",
+    "searching": "Pretraživanje…",
+    "unveiling": "Otkrivanje…",
+    "copied": "Kopirano",
+    "noneYet": "još ništa",
     "dash": "—",
     "errors": {
-      "generic": "Something went wrong.",
-      "createEvent": "Could not create event.",
-      "unlockHost": "Could not unlock host.",
-      "updateTable": "Could not update table.",
-      "startGame": "Could not start the game.",
-      "startAllGames": "Could not start all ready games.",
-      "finishTable": "Could not finish the table.",
-      "cancelPod": "Could not cancel the pod.",
-      "updateSettings": "Could not update settings.",
-      "matchTables": "Could not match tables.",
-      "fillBots": "Could not fill tables with bots.",
-      "clipboard": "Clipboard blocked — copy the link manually.",
-      "eventNotFound": "Event not found.",
-      "joinEvent": "Could not join event.",
-      "saveDecks": "Could not save decks.",
-      "updateReady": "Could not update ready.",
-      "updatePause": "Could not update pause.",
-      "leaveEvent": "Could not leave event.",
-      "trackerChoice": "Could not save the tracker choice.",
-      "saveRating": "Could not save that rating.",
-      "chooseCommander": "Choose a commander for every deck.",
-      "enterJoinCode": "Enter a join code.",
-      "sessionUnavailable": "Your event session is no longer available.",
-      "savePack": "Could not save the pack.",
-      "searchScryfall": "Could not search Scryfall.",
-      "loadArtwork": "Could not load alternate artwork.",
-      "submitResult": "Could not submit the result.",
-      "saveChallenge": "Could not save challenge progress.",
-      "unveilIdentity": "Could not unveil your identity.",
-      "apiWaking": "The host is waking up. Keep this page open — it usually takes under a minute.",
-      "apiUnreachable": "Cannot reach the API. Is the server running (yarn dev:server)?"
+      "generic": "Nešto je pošlo po zlu.",
+      "createEvent": "Nije moguće stvoriti događaj.",
+      "unlockHost": "Nije moguće otključati panel organizatora.",
+      "updateTable": "Nije moguće ažurirati stol.",
+      "startGame": "Nije moguće pokrenuti igru.",
+      "startAllGames": "Nije moguće pokrenuti sve spremne igre.",
+      "finishTable": "Nije moguće završiti igru za stolom.",
+      "cancelPod": "Nije moguće otkazati pod.",
+      "updateSettings": "Nije moguće ažurirati postavke.",
+      "matchTables": "Nije moguće upariti stolove.",
+      "fillBots": "Nije moguće popuniti stolove botovima.",
+      "clipboard": "Međuspremnik je blokiran — kopirajte poveznicu ručno.",
+      "eventNotFound": "Događaj nije pronađen.",
+      "joinEvent": "Nije se moguće pridružiti događaju.",
+      "saveDecks": "Nije moguće spremiti špilove.",
+      "updateReady": "Nije moguće ažurirati status spremnosti.",
+      "updatePause": "Nije moguće ažurirati pauzu.",
+      "leaveEvent": "Nije moguće napustiti događaj.",
+      "trackerChoice": "Nije moguće spremiti odabir trackera.",
+      "saveRating": "Nije moguće spremiti tu ocjenu.",
+      "chooseCommander": "Odaberite commandera za svaki špil.",
+      "enterJoinCode": "Unesite kod za pridruživanje.",
+      "sessionUnavailable": "Vaša sesija događaja više nije dostupna.",
+      "savePack": "Nije moguće spremiti paket.",
+      "searchScryfall": "Nije moguće pretražiti Scryfall.",
+      "loadArtwork": "Nije moguće učitati alternativnu ilustraciju.",
+      "submitResult": "Nije moguće poslati rezultat.",
+      "saveChallenge": "Nije moguće spremiti napredak izazova.",
+      "unveilIdentity": "Nije moguće otkriti vaš identitet.",
+      "apiWaking": "Server se budi. Ostavite ovu stranicu otvorenom — obično traje manje od minute.",
+      "apiUnreachable": "Nije moguće pristupiti API-ju. Je li server pokrenut (yarn dev:server)?"
     },
-    "assignedAtTable": "Assigned at the table",
-    "scanToJoin": "Scan to join this event"
+    "assignedAtTable": "Dodijeljen za stol",
+    "scanToJoin": "Skenirajte za pridruživanje ovom događaju"
   },
   "language": {
     "en": "English",
@@ -109,173 +109,173 @@
     "cy": "Cymraeg"
   },
   "families": {
-    "normal": "Normal",
+    "normal": "Normalno",
     "commander": "Commander"
   },
   "modes": {
     "shared": {
-      "commanderCombat": "A player loses after taking {{commanderDamage}} combat damage from one commander.",
-      "commanderTax": "Each time a commander is recast from the command zone, it costs 2 more mana.",
-      "lifeAndLoss": "Life and loss",
-      "turns": "Turns",
-      "commanders": "Commanders",
-      "eachPlayerLife": "Each player starts at {{life}} life.",
-      "loseAtZero": "A player loses at 0 life.",
-      "loseAtPoison": "A player loses at {{poison}} poison counters.",
-      "startingPlayerRandom": "The starting player is drawn at random.",
-      "startingPlayerSkipDraw": "The starting player is drawn at random and skips the draw step on the first turn.",
-      "multiplayerFirstTurnDraw": "In multiplayer, that player draws on their first turn.",
-      "commanderFirstTurnDraw": "In multiplayer Commander, that player draws on their first turn.",
-      "commandersInZone": "Commanders begin in the command zone and may be recast from there.",
-      "commanderRulesApply": "Commander rules still apply: {{life}} starting life, {{poison}} poison, and {{commanderDamage}} combat damage from one commander are lethal."
+      "commanderCombat": "Igrač gubi nakon što primi {{commanderDamage}} borbene štete od jednog commandera.",
+      "commanderTax": "Svaki put kada se commander ponovno igra iz command zone, košta 2 mane više.",
+      "lifeAndLoss": "Životi i poraz",
+      "turns": "Potezi",
+      "commanders": "Commanderi",
+      "eachPlayerLife": "Svaki igrač počinje s {{life}} života.",
+      "loseAtZero": "Igrač gubi na 0 života.",
+      "loseAtPoison": "Igrač gubi na {{poison}} poison countera.",
+      "startingPlayerRandom": "Početni igrač odabire se nasumično.",
+      "startingPlayerSkipDraw": "Početni igrač odabire se nasumično i preskače draw step u svom prvom potezu.",
+      "multiplayerFirstTurnDraw": "U multiplayeru taj igrač vuče kartu u svom prvom potezu.",
+      "commanderFirstTurnDraw": "U multiplayer Commanderu taj igrač vuče kartu u svom prvom potezu.",
+      "commandersInZone": "Commanderi počinju u command zone i mogu se ponovno igrati odande.",
+      "commanderRulesApply": "Pravila Commandera i dalje vrijede: {{life}} početnih života, {{poison}} poisona i {{commanderDamage}} borbene štete od jednog commandera smrtonosni su."
     },
     "duel": {
-      "label": "Duel",
-      "hint": "Two players. Each starts on 20 life.",
-      "hostHint": "Strict 2-player tables. Each player starts on 20 life.",
-      "hostFixedSeats": "Duel events always seat exactly two players.",
-      "title": "Duel",
-      "summary": "Two-player Magic. No commanders — just life and the board.",
+      "label": "Dvoboj",
+      "hint": "Dva igrača. Svaki počinje s 20 života.",
+      "hostHint": "Stolovi isključivo za 2 igrača. Svaki igrač počinje s 20 života.",
+      "hostFixedSeats": "Dvoboji uvijek imaju točno dva igrača.",
+      "title": "Dvoboj",
+      "summary": "Magic za dva igrača. Bez commandera — samo životi i ploča.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Životi i poraz",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters."
+            "Svaki igrač počinje s {{life}} života.",
+            "Igrač gubi na 0 života.",
+            "Igrač gubi na {{poison}} poison countera."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Potezi",
           "bullets": [
-            "The starting player is drawn at random and skips the draw step on the first turn."
+            "Početni igrač odabire se nasumično i preskače draw step u svom prvom potezu."
           ]
         }
       }
     },
     "multiplayer": {
       "label": "Multiplayer",
-      "hint": "Free-for-all without commanders. Everyone starts on 20 life.",
-      "hostHint": "Free-for-all without commanders. Matching fills your chosen table size; leftovers can sit as small as three.",
+      "hint": "Svatko protiv svakoga bez commandera. Svi počinju s 20 života.",
+      "hostHint": "Svatko protiv svakoga bez commandera. Uparivanje prvo popunjava odabranu veličinu stola; preostali stolovi mogu imati najmanje tri igrača.",
       "title": "Multiplayer",
-      "summary": "Free-for-all without the Commander format. Useful for casual multiplayer, Planechase, or any 20-life table.",
+      "summary": "Multiplayer bez Commander formata. Korisno za casual multiplayer, Planechase ili bilo koji stol s 20 života.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Životi i poraz",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters."
+            "Svaki igrač počinje s {{life}} života.",
+            "Igrač gubi na 0 života.",
+            "Igrač gubi na {{poison}} poison countera."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Potezi",
           "bullets": [
-            "The starting player is drawn at random.",
-            "In multiplayer, that player draws on their first turn."
+            "Početni igrač odabire se nasumično.",
+            "U multiplayeru taj igrač vuče kartu u svom prvom potezu."
           ]
         }
       }
     },
     "commander": {
-      "label": "Classic",
-      "hint": "Free-for-all. Everyone starts on 40 life.",
-      "hostHint": "Free-for-all Commander. Matching prefers four; leftover pods can be three or five when allowed.",
-      "title": "Classic",
-      "summary": "Free-for-all multiplayer. Each player fights for themselves.",
+      "label": "Klasično",
+      "hint": "Svatko protiv svakoga. Svi počinju s 40 života.",
+      "hostHint": "Commander svatko protiv svakoga. Uparivanje preferira četvero; preostali podovi mogu imati tri ili pet igrača kada je to dopušteno.",
+      "title": "Klasično",
+      "summary": "Multiplayer svatko protiv svakoga. Svaki igrač bori se za sebe.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Životi i poraz",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters.",
-            "A player loses after taking {{commanderDamage}} combat damage from one commander."
+            "Svaki igrač počinje s {{life}} života.",
+            "Igrač gubi na 0 života.",
+            "Igrač gubi na {{poison}} poison countera.",
+            "Igrač gubi nakon što primi {{commanderDamage}} borbene štete od jednog commandera."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Potezi",
           "bullets": [
-            "The starting player is drawn at random.",
-            "In multiplayer Commander, that player draws on their first turn."
+            "Početni igrač odabire se nasumično.",
+            "U multiplayer Commanderu taj igrač vuče kartu u svom prvom potezu."
           ]
         },
         "commanders": {
-          "heading": "Commanders",
+          "heading": "Commanderi",
           "bullets": [
-            "Commanders begin in the command zone and may be recast from there.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Commanderi počinju u command zone i mogu se ponovno igrati odande.",
+            "Svaki put kada se commander ponovno igra iz command zone, košta 2 mane više."
           ]
         }
       }
     },
     "treachery": {
-      "label": "Treachery",
-      "hint": "Secret identities dealt on this device. Pass it around so everyone reads their own in private.",
-      "hostHint": "Secret roles for Commander pods. Matching fills your chosen table size first; leftovers can sit as small as four.",
-      "title": "Treachery",
-      "summary": "Commander with secret identities. The Leader is public; everyone else stays hidden.",
+      "label": "Izdaja",
+      "hint": "Tajni identiteti dijele se na ovom uređaju. Proslijedite ga tako da svatko može privatno pročitati svoj identitet.",
+      "hostHint": "Tajne uloge za Commander podove. Uparivanje prvo popunjava odabranu veličinu stola; preostali podovi mogu imati najmanje četiri igrača.",
+      "title": "Izdaja",
+      "summary": "Commander s tajnim identitetima. Vođa je javan; svi ostali ostaju skriveni.",
       "sections": {
         "commander": {
-          "heading": "Commander rules still apply",
+          "heading": "Pravila Commandera i dalje vrijede",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "The Leader takes the first turn and draws on that turn.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Svaki igrač počinje s {{life}} života.",
+            "Igrač gubi na 0 života, {{poison}} poisona ili {{commanderDamage}} borbene štete od jednog commandera.",
+            "Vođa igra prvi i vuče kartu u tom potezu.",
+            "Svaki put kada se commander ponovno igra iz command zone, košta 2 mane više."
           ]
         },
         "identities": {
-          "heading": "Identities",
+          "heading": "Identiteti",
           "bullets": [
-            "Open Check my role from the timer menu. Only you see that card.",
-            "On a single tracker, deal the identities at setup and pass the device around so each player reads theirs alone.",
-            "Leader: Survive until every Assassin and Traitor is eliminated. Reveal yourself to the table. The Guardians share your victory, but you do not know who they are.",
-            "Guardian: Keep the Leader alive and eliminate the Leader's enemies. Your identity is secret. You win and lose with the Leader, even if you are eliminated first.",
-            "Assassin: Eliminate the Leader. Your identity is secret. Assassins share the same objective, but you do not know who the other Assassins are.",
-            "Traitor: Be the last player standing. Your identity is secret. Keep the Leader alive until the other threats are gone, then take the throne for yourself.",
-            "Follow any extra abilities printed on your identity card."
+            "Otvorite Provjeri moju ulogu iz izbornika timera. Samo vi vidite tu kartu.",
+            "Ako koristite jedan tracker, podijelite identitete tijekom postavljanja i proslijedite uređaj tako da svaki igrač pročita svoj identitet nasamo.",
+            "Vođa: Preživite dok svi Ubojice i Izdajnik ne budu eliminirani. Otkrijte se stolu. Čuvari dijele vašu pobjedu, ali ne znate tko su.",
+            "Čuvar: Održite Vođu na životu i eliminirajte njegove neprijatelje. Vaš identitet je tajan. Pobjeđujete i gubite zajedno s Vođom, čak i ako ste prvi eliminirani.",
+            "Ubojica: Eliminirajte Vođu. Vaš identitet je tajan. Ubojice dijele isti cilj, ali ne znate tko su drugi Ubojice.",
+            "Izdajnik: Budite posljednji preživjeli igrač. Vaš identitet je tajan. Održite Vođu na životu dok ostale prijetnje ne nestanu, zatim uzmite prijestolje za sebe.",
+            "Slijedite sve dodatne sposobnosti otisnute na vašoj karti identiteta."
           ]
         }
       },
       "roles": {
         "leader": {
-          "name": "Leader",
-          "objective": "Survive until every Assassin and Traitor is eliminated.",
-          "guidance": "Reveal yourself to the table. The Guardians share your victory, but you do not know who they are.",
-          "publicNote": "Your role is public. Tell the table you are the Leader."
+          "name": "Vođa",
+          "objective": "Preživite dok svi Ubojice i Izdajnik ne budu eliminirani.",
+          "guidance": "Otkrijte se stolu. Čuvari dijele vašu pobjedu, ali ne znate tko su.",
+          "publicNote": "Vaša uloga je javna. Recite stolu da ste Vođa."
         },
         "guardian": {
-          "name": "Guardian",
-          "objective": "Keep the Leader alive and eliminate the Leader's enemies.",
-          "guidance": "Your identity is secret. You win and lose with the Leader, even if you are eliminated first.",
-          "publicNote": "Keep this role secret."
+          "name": "Čuvar",
+          "objective": "Održite Vođu na životu i eliminirajte njegove neprijatelje.",
+          "guidance": "Vaš identitet je tajan. Pobjeđujete i gubite zajedno s Vođom, čak i ako ste prvi eliminirani.",
+          "publicNote": "Držite ovu ulogu u tajnosti."
         },
         "assassin": {
-          "name": "Assassin",
-          "objective": "Eliminate the Leader.",
-          "guidance": "Your identity is secret. Assassins share the same objective, but you do not know who the other Assassins are.",
-          "publicNote": "Keep this role secret."
+          "name": "Ubojica",
+          "objective": "Eliminirajte Vođu.",
+          "guidance": "Vaš identitet je tajan. Ubojice dijele isti cilj, ali ne znate tko su drugi Ubojice.",
+          "publicNote": "Držite ovu ulogu u tajnosti."
         },
         "traitor": {
-          "name": "Traitor",
-          "objective": "Be the last player standing.",
-          "guidance": "Your identity is secret. Keep the Leader alive until the other threats are gone, then take the throne for yourself.",
-          "publicNote": "Keep this role secret."
+          "name": "Izdajnik",
+          "objective": "Budite posljednji preživjeli igrač.",
+          "guidance": "Vaš identitet je tajan. Održite Vođu na životu dok ostale prijetnje ne nestanu, zatim uzmite prijestolje za sebe.",
+          "publicNote": "Držite ovu ulogu u tajnosti."
         }
       },
       "normal": {
-        "hint": "Secret identities on a shared phone. Everyone starts on 20 life — no commanders.",
-        "hostHint": "Secret roles without commanders. Matching fills your chosen table size first; leftovers can sit as small as four.",
-        "summary": "Secret identities without the Commander format. The Leader is public; everyone else stays hidden.",
+        "hint": "Tajni identiteti na zajedničkom telefonu. Svi počinju s 20 života — bez commandera.",
+        "hostHint": "Tajne uloge bez commandera. Uparivanje prvo popunjava odabranu veličinu stola; preostali podovi mogu imati najmanje četiri igrača.",
+        "summary": "Tajni identiteti bez Commander formata. Vođa je javan; svi ostali ostaju skriveni.",
         "sections": {
           "life": {
-            "heading": "Life and loss",
+            "heading": "Životi i poraz",
             "bullets": [
-              "Each player starts at {{life}} life.",
-              "A player loses at 0 life.",
-              "A player loses at {{poison}} poison counters.",
-              "The Leader takes the first turn and draws on that turn."
+              "Svaki igrač počinje s {{life}} života.",
+              "Igrač gubi na 0 života.",
+              "Igrač gubi na {{poison}} poison countera.",
+              "Vođa igra prvi i vuče kartu u tom potezu."
             ]
           },
           "identities": null
@@ -283,63 +283,63 @@
       }
     },
     "two-headed-giant": {
-      "label": "Two-Headed Giant",
-      "hint": "Two teams of two, 60 shared life each, turns taken together.",
-      "hostHint": "Strict 4-player Commander pods. Two teams share 60 life and take their turns together.",
-      "hostFixedSeats": "Two-Headed Giant games always seat exactly four players.",
-      "title": "Two-Headed Giant",
-      "summary": "Two teams of two. Teammates share a life total and a turn.",
+      "label": "Dvoglavi Div",
+      "hint": "Dva tima po dva igrača, svaki s 60 zajedničkih života, a potezi se igraju zajedno.",
+      "hostHint": "Commander podovi isključivo za 4 igrača. Dva tima dijele po 60 života i igraju svoje poteze zajedno.",
+      "hostFixedSeats": "Igre Dvoglavog Diva uvijek imaju točno četiri igrača.",
+      "title": "Dvoglavi Div",
+      "summary": "Dva tima po dva igrača. Suigrači dijele ukupan broj života i potez.",
       "sections": {
         "teams": {
-          "heading": "Teams",
+          "heading": "Timovi",
           "bullets": [
-            "Pick two allies, or let the table randomise the pairs.",
-            "Each team starts at {{sharedLife}} shared life.",
-            "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+            "Odaberite dva saveznika ili prepustite nasumično određivanje parova.",
+            "Svaki tim počinje s {{sharedLife}} zajedničkih života.",
+            "Suigrači igraju svoj potez zajedno. Svaki igrač i dalje ima vlastitu ruku, library i commandere."
           ]
         },
         "life": {
-          "heading": "Life and loss",
+          "heading": "Životi i poraz",
           "bullets": [
-            "A team loses when its shared life reaches 0.",
-            "A team loses at {{sharedPoison}} shared poison counters.",
-            "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+            "Tim gubi kada njegovi zajednički životi dosegnu 0.",
+            "Tim gubi na {{sharedPoison}} zajedničkih poison countera.",
+            "Tim gubi nakon što primi {{commanderDamage}} zajedničke borbene štete od jednog commandera."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Potezi",
           "bullets": [
-            "The starting team is drawn at random and skips the draw step on its first turn.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Početni tim odabire se nasumično i preskače draw step u svom prvom potezu.",
+            "Svaki put kada se commander ponovno igra iz command zone, košta 2 mane više."
           ]
         }
       },
       "normal": {
-        "hint": "Two teams of two, 40 shared life each, turns taken together.",
-        "hostHint": "Strict 4-player tables. Two teams share 40 life and take their turns together — no commanders.",
-        "summary": "Two teams of two. Teammates share a life total and a turn — standard decks, 20 life each in team terms.",
+        "hint": "Dva tima po dva igrača, svaki s 40 zajedničkih života, a potezi se igraju zajedno.",
+        "hostHint": "Stolovi isključivo za 4 igrača. Dva tima dijele po 40 života i igraju svoje poteze zajedno — bez commandera.",
+        "summary": "Dva tima po dva igrača. Suigrači dijele ukupan broj života i potez — standardni špilovi, 20 života po igraču u timskom smislu.",
         "sections": {
           "teams": {
-            "heading": "Teams",
+            "heading": "Timovi",
             "bullets": [
-              "Pick two allies, or let the table randomise the pairs.",
-              "Each team starts at {{sharedLife}} shared life.",
-              "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+              "Odaberite dva saveznika ili prepustite nasumično određivanje parova.",
+              "Svaki tim počinje s {{sharedLife}} zajedničkih života.",
+              "Suigrači igraju svoj potez zajedno. Svaki igrač i dalje ima vlastitu ruku, library i commandere."
             ]
           },
           "life": {
-            "heading": "Life and loss",
+            "heading": "Životi i poraz",
             "bullets": [
-              "A team loses when its shared life reaches 0.",
-              "A team loses at {{sharedPoison}} shared poison counters.",
-              "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+              "Tim gubi kada njegovi zajednički životi dosegnu 0.",
+              "Tim gubi na {{sharedPoison}} zajedničkih poison countera.",
+              "Tim gubi nakon što primi {{commanderDamage}} zajedničke borbene štete od jednog commandera."
             ]
           },
           "turns": {
-            "heading": "Turns",
+            "heading": "Potezi",
             "bullets": [
-              "The starting team is drawn at random and skips the draw step on its first turn.",
-              "Each time a commander is recast from the command zone, it costs 2 more mana."
+              "Početni tim odabire se nasumično i preskače draw step u svom prvom potezu.",
+              "Svaki put kada se commander ponovno igra iz command zone, košta 2 mane više."
             ]
           }
         }
@@ -347,286 +347,286 @@
     },
     "archenemy-commander": {
       "label": "Archenemy",
-      "hint": "One Archenemy on 60 life with a 40-card scheme deck against three heroes sharing 60 life.",
-      "hostHint": "Strict 4-player Commander pods. One 60-life Archenemy faces a three-player team with 60 shared life and a 40-card scheme deck.",
-      "hostFixedSeats": "Archenemy Commander games always seat exactly four players.",
+      "hint": "Jedan Archenemy sa 60 života i scheme špilom od 40 karata protiv tri heroja koji dijele 60 života.",
+      "hostHint": "Commander podovi isključivo za 4 igrača. Jedan Archenemy sa 60 života suočava se s timom od tri igrača koji dijele 60 života i scheme špil od 40 karata.",
+      "hostFixedSeats": "Igre Archenemy Commander uvijek imaju točno četiri igrača.",
       "title": "Archenemy Commander",
-      "summary": "One Archenemy against a team of three, with a scheme deck in motion.",
+      "summary": "Jedan Archenemy protiv tima od troje, sa scheme špilom u igri.",
       "sections": {
         "sides": {
-          "heading": "Sides",
+          "heading": "Strane",
           "bullets": [
-            "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
-            "Both sides start at {{life}} life.",
-            "The heroes share that life total and take their turn together.",
-            "The Archenemy goes first and draws on that turn."
+            "Odaberite Archenemyja ili ga dodijelite nasumično. Ostala tri igrača su heroji.",
+            "Obje strane počinju s {{life}} života.",
+            "Heroji dijele taj broj života i igraju svoj potez zajedno.",
+            "Archenemy igra prvi i vuče kartu u tom potezu."
           ]
         },
         "schemes": {
           "heading": "Schemes",
           "bullets": [
-            "The 40 Duskmourn Commander schemes are shuffled at the start.",
-            "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
-            "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
-            "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
-            "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+            "40 schemeova iz Duskmourn Commandera promiješa se na početku.",
+            "Tijekom svakog prvog main phasea Archenemyja otvorite izbornik timera i dodirnite Next scheme kako biste jedan pokrenuli.",
+            "Scheme koji nije ongoing razrješava se, a zatim ide na dno scheme špila.",
+            "Ongoing scheme ostaje licem prema gore dok ga stol ne označi kao abandoned, nakon čega ide na dno špila.",
+            "Schemeovi licem prema gore i graveyard završenih schemeova prikazuju se ispod karte kao minijature; dodirnite jedan za veliki prikaz."
           ]
         },
         "life": {
-          "heading": "Life and loss",
+          "heading": "Životi i poraz",
           "bullets": [
-            "The Archenemy loses at 0 life, or when the usual poison and commander-damage limits are reached.",
-            "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
-            "A player loses after taking {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Archenemy gubi na 0 života ili kada dosegne uobičajene granice poisona i commander damagea.",
+            "Heroji zajedno gube kada njihovi zajednički životi dosegnu 0, a na isti način dijele poison i commander damage.",
+            "Igrač gubi nakon što primi {{commanderDamage}} borbene štete od jednog commandera.",
+            "Svaki put kada se commander ponovno igra iz command zone, košta 2 mane više."
           ]
         }
       },
       "normal": {
-        "hint": "One Archenemy on 20 life with schemes against three heroes sharing 40 life.",
-        "hostHint": "Strict 4-player tables. One Archenemy with a scheme deck against a three-player team — no commanders.",
-        "summary": "One Archenemy against a team of three, with a scheme deck in motion — standard 20-life tables.",
+        "hint": "Jedan Archenemy s 20 života i schemesima protiv tri heroja koji dijele 40 života.",
+        "hostHint": "Stolovi isključivo za 4 igrača. Jedan Archenemy sa scheme špilom protiv tima od tri igrača — bez commandera.",
+        "summary": "Jedan Archenemy protiv tima od troje, sa scheme špilom u igri — standardni stolovi s 20 života.",
         "sections": {
           "sides": {
-            "heading": "Sides",
+            "heading": "Strane",
             "bullets": [
-              "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
-              "Both sides start at {{life}} life.",
-              "The heroes share that life total and take their turn together.",
-              "The Archenemy goes first and draws on that turn."
+              "Odaberite Archenemyja ili ga dodijelite nasumično. Ostala tri igrača su heroji.",
+              "Obje strane počinju s {{life}} života.",
+              "Heroji dijele taj broj života i igraju svoj potez zajedno.",
+              "Archenemy igra prvi i vuče kartu u tom potezu."
             ]
           },
           "schemes": {
             "heading": "Schemes",
             "bullets": [
-              "The 40 Duskmourn Commander schemes are shuffled at the start.",
-              "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
-              "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
-              "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
-              "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+              "40 schemeova iz Duskmourn Commandera promiješa se na početku.",
+              "Tijekom svakog prvog main phasea Archenemyja otvorite izbornik timera i dodirnite Next scheme kako biste jedan pokrenuli.",
+              "Scheme koji nije ongoing razrješava se, a zatim ide na dno scheme špila.",
+              "Ongoing scheme ostaje licem prema gore dok ga stol ne označi kao abandoned, nakon čega ide na dno špila.",
+              "Schemeovi licem prema gore i graveyard završenih schemeova prikazuju se ispod karte kao minijature; dodirnite jedan za veliki prikaz."
             ]
           },
           "life": {
-            "heading": "Life and loss",
+            "heading": "Životi i poraz",
             "bullets": [
-              "The Archenemy loses at 0 life, or when the usual poison and poison limits are reached.",
-              "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
-              "A player loses after taking {{poison}} poison counters."
+              "Archenemy gubi na 0 života ili kada dosegne uobičajene granice poisona i poisona.",
+              "Heroji zajedno gube kada njihovi zajednički životi dosegnu 0, a na isti način dijele poison i commander damage.",
+              "Igrač gubi nakon što primi {{poison}} poison countera."
             ]
           }
         }
       }
     },
     "emperor": {
-      "label": "Emperor",
-      "hint": "Two teams of three. Protect your Emperor using limited range of influence and deploy creatures.",
-      "hostHint": "Strict 6-player Commander pods. Two teams each place an Emperor between two Generals and play with limited range of influence.",
-      "hostFixedSeats": "Emperor games always seat exactly six players.",
-      "title": "Emperor",
-      "summary": "Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.",
+      "label": "Car",
+      "hint": "Dva tima po tri igrača. Zaštitite svog Cara ograničenim dometom utjecaja i premještajte creature.",
+      "hostHint": "Commander podovi isključivo za 6 igrača. Svaki tim postavlja Cara između dva Generala i igra s ograničenim dometom utjecaja.",
+      "hostFixedSeats": "Igre Cara uvijek imaju točno šest igrača.",
+      "title": "Car",
+      "summary": "Dva tima po tri igrača. Svaki Car sjedi između dva Generala, a eliminacija Cara donosi pobjedu.",
       "sections": {
         "teams": {
-          "heading": "Teams and turns",
+          "heading": "Timovi i potezi",
           "bullets": [
-            "Choose both teams and each team's Emperor, or randomise either choice.",
-            "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
-            "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
-            "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+            "Odaberite oba tima i Cara svakog tima ili jedan ili oba odabira napravite nasumično.",
+            "Svaki igrač počinje s {{life}} života i zadržava vlastitu ruku, manu, permanente, poison i potez.",
+            "Suigrači mogu gledati međusobne ruke i raspravljati o strategiji, ali ne smiju rukovati kartama svojih suigrača.",
+            "Nasumično odaberite koji Car igra prvi. Taj Car vuče kartu u prvom potezu."
           ]
         },
         "range": {
-          "heading": "Range and combat",
+          "heading": "Domet i borba",
           "bullets": [
-            "Generals have range of influence 1. Emperors have range of influence 2.",
-            "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
-            "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
-            "As players leave, the empty seats stop counting, bringing surviving players into range."
+            "Generali imaju domet utjecaja 1. Carevi imaju domet utjecaja 2.",
+            "Spellovi, abilityji, efekti i informacije mogu utjecati samo na igrače i objekte unutar dometa njihova controllera.",
+            "Igrač može napasti samo protivnika koji sjedi neposredno pokraj njega ili planeswalkere i protected battles tog protivnika.",
+            "Kako igrači napuštaju igru, prazna mjesta prestaju se računati, čime preživjeli igrači dolaze u međusobni domet."
           ]
         },
         "deploy": {
-          "heading": "Deploy creatures",
+          "heading": "Premještanje creaturea",
           "bullets": [
-            "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
-            "This can move creatures through the team as the battle lines change."
+            "Svaki creature ima \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
+            "To omogućuje premještanje creaturea kroz tim kako se mijenjaju borbene linije."
           ]
         },
         "winning": {
-          "heading": "Winning and Commander rules",
+          "heading": "Pobjeda i pravila Commandera",
           "bullets": [
-            "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
-            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Tim pobjeđuje ako njegov Car pobijedi i odmah gubi ako njegov Car izgubi. General može biti eliminiran bez završetka igre.",
+            "Igrač gubi na 0 života, {{poison}} poisona ili {{commanderDamage}} borbene štete od jednog commandera.",
+            "Svaki put kada se commander ponovno igra iz command zone, košta 2 mane više."
           ]
         }
       },
       "normal": {
-        "hint": "Two teams of three on 20 life. Protect your Emperor with limited range of influence.",
-        "hostHint": "Strict 6-player tables. Two Emperors between Generals — standard 20-life decks, no commanders.",
-        "summary": "Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.",
+        "hint": "Dva tima po tri igrača s 20 života. Zaštitite svog Cara ograničenim dometom utjecaja.",
+        "hostHint": "Stolovi isključivo za 6 igrača. Dva Cara između Generala — standardni špilovi s 20 života, bez commandera.",
+        "summary": "Dva tima po tri igrača. Svaki Car sjedi između dva Generala, a eliminacija Cara donosi pobjedu.",
         "sections": {
           "teams": {
-            "heading": "Teams and turns",
+            "heading": "Timovi i potezi",
             "bullets": [
-              "Choose both teams and each team's Emperor, or randomise either choice.",
-              "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
-              "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
-              "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+              "Odaberite oba tima i Cara svakog tima ili jedan ili oba odabira napravite nasumično.",
+              "Svaki igrač počinje s {{life}} života i zadržava vlastitu ruku, manu, permanente, poison i potez.",
+              "Suigrači mogu gledati međusobne ruke i raspravljati o strategiji, ali ne smiju rukovati kartama svojih suigrača.",
+              "Nasumično odaberite koji Car igra prvi. Taj Car vuče kartu u prvom potezu."
             ]
           },
           "range": {
-            "heading": "Range and combat",
+            "heading": "Domet i borba",
             "bullets": [
-              "Generals have range of influence 1. Emperors have range of influence 2.",
-              "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
-              "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
-              "As players leave, the empty seats stop counting, bringing surviving players into range."
+              "Generali imaju domet utjecaja 1. Carevi imaju domet utjecaja 2.",
+              "Spellovi, abilityji, efekti i informacije mogu utjecati samo na igrače i objekte unutar dometa njihova controllera.",
+              "Igrač može napasti samo protivnika koji sjedi neposredno pokraj njega ili planeswalkere i protected battles tog protivnika.",
+              "Kako igrači napuštaju igru, prazna mjesta prestaju se računati, čime preživjeli igrači dolaze u međusobni domet."
             ]
           },
           "deploy": {
-            "heading": "Deploy creatures",
+            "heading": "Premještanje creaturea",
             "bullets": [
-              "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
-              "This can move creatures through the team as the battle lines change."
+              "Svaki creature ima \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
+              "To omogućuje premještanje creaturea kroz tim kako se mijenjaju borbene linije."
             ]
           },
           "winning": {
-            "heading": "Winning and Commander rules",
+            "heading": "Pobjeda i pravila Commandera",
             "bullets": [
-              "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
-              "A player loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+              "Tim pobjeđuje ako njegov Car pobijedi i odmah gubi ako njegov Car izgubi. General može biti eliminiran bez završetka igre.",
+              "Igrač gubi na 0 života, {{poison}} poisona ili {{poison}} poison countera."
             ]
           }
         }
       }
     },
     "star": {
-      "label": "Star",
-      "hint": "Five players in a circle. Your neighbors are allies; eliminate both players across from you.",
-      "hostHint": "Strict 5-player Commander pods. Adjacent players are allies; each player wins by outlasting both opponents across the circle.",
-      "hostFixedSeats": "Star games always seat exactly five players.",
-      "title": "Star",
-      "summary": "Five players sit in a circle. Your neighbors are allies and the two players across from you are enemies.",
+      "label": "Zvijezda",
+      "hint": "Pet igrača u krugu. Vaši susjedi su saveznici; eliminirajte oba igrača nasuprot vama.",
+      "hostHint": "Commander podovi isključivo za 5 igrača. Susjedni igrači su saveznici; svaki igrač pobjeđuje tako da nadživi oba protivnika preko puta.",
+      "hostFixedSeats": "Igre Zvijezde uvijek imaju točno pet igrača.",
+      "title": "Zvijezda",
+      "summary": "Pet igrača sjedi u krugu. Vaši susjedi su saveznici, a dva igrača nasuprot vama su neprijatelji.",
       "sections": {
         "positions": {
-          "heading": "Positions and allies",
+          "heading": "Položaji i saveznici",
           "bullets": [
-            "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
-            "The players immediately to your left and right are your allies.",
-            "The two nonadjacent players across the circle are your enemies.",
-            "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+            "Odaberite položaje u krugu ručno zamjenom dva igrača ili nasumično rasporedite svih pet.",
+            "Igrači neposredno lijevo i desno od vas vaši su saveznici.",
+            "Dva nesusjedna igrača preko puta vaši su neprijatelji.",
+            "Položaji ostaju isti kada se igrač eliminira; vaši saveznici i neprijatelji ne mijenjaju se."
           ]
         },
         "combat": {
-          "heading": "Combat and interaction",
+          "heading": "Borba i interakcija",
           "bullets": [
-            "Players cannot attack their allies by default.",
-            "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
-            "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+            "Igrači prema zadanim pravilima ne mogu napadati svoje saveznike.",
+            "Spellovi i abilityji i dalje mogu pomoći ili utjecati na bilo kojeg igrača osim ako stol ne dogovori strožu varijantu.",
+            "Potezi se odvijaju u smjeru kazaljke na satu. Nasumično odaberite početnog igrača; taj igrač vuče kartu u prvom potezu."
           ]
         },
         "winning": {
-          "heading": "Winning",
+          "heading": "Pobjeda",
           "bullets": [
-            "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
-            "An eliminated player cannot win later.",
-            "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Pobjeđuje prvi preživjeli igrač čija su oba neprijatelja eliminirana, bez obzira na to tko ih je eliminirao.",
+            "Eliminirani igrač kasnije ne može pobijediti.",
+            "Svaki igrač počinje s {{life}} života i gubi na 0 života, {{poison}} poisona ili {{commanderDamage}} borbene štete od jednog commandera.",
+            "Svaki put kada se commander ponovno igra iz command zone, košta 2 mane više."
           ]
         }
       },
       "normal": {
-        "hint": "Five players in a circle on 20 life. Neighbors are allies; eliminate both players across from you.",
-        "hostHint": "Strict 5-player tables. Adjacent players ally; each player wins by outlasting both opponents across the circle.",
-        "summary": "Five players sit in a circle on 20 life. Your neighbors are allies and the two players across from you are enemies.",
+        "hint": "Pet igrača u krugu s 20 života. Susjedi su saveznici; eliminirajte oba igrača nasuprot vama.",
+        "hostHint": "Stolovi isključivo za 5 igrača. Susjedni igrači su saveznici; svaki igrač pobjeđuje tako da nadživi oba protivnika preko puta.",
+        "summary": "Pet igrača sjedi u krugu s 20 života. Vaši susjedi su saveznici, a dva igrača nasuprot vama su neprijatelji.",
         "sections": {
           "positions": {
-            "heading": "Positions and allies",
+            "heading": "Položaji i saveznici",
             "bullets": [
-              "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
-              "The players immediately to your left and right are your allies.",
-              "The two nonadjacent players across the circle are your enemies.",
-              "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+              "Odaberite položaje u krugu ručno zamjenom dva igrača ili nasumično rasporedite svih pet.",
+              "Igrači neposredno lijevo i desno od vas vaši su saveznici.",
+              "Dva nesusjedna igrača preko puta vaši su neprijatelji.",
+              "Položaji ostaju isti kada se igrač eliminira; vaši saveznici i neprijatelji ne mijenjaju se."
             ]
           },
           "combat": {
-            "heading": "Combat and interaction",
+            "heading": "Borba i interakcija",
             "bullets": [
-              "Players cannot attack their allies by default.",
-              "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
-              "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+              "Igrači prema zadanim pravilima ne mogu napadati svoje saveznike.",
+              "Spellovi i abilityji i dalje mogu pomoći ili utjecati na bilo kojeg igrača osim ako stol ne dogovori strožu varijantu.",
+              "Potezi se odvijaju u smjeru kazaljke na satu. Nasumično odaberite početnog igrača; taj igrač vuče kartu u prvom potezu."
             ]
           },
           "winning": {
-            "heading": "Winning",
+            "heading": "Pobjeda",
             "bullets": [
-              "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
-              "An eliminated player cannot win later.",
-              "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+              "Pobjeđuje prvi preživjeli igrač čija su oba neprijatelja eliminirana, bez obzira na to tko ih je eliminirao.",
+              "Eliminirani igrač kasnije ne može pobijediti.",
+              "Svaki igrač počinje s {{life}} života i gubi na 0 života, {{poison}} poisona ili {{poison}} poison countera."
             ]
           }
         }
       }
     },
     "assassin": {
-      "label": "Assassin",
-      "hint": "Secret contracts in a free-for-all. Eliminate your mark, score, and inherit their target.",
-      "hostHint": "Secret contracts for 3–8 players. Score by eliminating your mark, then inherit their target.",
-      "title": "Assassin",
-      "summary": "A free-for-all with secret contracts. Score marks, inherit new targets, and finish with the highest score.",
+      "label": "Ubojica",
+      "hint": "Tajni ugovori u igri svatko protiv svakoga. Eliminirajte svoju metu, osvojite bod i naslijedite njezinu metu.",
+      "hostHint": "Tajni ugovori za 3–8 igrača. Osvojite bod eliminiranjem svoje mete, a zatim naslijedite njezin ugovor.",
+      "title": "Ubojica",
+      "summary": "Svatko protiv svakoga s tajnim ugovorima. Eliminirajte mete, nasljeđujte nove i završite s najvećim rezultatom.",
       "sections": {
         "contracts": {
-          "heading": "Secret contracts",
+          "heading": "Tajni ugovori",
           "bullets": [
-            "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
-            "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
-            "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+            "Svaki igrač privatno dobiva jednu metu. Ugovori tvore krug, tako da nitko ne cilja samoga sebe i svakog igrača lovi točno jedan igrač.",
+            "Proslijedite uređaj tijekom postavljanja. Otvorite Provjeri metu iz izbornika timera kad god trebate ponovno pročitati svoj trenutačni ugovor.",
+            "Igrači mogu napadati i utjecati na bilo koga; ugovor određuje bodovanje, a ne dopuštene mete."
           ]
         },
         "elimination": {
-          "heading": "Elimination and inheritance",
+          "heading": "Eliminacija i nasljeđivanje",
           "bullets": [
-            "When a player is eliminated, record who dealt the finishing blow.",
-            "If you personally eliminate your assigned target, you score one mark.",
-            "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+            "Kada je igrač eliminiran, zabilježite tko je zadao završni udarac.",
+            "Ako osobno eliminirate svoju dodijeljenu metu, osvajate jedan mark.",
+            "Igrač koji je lovio eliminiranu metu nasljeđuje ugovor te mete, čak i ako je završni udarac zadao netko drugi. Tako svaki preživjeli igrač zadržava jedan aktivni ugovor."
           ]
         },
         "winning": {
-          "heading": "Winning",
+          "heading": "Pobjeda",
           "bullets": [
-            "Play until only one player remains. The last survivor scores one additional mark.",
-            "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
-            "Commander rules still apply: {{life}} starting life, {{poison}} poison, and {{commanderDamage}} combat damage from one commander are lethal.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Igrajte dok ne ostane samo jedan igrač. Posljednji preživjeli osvaja jedan dodatni mark.",
+            "Pobjeđuje igrač s najviše markova; ako je najveći rezultat izjednačen, posljednji preživjeli pobjeđuje u tom izjednačenju.",
+            "Pravila Commandera i dalje vrijede: {{life}} početnih života, {{poison}} poisona i {{commanderDamage}} borbene štete od jednog commandera smrtonosni su.",
+            "Svaki put kada se commander ponovno igra iz command zone, košta 2 mane više."
           ]
         }
       },
       "normal": {
-        "hint": "Secret contracts for 3–8 players on 20 life. Score by eliminating your mark.",
-        "hostHint": "Secret contracts without commanders. Matching fills your chosen table size; leftovers can sit as small as three.",
-        "summary": "A free-for-all with secret contracts on 20 life. Score marks, inherit new targets, and finish with the highest score.",
+        "hint": "Tajni ugovori za 3–8 igrača s 20 života. Osvojite bod eliminiranjem svoje mete.",
+        "hostHint": "Tajni ugovori bez commandera. Uparivanje popunjava odabranu veličinu stola; preostali krugovi mogu imati najmanje tri igrača.",
+        "summary": "Svatko protiv svakoga s tajnim ugovorima i 20 života. Eliminirajte mete, nasljeđujte nove i završite s najvećim rezultatom.",
         "sections": {
           "contracts": {
-            "heading": "Secret contracts",
+            "heading": "Tajni ugovori",
             "bullets": [
-              "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
-              "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
-              "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+              "Svaki igrač privatno dobiva jednu metu. Ugovori tvore krug, tako da nitko ne cilja samoga sebe i svakog igrača lovi točno jedan igrač.",
+              "Proslijedite uređaj tijekom postavljanja. Otvorite Provjeri metu iz izbornika timera kad god trebate ponovno pročitati svoj trenutačni ugovor.",
+              "Igrači mogu napadati i utjecati na bilo koga; ugovor određuje bodovanje, a ne dopuštene mete."
             ]
           },
           "elimination": {
-            "heading": "Elimination and inheritance",
+            "heading": "Eliminacija i nasljeđivanje",
             "bullets": [
-              "When a player is eliminated, record who dealt the finishing blow.",
-              "If you personally eliminate your assigned target, you score one mark.",
-              "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+              "Kada je igrač eliminiran, zabilježite tko je zadao završni udarac.",
+              "Ako osobno eliminirate svoju dodijeljenu metu, osvajate jedan mark.",
+              "Igrač koji je lovio eliminiranu metu nasljeđuje ugovor te mete, čak i ako je završni udarac zadao netko drugi. Tako svaki preživjeli igrač zadržava jedan aktivni ugovor."
             ]
           },
           "winning": {
-            "heading": "Winning",
+            "heading": "Pobjeda",
             "bullets": [
-              "Play until only one player remains. The last survivor scores one additional mark.",
-              "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
-              "{{life}} starting life, {{poison}} poison, and {{poison}} poison counters are lethal."
+              "Igrajte dok ne ostane samo jedan igrač. Posljednji preživjeli osvaja jedan dodatni mark.",
+              "Pobjeđuje igrač s najviše markova; ako je najveći rezultat izjednačen, posljednji preživjeli pobjeđuje u tom izjednačenju.",
+              "{{life}} početnih života, {{poison}} poisona i {{poison}} poison countera smrtonosni su."
             ]
           }
         }
@@ -634,446 +634,446 @@
     }
   },
   "home": {
-    "taglineBefore": "Your next",
+    "taglineBefore": "Vaš sljedeći",
     "taglineHighlight": "pod",
-    "taglineAfter": ", sorted.",
-    "startPlaying": "Start playing",
-    "ongoingGame": "ongoing game",
-    "noEventNeeded": "no event needed",
-    "startPlayingHint": "Open a battle screen on this device. Leave and come back without losing an unfinished game.",
-    "alwaysPlayers": "Always {{count}} players in this mode.",
-    "resumeGame": "Resume game",
-    "startNewGame": "Start a new game",
-    "startGame": "Start a game",
-    "commanderSetup": "Commanders",
-    "commanderSetupHint": "Search Scryfall for each player's commander. Partner pairs need both commanders.",
-    "chooseAllCommanders": "Choose a commander for every player.",
-    "advancedMatchConfig": "Advanced match config",
-    "hostEvent": "Host event",
-    "new": "new",
-    "targetTableSize": "Target table size",
-    "allowThreePods": "Allow 3-player pods",
-    "allowFivePods": "Allow 5-player pods",
-    "duelFixedSeats": "Duel events always seat exactly two players.",
-    "emperorFixedSeats": "Emperor games always seat exactly six players.",
-    "starFixedSeats": "Star games always seat exactly five players.",
-    "archenemyFixedSeats": "Archenemy Commander games always seat exactly four players.",
-    "twoHeadedFixedSeats": "Two-Headed Giant games always seat exactly four players.",
-    "eventName": "Event name",
-    "eventNamePlaceholder": "Friday Commander",
-    "tables": "Tables",
-    "tablesHint": "How many physical tables are free for this event.",
-    "eventLasts": "Event lasts",
-    "eventLastsHint": "Join code dies after this many hours. Use 48 or 72 for a weekend.",
-    "hostPin": "Host PIN",
-    "hostPinHint": "4 to 8 digits — reopens the host desk later.",
-    "createEvent": "Create event",
-    "joinWithCode": "Join with a code",
-    "playerAside": "player",
-    "joinCode": "Join code",
+    "taglineAfter": ", riješen.",
+    "startPlaying": "Počni igrati",
+    "ongoingGame": "igra u tijeku",
+    "noEventNeeded": "događaj nije potreban",
+    "startPlayingHint": "Otvorite zaslon igre na ovom uređaju. Možete otići i vratiti se bez gubitka nezavršene igre.",
+    "alwaysPlayers": "Ovaj način uvijek ima {{count}} igrača.",
+    "resumeGame": "Nastavi igru",
+    "startNewGame": "Pokreni novu igru",
+    "startGame": "Pokreni igru",
+    "commanderSetup": "Commanderi",
+    "commanderSetupHint": "Pretražite Scryfall za commandera svakog igrača. Partner parovi trebaju oba commandera.",
+    "chooseAllCommanders": "Odaberite commandera za svakog igrača.",
+    "advancedMatchConfig": "Napredne postavke igre",
+    "hostEvent": "Organiziraj događaj",
+    "new": "novo",
+    "targetTableSize": "Ciljana veličina stola",
+    "allowThreePods": "Dopusti podove s 3 igrača",
+    "allowFivePods": "Dopusti podove s 5 igrača",
+    "duelFixedSeats": "Dvoboji uvijek imaju točno dva igrača.",
+    "emperorFixedSeats": "Igre Cara uvijek imaju točno šest igrača.",
+    "starFixedSeats": "Igre Zvijezde uvijek imaju točno pet igrača.",
+    "archenemyFixedSeats": "Igre Archenemy Commander uvijek imaju točno četiri igrača.",
+    "twoHeadedFixedSeats": "Igre Dvoglavog Diva uvijek imaju točno četiri igrača.",
+    "eventName": "Naziv događaja",
+    "eventNamePlaceholder": "Petak Commander",
+    "tables": "Stolovi",
+    "tablesHint": "Koliko je fizičkih stolova slobodno za ovaj događaj.",
+    "eventLasts": "Trajanje događaja",
+    "eventLastsHint": "Kod za pridruživanje istječe nakon ovoliko sati. Za vikend upotrijebite 48 ili 72.",
+    "hostPin": "PIN organizatora",
+    "hostPinHint": "4 do 8 znamenki — kasnije ponovno otvara panel organizatora.",
+    "createEvent": "Stvori događaj",
+    "joinWithCode": "Pridruži se kodom",
+    "playerAside": "igrač",
+    "joinCode": "Kod za pridruživanje",
     "joinCodePlaceholder": "AB23CD",
-    "join": "Join",
-    "scanQr": "Scan QR",
-    "staleJoin": "That event is gone. Join with a new code, or host a new night."
+    "join": "Pridruži se",
+    "scanQr": "Skeniraj QR",
+    "staleJoin": "Taj događaj više ne postoji. Pridružite se novim kodom ili organizirajte novu večer."
   },
   "host": {
-    "desk": "Host desk",
-    "locked": "Locked",
-    "hostOnly": "host only",
-    "unlockHostDesk": "Unlock host desk",
-    "playerCount": "{{count}} player",
-    "playerCount_plural": "{{count}} players",
-    "ready": "{{count}} ready",
-    "matched": "{{count}} matched",
-    "playing": "{{count}} playing",
-    "paused": "{{count}} paused",
-    "ends": "ends {{date}}",
-    "podSizes": "Pod sizes",
-    "matching": "matching",
-    "allowLeftoverThree": "Allow leftover 3-player pods",
-    "allowFivePods": "Allow 5-player pods",
-    "treacheryTargetHint": "Target table size. Leftover pods can be as small as four.",
-    "matchingPrefers": "Matching prefers {{size}}-player tables.",
-    "matchingPrefersFour": "Matching prefers 4-player tables.",
-    "assassinTargetHint": "Target table size. Leftover contract circles can be as small as three.",
-    "multiplayerTargetHint": "Target table size. Leftover tables can be as small as three.",
-    "duelMatchmaking": "Duel matchmaking seats exactly two players per game.",
-    "twoHeadedMatchmaking": "Two-Headed Giant matchmaking seats exactly four players per game.",
-    "archenemyMatchmaking": "Archenemy Commander matchmaking seats exactly four players per game: one Archenemy against a team of three.",
-    "emperorMatchmaking": "Emperor matchmaking seats exactly six players per game: two teams with an Emperor and two Generals each.",
-    "starMatchmaking": "Star matchmaking seats exactly five players in a circular order.",
-    "eventLength": "Event length",
-    "joinCodeDies": "join code dies",
-    "hoursFromStart": "Hours from start",
-    "hoursFromStartHint": "Change this for a multi-day event. After it ends, the QR opens the home page.",
-    "joinCodeTitle": "Join code",
-    "share": "share",
-    "noLanAddress": "No LAN address found — this link only works on this computer.",
-    "copyPlayerLink": "Copy player link",
-    "queue": "Queue",
-    "nobodyWaiting": "Nobody waiting.",
+    "desk": "Panel organizatora",
+    "locked": "Zaključano",
+    "hostOnly": "samo organizator",
+    "unlockHostDesk": "Otključaj panel organizatora",
+    "playerCount": "{{count}} igrač",
+    "playerCount_plural": "{{count}} igrača",
+    "ready": "{{count}} spremno",
+    "matched": "{{count}} upareno",
+    "playing": "{{count}} igra",
+    "paused": "{{count}} na pauzi",
+    "ends": "završava {{date}}",
+    "podSizes": "Veličine podova",
+    "matching": "uparivanje",
+    "allowLeftoverThree": "Dopusti preostale podove s 3 igrača",
+    "allowFivePods": "Dopusti podove s 5 igrača",
+    "treacheryTargetHint": "Ciljana veličina stola. Preostali podovi mogu imati najmanje četiri igrača.",
+    "matchingPrefers": "Uparivanje preferira stolove s {{size}} igrača.",
+    "matchingPrefersFour": "Uparivanje preferira stolove s 4 igrača.",
+    "assassinTargetHint": "Ciljana veličina stola. Preostali krugovi ugovora mogu imati najmanje tri igrača.",
+    "multiplayerTargetHint": "Ciljana veličina stola. Preostali stolovi mogu imati najmanje tri igrača.",
+    "duelMatchmaking": "Uparivanje Dvoboja smješta točno dva igrača u svaku igru.",
+    "twoHeadedMatchmaking": "Uparivanje Dvoglavog Diva smješta točno četiri igrača u svaku igru.",
+    "archenemyMatchmaking": "Uparivanje Archenemy Commandera smješta točno četiri igrača u svaku igru: jednog Archenemyja protiv tima od troje.",
+    "emperorMatchmaking": "Uparivanje Cara smješta točno šest igrača u svaku igru: dva tima, svaki s Carem i dva Generala.",
+    "starMatchmaking": "Uparivanje Zvijezde smješta točno pet igrača u kružni raspored.",
+    "eventLength": "Trajanje događaja",
+    "joinCodeDies": "kod za pridruživanje istječe",
+    "hoursFromStart": "Sati od početka",
+    "hoursFromStartHint": "Promijenite ovo za višednevni događaj. Nakon završetka QR otvara početnu stranicu.",
+    "joinCodeTitle": "Kod za pridruživanje",
+    "share": "podijeli",
+    "noLanAddress": "LAN adresa nije pronađena — ova poveznica radi samo na ovom računalu.",
+    "copyPlayerLink": "Kopiraj poveznicu za igrače",
+    "queue": "Red čekanja",
+    "nobodyWaiting": "Nitko ne čeka.",
     "flex": "flex {{count}}",
-    "challengePts": "{{count}} challenge pts",
-    "pts": "{{count}} pts",
-    "notReady": "Not ready",
-    "pausedTitle": "Paused",
-    "seated": "Seated",
-    "atTables": "{{count}} at tables",
-    "tablesTitle": "Tables",
-    "total": "{{count}} total",
-    "noTables": "This event was created without tables.",
-    "startingGames": "Starting games…",
-    "startAllReady": "Start all ready games ({{count}})",
-    "startGame": "Start game",
-    "finishTable": "Finish table",
-    "cancelPod": "Cancel pod",
-    "enable": "Enable",
-    "disable": "Disable",
+    "challengePts": "{{count}} bodova izazova",
+    "pts": "{{count}} bodova",
+    "notReady": "Nije spreman",
+    "pausedTitle": "Na pauzi",
+    "seated": "Za stolom",
+    "atTables": "{{count}} za stolovima",
+    "tablesTitle": "Stolovi",
+    "total": "{{count}} ukupno",
+    "noTables": "Ovaj događaj stvoren je bez stolova.",
+    "startingGames": "Pokretanje igara…",
+    "startAllReady": "Pokreni sve spremne igre ({{count}})",
+    "startGame": "Pokreni igru",
+    "finishTable": "Završi stol",
+    "cancelPod": "Otkaži pod",
+    "enable": "Omogući",
+    "disable": "Onemogući",
     "trackerUsed": "tracker",
-    "noTracker": "no tracker",
-    "matchNow": "Match now",
-    "fillBots": "Fill tables with bots",
-    "playerJoinPage": "Player join page"
+    "noTracker": "bez trackera",
+    "matchNow": "Upari sada",
+    "fillBots": "Popuni stolove botovima",
+    "playerJoinPage": "Stranica za pridruživanje igrača"
   },
   "join": {
-    "joinEvent": "Join event",
-    "takeSeat": "Take a seat",
-    "displayName": "Display name",
+    "joinEvent": "Pridruži se događaju",
+    "takeSeat": "Zauzmi mjesto",
+    "displayName": "Prikazano ime",
     "displayNamePlaceholder": "Alex",
-    "joinEventButton": "Join event",
-    "saveDecks": "Save decks",
-    "matchFound": "Match found",
-    "yourDeck": "Your deck",
-    "checkMyRole": "Check my role",
-    "playingWithoutTracker": "Playing without the tracker. The host can finish the table.",
-    "chooseTracker": "Choose how this pod will record its game.",
-    "useGameTracker": "Use game tracker",
-    "playWithoutTracker": "Play without tracker",
-    "atTableMarked": "You're marked as at the table on this phone. The host still starts the game from the desk.",
-    "imAtTable": "I'm at the table",
-    "leftEvent": "You left this event. Scan the QR again if you want back in.",
-    "openPool": "Open pool — any table.",
-    "ready": "Ready",
-    "waiting": "waiting",
-    "holdTight": "Hold tight — a table is coming.",
-    "flex": "Flex: {{flex}} · Challenge Points: {{points}}",
-    "howWasPod": "How was your pod?",
-    "pause": "Pause",
-    "leave": "Leave",
-    "pausedMessage": "You are paused. Resume when you can sit, or leave the event.",
-    "imReady": "I'm ready",
-    "leaveEvent": "Leave event",
-    "markReady": "Mark ready when you can sit down for a game.",
-    "matchingShortly": "Matching will send you to a table shortly.",
-    "imTheHost": "I'm the host",
-    "offlineSaved": "Saved on this phone. It will send when you are back online.",
-    "stayAtTable": "Stay at the table until the host calls the game."
+    "joinEventButton": "Pridruži se događaju",
+    "saveDecks": "Spremi špilove",
+    "matchFound": "Igra pronađena",
+    "yourDeck": "Vaš špil",
+    "checkMyRole": "Provjeri moju ulogu",
+    "playingWithoutTracker": "Igrate bez trackera. Organizator može završiti stol.",
+    "chooseTracker": "Odaberite kako će ovaj pod bilježiti svoju igru.",
+    "useGameTracker": "Koristi tracker igre",
+    "playWithoutTracker": "Igraj bez trackera",
+    "atTableMarked": "Na ovom telefonu označeni ste kao prisutni za stolom. Organizator i dalje pokreće igru sa svojeg panela.",
+    "imAtTable": "Za stolom sam",
+    "leftEvent": "Napustili ste ovaj događaj. Ponovno skenirajte QR ako se želite vratiti.",
+    "openPool": "Otvoreni pool — bilo koji stol.",
+    "ready": "Spreman",
+    "waiting": "čeka",
+    "holdTight": "Pričekajte — uskoro ćete dobiti stol.",
+    "flex": "Flex: {{flex}} · Bodovi izazova: {{points}}",
+    "howWasPod": "Kakav je bio vaš pod?",
+    "pause": "Pauza",
+    "leave": "Napusti",
+    "pausedMessage": "Na pauzi ste. Nastavite kada možete sjesti ili napustite događaj.",
+    "imReady": "Spreman sam",
+    "leaveEvent": "Napusti događaj",
+    "markReady": "Označite se kao spremni kada možete sjesti za igru.",
+    "matchingShortly": "Uparivanje će vas uskoro poslati za stol.",
+    "imTheHost": "Ja sam organizator",
+    "offlineSaved": "Spremljeno na ovom telefonu. Poslat će se kada ponovno budete online.",
+    "stayAtTable": "Ostanite za stolom dok organizator ne završi igru."
   },
   "matchConfig": {
-    "title": "Match config",
-    "description": "Sets up the fake seated pod behind /match. Nothing here touches the server, and none of it appears on the battle screen, so that route can be checked on a phone as-is.",
-    "podSetup": "Pod setup",
-    "seats": "Seats",
-    "seatsCount": "{{count}} seats",
+    "title": "Postavke igre",
+    "description": "Postavlja lažni smješteni pod iza /match. Ništa ovdje ne utječe na server i ništa se ne pojavljuje na zaslonu igre, pa se ta ruta može provjeriti na telefonu kakva jest.",
+    "podSetup": "Postavljanje poda",
+    "seats": "Mjesta",
+    "seatsCount": "{{count}} mjesta",
     "bracket": "Bracket",
-    "header": "Header",
-    "eventNamePlaceholder": "Event name",
-    "joinCodePlaceholder": "Join code",
-    "matchCard": "Match card",
-    "tableLabelPlaceholder": "Table label",
-    "assignedDeckPlaceholder": "Assigned deck",
-    "openBattleScreen": "Open battle screen",
-    "resetGameState": "Reset game state",
+    "header": "Zaglavlje",
+    "eventNamePlaceholder": "Naziv događaja",
+    "joinCodePlaceholder": "Kod za pridruživanje",
+    "matchCard": "Kartica igre",
+    "tableLabelPlaceholder": "Oznaka stola",
+    "assignedDeckPlaceholder": "Dodijeljeni špil",
+    "openBattleScreen": "Otvori zaslon igre",
+    "resetGameState": "Poništi stanje igre",
     "commander": "Commander",
-    "secondCommander": "Second commander"
+    "secondCommander": "Drugi commander"
   },
   "app": {
-    "notFound": "Not found."
+    "notFound": "Nije pronađeno."
   },
   "wake": {
-    "title": "Waking the tables",
-    "message": "The free host went to sleep. Keep this page open — it usually takes under a minute."
+    "title": "Buđenje stolova",
+    "message": "Besplatni server je zaspao. Ostavite ovu stranicu otvorenom — obično traje manje od minute."
   },
   "scanner": {
-    "title": "Scan QR",
-    "ariaLabel": "Scan join QR code",
-    "hint": "Point at the host desk code.",
-    "closeScanner": "Close scanner",
-    "openingCamera": "Opening camera…",
-    "noCamera": "This browser cannot open the camera. Type the join code instead.",
-    "permissionDenied": "Camera permission was denied. Type the join code, or allow the camera and try again."
+    "title": "Skeniraj QR",
+    "ariaLabel": "Skeniraj QR kod za pridruživanje",
+    "hint": "Usmjerite kameru prema kodu organizatora.",
+    "closeScanner": "Zatvori skener",
+    "openingCamera": "Otvaranje kamere…",
+    "noCamera": "Ovaj preglednik ne može otvoriti kameru. Umjesto toga unesite kod za pridruživanje.",
+    "permissionDenied": "Pristup kameri je odbijen. Unesite kod za pridruživanje ili dopustite kameru i pokušajte ponovno."
   },
   "theme": {
-    "switchToLight": "Switch to light mode",
-    "switchToDark": "Switch to dark mode"
+    "switchToLight": "Prebaci na svijetli način",
+    "switchToDark": "Prebaci na tamni način"
   },
   "hostMetrics": {
-    "title": "Event recap",
+    "title": "Sažetak događaja",
     "aside": "pilot",
-    "players": "Players",
-    "games": "Games",
-    "gamesPerPlayer": "Games / player",
-    "waitAvg": "Wait avg",
-    "waitP95": "Wait p95",
-    "waitMax": "Wait max",
-    "rematchPairs": "Rematch pairs",
-    "flexEarned": "Flex earned",
-    "flexSeats": "Flex seats",
-    "durationAvg": "Duration avg",
-    "tablesOccupied": "Tables occupied",
-    "trackerUsed": "Tracker used",
-    "trackerUsedValue": "{{used}} used · {{skipped}} skipped",
-    "challenges": "Challenges",
-    "challengePts": "Challenge pts",
-    "podRating": "Pod rating",
-    "podSizes": "Pod sizes:",
-    "pools": "Pools:"
+    "players": "Igrači",
+    "games": "Igre",
+    "gamesPerPlayer": "Igre / igrač",
+    "waitAvg": "Prosj. čekanje",
+    "waitP95": "Čekanje p95",
+    "waitMax": "Maks. čekanje",
+    "rematchPairs": "Parovi ponovnih igara",
+    "flexEarned": "Osvojeni Flex",
+    "flexSeats": "Flex mjesta",
+    "durationAvg": "Prosj. trajanje",
+    "tablesOccupied": "Zauzeti stolovi",
+    "trackerUsed": "Korišten tracker",
+    "trackerUsedValue": "{{used}} korišteno · {{skipped}} preskočeno",
+    "challenges": "Izazovi",
+    "challengePts": "Bodovi izazova",
+    "podRating": "Ocjena poda",
+    "podSizes": "Veličine podova:",
+    "pools": "Poolovi:"
   },
   "deckEditor": {
-    "title": "Commander decks",
-    "deckNamePlaceholder": "Deck name (optional)",
+    "title": "Commander špilovi",
+    "deckNamePlaceholder": "Naziv špila (neobavezno)",
     "commander": "Commander",
-    "secondCommander": "Second commander",
-    "markPreferred": "Mark preferred",
-    "addAcceptedDeck": "Add accepted deck",
-    "hint": "Same-pool pods only. Extra decks let matching flex you into another bracket."
+    "secondCommander": "Drugi commander",
+    "markPreferred": "Označi kao preferirano",
+    "addAcceptedDeck": "Dodaj prihvatljivi špil",
+    "hint": "Samo podovi iz istog poola. Dodatni špilovi omogućuju uparivanju da vas prebaci u drugi bracket."
   },
   "commanderPicker": {
-    "searchCommander": "Search commander",
-    "searchPartner": "Commander that can pair with {{name}}",
-    "removeCommander": "Remove {{name}}",
-    "artworkFor": "Artwork for",
-    "loadingArtwork": "Loading artwork…"
+    "searchCommander": "Pretraži commandera",
+    "searchPartner": "Commander koji se može upariti s {{name}}",
+    "removeCommander": "Ukloni {{name}}",
+    "artworkFor": "Ilustracija za",
+    "loadingArtwork": "Učitavanje ilustracije…"
   },
   "challengePack": {
-    "title": "Challenge pack",
-    "description": "Only predefined primitives. Saving writes a new version and never mutates a pack already used by this event.",
-    "copyOfficial": "Copy official",
-    "startBlank": "Start blank",
-    "saveNewVersion": "Save new version",
-    "editHint": "Copy the official pack or start blank before editing.",
-    "packName": "Pack name",
-    "descriptionLabel": "Description",
-    "addChallenge": "Add challenge",
+    "title": "Paket izazova",
+    "description": "Samo unaprijed definirani primitives. Spremanje stvara novu verziju i nikada ne mijenja paket koji je ovaj događaj već koristio.",
+    "copyOfficial": "Kopiraj službeni",
+    "startBlank": "Počni prazno",
+    "saveNewVersion": "Spremi novu verziju",
+    "editHint": "Kopirajte službeni paket ili počnite prazno prije uređivanja.",
+    "packName": "Naziv paketa",
+    "descriptionLabel": "Opis",
+    "addChallenge": "Dodaj izazov",
     "id": "Id",
-    "name": "Name",
-    "category": "Category",
-    "points": "Points",
+    "name": "Naziv",
+    "category": "Kategorija",
+    "points": "Bodovi",
     "primitive": "Primitive",
-    "threshold": "Threshold",
-    "confirmationQuestion": "Confirmation question",
-    "defaultConfirmation": "Did this happen at the table?",
-    "newClaimName": "New claim",
-    "newClaimDescription": "Award this at the table."
+    "threshold": "Prag",
+    "confirmationQuestion": "Pitanje za potvrdu",
+    "defaultConfirmation": "Je li se ovo dogodilo za stolom?",
+    "newClaimName": "Novi zahtjev",
+    "newClaimDescription": "Dodijelite ovo za stolom."
   },
   "treacheryRole": {
-    "treachery": "Treachery",
-    "receivedRole": "You received a role",
-    "handDeviceTo": "Hand the device to {{name}}",
-    "lookAwayIdentity": "Everyone else should look away before the identity is revealed.",
-    "lookAwayScreen": "Make sure nobody else can see your screen before revealing it.",
-    "reveal": "Reveal",
-    "yourRole": "Your role",
-    "identityAlt": "{{name}}, {{role}} identity",
-    "illustratedBy": "Illustrated by {{artist}}",
-    "yourObjective": "Your objective",
-    "unveiledToTable": "Unveiled to the table",
-    "unveilWarning": "Everyone at your table will see this identity. Its ability must be resolved in the game.",
-    "confirmUnveil": "Confirm unveil",
-    "unveilToTable": "Unveil to the table",
-    "hideAndPass": "Hide & pass",
-    "hideIdentity": "Hide my identity"
+    "treachery": "Izdaja",
+    "receivedRole": "Dobili ste ulogu",
+    "handDeviceTo": "Predajte uređaj igraču {{name}}",
+    "lookAwayIdentity": "Svi ostali trebaju skrenuti pogled prije otkrivanja identiteta.",
+    "lookAwayScreen": "Provjerite da nitko drugi ne vidi vaš zaslon prije otkrivanja.",
+    "reveal": "Otkrij",
+    "yourRole": "Vaša uloga",
+    "identityAlt": "{{name}}, identitet {{role}}",
+    "illustratedBy": "Ilustrirao {{artist}}",
+    "yourObjective": "Vaš cilj",
+    "unveiledToTable": "Otkriveno stolu",
+    "unveilWarning": "Svi za vašim stolom vidjet će ovaj identitet. Njegova sposobnost mora se razriješiti u igri.",
+    "confirmUnveil": "Potvrdi otkrivanje",
+    "unveilToTable": "Otkrij stolu",
+    "hideAndPass": "Sakrij i proslijedi",
+    "hideIdentity": "Sakrij moj identitet"
   },
   "modeRulesSheet": {
-    "closeRules": "Close rules",
-    "backToGame": "Back to the game"
+    "closeRules": "Zatvori pravila",
+    "backToGame": "Natrag u igru"
   },
   "assassinTargets": {
-    "title": "Secret contracts",
-    "chooseOwnName": "Choose only your own name.",
-    "closeContracts": "Close contracts",
-    "handDeviceTo": "Hand the device to {{name}}",
-    "lookAway": "Everyone else should look away before the contract is revealed.",
-    "revealTarget": "Reveal my target",
-    "yourTarget": "Your target",
-    "noActiveTarget": "No active target",
-    "marksScored": "Marks scored: {{count}}",
-    "hideAndPass": "Hide & pass",
-    "allContractsChecked": "All contracts checked"
+    "title": "Tajni ugovori",
+    "chooseOwnName": "Odaberite samo svoje ime.",
+    "closeContracts": "Zatvori ugovore",
+    "handDeviceTo": "Predajte uređaj igraču {{name}}",
+    "lookAway": "Svi ostali trebaju skrenuti pogled prije otkrivanja ugovora.",
+    "revealTarget": "Otkrij moju metu",
+    "yourTarget": "Vaša meta",
+    "noActiveTarget": "Nema aktivne mete",
+    "marksScored": "Osvojeni markovi: {{count}}",
+    "hideAndPass": "Sakrij i proslijedi",
+    "allContractsChecked": "Svi ugovori provjereni"
   },
   "scheme": {
     "ongoingScheme": "Ongoing scheme",
     "scheme": "Scheme",
-    "pastScheme": "Past scheme",
+    "pastScheme": "Prethodni scheme",
     "abandon": "Abandon {{name}}",
     "ongoingSchemes": "Ongoing schemes",
     "graveyard": "Graveyard · {{count}}",
     "nextScheme": "Next scheme",
-    "remainingInDeck": "{{count}} left in the deck",
-    "scryfallCredit": "Card image via Scryfall. Magic: The Gathering is © Wizards of the Coast."
+    "remainingInDeck": "{{count}} preostalo u špilu",
+    "scryfallCredit": "Slika karte putem Scryfalla. Magic: The Gathering je © Wizards of the Coast."
   },
   "dungeon": {
-    "takeInitiativeTitle": "Take the initiative?",
-    "takeInitiativeEnter": "This also ventures into Undercity. Only take it when the table just gave this seat the initiative.",
-    "takeInitiativeWait": "Finish or leave the current dungeon before Undercity can open. Only take the initiative when the table just gave it to this seat.",
-    "takeInitiativeAndEnter": "Take initiative & enter Undercity",
-    "takeInitiative": "Take initiative",
-    "alreadyHoldInitiative": "You already hold the initiative",
-    "takeAndEnterUndercity": "Take the initiative and enter Undercity",
-    "completed": "{{name}} (completed)",
-    "ventureInto": "Venture into {{name}}",
-    "done": "Done",
-    "ventureTo": "Venture to {{room}}: {{effect}}",
-    "releaseInitiative": "Release the initiative",
-    "undoRoom": "Undo room",
-    "closeDungeon": "Close dungeon"
+    "takeInitiativeTitle": "Preuzeti initiative?",
+    "takeInitiativeEnter": "Ovo vas također vodi u Undercity. Preuzmite ga samo kada je stol upravo dao initiative ovom mjestu.",
+    "takeInitiativeWait": "Završite ili napustite trenutačni dungeon prije nego što se Undercity može otvoriti. Preuzmite initiative samo kada ga je stol upravo dao ovom mjestu.",
+    "takeInitiativeAndEnter": "Preuzmi initiative i uđi u Undercity",
+    "takeInitiative": "Preuzmi initiative",
+    "alreadyHoldInitiative": "Već imate initiative",
+    "takeAndEnterUndercity": "Preuzmi initiative i uđi u Undercity",
+    "completed": "{{name}} (završeno)",
+    "ventureInto": "Venture u {{name}}",
+    "done": "Gotovo",
+    "ventureTo": "Venture u {{room}}: {{effect}}",
+    "releaseInitiative": "Otpusti initiative",
+    "undoRoom": "Poništi room",
+    "closeDungeon": "Zatvori dungeon"
   },
   "treacheryRolesSheet": {
-    "title": "Secret identities",
-    "chooseOwnName": "Choose only your own name.",
-    "closeIdentities": "Close identities",
-    "allIdentitiesChecked": "All identities checked"
+    "title": "Tajni identiteti",
+    "chooseOwnName": "Odaberite samo svoje ime.",
+    "closeIdentities": "Zatvori identitete",
+    "allIdentitiesChecked": "Svi identiteti provjereni"
   },
   "tracker": {
-    "gameRules": "Game rules",
-    "loadingRoles": "Loading roles…",
-    "start": "Start",
-    "readRules": "Read rules",
-    "readyToBegin": "Ready to begin",
-    "readyToBeginHint": "Start the match when everyone is seated, or read the rules first.",
-    "dealContracts": "Deal contracts",
-    "dealContractsTitle": "Deal secret contracts",
-    "dealContractsHint": "Every player receives one private target. The device will be passed around so each contract can be checked in secret.",
-    "dealIdentities": "Deal identities",
-    "dealIdentitiesTitle": "Deal secret identities",
-    "dealIdentitiesHint": "Every player receives one hidden identity. The device will be passed around so each one can be read in secret.",
-    "chooseStarPositions": "Choose Star positions",
-    "starPositionsHint": "Players beside each other are allies. Tap two players to exchange their positions, or randomise the whole circle.",
-    "randomPositions": "Random positions",
-    "confirmPositions": "Confirm positions",
-    "adjacentPlayersAlly": "Adjacent\nplayers ally",
-    "buildEmperorTeams": "Build the Emperor teams",
-    "chooseTeamA": "Choose three players for Team A.",
-    "randomTeams": "Random teams",
-    "resetTeams": "Reset teams",
-    "teamEmperor": "Team {{team}} Emperor",
-    "randomEmperors": "Random Emperors",
-    "confirmTeams": "Confirm teams",
-    "chooseArchenemy": "Choose the Archenemy",
-    "chooseArchenemyHint": "The Archenemy faces the other three players. Both sides share 60 life. The Archenemy goes first, draws on that turn, and sets a scheme in motion during each first main phase.",
-    "confirmArchenemy": "Confirm Archenemy",
-    "chooseAllies": "Choose the allies",
-    "chooseAlliesHint": "Select two players for the first team. The other two players become the opposing team. Teams share 60 life and turns; all other player controls stay separate.",
-    "emperor": "Emperor",
-    "emperorRange": "Emperor · range 2",
-    "leader": "Leader",
+    "gameRules": "Pravila igre",
+    "loadingRoles": "Učitavanje uloga…",
+    "start": "Počni",
+    "readRules": "Pročitaj pravila",
+    "readyToBegin": "Spremno za početak",
+    "readyToBeginHint": "Pokrenite igru kada svi sjednu ili prvo pročitajte pravila.",
+    "dealContracts": "Podijeli ugovore",
+    "dealContractsTitle": "Podijeli tajne ugovore",
+    "dealContractsHint": "Svaki igrač dobiva jednu privatnu metu. Uređaj će se prosljeđivati kako bi svaki ugovor mogao biti provjeren u tajnosti.",
+    "dealIdentities": "Podijeli identitete",
+    "dealIdentitiesTitle": "Podijeli tajne identitete",
+    "dealIdentitiesHint": "Svaki igrač dobiva jedan skriveni identitet. Uređaj će se prosljeđivati kako bi svatko svoj mogao pročitati u tajnosti.",
+    "chooseStarPositions": "Odaberi položaje Zvijezde",
+    "starPositionsHint": "Igrači koji sjede jedan pokraj drugoga saveznici su. Dodirnite dva igrača kako biste zamijenili njihove položaje ili nasumično rasporedite cijeli krug.",
+    "randomPositions": "Nasumični položaji",
+    "confirmPositions": "Potvrdi položaje",
+    "adjacentPlayersAlly": "Susjedni\nigrači su saveznici",
+    "buildEmperorTeams": "Sastavi timove Cara",
+    "chooseTeamA": "Odaberite tri igrača za Tim A.",
+    "randomTeams": "Nasumični timovi",
+    "resetTeams": "Poništi timove",
+    "teamEmperor": "Car Tima {{team}}",
+    "randomEmperors": "Nasumični Carevi",
+    "confirmTeams": "Potvrdi timove",
+    "chooseArchenemy": "Odaberi Archenemyja",
+    "chooseArchenemyHint": "Archenemy se suočava s ostala tri igrača. Obje strane dijele 60 života. Archenemy igra prvi, vuče kartu u tom potezu i pokreće scheme tijekom svakog svog first main phasea.",
+    "confirmArchenemy": "Potvrdi Archenemyja",
+    "chooseAllies": "Odaberi saveznike",
+    "chooseAlliesHint": "Odaberite dva igrača za prvi tim. Preostala dva igrača postaju protivnički tim. Timovi dijele 60 života i poteze; sve ostale kontrole igrača ostaju odvojene.",
+    "emperor": "Car",
+    "emperorRange": "Car · domet 2",
+    "leader": "Vođa",
     "general": "General",
-    "generalRange": "General · range 1",
-    "marks": "{{count}} marks",
-    "winner": "Winner",
-    "turnPhone": "Turn your phone for the full board",
-    "matchMenu": "Match menu",
-    "matchMenuElapsed": "Match menu. {{clock}} elapsed",
-    "matchMenuPaused": ", paused",
-    "matchMenuDayNight": ", it is {{phase}}",
-    "day": "day",
-    "night": "night",
-    "closeMatchMenu": "Close match menu",
-    "match": "Match",
-    "firstScheme": "First scheme",
-    "nextScheme": "Next scheme",
-    "resume": "Resume",
-    "pause": "Pause",
-    "undo": "Undo",
-    "challenges": "Challenges",
-    "checkTarget": "Check target",
-    "checkMyRole": "Check my role",
-    "dayButton": "Day",
-    "nightButton": "Night",
-    "playerLost": "Player lost",
-    "gameWonBy": "Game won by",
-    "won": "{{name}} won",
-    "doneRequeue": "Done & requeue",
-    "savingChallenges": "Saving challenges…",
-    "quitToHome": "Quit to home",
-    "quitHint": "The game is kept — reopen it from the home screen.",
-    "secretContracts": "Secret contracts",
-    "secretIdentities": "Secret identities",
-    "whoEliminated": "Who eliminated {{name}}?",
-    "whoEliminatedHint": "A player scores only if this was their assigned mark. The contract chain advances either way.",
-    "noPlayerUnknown": "No player / unknown",
-    "revealedIdentity": "Revealed Treachery identity",
-    "closeRevealedIdentity": "Close revealed identity",
-    "commanderChallenges": "Commander challenges",
-    "challengeCompleted": "{{name}} completed",
-    "challengeFallback": "Challenge",
-    "matchResult": "Match result",
-    "wins": "{{name}} wins",
-    "reviewBoard": "Review board",
-    "yes": "Yes",
-    "no": "No",
-    "yesTheyLost": "Yes, they lost",
-    "noStillIn": "No, still in",
-    "openCounters": "Open counters for {{name}}",
-    "commanderDamageOn": "Commander damage on {{name}}",
-    "countersFor": "Counters for {{name}}",
-    "countersTitle": "Counters for {{name}}",
-    "closeCounters": "Close counters",
-    "closeChallenges": "Close challenges",
-    "sharedCommanderDamage": "Shared commander damage",
-    "closeCommanderDamage": "Close commander damage",
-    "highestCommanderDamage": "Highest commander damage on {{name}}: {{value}} from {{commander}}",
-    "noCommanderDamage": "No commander damage on {{name}}",
-    "removeCommanderDamage": "Remove commander damage from {{owner}}'s {{name}}",
-    "addCommanderDamage": "Add commander damage from {{owner}}'s {{name}}",
-    "isMonarch": "{{name}} is the monarch",
-    "makeMonarch": "Make {{name}} the monarch",
-    "enduringStory": "{{name}} {{has}} an enduring story",
-    "cityBlessing": "{{name}} {{has}} the city's blessing",
-    "has": "has",
-    "doesNotHave": "does not have",
-    "didLose": "Did {{name}} lose the game?",
-    "thisTeam": "This team",
-    "didTheyLose": "Did they lose?",
-    "poisonPrompt": "{{name}} has {{count}} poison counters. Did they lose?",
-    "sharedPoisonPrompt": "{{subject}} has {{count}} shared poison counters. {{lose}}",
-    "hitPrompt": "{{name}} owns {{count}} exiled cards with hit counters. Did they lose?",
-    "commanderPrompt": "{{name}} has taken {{damage}} commander damage from {{from}}. Did they lose?",
-    "sharedCommanderPrompt": "{{subject}} has taken {{damage}} commander damage from {{from}}. {{lose}}",
-    "lifePrompt": "{{name}} is at {{life}} life. Did they lose?",
-    "sharedLifePrompt": "{{subject}} is at {{life}} life. {{lose}}",
-    "anotherCommander": "another commander",
-    "addLife": "Add 1 life. Long press for a larger amount.",
-    "removeLife": "Remove 1 life. Long press for a larger amount.",
-    "addLifeFor": "Add life for {{name}}",
-    "removeLifeFor": "Remove life for {{name}}",
-    "addLifeLabel": "Add life · {{name}}",
-    "removeLifeLabel": "Remove life · {{name}}",
-    "deleteDigit": "Delete digit",
-    "add": "Add",
-    "removeVerb": "Remove",
-    "lower": "Lower {{label}}",
-    "raise": "Raise {{label}}",
-    "seatColour": "Seat colour for {{name}}",
-    "dungeonFor": "Dungeon for {{name}}",
-    "dungeonInitiative": "Dungeon and initiative for {{name}}. {{title}}",
-    "dungeonInitiativeActive": "{{name}} has the initiative · {{filled}} of {{total}} unique dungeons",
-    "dungeonInitiativeCompleted": "{{name}} has completed {{filled}} of {{total}} unique dungeons",
-    "counterOn": "{{label}} on {{name}}: {{value}}",
-    "counterFor": "{{label}} for {{name}}",
-    "claimFor": "Claim for {{name}}",
-    "challengesSubtitle": "Same challenges for every player · points never affect matching",
+    "generalRange": "General · domet 1",
+    "marks": "{{count}} markova",
+    "winner": "Pobjednik",
+    "turnPhone": "Okrenite telefon za prikaz cijele ploče",
+    "matchMenu": "Izbornik igre",
+    "matchMenuElapsed": "Izbornik igre. Proteklo {{clock}}",
+    "matchMenuPaused": ", pauzirano",
+    "matchMenuDayNight": ", sada je {{phase}}",
+    "day": "dan",
+    "night": "noć",
+    "closeMatchMenu": "Zatvori izbornik igre",
+    "match": "Igra",
+    "firstScheme": "Prvi scheme",
+    "nextScheme": "Sljedeći scheme",
+    "resume": "Nastavi",
+    "pause": "Pauza",
+    "undo": "Poništi",
+    "challenges": "Izazovi",
+    "checkTarget": "Provjeri metu",
+    "checkMyRole": "Provjeri moju ulogu",
+    "dayButton": "Dan",
+    "nightButton": "Noć",
+    "playerLost": "Igrač je izgubio",
+    "gameWonBy": "Igru je osvojio",
+    "won": "{{name}} je pobijedio",
+    "doneRequeue": "Gotovo i natrag u red",
+    "savingChallenges": "Spremanje izazova…",
+    "quitToHome": "Izađi na početnu",
+    "quitHint": "Igra ostaje spremljena — ponovno je otvorite s početnog zaslona.",
+    "secretContracts": "Tajni ugovori",
+    "secretIdentities": "Tajni identiteti",
+    "whoEliminated": "Tko je eliminirao {{name}}?",
+    "whoEliminatedHint": "Igrač osvaja bod samo ako je ovo bila njegova dodijeljena meta. Lanac ugovora nastavlja se u svakom slučaju.",
+    "noPlayerUnknown": "Nijedan igrač / nepoznato",
+    "revealedIdentity": "Otkriveni Treachery identitet",
+    "closeRevealedIdentity": "Zatvori otkriveni identitet",
+    "commanderChallenges": "Commander izazovi",
+    "challengeCompleted": "{{name}} završeno",
+    "challengeFallback": "Izazov",
+    "matchResult": "Rezultat igre",
+    "wins": "{{name}} pobjeđuje",
+    "reviewBoard": "Pregledaj ploču",
+    "yes": "Da",
+    "no": "Ne",
+    "yesTheyLost": "Da, izgubili su",
+    "noStillIn": "Ne, još su u igri",
+    "openCounters": "Otvori countere za {{name}}",
+    "commanderDamageOn": "Commander damage na {{name}}",
+    "countersFor": "Counteri za {{name}}",
+    "countersTitle": "Counteri za {{name}}",
+    "closeCounters": "Zatvori countere",
+    "closeChallenges": "Zatvori izazove",
+    "sharedCommanderDamage": "Zajednički commander damage",
+    "closeCommanderDamage": "Zatvori commander damage",
+    "highestCommanderDamage": "Najveći commander damage na {{name}}: {{value}} od {{commander}}",
+    "noCommanderDamage": "Nema commander damagea na {{name}}",
+    "removeCommanderDamage": "Ukloni commander damage od {{owner}}ovog {{name}}",
+    "addCommanderDamage": "Dodaj commander damage od {{owner}}ovog {{name}}",
+    "isMonarch": "{{name}} je monarch",
+    "makeMonarch": "Postavi {{name}} kao monarcha",
+    "enduringStory": "{{name}} {{has}} enduring story",
+    "cityBlessing": "{{name}} {{has}} city's blessing",
+    "has": "ima",
+    "doesNotHave": "nema",
+    "didLose": "Je li {{name}} izgubio igru?",
+    "thisTeam": "Ovaj tim",
+    "didTheyLose": "Jesu li izgubili?",
+    "poisonPrompt": "{{name}} ima {{count}} poison countera. Je li izgubio?",
+    "sharedPoisonPrompt": "{{subject}} ima {{count}} zajedničkih poison countera. {{lose}}",
+    "hitPrompt": "{{name}} ima {{count}} exiled karata s hit counterima. Je li izgubio?",
+    "commanderPrompt": "{{name}} je primio {{damage}} commander damagea od {{from}}. Je li izgubio?",
+    "sharedCommanderPrompt": "{{subject}} je primio {{damage}} commander damagea od {{from}}. {{lose}}",
+    "lifePrompt": "{{name}} je na {{life}} života. Je li izgubio?",
+    "sharedLifePrompt": "{{subject}} je na {{life}} života. {{lose}}",
+    "anotherCommander": "drugog commandera",
+    "addLife": "Dodaj 1 život. Dugo pritisnite za veći iznos.",
+    "removeLife": "Ukloni 1 život. Dugo pritisnite za veći iznos.",
+    "addLifeFor": "Dodaj živote za {{name}}",
+    "removeLifeFor": "Ukloni živote za {{name}}",
+    "addLifeLabel": "Dodaj živote · {{name}}",
+    "removeLifeLabel": "Ukloni živote · {{name}}",
+    "deleteDigit": "Izbriši znamenku",
+    "add": "Dodaj",
+    "removeVerb": "Ukloni",
+    "lower": "Smanji {{label}}",
+    "raise": "Povećaj {{label}}",
+    "seatColour": "Boja mjesta za {{name}}",
+    "dungeonFor": "Dungeon za {{name}}",
+    "dungeonInitiative": "Dungeon i initiative za {{name}}. {{title}}",
+    "dungeonInitiativeActive": "{{name}} ima initiative · {{filled}} od {{total}} jedinstvenih dungeona",
+    "dungeonInitiativeCompleted": "{{name}} je završio {{filled}} od {{total}} jedinstvenih dungeona",
+    "counterOn": "{{label}} na {{name}}: {{value}}",
+    "counterFor": "{{label}} za {{name}}",
+    "claimFor": "Dodijeli za {{name}}",
+    "challengesSubtitle": "Isti izazovi za svakog igrača · bodovi nikada ne utječu na uparivanje",
     "counters": {
       "poison": "Poison",
       "tax": "Commander tax",
-      "acorn": "Acorns",
-      "energy": "Energy",
-      "experience": "Experience",
+      "acorn": "Žirevi",
+      "energy": "Energija",
+      "experience": "Iskustvo",
       "hit": "Etrata hits",
-      "rad": "Radiation",
+      "rad": "Radijacija",
       "ring": "Ring temptation",
-      "speed": "Speed",
-      "ticket": "Tickets"
+      "speed": "Brzina",
+      "ticket": "Ulaznice"
     }
   }
 }

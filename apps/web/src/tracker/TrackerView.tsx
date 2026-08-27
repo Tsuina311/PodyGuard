@@ -107,12 +107,13 @@ import { ModeRulesSheet } from './ModeRulesSheet';
 import { SchemeSheet } from './SchemeSheet';
 import { AssassinTargetsSheet } from './AssassinTargetsSheet';
 import { TreacheryRolesSheet } from './TreacheryRolesSheet';
-import { useBoardLandscape, useLandscapeLock } from './orientation';
+import { useBoardLandscape, useOrientationLock } from './orientation';
 import {
   detectAutomaticChallenges,
   detectedConfirmation,
 } from './challenges';
 import i18n from '../i18n';
+import { assetUrl } from '../asset-url';
 import { forgetActiveMatch } from '../active-match';
 import { useFeedback } from '../feedback/FeedbackContext';
 import { seatColor } from '../match-config';
@@ -153,6 +154,11 @@ type Props = {
   /** Treachery's public Leader replaces the normal random starting seat. */
   startingPlayerId?: string;
   onCheckRole?: () => void;
+  /**
+   * True while the caller is showing that player their own identity card over
+   * the board, so the phone can be turned upright for it.
+   */
+  roleCheckOpen?: boolean;
   revealedIdentities?: Record<string, PublicTreacheryIdentity>;
   /**
    * Deals the Treachery identities here and passes the tracker around, for a
@@ -469,6 +475,7 @@ export function TrackerView({
   rulesFormat: rulesFormatProp = null,
   startingPlayerId,
   onCheckRole,
+  roleCheckOpen = false,
   revealedIdentities = {},
   dealTreachery = false,
 }: Props) {
@@ -557,7 +564,14 @@ export function TrackerView({
   const attemptedChallenges = useRef(new Set<string>());
   const { landscape, forceRotate } = useBoardLandscape();
   const boardLive = Boolean(state.firstPlayerId);
-  useLandscapeLock(boardLive);
+  /*
+    An identity is a portrait card scan held close to one player's face, so the
+    phone comes back upright to read it and returns to the table on the way out.
+  */
+  const readingIdentity = treacheryRolesOpen || roleCheckOpen;
+  useOrientationLock(
+    boardLive ? (readingIdentity ? 'portrait' : 'landscape') : null,
+  );
   const screenClass = cx(
     boardScreenClass(boardLive && forceRotate),
     boardLive && forceRotate && 'board-landscape',
@@ -2269,7 +2283,7 @@ export function TrackerView({
             >
               <section className="relative max-h-full max-w-md">
                 <img
-                  src={publicIdentities[publicIdentityPlayerId].image}
+                  src={assetUrl(publicIdentities[publicIdentityPlayerId].image)}
                   alt={publicIdentities[publicIdentityPlayerId].name}
                   className="max-h-[90dvh] max-w-full rounded-xl shadow-2xl"
                 />

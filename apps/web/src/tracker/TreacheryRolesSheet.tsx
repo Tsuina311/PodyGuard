@@ -71,7 +71,7 @@ export function TreacheryRolesSheet({
     selectable.every((player) => reviewed.has(player.id));
   return (
     <section className="flex h-full w-full flex-col">
-      <header className="mb-3 flex items-center justify-between gap-3">
+      <header className="mb-4 flex shrink-0 items-center justify-between gap-3">
         <div>
           <h4 className="font-display text-sm font-bold">
             {t('treacheryRolesSheet.title')}
@@ -91,10 +91,11 @@ export function TreacheryRolesSheet({
           </button>
         ) : null}
       </header>
-      <div className="grid min-h-0 flex-1 content-center gap-2 overflow-y-auto sm:grid-cols-2">
+      <div className="grid min-h-0 flex-1 content-center gap-3 overflow-y-auto p-0.5 sm:grid-cols-2">
         {selectable.map((player) => (
           <Button
             key={player.id}
+            size="lg"
             variant={reviewed.has(player.id) ? 'glass' : 'neon'}
             onClick={() => setSelectedId(player.id)}
           >
@@ -106,16 +107,23 @@ export function TreacheryRolesSheet({
           </Button>
         ))}
       </div>
+      {/*
+        Starting the game is a different kind of act than picking a name, and the
+        list above scrolls under it once a full table is dealt, so it is kept
+        apart rather than stacked flush against the last seat.
+      */}
       {requireAllReviewed ? (
-        <Button
-          variant="primary"
-          size="lg"
-          block
-          disabled={!allReviewed}
-          onClick={onReady}
-        >
-          {t('treacheryRolesSheet.allIdentitiesChecked')}
-        </Button>
+        <div className="border-muted/15 mt-4 shrink-0 border-t pt-4">
+          <Button
+            variant="primary"
+            size="lg"
+            block
+            disabled={!allReviewed}
+            onClick={onReady}
+          >
+            {t('treacheryRolesSheet.allIdentitiesChecked')}
+          </Button>
+        </div>
       ) : null}
     </section>
   );

@@ -1,75 +1,75 @@
 {
   "common": {
-    "home": "Home",
-    "cancel": "Cancel",
-    "close": "Close",
-    "save": "Save",
-    "loading": "Loading…",
-    "players": "Players",
-    "game": "Game",
-    "language": "Language",
-    "yes": "Yes",
-    "no": "No",
-    "reset": "Reset",
-    "random": "Random",
-    "remove": "Remove",
-    "empty": "Empty",
+    "home": "Hasiera",
+    "cancel": "Utzi",
+    "close": "Itxi",
+    "save": "Gorde",
+    "loading": "Kargatzen…",
+    "players": "Jokalariak",
+    "game": "Partida",
+    "language": "Hizkuntza",
+    "yes": "Bai",
+    "no": "Ez",
+    "reset": "Berrezarri",
+    "random": "Ausaz",
+    "remove": "Kendu",
+    "empty": "Hutsik",
     "bot": "bot",
     "dev": "dev",
-    "official": "official",
-    "open": "Open",
-    "preferred": "preferred",
-    "player": "Player {{number}}",
-    "versus": "versus",
-    "teamA": "Team A",
-    "teamB": "Team B",
-    "working": "Working…",
-    "creating": "Creating…",
-    "checking": "Checking…",
-    "joining": "Joining…",
-    "updating": "Updating…",
-    "submitting": "Submitting…",
-    "saving": "Saving…",
-    "searching": "Searching…",
-    "unveiling": "Unveiling…",
-    "copied": "Copied",
-    "noneYet": "none yet",
+    "official": "ofiziala",
+    "open": "Irekia",
+    "preferred": "hobetsia",
+    "player": "{{number}}. jokalaria",
+    "versus": "aurka",
+    "teamA": "A taldea",
+    "teamB": "B taldea",
+    "working": "Prozesatzen…",
+    "creating": "Sortzen…",
+    "checking": "Egiaztatzen…",
+    "joining": "Sartzen…",
+    "updating": "Eguneratzen…",
+    "submitting": "Bidaltzen…",
+    "saving": "Gordetzen…",
+    "searching": "Bilatzen…",
+    "unveiling": "Agerrarazten…",
+    "copied": "Kopiatuta",
+    "noneYet": "oraindik ezer ez",
     "dash": "—",
     "errors": {
-      "generic": "Something went wrong.",
-      "createEvent": "Could not create event.",
-      "unlockHost": "Could not unlock host.",
-      "updateTable": "Could not update table.",
-      "startGame": "Could not start the game.",
-      "startAllGames": "Could not start all ready games.",
-      "finishTable": "Could not finish the table.",
-      "cancelPod": "Could not cancel the pod.",
-      "updateSettings": "Could not update settings.",
-      "matchTables": "Could not match tables.",
-      "fillBots": "Could not fill tables with bots.",
-      "clipboard": "Clipboard blocked — copy the link manually.",
-      "eventNotFound": "Event not found.",
-      "joinEvent": "Could not join event.",
-      "saveDecks": "Could not save decks.",
-      "updateReady": "Could not update ready.",
-      "updatePause": "Could not update pause.",
-      "leaveEvent": "Could not leave event.",
-      "trackerChoice": "Could not save the tracker choice.",
-      "saveRating": "Could not save that rating.",
-      "chooseCommander": "Choose a commander for every deck.",
-      "enterJoinCode": "Enter a join code.",
-      "sessionUnavailable": "Your event session is no longer available.",
-      "savePack": "Could not save the pack.",
-      "searchScryfall": "Could not search Scryfall.",
-      "loadArtwork": "Could not load alternate artwork.",
-      "submitResult": "Could not submit the result.",
-      "saveChallenge": "Could not save challenge progress.",
-      "unveilIdentity": "Could not unveil your identity.",
-      "apiWaking": "The host is waking up. Keep this page open — it usually takes under a minute.",
-      "apiUnreachable": "Cannot reach the API. Is the server running (yarn dev:server)?"
+      "generic": "Zerbait gaizki joan da.",
+      "createEvent": "Ezin izan da ekitaldia sortu.",
+      "unlockHost": "Ezin izan da antolatzailearen panela desblokeatu.",
+      "updateTable": "Ezin izan da mahaia eguneratu.",
+      "startGame": "Ezin izan da partida hasi.",
+      "startAllGames": "Ezin izan dira prest dauden partida guztiak hasi.",
+      "finishTable": "Ezin izan da mahaiko partida amaitu.",
+      "cancelPod": "Ezin izan da poda bertan behera utzi.",
+      "updateSettings": "Ezin izan dira ezarpenak eguneratu.",
+      "matchTables": "Ezin izan dira mahaiak parekatu.",
+      "fillBots": "Ezin izan dira mahaiak botekin bete.",
+      "clipboard": "Arbela blokeatuta dago — kopiatu esteka eskuz.",
+      "eventNotFound": "Ez da ekitaldia aurkitu.",
+      "joinEvent": "Ezin izan da ekitaldira sartu.",
+      "saveDecks": "Ezin izan dira sortak gorde.",
+      "updateReady": "Ezin izan da prest egoera eguneratu.",
+      "updatePause": "Ezin izan da etenaldia eguneratu.",
+      "leaveEvent": "Ezin izan da ekitalditik irten.",
+      "trackerChoice": "Ezin izan da trackerraren aukera gorde.",
+      "saveRating": "Ezin izan da balorazio hori gorde.",
+      "chooseCommander": "Aukeratu commander bat sorta bakoitzerako.",
+      "enterJoinCode": "Sartu parte hartzeko kode bat.",
+      "sessionUnavailable": "Zure ekitaldiko saioa jada ez dago erabilgarri.",
+      "savePack": "Ezin izan da paketea gorde.",
+      "searchScryfall": "Ezin izan da Scryfallen bilatu.",
+      "loadArtwork": "Ezin izan da ordezko ilustrazioa kargatu.",
+      "submitResult": "Ezin izan da emaitza bidali.",
+      "saveChallenge": "Ezin izan da erronkaren aurrerapena gorde.",
+      "unveilIdentity": "Ezin izan da zure identitatea agerrarazi.",
+      "apiWaking": "Zerbitzaria esnatzen ari da. Mantendu orri hau irekita — normalean minutu bat baino gutxiago behar du.",
+      "apiUnreachable": "Ezin da APIarekin konektatu. Zerbitzaria martxan dago (yarn dev:server)?"
     },
-    "assignedAtTable": "Assigned at the table",
-    "scanToJoin": "Scan to join this event"
+    "assignedAtTable": "Mahaian esleituta",
+    "scanToJoin": "Eskaneatu ekitaldi honetan sartzeko"
   },
   "language": {
     "en": "English",
@@ -109,173 +109,173 @@
     "cy": "Cymraeg"
   },
   "families": {
-    "normal": "Normal",
+    "normal": "Normala",
     "commander": "Commander"
   },
   "modes": {
     "shared": {
-      "commanderCombat": "A player loses after taking {{commanderDamage}} combat damage from one commander.",
-      "commanderTax": "Each time a commander is recast from the command zone, it costs 2 more mana.",
-      "lifeAndLoss": "Life and loss",
-      "turns": "Turns",
-      "commanders": "Commanders",
-      "eachPlayerLife": "Each player starts at {{life}} life.",
-      "loseAtZero": "A player loses at 0 life.",
-      "loseAtPoison": "A player loses at {{poison}} poison counters.",
-      "startingPlayerRandom": "The starting player is drawn at random.",
-      "startingPlayerSkipDraw": "The starting player is drawn at random and skips the draw step on the first turn.",
-      "multiplayerFirstTurnDraw": "In multiplayer, that player draws on their first turn.",
-      "commanderFirstTurnDraw": "In multiplayer Commander, that player draws on their first turn.",
-      "commandersInZone": "Commanders begin in the command zone and may be recast from there.",
-      "commanderRulesApply": "Commander rules still apply: {{life}} starting life, {{poison}} poison, and {{commanderDamage}} combat damage from one commander are lethal."
+      "commanderCombat": "Jokalari batek galdu egiten du commander bakar baten {{commanderDamage}} borroka-kalte jaso ondoren.",
+      "commanderTax": "Commander bat command zone-tik berriro jokatzen den bakoitzean, 2 mana gehiago kostatzen da.",
+      "lifeAndLoss": "Bizitza eta porrota",
+      "turns": "Txandak",
+      "commanders": "Commanderrak",
+      "eachPlayerLife": "Jokalari bakoitza {{life}} bizitzarekin hasten da.",
+      "loseAtZero": "Jokalari batek 0 bizitzan galtzen du.",
+      "loseAtPoison": "Jokalari batek {{poison}} pozoi-kontagailurekin galtzen du.",
+      "startingPlayerRandom": "Hasierako jokalaria ausaz aukeratzen da.",
+      "startingPlayerSkipDraw": "Hasierako jokalaria ausaz aukeratzen da eta lehen txandako draw step-a saltatzen du.",
+      "multiplayerFirstTurnDraw": "Multiplayerrean, jokalari horrek karta bat hartzen du lehen txandan.",
+      "commanderFirstTurnDraw": "Multiplayer Commanderrean, jokalari horrek karta bat hartzen du lehen txandan.",
+      "commandersInZone": "Commanderrak command zone-n hasten dira eta handik berriro joka daitezke.",
+      "commanderRulesApply": "Commanderren arauek indarrean jarraitzen dute: {{life}} hasierako bizitza, {{poison}} pozoi eta commander bakar baten {{commanderDamage}} borroka-kalte hilgarriak dira."
     },
     "duel": {
-      "label": "Duel",
-      "hint": "Two players. Each starts on 20 life.",
-      "hostHint": "Strict 2-player tables. Each player starts on 20 life.",
-      "hostFixedSeats": "Duel events always seat exactly two players.",
-      "title": "Duel",
-      "summary": "Two-player Magic. No commanders — just life and the board.",
+      "label": "Duelua",
+      "hint": "Bi jokalari. Bakoitza 20 bizitzarekin hasten da.",
+      "hostHint": "2 jokalariko mahaiak soilik. Jokalari bakoitza 20 bizitzarekin hasten da.",
+      "hostFixedSeats": "Dueluetan beti bi jokalari zehazki esertzen dira.",
+      "title": "Duelua",
+      "summary": "Bi jokalarirentzako Magic. Commanderrik gabe — bizitza eta joko-eremua besterik ez.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Bizitza eta porrota",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters."
+            "Jokalari bakoitza {{life}} bizitzarekin hasten da.",
+            "Jokalari batek 0 bizitzan galtzen du.",
+            "Jokalari batek {{poison}} pozoi-kontagailurekin galtzen du."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Txandak",
           "bullets": [
-            "The starting player is drawn at random and skips the draw step on the first turn."
+            "Hasierako jokalaria ausaz aukeratzen da eta lehen txandako draw step-a saltatzen du."
           ]
         }
       }
     },
     "multiplayer": {
       "label": "Multiplayer",
-      "hint": "Free-for-all without commanders. Everyone starts on 20 life.",
-      "hostHint": "Free-for-all without commanders. Matching fills your chosen table size; leftovers can sit as small as three.",
+      "hint": "Denak denen aurka, commanderrik gabe. Denak 20 bizitzarekin hasten dira.",
+      "hostHint": "Denak denen aurka, commanderrik gabe. Parekatzeak aukeratutako mahai-tamaina betetzen du; soberan dauden mahaiak gutxienez hiru jokalarikoak izan daitezke.",
       "title": "Multiplayer",
-      "summary": "Free-for-all without the Commander format. Useful for casual multiplayer, Planechase, or any 20-life table.",
+      "summary": "Multiplayer, Commander formatua erabili gabe. Casual multiplayer, Planechase edo 20 bizitzako edozein mahaitarako erabilgarria.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Bizitza eta porrota",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters."
+            "Jokalari bakoitza {{life}} bizitzarekin hasten da.",
+            "Jokalari batek 0 bizitzan galtzen du.",
+            "Jokalari batek {{poison}} pozoi-kontagailurekin galtzen du."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Txandak",
           "bullets": [
-            "The starting player is drawn at random.",
-            "In multiplayer, that player draws on their first turn."
+            "Hasierako jokalaria ausaz aukeratzen da.",
+            "Multiplayerrean, jokalari horrek karta bat hartzen du lehen txandan."
           ]
         }
       }
     },
     "commander": {
-      "label": "Classic",
-      "hint": "Free-for-all. Everyone starts on 40 life.",
-      "hostHint": "Free-for-all Commander. Matching prefers four; leftover pods can be three or five when allowed.",
-      "title": "Classic",
-      "summary": "Free-for-all multiplayer. Each player fights for themselves.",
+      "label": "Klasikoa",
+      "hint": "Denak denen aurka. Denak 40 bizitzarekin hasten dira.",
+      "hostHint": "Commander denak denen aurka. Parekatzeak lau jokalariko taldeak lehenesten ditu; soberan dauden podek hiru edo bost jokalari izan ditzakete baimenduta badago.",
+      "title": "Klasikoa",
+      "summary": "Denak denen aurkako multiplayerra. Jokalari bakoitzak bere kabuz borrokatzen du.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Bizitza eta porrota",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters.",
-            "A player loses after taking {{commanderDamage}} combat damage from one commander."
+            "Jokalari bakoitza {{life}} bizitzarekin hasten da.",
+            "Jokalari batek 0 bizitzan galtzen du.",
+            "Jokalari batek {{poison}} pozoi-kontagailurekin galtzen du.",
+            "Jokalari batek galdu egiten du commander bakar baten {{commanderDamage}} borroka-kalte jaso ondoren."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Txandak",
           "bullets": [
-            "The starting player is drawn at random.",
-            "In multiplayer Commander, that player draws on their first turn."
+            "Hasierako jokalaria ausaz aukeratzen da.",
+            "Multiplayer Commanderrean, jokalari horrek karta bat hartzen du lehen txandan."
           ]
         },
         "commanders": {
-          "heading": "Commanders",
+          "heading": "Commanderrak",
           "bullets": [
-            "Commanders begin in the command zone and may be recast from there.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Commanderrak command zone-n hasten dira eta handik berriro joka daitezke.",
+            "Commander bat command zone-tik berriro jokatzen den bakoitzean, 2 mana gehiago kostatzen da."
           ]
         }
       }
     },
     "treachery": {
-      "label": "Treachery",
-      "hint": "Secret identities dealt on this device. Pass it around so everyone reads their own in private.",
-      "hostHint": "Secret roles for Commander pods. Matching fills your chosen table size first; leftovers can sit as small as four.",
-      "title": "Treachery",
-      "summary": "Commander with secret identities. The Leader is public; everyone else stays hidden.",
+      "label": "Traizioa",
+      "hint": "Identitate sekretuak gailu honetan banatzen dira. Pasatu gailua jokalariz jokalari, bakoitzak berea pribatuan irakur dezan.",
+      "hostHint": "Commander podetarako rol sekretuak. Parekatzeak aukeratutako mahai-tamaina betetzen du lehenik; soberan dauden podek gutxienez lau jokalari izan ditzakete.",
+      "title": "Traizioa",
+      "summary": "Commander identitate sekretuekin. Liderra publikoa da; gainerako guztiak ezkutuan daude.",
       "sections": {
         "commander": {
-          "heading": "Commander rules still apply",
+          "heading": "Commanderren arauek indarrean jarraitzen dute",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "The Leader takes the first turn and draws on that turn.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Jokalari bakoitza {{life}} bizitzarekin hasten da.",
+            "Jokalari batek 0 bizitzan, {{poison}} pozoirekin edo commander bakar baten {{commanderDamage}} borroka-kalterekin galtzen du.",
+            "Liderrak lehen txanda egiten du eta txanda horretan karta bat hartzen du.",
+            "Commander bat command zone-tik berriro jokatzen den bakoitzean, 2 mana gehiago kostatzen da."
           ]
         },
         "identities": {
-          "heading": "Identities",
+          "heading": "Identitateak",
           "bullets": [
-            "Open Check my role from the timer menu. Only you see that card.",
-            "On a single tracker, deal the identities at setup and pass the device around so each player reads theirs alone.",
-            "Leader: Survive until every Assassin and Traitor is eliminated. Reveal yourself to the table. The Guardians share your victory, but you do not know who they are.",
-            "Guardian: Keep the Leader alive and eliminate the Leader's enemies. Your identity is secret. You win and lose with the Leader, even if you are eliminated first.",
-            "Assassin: Eliminate the Leader. Your identity is secret. Assassins share the same objective, but you do not know who the other Assassins are.",
-            "Traitor: Be the last player standing. Your identity is secret. Keep the Leader alive until the other threats are gone, then take the throne for yourself.",
-            "Follow any extra abilities printed on your identity card."
+            "Ireki «Egiaztatu nire rola» tenporizadorearen menutik. Zuk bakarrik ikusiko duzu karta hori.",
+            "Tracker bakarra erabiltzean, banatu identitateak prestaketan eta pasatu gailua jokalariz jokalari, bakoitzak berea bakarrik irakur dezan.",
+            "Liderra: bizirik iraun Hiltzaile guztiak eta Traidorea kanporatu arte. Agerrarazi zure burua mahaian. Zaindariek zure garaipena partekatzen dute, baina ez dakizu nor diren.",
+            "Zaindaria: mantendu Liderra bizirik eta kanporatu haren etsaiak. Zure identitatea sekretua da. Liderrarekin batera irabazi eta galtzen duzu, nahiz eta zu lehenengo kanporatu.",
+            "Hiltzailea: kanporatu Liderra. Zure identitatea sekretua da. Hiltzaileek helburu bera dute, baina ez dakizu nor diren beste Hiltzaileak.",
+            "Traidorea: izan zutik geratzen den azken jokalaria. Zure identitatea sekretua da. Mantendu Liderra bizirik gainerako mehatxuak desagertu arte, eta gero hartu tronua zeuretzat.",
+            "Jarraitu zure identitate-kartan inprimatutako aparteko gaitasun guztiak."
           ]
         }
       },
       "roles": {
         "leader": {
-          "name": "Leader",
-          "objective": "Survive until every Assassin and Traitor is eliminated.",
-          "guidance": "Reveal yourself to the table. The Guardians share your victory, but you do not know who they are.",
-          "publicNote": "Your role is public. Tell the table you are the Leader."
+          "name": "Liderra",
+          "objective": "Bizirik iraun Hiltzaile guztiak eta Traidorea kanporatu arte.",
+          "guidance": "Agerrarazi zure burua mahaian. Zaindariek zure garaipena partekatzen dute, baina ez dakizu nor diren.",
+          "publicNote": "Zure rola publikoa da. Esan mahaikoei Liderra zarela."
         },
         "guardian": {
-          "name": "Guardian",
-          "objective": "Keep the Leader alive and eliminate the Leader's enemies.",
-          "guidance": "Your identity is secret. You win and lose with the Leader, even if you are eliminated first.",
-          "publicNote": "Keep this role secret."
+          "name": "Zaindaria",
+          "objective": "Mantendu Liderra bizirik eta kanporatu haren etsaiak.",
+          "guidance": "Zure identitatea sekretua da. Liderrarekin batera irabazi eta galtzen duzu, nahiz eta zu lehenengo kanporatu.",
+          "publicNote": "Mantendu rol hau sekretuan."
         },
         "assassin": {
-          "name": "Assassin",
-          "objective": "Eliminate the Leader.",
-          "guidance": "Your identity is secret. Assassins share the same objective, but you do not know who the other Assassins are.",
-          "publicNote": "Keep this role secret."
+          "name": "Hiltzailea",
+          "objective": "Kanporatu Liderra.",
+          "guidance": "Zure identitatea sekretua da. Hiltzaileek helburu bera dute, baina ez dakizu nor diren beste Hiltzaileak.",
+          "publicNote": "Mantendu rol hau sekretuan."
         },
         "traitor": {
-          "name": "Traitor",
-          "objective": "Be the last player standing.",
-          "guidance": "Your identity is secret. Keep the Leader alive until the other threats are gone, then take the throne for yourself.",
-          "publicNote": "Keep this role secret."
+          "name": "Traidorea",
+          "objective": "Izan zutik geratzen den azken jokalaria.",
+          "guidance": "Zure identitatea sekretua da. Mantendu Liderra bizirik gainerako mehatxuak desagertu arte, eta gero hartu tronua zeuretzat.",
+          "publicNote": "Mantendu rol hau sekretuan."
         }
       },
       "normal": {
-        "hint": "Secret identities on a shared phone. Everyone starts on 20 life — no commanders.",
-        "hostHint": "Secret roles without commanders. Matching fills your chosen table size first; leftovers can sit as small as four.",
-        "summary": "Secret identities without the Commander format. The Leader is public; everyone else stays hidden.",
+        "hint": "Identitate sekretuak partekatutako telefono batean. Denak 20 bizitzarekin hasten dira — commanderrik gabe.",
+        "hostHint": "Rol sekretuak commanderrik gabe. Parekatzeak aukeratutako mahai-tamaina betetzen du lehenik; soberan dauden podek gutxienez lau jokalari izan ditzakete.",
+        "summary": "Identitate sekretuak Commander formatua erabili gabe. Liderra publikoa da; gainerako guztiak ezkutuan daude.",
         "sections": {
           "life": {
-            "heading": "Life and loss",
+            "heading": "Bizitza eta porrota",
             "bullets": [
-              "Each player starts at {{life}} life.",
-              "A player loses at 0 life.",
-              "A player loses at {{poison}} poison counters.",
-              "The Leader takes the first turn and draws on that turn."
+              "Jokalari bakoitza {{life}} bizitzarekin hasten da.",
+              "Jokalari batek 0 bizitzan galtzen du.",
+              "Jokalari batek {{poison}} pozoi-kontagailurekin galtzen du.",
+              "Liderrak lehen txanda egiten du eta txanda horretan karta bat hartzen du."
             ]
           },
           "identities": null
@@ -283,63 +283,63 @@
       }
     },
     "two-headed-giant": {
-      "label": "Two-Headed Giant",
-      "hint": "Two teams of two, 60 shared life each, turns taken together.",
-      "hostHint": "Strict 4-player Commander pods. Two teams share 60 life and take their turns together.",
-      "hostFixedSeats": "Two-Headed Giant games always seat exactly four players.",
-      "title": "Two-Headed Giant",
-      "summary": "Two teams of two. Teammates share a life total and a turn.",
+      "label": "Bi Buruko Erraldoia",
+      "hint": "Bi jokalariko bi talde, bakoitzak 60 bizitza partekatu, eta txandak elkarrekin egiten dira.",
+      "hostHint": "4 jokalariko Commander podak soilik. Bi taldeek 60 bizitza partekatzen dituzte eta txandak elkarrekin egiten dituzte.",
+      "hostFixedSeats": "Bi Buruko Erraldoiaren partidetan beti lau jokalari zehazki esertzen dira.",
+      "title": "Bi Buruko Erraldoia",
+      "summary": "Bi jokalariko bi talde. Taldekideek bizitza-kopurua eta txanda partekatzen dituzte.",
       "sections": {
         "teams": {
-          "heading": "Teams",
+          "heading": "Taldeak",
           "bullets": [
-            "Pick two allies, or let the table randomise the pairs.",
-            "Each team starts at {{sharedLife}} shared life.",
-            "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+            "Aukeratu bi aliatu edo utzi bikoteak ausaz erabakitzen.",
+            "Talde bakoitza {{sharedLife}} bizitza partekaturekin hasten da.",
+            "Taldekideek txanda elkarrekin egiten dute. Jokalari bakoitzak bere eskua, library-a eta commanderrak ditu oraindik."
           ]
         },
         "life": {
-          "heading": "Life and loss",
+          "heading": "Bizitza eta porrota",
           "bullets": [
-            "A team loses when its shared life reaches 0.",
-            "A team loses at {{sharedPoison}} shared poison counters.",
-            "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+            "Talde batek galtzen du bere bizitza partekatua 0ra iristen denean.",
+            "Talde batek {{sharedPoison}} pozoi-kontagailu partekaturekin galtzen du.",
+            "Talde batek galdu egiten du commander bakar baten {{commanderDamage}} borroka-kalte partekatu jaso ondoren."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Txandak",
           "bullets": [
-            "The starting team is drawn at random and skips the draw step on its first turn.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Hasierako taldea ausaz aukeratzen da eta lehen txandako draw step-a saltatzen du.",
+            "Commander bat command zone-tik berriro jokatzen den bakoitzean, 2 mana gehiago kostatzen da."
           ]
         }
       },
       "normal": {
-        "hint": "Two teams of two, 40 shared life each, turns taken together.",
-        "hostHint": "Strict 4-player tables. Two teams share 40 life and take their turns together — no commanders.",
-        "summary": "Two teams of two. Teammates share a life total and a turn — standard decks, 20 life each in team terms.",
+        "hint": "Bi jokalariko bi talde, bakoitzak 40 bizitza partekatu, eta txandak elkarrekin egiten dira.",
+        "hostHint": "4 jokalariko mahaiak soilik. Bi taldeek 40 bizitza partekatzen dituzte eta txandak elkarrekin egiten dituzte — commanderrik gabe.",
+        "summary": "Bi jokalariko bi talde. Taldekideek bizitza-kopurua eta txanda partekatzen dituzte — sorta estandarrak, taldearen ikuspegitik 20 bizitza jokalari bakoitzeko.",
         "sections": {
           "teams": {
-            "heading": "Teams",
+            "heading": "Taldeak",
             "bullets": [
-              "Pick two allies, or let the table randomise the pairs.",
-              "Each team starts at {{sharedLife}} shared life.",
-              "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+              "Aukeratu bi aliatu edo utzi bikoteak ausaz erabakitzen.",
+              "Talde bakoitza {{sharedLife}} bizitza partekaturekin hasten da.",
+              "Taldekideek txanda elkarrekin egiten dute. Jokalari bakoitzak bere eskua, library-a eta commanderrak ditu oraindik."
             ]
           },
           "life": {
-            "heading": "Life and loss",
+            "heading": "Bizitza eta porrota",
             "bullets": [
-              "A team loses when its shared life reaches 0.",
-              "A team loses at {{sharedPoison}} shared poison counters.",
-              "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+              "Talde batek galtzen du bere bizitza partekatua 0ra iristen denean.",
+              "Talde batek {{sharedPoison}} pozoi-kontagailu partekaturekin galtzen du.",
+              "Talde batek galdu egiten du commander bakar baten {{commanderDamage}} borroka-kalte partekatu jaso ondoren."
             ]
           },
           "turns": {
-            "heading": "Turns",
+            "heading": "Txandak",
             "bullets": [
-              "The starting team is drawn at random and skips the draw step on its first turn.",
-              "Each time a commander is recast from the command zone, it costs 2 more mana."
+              "Hasierako taldea ausaz aukeratzen da eta lehen txandako draw step-a saltatzen du.",
+              "Commander bat command zone-tik berriro jokatzen den bakoitzean, 2 mana gehiago kostatzen da."
             ]
           }
         }
@@ -347,286 +347,286 @@
     },
     "archenemy-commander": {
       "label": "Archenemy",
-      "hint": "One Archenemy on 60 life with a 40-card scheme deck against three heroes sharing 60 life.",
-      "hostHint": "Strict 4-player Commander pods. One 60-life Archenemy faces a three-player team with 60 shared life and a 40-card scheme deck.",
-      "hostFixedSeats": "Archenemy Commander games always seat exactly four players.",
+      "hint": "60 bizitzako Archenemy bat 40 kartako scheme sorta batekin, 60 bizitza partekatzen dituzten hiru heroien aurka.",
+      "hostHint": "4 jokalariko Commander podak soilik. 60 bizitzako Archenemy batek 60 bizitza partekatzen dituen hiru jokalariko talde bati egiten dio aurre, 40 kartako scheme sorta batekin.",
+      "hostFixedSeats": "Archenemy Commander partidetan beti lau jokalari zehazki esertzen dira.",
       "title": "Archenemy Commander",
-      "summary": "One Archenemy against a team of three, with a scheme deck in motion.",
+      "summary": "Archenemy bat hiru jokalariko talde baten aurka, scheme sorta aktibo batekin.",
       "sections": {
         "sides": {
-          "heading": "Sides",
+          "heading": "Aldeak",
           "bullets": [
-            "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
-            "Both sides start at {{life}} life.",
-            "The heroes share that life total and take their turn together.",
-            "The Archenemy goes first and draws on that turn."
+            "Aukeratu Archenemy-a edo esleitu bat ausaz. Beste hiru jokalariak heroiak dira.",
+            "Bi aldeak {{life}} bizitzarekin hasten dira.",
+            "Heroiek bizitza-kopuru hori partekatzen dute eta txanda elkarrekin egiten dute.",
+            "Archenemy-a lehenengo doa eta txanda horretan karta bat hartzen du."
           ]
         },
         "schemes": {
           "heading": "Schemes",
           "bullets": [
-            "The 40 Duskmourn Commander schemes are shuffled at the start.",
-            "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
-            "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
-            "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
-            "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+            "Duskmourn Commanderreko 40 scheme-ak hasieran nahasten dira.",
+            "Archenemy-aren first main phase bakoitzean, ireki tenporizadorearen menua eta sakatu «Next scheme» bat martxan jartzeko.",
+            "Ongoing ez den scheme bat ebazten da eta gero scheme sortaren behealdera doa.",
+            "Ongoing scheme bat ahoz gora geratzen da mahaiak abandoned gisa markatu arte; gero sortaren behealdera doa.",
+            "Ahoz gora dauden scheme-ak eta amaitutakoen graveyard-a kartaren azpian agertzen dira miniatura gisa; sakatu bat handian irakurtzeko."
           ]
         },
         "life": {
-          "heading": "Life and loss",
+          "heading": "Bizitza eta porrota",
           "bullets": [
-            "The Archenemy loses at 0 life, or when the usual poison and commander-damage limits are reached.",
-            "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
-            "A player loses after taking {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Archenemy-ak 0 bizitzan galtzen du, edo ohiko poison eta commander-damage mugak lortzen direnean.",
+            "Heroiek elkarrekin galtzen dute beren bizitza partekatua 0ra iristen denean, eta poison eta commander damage ere partekatzen dituzte.",
+            "Jokalari batek galdu egiten du commander bakar baten {{commanderDamage}} borroka-kalte jaso ondoren.",
+            "Commander bat command zone-tik berriro jokatzen den bakoitzean, 2 mana gehiago kostatzen da."
           ]
         }
       },
       "normal": {
-        "hint": "One Archenemy on 20 life with schemes against three heroes sharing 40 life.",
-        "hostHint": "Strict 4-player tables. One Archenemy with a scheme deck against a three-player team — no commanders.",
-        "summary": "One Archenemy against a team of three, with a scheme deck in motion — standard 20-life tables.",
+        "hint": "20 bizitzako Archenemy bat schemes-ekin, 40 bizitza partekatzen dituzten hiru heroien aurka.",
+        "hostHint": "4 jokalariko mahaiak soilik. Scheme sorta duen Archenemy bat hiru jokalariko talde baten aurka — commanderrik gabe.",
+        "summary": "Archenemy bat hiru jokalariko talde baten aurka, scheme sorta aktibo batekin — 20 bizitzako mahai estandarrak.",
         "sections": {
           "sides": {
-            "heading": "Sides",
+            "heading": "Aldeak",
             "bullets": [
-              "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
-              "Both sides start at {{life}} life.",
-              "The heroes share that life total and take their turn together.",
-              "The Archenemy goes first and draws on that turn."
+              "Aukeratu Archenemy-a edo esleitu bat ausaz. Beste hiru jokalariak heroiak dira.",
+              "Bi aldeak {{life}} bizitzarekin hasten dira.",
+              "Heroiek bizitza-kopuru hori partekatzen dute eta txanda elkarrekin egiten dute.",
+              "Archenemy-a lehenengo doa eta txanda horretan karta bat hartzen du."
             ]
           },
           "schemes": {
             "heading": "Schemes",
             "bullets": [
-              "The 40 Duskmourn Commander schemes are shuffled at the start.",
-              "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
-              "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
-              "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
-              "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+              "Duskmourn Commanderreko 40 scheme-ak hasieran nahasten dira.",
+              "Archenemy-aren first main phase bakoitzean, ireki tenporizadorearen menua eta sakatu «Next scheme» bat martxan jartzeko.",
+              "Ongoing ez den scheme bat ebazten da eta gero scheme sortaren behealdera doa.",
+              "Ongoing scheme bat ahoz gora geratzen da mahaiak abandoned gisa markatu arte; gero sortaren behealdera doa.",
+              "Ahoz gora dauden scheme-ak eta amaitutakoen graveyard-a kartaren azpian agertzen dira miniatura gisa; sakatu bat handian irakurtzeko."
             ]
           },
           "life": {
-            "heading": "Life and loss",
+            "heading": "Bizitza eta porrota",
             "bullets": [
-              "The Archenemy loses at 0 life, or when the usual poison and poison limits are reached.",
-              "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
-              "A player loses after taking {{poison}} poison counters."
+              "Archenemy-ak 0 bizitzan galtzen du, edo ohiko poison mugak lortzen direnean.",
+              "Heroiek elkarrekin galtzen dute beren bizitza partekatua 0ra iristen denean, eta poison eta commander damage ere partekatzen dituzte.",
+              "Jokalari batek {{poison}} pozoi-kontagailu jaso ondoren galtzen du."
             ]
           }
         }
       }
     },
     "emperor": {
-      "label": "Emperor",
-      "hint": "Two teams of three. Protect your Emperor using limited range of influence and deploy creatures.",
-      "hostHint": "Strict 6-player Commander pods. Two teams each place an Emperor between two Generals and play with limited range of influence.",
-      "hostFixedSeats": "Emperor games always seat exactly six players.",
-      "title": "Emperor",
-      "summary": "Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.",
+      "label": "Enperadorea",
+      "hint": "Hiru jokalariko bi talde. Babestu zure Enperadorea eragin-eremu mugatua erabiliz eta izakiak lekualdatuz.",
+      "hostHint": "6 jokalariko Commander podak soilik. Talde bakoitzak Enperadore bat jartzen du bi Jeneralen artean eta eragin-eremu mugatuarekin jokatzen du.",
+      "hostFixedSeats": "Enperadore partidetan beti sei jokalari zehazki esertzen dira.",
+      "title": "Enperadorea",
+      "summary": "Hiru jokalariko bi talde. Enperadore bakoitza bi Jeneralen artean esertzen da, eta Enperadore bat kanporatzeak partida irabazten du.",
       "sections": {
         "teams": {
-          "heading": "Teams and turns",
+          "heading": "Taldeak eta txandak",
           "bullets": [
-            "Choose both teams and each team's Emperor, or randomise either choice.",
-            "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
-            "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
-            "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+            "Aukeratu bi taldeak eta talde bakoitzeko Enperadorea, edo egin aukera horietako bat edo biak ausaz.",
+            "Jokalari bakoitza {{life}} bizitzarekin hasten da eta bere eskua, mana, permanent-ak, poison-a eta txanda mantentzen ditu.",
+            "Taldekideek elkarren eskuak begiratu eta estrategia eztabaida dezakete, baina ezin dituzte elkarren kartak manipulatu.",
+            "Aukeratu ausaz zein Enperadorek egingo duen lehen txanda. Enperadore horrek lehen txandan karta bat hartzen du."
           ]
         },
         "range": {
-          "heading": "Range and combat",
+          "heading": "Eragin-eremua eta borroka",
           "bullets": [
-            "Generals have range of influence 1. Emperors have range of influence 2.",
-            "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
-            "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
-            "As players leave, the empty seats stop counting, bringing surviving players into range."
+            "Jeneralek 1eko eragin-eremua dute. Enperadoreek 2ko eragin-eremua dute.",
+            "Sorginkeriek, gaitasunek, efektuek eta informazioak beren controller-aren eragin-eremuan dauden jokalari eta objektuei soilik eragin diezaiekete.",
+            "Jokalari batek bere ondoan zuzenean eserita dagoen aurkari bati soilik eraso diezaioke, edo aurkari horren planeswalker eta protected battles-ei.",
+            "Jokalariak irten ahala, eserleku hutsak ez dira gehiago zenbatzen, eta bizirik geratzen diren jokalariak elkarren eragin-eremuan sartzen dira."
           ]
         },
         "deploy": {
-          "heading": "Deploy creatures",
+          "heading": "Izakiak lekualdatu",
           "bullets": [
-            "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
-            "This can move creatures through the team as the battle lines change."
+            "Izaki bakoitzak hau du: \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
+            "Horri esker izakiak taldearen barruan mugitu daitezke borroka-lerroak aldatzen diren heinean."
           ]
         },
         "winning": {
-          "heading": "Winning and Commander rules",
+          "heading": "Garaipena eta Commanderren arauak",
           "bullets": [
-            "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
-            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Talde batek irabazten du bere Enperadoreak irabazten badu, eta berehala galtzen du Enperadoreak galtzen badu. Jeneral bat kanporatu daiteke partida amaitu gabe.",
+            "Jokalari batek 0 bizitzan, {{poison}} pozoirekin edo commander bakar baten {{commanderDamage}} borroka-kalterekin galtzen du.",
+            "Commander bat command zone-tik berriro jokatzen den bakoitzean, 2 mana gehiago kostatzen da."
           ]
         }
       },
       "normal": {
-        "hint": "Two teams of three on 20 life. Protect your Emperor with limited range of influence.",
-        "hostHint": "Strict 6-player tables. Two Emperors between Generals — standard 20-life decks, no commanders.",
-        "summary": "Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.",
+        "hint": "Hiru jokalariko bi talde, 20 bizitzarekin. Babestu zure Enperadorea eragin-eremu mugatuarekin.",
+        "hostHint": "6 jokalariko mahaiak soilik. Bi Enperadore Jeneralen artean — 20 bizitzako sorta estandarrak, commanderrik gabe.",
+        "summary": "Hiru jokalariko bi talde. Enperadore bakoitza bi Jeneralen artean esertzen da, eta Enperadore bat kanporatzeak partida irabazten du.",
         "sections": {
           "teams": {
-            "heading": "Teams and turns",
+            "heading": "Taldeak eta txandak",
             "bullets": [
-              "Choose both teams and each team's Emperor, or randomise either choice.",
-              "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
-              "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
-              "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+              "Aukeratu bi taldeak eta talde bakoitzeko Enperadorea, edo egin aukera horietako bat edo biak ausaz.",
+              "Jokalari bakoitza {{life}} bizitzarekin hasten da eta bere eskua, mana, permanent-ak, poison-a eta txanda mantentzen ditu.",
+              "Taldekideek elkarren eskuak begiratu eta estrategia eztabaida dezakete, baina ezin dituzte elkarren kartak manipulatu.",
+              "Aukeratu ausaz zein Enperadorek egingo duen lehen txanda. Enperadore horrek lehen txandan karta bat hartzen du."
             ]
           },
           "range": {
-            "heading": "Range and combat",
+            "heading": "Eragin-eremua eta borroka",
             "bullets": [
-              "Generals have range of influence 1. Emperors have range of influence 2.",
-              "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
-              "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
-              "As players leave, the empty seats stop counting, bringing surviving players into range."
+              "Jeneralek 1eko eragin-eremua dute. Enperadoreek 2ko eragin-eremua dute.",
+              "Sorginkeriek, gaitasunek, efektuek eta informazioak beren controller-aren eragin-eremuan dauden jokalari eta objektuei soilik eragin diezaiekete.",
+              "Jokalari batek bere ondoan zuzenean eserita dagoen aurkari bati soilik eraso diezaioke, edo aurkari horren planeswalker eta protected battles-ei.",
+              "Jokalariak irten ahala, eserleku hutsak ez dira gehiago zenbatzen, eta bizirik geratzen diren jokalariak elkarren eragin-eremuan sartzen dira."
             ]
           },
           "deploy": {
-            "heading": "Deploy creatures",
+            "heading": "Izakiak lekualdatu",
             "bullets": [
-              "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
-              "This can move creatures through the team as the battle lines change."
+              "Izaki bakoitzak hau du: \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
+              "Horri esker izakiak taldearen barruan mugitu daitezke borroka-lerroak aldatzen diren heinean."
             ]
           },
           "winning": {
-            "heading": "Winning and Commander rules",
+            "heading": "Garaipena eta Commanderren arauak",
             "bullets": [
-              "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
-              "A player loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+              "Talde batek irabazten du bere Enperadoreak irabazten badu, eta berehala galtzen du Enperadoreak galtzen badu. Jeneral bat kanporatu daiteke partida amaitu gabe.",
+              "Jokalari batek 0 bizitzan, {{poison}} pozoirekin edo {{poison}} pozoi-kontagailurekin galtzen du."
             ]
           }
         }
       }
     },
     "star": {
-      "label": "Star",
-      "hint": "Five players in a circle. Your neighbors are allies; eliminate both players across from you.",
-      "hostHint": "Strict 5-player Commander pods. Adjacent players are allies; each player wins by outlasting both opponents across the circle.",
-      "hostFixedSeats": "Star games always seat exactly five players.",
-      "title": "Star",
-      "summary": "Five players sit in a circle. Your neighbors are allies and the two players across from you are enemies.",
+      "label": "Izarra",
+      "hint": "Bost jokalari zirkulu batean. Zure bizilagunak aliatuak dira; kanporatu zure aurrean dauden bi jokalariak.",
+      "hostHint": "5 jokalariko Commander podak soilik. Ondoko jokalariak aliatuak dira; jokalari bakoitzak aurrean dituen bi aurkariei bizirik iraunez irabazten du.",
+      "hostFixedSeats": "Izarra partidetan beti bost jokalari zehazki esertzen dira.",
+      "title": "Izarra",
+      "summary": "Bost jokalari zirkulu batean esertzen dira. Zure bizilagunak aliatuak dira eta zure aurrean dauden bi jokalariak etsaiak.",
       "sections": {
         "positions": {
-          "heading": "Positions and allies",
+          "heading": "Posizioak eta aliatuak",
           "bullets": [
-            "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
-            "The players immediately to your left and right are your allies.",
-            "The two nonadjacent players across the circle are your enemies.",
-            "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+            "Aukeratu posizio zirkularrak eskuz bi jokalari trukatuz, edo ausaz antolatu bost posizioak.",
+            "Zure ezkerrean eta eskuinean zuzenean dauden jokalariak zure aliatuak dira.",
+            "Zirkuluaren beste aldean dauden eta zure ondoan ez dauden bi jokalariak zure etsaiak dira.",
+            "Posizioak berdin mantentzen dira jokalari bat kanporatzen denean; zure aliatuak eta etsaiak ez dira aldatzen."
           ]
         },
         "combat": {
-          "heading": "Combat and interaction",
+          "heading": "Borroka eta elkarreragina",
           "bullets": [
-            "Players cannot attack their allies by default.",
-            "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
-            "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+            "Lehenespenez, jokalariek ezin dituzte beren aliatuak erasotu.",
+            "Sorginkeriek eta gaitasunek edozein jokalari lagundu edo eragin dezakete oraindik, mahaiak aldaera zorrotzago bat adosten ez badu.",
+            "Txandak erlojuaren noranzkoan doaz. Aukeratu hasierako jokalaria ausaz; jokalari horrek lehen txandan karta bat hartzen du."
           ]
         },
         "winning": {
-          "heading": "Winning",
+          "heading": "Garaipena",
           "bullets": [
-            "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
-            "An eliminated player cannot win later.",
-            "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Bizirik jarraitzen duen eta bere bi etsaiak kanporatuta dituen lehen jokalariak irabazten du, nork kanporatu dituen kontuan hartu gabe.",
+            "Kanporatutako jokalari batek ezin du geroago irabazi.",
+            "Jokalari bakoitza {{life}} bizitzarekin hasten da eta 0 bizitzan, {{poison}} pozoirekin edo commander bakar baten {{commanderDamage}} borroka-kalterekin galtzen du.",
+            "Commander bat command zone-tik berriro jokatzen den bakoitzean, 2 mana gehiago kostatzen da."
           ]
         }
       },
       "normal": {
-        "hint": "Five players in a circle on 20 life. Neighbors are allies; eliminate both players across from you.",
-        "hostHint": "Strict 5-player tables. Adjacent players ally; each player wins by outlasting both opponents across the circle.",
-        "summary": "Five players sit in a circle on 20 life. Your neighbors are allies and the two players across from you are enemies.",
+        "hint": "Bost jokalari zirkulu batean, 20 bizitzarekin. Bizilagunak aliatuak dira; kanporatu zure aurrean dauden bi jokalariak.",
+        "hostHint": "5 jokalariko mahaiak soilik. Ondoko jokalariak aliatuak dira; jokalari bakoitzak aurrean dituen bi aurkariei bizirik iraunez irabazten du.",
+        "summary": "Bost jokalari zirkulu batean esertzen dira 20 bizitzarekin. Zure bizilagunak aliatuak dira eta zure aurrean dauden bi jokalariak etsaiak.",
         "sections": {
           "positions": {
-            "heading": "Positions and allies",
+            "heading": "Posizioak eta aliatuak",
             "bullets": [
-              "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
-              "The players immediately to your left and right are your allies.",
-              "The two nonadjacent players across the circle are your enemies.",
-              "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+              "Aukeratu posizio zirkularrak eskuz bi jokalari trukatuz, edo ausaz antolatu bost posizioak.",
+              "Zure ezkerrean eta eskuinean zuzenean dauden jokalariak zure aliatuak dira.",
+              "Zirkuluaren beste aldean dauden eta zure ondoan ez dauden bi jokalariak zure etsaiak dira.",
+              "Posizioak berdin mantentzen dira jokalari bat kanporatzen denean; zure aliatuak eta etsaiak ez dira aldatzen."
             ]
           },
           "combat": {
-            "heading": "Combat and interaction",
+            "heading": "Borroka eta elkarreragina",
             "bullets": [
-              "Players cannot attack their allies by default.",
-              "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
-              "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+              "Lehenespenez, jokalariek ezin dituzte beren aliatuak erasotu.",
+              "Sorginkeriek eta gaitasunek edozein jokalari lagundu edo eragin dezakete oraindik, mahaiak aldaera zorrotzago bat adosten ez badu.",
+              "Txandak erlojuaren noranzkoan doaz. Aukeratu hasierako jokalaria ausaz; jokalari horrek lehen txandan karta bat hartzen du."
             ]
           },
           "winning": {
-            "heading": "Winning",
+            "heading": "Garaipena",
             "bullets": [
-              "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
-              "An eliminated player cannot win later.",
-              "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+              "Bizirik jarraitzen duen eta bere bi etsaiak kanporatuta dituen lehen jokalariak irabazten du, nork kanporatu dituen kontuan hartu gabe.",
+              "Kanporatutako jokalari batek ezin du geroago irabazi.",
+              "Jokalari bakoitza {{life}} bizitzarekin hasten da eta 0 bizitzan, {{poison}} pozoirekin edo {{poison}} pozoi-kontagailurekin galtzen du."
             ]
           }
         }
       }
     },
     "assassin": {
-      "label": "Assassin",
-      "hint": "Secret contracts in a free-for-all. Eliminate your mark, score, and inherit their target.",
-      "hostHint": "Secret contracts for 3–8 players. Score by eliminating your mark, then inherit their target.",
-      "title": "Assassin",
-      "summary": "A free-for-all with secret contracts. Score marks, inherit new targets, and finish with the highest score.",
+      "label": "Hiltzailea",
+      "hint": "Kontratu sekretuak denak denen aurka. Kanporatu zure helburua, lortu puntu bat eta oinordetu haren helburua.",
+      "hostHint": "3–8 jokalarirentzako kontratu sekretuak. Lortu puntuak zure helburua kanporatuz eta gero oinordetu haren kontratua.",
+      "title": "Hiltzailea",
+      "summary": "Denak denen aurka kontratu sekretuekin. Kanporatu helburuak, oinordetu berriak eta amaitu puntuaziorik handienarekin.",
       "sections": {
         "contracts": {
-          "heading": "Secret contracts",
+          "heading": "Kontratu sekretuak",
           "bullets": [
-            "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
-            "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
-            "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+            "Jokalari bakoitzak helburu bat jasotzen du pribatuan. Kontratuek zirkulu bat osatzen dute, inork bere burua helburu izan ez dezan eta jokalari bakoitza behin ehizatua izan dadin.",
+            "Pasatu gailua prestaketan. Ireki «Egiaztatu helburua» tenporizadorearen menutik zure uneko kontratua berriro irakurri behar duzunean.",
+            "Jokalariek edonor eraso eta eragin dezakete; kontratuak puntuazioa zehazten du, ez helburu legalak."
           ]
         },
         "elimination": {
-          "heading": "Elimination and inheritance",
+          "heading": "Kanporatzea eta oinordetza",
           "bullets": [
-            "When a player is eliminated, record who dealt the finishing blow.",
-            "If you personally eliminate your assigned target, you score one mark.",
-            "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+            "Jokalari bat kanporatzen denean, erregistratu nork eman duen azken kolpea.",
+            "Zuri esleitutako helburua pertsonalki kanporatzen baduzu, marka bat lortzen duzu.",
+            "Kanporatutako helburua ehizatzen ari zen jokalariak helburu horren kontratua oinordetzen du, azken kolpea beste norbaitek eman badu ere. Horrela, bizirik geratzen den jokalari bakoitzak kontratu aktibo bat du."
           ]
         },
         "winning": {
-          "heading": "Winning",
+          "heading": "Garaipena",
           "bullets": [
-            "Play until only one player remains. The last survivor scores one additional mark.",
-            "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
-            "Commander rules still apply: {{life}} starting life, {{poison}} poison, and {{commanderDamage}} combat damage from one commander are lethal.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Jokatu jokalari bakarra geratu arte. Azken bizirik dagoenak marka gehigarri bat lortzen du.",
+            "Marka gehien dituen jokalariak irabazten du; puntuaziorik altuenean berdinketa badago, azken bizirik dagoenak irabazten du berdinketa.",
+            "Commanderren arauek indarrean jarraitzen dute: {{life}} hasierako bizitza, {{poison}} pozoi eta commander bakar baten {{commanderDamage}} borroka-kalte hilgarriak dira.",
+            "Commander bat command zone-tik berriro jokatzen den bakoitzean, 2 mana gehiago kostatzen da."
           ]
         }
       },
       "normal": {
-        "hint": "Secret contracts for 3–8 players on 20 life. Score by eliminating your mark.",
-        "hostHint": "Secret contracts without commanders. Matching fills your chosen table size; leftovers can sit as small as three.",
-        "summary": "A free-for-all with secret contracts on 20 life. Score marks, inherit new targets, and finish with the highest score.",
+        "hint": "3–8 jokalarirentzako kontratu sekretuak, 20 bizitzarekin. Lortu puntuak zure helburua kanporatuz.",
+        "hostHint": "Kontratu sekretuak commanderrik gabe. Parekatzeak aukeratutako mahai-tamaina betetzen du; soberan dauden zirkuluek gutxienez hiru jokalari izan ditzakete.",
+        "summary": "Denak denen aurka kontratu sekretuekin eta 20 bizitzarekin. Kanporatu helburuak, oinordetu berriak eta amaitu puntuaziorik handienarekin.",
         "sections": {
           "contracts": {
-            "heading": "Secret contracts",
+            "heading": "Kontratu sekretuak",
             "bullets": [
-              "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
-              "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
-              "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+              "Jokalari bakoitzak helburu bat jasotzen du pribatuan. Kontratuek zirkulu bat osatzen dute, inork bere burua helburu izan ez dezan eta jokalari bakoitza behin ehizatua izan dadin.",
+              "Pasatu gailua prestaketan. Ireki «Egiaztatu helburua» tenporizadorearen menutik zure uneko kontratua berriro irakurri behar duzunean.",
+              "Jokalariek edonor eraso eta eragin dezakete; kontratuak puntuazioa zehazten du, ez helburu legalak."
             ]
           },
           "elimination": {
-            "heading": "Elimination and inheritance",
+            "heading": "Kanporatzea eta oinordetza",
             "bullets": [
-              "When a player is eliminated, record who dealt the finishing blow.",
-              "If you personally eliminate your assigned target, you score one mark.",
-              "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+              "Jokalari bat kanporatzen denean, erregistratu nork eman duen azken kolpea.",
+              "Zuri esleitutako helburua pertsonalki kanporatzen baduzu, marka bat lortzen duzu.",
+              "Kanporatutako helburua ehizatzen ari zen jokalariak helburu horren kontratua oinordetzen du, azken kolpea beste norbaitek eman badu ere. Horrela, bizirik geratzen den jokalari bakoitzak kontratu aktibo bat du."
             ]
           },
           "winning": {
-            "heading": "Winning",
+            "heading": "Garaipena",
             "bullets": [
-              "Play until only one player remains. The last survivor scores one additional mark.",
-              "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
-              "{{life}} starting life, {{poison}} poison, and {{poison}} poison counters are lethal."
+              "Jokatu jokalari bakarra geratu arte. Azken bizirik dagoenak marka gehigarri bat lortzen du.",
+              "Marka gehien dituen jokalariak irabazten du; puntuaziorik altuenean berdinketa badago, azken bizirik dagoenak irabazten du berdinketa.",
+              "{{life}} hasierako bizitza, {{poison}} pozoi eta {{poison}} pozoi-kontagailu hilgarriak dira."
             ]
           }
         }
@@ -634,446 +634,446 @@
     }
   },
   "home": {
-    "taglineBefore": "Your next",
-    "taglineHighlight": "pod",
-    "taglineAfter": ", sorted.",
-    "startPlaying": "Start playing",
-    "ongoingGame": "ongoing game",
-    "noEventNeeded": "no event needed",
-    "startPlayingHint": "Open a battle screen on this device. Leave and come back without losing an unfinished game.",
-    "alwaysPlayers": "Always {{count}} players in this mode.",
-    "resumeGame": "Resume game",
-    "startNewGame": "Start a new game",
-    "startGame": "Start a game",
-    "commanderSetup": "Commanders",
-    "commanderSetupHint": "Search Scryfall for each player's commander. Partner pairs need both commanders.",
-    "chooseAllCommanders": "Choose a commander for every player.",
-    "advancedMatchConfig": "Advanced match config",
-    "hostEvent": "Host event",
-    "new": "new",
-    "targetTableSize": "Target table size",
-    "allowThreePods": "Allow 3-player pods",
-    "allowFivePods": "Allow 5-player pods",
-    "duelFixedSeats": "Duel events always seat exactly two players.",
-    "emperorFixedSeats": "Emperor games always seat exactly six players.",
-    "starFixedSeats": "Star games always seat exactly five players.",
-    "archenemyFixedSeats": "Archenemy Commander games always seat exactly four players.",
-    "twoHeadedFixedSeats": "Two-Headed Giant games always seat exactly four players.",
-    "eventName": "Event name",
-    "eventNamePlaceholder": "Friday Commander",
-    "tables": "Tables",
-    "tablesHint": "How many physical tables are free for this event.",
-    "eventLasts": "Event lasts",
-    "eventLastsHint": "Join code dies after this many hours. Use 48 or 72 for a weekend.",
-    "hostPin": "Host PIN",
-    "hostPinHint": "4 to 8 digits — reopens the host desk later.",
-    "createEvent": "Create event",
-    "joinWithCode": "Join with a code",
-    "playerAside": "player",
-    "joinCode": "Join code",
+    "taglineBefore": "Zure hurrengo",
+    "taglineHighlight": "poda",
+    "taglineAfter": ", prest.",
+    "startPlaying": "Hasi jokatzen",
+    "ongoingGame": "partida martxan",
+    "noEventNeeded": "ez da ekitaldirik behar",
+    "startPlayingHint": "Ireki partida-pantaila bat gailu honetan. Irten eta itzuli zaitezke amaitu gabeko partida galdu gabe.",
+    "alwaysPlayers": "Modu honetan beti {{count}} jokalari daude.",
+    "resumeGame": "Jarraitu partida",
+    "startNewGame": "Hasi partida berri bat",
+    "startGame": "Hasi partida",
+    "commanderSetup": "Commanderrak",
+    "commanderSetupHint": "Bilatu jokalari bakoitzaren commanderra Scryfallen. Partner bikoteek bi commanderrak behar dituzte.",
+    "chooseAllCommanders": "Aukeratu commander bat jokalari bakoitzarentzat.",
+    "advancedMatchConfig": "Partidaren konfigurazio aurreratua",
+    "hostEvent": "Antolatu ekitaldia",
+    "new": "berria",
+    "targetTableSize": "Helburuko mahai-tamaina",
+    "allowThreePods": "Baimendu 3 jokalariko podak",
+    "allowFivePods": "Baimendu 5 jokalariko podak",
+    "duelFixedSeats": "Dueluetan beti bi jokalari zehazki esertzen dira.",
+    "emperorFixedSeats": "Enperadore partidetan beti sei jokalari zehazki esertzen dira.",
+    "starFixedSeats": "Izarra partidetan beti bost jokalari zehazki esertzen dira.",
+    "archenemyFixedSeats": "Archenemy Commander partidetan beti lau jokalari zehazki esertzen dira.",
+    "twoHeadedFixedSeats": "Bi Buruko Erraldoiaren partidetan beti lau jokalari zehazki esertzen dira.",
+    "eventName": "Ekitaldiaren izena",
+    "eventNamePlaceholder": "Ostiraleko Commander",
+    "tables": "Mahaiak",
+    "tablesHint": "Zenbat mahai fisiko daude libre ekitaldi honetarako.",
+    "eventLasts": "Ekitaldiaren iraupena",
+    "eventLastsHint": "Parte hartzeko kodea ordu kopuru honen ondoren iraungiko da. Erabili 48 edo 72 asteburu baterako.",
+    "hostPin": "Antolatzailearen PINa",
+    "hostPinHint": "4 eta 8 digitu artean — antolatzailearen panela geroago berriro irekitzen du.",
+    "createEvent": "Sortu ekitaldia",
+    "joinWithCode": "Sartu kode batekin",
+    "playerAside": "jokalaria",
+    "joinCode": "Parte hartzeko kodea",
     "joinCodePlaceholder": "AB23CD",
-    "join": "Join",
-    "scanQr": "Scan QR",
-    "staleJoin": "That event is gone. Join with a new code, or host a new night."
+    "join": "Sartu",
+    "scanQr": "Eskaneatu QR",
+    "staleJoin": "Ekitaldi hori amaitu da. Sartu kode berri batekin edo antolatu saio berri bat."
   },
   "host": {
-    "desk": "Host desk",
-    "locked": "Locked",
-    "hostOnly": "host only",
-    "unlockHostDesk": "Unlock host desk",
-    "playerCount": "{{count}} player",
-    "playerCount_plural": "{{count}} players",
-    "ready": "{{count}} ready",
-    "matched": "{{count}} matched",
-    "playing": "{{count}} playing",
-    "paused": "{{count}} paused",
-    "ends": "ends {{date}}",
-    "podSizes": "Pod sizes",
-    "matching": "matching",
-    "allowLeftoverThree": "Allow leftover 3-player pods",
-    "allowFivePods": "Allow 5-player pods",
-    "treacheryTargetHint": "Target table size. Leftover pods can be as small as four.",
-    "matchingPrefers": "Matching prefers {{size}}-player tables.",
-    "matchingPrefersFour": "Matching prefers 4-player tables.",
-    "assassinTargetHint": "Target table size. Leftover contract circles can be as small as three.",
-    "multiplayerTargetHint": "Target table size. Leftover tables can be as small as three.",
-    "duelMatchmaking": "Duel matchmaking seats exactly two players per game.",
-    "twoHeadedMatchmaking": "Two-Headed Giant matchmaking seats exactly four players per game.",
-    "archenemyMatchmaking": "Archenemy Commander matchmaking seats exactly four players per game: one Archenemy against a team of three.",
-    "emperorMatchmaking": "Emperor matchmaking seats exactly six players per game: two teams with an Emperor and two Generals each.",
-    "starMatchmaking": "Star matchmaking seats exactly five players in a circular order.",
-    "eventLength": "Event length",
-    "joinCodeDies": "join code dies",
-    "hoursFromStart": "Hours from start",
-    "hoursFromStartHint": "Change this for a multi-day event. After it ends, the QR opens the home page.",
-    "joinCodeTitle": "Join code",
-    "share": "share",
-    "noLanAddress": "No LAN address found — this link only works on this computer.",
-    "copyPlayerLink": "Copy player link",
-    "queue": "Queue",
-    "nobodyWaiting": "Nobody waiting.",
+    "desk": "Antolatzailearen panela",
+    "locked": "Blokeatuta",
+    "hostOnly": "antolatzailearentzat soilik",
+    "unlockHostDesk": "Desblokeatu antolatzailearen panela",
+    "playerCount": "{{count}} jokalari",
+    "playerCount_plural": "{{count}} jokalari",
+    "ready": "{{count}} prest",
+    "matched": "{{count}} parekatuta",
+    "playing": "{{count}} jokatzen",
+    "paused": "{{count}} etenaldian",
+    "ends": "{{date}} amaitzen da",
+    "podSizes": "Poden tamainak",
+    "matching": "parekatzea",
+    "allowLeftoverThree": "Baimendu soberan dauden 3 jokalariko podak",
+    "allowFivePods": "Baimendu 5 jokalariko podak",
+    "treacheryTargetHint": "Helburuko mahai-tamaina. Soberan dauden podek gutxienez lau jokalari izan ditzakete.",
+    "matchingPrefers": "Parekatzeak {{size}} jokalariko mahaiak lehenesten ditu.",
+    "matchingPrefersFour": "Parekatzeak 4 jokalariko mahaiak lehenesten ditu.",
+    "assassinTargetHint": "Helburuko mahai-tamaina. Soberan dauden kontratu-zirkuluek gutxienez hiru jokalari izan ditzakete.",
+    "multiplayerTargetHint": "Helburuko mahai-tamaina. Soberan dauden mahaiek gutxienez hiru jokalari izan ditzakete.",
+    "duelMatchmaking": "Dueluaren parekatzeak bi jokalari zehazki esertzen ditu partida bakoitzean.",
+    "twoHeadedMatchmaking": "Bi Buruko Erraldoiaren parekatzeak lau jokalari zehazki esertzen ditu partida bakoitzean.",
+    "archenemyMatchmaking": "Archenemy Commanderren parekatzeak lau jokalari zehazki esertzen ditu partida bakoitzean: Archenemy bat hiruko talde baten aurka.",
+    "emperorMatchmaking": "Enperadorearen parekatzeak sei jokalari zehazki esertzen ditu partida bakoitzean: bi talde, bakoitza Enperadore batekin eta bi Jeneralekin.",
+    "starMatchmaking": "Izarraren parekatzeak bost jokalari zehazki esertzen ditu ordena zirkularrean.",
+    "eventLength": "Ekitaldiaren iraupena",
+    "joinCodeDies": "parte hartzeko kodea iraungitzen da",
+    "hoursFromStart": "Hasieratik igarotako orduak",
+    "hoursFromStartHint": "Aldatu hau egun anitzeko ekitaldi baterako. Amaitutakoan, QRak hasierako orria irekiko du.",
+    "joinCodeTitle": "Parte hartzeko kodea",
+    "share": "partekatu",
+    "noLanAddress": "Ez da LAN helbiderik aurkitu — esteka honek ordenagailu honetan bakarrik funtzionatzen du.",
+    "copyPlayerLink": "Kopiatu jokalarien esteka",
+    "queue": "Ilara",
+    "nobodyWaiting": "Ez dago inor zain.",
     "flex": "flex {{count}}",
-    "challengePts": "{{count}} challenge pts",
-    "pts": "{{count}} pts",
-    "notReady": "Not ready",
-    "pausedTitle": "Paused",
-    "seated": "Seated",
-    "atTables": "{{count}} at tables",
-    "tablesTitle": "Tables",
-    "total": "{{count}} total",
-    "noTables": "This event was created without tables.",
-    "startingGames": "Starting games…",
-    "startAllReady": "Start all ready games ({{count}})",
-    "startGame": "Start game",
-    "finishTable": "Finish table",
-    "cancelPod": "Cancel pod",
-    "enable": "Enable",
-    "disable": "Disable",
+    "challengePts": "{{count}} erronka-puntu",
+    "pts": "{{count}} puntu",
+    "notReady": "Ez dago prest",
+    "pausedTitle": "Etenaldian",
+    "seated": "Eserita",
+    "atTables": "{{count}} mahaietan",
+    "tablesTitle": "Mahaiak",
+    "total": "{{count}} guztira",
+    "noTables": "Ekitaldi hau mahairik gabe sortu da.",
+    "startingGames": "Partidak hasten…",
+    "startAllReady": "Hasi prest dauden partida guztiak ({{count}})",
+    "startGame": "Hasi partida",
+    "finishTable": "Amaitu mahaia",
+    "cancelPod": "Utzi poda bertan behera",
+    "enable": "Gaitu",
+    "disable": "Desgaitu",
     "trackerUsed": "tracker",
-    "noTracker": "no tracker",
-    "matchNow": "Match now",
-    "fillBots": "Fill tables with bots",
-    "playerJoinPage": "Player join page"
+    "noTracker": "trackerrik gabe",
+    "matchNow": "Parekatu orain",
+    "fillBots": "Bete mahaiak botekin",
+    "playerJoinPage": "Jokalarien sarrera-orria"
   },
   "join": {
-    "joinEvent": "Join event",
-    "takeSeat": "Take a seat",
-    "displayName": "Display name",
+    "joinEvent": "Sartu ekitaldira",
+    "takeSeat": "Hartu eserlekua",
+    "displayName": "Bistaratzeko izena",
     "displayNamePlaceholder": "Alex",
-    "joinEventButton": "Join event",
-    "saveDecks": "Save decks",
-    "matchFound": "Match found",
-    "yourDeck": "Your deck",
-    "checkMyRole": "Check my role",
-    "playingWithoutTracker": "Playing without the tracker. The host can finish the table.",
-    "chooseTracker": "Choose how this pod will record its game.",
-    "useGameTracker": "Use game tracker",
-    "playWithoutTracker": "Play without tracker",
-    "atTableMarked": "You're marked as at the table on this phone. The host still starts the game from the desk.",
-    "imAtTable": "I'm at the table",
-    "leftEvent": "You left this event. Scan the QR again if you want back in.",
-    "openPool": "Open pool — any table.",
-    "ready": "Ready",
-    "waiting": "waiting",
-    "holdTight": "Hold tight — a table is coming.",
-    "flex": "Flex: {{flex}} · Challenge Points: {{points}}",
-    "howWasPod": "How was your pod?",
-    "pause": "Pause",
-    "leave": "Leave",
-    "pausedMessage": "You are paused. Resume when you can sit, or leave the event.",
-    "imReady": "I'm ready",
-    "leaveEvent": "Leave event",
-    "markReady": "Mark ready when you can sit down for a game.",
-    "matchingShortly": "Matching will send you to a table shortly.",
-    "imTheHost": "I'm the host",
-    "offlineSaved": "Saved on this phone. It will send when you are back online.",
-    "stayAtTable": "Stay at the table until the host calls the game."
+    "joinEventButton": "Sartu ekitaldira",
+    "saveDecks": "Gorde sortak",
+    "matchFound": "Partida aurkituta",
+    "yourDeck": "Zure sorta",
+    "checkMyRole": "Egiaztatu nire rola",
+    "playingWithoutTracker": "Trackerrik gabe jokatzen. Antolatzaileak mahaia amaitu dezake.",
+    "chooseTracker": "Aukeratu pod honek partida nola erregistratuko duen.",
+    "useGameTracker": "Erabili partida-trackerra",
+    "playWithoutTracker": "Jokatu trackerrik gabe",
+    "atTableMarked": "Telefono honetan mahaian zaudela markatuta dago. Antolatzaileak bere paneletik abiarazten du oraindik partida.",
+    "imAtTable": "Mahaian nago",
+    "leftEvent": "Ekitaldi honetatik irten zara. Eskaneatu QR berriro itzuli nahi baduzu.",
+    "openPool": "Pool irekia — edozein mahai.",
+    "ready": "Prest",
+    "waiting": "zain",
+    "holdTight": "Itxaron pixka bat — laster izango duzu mahaia.",
+    "flex": "Flex: {{flex}} · Erronka-puntuak: {{points}}",
+    "howWasPod": "Nolakoa izan da zure poda?",
+    "pause": "Eten",
+    "leave": "Irten",
+    "pausedMessage": "Etenaldian zaude. Jarraitu esertzeko prest zaudenean edo irten ekitalditik.",
+    "imReady": "Prest nago",
+    "leaveEvent": "Irten ekitalditik",
+    "markReady": "Markatu zeure burua prest partida batean esertzeko prest zaudenean.",
+    "matchingShortly": "Parekatzeak laster mahai batera bidaliko zaitu.",
+    "imTheHost": "Ni naiz antolatzailea",
+    "offlineSaved": "Telefono honetan gordeta. Berriro konektatuta zaudenean bidaliko da.",
+    "stayAtTable": "Geratu mahaian antolatzaileak partida amaitu arte."
   },
   "matchConfig": {
-    "title": "Match config",
-    "description": "Sets up the fake seated pod behind /match. Nothing here touches the server, and none of it appears on the battle screen, so that route can be checked on a phone as-is.",
-    "podSetup": "Pod setup",
-    "seats": "Seats",
-    "seatsCount": "{{count}} seats",
+    "title": "Partidaren konfigurazioa",
+    "description": "/match atzean dagoen eseritako proba-poda konfiguratzen du. Hemengo ezerk ez du zerbitzaria ukitzen eta ezer ez da partida-pantailan agertzen; beraz, route hori telefono batean dagoen bezala egiazta daiteke.",
+    "podSetup": "Podaren konfigurazioa",
+    "seats": "Eserlekuak",
+    "seatsCount": "{{count}} eserleku",
     "bracket": "Bracket",
-    "header": "Header",
-    "eventNamePlaceholder": "Event name",
-    "joinCodePlaceholder": "Join code",
-    "matchCard": "Match card",
-    "tableLabelPlaceholder": "Table label",
-    "assignedDeckPlaceholder": "Assigned deck",
-    "openBattleScreen": "Open battle screen",
-    "resetGameState": "Reset game state",
+    "header": "Goiburua",
+    "eventNamePlaceholder": "Ekitaldiaren izena",
+    "joinCodePlaceholder": "Parte hartzeko kodea",
+    "matchCard": "Partidaren txartela",
+    "tableLabelPlaceholder": "Mahaiaren etiketa",
+    "assignedDeckPlaceholder": "Esleitutako sorta",
+    "openBattleScreen": "Ireki partida-pantaila",
+    "resetGameState": "Berrezarri partidaren egoera",
     "commander": "Commander",
-    "secondCommander": "Second commander"
+    "secondCommander": "Bigarren commanderra"
   },
   "app": {
-    "notFound": "Not found."
+    "notFound": "Ez da aurkitu."
   },
   "wake": {
-    "title": "Waking the tables",
-    "message": "The free host went to sleep. Keep this page open — it usually takes under a minute."
+    "title": "Mahaiak esnatzen",
+    "message": "Doako zerbitzaria lo geratu da. Mantendu orri hau irekita — normalean minutu bat baino gutxiago behar du."
   },
   "scanner": {
-    "title": "Scan QR",
-    "ariaLabel": "Scan join QR code",
-    "hint": "Point at the host desk code.",
-    "closeScanner": "Close scanner",
-    "openingCamera": "Opening camera…",
-    "noCamera": "This browser cannot open the camera. Type the join code instead.",
-    "permissionDenied": "Camera permission was denied. Type the join code, or allow the camera and try again."
+    "title": "Eskaneatu QR",
+    "ariaLabel": "Eskaneatu parte hartzeko QR kodea",
+    "hint": "Zuzendu kamera antolatzailearen kodeari.",
+    "closeScanner": "Itxi eskanerra",
+    "openingCamera": "Kamera irekitzen…",
+    "noCamera": "Nabigatzaile honek ezin du kamera ireki. Sartu parte hartzeko kodea eskuz.",
+    "permissionDenied": "Kameraren baimena ukatu da. Sartu parte hartzeko kodea edo baimendu kamera eta saiatu berriro."
   },
   "theme": {
-    "switchToLight": "Switch to light mode",
-    "switchToDark": "Switch to dark mode"
+    "switchToLight": "Aldatu modu argira",
+    "switchToDark": "Aldatu modu ilunera"
   },
   "hostMetrics": {
-    "title": "Event recap",
-    "aside": "pilot",
-    "players": "Players",
-    "games": "Games",
-    "gamesPerPlayer": "Games / player",
-    "waitAvg": "Wait avg",
-    "waitP95": "Wait p95",
-    "waitMax": "Wait max",
-    "rematchPairs": "Rematch pairs",
-    "flexEarned": "Flex earned",
-    "flexSeats": "Flex seats",
-    "durationAvg": "Duration avg",
-    "tablesOccupied": "Tables occupied",
-    "trackerUsed": "Tracker used",
-    "trackerUsedValue": "{{used}} used · {{skipped}} skipped",
-    "challenges": "Challenges",
-    "challengePts": "Challenge pts",
-    "podRating": "Pod rating",
-    "podSizes": "Pod sizes:",
-    "pools": "Pools:"
+    "title": "Ekitaldiaren laburpena",
+    "aside": "pilotua",
+    "players": "Jokalariak",
+    "games": "Partidak",
+    "gamesPerPlayer": "Partidak / jokalari",
+    "waitAvg": "Batez besteko itxaronaldia",
+    "waitP95": "p95 itxaronaldia",
+    "waitMax": "Gehieneko itxaronaldia",
+    "rematchPairs": "Errepikatutako bikoteak",
+    "flexEarned": "Lortutako Flex",
+    "flexSeats": "Flex eserlekuak",
+    "durationAvg": "Batez besteko iraupena",
+    "tablesOccupied": "Okupatutako mahaiak",
+    "trackerUsed": "Tracker erabilia",
+    "trackerUsedValue": "{{used}} erabilita · {{skipped}} saltatuta",
+    "challenges": "Erronkak",
+    "challengePts": "Erronka-puntuak",
+    "podRating": "Podaren balorazioa",
+    "podSizes": "Poden tamainak:",
+    "pools": "Poolak:"
   },
   "deckEditor": {
-    "title": "Commander decks",
-    "deckNamePlaceholder": "Deck name (optional)",
+    "title": "Commander sortak",
+    "deckNamePlaceholder": "Sortaren izena (aukerakoa)",
     "commander": "Commander",
-    "secondCommander": "Second commander",
-    "markPreferred": "Mark preferred",
-    "addAcceptedDeck": "Add accepted deck",
-    "hint": "Same-pool pods only. Extra decks let matching flex you into another bracket."
+    "secondCommander": "Bigarren commanderra",
+    "markPreferred": "Markatu hobetsi gisa",
+    "addAcceptedDeck": "Gehitu onartutako sorta",
+    "hint": "Pool bereko podak soilik. Sorta gehigarriek parekatzeak beste bracket batera mugitzea ahalbidetzen dute."
   },
   "commanderPicker": {
-    "searchCommander": "Search commander",
-    "searchPartner": "Commander that can pair with {{name}}",
-    "removeCommander": "Remove {{name}}",
-    "artworkFor": "Artwork for",
-    "loadingArtwork": "Loading artwork…"
+    "searchCommander": "Bilatu commanderra",
+    "searchPartner": "{{name}}-rekin bikotea osa dezakeen commanderra",
+    "removeCommander": "Kendu {{name}}",
+    "artworkFor": "Ilustrazioa:",
+    "loadingArtwork": "Ilustrazioa kargatzen…"
   },
   "challengePack": {
-    "title": "Challenge pack",
-    "description": "Only predefined primitives. Saving writes a new version and never mutates a pack already used by this event.",
-    "copyOfficial": "Copy official",
-    "startBlank": "Start blank",
-    "saveNewVersion": "Save new version",
-    "editHint": "Copy the official pack or start blank before editing.",
-    "packName": "Pack name",
-    "descriptionLabel": "Description",
-    "addChallenge": "Add challenge",
-    "id": "Id",
-    "name": "Name",
-    "category": "Category",
-    "points": "Points",
+    "title": "Erronka-paketea",
+    "description": "Aurrez definitutako primitive-ak soilik. Gordetzeak bertsio berri bat sortzen du eta ez du inoiz ekitaldi honek jada erabilitako pakete bat aldatzen.",
+    "copyOfficial": "Kopiatu ofiziala",
+    "startBlank": "Hasi hutsetik",
+    "saveNewVersion": "Gorde bertsio berria",
+    "editHint": "Kopiatu pakete ofiziala edo hasi hutsetik editatu aurretik.",
+    "packName": "Paketearen izena",
+    "descriptionLabel": "Deskribapena",
+    "addChallenge": "Gehitu erronka",
+    "id": "ID",
+    "name": "Izena",
+    "category": "Kategoria",
+    "points": "Puntuak",
     "primitive": "Primitive",
-    "threshold": "Threshold",
-    "confirmationQuestion": "Confirmation question",
-    "defaultConfirmation": "Did this happen at the table?",
-    "newClaimName": "New claim",
-    "newClaimDescription": "Award this at the table."
+    "threshold": "Atalasea",
+    "confirmationQuestion": "Berrespen-galdera",
+    "defaultConfirmation": "Hau mahaian gertatu da?",
+    "newClaimName": "Lorpen berria",
+    "newClaimDescription": "Esleitu hau mahaian."
   },
   "treacheryRole": {
-    "treachery": "Treachery",
-    "receivedRole": "You received a role",
-    "handDeviceTo": "Hand the device to {{name}}",
-    "lookAwayIdentity": "Everyone else should look away before the identity is revealed.",
-    "lookAwayScreen": "Make sure nobody else can see your screen before revealing it.",
-    "reveal": "Reveal",
-    "yourRole": "Your role",
-    "identityAlt": "{{name}}, {{role}} identity",
-    "illustratedBy": "Illustrated by {{artist}}",
-    "yourObjective": "Your objective",
-    "unveiledToTable": "Unveiled to the table",
-    "unveilWarning": "Everyone at your table will see this identity. Its ability must be resolved in the game.",
-    "confirmUnveil": "Confirm unveil",
-    "unveilToTable": "Unveil to the table",
-    "hideAndPass": "Hide & pass",
-    "hideIdentity": "Hide my identity"
+    "treachery": "Traizioa",
+    "receivedRole": "Rol bat jaso duzu",
+    "handDeviceTo": "Eman gailua {{name}} jokalariari",
+    "lookAwayIdentity": "Gainerako guztiek beste aldera begiratu behar dute identitatea agerrarazi aurretik.",
+    "lookAwayScreen": "Ziurtatu beste inork ezin duela zure pantaila ikusi agerrarazi aurretik.",
+    "reveal": "Agerrarazi",
+    "yourRole": "Zure rola",
+    "identityAlt": "{{name}}, {{role}} identitatea",
+    "illustratedBy": "{{artist}}-ek ilustratua",
+    "yourObjective": "Zure helburua",
+    "unveiledToTable": "Mahaiari agerrarazita",
+    "unveilWarning": "Zure mahaiko guztiek identitate hau ikusiko dute. Haren gaitasuna partidan ebatzi behar da.",
+    "confirmUnveil": "Berretsi agerraraztea",
+    "unveilToTable": "Agerrarazi mahaiari",
+    "hideAndPass": "Ezkutatu eta pasa",
+    "hideIdentity": "Ezkutatu nire identitatea"
   },
   "modeRulesSheet": {
-    "closeRules": "Close rules",
-    "backToGame": "Back to the game"
+    "closeRules": "Itxi arauak",
+    "backToGame": "Itzuli partidara"
   },
   "assassinTargets": {
-    "title": "Secret contracts",
-    "chooseOwnName": "Choose only your own name.",
-    "closeContracts": "Close contracts",
-    "handDeviceTo": "Hand the device to {{name}}",
-    "lookAway": "Everyone else should look away before the contract is revealed.",
-    "revealTarget": "Reveal my target",
-    "yourTarget": "Your target",
-    "noActiveTarget": "No active target",
-    "marksScored": "Marks scored: {{count}}",
-    "hideAndPass": "Hide & pass",
-    "allContractsChecked": "All contracts checked"
+    "title": "Kontratu sekretuak",
+    "chooseOwnName": "Aukeratu zure izena bakarrik.",
+    "closeContracts": "Itxi kontratuak",
+    "handDeviceTo": "Eman gailua {{name}} jokalariari",
+    "lookAway": "Gainerako guztiek beste aldera begiratu behar dute kontratua agerrarazi aurretik.",
+    "revealTarget": "Agerrarazi nire helburua",
+    "yourTarget": "Zure helburua",
+    "noActiveTarget": "Ez dago helburu aktiborik",
+    "marksScored": "Lortutako markak: {{count}}",
+    "hideAndPass": "Ezkutatu eta pasa",
+    "allContractsChecked": "Kontratu guztiak egiaztatuta"
   },
   "scheme": {
     "ongoingScheme": "Ongoing scheme",
     "scheme": "Scheme",
-    "pastScheme": "Past scheme",
+    "pastScheme": "Aurreko scheme-a",
     "abandon": "Abandon {{name}}",
     "ongoingSchemes": "Ongoing schemes",
     "graveyard": "Graveyard · {{count}}",
     "nextScheme": "Next scheme",
-    "remainingInDeck": "{{count}} left in the deck",
-    "scryfallCredit": "Card image via Scryfall. Magic: The Gathering is © Wizards of the Coast."
+    "remainingInDeck": "{{count}} geratzen dira sortan",
+    "scryfallCredit": "Kartaren irudia Scryfall bidez. Magic: The Gathering © Wizards of the Coast."
   },
   "dungeon": {
-    "takeInitiativeTitle": "Take the initiative?",
-    "takeInitiativeEnter": "This also ventures into Undercity. Only take it when the table just gave this seat the initiative.",
-    "takeInitiativeWait": "Finish or leave the current dungeon before Undercity can open. Only take the initiative when the table just gave it to this seat.",
-    "takeInitiativeAndEnter": "Take initiative & enter Undercity",
-    "takeInitiative": "Take initiative",
-    "alreadyHoldInitiative": "You already hold the initiative",
-    "takeAndEnterUndercity": "Take the initiative and enter Undercity",
-    "completed": "{{name}} (completed)",
-    "ventureInto": "Venture into {{name}}",
-    "done": "Done",
-    "ventureTo": "Venture to {{room}}: {{effect}}",
-    "releaseInitiative": "Release the initiative",
-    "undoRoom": "Undo room",
-    "closeDungeon": "Close dungeon"
+    "takeInitiativeTitle": "Initiative-a hartu?",
+    "takeInitiativeEnter": "Honek Undercity-ra venture egitea ere eragiten du. Hartu initiative-a mahaiak eserleku honi eman berri dionean bakarrik.",
+    "takeInitiativeWait": "Amaitu edo utzi uneko dungeon-a Undercity ireki aurretik. Hartu initiative-a mahaiak eserleku honi eman berri dionean bakarrik.",
+    "takeInitiativeAndEnter": "Hartu initiative-a eta sartu Undercity-n",
+    "takeInitiative": "Hartu initiative-a",
+    "alreadyHoldInitiative": "Dagoeneko initiative-a duzu",
+    "takeAndEnterUndercity": "Hartu initiative-a eta sartu Undercity-n",
+    "completed": "{{name}} (osatuta)",
+    "ventureInto": "Venture {{name}}-ra",
+    "done": "Eginda",
+    "ventureTo": "Venture {{room}}-ra: {{effect}}",
+    "releaseInitiative": "Utzi initiative-a",
+    "undoRoom": "Desegin gela",
+    "closeDungeon": "Itxi dungeon-a"
   },
   "treacheryRolesSheet": {
-    "title": "Secret identities",
-    "chooseOwnName": "Choose only your own name.",
-    "closeIdentities": "Close identities",
-    "allIdentitiesChecked": "All identities checked"
+    "title": "Identitate sekretuak",
+    "chooseOwnName": "Aukeratu zure izena bakarrik.",
+    "closeIdentities": "Itxi identitateak",
+    "allIdentitiesChecked": "Identitate guztiak egiaztatuta"
   },
   "tracker": {
-    "gameRules": "Game rules",
-    "loadingRoles": "Loading roles…",
-    "start": "Start",
-    "readRules": "Read rules",
-    "readyToBegin": "Ready to begin",
-    "readyToBeginHint": "Start the match when everyone is seated, or read the rules first.",
-    "dealContracts": "Deal contracts",
-    "dealContractsTitle": "Deal secret contracts",
-    "dealContractsHint": "Every player receives one private target. The device will be passed around so each contract can be checked in secret.",
-    "dealIdentities": "Deal identities",
-    "dealIdentitiesTitle": "Deal secret identities",
-    "dealIdentitiesHint": "Every player receives one hidden identity. The device will be passed around so each one can be read in secret.",
-    "chooseStarPositions": "Choose Star positions",
-    "starPositionsHint": "Players beside each other are allies. Tap two players to exchange their positions, or randomise the whole circle.",
-    "randomPositions": "Random positions",
-    "confirmPositions": "Confirm positions",
-    "adjacentPlayersAlly": "Adjacent\nplayers ally",
-    "buildEmperorTeams": "Build the Emperor teams",
-    "chooseTeamA": "Choose three players for Team A.",
-    "randomTeams": "Random teams",
-    "resetTeams": "Reset teams",
-    "teamEmperor": "Team {{team}} Emperor",
-    "randomEmperors": "Random Emperors",
-    "confirmTeams": "Confirm teams",
-    "chooseArchenemy": "Choose the Archenemy",
-    "chooseArchenemyHint": "The Archenemy faces the other three players. Both sides share 60 life. The Archenemy goes first, draws on that turn, and sets a scheme in motion during each first main phase.",
-    "confirmArchenemy": "Confirm Archenemy",
-    "chooseAllies": "Choose the allies",
-    "chooseAlliesHint": "Select two players for the first team. The other two players become the opposing team. Teams share 60 life and turns; all other player controls stay separate.",
-    "emperor": "Emperor",
-    "emperorRange": "Emperor · range 2",
-    "leader": "Leader",
-    "general": "General",
-    "generalRange": "General · range 1",
-    "marks": "{{count}} marks",
-    "winner": "Winner",
-    "turnPhone": "Turn your phone for the full board",
-    "matchMenu": "Match menu",
-    "matchMenuElapsed": "Match menu. {{clock}} elapsed",
-    "matchMenuPaused": ", paused",
-    "matchMenuDayNight": ", it is {{phase}}",
-    "day": "day",
-    "night": "night",
-    "closeMatchMenu": "Close match menu",
-    "match": "Match",
-    "firstScheme": "First scheme",
-    "nextScheme": "Next scheme",
-    "resume": "Resume",
-    "pause": "Pause",
-    "undo": "Undo",
-    "challenges": "Challenges",
-    "checkTarget": "Check target",
-    "checkMyRole": "Check my role",
-    "dayButton": "Day",
-    "nightButton": "Night",
-    "playerLost": "Player lost",
-    "gameWonBy": "Game won by",
-    "won": "{{name}} won",
-    "doneRequeue": "Done & requeue",
-    "savingChallenges": "Saving challenges…",
-    "quitToHome": "Quit to home",
-    "quitHint": "The game is kept — reopen it from the home screen.",
-    "secretContracts": "Secret contracts",
-    "secretIdentities": "Secret identities",
-    "whoEliminated": "Who eliminated {{name}}?",
-    "whoEliminatedHint": "A player scores only if this was their assigned mark. The contract chain advances either way.",
-    "noPlayerUnknown": "No player / unknown",
-    "revealedIdentity": "Revealed Treachery identity",
-    "closeRevealedIdentity": "Close revealed identity",
-    "commanderChallenges": "Commander challenges",
-    "challengeCompleted": "{{name}} completed",
-    "challengeFallback": "Challenge",
-    "matchResult": "Match result",
-    "wins": "{{name}} wins",
-    "reviewBoard": "Review board",
-    "yes": "Yes",
-    "no": "No",
-    "yesTheyLost": "Yes, they lost",
-    "noStillIn": "No, still in",
-    "openCounters": "Open counters for {{name}}",
-    "commanderDamageOn": "Commander damage on {{name}}",
-    "countersFor": "Counters for {{name}}",
-    "countersTitle": "Counters for {{name}}",
-    "closeCounters": "Close counters",
-    "closeChallenges": "Close challenges",
-    "sharedCommanderDamage": "Shared commander damage",
-    "closeCommanderDamage": "Close commander damage",
-    "highestCommanderDamage": "Highest commander damage on {{name}}: {{value}} from {{commander}}",
-    "noCommanderDamage": "No commander damage on {{name}}",
-    "removeCommanderDamage": "Remove commander damage from {{owner}}'s {{name}}",
-    "addCommanderDamage": "Add commander damage from {{owner}}'s {{name}}",
-    "isMonarch": "{{name}} is the monarch",
-    "makeMonarch": "Make {{name}} the monarch",
-    "enduringStory": "{{name}} {{has}} an enduring story",
-    "cityBlessing": "{{name}} {{has}} the city's blessing",
-    "has": "has",
-    "doesNotHave": "does not have",
-    "didLose": "Did {{name}} lose the game?",
-    "thisTeam": "This team",
-    "didTheyLose": "Did they lose?",
-    "poisonPrompt": "{{name}} has {{count}} poison counters. Did they lose?",
-    "sharedPoisonPrompt": "{{subject}} has {{count}} shared poison counters. {{lose}}",
-    "hitPrompt": "{{name}} owns {{count}} exiled cards with hit counters. Did they lose?",
-    "commanderPrompt": "{{name}} has taken {{damage}} commander damage from {{from}}. Did they lose?",
-    "sharedCommanderPrompt": "{{subject}} has taken {{damage}} commander damage from {{from}}. {{lose}}",
-    "lifePrompt": "{{name}} is at {{life}} life. Did they lose?",
-    "sharedLifePrompt": "{{subject}} is at {{life}} life. {{lose}}",
-    "anotherCommander": "another commander",
-    "addLife": "Add 1 life. Long press for a larger amount.",
-    "removeLife": "Remove 1 life. Long press for a larger amount.",
-    "addLifeFor": "Add life for {{name}}",
-    "removeLifeFor": "Remove life for {{name}}",
-    "addLifeLabel": "Add life · {{name}}",
-    "removeLifeLabel": "Remove life · {{name}}",
-    "deleteDigit": "Delete digit",
-    "add": "Add",
-    "removeVerb": "Remove",
-    "lower": "Lower {{label}}",
-    "raise": "Raise {{label}}",
-    "seatColour": "Seat colour for {{name}}",
-    "dungeonFor": "Dungeon for {{name}}",
-    "dungeonInitiative": "Dungeon and initiative for {{name}}. {{title}}",
-    "dungeonInitiativeActive": "{{name}} has the initiative · {{filled}} of {{total}} unique dungeons",
-    "dungeonInitiativeCompleted": "{{name}} has completed {{filled}} of {{total}} unique dungeons",
-    "counterOn": "{{label}} on {{name}}: {{value}}",
-    "counterFor": "{{label}} for {{name}}",
-    "claimFor": "Claim for {{name}}",
-    "challengesSubtitle": "Same challenges for every player · points never affect matching",
+    "gameRules": "Partidaren arauak",
+    "loadingRoles": "Rolak kargatzen…",
+    "start": "Hasi",
+    "readRules": "Irakurri arauak",
+    "readyToBegin": "Hasteko prest",
+    "readyToBeginHint": "Hasi partida denak eserita daudenean edo irakurri arauak lehenik.",
+    "dealContracts": "Banatu kontratuak",
+    "dealContractsTitle": "Banatu kontratu sekretuak",
+    "dealContractsHint": "Jokalari bakoitzak helburu pribatu bat jasotzen du. Gailua jokalariz jokalari pasatuko da kontratu bakoitza sekretuan egiaztatzeko.",
+    "dealIdentities": "Banatu identitateak",
+    "dealIdentitiesTitle": "Banatu identitate sekretuak",
+    "dealIdentitiesHint": "Jokalari bakoitzak ezkutuko identitate bat jasotzen du. Gailua jokalariz jokalari pasatuko da bakoitzak berea sekretuan irakur dezan.",
+    "chooseStarPositions": "Aukeratu Izarraren posizioak",
+    "starPositionsHint": "Elkarren ondoan eserita dauden jokalariak aliatuak dira. Sakatu bi jokalari haien posizioak trukatzeko edo antolatu zirkulu osoa ausaz.",
+    "randomPositions": "Ausazko posizioak",
+    "confirmPositions": "Berretsi posizioak",
+    "adjacentPlayersAlly": "Ondoko\njokalariak aliatuak dira",
+    "buildEmperorTeams": "Osatu Enperadorearen taldeak",
+    "chooseTeamA": "Aukeratu hiru jokalari A talderako.",
+    "randomTeams": "Ausazko taldeak",
+    "resetTeams": "Berrezarri taldeak",
+    "teamEmperor": "{{team}} taldeko Enperadorea",
+    "randomEmperors": "Ausazko Enperadoreak",
+    "confirmTeams": "Berretsi taldeak",
+    "chooseArchenemy": "Aukeratu Archenemy-a",
+    "chooseArchenemyHint": "Archenemy-ak beste hiru jokalariei egiten die aurre. Bi aldeek 60 bizitza dituzte. Archenemy-a lehenengo doa, txanda horretan karta bat hartzen du eta first main phase bakoitzean scheme bat martxan jartzen du.",
+    "confirmArchenemy": "Berretsi Archenemy-a",
+    "chooseAllies": "Aukeratu aliatuak",
+    "chooseAlliesHint": "Aukeratu bi jokalari lehen talderako. Beste bi jokalariek aurkako taldea osatzen dute. Taldeek 60 bizitza eta txandak partekatzen dituzte; jokalari bakoitzaren gainerako kontrolak bereizita mantentzen dira.",
+    "emperor": "Enperadorea",
+    "emperorRange": "Enperadorea · eremua 2",
+    "leader": "Liderra",
+    "general": "Jenerala",
+    "generalRange": "Jenerala · eremua 1",
+    "marks": "{{count}} marka",
+    "winner": "Irabazlea",
+    "turnPhone": "Biratu telefonoa joko-eremu osoa ikusteko",
+    "matchMenu": "Partidaren menua",
+    "matchMenuElapsed": "Partidaren menua. {{clock}} igaro da",
+    "matchMenuPaused": ", etenaldian",
+    "matchMenuDayNight": ", une honetan {{phase}} da",
+    "day": "eguna",
+    "night": "gaua",
+    "closeMatchMenu": "Itxi partidaren menua",
+    "match": "Partida",
+    "firstScheme": "Lehen scheme-a",
+    "nextScheme": "Hurrengo scheme-a",
+    "resume": "Jarraitu",
+    "pause": "Eten",
+    "undo": "Desegin",
+    "challenges": "Erronkak",
+    "checkTarget": "Egiaztatu helburua",
+    "checkMyRole": "Egiaztatu nire rola",
+    "dayButton": "Eguna",
+    "nightButton": "Gaua",
+    "playerLost": "Jokalariak galdu du",
+    "gameWonBy": "Partida irabazi du",
+    "won": "{{name}}-k irabazi du",
+    "doneRequeue": "Amaitu eta itzuli ilarara",
+    "savingChallenges": "Erronkak gordetzen…",
+    "quitToHome": "Irten hasierara",
+    "quitHint": "Partida gordeko da — berriro ireki hasierako pantailatik.",
+    "secretContracts": "Kontratu sekretuak",
+    "secretIdentities": "Identitate sekretuak",
+    "whoEliminated": "Nork kanporatu du {{name}}?",
+    "whoEliminatedHint": "Jokalari batek puntu bat lortzen du soilik hau bere esleitutako helburua bazen. Kontratu-kateak aurrera egiten du edonola ere.",
+    "noPlayerUnknown": "Inor ez / ezezaguna",
+    "revealedIdentity": "Agerrarazitako Treachery identitatea",
+    "closeRevealedIdentity": "Itxi agerrarazitako identitatea",
+    "commanderChallenges": "Commander erronkak",
+    "challengeCompleted": "{{name}} osatuta",
+    "challengeFallback": "Erronka",
+    "matchResult": "Partidaren emaitza",
+    "wins": "{{name}}-k irabazten du",
+    "reviewBoard": "Berrikusi joko-eremua",
+    "yes": "Bai",
+    "no": "Ez",
+    "yesTheyLost": "Bai, galdu du",
+    "noStillIn": "Ez, oraindik jokoan dago",
+    "openCounters": "Ireki {{name}}-ren kontagailuak",
+    "commanderDamageOn": "Commander damage {{name}}-ri",
+    "countersFor": "{{name}}-ren kontagailuak",
+    "countersTitle": "{{name}}-ren kontagailuak",
+    "closeCounters": "Itxi kontagailuak",
+    "closeChallenges": "Itxi erronkak",
+    "sharedCommanderDamage": "Partekatutako commander damage",
+    "closeCommanderDamage": "Itxi commander damage",
+    "highestCommanderDamage": "{{name}}-ren commander damage handiena: {{value}}, {{commander}}-engandik",
+    "noCommanderDamage": "Ez dago commander damage-rik {{name}}-rentzat",
+    "removeCommanderDamage": "Kendu {{owner}}-ren {{name}}-k egindako commander damage",
+    "addCommanderDamage": "Gehitu {{owner}}-ren {{name}}-k egindako commander damage",
+    "isMonarch": "{{name}} monarch da",
+    "makeMonarch": "Egin {{name}} monarch",
+    "enduringStory": "{{name}}-k {{has}} enduring story bat",
+    "cityBlessing": "{{name}}-k {{has}} city's blessing",
+    "has": "badu",
+    "doesNotHave": "ez du",
+    "didLose": "{{name}}-k partida galdu du?",
+    "thisTeam": "Talde hau",
+    "didTheyLose": "Galdu dute?",
+    "poisonPrompt": "{{name}}-k {{count}} pozoi-kontagailu ditu. Galdu du?",
+    "sharedPoisonPrompt": "{{subject}}-k {{count}} pozoi-kontagailu partekatu ditu. {{lose}}",
+    "hitPrompt": "{{name}}-k {{count}} karta exiled ditu hit counterekin. Galdu du?",
+    "commanderPrompt": "{{name}}-k {{damage}} commander damage jaso du {{from}}-engandik. Galdu du?",
+    "sharedCommanderPrompt": "{{subject}}-k {{damage}} commander damage jaso du {{from}}-engandik. {{lose}}",
+    "lifePrompt": "{{name}} {{life}} bizitzan dago. Galdu du?",
+    "sharedLifePrompt": "{{subject}} {{life}} bizitzan dago. {{lose}}",
+    "anotherCommander": "beste commander bat",
+    "addLife": "Gehitu 1 bizitza. Luze sakatu kopuru handiago baterako.",
+    "removeLife": "Kendu 1 bizitza. Luze sakatu kopuru handiago baterako.",
+    "addLifeFor": "Gehitu bizitza {{name}}-ri",
+    "removeLifeFor": "Kendu bizitza {{name}}-ri",
+    "addLifeLabel": "Gehitu bizitza · {{name}}",
+    "removeLifeLabel": "Kendu bizitza · {{name}}",
+    "deleteDigit": "Ezabatu digitua",
+    "add": "Gehitu",
+    "removeVerb": "Kendu",
+    "lower": "Jaitsi {{label}}",
+    "raise": "Igo {{label}}",
+    "seatColour": "{{name}}-ren eserlekuaren kolorea",
+    "dungeonFor": "{{name}}-ren dungeon-a",
+    "dungeonInitiative": "{{name}}-ren dungeon-a eta initiative-a. {{title}}",
+    "dungeonInitiativeActive": "{{name}}-k initiative-a du · {{filled}} / {{total}} dungeon bakar",
+    "dungeonInitiativeCompleted": "{{name}}-k {{filled}} / {{total}} dungeon bakar osatu ditu",
+    "counterOn": "{{label}} {{name}}-ren gainean: {{value}}",
+    "counterFor": "{{label}} {{name}}-rentzat",
+    "claimFor": "Esleitu {{name}}-ri",
+    "challengesSubtitle": "Erronka berak jokalari guztientzat · puntuek ez dute inoiz parekatzea eragiten",
     "counters": {
-      "poison": "Poison",
+      "poison": "Pozoia",
       "tax": "Commander tax",
-      "acorn": "Acorns",
-      "energy": "Energy",
-      "experience": "Experience",
+      "acorn": "Ezkurrak",
+      "energy": "Energia",
+      "experience": "Esperientzia",
       "hit": "Etrata hits",
-      "rad": "Radiation",
+      "rad": "Erradiazioa",
       "ring": "Ring temptation",
-      "speed": "Speed",
-      "ticket": "Tickets"
+      "speed": "Abiadura",
+      "ticket": "Txartelak"
     }
   }
 }

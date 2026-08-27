@@ -1,75 +1,75 @@
 {
   "common": {
-    "home": "Home",
-    "cancel": "Cancel",
-    "close": "Close",
-    "save": "Save",
-    "loading": "Loading…",
-    "players": "Players",
-    "game": "Game",
-    "language": "Language",
-    "yes": "Yes",
-    "no": "No",
-    "reset": "Reset",
-    "random": "Random",
-    "remove": "Remove",
-    "empty": "Empty",
+    "home": "Αρχική",
+    "cancel": "Ακύρωση",
+    "close": "Κλείσιμο",
+    "save": "Αποθήκευση",
+    "loading": "Φόρτωση…",
+    "players": "Παίκτες",
+    "game": "Παιχνίδι",
+    "language": "Γλώσσα",
+    "yes": "Ναι",
+    "no": "Όχι",
+    "reset": "Επαναφορά",
+    "random": "Τυχαία",
+    "remove": "Αφαίρεση",
+    "empty": "Κενό",
     "bot": "bot",
     "dev": "dev",
-    "official": "official",
-    "open": "Open",
-    "preferred": "preferred",
-    "player": "Player {{number}}",
-    "versus": "versus",
-    "teamA": "Team A",
-    "teamB": "Team B",
-    "working": "Working…",
-    "creating": "Creating…",
-    "checking": "Checking…",
-    "joining": "Joining…",
-    "updating": "Updating…",
-    "submitting": "Submitting…",
-    "saving": "Saving…",
-    "searching": "Searching…",
-    "unveiling": "Unveiling…",
-    "copied": "Copied",
-    "noneYet": "none yet",
+    "official": "επίσημο",
+    "open": "Ανοιχτό",
+    "preferred": "προτιμώμενο",
+    "player": "Παίκτης {{number}}",
+    "versus": "εναντίον",
+    "teamA": "Ομάδα A",
+    "teamB": "Ομάδα B",
+    "working": "Επεξεργασία…",
+    "creating": "Δημιουργία…",
+    "checking": "Έλεγχος…",
+    "joining": "Σύνδεση…",
+    "updating": "Ενημέρωση…",
+    "submitting": "Υποβολή…",
+    "saving": "Αποθήκευση…",
+    "searching": "Αναζήτηση…",
+    "unveiling": "Αποκάλυψη…",
+    "copied": "Αντιγράφηκε",
+    "noneYet": "κανένα ακόμη",
     "dash": "—",
     "errors": {
-      "generic": "Something went wrong.",
-      "createEvent": "Could not create event.",
-      "unlockHost": "Could not unlock host.",
-      "updateTable": "Could not update table.",
-      "startGame": "Could not start the game.",
-      "startAllGames": "Could not start all ready games.",
-      "finishTable": "Could not finish the table.",
-      "cancelPod": "Could not cancel the pod.",
-      "updateSettings": "Could not update settings.",
-      "matchTables": "Could not match tables.",
-      "fillBots": "Could not fill tables with bots.",
-      "clipboard": "Clipboard blocked — copy the link manually.",
-      "eventNotFound": "Event not found.",
-      "joinEvent": "Could not join event.",
-      "saveDecks": "Could not save decks.",
-      "updateReady": "Could not update ready.",
-      "updatePause": "Could not update pause.",
-      "leaveEvent": "Could not leave event.",
-      "trackerChoice": "Could not save the tracker choice.",
-      "saveRating": "Could not save that rating.",
-      "chooseCommander": "Choose a commander for every deck.",
-      "enterJoinCode": "Enter a join code.",
-      "sessionUnavailable": "Your event session is no longer available.",
-      "savePack": "Could not save the pack.",
-      "searchScryfall": "Could not search Scryfall.",
-      "loadArtwork": "Could not load alternate artwork.",
-      "submitResult": "Could not submit the result.",
-      "saveChallenge": "Could not save challenge progress.",
-      "unveilIdentity": "Could not unveil your identity.",
-      "apiWaking": "The host is waking up. Keep this page open — it usually takes under a minute.",
-      "apiUnreachable": "Cannot reach the API. Is the server running (yarn dev:server)?"
+      "generic": "Κάτι πήγε στραβά.",
+      "createEvent": "Δεν ήταν δυνατή η δημιουργία του event.",
+      "unlockHost": "Δεν ήταν δυνατό το ξεκλείδωμα του πίνακα διοργανωτή.",
+      "updateTable": "Δεν ήταν δυνατή η ενημέρωση του τραπεζιού.",
+      "startGame": "Δεν ήταν δυνατή η έναρξη του παιχνιδιού.",
+      "startAllGames": "Δεν ήταν δυνατή η έναρξη όλων των έτοιμων παιχνιδιών.",
+      "finishTable": "Δεν ήταν δυνατό να ολοκληρωθεί το παιχνίδι στο τραπέζι.",
+      "cancelPod": "Δεν ήταν δυνατή η ακύρωση του pod.",
+      "updateSettings": "Δεν ήταν δυνατή η ενημέρωση των ρυθμίσεων.",
+      "matchTables": "Δεν ήταν δυνατή η αντιστοίχιση των τραπεζιών.",
+      "fillBots": "Δεν ήταν δυνατή η συμπλήρωση των τραπεζιών με bots.",
+      "clipboard": "Το πρόχειρο είναι μπλοκαρισμένο — αντιγράψτε τον σύνδεσμο χειροκίνητα.",
+      "eventNotFound": "Το event δεν βρέθηκε.",
+      "joinEvent": "Δεν ήταν δυνατή η συμμετοχή στο event.",
+      "saveDecks": "Δεν ήταν δυνατή η αποθήκευση των decks.",
+      "updateReady": "Δεν ήταν δυνατή η ενημέρωση της κατάστασης ετοιμότητας.",
+      "updatePause": "Δεν ήταν δυνατή η ενημέρωση της παύσης.",
+      "leaveEvent": "Δεν ήταν δυνατή η αποχώρηση από το event.",
+      "trackerChoice": "Δεν ήταν δυνατή η αποθήκευση της επιλογής tracker.",
+      "saveRating": "Δεν ήταν δυνατή η αποθήκευση αυτής της βαθμολογίας.",
+      "chooseCommander": "Επιλέξτε commander για κάθε deck.",
+      "enterJoinCode": "Εισαγάγετε κωδικό συμμετοχής.",
+      "sessionUnavailable": "Η συνεδρία σας για αυτό το event δεν είναι πλέον διαθέσιμη.",
+      "savePack": "Δεν ήταν δυνατή η αποθήκευση του πακέτου.",
+      "searchScryfall": "Δεν ήταν δυνατή η αναζήτηση στο Scryfall.",
+      "loadArtwork": "Δεν ήταν δυνατή η φόρτωση εναλλακτικού artwork.",
+      "submitResult": "Δεν ήταν δυνατή η υποβολή του αποτελέσματος.",
+      "saveChallenge": "Δεν ήταν δυνατή η αποθήκευση της προόδου της πρόκλησης.",
+      "unveilIdentity": "Δεν ήταν δυνατή η αποκάλυψη της ταυτότητάς σας.",
+      "apiWaking": "Ο server ενεργοποιείται. Αφήστε αυτή τη σελίδα ανοιχτή — συνήθως χρειάζεται λιγότερο από ένα λεπτό.",
+      "apiUnreachable": "Δεν είναι δυνατή η σύνδεση με το API. Εκτελείται ο server (yarn dev:server);"
     },
-    "assignedAtTable": "Assigned at the table",
-    "scanToJoin": "Scan to join this event"
+    "assignedAtTable": "Ανατέθηκε στο τραπέζι",
+    "scanToJoin": "Σαρώστε για να συμμετάσχετε σε αυτό το event"
   },
   "language": {
     "en": "English",
@@ -109,173 +109,173 @@
     "cy": "Cymraeg"
   },
   "families": {
-    "normal": "Normal",
+    "normal": "Κανονικό",
     "commander": "Commander"
   },
   "modes": {
     "shared": {
-      "commanderCombat": "A player loses after taking {{commanderDamage}} combat damage from one commander.",
-      "commanderTax": "Each time a commander is recast from the command zone, it costs 2 more mana.",
-      "lifeAndLoss": "Life and loss",
-      "turns": "Turns",
+      "commanderCombat": "Ένας παίκτης χάνει αφού δεχτεί {{commanderDamage}} combat damage από έναν commander.",
+      "commanderTax": "Κάθε φορά που ένας commander ξαναπαίζεται από την command zone, κοστίζει 2 mana επιπλέον.",
+      "lifeAndLoss": "Ζωή και ήττα",
+      "turns": "Γύροι",
       "commanders": "Commanders",
-      "eachPlayerLife": "Each player starts at {{life}} life.",
-      "loseAtZero": "A player loses at 0 life.",
-      "loseAtPoison": "A player loses at {{poison}} poison counters.",
-      "startingPlayerRandom": "The starting player is drawn at random.",
-      "startingPlayerSkipDraw": "The starting player is drawn at random and skips the draw step on the first turn.",
-      "multiplayerFirstTurnDraw": "In multiplayer, that player draws on their first turn.",
-      "commanderFirstTurnDraw": "In multiplayer Commander, that player draws on their first turn.",
-      "commandersInZone": "Commanders begin in the command zone and may be recast from there.",
-      "commanderRulesApply": "Commander rules still apply: {{life}} starting life, {{poison}} poison, and {{commanderDamage}} combat damage from one commander are lethal."
+      "eachPlayerLife": "Κάθε παίκτης ξεκινά με {{life}} ζωή.",
+      "loseAtZero": "Ένας παίκτης χάνει όταν φτάσει στο 0 ζωή.",
+      "loseAtPoison": "Ένας παίκτης χάνει όταν φτάσει τα {{poison}} poison counters.",
+      "startingPlayerRandom": "Ο αρχικός παίκτης επιλέγεται τυχαία.",
+      "startingPlayerSkipDraw": "Ο αρχικός παίκτης επιλέγεται τυχαία και παραλείπει το draw step στον πρώτο του γύρο.",
+      "multiplayerFirstTurnDraw": "Στο multiplayer, αυτός ο παίκτης τραβά κάρτα στον πρώτο του γύρο.",
+      "commanderFirstTurnDraw": "Στο multiplayer Commander, αυτός ο παίκτης τραβά κάρτα στον πρώτο του γύρο.",
+      "commandersInZone": "Οι commanders ξεκινούν στην command zone και μπορούν να ξαναπαιχτούν από εκεί.",
+      "commanderRulesApply": "Οι κανόνες Commander εξακολουθούν να ισχύουν: {{life}} αρχική ζωή, {{poison}} poison και {{commanderDamage}} combat damage από έναν commander είναι θανατηφόρα."
     },
     "duel": {
-      "label": "Duel",
-      "hint": "Two players. Each starts on 20 life.",
-      "hostHint": "Strict 2-player tables. Each player starts on 20 life.",
-      "hostFixedSeats": "Duel events always seat exactly two players.",
-      "title": "Duel",
-      "summary": "Two-player Magic. No commanders — just life and the board.",
+      "label": "Μονομαχία",
+      "hint": "Δύο παίκτες. Ο καθένας ξεκινά με 20 ζωή.",
+      "hostHint": "Αυστηρά τραπέζια 2 παικτών. Κάθε παίκτης ξεκινά με 20 ζωή.",
+      "hostFixedSeats": "Τα events Μονομαχίας έχουν πάντα ακριβώς δύο παίκτες.",
+      "title": "Μονομαχία",
+      "summary": "Magic για δύο παίκτες. Χωρίς commanders — μόνο ζωή και battlefield.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Ζωή και ήττα",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters."
+            "Κάθε παίκτης ξεκινά με {{life}} ζωή.",
+            "Ένας παίκτης χάνει όταν φτάσει στο 0 ζωή.",
+            "Ένας παίκτης χάνει όταν φτάσει τα {{poison}} poison counters."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Γύροι",
           "bullets": [
-            "The starting player is drawn at random and skips the draw step on the first turn."
+            "Ο αρχικός παίκτης επιλέγεται τυχαία και παραλείπει το draw step στον πρώτο του γύρο."
           ]
         }
       }
     },
     "multiplayer": {
       "label": "Multiplayer",
-      "hint": "Free-for-all without commanders. Everyone starts on 20 life.",
-      "hostHint": "Free-for-all without commanders. Matching fills your chosen table size; leftovers can sit as small as three.",
+      "hint": "Όλοι εναντίον όλων χωρίς commanders. Όλοι ξεκινούν με 20 ζωή.",
+      "hostHint": "Όλοι εναντίον όλων χωρίς commanders. Το matchmaking γεμίζει πρώτα το επιλεγμένο μέγεθος τραπεζιού· τα υπόλοιπα τραπέζια μπορούν να έχουν τουλάχιστον τρεις παίκτες.",
       "title": "Multiplayer",
-      "summary": "Free-for-all without the Commander format. Useful for casual multiplayer, Planechase, or any 20-life table.",
+      "summary": "Multiplayer χωρίς το format Commander. Χρήσιμο για casual multiplayer, Planechase ή οποιοδήποτε τραπέζι 20 ζωής.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Ζωή και ήττα",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters."
+            "Κάθε παίκτης ξεκινά με {{life}} ζωή.",
+            "Ένας παίκτης χάνει όταν φτάσει στο 0 ζωή.",
+            "Ένας παίκτης χάνει όταν φτάσει τα {{poison}} poison counters."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Γύροι",
           "bullets": [
-            "The starting player is drawn at random.",
-            "In multiplayer, that player draws on their first turn."
+            "Ο αρχικός παίκτης επιλέγεται τυχαία.",
+            "Στο multiplayer, αυτός ο παίκτης τραβά κάρτα στον πρώτο του γύρο."
           ]
         }
       }
     },
     "commander": {
-      "label": "Classic",
-      "hint": "Free-for-all. Everyone starts on 40 life.",
-      "hostHint": "Free-for-all Commander. Matching prefers four; leftover pods can be three or five when allowed.",
-      "title": "Classic",
-      "summary": "Free-for-all multiplayer. Each player fights for themselves.",
+      "label": "Κλασικό",
+      "hint": "Όλοι εναντίον όλων. Όλοι ξεκινούν με 40 ζωή.",
+      "hostHint": "Commander όλοι εναντίον όλων. Το matchmaking προτιμά τετράδες· τα υπόλοιπα pods μπορούν να έχουν τρεις ή πέντε παίκτες όταν επιτρέπεται.",
+      "title": "Κλασικό",
+      "summary": "Multiplayer όλοι εναντίον όλων. Κάθε παίκτης παίζει για τον εαυτό του.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Ζωή και ήττα",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters.",
-            "A player loses after taking {{commanderDamage}} combat damage from one commander."
+            "Κάθε παίκτης ξεκινά με {{life}} ζωή.",
+            "Ένας παίκτης χάνει όταν φτάσει στο 0 ζωή.",
+            "Ένας παίκτης χάνει όταν φτάσει τα {{poison}} poison counters.",
+            "Ένας παίκτης χάνει αφού δεχτεί {{commanderDamage}} combat damage από έναν commander."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Γύροι",
           "bullets": [
-            "The starting player is drawn at random.",
-            "In multiplayer Commander, that player draws on their first turn."
+            "Ο αρχικός παίκτης επιλέγεται τυχαία.",
+            "Στο multiplayer Commander, αυτός ο παίκτης τραβά κάρτα στον πρώτο του γύρο."
           ]
         },
         "commanders": {
           "heading": "Commanders",
           "bullets": [
-            "Commanders begin in the command zone and may be recast from there.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Οι commanders ξεκινούν στην command zone και μπορούν να ξαναπαιχτούν από εκεί.",
+            "Κάθε φορά που ένας commander ξαναπαίζεται από την command zone, κοστίζει 2 mana επιπλέον."
           ]
         }
       }
     },
     "treachery": {
-      "label": "Treachery",
-      "hint": "Secret identities dealt on this device. Pass it around so everyone reads their own in private.",
-      "hostHint": "Secret roles for Commander pods. Matching fills your chosen table size first; leftovers can sit as small as four.",
-      "title": "Treachery",
-      "summary": "Commander with secret identities. The Leader is public; everyone else stays hidden.",
+      "label": "Προδοσία",
+      "hint": "Οι μυστικές ταυτότητες μοιράζονται σε αυτή τη συσκευή. Περάστε τη από παίκτη σε παίκτη ώστε ο καθένας να διαβάσει τη δική του ιδιωτικά.",
+      "hostHint": "Μυστικοί ρόλοι για Commander pods. Το matchmaking γεμίζει πρώτα το επιλεγμένο μέγεθος τραπεζιού· τα υπόλοιπα pods μπορούν να έχουν τουλάχιστον τέσσερις παίκτες.",
+      "title": "Προδοσία",
+      "summary": "Commander με μυστικές ταυτότητες. Ο Αρχηγός είναι δημόσιος· όλοι οι υπόλοιποι παραμένουν κρυφοί.",
       "sections": {
         "commander": {
-          "heading": "Commander rules still apply",
+          "heading": "Οι κανόνες Commander εξακολουθούν να ισχύουν",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "The Leader takes the first turn and draws on that turn.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Κάθε παίκτης ξεκινά με {{life}} ζωή.",
+            "Ένας παίκτης χάνει στο 0 ζωή, {{poison}} poison ή {{commanderDamage}} combat damage από έναν commander.",
+            "Ο Αρχηγός παίζει πρώτος και τραβά κάρτα σε αυτόν τον γύρο.",
+            "Κάθε φορά που ένας commander ξαναπαίζεται από την command zone, κοστίζει 2 mana επιπλέον."
           ]
         },
         "identities": {
-          "heading": "Identities",
+          "heading": "Ταυτότητες",
           "bullets": [
-            "Open Check my role from the timer menu. Only you see that card.",
-            "On a single tracker, deal the identities at setup and pass the device around so each player reads theirs alone.",
-            "Leader: Survive until every Assassin and Traitor is eliminated. Reveal yourself to the table. The Guardians share your victory, but you do not know who they are.",
-            "Guardian: Keep the Leader alive and eliminate the Leader's enemies. Your identity is secret. You win and lose with the Leader, even if you are eliminated first.",
-            "Assassin: Eliminate the Leader. Your identity is secret. Assassins share the same objective, but you do not know who the other Assassins are.",
-            "Traitor: Be the last player standing. Your identity is secret. Keep the Leader alive until the other threats are gone, then take the throne for yourself.",
-            "Follow any extra abilities printed on your identity card."
+            "Ανοίξτε το Έλεγχος του ρόλου μου από το μενού του timer. Μόνο εσείς βλέπετε αυτή την κάρτα.",
+            "Με έναν κοινό tracker, μοιράστε τις ταυτότητες κατά το setup και περάστε τη συσκευή ώστε κάθε παίκτης να διαβάσει τη δική του μόνος του.",
+            "Αρχηγός: Επιβιώστε μέχρι να εξαλειφθούν όλοι οι Δολοφόνοι και ο Προδότης. Αποκαλυφθείτε στο τραπέζι. Οι Φύλακες μοιράζονται τη νίκη σας, αλλά δεν γνωρίζετε ποιοι είναι.",
+            "Φύλακας: Κρατήστε τον Αρχηγό ζωντανό και εξαλείψτε τους εχθρούς του. Η ταυτότητά σας είναι μυστική. Κερδίζετε και χάνετε μαζί με τον Αρχηγό, ακόμη κι αν εξαλειφθείτε πρώτοι.",
+            "Δολοφόνος: Εξαλείψτε τον Αρχηγό. Η ταυτότητά σας είναι μυστική. Οι Δολοφόνοι μοιράζονται τον ίδιο στόχο, αλλά δεν γνωρίζετε ποιοι είναι οι άλλοι Δολοφόνοι.",
+            "Προδότης: Μείνετε ο τελευταίος παίκτης στο παιχνίδι. Η ταυτότητά σας είναι μυστική. Κρατήστε τον Αρχηγό ζωντανό μέχρι να εξαφανιστούν οι άλλες απειλές και μετά πάρτε τον θρόνο για τον εαυτό σας.",
+            "Ακολουθήστε τυχόν πρόσθετες ικανότητες που είναι τυπωμένες στην κάρτα ταυτότητάς σας."
           ]
         }
       },
       "roles": {
         "leader": {
-          "name": "Leader",
-          "objective": "Survive until every Assassin and Traitor is eliminated.",
-          "guidance": "Reveal yourself to the table. The Guardians share your victory, but you do not know who they are.",
-          "publicNote": "Your role is public. Tell the table you are the Leader."
+          "name": "Αρχηγός",
+          "objective": "Επιβιώστε μέχρι να εξαλειφθούν όλοι οι Δολοφόνοι και ο Προδότης.",
+          "guidance": "Αποκαλυφθείτε στο τραπέζι. Οι Φύλακες μοιράζονται τη νίκη σας, αλλά δεν γνωρίζετε ποιοι είναι.",
+          "publicNote": "Ο ρόλος σας είναι δημόσιος. Πείτε στο τραπέζι ότι είστε ο Αρχηγός."
         },
         "guardian": {
-          "name": "Guardian",
-          "objective": "Keep the Leader alive and eliminate the Leader's enemies.",
-          "guidance": "Your identity is secret. You win and lose with the Leader, even if you are eliminated first.",
-          "publicNote": "Keep this role secret."
+          "name": "Φύλακας",
+          "objective": "Κρατήστε τον Αρχηγό ζωντανό και εξαλείψτε τους εχθρούς του.",
+          "guidance": "Η ταυτότητά σας είναι μυστική. Κερδίζετε και χάνετε μαζί με τον Αρχηγό, ακόμη κι αν εξαλειφθείτε πρώτοι.",
+          "publicNote": "Κρατήστε αυτόν τον ρόλο μυστικό."
         },
         "assassin": {
-          "name": "Assassin",
-          "objective": "Eliminate the Leader.",
-          "guidance": "Your identity is secret. Assassins share the same objective, but you do not know who the other Assassins are.",
-          "publicNote": "Keep this role secret."
+          "name": "Δολοφόνος",
+          "objective": "Εξαλείψτε τον Αρχηγό.",
+          "guidance": "Η ταυτότητά σας είναι μυστική. Οι Δολοφόνοι μοιράζονται τον ίδιο στόχο, αλλά δεν γνωρίζετε ποιοι είναι οι άλλοι Δολοφόνοι.",
+          "publicNote": "Κρατήστε αυτόν τον ρόλο μυστικό."
         },
         "traitor": {
-          "name": "Traitor",
-          "objective": "Be the last player standing.",
-          "guidance": "Your identity is secret. Keep the Leader alive until the other threats are gone, then take the throne for yourself.",
-          "publicNote": "Keep this role secret."
+          "name": "Προδότης",
+          "objective": "Μείνετε ο τελευταίος παίκτης στο παιχνίδι.",
+          "guidance": "Η ταυτότητά σας είναι μυστική. Κρατήστε τον Αρχηγό ζωντανό μέχρι να εξαφανιστούν οι άλλες απειλές και μετά πάρτε τον θρόνο για τον εαυτό σας.",
+          "publicNote": "Κρατήστε αυτόν τον ρόλο μυστικό."
         }
       },
       "normal": {
-        "hint": "Secret identities on a shared phone. Everyone starts on 20 life — no commanders.",
-        "hostHint": "Secret roles without commanders. Matching fills your chosen table size first; leftovers can sit as small as four.",
-        "summary": "Secret identities without the Commander format. The Leader is public; everyone else stays hidden.",
+        "hint": "Μυστικές ταυτότητες σε κοινόχρηστο τηλέφωνο. Όλοι ξεκινούν με 20 ζωή — χωρίς commanders.",
+        "hostHint": "Μυστικοί ρόλοι χωρίς commanders. Το matchmaking γεμίζει πρώτα το επιλεγμένο μέγεθος τραπεζιού· τα υπόλοιπα pods μπορούν να έχουν τουλάχιστον τέσσερις παίκτες.",
+        "summary": "Μυστικές ταυτότητες χωρίς το format Commander. Ο Αρχηγός είναι δημόσιος· όλοι οι υπόλοιποι παραμένουν κρυφοί.",
         "sections": {
           "life": {
-            "heading": "Life and loss",
+            "heading": "Ζωή και ήττα",
             "bullets": [
-              "Each player starts at {{life}} life.",
-              "A player loses at 0 life.",
-              "A player loses at {{poison}} poison counters.",
-              "The Leader takes the first turn and draws on that turn."
+              "Κάθε παίκτης ξεκινά με {{life}} ζωή.",
+              "Ένας παίκτης χάνει όταν φτάσει στο 0 ζωή.",
+              "Ένας παίκτης χάνει όταν φτάσει τα {{poison}} poison counters.",
+              "Ο Αρχηγός παίζει πρώτος και τραβά κάρτα σε αυτόν τον γύρο."
             ]
           },
           "identities": null
@@ -283,63 +283,63 @@
       }
     },
     "two-headed-giant": {
-      "label": "Two-Headed Giant",
-      "hint": "Two teams of two, 60 shared life each, turns taken together.",
-      "hostHint": "Strict 4-player Commander pods. Two teams share 60 life and take their turns together.",
-      "hostFixedSeats": "Two-Headed Giant games always seat exactly four players.",
-      "title": "Two-Headed Giant",
-      "summary": "Two teams of two. Teammates share a life total and a turn.",
+      "label": "Δικέφαλος Γίγαντας",
+      "hint": "Δύο ομάδες των δύο, με 60 κοινή ζωή η καθεμία, και οι γύροι παίζονται μαζί.",
+      "hostHint": "Αυστηρά Commander pods 4 παικτών. Δύο ομάδες μοιράζονται από 60 ζωή και παίζουν τους γύρους τους μαζί.",
+      "hostFixedSeats": "Τα παιχνίδια Δικέφαλου Γίγαντα έχουν πάντα ακριβώς τέσσερις παίκτες.",
+      "title": "Δικέφαλος Γίγαντας",
+      "summary": "Δύο ομάδες των δύο. Οι συμπαίκτες μοιράζονται συνολική ζωή και γύρο.",
       "sections": {
         "teams": {
-          "heading": "Teams",
+          "heading": "Ομάδες",
           "bullets": [
-            "Pick two allies, or let the table randomise the pairs.",
-            "Each team starts at {{sharedLife}} shared life.",
-            "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+            "Επιλέξτε δύο συμμάχους ή αφήστε τα ζευγάρια να καθοριστούν τυχαία.",
+            "Κάθε ομάδα ξεκινά με {{sharedLife}} κοινή ζωή.",
+            "Οι συμπαίκτες παίζουν τον γύρο τους μαζί. Κάθε παίκτης εξακολουθεί να έχει το δικό του χέρι, library και commanders."
           ]
         },
         "life": {
-          "heading": "Life and loss",
+          "heading": "Ζωή και ήττα",
           "bullets": [
-            "A team loses when its shared life reaches 0.",
-            "A team loses at {{sharedPoison}} shared poison counters.",
-            "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+            "Μια ομάδα χάνει όταν η κοινή ζωή της φτάσει στο 0.",
+            "Μια ομάδα χάνει όταν φτάσει τα {{sharedPoison}} κοινά poison counters.",
+            "Μια ομάδα χάνει αφού δεχτεί {{commanderDamage}} κοινό combat damage από έναν commander."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Γύροι",
           "bullets": [
-            "The starting team is drawn at random and skips the draw step on its first turn.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Η αρχική ομάδα επιλέγεται τυχαία και παραλείπει το draw step στον πρώτο της γύρο.",
+            "Κάθε φορά που ένας commander ξαναπαίζεται από την command zone, κοστίζει 2 mana επιπλέον."
           ]
         }
       },
       "normal": {
-        "hint": "Two teams of two, 40 shared life each, turns taken together.",
-        "hostHint": "Strict 4-player tables. Two teams share 40 life and take their turns together — no commanders.",
-        "summary": "Two teams of two. Teammates share a life total and a turn — standard decks, 20 life each in team terms.",
+        "hint": "Δύο ομάδες των δύο, με 40 κοινή ζωή η καθεμία, και οι γύροι παίζονται μαζί.",
+        "hostHint": "Αυστηρά τραπέζια 4 παικτών. Δύο ομάδες μοιράζονται από 40 ζωή και παίζουν τους γύρους τους μαζί — χωρίς commanders.",
+        "summary": "Δύο ομάδες των δύο. Οι συμπαίκτες μοιράζονται συνολική ζωή και γύρο — standard decks, με 20 ζωή ανά παίκτη σε ομαδικούς όρους.",
         "sections": {
           "teams": {
-            "heading": "Teams",
+            "heading": "Ομάδες",
             "bullets": [
-              "Pick two allies, or let the table randomise the pairs.",
-              "Each team starts at {{sharedLife}} shared life.",
-              "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+              "Επιλέξτε δύο συμμάχους ή αφήστε τα ζευγάρια να καθοριστούν τυχαία.",
+              "Κάθε ομάδα ξεκινά με {{sharedLife}} κοινή ζωή.",
+              "Οι συμπαίκτες παίζουν τον γύρο τους μαζί. Κάθε παίκτης εξακολουθεί να έχει το δικό του χέρι, library και commanders."
             ]
           },
           "life": {
-            "heading": "Life and loss",
+            "heading": "Ζωή και ήττα",
             "bullets": [
-              "A team loses when its shared life reaches 0.",
-              "A team loses at {{sharedPoison}} shared poison counters.",
-              "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+              "Μια ομάδα χάνει όταν η κοινή ζωή της φτάσει στο 0.",
+              "Μια ομάδα χάνει όταν φτάσει τα {{sharedPoison}} κοινά poison counters.",
+              "Μια ομάδα χάνει αφού δεχτεί {{commanderDamage}} κοινό combat damage από έναν commander."
             ]
           },
           "turns": {
-            "heading": "Turns",
+            "heading": "Γύροι",
             "bullets": [
-              "The starting team is drawn at random and skips the draw step on its first turn.",
-              "Each time a commander is recast from the command zone, it costs 2 more mana."
+              "Η αρχική ομάδα επιλέγεται τυχαία και παραλείπει το draw step στον πρώτο της γύρο.",
+              "Κάθε φορά που ένας commander ξαναπαίζεται από την command zone, κοστίζει 2 mana επιπλέον."
             ]
           }
         }
@@ -347,286 +347,286 @@
     },
     "archenemy-commander": {
       "label": "Archenemy",
-      "hint": "One Archenemy on 60 life with a 40-card scheme deck against three heroes sharing 60 life.",
-      "hostHint": "Strict 4-player Commander pods. One 60-life Archenemy faces a three-player team with 60 shared life and a 40-card scheme deck.",
-      "hostFixedSeats": "Archenemy Commander games always seat exactly four players.",
+      "hint": "Ένας Archenemy με 60 ζωή και deck 40 scheme cards εναντίον τριών ηρώων που μοιράζονται 60 ζωή.",
+      "hostHint": "Αυστηρά Commander pods 4 παικτών. Ένας Archenemy με 60 ζωή αντιμετωπίζει ομάδα τριών παικτών με 60 κοινή ζωή και deck 40 scheme cards.",
+      "hostFixedSeats": "Τα παιχνίδια Archenemy Commander έχουν πάντα ακριβώς τέσσερις παίκτες.",
       "title": "Archenemy Commander",
-      "summary": "One Archenemy against a team of three, with a scheme deck in motion.",
+      "summary": "Ένας Archenemy εναντίον μιας ομάδας τριών, με ένα scheme deck σε δράση.",
       "sections": {
         "sides": {
-          "heading": "Sides",
+          "heading": "Πλευρές",
           "bullets": [
-            "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
-            "Both sides start at {{life}} life.",
-            "The heroes share that life total and take their turn together.",
-            "The Archenemy goes first and draws on that turn."
+            "Επιλέξτε τον Archenemy ή ορίστε έναν τυχαία. Οι άλλοι τρεις παίκτες είναι οι ήρωες.",
+            "Και οι δύο πλευρές ξεκινούν με {{life}} ζωή.",
+            "Οι ήρωες μοιράζονται αυτή τη ζωή και παίζουν τον γύρο τους μαζί.",
+            "Ο Archenemy παίζει πρώτος και τραβά κάρτα σε αυτόν τον γύρο."
           ]
         },
         "schemes": {
           "heading": "Schemes",
           "bullets": [
-            "The 40 Duskmourn Commander schemes are shuffled at the start.",
-            "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
-            "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
-            "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
-            "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+            "Τα 40 Duskmourn Commander schemes ανακατεύονται στην αρχή.",
+            "Κατά τη διάρκεια κάθε first main phase του Archenemy, ανοίξτε το μενού του timer και πατήστε Next scheme για να θέσετε ένα σε κίνηση.",
+            "Ένα scheme που δεν είναι ongoing επιλύεται και μετά πηγαίνει στο κάτω μέρος του scheme deck.",
+            "Ένα ongoing scheme παραμένει ανοιχτό μέχρι το τραπέζι να το σημειώσει ως abandoned και μετά πηγαίνει στο κάτω μέρος του deck.",
+            "Τα ανοιχτά schemes και το graveyard των ολοκληρωμένων εμφανίζονται κάτω από την κάρτα ως μικρογραφίες· πατήστε ένα για να το δείτε μεγάλο."
           ]
         },
         "life": {
-          "heading": "Life and loss",
+          "heading": "Ζωή και ήττα",
           "bullets": [
-            "The Archenemy loses at 0 life, or when the usual poison and commander-damage limits are reached.",
-            "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
-            "A player loses after taking {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Ο Archenemy χάνει στο 0 ζωή ή όταν φτάσει τα συνηθισμένα όρια poison και commander damage.",
+            "Οι ήρωες χάνουν μαζί όταν η κοινή ζωή τους φτάσει στο 0 και μοιράζονται επίσης poison και commander damage.",
+            "Ένας παίκτης χάνει αφού δεχτεί {{commanderDamage}} combat damage από έναν commander.",
+            "Κάθε φορά που ένας commander ξαναπαίζεται από την command zone, κοστίζει 2 mana επιπλέον."
           ]
         }
       },
       "normal": {
-        "hint": "One Archenemy on 20 life with schemes against three heroes sharing 40 life.",
-        "hostHint": "Strict 4-player tables. One Archenemy with a scheme deck against a three-player team — no commanders.",
-        "summary": "One Archenemy against a team of three, with a scheme deck in motion — standard 20-life tables.",
+        "hint": "Ένας Archenemy με 20 ζωή και schemes εναντίον τριών ηρώων που μοιράζονται 40 ζωή.",
+        "hostHint": "Αυστηρά τραπέζια 4 παικτών. Ένας Archenemy με scheme deck εναντίον ομάδας τριών — χωρίς commanders.",
+        "summary": "Ένας Archenemy εναντίον μιας ομάδας τριών, με scheme deck σε δράση — standard τραπέζια 20 ζωής.",
         "sections": {
           "sides": {
-            "heading": "Sides",
+            "heading": "Πλευρές",
             "bullets": [
-              "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
-              "Both sides start at {{life}} life.",
-              "The heroes share that life total and take their turn together.",
-              "The Archenemy goes first and draws on that turn."
+              "Επιλέξτε τον Archenemy ή ορίστε έναν τυχαία. Οι άλλοι τρεις παίκτες είναι οι ήρωες.",
+              "Και οι δύο πλευρές ξεκινούν με {{life}} ζωή.",
+              "Οι ήρωες μοιράζονται αυτή τη ζωή και παίζουν τον γύρο τους μαζί.",
+              "Ο Archenemy παίζει πρώτος και τραβά κάρτα σε αυτόν τον γύρο."
             ]
           },
           "schemes": {
             "heading": "Schemes",
             "bullets": [
-              "The 40 Duskmourn Commander schemes are shuffled at the start.",
-              "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
-              "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
-              "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
-              "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+              "Τα 40 Duskmourn Commander schemes ανακατεύονται στην αρχή.",
+              "Κατά τη διάρκεια κάθε first main phase του Archenemy, ανοίξτε το μενού του timer και πατήστε Next scheme για να θέσετε ένα σε κίνηση.",
+              "Ένα scheme που δεν είναι ongoing επιλύεται και μετά πηγαίνει στο κάτω μέρος του scheme deck.",
+              "Ένα ongoing scheme παραμένει ανοιχτό μέχρι το τραπέζι να το σημειώσει ως abandoned και μετά πηγαίνει στο κάτω μέρος του deck.",
+              "Τα ανοιχτά schemes και το graveyard των ολοκληρωμένων εμφανίζονται κάτω από την κάρτα ως μικρογραφίες· πατήστε ένα για να το δείτε μεγάλο."
             ]
           },
           "life": {
-            "heading": "Life and loss",
+            "heading": "Ζωή και ήττα",
             "bullets": [
-              "The Archenemy loses at 0 life, or when the usual poison and poison limits are reached.",
-              "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
-              "A player loses after taking {{poison}} poison counters."
+              "Ο Archenemy χάνει στο 0 ζωή ή όταν φτάσει τα συνηθισμένα όρια poison.",
+              "Οι ήρωες χάνουν μαζί όταν η κοινή ζωή τους φτάσει στο 0 και μοιράζονται επίσης poison και commander damage.",
+              "Ένας παίκτης χάνει αφού δεχτεί {{poison}} poison counters."
             ]
           }
         }
       }
     },
     "emperor": {
-      "label": "Emperor",
-      "hint": "Two teams of three. Protect your Emperor using limited range of influence and deploy creatures.",
-      "hostHint": "Strict 6-player Commander pods. Two teams each place an Emperor between two Generals and play with limited range of influence.",
-      "hostFixedSeats": "Emperor games always seat exactly six players.",
-      "title": "Emperor",
-      "summary": "Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.",
+      "label": "Αυτοκράτορας",
+      "hint": "Δύο ομάδες των τριών. Προστατέψτε τον Αυτοκράτορά σας χρησιμοποιώντας περιορισμένο range of influence και μετακινώντας creatures.",
+      "hostHint": "Αυστηρά Commander pods 6 παικτών. Κάθε ομάδα τοποθετεί έναν Αυτοκράτορα ανάμεσα σε δύο Στρατηγούς και παίζει με περιορισμένο range of influence.",
+      "hostFixedSeats": "Τα παιχνίδια Αυτοκράτορα έχουν πάντα ακριβώς έξι παίκτες.",
+      "title": "Αυτοκράτορας",
+      "summary": "Δύο ομάδες των τριών. Κάθε Αυτοκράτορας κάθεται ανάμεσα σε δύο Στρατηγούς και η εξάλειψη ενός Αυτοκράτορα κερδίζει το παιχνίδι.",
       "sections": {
         "teams": {
-          "heading": "Teams and turns",
+          "heading": "Ομάδες και γύροι",
           "bullets": [
-            "Choose both teams and each team's Emperor, or randomise either choice.",
-            "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
-            "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
-            "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+            "Επιλέξτε και τις δύο ομάδες και τον Αυτοκράτορα κάθε ομάδας ή κάντε τυχαία μία ή και τις δύο επιλογές.",
+            "Κάθε παίκτης ξεκινά με {{life}} ζωή και κρατά το δικό του χέρι, mana, permanents, poison και γύρο.",
+            "Οι συμπαίκτες μπορούν να κοιτάζουν τα χέρια ο ένας του άλλου και να συζητούν στρατηγική, αλλά δεν μπορούν να χειρίζονται τις κάρτες των συμπαικτών τους.",
+            "Επιλέξτε τυχαία ποιος Αυτοκράτορας παίζει πρώτος. Αυτός ο Αυτοκράτορας τραβά κάρτα στον πρώτο γύρο."
           ]
         },
         "range": {
-          "heading": "Range and combat",
+          "heading": "Εμβέλεια και μάχη",
           "bullets": [
-            "Generals have range of influence 1. Emperors have range of influence 2.",
-            "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
-            "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
-            "As players leave, the empty seats stop counting, bringing surviving players into range."
+            "Οι Στρατηγοί έχουν range of influence 1. Οι Αυτοκράτορες έχουν range of influence 2.",
+            "Spells, abilities, effects και πληροφορίες μπορούν να επηρεάσουν μόνο παίκτες και αντικείμενα εντός της εμβέλειας του controller τους.",
+            "Ένας παίκτης μπορεί να επιτεθεί μόνο σε έναν αντίπαλο που κάθεται ακριβώς δίπλα του ή στα planeswalkers και protected battles αυτού του αντιπάλου.",
+            "Καθώς οι παίκτες αποχωρούν, οι άδειες θέσεις παύουν να μετρούν, φέρνοντας τους επιζώντες παίκτες εντός εμβέλειας."
           ]
         },
         "deploy": {
-          "heading": "Deploy creatures",
+          "heading": "Μετακίνηση creatures",
           "bullets": [
-            "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
-            "This can move creatures through the team as the battle lines change."
+            "Κάθε creature έχει \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
+            "Αυτό επιτρέπει τη μετακίνηση creatures μέσα στην ομάδα καθώς αλλάζουν οι γραμμές μάχης."
           ]
         },
         "winning": {
-          "heading": "Winning and Commander rules",
+          "heading": "Νίκη και κανόνες Commander",
           "bullets": [
-            "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
-            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Μια ομάδα κερδίζει αν κερδίσει ο Αυτοκράτοράς της και χάνει αμέσως αν χάσει ο Αυτοκράτοράς της. Ένας Στρατηγός μπορεί να εξαλειφθεί χωρίς να τελειώσει το παιχνίδι.",
+            "Ένας παίκτης χάνει στο 0 ζωή, {{poison}} poison ή {{commanderDamage}} combat damage από έναν commander.",
+            "Κάθε φορά που ένας commander ξαναπαίζεται από την command zone, κοστίζει 2 mana επιπλέον."
           ]
         }
       },
       "normal": {
-        "hint": "Two teams of three on 20 life. Protect your Emperor with limited range of influence.",
-        "hostHint": "Strict 6-player tables. Two Emperors between Generals — standard 20-life decks, no commanders.",
-        "summary": "Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.",
+        "hint": "Δύο ομάδες των τριών με 20 ζωή. Προστατέψτε τον Αυτοκράτορά σας με περιορισμένο range of influence.",
+        "hostHint": "Αυστηρά τραπέζια 6 παικτών. Δύο Αυτοκράτορες ανάμεσα σε Στρατηγούς — standard decks 20 ζωής, χωρίς commanders.",
+        "summary": "Δύο ομάδες των τριών. Κάθε Αυτοκράτορας κάθεται ανάμεσα σε δύο Στρατηγούς και η εξάλειψη ενός Αυτοκράτορα κερδίζει το παιχνίδι.",
         "sections": {
           "teams": {
-            "heading": "Teams and turns",
+            "heading": "Ομάδες και γύροι",
             "bullets": [
-              "Choose both teams and each team's Emperor, or randomise either choice.",
-              "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
-              "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
-              "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+              "Επιλέξτε και τις δύο ομάδες και τον Αυτοκράτορα κάθε ομάδας ή κάντε τυχαία μία ή και τις δύο επιλογές.",
+              "Κάθε παίκτης ξεκινά με {{life}} ζωή και κρατά το δικό του χέρι, mana, permanents, poison και γύρο.",
+              "Οι συμπαίκτες μπορούν να κοιτάζουν τα χέρια ο ένας του άλλου και να συζητούν στρατηγική, αλλά δεν μπορούν να χειρίζονται τις κάρτες των συμπαικτών τους.",
+              "Επιλέξτε τυχαία ποιος Αυτοκράτορας παίζει πρώτος. Αυτός ο Αυτοκράτορας τραβά κάρτα στον πρώτο γύρο."
             ]
           },
           "range": {
-            "heading": "Range and combat",
+            "heading": "Εμβέλεια και μάχη",
             "bullets": [
-              "Generals have range of influence 1. Emperors have range of influence 2.",
-              "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
-              "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
-              "As players leave, the empty seats stop counting, bringing surviving players into range."
+              "Οι Στρατηγοί έχουν range of influence 1. Οι Αυτοκράτορες έχουν range of influence 2.",
+              "Spells, abilities, effects και πληροφορίες μπορούν να επηρεάσουν μόνο παίκτες και αντικείμενα εντός της εμβέλειας του controller τους.",
+              "Ένας παίκτης μπορεί να επιτεθεί μόνο σε έναν αντίπαλο που κάθεται ακριβώς δίπλα του ή στα planeswalkers και protected battles αυτού του αντιπάλου.",
+              "Καθώς οι παίκτες αποχωρούν, οι άδειες θέσεις παύουν να μετρούν, φέρνοντας τους επιζώντες παίκτες εντός εμβέλειας."
             ]
           },
           "deploy": {
-            "heading": "Deploy creatures",
+            "heading": "Μετακίνηση creatures",
             "bullets": [
-              "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
-              "This can move creatures through the team as the battle lines change."
+              "Κάθε creature έχει \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
+              "Αυτό επιτρέπει τη μετακίνηση creatures μέσα στην ομάδα καθώς αλλάζουν οι γραμμές μάχης."
             ]
           },
           "winning": {
-            "heading": "Winning and Commander rules",
+            "heading": "Νίκη",
             "bullets": [
-              "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
-              "A player loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+              "Μια ομάδα κερδίζει αν κερδίσει ο Αυτοκράτοράς της και χάνει αμέσως αν χάσει ο Αυτοκράτοράς της. Ένας Στρατηγός μπορεί να εξαλειφθεί χωρίς να τελειώσει το παιχνίδι.",
+              "Ένας παίκτης χάνει στο 0 ζωή ή {{poison}} poison counters."
             ]
           }
         }
       }
     },
     "star": {
-      "label": "Star",
-      "hint": "Five players in a circle. Your neighbors are allies; eliminate both players across from you.",
-      "hostHint": "Strict 5-player Commander pods. Adjacent players are allies; each player wins by outlasting both opponents across the circle.",
-      "hostFixedSeats": "Star games always seat exactly five players.",
-      "title": "Star",
-      "summary": "Five players sit in a circle. Your neighbors are allies and the two players across from you are enemies.",
+      "label": "Αστέρι",
+      "hint": "Πέντε παίκτες σε κύκλο. Οι γείτονές σας είναι σύμμαχοι· εξαλείψτε τους δύο παίκτες απέναντί σας.",
+      "hostHint": "Αυστηρά Commander pods 5 παικτών. Οι διπλανοί παίκτες είναι σύμμαχοι· κάθε παίκτης κερδίζει επιβιώνοντας από τους δύο αντιπάλους απέναντί του.",
+      "hostFixedSeats": "Τα παιχνίδια Αστεριού έχουν πάντα ακριβώς πέντε παίκτες.",
+      "title": "Αστέρι",
+      "summary": "Πέντε παίκτες κάθονται σε κύκλο. Οι γείτονές σας είναι σύμμαχοι και οι δύο παίκτες απέναντί σας είναι εχθροί.",
       "sections": {
         "positions": {
-          "heading": "Positions and allies",
+          "heading": "Θέσεις και σύμμαχοι",
           "bullets": [
-            "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
-            "The players immediately to your left and right are your allies.",
-            "The two nonadjacent players across the circle are your enemies.",
-            "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+            "Επιλέξτε τις κυκλικές θέσεις χειροκίνητα ανταλλάσσοντας δύο παίκτες ή τοποθετήστε και τους πέντε τυχαία.",
+            "Οι παίκτες ακριβώς αριστερά και δεξιά σας είναι οι σύμμαχοί σας.",
+            "Οι δύο μη γειτονικοί παίκτες απέναντί σας είναι οι εχθροί σας.",
+            "Οι θέσεις παραμένουν σταθερές όταν ένας παίκτης εξαλειφθεί· οι σύμμαχοι και οι εχθροί σας δεν αλλάζουν."
           ]
         },
         "combat": {
-          "heading": "Combat and interaction",
+          "heading": "Μάχη και αλληλεπίδραση",
           "bullets": [
-            "Players cannot attack their allies by default.",
-            "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
-            "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+            "Από προεπιλογή, οι παίκτες δεν μπορούν να επιτεθούν στους συμμάχους τους.",
+            "Spells και abilities μπορούν ακόμη να βοηθήσουν ή να επηρεάσουν οποιονδήποτε παίκτη, εκτός αν το τραπέζι συμφωνήσει σε αυστηρότερη παραλλαγή.",
+            "Οι γύροι προχωρούν δεξιόστροφα. Επιλέξτε τυχαία τον αρχικό παίκτη· αυτός ο παίκτης τραβά κάρτα στον πρώτο γύρο."
           ]
         },
         "winning": {
-          "heading": "Winning",
+          "heading": "Νίκη",
           "bullets": [
-            "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
-            "An eliminated player cannot win later.",
-            "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Κερδίζει ο πρώτος παίκτης που παραμένει ζωντανός και του οποίου και οι δύο εχθροί έχουν εξαλειφθεί, ανεξάρτητα από το ποιος τους εξάλειψε.",
+            "Ένας παίκτης που έχει εξαλειφθεί δεν μπορεί να κερδίσει αργότερα.",
+            "Κάθε παίκτης ξεκινά με {{life}} ζωή και χάνει στο 0 ζωή, {{poison}} poison ή {{commanderDamage}} combat damage από έναν commander.",
+            "Κάθε φορά που ένας commander ξαναπαίζεται από την command zone, κοστίζει 2 mana επιπλέον."
           ]
         }
       },
       "normal": {
-        "hint": "Five players in a circle on 20 life. Neighbors are allies; eliminate both players across from you.",
-        "hostHint": "Strict 5-player tables. Adjacent players ally; each player wins by outlasting both opponents across the circle.",
-        "summary": "Five players sit in a circle on 20 life. Your neighbors are allies and the two players across from you are enemies.",
+        "hint": "Πέντε παίκτες σε κύκλο με 20 ζωή. Οι γείτονες είναι σύμμαχοι· εξαλείψτε τους δύο παίκτες απέναντί σας.",
+        "hostHint": "Αυστηρά τραπέζια 5 παικτών. Οι διπλανοί παίκτες είναι σύμμαχοι· κάθε παίκτης κερδίζει επιβιώνοντας από τους δύο αντιπάλους απέναντί του.",
+        "summary": "Πέντε παίκτες κάθονται σε κύκλο με 20 ζωή. Οι γείτονές σας είναι σύμμαχοι και οι δύο παίκτες απέναντί σας είναι εχθροί.",
         "sections": {
           "positions": {
-            "heading": "Positions and allies",
+            "heading": "Θέσεις και σύμμαχοι",
             "bullets": [
-              "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
-              "The players immediately to your left and right are your allies.",
-              "The two nonadjacent players across the circle are your enemies.",
-              "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+              "Επιλέξτε τις κυκλικές θέσεις χειροκίνητα ανταλλάσσοντας δύο παίκτες ή τοποθετήστε και τους πέντε τυχαία.",
+              "Οι παίκτες ακριβώς αριστερά και δεξιά σας είναι οι σύμμαχοί σας.",
+              "Οι δύο μη γειτονικοί παίκτες απέναντί σας είναι οι εχθροί σας.",
+              "Οι θέσεις παραμένουν σταθερές όταν ένας παίκτης εξαλειφθεί· οι σύμμαχοι και οι εχθροί σας δεν αλλάζουν."
             ]
           },
           "combat": {
-            "heading": "Combat and interaction",
+            "heading": "Μάχη και αλληλεπίδραση",
             "bullets": [
-              "Players cannot attack their allies by default.",
-              "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
-              "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+              "Από προεπιλογή, οι παίκτες δεν μπορούν να επιτεθούν στους συμμάχους τους.",
+              "Spells και abilities μπορούν ακόμη να βοηθήσουν ή να επηρεάσουν οποιονδήποτε παίκτη, εκτός αν το τραπέζι συμφωνήσει σε αυστηρότερη παραλλαγή.",
+              "Οι γύροι προχωρούν δεξιόστροφα. Επιλέξτε τυχαία τον αρχικό παίκτη· αυτός ο παίκτης τραβά κάρτα στον πρώτο γύρο."
             ]
           },
           "winning": {
-            "heading": "Winning",
+            "heading": "Νίκη",
             "bullets": [
-              "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
-              "An eliminated player cannot win later.",
-              "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+              "Κερδίζει ο πρώτος παίκτης που παραμένει ζωντανός και του οποίου και οι δύο εχθροί έχουν εξαλειφθεί, ανεξάρτητα από το ποιος τους εξάλειψε.",
+              "Ένας παίκτης που έχει εξαλειφθεί δεν μπορεί να κερδίσει αργότερα.",
+              "Κάθε παίκτης ξεκινά με {{life}} ζωή και χάνει στο 0 ζωή ή {{poison}} poison counters."
             ]
           }
         }
       }
     },
     "assassin": {
-      "label": "Assassin",
-      "hint": "Secret contracts in a free-for-all. Eliminate your mark, score, and inherit their target.",
-      "hostHint": "Secret contracts for 3–8 players. Score by eliminating your mark, then inherit their target.",
-      "title": "Assassin",
-      "summary": "A free-for-all with secret contracts. Score marks, inherit new targets, and finish with the highest score.",
+      "label": "Δολοφόνος",
+      "hint": "Μυστικά συμβόλαια σε παιχνίδι όλοι εναντίον όλων. Εξαλείψτε τον στόχο σας, κερδίστε πόντο και κληρονομήστε τον στόχο του.",
+      "hostHint": "Μυστικά συμβόλαια για 3–8 παίκτες. Κερδίστε πόντους εξαλείφοντας τον στόχο σας και μετά κληρονομήστε το συμβόλαιό του.",
+      "title": "Δολοφόνος",
+      "summary": "Όλοι εναντίον όλων με μυστικά συμβόλαια. Εξαλείψτε στόχους, κληρονομήστε νέους και τελειώστε με το υψηλότερο σκορ.",
       "sections": {
         "contracts": {
-          "heading": "Secret contracts",
+          "heading": "Μυστικά συμβόλαια",
           "bullets": [
-            "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
-            "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
-            "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+            "Κάθε παίκτης λαμβάνει ιδιωτικά έναν στόχο. Τα συμβόλαια σχηματίζουν κύκλο, ώστε κανείς να μην στοχεύει τον εαυτό του και κάθε παίκτης να κυνηγιέται από έναν μόνο παίκτη.",
+            "Περάστε τη συσκευή από παίκτη σε παίκτη κατά το setup. Ανοίξτε το Έλεγχος στόχου από το μενού του timer όποτε χρειάζεται να ξαναδείτε το τρέχον συμβόλαιό σας.",
+            "Οι παίκτες μπορούν να επιτεθούν και να επηρεάσουν οποιονδήποτε· το συμβόλαιο καθορίζει τη βαθμολογία, όχι τους νόμιμους στόχους."
           ]
         },
         "elimination": {
-          "heading": "Elimination and inheritance",
+          "heading": "Εξάλειψη και κληρονομιά",
           "bullets": [
-            "When a player is eliminated, record who dealt the finishing blow.",
-            "If you personally eliminate your assigned target, you score one mark.",
-            "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+            "Όταν ένας παίκτης εξαλειφθεί, καταγράψτε ποιος έδωσε το τελειωτικό χτύπημα.",
+            "Αν εξαλείψετε προσωπικά τον στόχο που σας έχει ανατεθεί, κερδίζετε ένα mark.",
+            "Ο παίκτης που κυνηγούσε τον εξαλειφθέντα στόχο κληρονομεί το συμβόλαιο αυτού του στόχου, ακόμη κι αν κάποιος άλλος έδωσε το τελειωτικό χτύπημα. Έτσι κάθε επιζών παίκτης έχει πάντα ένα ενεργό συμβόλαιο."
           ]
         },
         "winning": {
-          "heading": "Winning",
+          "heading": "Νίκη",
           "bullets": [
-            "Play until only one player remains. The last survivor scores one additional mark.",
-            "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
-            "Commander rules still apply: {{life}} starting life, {{poison}} poison, and {{commanderDamage}} combat damage from one commander are lethal.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Παίξτε μέχρι να απομείνει μόνο ένας παίκτης. Ο τελευταίος επιζών κερδίζει ένα επιπλέον mark.",
+            "Κερδίζει ο παίκτης με τα περισσότερα marks· αν υπάρχει ισοπαλία στην υψηλότερη βαθμολογία, ο τελευταίος επιζών κερδίζει την ισοπαλία.",
+            "Οι κανόνες Commander εξακολουθούν να ισχύουν: {{life}} αρχική ζωή, {{poison}} poison και {{commanderDamage}} combat damage από έναν commander είναι θανατηφόρα.",
+            "Κάθε φορά που ένας commander ξαναπαίζεται από την command zone, κοστίζει 2 mana επιπλέον."
           ]
         }
       },
       "normal": {
-        "hint": "Secret contracts for 3–8 players on 20 life. Score by eliminating your mark.",
-        "hostHint": "Secret contracts without commanders. Matching fills your chosen table size; leftovers can sit as small as three.",
-        "summary": "A free-for-all with secret contracts on 20 life. Score marks, inherit new targets, and finish with the highest score.",
+        "hint": "Μυστικά συμβόλαια για 3–8 παίκτες με 20 ζωή. Κερδίστε πόντους εξαλείφοντας τον στόχο σας.",
+        "hostHint": "Μυστικά συμβόλαια χωρίς commanders. Το matchmaking γεμίζει το επιλεγμένο μέγεθος τραπεζιού· οι υπόλοιποι κύκλοι μπορούν να έχουν τουλάχιστον τρεις παίκτες.",
+        "summary": "Όλοι εναντίον όλων με μυστικά συμβόλαια και 20 ζωή. Εξαλείψτε στόχους, κληρονομήστε νέους και τελειώστε με το υψηλότερο σκορ.",
         "sections": {
           "contracts": {
-            "heading": "Secret contracts",
+            "heading": "Μυστικά συμβόλαια",
             "bullets": [
-              "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
-              "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
-              "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+              "Κάθε παίκτης λαμβάνει ιδιωτικά έναν στόχο. Τα συμβόλαια σχηματίζουν κύκλο, ώστε κανείς να μην στοχεύει τον εαυτό του και κάθε παίκτης να κυνηγιέται από έναν μόνο παίκτη.",
+              "Περάστε τη συσκευή από παίκτη σε παίκτη κατά το setup. Ανοίξτε το Έλεγχος στόχου από το μενού του timer όποτε χρειάζεται να ξαναδείτε το τρέχον συμβόλαιό σας.",
+              "Οι παίκτες μπορούν να επιτεθούν και να επηρεάσουν οποιονδήποτε· το συμβόλαιο καθορίζει τη βαθμολογία, όχι τους νόμιμους στόχους."
             ]
           },
           "elimination": {
-            "heading": "Elimination and inheritance",
+            "heading": "Εξάλειψη και κληρονομιά",
             "bullets": [
-              "When a player is eliminated, record who dealt the finishing blow.",
-              "If you personally eliminate your assigned target, you score one mark.",
-              "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+              "Όταν ένας παίκτης εξαλειφθεί, καταγράψτε ποιος έδωσε το τελειωτικό χτύπημα.",
+              "Αν εξαλείψετε προσωπικά τον στόχο που σας έχει ανατεθεί, κερδίζετε ένα mark.",
+              "Ο παίκτης που κυνηγούσε τον εξαλειφθέντα στόχο κληρονομεί το συμβόλαιο αυτού του στόχου, ακόμη κι αν κάποιος άλλος έδωσε το τελειωτικό χτύπημα. Έτσι κάθε επιζών παίκτης έχει πάντα ένα ενεργό συμβόλαιο."
             ]
           },
           "winning": {
-            "heading": "Winning",
+            "heading": "Νίκη",
             "bullets": [
-              "Play until only one player remains. The last survivor scores one additional mark.",
-              "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
-              "{{life}} starting life, {{poison}} poison, and {{poison}} poison counters are lethal."
+              "Παίξτε μέχρι να απομείνει μόνο ένας παίκτης. Ο τελευταίος επιζών κερδίζει ένα επιπλέον mark.",
+              "Κερδίζει ο παίκτης με τα περισσότερα marks· αν υπάρχει ισοπαλία στην υψηλότερη βαθμολογία, ο τελευταίος επιζών κερδίζει την ισοπαλία.",
+              "{{life}} αρχική ζωή και {{poison}} poison counters είναι θανατηφόρα όρια."
             ]
           }
         }
@@ -634,435 +634,435 @@
     }
   },
   "home": {
-    "taglineBefore": "Your next",
+    "taglineBefore": "Το επόμενο",
     "taglineHighlight": "pod",
-    "taglineAfter": ", sorted.",
-    "startPlaying": "Start playing",
-    "ongoingGame": "ongoing game",
-    "noEventNeeded": "no event needed",
-    "startPlayingHint": "Open a battle screen on this device. Leave and come back without losing an unfinished game.",
-    "alwaysPlayers": "Always {{count}} players in this mode.",
-    "resumeGame": "Resume game",
-    "startNewGame": "Start a new game",
-    "startGame": "Start a game",
+    "taglineAfter": " σου, έτοιμο.",
+    "startPlaying": "Ξεκινήστε να παίζετε",
+    "ongoingGame": "παιχνίδι σε εξέλιξη",
+    "noEventNeeded": "δεν απαιτείται event",
+    "startPlayingHint": "Ανοίξτε μια οθόνη παιχνιδιού σε αυτή τη συσκευή. Μπορείτε να φύγετε και να επιστρέψετε χωρίς να χάσετε ένα ημιτελές παιχνίδι.",
+    "alwaysPlayers": "Αυτό το mode έχει πάντα {{count}} παίκτες.",
+    "resumeGame": "Συνέχιση παιχνιδιού",
+    "startNewGame": "Έναρξη νέου παιχνιδιού",
+    "startGame": "Έναρξη παιχνιδιού",
     "commanderSetup": "Commanders",
-    "commanderSetupHint": "Search Scryfall for each player's commander. Partner pairs need both commanders.",
-    "chooseAllCommanders": "Choose a commander for every player.",
-    "advancedMatchConfig": "Advanced match config",
-    "hostEvent": "Host event",
-    "new": "new",
-    "targetTableSize": "Target table size",
-    "allowThreePods": "Allow 3-player pods",
-    "allowFivePods": "Allow 5-player pods",
-    "duelFixedSeats": "Duel events always seat exactly two players.",
-    "emperorFixedSeats": "Emperor games always seat exactly six players.",
-    "starFixedSeats": "Star games always seat exactly five players.",
-    "archenemyFixedSeats": "Archenemy Commander games always seat exactly four players.",
-    "twoHeadedFixedSeats": "Two-Headed Giant games always seat exactly four players.",
-    "eventName": "Event name",
-    "eventNamePlaceholder": "Friday Commander",
-    "tables": "Tables",
-    "tablesHint": "How many physical tables are free for this event.",
-    "eventLasts": "Event lasts",
-    "eventLastsHint": "Join code dies after this many hours. Use 48 or 72 for a weekend.",
-    "hostPin": "Host PIN",
-    "hostPinHint": "4 to 8 digits — reopens the host desk later.",
-    "createEvent": "Create event",
-    "joinWithCode": "Join with a code",
-    "playerAside": "player",
-    "joinCode": "Join code",
+    "commanderSetupHint": "Αναζητήστε στο Scryfall τον commander κάθε παίκτη. Τα Partner ζευγάρια χρειάζονται και τους δύο commanders.",
+    "chooseAllCommanders": "Επιλέξτε commander για κάθε παίκτη.",
+    "advancedMatchConfig": "Προηγμένες ρυθμίσεις παιχνιδιού",
+    "hostEvent": "Διοργάνωση event",
+    "new": "νέο",
+    "targetTableSize": "Στόχος μεγέθους τραπεζιού",
+    "allowThreePods": "Να επιτρέπονται pods 3 παικτών",
+    "allowFivePods": "Να επιτρέπονται pods 5 παικτών",
+    "duelFixedSeats": "Τα events Μονομαχίας έχουν πάντα ακριβώς δύο παίκτες.",
+    "emperorFixedSeats": "Τα παιχνίδια Αυτοκράτορα έχουν πάντα ακριβώς έξι παίκτες.",
+    "starFixedSeats": "Τα παιχνίδια Αστεριού έχουν πάντα ακριβώς πέντε παίκτες.",
+    "archenemyFixedSeats": "Τα παιχνίδια Archenemy Commander έχουν πάντα ακριβώς τέσσερις παίκτες.",
+    "twoHeadedFixedSeats": "Τα παιχνίδια Δικέφαλου Γίγαντα έχουν πάντα ακριβώς τέσσερις παίκτες.",
+    "eventName": "Όνομα event",
+    "eventNamePlaceholder": "Παρασκευιάτικο Commander",
+    "tables": "Τραπέζια",
+    "tablesHint": "Πόσα φυσικά τραπέζια είναι διαθέσιμα για αυτό το event.",
+    "eventLasts": "Διάρκεια event",
+    "eventLastsHint": "Ο κωδικός συμμετοχής λήγει μετά από τόσες ώρες. Χρησιμοποιήστε 48 ή 72 για ένα σαββατοκύριακο.",
+    "hostPin": "PIN διοργανωτή",
+    "hostPinHint": "4 έως 8 ψηφία — ανοίγει ξανά τον πίνακα διοργανωτή αργότερα.",
+    "createEvent": "Δημιουργία event",
+    "joinWithCode": "Συμμετοχή με κωδικό",
+    "playerAside": "παίκτης",
+    "joinCode": "Κωδικός συμμετοχής",
     "joinCodePlaceholder": "AB23CD",
-    "join": "Join",
-    "scanQr": "Scan QR",
-    "staleJoin": "That event is gone. Join with a new code, or host a new night."
+    "join": "Συμμετοχή",
+    "scanQr": "Σάρωση QR",
+    "staleJoin": "Αυτό το event δεν υπάρχει πλέον. Συμμετάσχετε με νέο κωδικό ή διοργανώστε νέα βραδιά."
   },
   "host": {
-    "desk": "Host desk",
-    "locked": "Locked",
-    "hostOnly": "host only",
-    "unlockHostDesk": "Unlock host desk",
-    "playerCount": "{{count}} player",
-    "playerCount_plural": "{{count}} players",
-    "ready": "{{count}} ready",
-    "matched": "{{count}} matched",
-    "playing": "{{count}} playing",
-    "paused": "{{count}} paused",
-    "ends": "ends {{date}}",
-    "podSizes": "Pod sizes",
-    "matching": "matching",
-    "allowLeftoverThree": "Allow leftover 3-player pods",
-    "allowFivePods": "Allow 5-player pods",
-    "treacheryTargetHint": "Target table size. Leftover pods can be as small as four.",
-    "matchingPrefers": "Matching prefers {{size}}-player tables.",
-    "matchingPrefersFour": "Matching prefers 4-player tables.",
-    "assassinTargetHint": "Target table size. Leftover contract circles can be as small as three.",
-    "multiplayerTargetHint": "Target table size. Leftover tables can be as small as three.",
-    "duelMatchmaking": "Duel matchmaking seats exactly two players per game.",
-    "twoHeadedMatchmaking": "Two-Headed Giant matchmaking seats exactly four players per game.",
-    "archenemyMatchmaking": "Archenemy Commander matchmaking seats exactly four players per game: one Archenemy against a team of three.",
-    "emperorMatchmaking": "Emperor matchmaking seats exactly six players per game: two teams with an Emperor and two Generals each.",
-    "starMatchmaking": "Star matchmaking seats exactly five players in a circular order.",
-    "eventLength": "Event length",
-    "joinCodeDies": "join code dies",
-    "hoursFromStart": "Hours from start",
-    "hoursFromStartHint": "Change this for a multi-day event. After it ends, the QR opens the home page.",
-    "joinCodeTitle": "Join code",
-    "share": "share",
-    "noLanAddress": "No LAN address found — this link only works on this computer.",
-    "copyPlayerLink": "Copy player link",
-    "queue": "Queue",
-    "nobodyWaiting": "Nobody waiting.",
+    "desk": "Πίνακας διοργανωτή",
+    "locked": "Κλειδωμένο",
+    "hostOnly": "μόνο διοργανωτής",
+    "unlockHostDesk": "Ξεκλείδωμα πίνακα διοργανωτή",
+    "playerCount": "{{count}} παίκτης",
+    "playerCount_plural": "{{count}} παίκτες",
+    "ready": "{{count}} έτοιμοι",
+    "matched": "{{count}} αντιστοιχισμένοι",
+    "playing": "{{count}} παίζουν",
+    "paused": "{{count}} σε παύση",
+    "ends": "λήγει {{date}}",
+    "podSizes": "Μεγέθη pods",
+    "matching": "matchmaking",
+    "allowLeftoverThree": "Να επιτρέπονται εναπομείναντα pods 3 παικτών",
+    "allowFivePods": "Να επιτρέπονται pods 5 παικτών",
+    "treacheryTargetHint": "Στόχος μεγέθους τραπεζιού. Τα εναπομείναντα pods μπορούν να έχουν τουλάχιστον τέσσερις παίκτες.",
+    "matchingPrefers": "Το matchmaking προτιμά τραπέζια {{size}} παικτών.",
+    "matchingPrefersFour": "Το matchmaking προτιμά τραπέζια 4 παικτών.",
+    "assassinTargetHint": "Στόχος μεγέθους τραπεζιού. Οι εναπομείναντες κύκλοι συμβολαίων μπορούν να έχουν τουλάχιστον τρεις παίκτες.",
+    "multiplayerTargetHint": "Στόχος μεγέθους τραπεζιού. Τα εναπομείναντα τραπέζια μπορούν να έχουν τουλάχιστον τρεις παίκτες.",
+    "duelMatchmaking": "Το matchmaking Μονομαχίας τοποθετεί ακριβώς δύο παίκτες σε κάθε παιχνίδι.",
+    "twoHeadedMatchmaking": "Το matchmaking Δικέφαλου Γίγαντα τοποθετεί ακριβώς τέσσερις παίκτες σε κάθε παιχνίδι.",
+    "archenemyMatchmaking": "Το matchmaking Archenemy Commander τοποθετεί ακριβώς τέσσερις παίκτες ανά παιχνίδι: έναν Archenemy εναντίον ομάδας τριών.",
+    "emperorMatchmaking": "Το matchmaking Αυτοκράτορα τοποθετεί ακριβώς έξι παίκτες ανά παιχνίδι: δύο ομάδες με έναν Αυτοκράτορα και δύο Στρατηγούς η καθεμία.",
+    "starMatchmaking": "Το matchmaking Αστεριού τοποθετεί ακριβώς πέντε παίκτες σε κυκλική σειρά.",
+    "eventLength": "Διάρκεια event",
+    "joinCodeDies": "ο κωδικός συμμετοχής λήγει",
+    "hoursFromStart": "Ώρες από την έναρξη",
+    "hoursFromStartHint": "Αλλάξτε το για event πολλών ημερών. Μετά τη λήξη του, το QR ανοίγει την αρχική σελίδα.",
+    "joinCodeTitle": "Κωδικός συμμετοχής",
+    "share": "κοινοποίηση",
+    "noLanAddress": "Δεν βρέθηκε διεύθυνση LAN — αυτός ο σύνδεσμος λειτουργεί μόνο σε αυτόν τον υπολογιστή.",
+    "copyPlayerLink": "Αντιγραφή συνδέσμου παικτών",
+    "queue": "Ουρά",
+    "nobodyWaiting": "Κανείς δεν περιμένει.",
     "flex": "flex {{count}}",
-    "challengePts": "{{count}} challenge pts",
-    "pts": "{{count}} pts",
-    "notReady": "Not ready",
-    "pausedTitle": "Paused",
-    "seated": "Seated",
-    "atTables": "{{count}} at tables",
-    "tablesTitle": "Tables",
-    "total": "{{count}} total",
-    "noTables": "This event was created without tables.",
-    "startingGames": "Starting games…",
-    "startAllReady": "Start all ready games ({{count}})",
-    "startGame": "Start game",
-    "finishTable": "Finish table",
-    "cancelPod": "Cancel pod",
-    "enable": "Enable",
-    "disable": "Disable",
+    "challengePts": "{{count}} πόντοι προκλήσεων",
+    "pts": "{{count}} πόντοι",
+    "notReady": "Όχι έτοιμος",
+    "pausedTitle": "Σε παύση",
+    "seated": "Στο τραπέζι",
+    "atTables": "{{count}} στα τραπέζια",
+    "tablesTitle": "Τραπέζια",
+    "total": "{{count}} συνολικά",
+    "noTables": "Αυτό το event δημιουργήθηκε χωρίς τραπέζια.",
+    "startingGames": "Έναρξη παιχνιδιών…",
+    "startAllReady": "Έναρξη όλων των έτοιμων παιχνιδιών ({{count}})",
+    "startGame": "Έναρξη παιχνιδιού",
+    "finishTable": "Ολοκλήρωση τραπεζιού",
+    "cancelPod": "Ακύρωση pod",
+    "enable": "Ενεργοποίηση",
+    "disable": "Απενεργοποίηση",
     "trackerUsed": "tracker",
-    "noTracker": "no tracker",
-    "matchNow": "Match now",
-    "fillBots": "Fill tables with bots",
-    "playerJoinPage": "Player join page"
+    "noTracker": "χωρίς tracker",
+    "matchNow": "Match τώρα",
+    "fillBots": "Συμπλήρωση τραπεζιών με bots",
+    "playerJoinPage": "Σελίδα συμμετοχής παικτών"
   },
   "join": {
-    "joinEvent": "Join event",
-    "takeSeat": "Take a seat",
-    "displayName": "Display name",
+    "joinEvent": "Συμμετοχή στο event",
+    "takeSeat": "Πάρτε θέση",
+    "displayName": "Εμφανιζόμενο όνομα",
     "displayNamePlaceholder": "Alex",
-    "joinEventButton": "Join event",
-    "saveDecks": "Save decks",
-    "matchFound": "Match found",
-    "yourDeck": "Your deck",
-    "checkMyRole": "Check my role",
-    "playingWithoutTracker": "Playing without the tracker. The host can finish the table.",
-    "chooseTracker": "Choose how this pod will record its game.",
-    "useGameTracker": "Use game tracker",
-    "playWithoutTracker": "Play without tracker",
-    "atTableMarked": "You're marked as at the table on this phone. The host still starts the game from the desk.",
-    "imAtTable": "I'm at the table",
-    "leftEvent": "You left this event. Scan the QR again if you want back in.",
-    "openPool": "Open pool — any table.",
-    "ready": "Ready",
-    "waiting": "waiting",
-    "holdTight": "Hold tight — a table is coming.",
-    "flex": "Flex: {{flex}} · Challenge Points: {{points}}",
-    "howWasPod": "How was your pod?",
-    "pause": "Pause",
-    "leave": "Leave",
-    "pausedMessage": "You are paused. Resume when you can sit, or leave the event.",
-    "imReady": "I'm ready",
-    "leaveEvent": "Leave event",
-    "markReady": "Mark ready when you can sit down for a game.",
-    "matchingShortly": "Matching will send you to a table shortly.",
-    "imTheHost": "I'm the host",
-    "offlineSaved": "Saved on this phone. It will send when you are back online.",
-    "stayAtTable": "Stay at the table until the host calls the game."
+    "joinEventButton": "Συμμετοχή στο event",
+    "saveDecks": "Αποθήκευση decks",
+    "matchFound": "Βρέθηκε παιχνίδι",
+    "yourDeck": "Το deck σας",
+    "checkMyRole": "Έλεγχος του ρόλου μου",
+    "playingWithoutTracker": "Παίζετε χωρίς tracker. Ο διοργανωτής μπορεί να ολοκληρώσει το τραπέζι.",
+    "chooseTracker": "Επιλέξτε πώς θα καταγράψει αυτό το pod το παιχνίδι.",
+    "useGameTracker": "Χρήση game tracker",
+    "playWithoutTracker": "Παιχνίδι χωρίς tracker",
+    "atTableMarked": "Σε αυτό το τηλέφωνο έχετε σημειωθεί ως παρών στο τραπέζι. Ο διοργανωτής εξακολουθεί να ξεκινά το παιχνίδι από τον πίνακά του.",
+    "imAtTable": "Είμαι στο τραπέζι",
+    "leftEvent": "Αποχωρήσατε από αυτό το event. Σαρώστε ξανά το QR αν θέλετε να επιστρέψετε.",
+    "openPool": "Ανοιχτό pool — οποιοδήποτε τραπέζι.",
+    "ready": "Έτοιμος",
+    "waiting": "αναμονή",
+    "holdTight": "Περιμένετε λίγο — σύντομα θα βρεθεί τραπέζι.",
+    "flex": "Flex: {{flex}} · Πόντοι Προκλήσεων: {{points}}",
+    "howWasPod": "Πώς ήταν το pod σας;",
+    "pause": "Παύση",
+    "leave": "Αποχώρηση",
+    "pausedMessage": "Βρίσκεστε σε παύση. Συνεχίστε όταν μπορείτε να καθίσετε ή αποχωρήστε από το event.",
+    "imReady": "Είμαι έτοιμος",
+    "leaveEvent": "Αποχώρηση από το event",
+    "markReady": "Σημειώστε ότι είστε έτοιμος όταν μπορείτε να καθίσετε για παιχνίδι.",
+    "matchingShortly": "Το matchmaking θα σας στείλει σύντομα σε τραπέζι.",
+    "imTheHost": "Είμαι ο διοργανωτής",
+    "offlineSaved": "Αποθηκεύτηκε σε αυτό το τηλέφωνο. Θα σταλεί όταν συνδεθείτε ξανά.",
+    "stayAtTable": "Μείνετε στο τραπέζι μέχρι ο διοργανωτής να ολοκληρώσει το παιχνίδι."
   },
   "matchConfig": {
-    "title": "Match config",
-    "description": "Sets up the fake seated pod behind /match. Nothing here touches the server, and none of it appears on the battle screen, so that route can be checked on a phone as-is.",
-    "podSetup": "Pod setup",
-    "seats": "Seats",
-    "seatsCount": "{{count}} seats",
+    "title": "Ρυθμίσεις παιχνιδιού",
+    "description": "Ρυθμίζει το εικονικό καθισμένο pod πίσω από το /match. Τίποτα εδώ δεν επηρεάζει τον server και τίποτα δεν εμφανίζεται στην οθόνη μάχης, οπότε αυτή η διαδρομή μπορεί να ελεγχθεί σε τηλέφωνο όπως είναι.",
+    "podSetup": "Ρύθμιση pod",
+    "seats": "Θέσεις",
+    "seatsCount": "{{count}} θέσεις",
     "bracket": "Bracket",
-    "header": "Header",
-    "eventNamePlaceholder": "Event name",
-    "joinCodePlaceholder": "Join code",
-    "matchCard": "Match card",
-    "tableLabelPlaceholder": "Table label",
-    "assignedDeckPlaceholder": "Assigned deck",
-    "openBattleScreen": "Open battle screen",
-    "resetGameState": "Reset game state",
+    "header": "Κεφαλίδα",
+    "eventNamePlaceholder": "Όνομα event",
+    "joinCodePlaceholder": "Κωδικός συμμετοχής",
+    "matchCard": "Κάρτα παιχνιδιού",
+    "tableLabelPlaceholder": "Ετικέτα τραπεζιού",
+    "assignedDeckPlaceholder": "Ανατεθειμένο deck",
+    "openBattleScreen": "Άνοιγμα οθόνης μάχης",
+    "resetGameState": "Επαναφορά κατάστασης παιχνιδιού",
     "commander": "Commander",
-    "secondCommander": "Second commander"
+    "secondCommander": "Δεύτερος commander"
   },
   "app": {
-    "notFound": "Not found."
+    "notFound": "Δεν βρέθηκε."
   },
   "wake": {
-    "title": "Waking the tables",
-    "message": "The free host went to sleep. Keep this page open — it usually takes under a minute."
+    "title": "Ενεργοποίηση τραπεζιών",
+    "message": "Ο δωρεάν server έχει κοιμηθεί. Αφήστε αυτή τη σελίδα ανοιχτή — συνήθως χρειάζεται λιγότερο από ένα λεπτό."
   },
   "scanner": {
-    "title": "Scan QR",
-    "ariaLabel": "Scan join QR code",
-    "hint": "Point at the host desk code.",
-    "closeScanner": "Close scanner",
-    "openingCamera": "Opening camera…",
-    "noCamera": "This browser cannot open the camera. Type the join code instead.",
-    "permissionDenied": "Camera permission was denied. Type the join code, or allow the camera and try again."
+    "title": "Σάρωση QR",
+    "ariaLabel": "Σάρωση QR κωδικού συμμετοχής",
+    "hint": "Στρέψτε την κάμερα προς τον κωδικό του διοργανωτή.",
+    "closeScanner": "Κλείσιμο scanner",
+    "openingCamera": "Άνοιγμα κάμερας…",
+    "noCamera": "Αυτός ο browser δεν μπορεί να ανοίξει την κάμερα. Εισαγάγετε τον κωδικό συμμετοχής χειροκίνητα.",
+    "permissionDenied": "Η άδεια κάμερας απορρίφθηκε. Εισαγάγετε τον κωδικό συμμετοχής ή επιτρέψτε την κάμερα και δοκιμάστε ξανά."
   },
   "theme": {
-    "switchToLight": "Switch to light mode",
-    "switchToDark": "Switch to dark mode"
+    "switchToLight": "Μετάβαση σε φωτεινή λειτουργία",
+    "switchToDark": "Μετάβαση σε σκοτεινή λειτουργία"
   },
   "hostMetrics": {
-    "title": "Event recap",
+    "title": "Ανακεφαλαίωση event",
     "aside": "pilot",
-    "players": "Players",
-    "games": "Games",
-    "gamesPerPlayer": "Games / player",
-    "waitAvg": "Wait avg",
-    "waitP95": "Wait p95",
-    "waitMax": "Wait max",
-    "rematchPairs": "Rematch pairs",
-    "flexEarned": "Flex earned",
-    "flexSeats": "Flex seats",
-    "durationAvg": "Duration avg",
-    "tablesOccupied": "Tables occupied",
-    "trackerUsed": "Tracker used",
-    "trackerUsedValue": "{{used}} used · {{skipped}} skipped",
-    "challenges": "Challenges",
-    "challengePts": "Challenge pts",
-    "podRating": "Pod rating",
-    "podSizes": "Pod sizes:",
+    "players": "Παίκτες",
+    "games": "Παιχνίδια",
+    "gamesPerPlayer": "Παιχνίδια / παίκτη",
+    "waitAvg": "Μέση αναμονή",
+    "waitP95": "Αναμονή p95",
+    "waitMax": "Μέγ. αναμονή",
+    "rematchPairs": "Ζεύγη rematch",
+    "flexEarned": "Flex που κερδήθηκε",
+    "flexSeats": "Flex θέσεις",
+    "durationAvg": "Μέση διάρκεια",
+    "tablesOccupied": "Κατειλημμένα τραπέζια",
+    "trackerUsed": "Χρήση tracker",
+    "trackerUsedValue": "{{used}} χρησιμοποιήθηκαν · {{skipped}} παραλείφθηκαν",
+    "challenges": "Προκλήσεις",
+    "challengePts": "Πόντοι προκλήσεων",
+    "podRating": "Βαθμολογία pod",
+    "podSizes": "Μεγέθη pods:",
     "pools": "Pools:"
   },
   "deckEditor": {
     "title": "Commander decks",
-    "deckNamePlaceholder": "Deck name (optional)",
+    "deckNamePlaceholder": "Όνομα deck (προαιρετικό)",
     "commander": "Commander",
-    "secondCommander": "Second commander",
-    "markPreferred": "Mark preferred",
-    "addAcceptedDeck": "Add accepted deck",
-    "hint": "Same-pool pods only. Extra decks let matching flex you into another bracket."
+    "secondCommander": "Δεύτερος commander",
+    "markPreferred": "Ορισμός ως προτιμώμενο",
+    "addAcceptedDeck": "Προσθήκη αποδεκτού deck",
+    "hint": "Μόνο pods του ίδιου pool. Πρόσθετα decks επιτρέπουν στο matchmaking να σας μετακινήσει σε άλλο bracket."
   },
   "commanderPicker": {
-    "searchCommander": "Search commander",
-    "searchPartner": "Commander that can pair with {{name}}",
-    "removeCommander": "Remove {{name}}",
-    "artworkFor": "Artwork for",
-    "loadingArtwork": "Loading artwork…"
+    "searchCommander": "Αναζήτηση commander",
+    "searchPartner": "Commander που μπορεί να γίνει partner με {{name}}",
+    "removeCommander": "Αφαίρεση {{name}}",
+    "artworkFor": "Artwork για",
+    "loadingArtwork": "Φόρτωση artwork…"
   },
   "challengePack": {
-    "title": "Challenge pack",
-    "description": "Only predefined primitives. Saving writes a new version and never mutates a pack already used by this event.",
-    "copyOfficial": "Copy official",
-    "startBlank": "Start blank",
-    "saveNewVersion": "Save new version",
-    "editHint": "Copy the official pack or start blank before editing.",
-    "packName": "Pack name",
-    "descriptionLabel": "Description",
-    "addChallenge": "Add challenge",
-    "id": "Id",
-    "name": "Name",
-    "category": "Category",
-    "points": "Points",
+    "title": "Πακέτο προκλήσεων",
+    "description": "Μόνο προκαθορισμένα primitives. Η αποθήκευση δημιουργεί νέα έκδοση και δεν αλλάζει ποτέ πακέτο που έχει ήδη χρησιμοποιηθεί από αυτό το event.",
+    "copyOfficial": "Αντιγραφή επίσημου",
+    "startBlank": "Έναρξη από κενό",
+    "saveNewVersion": "Αποθήκευση νέας έκδοσης",
+    "editHint": "Αντιγράψτε το επίσημο πακέτο ή ξεκινήστε από κενό πριν την επεξεργασία.",
+    "packName": "Όνομα πακέτου",
+    "descriptionLabel": "Περιγραφή",
+    "addChallenge": "Προσθήκη πρόκλησης",
+    "id": "ID",
+    "name": "Όνομα",
+    "category": "Κατηγορία",
+    "points": "Πόντοι",
     "primitive": "Primitive",
-    "threshold": "Threshold",
-    "confirmationQuestion": "Confirmation question",
-    "defaultConfirmation": "Did this happen at the table?",
-    "newClaimName": "New claim",
-    "newClaimDescription": "Award this at the table."
+    "threshold": "Όριο",
+    "confirmationQuestion": "Ερώτηση επιβεβαίωσης",
+    "defaultConfirmation": "Συνέβη αυτό στο τραπέζι;",
+    "newClaimName": "Νέα διεκδίκηση",
+    "newClaimDescription": "Αποδώστε το στο τραπέζι."
   },
   "treacheryRole": {
-    "treachery": "Treachery",
-    "receivedRole": "You received a role",
-    "handDeviceTo": "Hand the device to {{name}}",
-    "lookAwayIdentity": "Everyone else should look away before the identity is revealed.",
-    "lookAwayScreen": "Make sure nobody else can see your screen before revealing it.",
-    "reveal": "Reveal",
-    "yourRole": "Your role",
-    "identityAlt": "{{name}}, {{role}} identity",
-    "illustratedBy": "Illustrated by {{artist}}",
-    "yourObjective": "Your objective",
-    "unveiledToTable": "Unveiled to the table",
-    "unveilWarning": "Everyone at your table will see this identity. Its ability must be resolved in the game.",
-    "confirmUnveil": "Confirm unveil",
-    "unveilToTable": "Unveil to the table",
-    "hideAndPass": "Hide & pass",
-    "hideIdentity": "Hide my identity"
+    "treachery": "Προδοσία",
+    "receivedRole": "Λάβατε έναν ρόλο",
+    "handDeviceTo": "Δώστε τη συσκευή στον/στην {{name}}",
+    "lookAwayIdentity": "Όλοι οι υπόλοιποι πρέπει να κοιτάξουν αλλού πριν αποκαλυφθεί η ταυτότητα.",
+    "lookAwayScreen": "Βεβαιωθείτε ότι κανείς άλλος δεν βλέπει την οθόνη σας πριν την αποκάλυψη.",
+    "reveal": "Αποκάλυψη",
+    "yourRole": "Ο ρόλος σας",
+    "identityAlt": "{{name}}, ταυτότητα {{role}}",
+    "illustratedBy": "Εικονογράφηση από {{artist}}",
+    "yourObjective": "Ο στόχος σας",
+    "unveiledToTable": "Αποκαλύφθηκε στο τραπέζι",
+    "unveilWarning": "Όλοι στο τραπέζι σας θα δουν αυτή την ταυτότητα. Η ικανότητά της πρέπει να επιλυθεί μέσα στο παιχνίδι.",
+    "confirmUnveil": "Επιβεβαίωση αποκάλυψης",
+    "unveilToTable": "Αποκάλυψη στο τραπέζι",
+    "hideAndPass": "Απόκρυψη και παράδοση",
+    "hideIdentity": "Απόκρυψη της ταυτότητάς μου"
   },
   "modeRulesSheet": {
-    "closeRules": "Close rules",
-    "backToGame": "Back to the game"
+    "closeRules": "Κλείσιμο κανόνων",
+    "backToGame": "Πίσω στο παιχνίδι"
   },
   "assassinTargets": {
-    "title": "Secret contracts",
-    "chooseOwnName": "Choose only your own name.",
-    "closeContracts": "Close contracts",
-    "handDeviceTo": "Hand the device to {{name}}",
-    "lookAway": "Everyone else should look away before the contract is revealed.",
-    "revealTarget": "Reveal my target",
-    "yourTarget": "Your target",
-    "noActiveTarget": "No active target",
-    "marksScored": "Marks scored: {{count}}",
-    "hideAndPass": "Hide & pass",
-    "allContractsChecked": "All contracts checked"
+    "title": "Μυστικά συμβόλαια",
+    "chooseOwnName": "Επιλέξτε μόνο το δικό σας όνομα.",
+    "closeContracts": "Κλείσιμο συμβολαίων",
+    "handDeviceTo": "Δώστε τη συσκευή στον/στην {{name}}",
+    "lookAway": "Όλοι οι υπόλοιποι πρέπει να κοιτάξουν αλλού πριν αποκαλυφθεί το συμβόλαιο.",
+    "revealTarget": "Αποκάλυψη του στόχου μου",
+    "yourTarget": "Ο στόχος σας",
+    "noActiveTarget": "Κανένας ενεργός στόχος",
+    "marksScored": "Marks που κερδήθηκαν: {{count}}",
+    "hideAndPass": "Απόκρυψη και παράδοση",
+    "allContractsChecked": "Όλα τα συμβόλαια ελέγχθηκαν"
   },
   "scheme": {
     "ongoingScheme": "Ongoing scheme",
     "scheme": "Scheme",
-    "pastScheme": "Past scheme",
+    "pastScheme": "Προηγούμενο scheme",
     "abandon": "Abandon {{name}}",
     "ongoingSchemes": "Ongoing schemes",
     "graveyard": "Graveyard · {{count}}",
     "nextScheme": "Next scheme",
-    "remainingInDeck": "{{count}} left in the deck",
-    "scryfallCredit": "Card image via Scryfall. Magic: The Gathering is © Wizards of the Coast."
+    "remainingInDeck": "{{count}} απομένουν στο deck",
+    "scryfallCredit": "Εικόνα κάρτας μέσω Scryfall. Το Magic: The Gathering είναι © Wizards of the Coast."
   },
   "dungeon": {
-    "takeInitiativeTitle": "Take the initiative?",
-    "takeInitiativeEnter": "This also ventures into Undercity. Only take it when the table just gave this seat the initiative.",
-    "takeInitiativeWait": "Finish or leave the current dungeon before Undercity can open. Only take the initiative when the table just gave it to this seat.",
-    "takeInitiativeAndEnter": "Take initiative & enter Undercity",
-    "takeInitiative": "Take initiative",
-    "alreadyHoldInitiative": "You already hold the initiative",
-    "takeAndEnterUndercity": "Take the initiative and enter Undercity",
-    "completed": "{{name}} (completed)",
-    "ventureInto": "Venture into {{name}}",
-    "done": "Done",
-    "ventureTo": "Venture to {{room}}: {{effect}}",
-    "releaseInitiative": "Release the initiative",
-    "undoRoom": "Undo room",
-    "closeDungeon": "Close dungeon"
+    "takeInitiativeTitle": "Πάρετε το initiative;",
+    "takeInitiativeEnter": "Αυτό σας κάνει επίσης venture στο Undercity. Πάρτε το μόνο όταν το τραπέζι μόλις έδωσε το initiative σε αυτή τη θέση.",
+    "takeInitiativeWait": "Ολοκληρώστε ή εγκαταλείψτε το τρέχον dungeon πριν ανοίξει το Undercity. Πάρτε το initiative μόνο όταν το τραπέζι μόλις το έδωσε σε αυτή τη θέση.",
+    "takeInitiativeAndEnter": "Πάρτε το initiative και μπείτε στο Undercity",
+    "takeInitiative": "Πάρτε το initiative",
+    "alreadyHoldInitiative": "Έχετε ήδη το initiative",
+    "takeAndEnterUndercity": "Πάρτε το initiative και μπείτε στο Undercity",
+    "completed": "{{name}} (ολοκληρώθηκε)",
+    "ventureInto": "Venture στο {{name}}",
+    "done": "Τέλος",
+    "ventureTo": "Venture στο {{room}}: {{effect}}",
+    "releaseInitiative": "Αφήστε το initiative",
+    "undoRoom": "Αναίρεση room",
+    "closeDungeon": "Κλείσιμο dungeon"
   },
   "treacheryRolesSheet": {
-    "title": "Secret identities",
-    "chooseOwnName": "Choose only your own name.",
-    "closeIdentities": "Close identities",
-    "allIdentitiesChecked": "All identities checked"
+    "title": "Μυστικές ταυτότητες",
+    "chooseOwnName": "Επιλέξτε μόνο το δικό σας όνομα.",
+    "closeIdentities": "Κλείσιμο ταυτοτήτων",
+    "allIdentitiesChecked": "Όλες οι ταυτότητες ελέγχθηκαν"
   },
   "tracker": {
-    "gameRules": "Game rules",
-    "loadingRoles": "Loading roles…",
-    "start": "Start",
-    "readRules": "Read rules",
-    "readyToBegin": "Ready to begin",
-    "readyToBeginHint": "Start the match when everyone is seated, or read the rules first.",
-    "dealContracts": "Deal contracts",
-    "dealContractsTitle": "Deal secret contracts",
-    "dealContractsHint": "Every player receives one private target. The device will be passed around so each contract can be checked in secret.",
-    "dealIdentities": "Deal identities",
-    "dealIdentitiesTitle": "Deal secret identities",
-    "dealIdentitiesHint": "Every player receives one hidden identity. The device will be passed around so each one can be read in secret.",
-    "chooseStarPositions": "Choose Star positions",
-    "starPositionsHint": "Players beside each other are allies. Tap two players to exchange their positions, or randomise the whole circle.",
-    "randomPositions": "Random positions",
-    "confirmPositions": "Confirm positions",
-    "adjacentPlayersAlly": "Adjacent\nplayers ally",
-    "buildEmperorTeams": "Build the Emperor teams",
-    "chooseTeamA": "Choose three players for Team A.",
-    "randomTeams": "Random teams",
-    "resetTeams": "Reset teams",
-    "teamEmperor": "Team {{team}} Emperor",
-    "randomEmperors": "Random Emperors",
-    "confirmTeams": "Confirm teams",
-    "chooseArchenemy": "Choose the Archenemy",
-    "chooseArchenemyHint": "The Archenemy faces the other three players. Both sides share 60 life. The Archenemy goes first, draws on that turn, and sets a scheme in motion during each first main phase.",
-    "confirmArchenemy": "Confirm Archenemy",
-    "chooseAllies": "Choose the allies",
-    "chooseAlliesHint": "Select two players for the first team. The other two players become the opposing team. Teams share 60 life and turns; all other player controls stay separate.",
-    "emperor": "Emperor",
-    "emperorRange": "Emperor · range 2",
-    "leader": "Leader",
-    "general": "General",
-    "generalRange": "General · range 1",
+    "gameRules": "Κανόνες παιχνιδιού",
+    "loadingRoles": "Φόρτωση ρόλων…",
+    "start": "Έναρξη",
+    "readRules": "Διαβάστε τους κανόνες",
+    "readyToBegin": "Έτοιμοι για έναρξη",
+    "readyToBeginHint": "Ξεκινήστε το παιχνίδι όταν όλοι έχουν καθίσει ή διαβάστε πρώτα τους κανόνες.",
+    "dealContracts": "Μοίρασμα συμβολαίων",
+    "dealContractsTitle": "Μοίρασμα μυστικών συμβολαίων",
+    "dealContractsHint": "Κάθε παίκτης λαμβάνει έναν ιδιωτικό στόχο. Η συσκευή θα περάσει από παίκτη σε παίκτη ώστε κάθε συμβόλαιο να ελεγχθεί μυστικά.",
+    "dealIdentities": "Μοίρασμα ταυτοτήτων",
+    "dealIdentitiesTitle": "Μοίρασμα μυστικών ταυτοτήτων",
+    "dealIdentitiesHint": "Κάθε παίκτης λαμβάνει μία κρυφή ταυτότητα. Η συσκευή θα περάσει από παίκτη σε παίκτη ώστε ο καθένας να διαβάσει τη δική του μυστικά.",
+    "chooseStarPositions": "Επιλογή θέσεων Αστεριού",
+    "starPositionsHint": "Οι παίκτες που κάθονται δίπλα είναι σύμμαχοι. Πατήστε δύο παίκτες για να ανταλλάξετε τις θέσεις τους ή τοποθετήστε όλο τον κύκλο τυχαία.",
+    "randomPositions": "Τυχαίες θέσεις",
+    "confirmPositions": "Επιβεβαίωση θέσεων",
+    "adjacentPlayersAlly": "Οι διπλανοί\nπαίκτες είναι σύμμαχοι",
+    "buildEmperorTeams": "Δημιουργία ομάδων Αυτοκράτορα",
+    "chooseTeamA": "Επιλέξτε τρεις παίκτες για την Ομάδα A.",
+    "randomTeams": "Τυχαίες ομάδες",
+    "resetTeams": "Επαναφορά ομάδων",
+    "teamEmperor": "Αυτοκράτορας Ομάδας {{team}}",
+    "randomEmperors": "Τυχαίοι Αυτοκράτορες",
+    "confirmTeams": "Επιβεβαίωση ομάδων",
+    "chooseArchenemy": "Επιλογή Archenemy",
+    "chooseArchenemyHint": "Ο Archenemy αντιμετωπίζει τους άλλους τρεις παίκτες. Και οι δύο πλευρές μοιράζονται 60 ζωή. Ο Archenemy παίζει πρώτος, τραβά κάρτα σε αυτόν τον γύρο και θέτει ένα scheme σε κίνηση κατά τη διάρκεια κάθε first main phase.",
+    "confirmArchenemy": "Επιβεβαίωση Archenemy",
+    "chooseAllies": "Επιλογή συμμάχων",
+    "chooseAlliesHint": "Επιλέξτε δύο παίκτες για την πρώτη ομάδα. Οι άλλοι δύο παίκτες σχηματίζουν την αντίπαλη ομάδα. Οι ομάδες μοιράζονται 60 ζωή και γύρους· όλα τα υπόλοιπα στοιχεία κάθε παίκτη παραμένουν ξεχωριστά.",
+    "emperor": "Αυτοκράτορας",
+    "emperorRange": "Αυτοκράτορας · εμβέλεια 2",
+    "leader": "Αρχηγός",
+    "general": "Στρατηγός",
+    "generalRange": "Στρατηγός · εμβέλεια 1",
     "marks": "{{count}} marks",
-    "winner": "Winner",
-    "turnPhone": "Turn your phone for the full board",
-    "matchMenu": "Match menu",
-    "matchMenuElapsed": "Match menu. {{clock}} elapsed",
-    "matchMenuPaused": ", paused",
-    "matchMenuDayNight": ", it is {{phase}}",
-    "day": "day",
-    "night": "night",
-    "closeMatchMenu": "Close match menu",
-    "match": "Match",
-    "firstScheme": "First scheme",
-    "nextScheme": "Next scheme",
-    "resume": "Resume",
-    "pause": "Pause",
-    "undo": "Undo",
-    "challenges": "Challenges",
-    "checkTarget": "Check target",
-    "checkMyRole": "Check my role",
-    "dayButton": "Day",
-    "nightButton": "Night",
-    "playerLost": "Player lost",
-    "gameWonBy": "Game won by",
-    "won": "{{name}} won",
-    "doneRequeue": "Done & requeue",
-    "savingChallenges": "Saving challenges…",
-    "quitToHome": "Quit to home",
-    "quitHint": "The game is kept — reopen it from the home screen.",
-    "secretContracts": "Secret contracts",
-    "secretIdentities": "Secret identities",
-    "whoEliminated": "Who eliminated {{name}}?",
-    "whoEliminatedHint": "A player scores only if this was their assigned mark. The contract chain advances either way.",
-    "noPlayerUnknown": "No player / unknown",
-    "revealedIdentity": "Revealed Treachery identity",
-    "closeRevealedIdentity": "Close revealed identity",
-    "commanderChallenges": "Commander challenges",
-    "challengeCompleted": "{{name}} completed",
-    "challengeFallback": "Challenge",
-    "matchResult": "Match result",
-    "wins": "{{name}} wins",
-    "reviewBoard": "Review board",
-    "yes": "Yes",
-    "no": "No",
-    "yesTheyLost": "Yes, they lost",
-    "noStillIn": "No, still in",
-    "openCounters": "Open counters for {{name}}",
-    "commanderDamageOn": "Commander damage on {{name}}",
-    "countersFor": "Counters for {{name}}",
-    "countersTitle": "Counters for {{name}}",
-    "closeCounters": "Close counters",
-    "closeChallenges": "Close challenges",
-    "sharedCommanderDamage": "Shared commander damage",
-    "closeCommanderDamage": "Close commander damage",
-    "highestCommanderDamage": "Highest commander damage on {{name}}: {{value}} from {{commander}}",
-    "noCommanderDamage": "No commander damage on {{name}}",
-    "removeCommanderDamage": "Remove commander damage from {{owner}}'s {{name}}",
-    "addCommanderDamage": "Add commander damage from {{owner}}'s {{name}}",
-    "isMonarch": "{{name}} is the monarch",
-    "makeMonarch": "Make {{name}} the monarch",
-    "enduringStory": "{{name}} {{has}} an enduring story",
-    "cityBlessing": "{{name}} {{has}} the city's blessing",
-    "has": "has",
-    "doesNotHave": "does not have",
-    "didLose": "Did {{name}} lose the game?",
-    "thisTeam": "This team",
-    "didTheyLose": "Did they lose?",
-    "poisonPrompt": "{{name}} has {{count}} poison counters. Did they lose?",
-    "sharedPoisonPrompt": "{{subject}} has {{count}} shared poison counters. {{lose}}",
-    "hitPrompt": "{{name}} owns {{count}} exiled cards with hit counters. Did they lose?",
-    "commanderPrompt": "{{name}} has taken {{damage}} commander damage from {{from}}. Did they lose?",
-    "sharedCommanderPrompt": "{{subject}} has taken {{damage}} commander damage from {{from}}. {{lose}}",
-    "lifePrompt": "{{name}} is at {{life}} life. Did they lose?",
-    "sharedLifePrompt": "{{subject}} is at {{life}} life. {{lose}}",
-    "anotherCommander": "another commander",
-    "addLife": "Add 1 life. Long press for a larger amount.",
-    "removeLife": "Remove 1 life. Long press for a larger amount.",
-    "addLifeFor": "Add life for {{name}}",
-    "removeLifeFor": "Remove life for {{name}}",
-    "addLifeLabel": "Add life · {{name}}",
-    "removeLifeLabel": "Remove life · {{name}}",
-    "deleteDigit": "Delete digit",
-    "add": "Add",
-    "removeVerb": "Remove",
-    "lower": "Lower {{label}}",
-    "raise": "Raise {{label}}",
-    "seatColour": "Seat colour for {{name}}",
-    "dungeonFor": "Dungeon for {{name}}",
-    "dungeonInitiative": "Dungeon and initiative for {{name}}. {{title}}",
-    "dungeonInitiativeActive": "{{name}} has the initiative · {{filled}} of {{total}} unique dungeons",
-    "dungeonInitiativeCompleted": "{{name}} has completed {{filled}} of {{total}} unique dungeons",
-    "counterOn": "{{label}} on {{name}}: {{value}}",
-    "counterFor": "{{label}} for {{name}}",
-    "claimFor": "Claim for {{name}}",
-    "challengesSubtitle": "Same challenges for every player · points never affect matching",
+    "winner": "Νικητής",
+    "turnPhone": "Γυρίστε το τηλέφωνο για ολόκληρο το battlefield",
+    "matchMenu": "Μενού παιχνιδιού",
+    "matchMenuElapsed": "Μενού παιχνιδιού. Έχουν περάσει {{clock}}",
+    "matchMenuPaused": ", σε παύση",
+    "matchMenuDayNight": ", είναι {{phase}}",
+    "day": "μέρα",
+    "night": "νύχτα",
+    "closeMatchMenu": "Κλείσιμο μενού παιχνιδιού",
+    "match": "Παιχνίδι",
+    "firstScheme": "Πρώτο scheme",
+    "nextScheme": "Επόμενο scheme",
+    "resume": "Συνέχιση",
+    "pause": "Παύση",
+    "undo": "Αναίρεση",
+    "challenges": "Προκλήσεις",
+    "checkTarget": "Έλεγχος στόχου",
+    "checkMyRole": "Έλεγχος του ρόλου μου",
+    "dayButton": "Μέρα",
+    "nightButton": "Νύχτα",
+    "playerLost": "Ο παίκτης έχασε",
+    "gameWonBy": "Το παιχνίδι κερδήθηκε από",
+    "won": "Ο/Η {{name}} κέρδισε",
+    "doneRequeue": "Τέλος και επιστροφή στην ουρά",
+    "savingChallenges": "Αποθήκευση προκλήσεων…",
+    "quitToHome": "Έξοδος στην αρχική",
+    "quitHint": "Το παιχνίδι διατηρείται — ανοίξτε το ξανά από την αρχική οθόνη.",
+    "secretContracts": "Μυστικά συμβόλαια",
+    "secretIdentities": "Μυστικές ταυτότητες",
+    "whoEliminated": "Ποιος εξάλειψε τον/την {{name}};",
+    "whoEliminatedHint": "Ένας παίκτης κερδίζει πόντο μόνο αν αυτός ήταν ο ανατεθειμένος στόχος του. Η αλυσίδα συμβολαίων προχωρά ούτως ή άλλως.",
+    "noPlayerUnknown": "Κανένας παίκτης / άγνωστο",
+    "revealedIdentity": "Αποκαλυμμένη ταυτότητα Treachery",
+    "closeRevealedIdentity": "Κλείσιμο αποκαλυμμένης ταυτότητας",
+    "commanderChallenges": "Commander προκλήσεις",
+    "challengeCompleted": "Ολοκληρώθηκε: {{name}}",
+    "challengeFallback": "Πρόκληση",
+    "matchResult": "Αποτέλεσμα παιχνιδιού",
+    "wins": "Ο/Η {{name}} κερδίζει",
+    "reviewBoard": "Προβολή battlefield",
+    "yes": "Ναι",
+    "no": "Όχι",
+    "yesTheyLost": "Ναι, έχασε",
+    "noStillIn": "Όχι, παραμένει στο παιχνίδι",
+    "openCounters": "Άνοιγμα counters για {{name}}",
+    "commanderDamageOn": "Commander damage στον/στην {{name}}",
+    "countersFor": "Counters για {{name}}",
+    "countersTitle": "Counters για {{name}}",
+    "closeCounters": "Κλείσιμο counters",
+    "closeChallenges": "Κλείσιμο προκλήσεων",
+    "sharedCommanderDamage": "Κοινό commander damage",
+    "closeCommanderDamage": "Κλείσιμο commander damage",
+    "highestCommanderDamage": "Υψηλότερο commander damage στον/στην {{name}}: {{value}} από {{commander}}",
+    "noCommanderDamage": "Κανένα commander damage στον/στην {{name}}",
+    "removeCommanderDamage": "Αφαίρεση commander damage από τον {{name}} του/της {{owner}}",
+    "addCommanderDamage": "Προσθήκη commander damage από τον {{name}} του/της {{owner}}",
+    "isMonarch": "Ο/Η {{name}} είναι ο monarch",
+    "makeMonarch": "Κάντε τον/την {{name}} monarch",
+    "enduringStory": "Ο/Η {{name}} {{has}} enduring story",
+    "cityBlessing": "Ο/Η {{name}} {{has}} city's blessing",
+    "has": "έχει",
+    "doesNotHave": "δεν έχει",
+    "didLose": "Έχασε ο/η {{name}} το παιχνίδι;",
+    "thisTeam": "Αυτή η ομάδα",
+    "didTheyLose": "Έχασαν;",
+    "poisonPrompt": "Ο/Η {{name}} έχει {{count}} poison counters. Έχασε;",
+    "sharedPoisonPrompt": "Το {{subject}} έχει {{count}} κοινά poison counters. {{lose}}",
+    "hitPrompt": "Ο/Η {{name}} έχει {{count}} exiled cards με hit counters. Έχασε;",
+    "commanderPrompt": "Ο/Η {{name}} έχει δεχτεί {{damage}} commander damage από {{from}}. Έχασε;",
+    "sharedCommanderPrompt": "Το {{subject}} έχει δεχτεί {{damage}} κοινό commander damage από {{from}}. {{lose}}",
+    "lifePrompt": "Ο/Η {{name}} είναι στα {{life}} ζωή. Έχασε;",
+    "sharedLifePrompt": "Το {{subject}} είναι στα {{life}} κοινή ζωή. {{lose}}",
+    "anotherCommander": "άλλον commander",
+    "addLife": "Προσθήκη 1 ζωής. Κρατήστε πατημένο για μεγαλύτερη ποσότητα.",
+    "removeLife": "Αφαίρεση 1 ζωής. Κρατήστε πατημένο για μεγαλύτερη ποσότητα.",
+    "addLifeFor": "Προσθήκη ζωής για {{name}}",
+    "removeLifeFor": "Αφαίρεση ζωής από {{name}}",
+    "addLifeLabel": "Προσθήκη ζωής · {{name}}",
+    "removeLifeLabel": "Αφαίρεση ζωής · {{name}}",
+    "deleteDigit": "Διαγραφή ψηφίου",
+    "add": "Προσθήκη",
+    "removeVerb": "Αφαίρεση",
+    "lower": "Μείωση {{label}}",
+    "raise": "Αύξηση {{label}}",
+    "seatColour": "Χρώμα θέσης για {{name}}",
+    "dungeonFor": "Dungeon για {{name}}",
+    "dungeonInitiative": "Dungeon και initiative για {{name}}. {{title}}",
+    "dungeonInitiativeActive": "Ο/Η {{name}} έχει το initiative · {{filled}} από {{total}} μοναδικά dungeons",
+    "dungeonInitiativeCompleted": "Ο/Η {{name}} έχει ολοκληρώσει {{filled}} από {{total}} μοναδικά dungeons",
+    "counterOn": "{{label}} στον/στην {{name}}: {{value}}",
+    "counterFor": "{{label}} για {{name}}",
+    "claimFor": "Διεκδίκηση για {{name}}",
+    "challengesSubtitle": "Οι ίδιες προκλήσεις για κάθε παίκτη · οι πόντοι δεν επηρεάζουν ποτέ το matchmaking",
     "counters": {
       "poison": "Poison",
       "tax": "Commander tax",

@@ -557,6 +557,7 @@ export function JoinPage() {
                 }
               : undefined
           }
+          roleCheckOpen={roleOpen && Boolean(treacheryRole)}
         />
         {roleOpen && treacheryRole ? (
           <TreacheryRoleDialog

@@ -1,75 +1,75 @@
 {
   "common": {
-    "home": "Home",
-    "cancel": "Cancel",
-    "close": "Close",
-    "save": "Save",
-    "loading": "Loading…",
-    "players": "Players",
-    "game": "Game",
-    "language": "Language",
-    "yes": "Yes",
-    "no": "No",
-    "reset": "Reset",
-    "random": "Random",
-    "remove": "Remove",
-    "empty": "Empty",
+    "home": "Avaleht",
+    "cancel": "Tühista",
+    "close": "Sulge",
+    "save": "Salvesta",
+    "loading": "Laadimine…",
+    "players": "Mängijad",
+    "game": "Mäng",
+    "language": "Keel",
+    "yes": "Jah",
+    "no": "Ei",
+    "reset": "Lähtesta",
+    "random": "Juhuslik",
+    "remove": "Eemalda",
+    "empty": "Tühi",
     "bot": "bot",
     "dev": "dev",
-    "official": "official",
-    "open": "Open",
-    "preferred": "preferred",
-    "player": "Player {{number}}",
-    "versus": "versus",
-    "teamA": "Team A",
-    "teamB": "Team B",
-    "working": "Working…",
-    "creating": "Creating…",
-    "checking": "Checking…",
-    "joining": "Joining…",
-    "updating": "Updating…",
-    "submitting": "Submitting…",
-    "saving": "Saving…",
-    "searching": "Searching…",
-    "unveiling": "Unveiling…",
-    "copied": "Copied",
-    "noneYet": "none yet",
+    "official": "ametlik",
+    "open": "Avatud",
+    "preferred": "eelistatud",
+    "player": "Mängija {{number}}",
+    "versus": "vastu",
+    "teamA": "Võistkond A",
+    "teamB": "Võistkond B",
+    "working": "Töötlemine…",
+    "creating": "Loomine…",
+    "checking": "Kontrollimine…",
+    "joining": "Liitumine…",
+    "updating": "Uuendamine…",
+    "submitting": "Saatmine…",
+    "saving": "Salvestamine…",
+    "searching": "Otsimine…",
+    "unveiling": "Paljastamine…",
+    "copied": "Kopeeritud",
+    "noneYet": "veel pole",
     "dash": "—",
     "errors": {
-      "generic": "Something went wrong.",
-      "createEvent": "Could not create event.",
-      "unlockHost": "Could not unlock host.",
-      "updateTable": "Could not update table.",
-      "startGame": "Could not start the game.",
-      "startAllGames": "Could not start all ready games.",
-      "finishTable": "Could not finish the table.",
-      "cancelPod": "Could not cancel the pod.",
-      "updateSettings": "Could not update settings.",
-      "matchTables": "Could not match tables.",
-      "fillBots": "Could not fill tables with bots.",
-      "clipboard": "Clipboard blocked — copy the link manually.",
-      "eventNotFound": "Event not found.",
-      "joinEvent": "Could not join event.",
-      "saveDecks": "Could not save decks.",
-      "updateReady": "Could not update ready.",
-      "updatePause": "Could not update pause.",
-      "leaveEvent": "Could not leave event.",
-      "trackerChoice": "Could not save the tracker choice.",
-      "saveRating": "Could not save that rating.",
-      "chooseCommander": "Choose a commander for every deck.",
-      "enterJoinCode": "Enter a join code.",
-      "sessionUnavailable": "Your event session is no longer available.",
-      "savePack": "Could not save the pack.",
-      "searchScryfall": "Could not search Scryfall.",
-      "loadArtwork": "Could not load alternate artwork.",
-      "submitResult": "Could not submit the result.",
-      "saveChallenge": "Could not save challenge progress.",
-      "unveilIdentity": "Could not unveil your identity.",
-      "apiWaking": "The host is waking up. Keep this page open — it usually takes under a minute.",
-      "apiUnreachable": "Cannot reach the API. Is the server running (yarn dev:server)?"
+      "generic": "Midagi läks valesti.",
+      "createEvent": "Sündmust ei õnnestunud luua.",
+      "unlockHost": "Korraldaja juhtpaneeli ei õnnestunud avada.",
+      "updateTable": "Lauda ei õnnestunud uuendada.",
+      "startGame": "Mängu ei õnnestunud alustada.",
+      "startAllGames": "Kõiki valmis mänge ei õnnestunud alustada.",
+      "finishTable": "Laua mängu ei õnnestunud lõpetada.",
+      "cancelPod": "Podi ei õnnestunud tühistada.",
+      "updateSettings": "Seadeid ei õnnestunud uuendada.",
+      "matchTables": "Laudu ei õnnestunud sobitada.",
+      "fillBots": "Laudu ei õnnestunud botidega täita.",
+      "clipboard": "Lõikelaud on blokeeritud — kopeerige link käsitsi.",
+      "eventNotFound": "Sündmust ei leitud.",
+      "joinEvent": "Sündmusega ei õnnestunud liituda.",
+      "saveDecks": "Pakke ei õnnestunud salvestada.",
+      "updateReady": "Valmisolekut ei õnnestunud uuendada.",
+      "updatePause": "Pausi olekut ei õnnestunud uuendada.",
+      "leaveEvent": "Sündmuselt ei õnnestunud lahkuda.",
+      "trackerChoice": "Trackeri valikut ei õnnestunud salvestada.",
+      "saveRating": "Hinnangut ei õnnestunud salvestada.",
+      "chooseCommander": "Valige igale pakile commander.",
+      "enterJoinCode": "Sisestage liitumiskood.",
+      "sessionUnavailable": "Teie sündmuse sessioon pole enam saadaval.",
+      "savePack": "Paketti ei õnnestunud salvestada.",
+      "searchScryfall": "Scryfallist otsimine ebaõnnestus.",
+      "loadArtwork": "Alternatiivset illustratsiooni ei õnnestunud laadida.",
+      "submitResult": "Tulemust ei õnnestunud saata.",
+      "saveChallenge": "Väljakutse edenemist ei õnnestunud salvestada.",
+      "unveilIdentity": "Teie identiteeti ei õnnestunud paljastada.",
+      "apiWaking": "Server ärkab. Hoidke see leht avatuna — tavaliselt kulub alla minuti.",
+      "apiUnreachable": "API-ga ei saa ühendust. Kas server töötab (yarn dev:server)?"
     },
-    "assignedAtTable": "Assigned at the table",
-    "scanToJoin": "Scan to join this event"
+    "assignedAtTable": "Määratud lauda",
+    "scanToJoin": "Skannige, et selle sündmusega liituda"
   },
   "language": {
     "en": "English",
@@ -109,173 +109,173 @@
     "cy": "Cymraeg"
   },
   "families": {
-    "normal": "Normal",
+    "normal": "Tavaline",
     "commander": "Commander"
   },
   "modes": {
     "shared": {
-      "commanderCombat": "A player loses after taking {{commanderDamage}} combat damage from one commander.",
-      "commanderTax": "Each time a commander is recast from the command zone, it costs 2 more mana.",
-      "lifeAndLoss": "Life and loss",
-      "turns": "Turns",
-      "commanders": "Commanders",
-      "eachPlayerLife": "Each player starts at {{life}} life.",
-      "loseAtZero": "A player loses at 0 life.",
-      "loseAtPoison": "A player loses at {{poison}} poison counters.",
-      "startingPlayerRandom": "The starting player is drawn at random.",
-      "startingPlayerSkipDraw": "The starting player is drawn at random and skips the draw step on the first turn.",
-      "multiplayerFirstTurnDraw": "In multiplayer, that player draws on their first turn.",
-      "commanderFirstTurnDraw": "In multiplayer Commander, that player draws on their first turn.",
-      "commandersInZone": "Commanders begin in the command zone and may be recast from there.",
-      "commanderRulesApply": "Commander rules still apply: {{life}} starting life, {{poison}} poison, and {{commanderDamage}} combat damage from one commander are lethal."
+      "commanderCombat": "Mängija kaotab pärast {{commanderDamage}} lahingukahju saamist ühelt commanderilt.",
+      "commanderTax": "Iga kord, kui commander command zone'ist uuesti mängitakse, maksab see 2 mana rohkem.",
+      "lifeAndLoss": "Elud ja kaotus",
+      "turns": "Käigud",
+      "commanders": "Commanderid",
+      "eachPlayerLife": "Iga mängija alustab {{life}} eluga.",
+      "loseAtZero": "Mängija kaotab 0 elu juures.",
+      "loseAtPoison": "Mängija kaotab {{poison}} poison counteri juures.",
+      "startingPlayerRandom": "Alustav mängija valitakse juhuslikult.",
+      "startingPlayerSkipDraw": "Alustav mängija valitakse juhuslikult ja jätab oma esimesel käigul draw step'i vahele.",
+      "multiplayerFirstTurnDraw": "Multiplayeris tõmbab see mängija oma esimesel käigul kaardi.",
+      "commanderFirstTurnDraw": "Multiplayer Commander'is tõmbab see mängija oma esimesel käigul kaardi.",
+      "commandersInZone": "Commanderid alustavad command zone'is ja neid saab sealt uuesti mängida.",
+      "commanderRulesApply": "Commanderi reeglid kehtivad endiselt: {{life}} algelu, {{poison}} poisonit ja {{commanderDamage}} lahingukahju ühelt commanderilt on surmavad."
     },
     "duel": {
-      "label": "Duel",
-      "hint": "Two players. Each starts on 20 life.",
-      "hostHint": "Strict 2-player tables. Each player starts on 20 life.",
-      "hostFixedSeats": "Duel events always seat exactly two players.",
-      "title": "Duel",
-      "summary": "Two-player Magic. No commanders — just life and the board.",
+      "label": "Duell",
+      "hint": "Kaks mängijat. Mõlemad alustavad 20 eluga.",
+      "hostHint": "Rangelt 2 mängijaga lauad. Iga mängija alustab 20 eluga.",
+      "hostFixedSeats": "Duellides istub alati täpselt kaks mängijat.",
+      "title": "Duell",
+      "summary": "Magic kahele mängijale. Commandereid pole — ainult elud ja mängulaud.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Elud ja kaotus",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters."
+            "Iga mängija alustab {{life}} eluga.",
+            "Mängija kaotab 0 elu juures.",
+            "Mängija kaotab {{poison}} poison counteri juures."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Käigud",
           "bullets": [
-            "The starting player is drawn at random and skips the draw step on the first turn."
+            "Alustav mängija valitakse juhuslikult ja jätab oma esimesel käigul draw step'i vahele."
           ]
         }
       }
     },
     "multiplayer": {
       "label": "Multiplayer",
-      "hint": "Free-for-all without commanders. Everyone starts on 20 life.",
-      "hostHint": "Free-for-all without commanders. Matching fills your chosen table size; leftovers can sit as small as three.",
+      "hint": "Kõik kõigi vastu ilma commanderiteta. Kõik alustavad 20 eluga.",
+      "hostHint": "Kõik kõigi vastu ilma commanderiteta. Sobitamine täidab valitud lauasuuruse; ülejäänud lauad võivad olla vähemalt kolme mängijaga.",
       "title": "Multiplayer",
-      "summary": "Free-for-all without the Commander format. Useful for casual multiplayer, Planechase, or any 20-life table.",
+      "summary": "Multiplayer ilma Commanderi formaadita. Sobib casual multiplayeriks, Planechase'iks või mis tahes 20-eluga lauaks.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Elud ja kaotus",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters."
+            "Iga mängija alustab {{life}} eluga.",
+            "Mängija kaotab 0 elu juures.",
+            "Mängija kaotab {{poison}} poison counteri juures."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Käigud",
           "bullets": [
-            "The starting player is drawn at random.",
-            "In multiplayer, that player draws on their first turn."
+            "Alustav mängija valitakse juhuslikult.",
+            "Multiplayeris tõmbab see mängija oma esimesel käigul kaardi."
           ]
         }
       }
     },
     "commander": {
-      "label": "Classic",
-      "hint": "Free-for-all. Everyone starts on 40 life.",
-      "hostHint": "Free-for-all Commander. Matching prefers four; leftover pods can be three or five when allowed.",
-      "title": "Classic",
-      "summary": "Free-for-all multiplayer. Each player fights for themselves.",
+      "label": "Klassikaline",
+      "hint": "Kõik kõigi vastu. Kõik alustavad 40 eluga.",
+      "hostHint": "Commander kõik kõigi vastu. Sobitamine eelistab neljaseid gruppe; ülejäänud podid võivad lubamise korral olla kolme- või viiemängijalised.",
+      "title": "Klassikaline",
+      "summary": "Multiplayer kõik kõigi vastu. Iga mängija võitleb enda eest.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Elud ja kaotus",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters.",
-            "A player loses after taking {{commanderDamage}} combat damage from one commander."
+            "Iga mängija alustab {{life}} eluga.",
+            "Mängija kaotab 0 elu juures.",
+            "Mängija kaotab {{poison}} poison counteri juures.",
+            "Mängija kaotab pärast {{commanderDamage}} lahingukahju saamist ühelt commanderilt."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Käigud",
           "bullets": [
-            "The starting player is drawn at random.",
-            "In multiplayer Commander, that player draws on their first turn."
+            "Alustav mängija valitakse juhuslikult.",
+            "Multiplayer Commander'is tõmbab see mängija oma esimesel käigul kaardi."
           ]
         },
         "commanders": {
-          "heading": "Commanders",
+          "heading": "Commanderid",
           "bullets": [
-            "Commanders begin in the command zone and may be recast from there.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Commanderid alustavad command zone'is ja neid saab sealt uuesti mängida.",
+            "Iga kord, kui commander command zone'ist uuesti mängitakse, maksab see 2 mana rohkem."
           ]
         }
       }
     },
     "treachery": {
-      "label": "Treachery",
-      "hint": "Secret identities dealt on this device. Pass it around so everyone reads their own in private.",
-      "hostHint": "Secret roles for Commander pods. Matching fills your chosen table size first; leftovers can sit as small as four.",
-      "title": "Treachery",
-      "summary": "Commander with secret identities. The Leader is public; everyone else stays hidden.",
+      "label": "Reetmine",
+      "hint": "Salajased identiteedid jagatakse selles seadmes. Andke seade ringi, et igaüks saaks enda oma privaatselt lugeda.",
+      "hostHint": "Salajased rollid Commanderi podidele. Sobitamine täidab esmalt valitud lauasuuruse; ülejäänud podid võivad olla vähemalt neljamängijalised.",
+      "title": "Reetmine",
+      "summary": "Commander salajaste identiteetidega. Liider on avalik; kõik teised jäävad varjatuks.",
       "sections": {
         "commander": {
-          "heading": "Commander rules still apply",
+          "heading": "Commanderi reeglid kehtivad endiselt",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "The Leader takes the first turn and draws on that turn.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Iga mängija alustab {{life}} eluga.",
+            "Mängija kaotab 0 elu, {{poison}} poisoni või {{commanderDamage}} lahingukahju korral ühelt commanderilt.",
+            "Liider teeb esimese käigu ja tõmbab sellel käigul kaardi.",
+            "Iga kord, kui commander command zone'ist uuesti mängitakse, maksab see 2 mana rohkem."
           ]
         },
         "identities": {
-          "heading": "Identities",
+          "heading": "Identiteedid",
           "bullets": [
-            "Open Check my role from the timer menu. Only you see that card.",
-            "On a single tracker, deal the identities at setup and pass the device around so each player reads theirs alone.",
-            "Leader: Survive until every Assassin and Traitor is eliminated. Reveal yourself to the table. The Guardians share your victory, but you do not know who they are.",
-            "Guardian: Keep the Leader alive and eliminate the Leader's enemies. Your identity is secret. You win and lose with the Leader, even if you are eliminated first.",
-            "Assassin: Eliminate the Leader. Your identity is secret. Assassins share the same objective, but you do not know who the other Assassins are.",
-            "Traitor: Be the last player standing. Your identity is secret. Keep the Leader alive until the other threats are gone, then take the throne for yourself.",
-            "Follow any extra abilities printed on your identity card."
+            "Avage taimeri menüüst „Kontrolli minu rolli“. Ainult teie näete seda kaarti.",
+            "Ühe trackeri kasutamisel jagage identiteedid setup'i ajal ja andke seade ringi, et iga mängija saaks enda oma üksi lugeda.",
+            "Liider: jääge ellu, kuni kõik Palgamõrvarid ja Reetur on kõrvaldatud. Paljastage end lauale. Kaitsjad jagavad teie võitu, kuid te ei tea, kes nad on.",
+            "Kaitsja: hoidke Liider elus ja kõrvaldage tema vaenlased. Teie identiteet on salajane. Võidate ja kaotate koos Liidriga isegi siis, kui teid kõrvaldatakse esimesena.",
+            "Palgamõrvar: kõrvaldage Liider. Teie identiteet on salajane. Palgamõrvaritel on sama eesmärk, kuid te ei tea, kes on teised Palgamõrvarid.",
+            "Reetur: jääge viimaseks mängijaks. Teie identiteet on salajane. Hoidke Liider elus, kuni teised ohud on kõrvaldatud, seejärel võtke troon endale.",
+            "Järgige kõiki teie identiteedikaardile trükitud lisavõimeid."
           ]
         }
       },
       "roles": {
         "leader": {
-          "name": "Leader",
-          "objective": "Survive until every Assassin and Traitor is eliminated.",
-          "guidance": "Reveal yourself to the table. The Guardians share your victory, but you do not know who they are.",
-          "publicNote": "Your role is public. Tell the table you are the Leader."
+          "name": "Liider",
+          "objective": "Jääge ellu, kuni kõik Palgamõrvarid ja Reetur on kõrvaldatud.",
+          "guidance": "Paljastage end lauale. Kaitsjad jagavad teie võitu, kuid te ei tea, kes nad on.",
+          "publicNote": "Teie roll on avalik. Öelge lauale, et olete Liider."
         },
         "guardian": {
-          "name": "Guardian",
-          "objective": "Keep the Leader alive and eliminate the Leader's enemies.",
-          "guidance": "Your identity is secret. You win and lose with the Leader, even if you are eliminated first.",
-          "publicNote": "Keep this role secret."
+          "name": "Kaitsja",
+          "objective": "Hoidke Liider elus ja kõrvaldage tema vaenlased.",
+          "guidance": "Teie identiteet on salajane. Võidate ja kaotate koos Liidriga isegi siis, kui teid kõrvaldatakse esimesena.",
+          "publicNote": "Hoidke seda rolli saladuses."
         },
         "assassin": {
-          "name": "Assassin",
-          "objective": "Eliminate the Leader.",
-          "guidance": "Your identity is secret. Assassins share the same objective, but you do not know who the other Assassins are.",
-          "publicNote": "Keep this role secret."
+          "name": "Palgamõrvar",
+          "objective": "Kõrvaldage Liider.",
+          "guidance": "Teie identiteet on salajane. Palgamõrvaritel on sama eesmärk, kuid te ei tea, kes on teised Palgamõrvarid.",
+          "publicNote": "Hoidke seda rolli saladuses."
         },
         "traitor": {
-          "name": "Traitor",
-          "objective": "Be the last player standing.",
-          "guidance": "Your identity is secret. Keep the Leader alive until the other threats are gone, then take the throne for yourself.",
-          "publicNote": "Keep this role secret."
+          "name": "Reetur",
+          "objective": "Jääge viimaseks mängijaks.",
+          "guidance": "Teie identiteet on salajane. Hoidke Liider elus, kuni teised ohud on kõrvaldatud, seejärel võtke troon endale.",
+          "publicNote": "Hoidke seda rolli saladuses."
         }
       },
       "normal": {
-        "hint": "Secret identities on a shared phone. Everyone starts on 20 life — no commanders.",
-        "hostHint": "Secret roles without commanders. Matching fills your chosen table size first; leftovers can sit as small as four.",
-        "summary": "Secret identities without the Commander format. The Leader is public; everyone else stays hidden.",
+        "hint": "Salajased identiteedid ühises telefonis. Kõik alustavad 20 eluga — commandereid pole.",
+        "hostHint": "Salajased rollid ilma commanderiteta. Sobitamine täidab esmalt valitud lauasuuruse; ülejäänud podid võivad olla vähemalt neljamängijalised.",
+        "summary": "Salajased identiteedid ilma Commanderi formaadita. Liider on avalik; kõik teised jäävad varjatuks.",
         "sections": {
           "life": {
-            "heading": "Life and loss",
+            "heading": "Elud ja kaotus",
             "bullets": [
-              "Each player starts at {{life}} life.",
-              "A player loses at 0 life.",
-              "A player loses at {{poison}} poison counters.",
-              "The Leader takes the first turn and draws on that turn."
+              "Iga mängija alustab {{life}} eluga.",
+              "Mängija kaotab 0 elu juures.",
+              "Mängija kaotab {{poison}} poison counteri juures.",
+              "Liider teeb esimese käigu ja tõmbab sellel käigul kaardi."
             ]
           },
           "identities": null
@@ -283,63 +283,63 @@
       }
     },
     "two-headed-giant": {
-      "label": "Two-Headed Giant",
-      "hint": "Two teams of two, 60 shared life each, turns taken together.",
-      "hostHint": "Strict 4-player Commander pods. Two teams share 60 life and take their turns together.",
-      "hostFixedSeats": "Two-Headed Giant games always seat exactly four players.",
-      "title": "Two-Headed Giant",
-      "summary": "Two teams of two. Teammates share a life total and a turn.",
+      "label": "Kahepäine Hiiglane",
+      "hint": "Kaks kaheliikmelist võistkonda, kummalgi 60 jagatud elu, käigud tehakse koos.",
+      "hostHint": "Rangelt 4 mängijaga Commanderi podid. Kaks võistkonda jagavad kumbki 60 elu ja teevad käigud koos.",
+      "hostFixedSeats": "Kahepäise Hiiglase mängudes on alati täpselt neli mängijat.",
+      "title": "Kahepäine Hiiglane",
+      "summary": "Kaks kaheliikmelist võistkonda. Võistkonnakaaslased jagavad elusid ja käiku.",
       "sections": {
         "teams": {
-          "heading": "Teams",
+          "heading": "Võistkonnad",
           "bullets": [
-            "Pick two allies, or let the table randomise the pairs.",
-            "Each team starts at {{sharedLife}} shared life.",
-            "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+            "Valige kaks liitlast või laske paarid juhuslikult määrata.",
+            "Iga võistkond alustab {{sharedLife}} jagatud eluga.",
+            "Võistkonnakaaslased teevad oma käigu koos. Igal mängijal on endiselt oma käsi, library ja commanderid."
           ]
         },
         "life": {
-          "heading": "Life and loss",
+          "heading": "Elud ja kaotus",
           "bullets": [
-            "A team loses when its shared life reaches 0.",
-            "A team loses at {{sharedPoison}} shared poison counters.",
-            "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+            "Võistkond kaotab, kui tema jagatud elud jõuavad 0-ni.",
+            "Võistkond kaotab {{sharedPoison}} jagatud poison counteri juures.",
+            "Võistkond kaotab pärast {{commanderDamage}} jagatud lahingukahju saamist ühelt commanderilt."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Käigud",
           "bullets": [
-            "The starting team is drawn at random and skips the draw step on its first turn.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Alustav võistkond valitakse juhuslikult ja jätab oma esimesel käigul draw step'i vahele.",
+            "Iga kord, kui commander command zone'ist uuesti mängitakse, maksab see 2 mana rohkem."
           ]
         }
       },
       "normal": {
-        "hint": "Two teams of two, 40 shared life each, turns taken together.",
-        "hostHint": "Strict 4-player tables. Two teams share 40 life and take their turns together — no commanders.",
-        "summary": "Two teams of two. Teammates share a life total and a turn — standard decks, 20 life each in team terms.",
+        "hint": "Kaks kaheliikmelist võistkonda, kummalgi 40 jagatud elu, käigud tehakse koos.",
+        "hostHint": "Rangelt 4 mängijaga lauad. Kaks võistkonda jagavad kumbki 40 elu ja teevad käigud koos — commandereid pole.",
+        "summary": "Kaks kaheliikmelist võistkonda. Võistkonnakaaslased jagavad elusid ja käiku — standardsed pakid, meeskonna mõistes 20 elu mängija kohta.",
         "sections": {
           "teams": {
-            "heading": "Teams",
+            "heading": "Võistkonnad",
             "bullets": [
-              "Pick two allies, or let the table randomise the pairs.",
-              "Each team starts at {{sharedLife}} shared life.",
-              "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+              "Valige kaks liitlast või laske paarid juhuslikult määrata.",
+              "Iga võistkond alustab {{sharedLife}} jagatud eluga.",
+              "Võistkonnakaaslased teevad oma käigu koos. Igal mängijal on endiselt oma käsi, library ja commanderid."
             ]
           },
           "life": {
-            "heading": "Life and loss",
+            "heading": "Elud ja kaotus",
             "bullets": [
-              "A team loses when its shared life reaches 0.",
-              "A team loses at {{sharedPoison}} shared poison counters.",
-              "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+              "Võistkond kaotab, kui tema jagatud elud jõuavad 0-ni.",
+              "Võistkond kaotab {{sharedPoison}} jagatud poison counteri juures.",
+              "Võistkond kaotab pärast {{commanderDamage}} jagatud lahingukahju saamist ühelt commanderilt."
             ]
           },
           "turns": {
-            "heading": "Turns",
+            "heading": "Käigud",
             "bullets": [
-              "The starting team is drawn at random and skips the draw step on its first turn.",
-              "Each time a commander is recast from the command zone, it costs 2 more mana."
+              "Alustav võistkond valitakse juhuslikult ja jätab oma esimesel käigul draw step'i vahele.",
+              "Iga kord, kui commander command zone'ist uuesti mängitakse, maksab see 2 mana rohkem."
             ]
           }
         }
@@ -347,286 +347,286 @@
     },
     "archenemy-commander": {
       "label": "Archenemy",
-      "hint": "One Archenemy on 60 life with a 40-card scheme deck against three heroes sharing 60 life.",
-      "hostHint": "Strict 4-player Commander pods. One 60-life Archenemy faces a three-player team with 60 shared life and a 40-card scheme deck.",
-      "hostFixedSeats": "Archenemy Commander games always seat exactly four players.",
+      "hint": "Üks 60 eluga Archenemy ja 40-kaardiline scheme deck kolme kangelase vastu, kes jagavad 60 elu.",
+      "hostHint": "Rangelt 4 mängijaga Commanderi podid. Üks 60-eluga Archenemy seisab vastu kolmeliikmelisele võistkonnale, kellel on 60 jagatud elu ja 40-kaardiline scheme deck.",
+      "hostFixedSeats": "Archenemy Commanderi mängudes on alati täpselt neli mängijat.",
       "title": "Archenemy Commander",
-      "summary": "One Archenemy against a team of three, with a scheme deck in motion.",
+      "summary": "Üks Archenemy kolme mängija vastu, scheme deck tegevuses.",
       "sections": {
         "sides": {
-          "heading": "Sides",
+          "heading": "Pooled",
           "bullets": [
-            "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
-            "Both sides start at {{life}} life.",
-            "The heroes share that life total and take their turn together.",
-            "The Archenemy goes first and draws on that turn."
+            "Valige Archenemy või määrake see juhuslikult. Ülejäänud kolm mängijat on kangelased.",
+            "Mõlemad pooled alustavad {{life}} eluga.",
+            "Kangelased jagavad seda elude koguarvu ja teevad oma käigu koos.",
+            "Archenemy mängib esimesena ja tõmbab sellel käigul kaardi."
           ]
         },
         "schemes": {
           "heading": "Schemes",
           "bullets": [
-            "The 40 Duskmourn Commander schemes are shuffled at the start.",
-            "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
-            "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
-            "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
-            "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+            "40 Duskmourn Commanderi scheme'i segatakse mängu alguses.",
+            "Archenemy iga esimese main phase'i ajal avage taimeri menüü ja puudutage „Next scheme“, et üks scheme käivitada.",
+            "Scheme, mis ei ole ongoing, lahendatakse ja asetatakse seejärel scheme deck'i põhja.",
+            "Ongoing scheme jääb avatuks, kuni laud märgib selle abandoned'iks, seejärel asetatakse see deck'i põhja.",
+            "Avatud schemes ja lõpetatud scheme'ide graveyard kuvatakse kaardi all pisipiltidena; puudutage üht, et seda suurelt lugeda."
           ]
         },
         "life": {
-          "heading": "Life and loss",
+          "heading": "Elud ja kaotus",
           "bullets": [
-            "The Archenemy loses at 0 life, or when the usual poison and commander-damage limits are reached.",
-            "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
-            "A player loses after taking {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Archenemy kaotab 0 elu juures või tavaliste poisoni ja commander damage'i piiride täitumisel.",
+            "Kangelased kaotavad koos, kui nende jagatud elud jõuavad 0-ni, ning nad jagavad samal viisil poisonit ja commander damage'it.",
+            "Mängija kaotab pärast {{commanderDamage}} lahingukahju saamist ühelt commanderilt.",
+            "Iga kord, kui commander command zone'ist uuesti mängitakse, maksab see 2 mana rohkem."
           ]
         }
       },
       "normal": {
-        "hint": "One Archenemy on 20 life with schemes against three heroes sharing 40 life.",
-        "hostHint": "Strict 4-player tables. One Archenemy with a scheme deck against a three-player team — no commanders.",
-        "summary": "One Archenemy against a team of three, with a scheme deck in motion — standard 20-life tables.",
+        "hint": "Üks 20 eluga Archenemy koos schemes'idega kolme kangelase vastu, kes jagavad 40 elu.",
+        "hostHint": "Rangelt 4 mängijaga lauad. Üks Archenemy scheme deck'iga kolmeliikmelise võistkonna vastu — commandereid pole.",
+        "summary": "Üks Archenemy kolme mängija vastu, scheme deck tegevuses — standardsed 20-eluga lauad.",
         "sections": {
           "sides": {
-            "heading": "Sides",
+            "heading": "Pooled",
             "bullets": [
-              "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
-              "Both sides start at {{life}} life.",
-              "The heroes share that life total and take their turn together.",
-              "The Archenemy goes first and draws on that turn."
+              "Valige Archenemy või määrake see juhuslikult. Ülejäänud kolm mängijat on kangelased.",
+              "Mõlemad pooled alustavad {{life}} eluga.",
+              "Kangelased jagavad seda elude koguarvu ja teevad oma käigu koos.",
+              "Archenemy mängib esimesena ja tõmbab sellel käigul kaardi."
             ]
           },
           "schemes": {
             "heading": "Schemes",
             "bullets": [
-              "The 40 Duskmourn Commander schemes are shuffled at the start.",
-              "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
-              "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
-              "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
-              "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+              "40 Duskmourn Commanderi scheme'i segatakse mängu alguses.",
+              "Archenemy iga esimese main phase'i ajal avage taimeri menüü ja puudutage „Next scheme“, et üks scheme käivitada.",
+              "Scheme, mis ei ole ongoing, lahendatakse ja asetatakse seejärel scheme deck'i põhja.",
+              "Ongoing scheme jääb avatuks, kuni laud märgib selle abandoned'iks, seejärel asetatakse see deck'i põhja.",
+              "Avatud schemes ja lõpetatud scheme'ide graveyard kuvatakse kaardi all pisipiltidena; puudutage üht, et seda suurelt lugeda."
             ]
           },
           "life": {
-            "heading": "Life and loss",
+            "heading": "Elud ja kaotus",
             "bullets": [
-              "The Archenemy loses at 0 life, or when the usual poison and poison limits are reached.",
-              "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
-              "A player loses after taking {{poison}} poison counters."
+              "Archenemy kaotab 0 elu juures või tavalise poisoni piiri täitumisel.",
+              "Kangelased kaotavad koos, kui nende jagatud elud jõuavad 0-ni, ning nad jagavad samal viisil poisonit ja commander damage'it.",
+              "Mängija kaotab pärast {{poison}} poison counteri saamist."
             ]
           }
         }
       }
     },
     "emperor": {
-      "label": "Emperor",
-      "hint": "Two teams of three. Protect your Emperor using limited range of influence and deploy creatures.",
-      "hostHint": "Strict 6-player Commander pods. Two teams each place an Emperor between two Generals and play with limited range of influence.",
-      "hostFixedSeats": "Emperor games always seat exactly six players.",
-      "title": "Emperor",
-      "summary": "Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.",
+      "label": "Keiser",
+      "hint": "Kaks kolmeliikmelist võistkonda. Kaitske oma Keisrit piiratud mõjualaga ja liigutage olendeid.",
+      "hostHint": "Rangelt 6 mängijaga Commanderi podid. Mõlemas võistkonnas istub Keiser kahe Kindrali vahel ning mängitakse piiratud mõjualaga.",
+      "hostFixedSeats": "Keisri mängudes on alati täpselt kuus mängijat.",
+      "title": "Keiser",
+      "summary": "Kaks kolmeliikmelist võistkonda. Iga Keiser istub kahe Kindrali vahel ning Keisri kõrvaldamine võidab mängu.",
       "sections": {
         "teams": {
-          "heading": "Teams and turns",
+          "heading": "Võistkonnad ja käigud",
           "bullets": [
-            "Choose both teams and each team's Emperor, or randomise either choice.",
-            "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
-            "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
-            "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+            "Valige mõlemad võistkonnad ja kummagi Keiser või määrake üks või mõlemad juhuslikult.",
+            "Iga mängija alustab {{life}} eluga ning hoiab enda käes oma käe, mana, permanendid, poisoni ja käigu.",
+            "Võistkonnakaaslased võivad vaadata üksteise käsi ja arutada strateegiat, kuid ei tohi teise mängija kaartidega manipuleerida.",
+            "Valige juhuslikult, kumb Keiser teeb esimese käigu. See Keiser tõmbab esimesel käigul kaardi."
           ]
         },
         "range": {
-          "heading": "Range and combat",
+          "heading": "Mõjuala ja võitlus",
           "bullets": [
-            "Generals have range of influence 1. Emperors have range of influence 2.",
-            "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
-            "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
-            "As players leave, the empty seats stop counting, bringing surviving players into range."
+            "Kindralite mõjuala on 1. Keisrite mõjuala on 2.",
+            "Loitsud, võimed, efektid ja informatsioon saavad mõjutada ainult nende controlleri mõjualas olevaid mängijaid ja objekte.",
+            "Mängija võib rünnata ainult otse tema kõrval istuvat vastast või selle vastase planeswalkereid ja kaitstud battles'eid.",
+            "Kui mängijad lahkuvad, ei arvestata tühje kohti enam ning ellujäänud mängijad liiguvad üksteise mõjualasse."
           ]
         },
         "deploy": {
-          "heading": "Deploy creatures",
+          "heading": "Olendite ümberpaigutamine",
           "bullets": [
-            "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
-            "This can move creatures through the team as the battle lines change."
+            "Igal olendil on \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
+            "See võimaldab olendeid võistkonna sees ümber paigutada, kui lahingujooned muutuvad."
           ]
         },
         "winning": {
-          "heading": "Winning and Commander rules",
+          "heading": "Võit ja Commanderi reeglid",
           "bullets": [
-            "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
-            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Võistkond võidab, kui tema Keiser võidab, ja kaotab kohe, kui tema Keiser kaotab. Kindrali võib kõrvaldada ilma mängu lõpetamata.",
+            "Mängija kaotab 0 elu, {{poison}} poisoni või {{commanderDamage}} lahingukahju korral ühelt commanderilt.",
+            "Iga kord, kui commander command zone'ist uuesti mängitakse, maksab see 2 mana rohkem."
           ]
         }
       },
       "normal": {
-        "hint": "Two teams of three on 20 life. Protect your Emperor with limited range of influence.",
-        "hostHint": "Strict 6-player tables. Two Emperors between Generals — standard 20-life decks, no commanders.",
-        "summary": "Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.",
+        "hint": "Kaks kolmeliikmelist võistkonda 20 eluga. Kaitske oma Keisrit piiratud mõjualaga.",
+        "hostHint": "Rangelt 6 mängijaga lauad. Kaks Keisrit Kindralite vahel — standardsed 20-eluga pakid, commandereid pole.",
+        "summary": "Kaks kolmeliikmelist võistkonda. Iga Keiser istub kahe Kindrali vahel ning Keisri kõrvaldamine võidab mängu.",
         "sections": {
           "teams": {
-            "heading": "Teams and turns",
+            "heading": "Võistkonnad ja käigud",
             "bullets": [
-              "Choose both teams and each team's Emperor, or randomise either choice.",
-              "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
-              "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
-              "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+              "Valige mõlemad võistkonnad ja kummagi Keiser või määrake üks või mõlemad juhuslikult.",
+              "Iga mängija alustab {{life}} eluga ning hoiab enda käes oma käe, mana, permanendid, poisoni ja käigu.",
+              "Võistkonnakaaslased võivad vaadata üksteise käsi ja arutada strateegiat, kuid ei tohi teise mängija kaartidega manipuleerida.",
+              "Valige juhuslikult, kumb Keiser teeb esimese käigu. See Keiser tõmbab esimesel käigul kaardi."
             ]
           },
           "range": {
-            "heading": "Range and combat",
+            "heading": "Mõjuala ja võitlus",
             "bullets": [
-              "Generals have range of influence 1. Emperors have range of influence 2.",
-              "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
-              "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
-              "As players leave, the empty seats stop counting, bringing surviving players into range."
+              "Kindralite mõjuala on 1. Keisrite mõjuala on 2.",
+              "Loitsud, võimed, efektid ja informatsioon saavad mõjutada ainult nende controlleri mõjualas olevaid mängijaid ja objekte.",
+              "Mängija võib rünnata ainult otse tema kõrval istuvat vastast või selle vastase planeswalkereid ja kaitstud battles'eid.",
+              "Kui mängijad lahkuvad, ei arvestata tühje kohti enam ning ellujäänud mängijad liiguvad üksteise mõjualasse."
             ]
           },
           "deploy": {
-            "heading": "Deploy creatures",
+            "heading": "Olendite ümberpaigutamine",
             "bullets": [
-              "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
-              "This can move creatures through the team as the battle lines change."
+              "Igal olendil on \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
+              "See võimaldab olendeid võistkonna sees ümber paigutada, kui lahingujooned muutuvad."
             ]
           },
           "winning": {
-            "heading": "Winning and Commander rules",
+            "heading": "Võit",
             "bullets": [
-              "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
-              "A player loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+              "Võistkond võidab, kui tema Keiser võidab, ja kaotab kohe, kui tema Keiser kaotab. Kindrali võib kõrvaldada ilma mängu lõpetamata.",
+              "Mängija kaotab 0 elu või {{poison}} poison counteri juures."
             ]
           }
         }
       }
     },
     "star": {
-      "label": "Star",
-      "hint": "Five players in a circle. Your neighbors are allies; eliminate both players across from you.",
-      "hostHint": "Strict 5-player Commander pods. Adjacent players are allies; each player wins by outlasting both opponents across the circle.",
-      "hostFixedSeats": "Star games always seat exactly five players.",
-      "title": "Star",
-      "summary": "Five players sit in a circle. Your neighbors are allies and the two players across from you are enemies.",
+      "label": "Täht",
+      "hint": "Viis mängijat ringis. Teie naabrid on liitlased; kõrvaldage mõlemad teie vastas olevad mängijad.",
+      "hostHint": "Rangelt 5 mängijaga Commanderi podid. Kõrvuti olevad mängijad on liitlased; iga mängija võidab, kui elab üle mõlemad vastas olevad vastased.",
+      "hostFixedSeats": "Tähe mängudes on alati täpselt viis mängijat.",
+      "title": "Täht",
+      "summary": "Viis mängijat istuvad ringis. Teie naabrid on liitlased ja kaks teie vastas olevat mängijat on vaenlased.",
       "sections": {
         "positions": {
-          "heading": "Positions and allies",
+          "heading": "Kohad ja liitlased",
           "bullets": [
-            "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
-            "The players immediately to your left and right are your allies.",
-            "The two nonadjacent players across the circle are your enemies.",
-            "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+            "Valige ringikohad käsitsi, vahetades kaks mängijat omavahel, või paigutage kõik viis juhuslikult.",
+            "Teist vahetult vasakul ja paremal olevad mängijad on teie liitlased.",
+            "Kaks mitte-kõrvuti olevat mängijat teie vastas on teie vaenlased.",
+            "Kohad jäävad mängija kõrvaldamisel samaks; teie liitlased ja vaenlased ei muutu."
           ]
         },
         "combat": {
-          "heading": "Combat and interaction",
+          "heading": "Võitlus ja suhtlus",
           "bullets": [
-            "Players cannot attack their allies by default.",
-            "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
-            "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+            "Vaikimisi ei saa mängijad oma liitlasi rünnata.",
+            "Loitsud ja võimed võivad siiski aidata või mõjutada ükskõik millist mängijat, kui laud ei lepi kokku rangemas variandis.",
+            "Käigud liiguvad päripäeva. Valige alustav mängija juhuslikult; see mängija tõmbab esimesel käigul kaardi."
           ]
         },
         "winning": {
-          "heading": "Winning",
+          "heading": "Võit",
           "bullets": [
-            "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
-            "An eliminated player cannot win later.",
-            "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Võidab esimene ellujäänud mängija, kelle mõlemad vaenlased on kõrvaldatud, sõltumata sellest, kes nad kõrvaldas.",
+            "Kõrvaldatud mängija ei saa hiljem võita.",
+            "Iga mängija alustab {{life}} eluga ja kaotab 0 elu, {{poison}} poisoni või {{commanderDamage}} lahingukahju korral ühelt commanderilt.",
+            "Iga kord, kui commander command zone'ist uuesti mängitakse, maksab see 2 mana rohkem."
           ]
         }
       },
       "normal": {
-        "hint": "Five players in a circle on 20 life. Neighbors are allies; eliminate both players across from you.",
-        "hostHint": "Strict 5-player tables. Adjacent players ally; each player wins by outlasting both opponents across the circle.",
-        "summary": "Five players sit in a circle on 20 life. Your neighbors are allies and the two players across from you are enemies.",
+        "hint": "Viis mängijat ringis 20 eluga. Naabrid on liitlased; kõrvaldage mõlemad teie vastas olevad mängijad.",
+        "hostHint": "Rangelt 5 mängijaga lauad. Kõrvuti olevad mängijad on liitlased; iga mängija võidab, kui elab üle mõlemad vastas olevad vastased.",
+        "summary": "Viis mängijat istuvad ringis 20 eluga. Teie naabrid on liitlased ja kaks teie vastas olevat mängijat on vaenlased.",
         "sections": {
           "positions": {
-            "heading": "Positions and allies",
+            "heading": "Kohad ja liitlased",
             "bullets": [
-              "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
-              "The players immediately to your left and right are your allies.",
-              "The two nonadjacent players across the circle are your enemies.",
-              "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+              "Valige ringikohad käsitsi, vahetades kaks mängijat omavahel, või paigutage kõik viis juhuslikult.",
+              "Teist vahetult vasakul ja paremal olevad mängijad on teie liitlased.",
+              "Kaks mitte-kõrvuti olevat mängijat teie vastas on teie vaenlased.",
+              "Kohad jäävad mängija kõrvaldamisel samaks; teie liitlased ja vaenlased ei muutu."
             ]
           },
           "combat": {
-            "heading": "Combat and interaction",
+            "heading": "Võitlus ja suhtlus",
             "bullets": [
-              "Players cannot attack their allies by default.",
-              "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
-              "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+              "Vaikimisi ei saa mängijad oma liitlasi rünnata.",
+              "Loitsud ja võimed võivad siiski aidata või mõjutada ükskõik millist mängijat, kui laud ei lepi kokku rangemas variandis.",
+              "Käigud liiguvad päripäeva. Valige alustav mängija juhuslikult; see mängija tõmbab esimesel käigul kaardi."
             ]
           },
           "winning": {
-            "heading": "Winning",
+            "heading": "Võit",
             "bullets": [
-              "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
-              "An eliminated player cannot win later.",
-              "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+              "Võidab esimene ellujäänud mängija, kelle mõlemad vaenlased on kõrvaldatud, sõltumata sellest, kes nad kõrvaldas.",
+              "Kõrvaldatud mängija ei saa hiljem võita.",
+              "Iga mängija alustab {{life}} eluga ja kaotab 0 elu või {{poison}} poison counteri juures."
             ]
           }
         }
       }
     },
     "assassin": {
-      "label": "Assassin",
-      "hint": "Secret contracts in a free-for-all. Eliminate your mark, score, and inherit their target.",
-      "hostHint": "Secret contracts for 3–8 players. Score by eliminating your mark, then inherit their target.",
-      "title": "Assassin",
-      "summary": "A free-for-all with secret contracts. Score marks, inherit new targets, and finish with the highest score.",
+      "label": "Palgamõrvar",
+      "hint": "Salajased lepingud kõik-kõigi-vastu mängus. Kõrvaldage oma sihtmärk, teenige punkt ja pärige tema sihtmärk.",
+      "hostHint": "Salajased lepingud 3–8 mängijale. Teenige punkte oma sihtmärgi kõrvaldamise eest ja pärige seejärel tema leping.",
+      "title": "Palgamõrvar",
+      "summary": "Kõik kõigi vastu salajaste lepingutega. Kõrvaldage sihtmärke, pärige uusi ja lõpetage kõrgeima skooriga.",
       "sections": {
         "contracts": {
-          "heading": "Secret contracts",
+          "heading": "Salajased lepingud",
           "bullets": [
-            "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
-            "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
-            "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+            "Iga mängija saab privaatselt ühe sihtmärgi. Lepingud moodustavad ringi, nii et keegi ei sihi iseennast ja iga mängijat jahib täpselt üks mängija.",
+            "Andke seade setup'i ajal ringi. Avage taimeri menüüst „Kontrolli sihtmärki“, kui soovite oma praegust lepingut uuesti lugeda.",
+            "Mängijad võivad rünnata ja mõjutada kõiki; leping määrab punktiarvestuse, mitte lubatud sihtmärgid."
           ]
         },
         "elimination": {
-          "heading": "Elimination and inheritance",
+          "heading": "Kõrvaldamine ja pärimine",
           "bullets": [
-            "When a player is eliminated, record who dealt the finishing blow.",
-            "If you personally eliminate your assigned target, you score one mark.",
-            "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+            "Kui mängija kõrvaldatakse, märkige üles, kes andis viimase löögi.",
+            "Kui kõrvaldate isiklikult teile määratud sihtmärgi, teenite ühe märgi.",
+            "Mängija, kes jahtis kõrvaldatud sihtmärki, pärib selle sihtmärgi lepingu isegi siis, kui viimase löögi andis keegi teine. Nii jääb igale ellujäänud mängijale üks aktiivne leping."
           ]
         },
         "winning": {
-          "heading": "Winning",
+          "heading": "Võit",
           "bullets": [
-            "Play until only one player remains. The last survivor scores one additional mark.",
-            "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
-            "Commander rules still apply: {{life}} starting life, {{poison}} poison, and {{commanderDamage}} combat damage from one commander are lethal.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Mängige, kuni alles jääb ainult üks mängija. Viimane ellujäänu teenib ühe lisamärgi.",
+            "Võidab kõige rohkem märke teeninud mängija; kõrgeima skoori viigi korral võidab viigi viimane ellujäänu.",
+            "Commanderi reeglid kehtivad endiselt: {{life}} algelu, {{poison}} poisonit ja {{commanderDamage}} lahingukahju ühelt commanderilt on surmavad.",
+            "Iga kord, kui commander command zone'ist uuesti mängitakse, maksab see 2 mana rohkem."
           ]
         }
       },
       "normal": {
-        "hint": "Secret contracts for 3–8 players on 20 life. Score by eliminating your mark.",
-        "hostHint": "Secret contracts without commanders. Matching fills your chosen table size; leftovers can sit as small as three.",
-        "summary": "A free-for-all with secret contracts on 20 life. Score marks, inherit new targets, and finish with the highest score.",
+        "hint": "Salajased lepingud 3–8 mängijale 20 eluga. Teenige punkte oma sihtmärgi kõrvaldamise eest.",
+        "hostHint": "Salajased lepingud ilma commanderiteta. Sobitamine täidab valitud lauasuuruse; ülejäänud ringid võivad olla vähemalt kolme mängijaga.",
+        "summary": "Kõik kõigi vastu salajaste lepingutega ja 20 eluga. Kõrvaldage sihtmärke, pärige uusi ja lõpetage kõrgeima skooriga.",
         "sections": {
           "contracts": {
-            "heading": "Secret contracts",
+            "heading": "Salajased lepingud",
             "bullets": [
-              "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
-              "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
-              "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+              "Iga mängija saab privaatselt ühe sihtmärgi. Lepingud moodustavad ringi, nii et keegi ei sihi iseennast ja iga mängijat jahib täpselt üks mängija.",
+              "Andke seade setup'i ajal ringi. Avage taimeri menüüst „Kontrolli sihtmärki“, kui soovite oma praegust lepingut uuesti lugeda.",
+              "Mängijad võivad rünnata ja mõjutada kõiki; leping määrab punktiarvestuse, mitte lubatud sihtmärgid."
             ]
           },
           "elimination": {
-            "heading": "Elimination and inheritance",
+            "heading": "Kõrvaldamine ja pärimine",
             "bullets": [
-              "When a player is eliminated, record who dealt the finishing blow.",
-              "If you personally eliminate your assigned target, you score one mark.",
-              "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+              "Kui mängija kõrvaldatakse, märkige üles, kes andis viimase löögi.",
+              "Kui kõrvaldate isiklikult teile määratud sihtmärgi, teenite ühe märgi.",
+              "Mängija, kes jahtis kõrvaldatud sihtmärki, pärib selle sihtmärgi lepingu isegi siis, kui viimase löögi andis keegi teine. Nii jääb igale ellujäänud mängijale üks aktiivne leping."
             ]
           },
           "winning": {
-            "heading": "Winning",
+            "heading": "Võit",
             "bullets": [
-              "Play until only one player remains. The last survivor scores one additional mark.",
-              "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
-              "{{life}} starting life, {{poison}} poison, and {{poison}} poison counters are lethal."
+              "Mängige, kuni alles jääb ainult üks mängija. Viimane ellujäänu teenib ühe lisamärgi.",
+              "Võidab kõige rohkem märke teeninud mängija; kõrgeima skoori viigi korral võidab viigi viimane ellujäänu.",
+              "{{life}} algelu ja {{poison}} poison counterit on surmavad piirid."
             ]
           }
         }
@@ -634,446 +634,446 @@
     }
   },
   "home": {
-    "taglineBefore": "Your next",
+    "taglineBefore": "Sinu järgmine",
     "taglineHighlight": "pod",
-    "taglineAfter": ", sorted.",
-    "startPlaying": "Start playing",
-    "ongoingGame": "ongoing game",
-    "noEventNeeded": "no event needed",
-    "startPlayingHint": "Open a battle screen on this device. Leave and come back without losing an unfinished game.",
-    "alwaysPlayers": "Always {{count}} players in this mode.",
-    "resumeGame": "Resume game",
-    "startNewGame": "Start a new game",
-    "startGame": "Start a game",
-    "commanderSetup": "Commanders",
-    "commanderSetupHint": "Search Scryfall for each player's commander. Partner pairs need both commanders.",
-    "chooseAllCommanders": "Choose a commander for every player.",
-    "advancedMatchConfig": "Advanced match config",
-    "hostEvent": "Host event",
-    "new": "new",
-    "targetTableSize": "Target table size",
-    "allowThreePods": "Allow 3-player pods",
-    "allowFivePods": "Allow 5-player pods",
-    "duelFixedSeats": "Duel events always seat exactly two players.",
-    "emperorFixedSeats": "Emperor games always seat exactly six players.",
-    "starFixedSeats": "Star games always seat exactly five players.",
-    "archenemyFixedSeats": "Archenemy Commander games always seat exactly four players.",
-    "twoHeadedFixedSeats": "Two-Headed Giant games always seat exactly four players.",
-    "eventName": "Event name",
-    "eventNamePlaceholder": "Friday Commander",
-    "tables": "Tables",
-    "tablesHint": "How many physical tables are free for this event.",
-    "eventLasts": "Event lasts",
-    "eventLastsHint": "Join code dies after this many hours. Use 48 or 72 for a weekend.",
-    "hostPin": "Host PIN",
-    "hostPinHint": "4 to 8 digits — reopens the host desk later.",
-    "createEvent": "Create event",
-    "joinWithCode": "Join with a code",
-    "playerAside": "player",
-    "joinCode": "Join code",
+    "taglineAfter": ", paigas.",
+    "startPlaying": "Alusta mängimist",
+    "ongoingGame": "pooleliolev mäng",
+    "noEventNeeded": "sündmust pole vaja",
+    "startPlayingHint": "Avage selles seadmes mänguekraan. Võite lahkuda ja tagasi tulla ilma pooleliolevat mängu kaotamata.",
+    "alwaysPlayers": "Selles režiimis on alati {{count}} mängijat.",
+    "resumeGame": "Jätka mängu",
+    "startNewGame": "Alusta uut mängu",
+    "startGame": "Alusta mängu",
+    "commanderSetup": "Commanderid",
+    "commanderSetupHint": "Otsige Scryfallist iga mängija commander. Partner-paaride puhul on vaja mõlemat commanderit.",
+    "chooseAllCommanders": "Valige commander igale mängijale.",
+    "advancedMatchConfig": "Täpsemad mänguseaded",
+    "hostEvent": "Korralda sündmus",
+    "new": "uus",
+    "targetTableSize": "Soovitud lauasuurus",
+    "allowThreePods": "Luba 3 mängijaga podid",
+    "allowFivePods": "Luba 5 mängijaga podid",
+    "duelFixedSeats": "Duellides istub alati täpselt kaks mängijat.",
+    "emperorFixedSeats": "Keisri mängudes on alati täpselt kuus mängijat.",
+    "starFixedSeats": "Tähe mängudes on alati täpselt viis mängijat.",
+    "archenemyFixedSeats": "Archenemy Commanderi mängudes on alati täpselt neli mängijat.",
+    "twoHeadedFixedSeats": "Kahepäise Hiiglase mängudes on alati täpselt neli mängijat.",
+    "eventName": "Sündmuse nimi",
+    "eventNamePlaceholder": "Reedene Commander",
+    "tables": "Lauad",
+    "tablesHint": "Mitu füüsilist lauda on selle sündmuse jaoks vaba.",
+    "eventLasts": "Sündmuse kestus",
+    "eventLastsHint": "Liitumiskood aegub pärast seda arvu tunde. Nädalavahetuse jaoks kasutage 48 või 72.",
+    "hostPin": "Korraldaja PIN",
+    "hostPinHint": "4 kuni 8 numbrit — avab korraldaja juhtpaneeli hiljem uuesti.",
+    "createEvent": "Loo sündmus",
+    "joinWithCode": "Liitu koodiga",
+    "playerAside": "mängija",
+    "joinCode": "Liitumiskood",
     "joinCodePlaceholder": "AB23CD",
-    "join": "Join",
-    "scanQr": "Scan QR",
-    "staleJoin": "That event is gone. Join with a new code, or host a new night."
+    "join": "Liitu",
+    "scanQr": "Skanni QR",
+    "staleJoin": "Seda sündmust enam pole. Liituge uue koodiga või korraldage uus mänguõhtu."
   },
   "host": {
-    "desk": "Host desk",
-    "locked": "Locked",
-    "hostOnly": "host only",
-    "unlockHostDesk": "Unlock host desk",
-    "playerCount": "{{count}} player",
-    "playerCount_plural": "{{count}} players",
-    "ready": "{{count}} ready",
-    "matched": "{{count}} matched",
-    "playing": "{{count}} playing",
-    "paused": "{{count}} paused",
-    "ends": "ends {{date}}",
-    "podSizes": "Pod sizes",
-    "matching": "matching",
-    "allowLeftoverThree": "Allow leftover 3-player pods",
-    "allowFivePods": "Allow 5-player pods",
-    "treacheryTargetHint": "Target table size. Leftover pods can be as small as four.",
-    "matchingPrefers": "Matching prefers {{size}}-player tables.",
-    "matchingPrefersFour": "Matching prefers 4-player tables.",
-    "assassinTargetHint": "Target table size. Leftover contract circles can be as small as three.",
-    "multiplayerTargetHint": "Target table size. Leftover tables can be as small as three.",
-    "duelMatchmaking": "Duel matchmaking seats exactly two players per game.",
-    "twoHeadedMatchmaking": "Two-Headed Giant matchmaking seats exactly four players per game.",
-    "archenemyMatchmaking": "Archenemy Commander matchmaking seats exactly four players per game: one Archenemy against a team of three.",
-    "emperorMatchmaking": "Emperor matchmaking seats exactly six players per game: two teams with an Emperor and two Generals each.",
-    "starMatchmaking": "Star matchmaking seats exactly five players in a circular order.",
-    "eventLength": "Event length",
-    "joinCodeDies": "join code dies",
-    "hoursFromStart": "Hours from start",
-    "hoursFromStartHint": "Change this for a multi-day event. After it ends, the QR opens the home page.",
-    "joinCodeTitle": "Join code",
-    "share": "share",
-    "noLanAddress": "No LAN address found — this link only works on this computer.",
-    "copyPlayerLink": "Copy player link",
-    "queue": "Queue",
-    "nobodyWaiting": "Nobody waiting.",
+    "desk": "Korraldaja juhtpaneel",
+    "locked": "Lukustatud",
+    "hostOnly": "ainult korraldajale",
+    "unlockHostDesk": "Ava korraldaja juhtpaneel",
+    "playerCount": "{{count}} mängija",
+    "playerCount_plural": "{{count}} mängijat",
+    "ready": "{{count}} valmis",
+    "matched": "{{count}} sobitatud",
+    "playing": "{{count}} mängib",
+    "paused": "{{count}} pausil",
+    "ends": "lõpeb {{date}}",
+    "podSizes": "Podide suurused",
+    "matching": "sobitamine",
+    "allowLeftoverThree": "Luba ülejäänud 3 mängijaga podid",
+    "allowFivePods": "Luba 5 mängijaga podid",
+    "treacheryTargetHint": "Soovitud lauasuurus. Ülejäänud podid võivad olla vähemalt neljamängijalised.",
+    "matchingPrefers": "Sobitamine eelistab {{size}} mängijaga laudu.",
+    "matchingPrefersFour": "Sobitamine eelistab 4 mängijaga laudu.",
+    "assassinTargetHint": "Soovitud lauasuurus. Ülejäänud lepinguringid võivad olla vähemalt kolme mängijaga.",
+    "multiplayerTargetHint": "Soovitud lauasuurus. Ülejäänud lauad võivad olla vähemalt kolme mängijaga.",
+    "duelMatchmaking": "Duelli sobitamine paigutab igasse mängu täpselt kaks mängijat.",
+    "twoHeadedMatchmaking": "Kahepäise Hiiglase sobitamine paigutab igasse mängu täpselt neli mängijat.",
+    "archenemyMatchmaking": "Archenemy Commanderi sobitamine paigutab igasse mängu täpselt neli mängijat: ühe Archenemy kolmeliikmelise võistkonna vastu.",
+    "emperorMatchmaking": "Keisri sobitamine paigutab igasse mängu täpselt kuus mängijat: kaks võistkonda, kummaski Keiser ja kaks Kindralit.",
+    "starMatchmaking": "Tähe sobitamine paigutab täpselt viis mängijat ringikujulisse järjestusse.",
+    "eventLength": "Sündmuse kestus",
+    "joinCodeDies": "liitumiskood aegub",
+    "hoursFromStart": "Tundi algusest",
+    "hoursFromStartHint": "Muutke seda mitmepäevase sündmuse jaoks. Pärast lõppu avab QR avalehe.",
+    "joinCodeTitle": "Liitumiskood",
+    "share": "jaga",
+    "noLanAddress": "LAN-aadressi ei leitud — see link töötab ainult selles arvutis.",
+    "copyPlayerLink": "Kopeeri mängija link",
+    "queue": "Järjekord",
+    "nobodyWaiting": "Keegi ei oota.",
     "flex": "flex {{count}}",
-    "challengePts": "{{count}} challenge pts",
-    "pts": "{{count}} pts",
-    "notReady": "Not ready",
-    "pausedTitle": "Paused",
-    "seated": "Seated",
-    "atTables": "{{count}} at tables",
-    "tablesTitle": "Tables",
-    "total": "{{count}} total",
-    "noTables": "This event was created without tables.",
-    "startingGames": "Starting games…",
-    "startAllReady": "Start all ready games ({{count}})",
-    "startGame": "Start game",
-    "finishTable": "Finish table",
-    "cancelPod": "Cancel pod",
-    "enable": "Enable",
-    "disable": "Disable",
+    "challengePts": "{{count}} väljakutsepunkti",
+    "pts": "{{count}} punkti",
+    "notReady": "Pole valmis",
+    "pausedTitle": "Pausil",
+    "seated": "Istub lauas",
+    "atTables": "{{count}} laudades",
+    "tablesTitle": "Lauad",
+    "total": "{{count}} kokku",
+    "noTables": "See sündmus loodi ilma laudadeta.",
+    "startingGames": "Mängude alustamine…",
+    "startAllReady": "Alusta kõiki valmis mänge ({{count}})",
+    "startGame": "Alusta mängu",
+    "finishTable": "Lõpeta laud",
+    "cancelPod": "Tühista pod",
+    "enable": "Luba",
+    "disable": "Keela",
     "trackerUsed": "tracker",
-    "noTracker": "no tracker",
-    "matchNow": "Match now",
-    "fillBots": "Fill tables with bots",
-    "playerJoinPage": "Player join page"
+    "noTracker": "ilma trackerita",
+    "matchNow": "Sobita nüüd",
+    "fillBots": "Täida lauad botidega",
+    "playerJoinPage": "Mängija liitumisleht"
   },
   "join": {
-    "joinEvent": "Join event",
-    "takeSeat": "Take a seat",
-    "displayName": "Display name",
+    "joinEvent": "Liitu sündmusega",
+    "takeSeat": "Võta koht",
+    "displayName": "Kuvatav nimi",
     "displayNamePlaceholder": "Alex",
-    "joinEventButton": "Join event",
-    "saveDecks": "Save decks",
-    "matchFound": "Match found",
-    "yourDeck": "Your deck",
-    "checkMyRole": "Check my role",
-    "playingWithoutTracker": "Playing without the tracker. The host can finish the table.",
-    "chooseTracker": "Choose how this pod will record its game.",
-    "useGameTracker": "Use game tracker",
-    "playWithoutTracker": "Play without tracker",
-    "atTableMarked": "You're marked as at the table on this phone. The host still starts the game from the desk.",
-    "imAtTable": "I'm at the table",
-    "leftEvent": "You left this event. Scan the QR again if you want back in.",
-    "openPool": "Open pool — any table.",
-    "ready": "Ready",
-    "waiting": "waiting",
-    "holdTight": "Hold tight — a table is coming.",
-    "flex": "Flex: {{flex}} · Challenge Points: {{points}}",
-    "howWasPod": "How was your pod?",
-    "pause": "Pause",
-    "leave": "Leave",
-    "pausedMessage": "You are paused. Resume when you can sit, or leave the event.",
-    "imReady": "I'm ready",
-    "leaveEvent": "Leave event",
-    "markReady": "Mark ready when you can sit down for a game.",
-    "matchingShortly": "Matching will send you to a table shortly.",
-    "imTheHost": "I'm the host",
-    "offlineSaved": "Saved on this phone. It will send when you are back online.",
-    "stayAtTable": "Stay at the table until the host calls the game."
+    "joinEventButton": "Liitu sündmusega",
+    "saveDecks": "Salvesta pakid",
+    "matchFound": "Mäng leitud",
+    "yourDeck": "Sinu pakk",
+    "checkMyRole": "Kontrolli minu rolli",
+    "playingWithoutTracker": "Mängite ilma trackerita. Korraldaja saab laua lõpetada.",
+    "chooseTracker": "Valige, kuidas see pod oma mängu registreerib.",
+    "useGameTracker": "Kasuta mängutrackerit",
+    "playWithoutTracker": "Mängi ilma trackerita",
+    "atTableMarked": "Selles telefonis olete märgitud lauas olevaks. Korraldaja käivitab mängu endiselt oma juhtpaneelilt.",
+    "imAtTable": "Olen lauas",
+    "leftEvent": "Lahkusite sellelt sündmuselt. Kui soovite tagasi tulla, skannige QR uuesti.",
+    "openPool": "Avatud pool — ükskõik milline laud.",
+    "ready": "Valmis",
+    "waiting": "ootel",
+    "holdTight": "Oodake veidi — laud on peagi tulemas.",
+    "flex": "Flex: {{flex}} · Väljakutsepunktid: {{points}}",
+    "howWasPod": "Kuidas teie pod läks?",
+    "pause": "Paus",
+    "leave": "Lahku",
+    "pausedMessage": "Olete pausil. Jätkake, kui saate lauda istuda, või lahkuge sündmuselt.",
+    "imReady": "Olen valmis",
+    "leaveEvent": "Lahku sündmuselt",
+    "markReady": "Märkige end valmis, kui saate mängima istuda.",
+    "matchingShortly": "Sobitamine saadab teid peagi lauda.",
+    "imTheHost": "Olen korraldaja",
+    "offlineSaved": "Salvestatud selles telefonis. Andmed saadetakse, kui olete taas võrgus.",
+    "stayAtTable": "Jääge lauda, kuni korraldaja mängu lõpetab."
   },
   "matchConfig": {
-    "title": "Match config",
-    "description": "Sets up the fake seated pod behind /match. Nothing here touches the server, and none of it appears on the battle screen, so that route can be checked on a phone as-is.",
-    "podSetup": "Pod setup",
-    "seats": "Seats",
-    "seatsCount": "{{count}} seats",
+    "title": "Mängu seadistus",
+    "description": "Seadistab /match taga oleva näidispodi. Miski siin ei mõjuta serverit ega ilmu mänguekraanile, seega saab seda route'i telefonis sellisena kontrollida.",
+    "podSetup": "Podi seadistus",
+    "seats": "Kohad",
+    "seatsCount": "{{count}} kohta",
     "bracket": "Bracket",
-    "header": "Header",
-    "eventNamePlaceholder": "Event name",
-    "joinCodePlaceholder": "Join code",
-    "matchCard": "Match card",
-    "tableLabelPlaceholder": "Table label",
-    "assignedDeckPlaceholder": "Assigned deck",
-    "openBattleScreen": "Open battle screen",
-    "resetGameState": "Reset game state",
+    "header": "Päis",
+    "eventNamePlaceholder": "Sündmuse nimi",
+    "joinCodePlaceholder": "Liitumiskood",
+    "matchCard": "Mängukaart",
+    "tableLabelPlaceholder": "Laua nimi",
+    "assignedDeckPlaceholder": "Määratud pakk",
+    "openBattleScreen": "Ava mänguekraan",
+    "resetGameState": "Lähtesta mängu olek",
     "commander": "Commander",
-    "secondCommander": "Second commander"
+    "secondCommander": "Teine commander"
   },
   "app": {
-    "notFound": "Not found."
+    "notFound": "Ei leitud."
   },
   "wake": {
-    "title": "Waking the tables",
-    "message": "The free host went to sleep. Keep this page open — it usually takes under a minute."
+    "title": "Laudade äratamine",
+    "message": "Tasuta server jäi magama. Hoidke see leht avatuna — tavaliselt kulub alla minuti."
   },
   "scanner": {
-    "title": "Scan QR",
-    "ariaLabel": "Scan join QR code",
-    "hint": "Point at the host desk code.",
-    "closeScanner": "Close scanner",
-    "openingCamera": "Opening camera…",
-    "noCamera": "This browser cannot open the camera. Type the join code instead.",
-    "permissionDenied": "Camera permission was denied. Type the join code, or allow the camera and try again."
+    "title": "Skanni QR",
+    "ariaLabel": "Skanni liitumise QR-kood",
+    "hint": "Suunake kaamera korraldaja koodile.",
+    "closeScanner": "Sulge skanner",
+    "openingCamera": "Kaamera avamine…",
+    "noCamera": "See brauser ei saa kaamerat avada. Sisestage liitumiskood käsitsi.",
+    "permissionDenied": "Kaamera luba keelati. Sisestage liitumiskood või lubage kaamera ja proovige uuesti."
   },
   "theme": {
-    "switchToLight": "Switch to light mode",
-    "switchToDark": "Switch to dark mode"
+    "switchToLight": "Lülita heledale režiimile",
+    "switchToDark": "Lülita tumedale režiimile"
   },
   "hostMetrics": {
-    "title": "Event recap",
-    "aside": "pilot",
-    "players": "Players",
-    "games": "Games",
-    "gamesPerPlayer": "Games / player",
-    "waitAvg": "Wait avg",
-    "waitP95": "Wait p95",
-    "waitMax": "Wait max",
-    "rematchPairs": "Rematch pairs",
-    "flexEarned": "Flex earned",
-    "flexSeats": "Flex seats",
-    "durationAvg": "Duration avg",
-    "tablesOccupied": "Tables occupied",
-    "trackerUsed": "Tracker used",
-    "trackerUsedValue": "{{used}} used · {{skipped}} skipped",
-    "challenges": "Challenges",
-    "challengePts": "Challenge pts",
-    "podRating": "Pod rating",
-    "podSizes": "Pod sizes:",
-    "pools": "Pools:"
+    "title": "Sündmuse kokkuvõte",
+    "aside": "piloot",
+    "players": "Mängijad",
+    "games": "Mängud",
+    "gamesPerPlayer": "Mänge / mängija",
+    "waitAvg": "Keskm. ooteaeg",
+    "waitP95": "Ooteaeg p95",
+    "waitMax": "Maks. ooteaeg",
+    "rematchPairs": "Kordusmängu paarid",
+    "flexEarned": "Teenitud Flex",
+    "flexSeats": "Flex-kohad",
+    "durationAvg": "Keskm. kestus",
+    "tablesOccupied": "Hõivatud lauad",
+    "trackerUsed": "Trackeri kasutus",
+    "trackerUsedValue": "{{used}} kasutatud · {{skipped}} vahele jäetud",
+    "challenges": "Väljakutsed",
+    "challengePts": "Väljakutsepunktid",
+    "podRating": "Podi hinnang",
+    "podSizes": "Podide suurused:",
+    "pools": "Poolid:"
   },
   "deckEditor": {
-    "title": "Commander decks",
-    "deckNamePlaceholder": "Deck name (optional)",
+    "title": "Commanderi pakid",
+    "deckNamePlaceholder": "Paki nimi (valikuline)",
     "commander": "Commander",
-    "secondCommander": "Second commander",
-    "markPreferred": "Mark preferred",
-    "addAcceptedDeck": "Add accepted deck",
-    "hint": "Same-pool pods only. Extra decks let matching flex you into another bracket."
+    "secondCommander": "Teine commander",
+    "markPreferred": "Märgi eelistatuks",
+    "addAcceptedDeck": "Lisa sobiv pakk",
+    "hint": "Ainult sama pooli podid. Lisapakid võimaldavad sobitamisel teid teise bracket'isse paigutada."
   },
   "commanderPicker": {
-    "searchCommander": "Search commander",
-    "searchPartner": "Commander that can pair with {{name}}",
-    "removeCommander": "Remove {{name}}",
-    "artworkFor": "Artwork for",
-    "loadingArtwork": "Loading artwork…"
+    "searchCommander": "Otsi commanderit",
+    "searchPartner": "Commander, kes saab olla {{name}} partner",
+    "removeCommander": "Eemalda {{name}}",
+    "artworkFor": "Illustratsioon:",
+    "loadingArtwork": "Illustratsiooni laadimine…"
   },
   "challengePack": {
-    "title": "Challenge pack",
-    "description": "Only predefined primitives. Saving writes a new version and never mutates a pack already used by this event.",
-    "copyOfficial": "Copy official",
-    "startBlank": "Start blank",
-    "saveNewVersion": "Save new version",
-    "editHint": "Copy the official pack or start blank before editing.",
-    "packName": "Pack name",
-    "descriptionLabel": "Description",
-    "addChallenge": "Add challenge",
-    "id": "Id",
-    "name": "Name",
-    "category": "Category",
-    "points": "Points",
-    "primitive": "Primitive",
-    "threshold": "Threshold",
-    "confirmationQuestion": "Confirmation question",
-    "defaultConfirmation": "Did this happen at the table?",
-    "newClaimName": "New claim",
-    "newClaimDescription": "Award this at the table."
+    "title": "Väljakutsete pakett",
+    "description": "Ainult eelmääratud primitiivid. Salvestamine loob uue versiooni ega muuda kunagi paketti, mida see sündmus on juba kasutanud.",
+    "copyOfficial": "Kopeeri ametlik",
+    "startBlank": "Alusta tühjalt",
+    "saveNewVersion": "Salvesta uus versioon",
+    "editHint": "Enne muutmist kopeerige ametlik pakett või alustage tühjalt.",
+    "packName": "Paketi nimi",
+    "descriptionLabel": "Kirjeldus",
+    "addChallenge": "Lisa väljakutse",
+    "id": "ID",
+    "name": "Nimi",
+    "category": "Kategooria",
+    "points": "Punktid",
+    "primitive": "Primitiiv",
+    "threshold": "Lävi",
+    "confirmationQuestion": "Kinnitusküsimus",
+    "defaultConfirmation": "Kas see juhtus lauas?",
+    "newClaimName": "Uus saavutus",
+    "newClaimDescription": "Arvestage see lauas."
   },
   "treacheryRole": {
-    "treachery": "Treachery",
-    "receivedRole": "You received a role",
-    "handDeviceTo": "Hand the device to {{name}}",
-    "lookAwayIdentity": "Everyone else should look away before the identity is revealed.",
-    "lookAwayScreen": "Make sure nobody else can see your screen before revealing it.",
-    "reveal": "Reveal",
-    "yourRole": "Your role",
-    "identityAlt": "{{name}}, {{role}} identity",
-    "illustratedBy": "Illustrated by {{artist}}",
-    "yourObjective": "Your objective",
-    "unveiledToTable": "Unveiled to the table",
-    "unveilWarning": "Everyone at your table will see this identity. Its ability must be resolved in the game.",
-    "confirmUnveil": "Confirm unveil",
-    "unveilToTable": "Unveil to the table",
-    "hideAndPass": "Hide & pass",
-    "hideIdentity": "Hide my identity"
+    "treachery": "Reetmine",
+    "receivedRole": "Saite rolli",
+    "handDeviceTo": "Andke seade mängijale {{name}}",
+    "lookAwayIdentity": "Kõik teised peaksid enne identiteedi paljastamist eemale vaatama.",
+    "lookAwayScreen": "Veenduge enne paljastamist, et keegi teine teie ekraani ei näe.",
+    "reveal": "Paljasta",
+    "yourRole": "Teie roll",
+    "identityAlt": "{{name}}, {{role}} identiteet",
+    "illustratedBy": "Illustreerinud {{artist}}",
+    "yourObjective": "Teie eesmärk",
+    "unveiledToTable": "Lauale paljastatud",
+    "unveilWarning": "Kõik teie lauas näevad seda identiteeti. Selle võime tuleb mängus lahendada.",
+    "confirmUnveil": "Kinnita paljastamine",
+    "unveilToTable": "Paljasta lauale",
+    "hideAndPass": "Peida ja anna edasi",
+    "hideIdentity": "Peida minu identiteet"
   },
   "modeRulesSheet": {
-    "closeRules": "Close rules",
-    "backToGame": "Back to the game"
+    "closeRules": "Sulge reeglid",
+    "backToGame": "Tagasi mängu"
   },
   "assassinTargets": {
-    "title": "Secret contracts",
-    "chooseOwnName": "Choose only your own name.",
-    "closeContracts": "Close contracts",
-    "handDeviceTo": "Hand the device to {{name}}",
-    "lookAway": "Everyone else should look away before the contract is revealed.",
-    "revealTarget": "Reveal my target",
-    "yourTarget": "Your target",
-    "noActiveTarget": "No active target",
-    "marksScored": "Marks scored: {{count}}",
-    "hideAndPass": "Hide & pass",
-    "allContractsChecked": "All contracts checked"
+    "title": "Salajased lepingud",
+    "chooseOwnName": "Valige ainult enda nimi.",
+    "closeContracts": "Sulge lepingud",
+    "handDeviceTo": "Andke seade mängijale {{name}}",
+    "lookAway": "Kõik teised peaksid enne lepingu paljastamist eemale vaatama.",
+    "revealTarget": "Paljasta minu sihtmärk",
+    "yourTarget": "Teie sihtmärk",
+    "noActiveTarget": "Aktiivset sihtmärki pole",
+    "marksScored": "Teenitud märgid: {{count}}",
+    "hideAndPass": "Peida ja anna edasi",
+    "allContractsChecked": "Kõik lepingud kontrollitud"
   },
   "scheme": {
     "ongoingScheme": "Ongoing scheme",
     "scheme": "Scheme",
-    "pastScheme": "Past scheme",
+    "pastScheme": "Eelmine scheme",
     "abandon": "Abandon {{name}}",
     "ongoingSchemes": "Ongoing schemes",
     "graveyard": "Graveyard · {{count}}",
     "nextScheme": "Next scheme",
-    "remainingInDeck": "{{count}} left in the deck",
-    "scryfallCredit": "Card image via Scryfall. Magic: The Gathering is © Wizards of the Coast."
+    "remainingInDeck": "{{count}} deck'is alles",
+    "scryfallCredit": "Kaardi pilt Scryfalli kaudu. Magic: The Gathering on © Wizards of the Coast."
   },
   "dungeon": {
-    "takeInitiativeTitle": "Take the initiative?",
-    "takeInitiativeEnter": "This also ventures into Undercity. Only take it when the table just gave this seat the initiative.",
-    "takeInitiativeWait": "Finish or leave the current dungeon before Undercity can open. Only take the initiative when the table just gave it to this seat.",
-    "takeInitiativeAndEnter": "Take initiative & enter Undercity",
-    "takeInitiative": "Take initiative",
-    "alreadyHoldInitiative": "You already hold the initiative",
-    "takeAndEnterUndercity": "Take the initiative and enter Undercity",
-    "completed": "{{name}} (completed)",
-    "ventureInto": "Venture into {{name}}",
-    "done": "Done",
-    "ventureTo": "Venture to {{room}}: {{effect}}",
-    "releaseInitiative": "Release the initiative",
-    "undoRoom": "Undo room",
-    "closeDungeon": "Close dungeon"
+    "takeInitiativeTitle": "Võtta initiative?",
+    "takeInitiativeEnter": "See viib teid ka Undercitysse. Võtke initiative ainult siis, kui laud just andis selle sellele kohale.",
+    "takeInitiativeWait": "Lõpetage või lahkuge praegusest dungeonist enne, kui Undercity saab avaneda. Võtke initiative ainult siis, kui laud just andis selle sellele kohale.",
+    "takeInitiativeAndEnter": "Võta initiative ja sisene Undercitysse",
+    "takeInitiative": "Võta initiative",
+    "alreadyHoldInitiative": "Teil on initiative juba olemas",
+    "takeAndEnterUndercity": "Võta initiative ja sisene Undercitysse",
+    "completed": "{{name}} (lõpetatud)",
+    "ventureInto": "Venture asukohta {{name}}",
+    "done": "Valmis",
+    "ventureTo": "Venture asukohta {{room}}: {{effect}}",
+    "releaseInitiative": "Loobu initiative'ist",
+    "undoRoom": "Võta ruum tagasi",
+    "closeDungeon": "Sulge dungeon"
   },
   "treacheryRolesSheet": {
-    "title": "Secret identities",
-    "chooseOwnName": "Choose only your own name.",
-    "closeIdentities": "Close identities",
-    "allIdentitiesChecked": "All identities checked"
+    "title": "Salajased identiteedid",
+    "chooseOwnName": "Valige ainult enda nimi.",
+    "closeIdentities": "Sulge identiteedid",
+    "allIdentitiesChecked": "Kõik identiteedid kontrollitud"
   },
   "tracker": {
-    "gameRules": "Game rules",
-    "loadingRoles": "Loading roles…",
-    "start": "Start",
-    "readRules": "Read rules",
-    "readyToBegin": "Ready to begin",
-    "readyToBeginHint": "Start the match when everyone is seated, or read the rules first.",
-    "dealContracts": "Deal contracts",
-    "dealContractsTitle": "Deal secret contracts",
-    "dealContractsHint": "Every player receives one private target. The device will be passed around so each contract can be checked in secret.",
-    "dealIdentities": "Deal identities",
-    "dealIdentitiesTitle": "Deal secret identities",
-    "dealIdentitiesHint": "Every player receives one hidden identity. The device will be passed around so each one can be read in secret.",
-    "chooseStarPositions": "Choose Star positions",
-    "starPositionsHint": "Players beside each other are allies. Tap two players to exchange their positions, or randomise the whole circle.",
-    "randomPositions": "Random positions",
-    "confirmPositions": "Confirm positions",
-    "adjacentPlayersAlly": "Adjacent\nplayers ally",
-    "buildEmperorTeams": "Build the Emperor teams",
-    "chooseTeamA": "Choose three players for Team A.",
-    "randomTeams": "Random teams",
-    "resetTeams": "Reset teams",
-    "teamEmperor": "Team {{team}} Emperor",
-    "randomEmperors": "Random Emperors",
-    "confirmTeams": "Confirm teams",
-    "chooseArchenemy": "Choose the Archenemy",
-    "chooseArchenemyHint": "The Archenemy faces the other three players. Both sides share 60 life. The Archenemy goes first, draws on that turn, and sets a scheme in motion during each first main phase.",
-    "confirmArchenemy": "Confirm Archenemy",
-    "chooseAllies": "Choose the allies",
-    "chooseAlliesHint": "Select two players for the first team. The other two players become the opposing team. Teams share 60 life and turns; all other player controls stay separate.",
-    "emperor": "Emperor",
-    "emperorRange": "Emperor · range 2",
-    "leader": "Leader",
-    "general": "General",
-    "generalRange": "General · range 1",
-    "marks": "{{count}} marks",
-    "winner": "Winner",
-    "turnPhone": "Turn your phone for the full board",
-    "matchMenu": "Match menu",
-    "matchMenuElapsed": "Match menu. {{clock}} elapsed",
-    "matchMenuPaused": ", paused",
-    "matchMenuDayNight": ", it is {{phase}}",
-    "day": "day",
-    "night": "night",
-    "closeMatchMenu": "Close match menu",
-    "match": "Match",
-    "firstScheme": "First scheme",
-    "nextScheme": "Next scheme",
-    "resume": "Resume",
-    "pause": "Pause",
-    "undo": "Undo",
-    "challenges": "Challenges",
-    "checkTarget": "Check target",
-    "checkMyRole": "Check my role",
-    "dayButton": "Day",
-    "nightButton": "Night",
-    "playerLost": "Player lost",
-    "gameWonBy": "Game won by",
-    "won": "{{name}} won",
-    "doneRequeue": "Done & requeue",
-    "savingChallenges": "Saving challenges…",
-    "quitToHome": "Quit to home",
-    "quitHint": "The game is kept — reopen it from the home screen.",
-    "secretContracts": "Secret contracts",
-    "secretIdentities": "Secret identities",
-    "whoEliminated": "Who eliminated {{name}}?",
-    "whoEliminatedHint": "A player scores only if this was their assigned mark. The contract chain advances either way.",
-    "noPlayerUnknown": "No player / unknown",
-    "revealedIdentity": "Revealed Treachery identity",
-    "closeRevealedIdentity": "Close revealed identity",
-    "commanderChallenges": "Commander challenges",
-    "challengeCompleted": "{{name}} completed",
-    "challengeFallback": "Challenge",
-    "matchResult": "Match result",
-    "wins": "{{name}} wins",
-    "reviewBoard": "Review board",
-    "yes": "Yes",
-    "no": "No",
-    "yesTheyLost": "Yes, they lost",
-    "noStillIn": "No, still in",
-    "openCounters": "Open counters for {{name}}",
-    "commanderDamageOn": "Commander damage on {{name}}",
-    "countersFor": "Counters for {{name}}",
-    "countersTitle": "Counters for {{name}}",
-    "closeCounters": "Close counters",
-    "closeChallenges": "Close challenges",
-    "sharedCommanderDamage": "Shared commander damage",
-    "closeCommanderDamage": "Close commander damage",
-    "highestCommanderDamage": "Highest commander damage on {{name}}: {{value}} from {{commander}}",
-    "noCommanderDamage": "No commander damage on {{name}}",
-    "removeCommanderDamage": "Remove commander damage from {{owner}}'s {{name}}",
-    "addCommanderDamage": "Add commander damage from {{owner}}'s {{name}}",
-    "isMonarch": "{{name}} is the monarch",
-    "makeMonarch": "Make {{name}} the monarch",
-    "enduringStory": "{{name}} {{has}} an enduring story",
-    "cityBlessing": "{{name}} {{has}} the city's blessing",
-    "has": "has",
-    "doesNotHave": "does not have",
-    "didLose": "Did {{name}} lose the game?",
-    "thisTeam": "This team",
-    "didTheyLose": "Did they lose?",
-    "poisonPrompt": "{{name}} has {{count}} poison counters. Did they lose?",
-    "sharedPoisonPrompt": "{{subject}} has {{count}} shared poison counters. {{lose}}",
-    "hitPrompt": "{{name}} owns {{count}} exiled cards with hit counters. Did they lose?",
-    "commanderPrompt": "{{name}} has taken {{damage}} commander damage from {{from}}. Did they lose?",
-    "sharedCommanderPrompt": "{{subject}} has taken {{damage}} commander damage from {{from}}. {{lose}}",
-    "lifePrompt": "{{name}} is at {{life}} life. Did they lose?",
-    "sharedLifePrompt": "{{subject}} is at {{life}} life. {{lose}}",
-    "anotherCommander": "another commander",
-    "addLife": "Add 1 life. Long press for a larger amount.",
-    "removeLife": "Remove 1 life. Long press for a larger amount.",
-    "addLifeFor": "Add life for {{name}}",
-    "removeLifeFor": "Remove life for {{name}}",
-    "addLifeLabel": "Add life · {{name}}",
-    "removeLifeLabel": "Remove life · {{name}}",
-    "deleteDigit": "Delete digit",
-    "add": "Add",
-    "removeVerb": "Remove",
-    "lower": "Lower {{label}}",
-    "raise": "Raise {{label}}",
-    "seatColour": "Seat colour for {{name}}",
-    "dungeonFor": "Dungeon for {{name}}",
-    "dungeonInitiative": "Dungeon and initiative for {{name}}. {{title}}",
-    "dungeonInitiativeActive": "{{name}} has the initiative · {{filled}} of {{total}} unique dungeons",
-    "dungeonInitiativeCompleted": "{{name}} has completed {{filled}} of {{total}} unique dungeons",
-    "counterOn": "{{label}} on {{name}}: {{value}}",
-    "counterFor": "{{label}} for {{name}}",
-    "claimFor": "Claim for {{name}}",
-    "challengesSubtitle": "Same challenges for every player · points never affect matching",
+    "gameRules": "Mängureeglid",
+    "loadingRoles": "Rollide laadimine…",
+    "start": "Alusta",
+    "readRules": "Loe reegleid",
+    "readyToBegin": "Valmis alustama",
+    "readyToBeginHint": "Alustage mängu, kui kõik on lauda istunud, või lugege esmalt reegleid.",
+    "dealContracts": "Jaga lepingud",
+    "dealContractsTitle": "Jaga salajased lepingud",
+    "dealContractsHint": "Iga mängija saab ühe privaatse sihtmärgi. Seade antakse ringi, et iga lepingut saaks salaja kontrollida.",
+    "dealIdentities": "Jaga identiteedid",
+    "dealIdentitiesTitle": "Jaga salajased identiteedid",
+    "dealIdentitiesHint": "Iga mängija saab ühe varjatud identiteedi. Seade antakse ringi, et iga mängija saaks enda oma salaja lugeda.",
+    "chooseStarPositions": "Vali Tähe kohad",
+    "starPositionsHint": "Kõrvuti istuvad mängijad on liitlased. Puudutage kahte mängijat nende kohtade vahetamiseks või paigutage kogu ring juhuslikult.",
+    "randomPositions": "Juhuslikud kohad",
+    "confirmPositions": "Kinnita kohad",
+    "adjacentPlayersAlly": "Kõrvuti\nmängijad on liitlased",
+    "buildEmperorTeams": "Koosta Keisri võistkonnad",
+    "chooseTeamA": "Valige kolm mängijat Võistkonda A.",
+    "randomTeams": "Juhuslikud võistkonnad",
+    "resetTeams": "Lähtesta võistkonnad",
+    "teamEmperor": "Võistkonna {{team}} Keiser",
+    "randomEmperors": "Juhuslikud Keisrid",
+    "confirmTeams": "Kinnita võistkonnad",
+    "chooseArchenemy": "Vali Archenemy",
+    "chooseArchenemyHint": "Archenemy seisab vastu ülejäänud kolmele mängijale. Mõlemal poolel on 60 elu. Archenemy mängib esimesena, tõmbab sellel käigul kaardi ja käivitab iga esimese main phase'i ajal ühe scheme'i.",
+    "confirmArchenemy": "Kinnita Archenemy",
+    "chooseAllies": "Vali liitlased",
+    "chooseAlliesHint": "Valige kaks mängijat esimesse võistkonda. Ülejäänud kaks moodustavad vastasvõistkonna. Võistkonnad jagavad 60 elu ja käike; kõik muud mängija elemendid jäävad eraldi.",
+    "emperor": "Keiser",
+    "emperorRange": "Keiser · mõjuala 2",
+    "leader": "Liider",
+    "general": "Kindral",
+    "generalRange": "Kindral · mõjuala 1",
+    "marks": "{{count}} märki",
+    "winner": "Võitja",
+    "turnPhone": "Kogu mängulaua nägemiseks pöörake telefon külili",
+    "matchMenu": "Mängumenüü",
+    "matchMenuElapsed": "Mängumenüü. Möödunud {{clock}}",
+    "matchMenuPaused": ", pausil",
+    "matchMenuDayNight": ", praegu on {{phase}}",
+    "day": "päev",
+    "night": "öö",
+    "closeMatchMenu": "Sulge mängumenüü",
+    "match": "Mäng",
+    "firstScheme": "Esimene scheme",
+    "nextScheme": "Järgmine scheme",
+    "resume": "Jätka",
+    "pause": "Paus",
+    "undo": "Võta tagasi",
+    "challenges": "Väljakutsed",
+    "checkTarget": "Kontrolli sihtmärki",
+    "checkMyRole": "Kontrolli minu rolli",
+    "dayButton": "Päev",
+    "nightButton": "Öö",
+    "playerLost": "Mängija kaotas",
+    "gameWonBy": "Mängu võitis",
+    "won": "{{name}} võitis",
+    "doneRequeue": "Valmis ja tagasi järjekorda",
+    "savingChallenges": "Väljakutsete salvestamine…",
+    "quitToHome": "Välju avalehele",
+    "quitHint": "Mäng säilitatakse — avage see avalehelt uuesti.",
+    "secretContracts": "Salajased lepingud",
+    "secretIdentities": "Salajased identiteedid",
+    "whoEliminated": "Kes kõrvaldas mängija {{name}}?",
+    "whoEliminatedHint": "Mängija saab punkti ainult siis, kui see oli talle määratud sihtmärk. Lepinguahel liigub edasi mõlemal juhul.",
+    "noPlayerUnknown": "Ükski mängija / teadmata",
+    "revealedIdentity": "Paljastatud Treachery identiteet",
+    "closeRevealedIdentity": "Sulge paljastatud identiteet",
+    "commanderChallenges": "Commanderi väljakutsed",
+    "challengeCompleted": "{{name}} lõpetatud",
+    "challengeFallback": "Väljakutse",
+    "matchResult": "Mängu tulemus",
+    "wins": "{{name}} võidab",
+    "reviewBoard": "Vaata mängulaud üle",
+    "yes": "Jah",
+    "no": "Ei",
+    "yesTheyLost": "Jah, nad kaotasid",
+    "noStillIn": "Ei, endiselt mängus",
+    "openCounters": "Ava mängija {{name}} counterid",
+    "commanderDamageOn": "Commander damage mängijale {{name}}",
+    "countersFor": "Counterid mängijale {{name}}",
+    "countersTitle": "Counterid mängijale {{name}}",
+    "closeCounters": "Sulge counterid",
+    "closeChallenges": "Sulge väljakutsed",
+    "sharedCommanderDamage": "Jagatud commander damage",
+    "closeCommanderDamage": "Sulge commander damage",
+    "highestCommanderDamage": "Suurim commander damage mängijale {{name}}: {{value}} commanderilt {{commander}}",
+    "noCommanderDamage": "Mängijal {{name}} pole commander damage'it",
+    "removeCommanderDamage": "Eemalda commander damage mängija {{owner}} commanderilt {{name}}",
+    "addCommanderDamage": "Lisa commander damage mängija {{owner}} commanderilt {{name}}",
+    "isMonarch": "{{name}} on monarch",
+    "makeMonarch": "Tee {{name}} monarchiks",
+    "enduringStory": "{{name}} {{has}} enduring story",
+    "cityBlessing": "{{name}} {{has}} city's blessing",
+    "has": "omab",
+    "doesNotHave": "ei oma",
+    "didLose": "Kas {{name}} kaotas mängu?",
+    "thisTeam": "See võistkond",
+    "didTheyLose": "Kas nad kaotasid?",
+    "poisonPrompt": "Mängijal {{name}} on {{count}} poison counterit. Kas ta kaotas?",
+    "sharedPoisonPrompt": "{{subject}} on saanud {{count}} jagatud poison counterit. {{lose}}",
+    "hitPrompt": "Mängijal {{name}} on {{count}} exile'itud kaarti hit counteritega. Kas ta kaotas?",
+    "commanderPrompt": "{{name}} on saanud {{damage}} commander damage'it mängijalt {{from}}. Kas ta kaotas?",
+    "sharedCommanderPrompt": "{{subject}} on saanud {{damage}} jagatud commander damage'it mängijalt {{from}}. {{lose}}",
+    "lifePrompt": "Mängijal {{name}} on {{life}} elu. Kas ta kaotas?",
+    "sharedLifePrompt": "{{subject}} on {{life}} jagatud elu. {{lose}}",
+    "anotherCommander": "teine commander",
+    "addLife": "Lisa 1 elu. Suurema väärtuse jaoks hoidke pikalt all.",
+    "removeLife": "Eemalda 1 elu. Suurema väärtuse jaoks hoidke pikalt all.",
+    "addLifeFor": "Lisa elusid mängijale {{name}}",
+    "removeLifeFor": "Eemalda elusid mängijalt {{name}}",
+    "addLifeLabel": "Lisa elusid · {{name}}",
+    "removeLifeLabel": "Eemalda elusid · {{name}}",
+    "deleteDigit": "Kustuta number",
+    "add": "Lisa",
+    "removeVerb": "Eemalda",
+    "lower": "Vähenda {{label}}",
+    "raise": "Suurenda {{label}}",
+    "seatColour": "Mängija {{name}} koha värv",
+    "dungeonFor": "Dungeon mängijale {{name}}",
+    "dungeonInitiative": "Dungeon ja initiative mängijale {{name}}. {{title}}",
+    "dungeonInitiativeActive": "Mängijal {{name}} on initiative · {{filled}} / {{total}} unikaalset dungeonit",
+    "dungeonInitiativeCompleted": "{{name}} on lõpetanud {{filled}} / {{total}} unikaalset dungeonit",
+    "counterOn": "{{label}} mängijal {{name}}: {{value}}",
+    "counterFor": "{{label}} mängijale {{name}}",
+    "claimFor": "Märgi saavutus mängijale {{name}}",
+    "challengesSubtitle": "Kõigile mängijatele samad väljakutsed · punktid ei mõjuta kunagi sobitamist",
     "counters": {
       "poison": "Poison",
       "tax": "Commander tax",
-      "acorn": "Acorns",
-      "energy": "Energy",
-      "experience": "Experience",
-      "hit": "Etrata hits",
-      "rad": "Radiation",
-      "ring": "Ring temptation",
-      "speed": "Speed",
-      "ticket": "Tickets"
+      "acorn": "Tammetõrud",
+      "energy": "Energia",
+      "experience": "Kogemus",
+      "hit": "Etrata tabamused",
+      "rad": "Kiirgus",
+      "ring": "Sõrmuse kiusatus",
+      "speed": "Kiirus",
+      "ticket": "Piletid"
     }
   }
 }

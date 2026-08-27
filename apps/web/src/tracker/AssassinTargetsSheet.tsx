@@ -82,7 +82,7 @@ export function AssassinTargetsSheet({
     selectable.every((player) => reviewed.has(player.id));
   return (
     <section className="flex h-full w-full flex-col">
-      <header className="mb-3 flex items-center justify-between gap-3">
+      <header className="mb-4 flex shrink-0 items-center justify-between gap-3">
         <div>
           <h4 className="font-display text-sm font-bold">
             {t('assassinTargets.title')}
@@ -100,10 +100,11 @@ export function AssassinTargetsSheet({
           </button>
         ) : null}
       </header>
-      <div className="grid min-h-0 flex-1 content-center gap-2 overflow-y-auto sm:grid-cols-2">
+      <div className="grid min-h-0 flex-1 content-center gap-3 overflow-y-auto p-0.5 sm:grid-cols-2">
         {selectable.map((player) => (
           <Button
             key={player.id}
+            size="lg"
             variant={reviewed.has(player.id) ? 'glass' : 'neon'}
             onClick={() => setSelectedId(player.id)}
           >
@@ -116,15 +117,17 @@ export function AssassinTargetsSheet({
         ))}
       </div>
       {requireAllReviewed ? (
-        <Button
-          variant="primary"
-          size="lg"
-          block
-          disabled={!allReviewed}
-          onClick={onReady}
-        >
-          {t('assassinTargets.allContractsChecked')}
-        </Button>
+        <div className="border-muted/15 mt-4 shrink-0 border-t pt-4">
+          <Button
+            variant="primary"
+            size="lg"
+            block
+            disabled={!allReviewed}
+            onClick={onReady}
+          >
+            {t('assassinTargets.allContractsChecked')}
+          </Button>
+        </div>
       ) : null}
     </section>
   );

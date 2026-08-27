@@ -4,6 +4,7 @@ import {
   type TreacheryRole,
   type TreacheryRoleAssignment,
 } from '@podyguard/shared';
+import { assetUrl } from './asset-url';
 import { Button } from './ui/Button';
 
 const roleColour = {
@@ -83,7 +84,7 @@ export function TreacheryRoleDialog({
               {roleName}
             </h2>
             <img
-              src={assignment.identity.image}
+              src={assetUrl(assignment.identity.image)}
               alt={t('treacheryRole.identityAlt', {
                 name: assignment.identity.name,
                 role: roleName,

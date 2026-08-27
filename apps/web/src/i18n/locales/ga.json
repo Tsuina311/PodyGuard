@@ -1,75 +1,75 @@
 {
   "common": {
-    "home": "Home",
-    "cancel": "Cancel",
-    "close": "Close",
-    "save": "Save",
-    "loading": "Loading…",
-    "players": "Players",
-    "game": "Game",
-    "language": "Language",
-    "yes": "Yes",
-    "no": "No",
-    "reset": "Reset",
-    "random": "Random",
-    "remove": "Remove",
-    "empty": "Empty",
+    "home": "Baile",
+    "cancel": "Cealaigh",
+    "close": "Dún",
+    "save": "Sábháil",
+    "loading": "Á lódáil…",
+    "players": "Imreoirí",
+    "game": "Cluiche",
+    "language": "Teanga",
+    "yes": "Tá",
+    "no": "Níl",
+    "reset": "Athshocraigh",
+    "random": "Randamach",
+    "remove": "Bain",
+    "empty": "Folamh",
     "bot": "bot",
     "dev": "dev",
-    "official": "official",
-    "open": "Open",
-    "preferred": "preferred",
-    "player": "Player {{number}}",
-    "versus": "versus",
-    "teamA": "Team A",
-    "teamB": "Team B",
-    "working": "Working…",
-    "creating": "Creating…",
-    "checking": "Checking…",
-    "joining": "Joining…",
-    "updating": "Updating…",
-    "submitting": "Submitting…",
-    "saving": "Saving…",
-    "searching": "Searching…",
-    "unveiling": "Unveiling…",
-    "copied": "Copied",
-    "noneYet": "none yet",
+    "official": "oifigiúil",
+    "open": "Oscailte",
+    "preferred": "roghnaithe",
+    "player": "Imreoir {{number}}",
+    "versus": "in aghaidh",
+    "teamA": "Foireann A",
+    "teamB": "Foireann B",
+    "working": "Á phróiseáil…",
+    "creating": "Á chruthú…",
+    "checking": "Á sheiceáil…",
+    "joining": "Ag dul isteach…",
+    "updating": "Á nuashonrú…",
+    "submitting": "Á sheoladh…",
+    "saving": "Á shábháil…",
+    "searching": "Á chuardach…",
+    "unveiling": "Á nochtadh…",
+    "copied": "Cóipeáilte",
+    "noneYet": "faic fós",
     "dash": "—",
     "errors": {
-      "generic": "Something went wrong.",
-      "createEvent": "Could not create event.",
-      "unlockHost": "Could not unlock host.",
-      "updateTable": "Could not update table.",
-      "startGame": "Could not start the game.",
-      "startAllGames": "Could not start all ready games.",
-      "finishTable": "Could not finish the table.",
-      "cancelPod": "Could not cancel the pod.",
-      "updateSettings": "Could not update settings.",
-      "matchTables": "Could not match tables.",
-      "fillBots": "Could not fill tables with bots.",
-      "clipboard": "Clipboard blocked — copy the link manually.",
-      "eventNotFound": "Event not found.",
-      "joinEvent": "Could not join event.",
-      "saveDecks": "Could not save decks.",
-      "updateReady": "Could not update ready.",
-      "updatePause": "Could not update pause.",
-      "leaveEvent": "Could not leave event.",
-      "trackerChoice": "Could not save the tracker choice.",
-      "saveRating": "Could not save that rating.",
-      "chooseCommander": "Choose a commander for every deck.",
-      "enterJoinCode": "Enter a join code.",
-      "sessionUnavailable": "Your event session is no longer available.",
-      "savePack": "Could not save the pack.",
-      "searchScryfall": "Could not search Scryfall.",
-      "loadArtwork": "Could not load alternate artwork.",
-      "submitResult": "Could not submit the result.",
-      "saveChallenge": "Could not save challenge progress.",
-      "unveilIdentity": "Could not unveil your identity.",
-      "apiWaking": "The host is waking up. Keep this page open — it usually takes under a minute.",
-      "apiUnreachable": "Cannot reach the API. Is the server running (yarn dev:server)?"
+      "generic": "Chuaigh rud éigin mícheart.",
+      "createEvent": "Níorbh fhéidir an t-imeacht a chruthú.",
+      "unlockHost": "Níorbh fhéidir painéal an óstaigh a dhíghlasáil.",
+      "updateTable": "Níorbh fhéidir an bord a nuashonrú.",
+      "startGame": "Níorbh fhéidir an cluiche a thosú.",
+      "startAllGames": "Níorbh fhéidir na cluichí réidh go léir a thosú.",
+      "finishTable": "Níorbh fhéidir an bord a chríochnú.",
+      "cancelPod": "Níorbh fhéidir an pod a chealú.",
+      "updateSettings": "Níorbh fhéidir na socruithe a nuashonrú.",
+      "matchTables": "Níorbh fhéidir na boird a mheaitseáil.",
+      "fillBots": "Níorbh fhéidir na boird a líonadh le bots.",
+      "clipboard": "Tá an ghearrthaisce blocáilte — cóipeáil an nasc de láimh.",
+      "eventNotFound": "Níor aimsíodh an t-imeacht.",
+      "joinEvent": "Níorbh fhéidir dul isteach san imeacht.",
+      "saveDecks": "Níorbh fhéidir na deiceanna a shábháil.",
+      "updateReady": "Níorbh fhéidir an stádas réidh a nuashonrú.",
+      "updatePause": "Níorbh fhéidir an sos a nuashonrú.",
+      "leaveEvent": "Níorbh fhéidir an t-imeacht a fhágáil.",
+      "trackerChoice": "Níorbh fhéidir rogha an tracker a shábháil.",
+      "saveRating": "Níorbh fhéidir an rátáil sin a shábháil.",
+      "chooseCommander": "Roghnaigh commander do gach deic.",
+      "enterJoinCode": "Cuir isteach cód iontrála.",
+      "sessionUnavailable": "Níl do sheisiún imeachta ar fáil a thuilleadh.",
+      "savePack": "Níorbh fhéidir an pacáiste a shábháil.",
+      "searchScryfall": "Níorbh fhéidir Scryfall a chuardach.",
+      "loadArtwork": "Níorbh fhéidir an saothar ealaíne malartach a lódáil.",
+      "submitResult": "Níorbh fhéidir an toradh a sheoladh.",
+      "saveChallenge": "Níorbh fhéidir dul chun cinn an dúshláin a shábháil.",
+      "unveilIdentity": "Níorbh fhéidir d'aitheantas a nochtadh.",
+      "apiWaking": "Tá an t-óstach ag dúiseacht. Coinnigh an leathanach seo ar oscailt — de ghnáth tógann sé níos lú ná nóiméad.",
+      "apiUnreachable": "Ní féidir an API a bhaint amach. An bhfuil an freastalaí ag rith (yarn dev:server)?"
     },
-    "assignedAtTable": "Assigned at the table",
-    "scanToJoin": "Scan to join this event"
+    "assignedAtTable": "Sannta ag an mbord",
+    "scanToJoin": "Scanáil chun dul isteach san imeacht seo"
   },
   "language": {
     "en": "English",
@@ -109,173 +109,173 @@
     "cy": "Cymraeg"
   },
   "families": {
-    "normal": "Normal",
+    "normal": "Gnáth",
     "commander": "Commander"
   },
   "modes": {
     "shared": {
-      "commanderCombat": "A player loses after taking {{commanderDamage}} combat damage from one commander.",
-      "commanderTax": "Each time a commander is recast from the command zone, it costs 2 more mana.",
-      "lifeAndLoss": "Life and loss",
-      "turns": "Turns",
+      "commanderCombat": "Cailleann imreoir tar éis {{commanderDamage}} damáiste comhraic a fháil ó commander amháin.",
+      "commanderTax": "Gach uair a imrítear commander arís ón command zone, cosnaíonn sé 2 mana sa bhreis.",
+      "lifeAndLoss": "Beatha agus cailliúint",
+      "turns": "Babhtaí",
       "commanders": "Commanders",
-      "eachPlayerLife": "Each player starts at {{life}} life.",
-      "loseAtZero": "A player loses at 0 life.",
-      "loseAtPoison": "A player loses at {{poison}} poison counters.",
-      "startingPlayerRandom": "The starting player is drawn at random.",
-      "startingPlayerSkipDraw": "The starting player is drawn at random and skips the draw step on the first turn.",
-      "multiplayerFirstTurnDraw": "In multiplayer, that player draws on their first turn.",
-      "commanderFirstTurnDraw": "In multiplayer Commander, that player draws on their first turn.",
-      "commandersInZone": "Commanders begin in the command zone and may be recast from there.",
-      "commanderRulesApply": "Commander rules still apply: {{life}} starting life, {{poison}} poison, and {{commanderDamage}} combat damage from one commander are lethal."
+      "eachPlayerLife": "Tosaíonn gach imreoir le {{life}} beatha.",
+      "loseAtZero": "Cailleann imreoir ag 0 beatha.",
+      "loseAtPoison": "Cailleann imreoir ag {{poison}} poison counters.",
+      "startingPlayerRandom": "Roghnaítear an t-imreoir tosaigh go randamach.",
+      "startingPlayerSkipDraw": "Roghnaítear an t-imreoir tosaigh go randamach agus scipeálann sé an draw step ar an gcéad bhabhta.",
+      "multiplayerFirstTurnDraw": "I multiplayer, tarraingíonn an t-imreoir sin cárta ar a chéad bhabhta.",
+      "commanderFirstTurnDraw": "I multiplayer Commander, tarraingíonn an t-imreoir sin cárta ar a chéad bhabhta.",
+      "commandersInZone": "Tosaíonn commanders sa command zone agus is féidir iad a imirt arís as sin.",
+      "commanderRulesApply": "Tá rialacha Commander fós i bhfeidhm: tá {{life}} beatha tosaigh, {{poison}} poison, agus {{commanderDamage}} damáiste comhraic ó commander amháin marfach."
     },
     "duel": {
       "label": "Duel",
-      "hint": "Two players. Each starts on 20 life.",
-      "hostHint": "Strict 2-player tables. Each player starts on 20 life.",
-      "hostFixedSeats": "Duel events always seat exactly two players.",
+      "hint": "Beirt imreoirí. Tosaíonn gach duine le 20 beatha.",
+      "hostHint": "Boird do 2 imreoir go díreach. Tosaíonn gach imreoir le 20 beatha.",
+      "hostFixedSeats": "Bíonn beirt imreoirí go díreach i gcluichí Duel.",
       "title": "Duel",
-      "summary": "Two-player Magic. No commanders — just life and the board.",
+      "summary": "Magic do bheirt imreoirí. Gan commanders — díreach beatha agus an bord.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Beatha agus cailliúint",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters."
+            "Tosaíonn gach imreoir le {{life}} beatha.",
+            "Cailleann imreoir ag 0 beatha.",
+            "Cailleann imreoir ag {{poison}} poison counters."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Babhtaí",
           "bullets": [
-            "The starting player is drawn at random and skips the draw step on the first turn."
+            "Roghnaítear an t-imreoir tosaigh go randamach agus scipeálann sé an draw step ar an gcéad bhabhta."
           ]
         }
       }
     },
     "multiplayer": {
       "label": "Multiplayer",
-      "hint": "Free-for-all without commanders. Everyone starts on 20 life.",
-      "hostHint": "Free-for-all without commanders. Matching fills your chosen table size; leftovers can sit as small as three.",
+      "hint": "Gach duine in aghaidh gach duine gan commanders. Tosaíonn gach duine le 20 beatha.",
+      "hostHint": "Gach duine in aghaidh gach duine gan commanders. Líonann an meaitseáil an méid boird roghnaithe ar dtús; is féidir le boird atá fágtha a bheith chomh beag le triúr.",
       "title": "Multiplayer",
-      "summary": "Free-for-all without the Commander format. Useful for casual multiplayer, Planechase, or any 20-life table.",
+      "summary": "Multiplayer gan formáid Commander. Úsáideach do multiplayer ócáideach, Planechase, nó aon bhord 20 beatha.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Beatha agus cailliúint",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters."
+            "Tosaíonn gach imreoir le {{life}} beatha.",
+            "Cailleann imreoir ag 0 beatha.",
+            "Cailleann imreoir ag {{poison}} poison counters."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Babhtaí",
           "bullets": [
-            "The starting player is drawn at random.",
-            "In multiplayer, that player draws on their first turn."
+            "Roghnaítear an t-imreoir tosaigh go randamach.",
+            "I multiplayer, tarraingíonn an t-imreoir sin cárta ar a chéad bhabhta."
           ]
         }
       }
     },
     "commander": {
-      "label": "Classic",
-      "hint": "Free-for-all. Everyone starts on 40 life.",
-      "hostHint": "Free-for-all Commander. Matching prefers four; leftover pods can be three or five when allowed.",
-      "title": "Classic",
-      "summary": "Free-for-all multiplayer. Each player fights for themselves.",
+      "label": "Clasaiceach",
+      "hint": "Gach duine in aghaidh gach duine. Tosaíonn gach duine le 40 beatha.",
+      "hostHint": "Commander gach duine in aghaidh gach duine. Is fearr leis an meaitseáil ceathrar; is féidir pods atá fágtha a bheith de thriúr nó de chúigear nuair a cheadaítear é.",
+      "title": "Clasaiceach",
+      "summary": "Multiplayer gach duine in aghaidh gach duine. Troideann gach imreoir ar a shon féin.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Beatha agus cailliúint",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters.",
-            "A player loses after taking {{commanderDamage}} combat damage from one commander."
+            "Tosaíonn gach imreoir le {{life}} beatha.",
+            "Cailleann imreoir ag 0 beatha.",
+            "Cailleann imreoir ag {{poison}} poison counters.",
+            "Cailleann imreoir tar éis {{commanderDamage}} damáiste comhraic a fháil ó commander amháin."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Babhtaí",
           "bullets": [
-            "The starting player is drawn at random.",
-            "In multiplayer Commander, that player draws on their first turn."
+            "Roghnaítear an t-imreoir tosaigh go randamach.",
+            "I multiplayer Commander, tarraingíonn an t-imreoir sin cárta ar a chéad bhabhta."
           ]
         },
         "commanders": {
           "heading": "Commanders",
           "bullets": [
-            "Commanders begin in the command zone and may be recast from there.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Tosaíonn commanders sa command zone agus is féidir iad a imirt arís as sin.",
+            "Gach uair a imrítear commander arís ón command zone, cosnaíonn sé 2 mana sa bhreis."
           ]
         }
       }
     },
     "treachery": {
-      "label": "Treachery",
-      "hint": "Secret identities dealt on this device. Pass it around so everyone reads their own in private.",
-      "hostHint": "Secret roles for Commander pods. Matching fills your chosen table size first; leftovers can sit as small as four.",
-      "title": "Treachery",
-      "summary": "Commander with secret identities. The Leader is public; everyone else stays hidden.",
+      "label": "Feall",
+      "hint": "Déantar na haitheantais rúnda a roinnt ar an ngléas seo. Tabhair timpeall é ionas gur féidir le gach duine a cheann féin a léamh go príobháideach.",
+      "hostHint": "Róil rúnda do pods Commander. Líonann an meaitseáil an méid boird roghnaithe ar dtús; is féidir le pods atá fágtha a bheith chomh beag le ceathrar.",
+      "title": "Feall",
+      "summary": "Commander le haitheantais rúnda. Tá an Ceannaire poiblí; fanann gach duine eile i bhfolach.",
       "sections": {
         "commander": {
-          "heading": "Commander rules still apply",
+          "heading": "Tá rialacha Commander fós i bhfeidhm",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "The Leader takes the first turn and draws on that turn.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Tosaíonn gach imreoir le {{life}} beatha.",
+            "Cailleann imreoir ag 0 beatha, {{poison}} poison, nó {{commanderDamage}} damáiste comhraic ó commander amháin.",
+            "Glacann an Ceannaire an chéad bhabhta agus tarraingíonn sé cárta ar an mbabhta sin.",
+            "Gach uair a imrítear commander arís ón command zone, cosnaíonn sé 2 mana sa bhreis."
           ]
         },
         "identities": {
-          "heading": "Identities",
+          "heading": "Aitheantais",
           "bullets": [
-            "Open Check my role from the timer menu. Only you see that card.",
-            "On a single tracker, deal the identities at setup and pass the device around so each player reads theirs alone.",
-            "Leader: Survive until every Assassin and Traitor is eliminated. Reveal yourself to the table. The Guardians share your victory, but you do not know who they are.",
-            "Guardian: Keep the Leader alive and eliminate the Leader's enemies. Your identity is secret. You win and lose with the Leader, even if you are eliminated first.",
-            "Assassin: Eliminate the Leader. Your identity is secret. Assassins share the same objective, but you do not know who the other Assassins are.",
-            "Traitor: Be the last player standing. Your identity is secret. Keep the Leader alive until the other threats are gone, then take the throne for yourself.",
-            "Follow any extra abilities printed on your identity card."
+            "Oscail Seiceáil mo ról ó roghchlár an timer. Ní fheiceann ach tusa an cárta sin.",
+            "Le tracker amháin, roinn na haitheantais le linn an setup agus tabhair an gléas timpeall ionas go léifidh gach imreoir a cheann féin ina aonar.",
+            "Ceannaire: Mair go dtí go mbeidh gach Feallmharfóir agus an Fealltóir curtha as an gcluiche. Nocht tú féin don bhord. Roinneann na Caomhnóirí do bhua, ach níl a fhios agat cé hiad.",
+            "Caomhnóir: Coinnigh an Ceannaire beo agus cuir naimhde an Cheannaire as an gcluiche. Tá d'aitheantas rúnda. Buann agus cailleann tú leis an gCeannaire, fiú má chuirtear tusa as an gcluiche ar dtús.",
+            "Feallmharfóir: Cuir an Ceannaire as an gcluiche. Tá d'aitheantas rúnda. Tá an cuspóir céanna ag na Feallmharfóirí, ach níl a fhios agat cé hiad na Feallmharfóirí eile.",
+            "Fealltóir: Bí ar an imreoir deireanach atá fágtha. Tá d'aitheantas rúnda. Coinnigh an Ceannaire beo go dtí go mbeidh na bagairtí eile imithe, ansin tóg an ríchathaoir duit féin.",
+            "Lean aon chumais bhreise atá priontáilte ar do chárta aitheantais."
           ]
         }
       },
       "roles": {
         "leader": {
-          "name": "Leader",
-          "objective": "Survive until every Assassin and Traitor is eliminated.",
-          "guidance": "Reveal yourself to the table. The Guardians share your victory, but you do not know who they are.",
-          "publicNote": "Your role is public. Tell the table you are the Leader."
+          "name": "Ceannaire",
+          "objective": "Mair go dtí go mbeidh gach Feallmharfóir agus an Fealltóir curtha as an gcluiche.",
+          "guidance": "Nocht tú féin don bhord. Roinneann na Caomhnóirí do bhua, ach níl a fhios agat cé hiad.",
+          "publicNote": "Tá do ról poiblí. Inis don bhord gur tusa an Ceannaire."
         },
         "guardian": {
-          "name": "Guardian",
-          "objective": "Keep the Leader alive and eliminate the Leader's enemies.",
-          "guidance": "Your identity is secret. You win and lose with the Leader, even if you are eliminated first.",
-          "publicNote": "Keep this role secret."
+          "name": "Caomhnóir",
+          "objective": "Coinnigh an Ceannaire beo agus cuir naimhde an Cheannaire as an gcluiche.",
+          "guidance": "Tá d'aitheantas rúnda. Buann agus cailleann tú leis an gCeannaire, fiú má chuirtear tusa as an gcluiche ar dtús.",
+          "publicNote": "Coinnigh an ról seo faoi rún."
         },
         "assassin": {
-          "name": "Assassin",
-          "objective": "Eliminate the Leader.",
-          "guidance": "Your identity is secret. Assassins share the same objective, but you do not know who the other Assassins are.",
-          "publicNote": "Keep this role secret."
+          "name": "Feallmharfóir",
+          "objective": "Cuir an Ceannaire as an gcluiche.",
+          "guidance": "Tá d'aitheantas rúnda. Tá an cuspóir céanna ag na Feallmharfóirí, ach níl a fhios agat cé hiad na Feallmharfóirí eile.",
+          "publicNote": "Coinnigh an ról seo faoi rún."
         },
         "traitor": {
-          "name": "Traitor",
-          "objective": "Be the last player standing.",
-          "guidance": "Your identity is secret. Keep the Leader alive until the other threats are gone, then take the throne for yourself.",
-          "publicNote": "Keep this role secret."
+          "name": "Fealltóir",
+          "objective": "Bí ar an imreoir deireanach atá fágtha.",
+          "guidance": "Tá d'aitheantas rúnda. Coinnigh an Ceannaire beo go dtí go mbeidh na bagairtí eile imithe, ansin tóg an ríchathaoir duit féin.",
+          "publicNote": "Coinnigh an ról seo faoi rún."
         }
       },
       "normal": {
-        "hint": "Secret identities on a shared phone. Everyone starts on 20 life — no commanders.",
-        "hostHint": "Secret roles without commanders. Matching fills your chosen table size first; leftovers can sit as small as four.",
-        "summary": "Secret identities without the Commander format. The Leader is public; everyone else stays hidden.",
+        "hint": "Aitheantais rúnda ar fhón comhroinnte. Tosaíonn gach duine le 20 beatha — gan commanders.",
+        "hostHint": "Róil rúnda gan commanders. Líonann an meaitseáil an méid boird roghnaithe ar dtús; is féidir le pods atá fágtha a bheith chomh beag le ceathrar.",
+        "summary": "Aitheantais rúnda gan formáid Commander. Tá an Ceannaire poiblí; fanann gach duine eile i bhfolach.",
         "sections": {
           "life": {
-            "heading": "Life and loss",
+            "heading": "Beatha agus cailliúint",
             "bullets": [
-              "Each player starts at {{life}} life.",
-              "A player loses at 0 life.",
-              "A player loses at {{poison}} poison counters.",
-              "The Leader takes the first turn and draws on that turn."
+              "Tosaíonn gach imreoir le {{life}} beatha.",
+              "Cailleann imreoir ag 0 beatha.",
+              "Cailleann imreoir ag {{poison}} poison counters.",
+              "Glacann an Ceannaire an chéad bhabhta agus tarraingíonn sé cárta ar an mbabhta sin."
             ]
           },
           "identities": null
@@ -283,63 +283,63 @@
       }
     },
     "two-headed-giant": {
-      "label": "Two-Headed Giant",
-      "hint": "Two teams of two, 60 shared life each, turns taken together.",
-      "hostHint": "Strict 4-player Commander pods. Two teams share 60 life and take their turns together.",
-      "hostFixedSeats": "Two-Headed Giant games always seat exactly four players.",
-      "title": "Two-Headed Giant",
-      "summary": "Two teams of two. Teammates share a life total and a turn.",
+      "label": "Fathach Dhá Cheann",
+      "hint": "Dhá fhoireann de bheirt, 60 beatha comhroinnte ag gach foireann, agus na babhtaí á nglacadh le chéile.",
+      "hostHint": "Pods Commander do 4 imreoir go díreach. Roinneann dhá fhoireann 60 beatha agus glacann siad a mbabhtaí le chéile.",
+      "hostFixedSeats": "Bíonn ceathrar imreoirí go díreach i gcluichí Fathach Dhá Cheann.",
+      "title": "Fathach Dhá Cheann",
+      "summary": "Dhá fhoireann de bheirt. Roinneann comhghleacaithe foirne líon na beatha agus babhta.",
       "sections": {
         "teams": {
-          "heading": "Teams",
+          "heading": "Foirne",
           "bullets": [
-            "Pick two allies, or let the table randomise the pairs.",
-            "Each team starts at {{sharedLife}} shared life.",
-            "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+            "Roghnaigh beirt chomhghuaillithe, nó lig don bhord na péirí a roghnú go randamach.",
+            "Tosaíonn gach foireann le {{sharedLife}} beatha comhroinnte.",
+            "Glacann comhghleacaithe foirne a mbabhta le chéile. Tá a lámh, library agus commanders féin ag gach imreoir fós."
           ]
         },
         "life": {
-          "heading": "Life and loss",
+          "heading": "Beatha agus cailliúint",
           "bullets": [
-            "A team loses when its shared life reaches 0.",
-            "A team loses at {{sharedPoison}} shared poison counters.",
-            "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+            "Cailleann foireann nuair a shroicheann a beatha comhroinnte 0.",
+            "Cailleann foireann ag {{sharedPoison}} poison counters comhroinnte.",
+            "Cailleann foireann tar éis {{commanderDamage}} damáiste comhraic comhroinnte a fháil ó commander amháin."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Babhtaí",
           "bullets": [
-            "The starting team is drawn at random and skips the draw step on its first turn.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Roghnaítear an fhoireann tosaigh go randamach agus scipeálann sí an draw step ar a céad bhabhta.",
+            "Gach uair a imrítear commander arís ón command zone, cosnaíonn sé 2 mana sa bhreis."
           ]
         }
       },
       "normal": {
-        "hint": "Two teams of two, 40 shared life each, turns taken together.",
-        "hostHint": "Strict 4-player tables. Two teams share 40 life and take their turns together — no commanders.",
-        "summary": "Two teams of two. Teammates share a life total and a turn — standard decks, 20 life each in team terms.",
+        "hint": "Dhá fhoireann de bheirt, 40 beatha comhroinnte ag gach foireann, agus na babhtaí á nglacadh le chéile.",
+        "hostHint": "Boird do 4 imreoir go díreach. Roinneann dhá fhoireann 40 beatha agus glacann siad a mbabhtaí le chéile — gan commanders.",
+        "summary": "Dhá fhoireann de bheirt. Roinneann comhghleacaithe foirne líon na beatha agus babhta — deiceanna caighdeánacha, 20 beatha an duine i dtéarmaí foirne.",
         "sections": {
           "teams": {
-            "heading": "Teams",
+            "heading": "Foirne",
             "bullets": [
-              "Pick two allies, or let the table randomise the pairs.",
-              "Each team starts at {{sharedLife}} shared life.",
-              "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+              "Roghnaigh beirt chomhghuaillithe, nó lig don bhord na péirí a roghnú go randamach.",
+              "Tosaíonn gach foireann le {{sharedLife}} beatha comhroinnte.",
+              "Glacann comhghleacaithe foirne a mbabhta le chéile. Tá a lámh, library agus commanders féin ag gach imreoir fós."
             ]
           },
           "life": {
-            "heading": "Life and loss",
+            "heading": "Beatha agus cailliúint",
             "bullets": [
-              "A team loses when its shared life reaches 0.",
-              "A team loses at {{sharedPoison}} shared poison counters.",
-              "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+              "Cailleann foireann nuair a shroicheann a beatha comhroinnte 0.",
+              "Cailleann foireann ag {{sharedPoison}} poison counters comhroinnte.",
+              "Cailleann foireann tar éis {{commanderDamage}} damáiste comhraic comhroinnte a fháil ó commander amháin."
             ]
           },
           "turns": {
-            "heading": "Turns",
+            "heading": "Babhtaí",
             "bullets": [
-              "The starting team is drawn at random and skips the draw step on its first turn.",
-              "Each time a commander is recast from the command zone, it costs 2 more mana."
+              "Roghnaítear an fhoireann tosaigh go randamach agus scipeálann sí an draw step ar a céad bhabhta.",
+              "Gach uair a imrítear commander arís ón command zone, cosnaíonn sé 2 mana sa bhreis."
             ]
           }
         }
@@ -347,286 +347,286 @@
     },
     "archenemy-commander": {
       "label": "Archenemy",
-      "hint": "One Archenemy on 60 life with a 40-card scheme deck against three heroes sharing 60 life.",
-      "hostHint": "Strict 4-player Commander pods. One 60-life Archenemy faces a three-player team with 60 shared life and a 40-card scheme deck.",
-      "hostFixedSeats": "Archenemy Commander games always seat exactly four players.",
+      "hint": "Archenemy amháin le 60 beatha agus deic 40 scheme in aghaidh triúr laoch a roinneann 60 beatha.",
+      "hostHint": "Pods Commander do 4 imreoir go díreach. Tugann Archenemy amháin le 60 beatha aghaidh ar fhoireann triúr le 60 beatha comhroinnte agus deic 40 scheme.",
+      "hostFixedSeats": "Bíonn ceathrar imreoirí go díreach i gcluichí Archenemy Commander.",
       "title": "Archenemy Commander",
-      "summary": "One Archenemy against a team of three, with a scheme deck in motion.",
+      "summary": "Archenemy amháin in aghaidh foireann de thriúr, le deic scheme ar siúl.",
       "sections": {
         "sides": {
-          "heading": "Sides",
+          "heading": "Taobhanna",
           "bullets": [
-            "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
-            "Both sides start at {{life}} life.",
-            "The heroes share that life total and take their turn together.",
-            "The Archenemy goes first and draws on that turn."
+            "Roghnaigh an Archenemy, nó sann ceann go randamach. Is iad na trí imreoir eile na laochra.",
+            "Tosaíonn an dá thaobh le {{life}} beatha.",
+            "Roinneann na laochra an líon beatha sin agus glacann siad a mbabhta le chéile.",
+            "Téann an Archenemy ar dtús agus tarraingíonn sé cárta ar an mbabhta sin."
           ]
         },
         "schemes": {
           "heading": "Schemes",
           "bullets": [
-            "The 40 Duskmourn Commander schemes are shuffled at the start.",
-            "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
-            "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
-            "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
-            "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+            "Déantar na 40 schemes ó Duskmourn Commander a shuaitheadh ag an tús.",
+            "Le linn gach first main phase den Archenemy, oscail roghchlár an timer agus brúigh Next scheme chun ceann a chur ar bun.",
+            "Réitítear scheme nach ongoing é, ansin téann sé go bun na deice scheme.",
+            "Fanann ongoing scheme aghaidh suas go dtí go marcálann an bord é mar abandoned, ansin téann sé go bun na deice.",
+            "Taispeántar schemes aghaidh suas agus graveyard na schemes críochnaithe mar mhionsamhlacha faoin gcárta; brúigh ceann chun é a léamh i méid mór."
           ]
         },
         "life": {
-          "heading": "Life and loss",
+          "heading": "Beatha agus cailliúint",
           "bullets": [
-            "The Archenemy loses at 0 life, or when the usual poison and commander-damage limits are reached.",
-            "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
-            "A player loses after taking {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Cailleann an Archenemy ag 0 beatha, nó nuair a shroichtear na gnáth-theorainneacha poison agus commander damage.",
+            "Cailleann na laochra le chéile nuair a shroicheann a mbeatha comhroinnte 0, agus roinneann siad poison agus commander damage ar an mbealach céanna.",
+            "Cailleann imreoir tar éis {{commanderDamage}} damáiste comhraic a fháil ó commander amháin.",
+            "Gach uair a imrítear commander arís ón command zone, cosnaíonn sé 2 mana sa bhreis."
           ]
         }
       },
       "normal": {
-        "hint": "One Archenemy on 20 life with schemes against three heroes sharing 40 life.",
-        "hostHint": "Strict 4-player tables. One Archenemy with a scheme deck against a three-player team — no commanders.",
-        "summary": "One Archenemy against a team of three, with a scheme deck in motion — standard 20-life tables.",
+        "hint": "Archenemy amháin le 20 beatha agus schemes in aghaidh triúr laoch a roinneann 40 beatha.",
+        "hostHint": "Boird do 4 imreoir go díreach. Archenemy amháin le deic scheme in aghaidh foireann triúr — gan commanders.",
+        "summary": "Archenemy amháin in aghaidh foireann de thriúr, le deic scheme ar siúl — boird chaighdeánacha 20 beatha.",
         "sections": {
           "sides": {
-            "heading": "Sides",
+            "heading": "Taobhanna",
             "bullets": [
-              "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
-              "Both sides start at {{life}} life.",
-              "The heroes share that life total and take their turn together.",
-              "The Archenemy goes first and draws on that turn."
+              "Roghnaigh an Archenemy, nó sann ceann go randamach. Is iad na trí imreoir eile na laochra.",
+              "Tosaíonn an dá thaobh le {{life}} beatha.",
+              "Roinneann na laochra an líon beatha sin agus glacann siad a mbabhta le chéile.",
+              "Téann an Archenemy ar dtús agus tarraingíonn sé cárta ar an mbabhta sin."
             ]
           },
           "schemes": {
             "heading": "Schemes",
             "bullets": [
-              "The 40 Duskmourn Commander schemes are shuffled at the start.",
-              "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
-              "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
-              "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
-              "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+              "Déantar na 40 schemes ó Duskmourn Commander a shuaitheadh ag an tús.",
+              "Le linn gach first main phase den Archenemy, oscail roghchlár an timer agus brúigh Next scheme chun ceann a chur ar bun.",
+              "Réitítear scheme nach ongoing é, ansin téann sé go bun na deice scheme.",
+              "Fanann ongoing scheme aghaidh suas go dtí go marcálann an bord é mar abandoned, ansin téann sé go bun na deice.",
+              "Taispeántar schemes aghaidh suas agus graveyard na schemes críochnaithe mar mhionsamhlacha faoin gcárta; brúigh ceann chun é a léamh i méid mór."
             ]
           },
           "life": {
-            "heading": "Life and loss",
+            "heading": "Beatha agus cailliúint",
             "bullets": [
-              "The Archenemy loses at 0 life, or when the usual poison and poison limits are reached.",
-              "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
-              "A player loses after taking {{poison}} poison counters."
+              "Cailleann an Archenemy ag 0 beatha, nó nuair a shroichtear na gnáth-theorainneacha poison agus poison.",
+              "Cailleann na laochra le chéile nuair a shroicheann a mbeatha comhroinnte 0, agus roinneann siad poison agus commander damage ar an mbealach céanna.",
+              "Cailleann imreoir tar éis {{poison}} poison counters a fháil."
             ]
           }
         }
       }
     },
     "emperor": {
-      "label": "Emperor",
-      "hint": "Two teams of three. Protect your Emperor using limited range of influence and deploy creatures.",
-      "hostHint": "Strict 6-player Commander pods. Two teams each place an Emperor between two Generals and play with limited range of influence.",
-      "hostFixedSeats": "Emperor games always seat exactly six players.",
-      "title": "Emperor",
-      "summary": "Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.",
+      "label": "Impire",
+      "hint": "Dhá fhoireann de thriúr. Cosain d'Impire le raon tionchair teoranta agus cuir creatures chun cinn.",
+      "hostHint": "Pods Commander do 6 imreoir go díreach. Cuireann gach foireann Impire idir beirt Ghinearál agus imríonn siad le raon tionchair teoranta.",
+      "hostFixedSeats": "Bíonn seisear imreoirí go díreach i gcluichí Impire.",
+      "title": "Impire",
+      "summary": "Dhá fhoireann de thriúr. Suíonn gach Impire idir beirt Ghinearál, agus má chuirtear Impire as an gcluiche buann an fhoireann eile.",
       "sections": {
         "teams": {
-          "heading": "Teams and turns",
+          "heading": "Foirne agus babhtaí",
           "bullets": [
-            "Choose both teams and each team's Emperor, or randomise either choice.",
-            "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
-            "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
-            "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+            "Roghnaigh an dá fhoireann agus Impire gach foirne, nó déan ceachtar rogha go randamach.",
+            "Tosaíonn gach imreoir le {{life}} beatha agus coimeádann sé a lámh, mana, permanents, poison agus babhta féin.",
+            "Féadfaidh comhghleacaithe foirne lámha a chéile a fheiceáil agus straitéis a phlé, ach ní fhéadfaidh siad cártaí a chéile a láimhseáil.",
+            "Roghnaigh go randamach cén tImpire a ghlacann an chéad bhabhta. Tarraingíonn an tImpire sin cárta ar an gcéad bhabhta."
           ]
         },
         "range": {
-          "heading": "Range and combat",
+          "heading": "Raon agus comhrac",
           "bullets": [
-            "Generals have range of influence 1. Emperors have range of influence 2.",
-            "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
-            "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
-            "As players leave, the empty seats stop counting, bringing surviving players into range."
+            "Tá raon tionchair 1 ag Ginearáil. Tá raon tionchair 2 ag Impirí.",
+            "Ní féidir le spells, abilities, effects agus faisnéis dul i bhfeidhm ach ar imreoirí agus rudaí laistigh de raon a controller.",
+            "Ní féidir le himreoir ionsaí a dhéanamh ach ar chéile comhraic atá ina shuí díreach in aice leis, nó ar planeswalkers agus protected battles an chéile comhraic sin.",
+            "De réir mar a fhágann imreoirí, ní áirítear na suíocháin fholmha a thuilleadh, rud a thugann na himreoirí atá fágtha isteach i raon a chéile."
           ]
         },
         "deploy": {
-          "heading": "Deploy creatures",
+          "heading": "Cuir creatures chun cinn",
           "bullets": [
-            "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
-            "This can move creatures through the team as the battle lines change."
+            "Tá \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\" ag gach creature.",
+            "Ligeann sé seo creatures a bhogadh tríd an bhfoireann de réir mar a athraíonn línte an chatha."
           ]
         },
         "winning": {
-          "heading": "Winning and Commander rules",
+          "heading": "Bua agus rialacha Commander",
           "bullets": [
-            "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
-            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Buann foireann má bhuann a hImpire agus cailleann sí láithreach má chailleann a hImpire. Is féidir Ginearál a chur as an gcluiche gan deireadh a chur leis an gcluiche.",
+            "Cailleann imreoir ag 0 beatha, {{poison}} poison, nó {{commanderDamage}} damáiste comhraic ó commander amháin.",
+            "Gach uair a imrítear commander arís ón command zone, cosnaíonn sé 2 mana sa bhreis."
           ]
         }
       },
       "normal": {
-        "hint": "Two teams of three on 20 life. Protect your Emperor with limited range of influence.",
-        "hostHint": "Strict 6-player tables. Two Emperors between Generals — standard 20-life decks, no commanders.",
-        "summary": "Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.",
+        "hint": "Dhá fhoireann de thriúr le 20 beatha. Cosain d'Impire le raon tionchair teoranta.",
+        "hostHint": "Boird do 6 imreoir go díreach. Beirt Impirí idir Ginearáil — deiceanna caighdeánacha 20 beatha, gan commanders.",
+        "summary": "Dhá fhoireann de thriúr. Suíonn gach Impire idir beirt Ghinearál, agus má chuirtear Impire as an gcluiche buann an fhoireann eile.",
         "sections": {
           "teams": {
-            "heading": "Teams and turns",
+            "heading": "Foirne agus babhtaí",
             "bullets": [
-              "Choose both teams and each team's Emperor, or randomise either choice.",
-              "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
-              "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
-              "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+              "Roghnaigh an dá fhoireann agus Impire gach foirne, nó déan ceachtar rogha go randamach.",
+              "Tosaíonn gach imreoir le {{life}} beatha agus coimeádann sé a lámh, mana, permanents, poison agus babhta féin.",
+              "Féadfaidh comhghleacaithe foirne lámha a chéile a fheiceáil agus straitéis a phlé, ach ní fhéadfaidh siad cártaí a chéile a láimhseáil.",
+              "Roghnaigh go randamach cén tImpire a ghlacann an chéad bhabhta. Tarraingíonn an tImpire sin cárta ar an gcéad bhabhta."
             ]
           },
           "range": {
-            "heading": "Range and combat",
+            "heading": "Raon agus comhrac",
             "bullets": [
-              "Generals have range of influence 1. Emperors have range of influence 2.",
-              "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
-              "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
-              "As players leave, the empty seats stop counting, bringing surviving players into range."
+              "Tá raon tionchair 1 ag Ginearáil. Tá raon tionchair 2 ag Impirí.",
+              "Ní féidir le spells, abilities, effects agus faisnéis dul i bhfeidhm ach ar imreoirí agus rudaí laistigh de raon a controller.",
+              "Ní féidir le himreoir ionsaí a dhéanamh ach ar chéile comhraic atá ina shuí díreach in aice leis, nó ar planeswalkers agus protected battles an chéile comhraic sin.",
+              "De réir mar a fhágann imreoirí, ní áirítear na suíocháin fholmha a thuilleadh, rud a thugann na himreoirí atá fágtha isteach i raon a chéile."
             ]
           },
           "deploy": {
-            "heading": "Deploy creatures",
+            "heading": "Cuir creatures chun cinn",
             "bullets": [
-              "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
-              "This can move creatures through the team as the battle lines change."
+              "Tá \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\" ag gach creature.",
+              "Ligeann sé seo creatures a bhogadh tríd an bhfoireann de réir mar a athraíonn línte an chatha."
             ]
           },
           "winning": {
-            "heading": "Winning and Commander rules",
+            "heading": "Bua agus rialacha Commander",
             "bullets": [
-              "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
-              "A player loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+              "Buann foireann má bhuann a hImpire agus cailleann sí láithreach má chailleann a hImpire. Is féidir Ginearál a chur as an gcluiche gan deireadh a chur leis an gcluiche.",
+              "Cailleann imreoir ag 0 beatha, {{poison}} poison, nó {{poison}} poison counters."
             ]
           }
         }
       }
     },
     "star": {
-      "label": "Star",
-      "hint": "Five players in a circle. Your neighbors are allies; eliminate both players across from you.",
-      "hostHint": "Strict 5-player Commander pods. Adjacent players are allies; each player wins by outlasting both opponents across the circle.",
-      "hostFixedSeats": "Star games always seat exactly five players.",
-      "title": "Star",
-      "summary": "Five players sit in a circle. Your neighbors are allies and the two players across from you are enemies.",
+      "label": "Réalta",
+      "hint": "Cúigear imreoirí i gciorcal. Is comhghuaillithe iad do chomharsana; cuir an bheirt imreoirí trasna uait as an gcluiche.",
+      "hostHint": "Pods Commander do 5 imreoir go díreach. Is comhghuaillithe iad imreoirí in aice lena chéile; buann gach imreoir trí fanacht beo níos faide ná an bheirt chéile comhraic trasna an chiorcail.",
+      "hostFixedSeats": "Bíonn cúigear imreoirí go díreach i gcluichí Réalta.",
+      "title": "Réalta",
+      "summary": "Suíonn cúigear imreoirí i gciorcal. Is comhghuaillithe iad do chomharsana agus is naimhde iad an bheirt imreoirí trasna uait.",
       "sections": {
         "positions": {
-          "heading": "Positions and allies",
+          "heading": "Suíomhanna agus comhghuaillithe",
           "bullets": [
-            "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
-            "The players immediately to your left and right are your allies.",
-            "The two nonadjacent players across the circle are your enemies.",
-            "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+            "Roghnaigh na suíomhanna sa chiorcal de láimh trí bheirt imreoirí a mhalartú, nó déan na cúig shuíomh go léir randamach.",
+            "Is comhghuaillithe iad na himreoirí díreach ar do chlé agus ar do dheis.",
+            "Is naimhde iad an bheirt imreoirí nach bhfuil in aice leat agus atá trasna an chiorcail.",
+            "Fanann na suíomhanna mar atá nuair a chuirtear imreoir as an gcluiche; ní athraíonn do chomhghuaillithe ná do naimhde."
           ]
         },
         "combat": {
-          "heading": "Combat and interaction",
+          "heading": "Comhrac agus idirghníomhú",
           "bullets": [
-            "Players cannot attack their allies by default.",
-            "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
-            "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+            "De réir réamhshocraithe, ní féidir le himreoirí ionsaí a dhéanamh ar a gcomhghuaillithe.",
+            "Is féidir le spells agus abilities cabhrú le haon imreoir nó dul i bhfeidhm orthu fós, mura n-aontaíonn an bord le leagan níos déine.",
+            "Téann na babhtaí deiseal. Roghnaigh an t-imreoir tosaigh go randamach; tarraingíonn an t-imreoir sin cárta ar an gcéad bhabhta."
           ]
         },
         "winning": {
-          "heading": "Winning",
+          "heading": "Bua",
           "bullets": [
-            "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
-            "An eliminated player cannot win later.",
-            "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Buann an chéad imreoir atá fós beo agus a bhfuil a bheirt naimhde curtha as an gcluiche, is cuma cé a chuir as iad.",
+            "Ní féidir le himreoir a cuireadh as an gcluiche buachan níos déanaí.",
+            "Tosaíonn gach imreoir le {{life}} beatha agus cailleann sé ag 0 beatha, {{poison}} poison, nó {{commanderDamage}} damáiste comhraic ó commander amháin.",
+            "Gach uair a imrítear commander arís ón command zone, cosnaíonn sé 2 mana sa bhreis."
           ]
         }
       },
       "normal": {
-        "hint": "Five players in a circle on 20 life. Neighbors are allies; eliminate both players across from you.",
-        "hostHint": "Strict 5-player tables. Adjacent players ally; each player wins by outlasting both opponents across the circle.",
-        "summary": "Five players sit in a circle on 20 life. Your neighbors are allies and the two players across from you are enemies.",
+        "hint": "Cúigear imreoirí i gciorcal le 20 beatha. Is comhghuaillithe iad na comharsana; cuir an bheirt imreoirí trasna uait as an gcluiche.",
+        "hostHint": "Boird do 5 imreoir go díreach. Is comhghuaillithe iad imreoirí in aice lena chéile; buann gach imreoir trí fanacht beo níos faide ná an bheirt chéile comhraic trasna an chiorcail.",
+        "summary": "Suíonn cúigear imreoirí i gciorcal le 20 beatha. Is comhghuaillithe iad do chomharsana agus is naimhde iad an bheirt imreoirí trasna uait.",
         "sections": {
           "positions": {
-            "heading": "Positions and allies",
+            "heading": "Suíomhanna agus comhghuaillithe",
             "bullets": [
-              "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
-              "The players immediately to your left and right are your allies.",
-              "The two nonadjacent players across the circle are your enemies.",
-              "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+              "Roghnaigh na suíomhanna sa chiorcal de láimh trí bheirt imreoirí a mhalartú, nó déan na cúig shuíomh go léir randamach.",
+              "Is comhghuaillithe iad na himreoirí díreach ar do chlé agus ar do dheis.",
+              "Is naimhde iad an bheirt imreoirí nach bhfuil in aice leat agus atá trasna an chiorcail.",
+              "Fanann na suíomhanna mar atá nuair a chuirtear imreoir as an gcluiche; ní athraíonn do chomhghuaillithe ná do naimhde."
             ]
           },
           "combat": {
-            "heading": "Combat and interaction",
+            "heading": "Comhrac agus idirghníomhú",
             "bullets": [
-              "Players cannot attack their allies by default.",
-              "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
-              "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+              "De réir réamhshocraithe, ní féidir le himreoirí ionsaí a dhéanamh ar a gcomhghuaillithe.",
+              "Is féidir le spells agus abilities cabhrú le haon imreoir nó dul i bhfeidhm orthu fós, mura n-aontaíonn an bord le leagan níos déine.",
+              "Téann na babhtaí deiseal. Roghnaigh an t-imreoir tosaigh go randamach; tarraingíonn an t-imreoir sin cárta ar an gcéad bhabhta."
             ]
           },
           "winning": {
-            "heading": "Winning",
+            "heading": "Bua",
             "bullets": [
-              "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
-              "An eliminated player cannot win later.",
-              "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+              "Buann an chéad imreoir atá fós beo agus a bhfuil a bheirt naimhde curtha as an gcluiche, is cuma cé a chuir as iad.",
+              "Ní féidir le himreoir a cuireadh as an gcluiche buachan níos déanaí.",
+              "Tosaíonn gach imreoir le {{life}} beatha agus cailleann sé ag 0 beatha, {{poison}} poison, nó {{poison}} poison counters."
             ]
           }
         }
       }
     },
     "assassin": {
-      "label": "Assassin",
-      "hint": "Secret contracts in a free-for-all. Eliminate your mark, score, and inherit their target.",
-      "hostHint": "Secret contracts for 3–8 players. Score by eliminating your mark, then inherit their target.",
-      "title": "Assassin",
-      "summary": "A free-for-all with secret contracts. Score marks, inherit new targets, and finish with the highest score.",
+      "label": "Feallmharfóir",
+      "hint": "Conarthaí rúnda i gcluiche gach duine in aghaidh gach duine. Cuir do sprioc as an gcluiche, scóráil, agus faigh a sprioc mar oidhreacht.",
+      "hostHint": "Conarthaí rúnda do 3–8 imreoir. Scóráil trí do sprioc a chur as an gcluiche, ansin faigh a sprioc mar oidhreacht.",
+      "title": "Feallmharfóir",
+      "summary": "Gach duine in aghaidh gach duine le conarthaí rúnda. Scóráil spriocanna, faigh spriocanna nua mar oidhreacht, agus críochnaigh leis an scór is airde.",
       "sections": {
         "contracts": {
-          "heading": "Secret contracts",
+          "heading": "Conarthaí rúnda",
           "bullets": [
-            "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
-            "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
-            "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+            "Faigheann gach imreoir sprioc amháin go príobháideach. Cruthaíonn na conarthaí ciorcal, mar sin ní dhíríonn aon duine orthu féin agus déantar gach duine a sheilg uair amháin.",
+            "Tabhair an gléas timpeall le linn an setup. Oscail Seiceáil sprioc ó roghchlár an timer aon uair is gá duit do chonradh reatha a léamh arís.",
+            "Is féidir le himreoirí ionsaí a dhéanamh ar aon duine agus dul i bhfeidhm orthu; socraíonn an conradh an scóráil, ní na spriocanna dleathacha."
           ]
         },
         "elimination": {
-          "heading": "Elimination and inheritance",
+          "heading": "Cur as an gcluiche agus oidhreacht",
           "bullets": [
-            "When a player is eliminated, record who dealt the finishing blow.",
-            "If you personally eliminate your assigned target, you score one mark.",
-            "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+            "Nuair a chuirtear imreoir as an gcluiche, taifead cé a thug an buille deiridh.",
+            "Má chuireann tú do sprioc sannta as an gcluiche tú féin, scórálann tú mark amháin.",
+            "Faigheann an t-imreoir a bhí ag seilg na sprice a cuireadh as an gcluiche conradh na sprice sin mar oidhreacht, fiú má thug duine eile an buille deiridh. Coinníonn sé seo conradh gníomhach amháin do gach imreoir atá fós beo."
           ]
         },
         "winning": {
-          "heading": "Winning",
+          "heading": "Bua",
           "bullets": [
-            "Play until only one player remains. The last survivor scores one additional mark.",
-            "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
-            "Commander rules still apply: {{life}} starting life, {{poison}} poison, and {{commanderDamage}} combat damage from one commander are lethal.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Imir go dtí nach mbeidh ach imreoir amháin fágtha. Scórálann an marthanóir deireanach mark breise amháin.",
+            "Buann an t-imreoir leis an líon is mó marks; má tá comhscór ag an scór is airde, buann an marthanóir deireanach an comhscór.",
+            "Tá rialacha Commander fós i bhfeidhm: tá {{life}} beatha tosaigh, {{poison}} poison, agus {{commanderDamage}} damáiste comhraic ó commander amháin marfach.",
+            "Gach uair a imrítear commander arís ón command zone, cosnaíonn sé 2 mana sa bhreis."
           ]
         }
       },
       "normal": {
-        "hint": "Secret contracts for 3–8 players on 20 life. Score by eliminating your mark.",
-        "hostHint": "Secret contracts without commanders. Matching fills your chosen table size; leftovers can sit as small as three.",
-        "summary": "A free-for-all with secret contracts on 20 life. Score marks, inherit new targets, and finish with the highest score.",
+        "hint": "Conarthaí rúnda do 3–8 imreoir le 20 beatha. Scóráil trí do sprioc a chur as an gcluiche.",
+        "hostHint": "Conarthaí rúnda gan commanders. Líonann an meaitseáil an méid boird roghnaithe; is féidir leis na ciorcail atá fágtha a bheith chomh beag le triúr.",
+        "summary": "Gach duine in aghaidh gach duine le conarthaí rúnda agus 20 beatha. Scóráil spriocanna, faigh spriocanna nua mar oidhreacht, agus críochnaigh leis an scór is airde.",
         "sections": {
           "contracts": {
-            "heading": "Secret contracts",
+            "heading": "Conarthaí rúnda",
             "bullets": [
-              "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
-              "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
-              "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+              "Faigheann gach imreoir sprioc amháin go príobháideach. Cruthaíonn na conarthaí ciorcal, mar sin ní dhíríonn aon duine orthu féin agus déantar gach duine a sheilg uair amháin.",
+              "Tabhair an gléas timpeall le linn an setup. Oscail Seiceáil sprioc ó roghchlár an timer aon uair is gá duit do chonradh reatha a léamh arís.",
+              "Is féidir le himreoirí ionsaí a dhéanamh ar aon duine agus dul i bhfeidhm orthu; socraíonn an conradh an scóráil, ní na spriocanna dleathacha."
             ]
           },
           "elimination": {
-            "heading": "Elimination and inheritance",
+            "heading": "Cur as an gcluiche agus oidhreacht",
             "bullets": [
-              "When a player is eliminated, record who dealt the finishing blow.",
-              "If you personally eliminate your assigned target, you score one mark.",
-              "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+              "Nuair a chuirtear imreoir as an gcluiche, taifead cé a thug an buille deiridh.",
+              "Má chuireann tú do sprioc sannta as an gcluiche tú féin, scórálann tú mark amháin.",
+              "Faigheann an t-imreoir a bhí ag seilg na sprice a cuireadh as an gcluiche conradh na sprice sin mar oidhreacht, fiú má thug duine eile an buille deiridh. Coinníonn sé seo conradh gníomhach amháin do gach imreoir atá fós beo."
             ]
           },
           "winning": {
-            "heading": "Winning",
+            "heading": "Bua",
             "bullets": [
-              "Play until only one player remains. The last survivor scores one additional mark.",
-              "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
-              "{{life}} starting life, {{poison}} poison, and {{poison}} poison counters are lethal."
+              "Imir go dtí nach mbeidh ach imreoir amháin fágtha. Scórálann an marthanóir deireanach mark breise amháin.",
+              "Buann an t-imreoir leis an líon is mó marks; má tá comhscór ag an scór is airde, buann an marthanóir deireanach an comhscór.",
+              "Tá {{life}} beatha tosaigh, {{poison}} poison, agus {{poison}} poison counters marfach."
             ]
           }
         }
@@ -634,446 +634,446 @@
     }
   },
   "home": {
-    "taglineBefore": "Your next",
+    "taglineBefore": "Do chéad",
     "taglineHighlight": "pod",
-    "taglineAfter": ", sorted.",
-    "startPlaying": "Start playing",
-    "ongoingGame": "ongoing game",
-    "noEventNeeded": "no event needed",
-    "startPlayingHint": "Open a battle screen on this device. Leave and come back without losing an unfinished game.",
-    "alwaysPlayers": "Always {{count}} players in this mode.",
-    "resumeGame": "Resume game",
-    "startNewGame": "Start a new game",
-    "startGame": "Start a game",
+    "taglineAfter": " eile, réitithe.",
+    "startPlaying": "Tosaigh ag imirt",
+    "ongoingGame": "cluiche ar siúl",
+    "noEventNeeded": "níl imeacht ag teastáil",
+    "startPlayingHint": "Oscail scáileán cluiche ar an ngléas seo. Is féidir leat imeacht agus filleadh gan cluiche neamhchríochnaithe a chailleadh.",
+    "alwaysPlayers": "Bíonn {{count}} imreoir i gcónaí sa mhód seo.",
+    "resumeGame": "Lean leis an gcluiche",
+    "startNewGame": "Tosaigh cluiche nua",
+    "startGame": "Tosaigh cluiche",
     "commanderSetup": "Commanders",
-    "commanderSetupHint": "Search Scryfall for each player's commander. Partner pairs need both commanders.",
-    "chooseAllCommanders": "Choose a commander for every player.",
-    "advancedMatchConfig": "Advanced match config",
-    "hostEvent": "Host event",
-    "new": "new",
-    "targetTableSize": "Target table size",
-    "allowThreePods": "Allow 3-player pods",
-    "allowFivePods": "Allow 5-player pods",
-    "duelFixedSeats": "Duel events always seat exactly two players.",
-    "emperorFixedSeats": "Emperor games always seat exactly six players.",
-    "starFixedSeats": "Star games always seat exactly five players.",
-    "archenemyFixedSeats": "Archenemy Commander games always seat exactly four players.",
-    "twoHeadedFixedSeats": "Two-Headed Giant games always seat exactly four players.",
-    "eventName": "Event name",
-    "eventNamePlaceholder": "Friday Commander",
-    "tables": "Tables",
-    "tablesHint": "How many physical tables are free for this event.",
-    "eventLasts": "Event lasts",
-    "eventLastsHint": "Join code dies after this many hours. Use 48 or 72 for a weekend.",
-    "hostPin": "Host PIN",
-    "hostPinHint": "4 to 8 digits — reopens the host desk later.",
-    "createEvent": "Create event",
-    "joinWithCode": "Join with a code",
-    "playerAside": "player",
-    "joinCode": "Join code",
+    "commanderSetupHint": "Cuardaigh Scryfall le haghaidh commander gach imreora. Teastaíonn an dá commander ó phéirí Partner.",
+    "chooseAllCommanders": "Roghnaigh commander do gach imreoir.",
+    "advancedMatchConfig": "Ardsocruithe cluiche",
+    "hostEvent": "Óstáil imeacht",
+    "new": "nua",
+    "targetTableSize": "Spriocmhéid boird",
+    "allowThreePods": "Ceadaigh pods 3 imreoir",
+    "allowFivePods": "Ceadaigh pods 5 imreoir",
+    "duelFixedSeats": "Bíonn beirt imreoirí go díreach in imeachtaí Duel.",
+    "emperorFixedSeats": "Bíonn seisear imreoirí go díreach i gcluichí Impire.",
+    "starFixedSeats": "Bíonn cúigear imreoirí go díreach i gcluichí Réalta.",
+    "archenemyFixedSeats": "Bíonn ceathrar imreoirí go díreach i gcluichí Archenemy Commander.",
+    "twoHeadedFixedSeats": "Bíonn ceathrar imreoirí go díreach i gcluichí Fathach Dhá Cheann.",
+    "eventName": "Ainm an imeachta",
+    "eventNamePlaceholder": "Commander Dé hAoine",
+    "tables": "Boird",
+    "tablesHint": "Cé mhéad bord fisiciúil atá saor don imeacht seo.",
+    "eventLasts": "Fad an imeachta",
+    "eventLastsHint": "Rachaidh an cód iontrála in éag tar éis an líon seo uaireanta. Úsáid 48 nó 72 do dheireadh seachtaine.",
+    "hostPin": "PIN an óstaigh",
+    "hostPinHint": "4 go 8 ndigit — osclaíonn sé painéal an óstaigh arís níos déanaí.",
+    "createEvent": "Cruthaigh imeacht",
+    "joinWithCode": "Téigh isteach le cód",
+    "playerAside": "imreoir",
+    "joinCode": "Cód iontrála",
     "joinCodePlaceholder": "AB23CD",
-    "join": "Join",
-    "scanQr": "Scan QR",
-    "staleJoin": "That event is gone. Join with a new code, or host a new night."
+    "join": "Téigh isteach",
+    "scanQr": "Scanáil QR",
+    "staleJoin": "Níl an t-imeacht sin ann a thuilleadh. Téigh isteach le cód nua, nó óstáil oíche nua."
   },
   "host": {
-    "desk": "Host desk",
-    "locked": "Locked",
-    "hostOnly": "host only",
-    "unlockHostDesk": "Unlock host desk",
-    "playerCount": "{{count}} player",
-    "playerCount_plural": "{{count}} players",
-    "ready": "{{count}} ready",
-    "matched": "{{count}} matched",
-    "playing": "{{count}} playing",
-    "paused": "{{count}} paused",
-    "ends": "ends {{date}}",
-    "podSizes": "Pod sizes",
-    "matching": "matching",
-    "allowLeftoverThree": "Allow leftover 3-player pods",
-    "allowFivePods": "Allow 5-player pods",
-    "treacheryTargetHint": "Target table size. Leftover pods can be as small as four.",
-    "matchingPrefers": "Matching prefers {{size}}-player tables.",
-    "matchingPrefersFour": "Matching prefers 4-player tables.",
-    "assassinTargetHint": "Target table size. Leftover contract circles can be as small as three.",
-    "multiplayerTargetHint": "Target table size. Leftover tables can be as small as three.",
-    "duelMatchmaking": "Duel matchmaking seats exactly two players per game.",
-    "twoHeadedMatchmaking": "Two-Headed Giant matchmaking seats exactly four players per game.",
-    "archenemyMatchmaking": "Archenemy Commander matchmaking seats exactly four players per game: one Archenemy against a team of three.",
-    "emperorMatchmaking": "Emperor matchmaking seats exactly six players per game: two teams with an Emperor and two Generals each.",
-    "starMatchmaking": "Star matchmaking seats exactly five players in a circular order.",
-    "eventLength": "Event length",
-    "joinCodeDies": "join code dies",
-    "hoursFromStart": "Hours from start",
-    "hoursFromStartHint": "Change this for a multi-day event. After it ends, the QR opens the home page.",
-    "joinCodeTitle": "Join code",
-    "share": "share",
-    "noLanAddress": "No LAN address found — this link only works on this computer.",
-    "copyPlayerLink": "Copy player link",
-    "queue": "Queue",
-    "nobodyWaiting": "Nobody waiting.",
+    "desk": "Painéal an óstaigh",
+    "locked": "Faoi ghlas",
+    "hostOnly": "óstach amháin",
+    "unlockHostDesk": "Díghlasáil painéal an óstaigh",
+    "playerCount": "{{count}} imreoir",
+    "playerCount_plural": "{{count}} imreoir",
+    "ready": "{{count}} réidh",
+    "matched": "{{count}} meaitseáilte",
+    "playing": "{{count}} ag imirt",
+    "paused": "{{count}} ar sos",
+    "ends": "críochnaíonn {{date}}",
+    "podSizes": "Méideanna pod",
+    "matching": "meaitseáil",
+    "allowLeftoverThree": "Ceadaigh pods atá fágtha le 3 imreoir",
+    "allowFivePods": "Ceadaigh pods le 5 imreoir",
+    "treacheryTargetHint": "Spriocmhéid boird. Is féidir le pods atá fágtha a bheith chomh beag le ceathrar.",
+    "matchingPrefers": "Is fearr leis an meaitseáil boird {{size}} imreoir.",
+    "matchingPrefersFour": "Is fearr leis an meaitseáil boird 4 imreoir.",
+    "assassinTargetHint": "Spriocmhéid boird. Is féidir le ciorcail chonartha atá fágtha a bheith chomh beag le triúr.",
+    "multiplayerTargetHint": "Spriocmhéid boird. Is féidir le boird atá fágtha a bheith chomh beag le triúr.",
+    "duelMatchmaking": "Cuireann meaitseáil Duel beirt imreoirí go díreach i ngach cluiche.",
+    "twoHeadedMatchmaking": "Cuireann meaitseáil Fathach Dhá Cheann ceathrar imreoirí go díreach i ngach cluiche.",
+    "archenemyMatchmaking": "Cuireann meaitseáil Archenemy Commander ceathrar imreoirí go díreach i ngach cluiche: Archenemy amháin in aghaidh foireann de thriúr.",
+    "emperorMatchmaking": "Cuireann meaitseáil Impire seisear imreoirí go díreach i ngach cluiche: dhá fhoireann le hImpire agus beirt Ghinearál an ceann.",
+    "starMatchmaking": "Cuireann meaitseáil Réalta cúigear imreoirí go díreach in ord ciorclach.",
+    "eventLength": "Fad an imeachta",
+    "joinCodeDies": "téann an cód iontrála in éag",
+    "hoursFromStart": "Uaireanta ón tús",
+    "hoursFromStartHint": "Athraigh é seo d'imeacht il-lae. Tar éis dó críochnú, osclaíonn an QR an leathanach baile.",
+    "joinCodeTitle": "Cód iontrála",
+    "share": "comhroinn",
+    "noLanAddress": "Níor aimsíodh seoladh LAN — ní oibríonn an nasc seo ach ar an ríomhaire seo.",
+    "copyPlayerLink": "Cóipeáil nasc na n-imreoirí",
+    "queue": "Scuaine",
+    "nobodyWaiting": "Níl aon duine ag fanacht.",
     "flex": "flex {{count}}",
-    "challengePts": "{{count}} challenge pts",
-    "pts": "{{count}} pts",
-    "notReady": "Not ready",
-    "pausedTitle": "Paused",
-    "seated": "Seated",
-    "atTables": "{{count}} at tables",
-    "tablesTitle": "Tables",
-    "total": "{{count}} total",
-    "noTables": "This event was created without tables.",
-    "startingGames": "Starting games…",
-    "startAllReady": "Start all ready games ({{count}})",
-    "startGame": "Start game",
-    "finishTable": "Finish table",
-    "cancelPod": "Cancel pod",
-    "enable": "Enable",
-    "disable": "Disable",
+    "challengePts": "{{count}} pointe dúshláin",
+    "pts": "{{count}} pointe",
+    "notReady": "Níl réidh",
+    "pausedTitle": "Ar sos",
+    "seated": "Ina shuí",
+    "atTables": "{{count}} ag boird",
+    "tablesTitle": "Boird",
+    "total": "{{count}} san iomlán",
+    "noTables": "Cruthaíodh an t-imeacht seo gan bhoird.",
+    "startingGames": "Ag tosú cluichí…",
+    "startAllReady": "Tosaigh gach cluiche réidh ({{count}})",
+    "startGame": "Tosaigh cluiche",
+    "finishTable": "Críochnaigh an bord",
+    "cancelPod": "Cealaigh pod",
+    "enable": "Cumasaigh",
+    "disable": "Díchumasaigh",
     "trackerUsed": "tracker",
-    "noTracker": "no tracker",
-    "matchNow": "Match now",
-    "fillBots": "Fill tables with bots",
-    "playerJoinPage": "Player join page"
+    "noTracker": "gan tracker",
+    "matchNow": "Meaitseáil anois",
+    "fillBots": "Líon boird le bots",
+    "playerJoinPage": "Leathanach iontrála na n-imreoirí"
   },
   "join": {
-    "joinEvent": "Join event",
-    "takeSeat": "Take a seat",
-    "displayName": "Display name",
+    "joinEvent": "Téigh isteach san imeacht",
+    "takeSeat": "Glac suíochán",
+    "displayName": "Ainm taispeána",
     "displayNamePlaceholder": "Alex",
-    "joinEventButton": "Join event",
-    "saveDecks": "Save decks",
-    "matchFound": "Match found",
-    "yourDeck": "Your deck",
-    "checkMyRole": "Check my role",
-    "playingWithoutTracker": "Playing without the tracker. The host can finish the table.",
-    "chooseTracker": "Choose how this pod will record its game.",
-    "useGameTracker": "Use game tracker",
-    "playWithoutTracker": "Play without tracker",
-    "atTableMarked": "You're marked as at the table on this phone. The host still starts the game from the desk.",
-    "imAtTable": "I'm at the table",
-    "leftEvent": "You left this event. Scan the QR again if you want back in.",
-    "openPool": "Open pool — any table.",
-    "ready": "Ready",
-    "waiting": "waiting",
-    "holdTight": "Hold tight — a table is coming.",
-    "flex": "Flex: {{flex}} · Challenge Points: {{points}}",
-    "howWasPod": "How was your pod?",
-    "pause": "Pause",
-    "leave": "Leave",
-    "pausedMessage": "You are paused. Resume when you can sit, or leave the event.",
-    "imReady": "I'm ready",
-    "leaveEvent": "Leave event",
-    "markReady": "Mark ready when you can sit down for a game.",
-    "matchingShortly": "Matching will send you to a table shortly.",
-    "imTheHost": "I'm the host",
-    "offlineSaved": "Saved on this phone. It will send when you are back online.",
-    "stayAtTable": "Stay at the table until the host calls the game."
+    "joinEventButton": "Téigh isteach san imeacht",
+    "saveDecks": "Sábháil deiceanna",
+    "matchFound": "Cluiche aimsithe",
+    "yourDeck": "Do dheic",
+    "checkMyRole": "Seiceáil mo ról",
+    "playingWithoutTracker": "Ag imirt gan an tracker. Is féidir leis an óstach an bord a chríochnú.",
+    "chooseTracker": "Roghnaigh conas a thaifeadfaidh an pod seo a chluiche.",
+    "useGameTracker": "Úsáid tracker cluiche",
+    "playWithoutTracker": "Imir gan tracker",
+    "atTableMarked": "Tá tú marcáilte mar dhuine atá ag an mbord ar an bhfón seo. Tosaíonn an t-óstach an cluiche ón bpainéal fós.",
+    "imAtTable": "Tá mé ag an mbord",
+    "leftEvent": "D'fhág tú an t-imeacht seo. Scanáil an QR arís más mian leat filleadh.",
+    "openPool": "Pool oscailte — bord ar bith.",
+    "ready": "Réidh",
+    "waiting": "ag fanacht",
+    "holdTight": "Fan go fóill — tá bord ag teacht.",
+    "flex": "Flex: {{flex}} · Pointí Dúshláin: {{points}}",
+    "howWasPod": "Conas a bhí do pod?",
+    "pause": "Sos",
+    "leave": "Fág",
+    "pausedMessage": "Tá tú ar sos. Lean ar aghaidh nuair is féidir leat suí, nó fág an t-imeacht.",
+    "imReady": "Tá mé réidh",
+    "leaveEvent": "Fág an t-imeacht",
+    "markReady": "Marcáil tú féin mar réidh nuair is féidir leat suí síos do chluiche.",
+    "matchingShortly": "Seolfaidh an meaitseáil chuig bord thú go luath.",
+    "imTheHost": "Is mise an t-óstach",
+    "offlineSaved": "Sábháilte ar an bhfón seo. Seolfar é nuair a bheidh tú ar líne arís.",
+    "stayAtTable": "Fan ag an mbord go dtí go gcríochnaíonn an t-óstach an cluiche."
   },
   "matchConfig": {
-    "title": "Match config",
-    "description": "Sets up the fake seated pod behind /match. Nothing here touches the server, and none of it appears on the battle screen, so that route can be checked on a phone as-is.",
-    "podSetup": "Pod setup",
-    "seats": "Seats",
-    "seatsCount": "{{count}} seats",
+    "title": "Cumraíocht cluiche",
+    "description": "Socraíonn sé an pod bréige atá ina shuí taobh thiar de /match. Ní dhéanann aon rud anseo teagmháil leis an bhfreastalaí, agus ní bhíonn aon rud de le feiceáil ar an scáileán cluiche, mar sin is féidir an route sin a sheiceáil ar fhón mar atá.",
+    "podSetup": "Socrú pod",
+    "seats": "Suíocháin",
+    "seatsCount": "{{count}} suíochán",
     "bracket": "Bracket",
-    "header": "Header",
-    "eventNamePlaceholder": "Event name",
-    "joinCodePlaceholder": "Join code",
-    "matchCard": "Match card",
-    "tableLabelPlaceholder": "Table label",
-    "assignedDeckPlaceholder": "Assigned deck",
-    "openBattleScreen": "Open battle screen",
-    "resetGameState": "Reset game state",
+    "header": "Ceanntásc",
+    "eventNamePlaceholder": "Ainm an imeachta",
+    "joinCodePlaceholder": "Cód iontrála",
+    "matchCard": "Cárta cluiche",
+    "tableLabelPlaceholder": "Lipéad boird",
+    "assignedDeckPlaceholder": "Deic shannta",
+    "openBattleScreen": "Oscail scáileán cluiche",
+    "resetGameState": "Athshocraigh staid an chluiche",
     "commander": "Commander",
-    "secondCommander": "Second commander"
+    "secondCommander": "Dara commander"
   },
   "app": {
-    "notFound": "Not found."
+    "notFound": "Níor aimsíodh."
   },
   "wake": {
-    "title": "Waking the tables",
-    "message": "The free host went to sleep. Keep this page open — it usually takes under a minute."
+    "title": "Ag dúiseacht na mbord",
+    "message": "Chuaigh an t-óstach saor in aisce a chodladh. Coinnigh an leathanach seo ar oscailt — de ghnáth tógann sé níos lú ná nóiméad."
   },
   "scanner": {
-    "title": "Scan QR",
-    "ariaLabel": "Scan join QR code",
-    "hint": "Point at the host desk code.",
-    "closeScanner": "Close scanner",
-    "openingCamera": "Opening camera…",
-    "noCamera": "This browser cannot open the camera. Type the join code instead.",
-    "permissionDenied": "Camera permission was denied. Type the join code, or allow the camera and try again."
+    "title": "Scanáil QR",
+    "ariaLabel": "Scanáil cód QR iontrála",
+    "hint": "Dírigh ar chód phainéal an óstaigh.",
+    "closeScanner": "Dún an scanóir",
+    "openingCamera": "Ag oscailt an cheamara…",
+    "noCamera": "Ní féidir leis an mbrabhsálaí seo an ceamara a oscailt. Clóscríobh an cód iontrála ina áit.",
+    "permissionDenied": "Diúltaíodh cead don cheamara. Clóscríobh an cód iontrála, nó ceadaigh an ceamara agus bain triail eile as."
   },
   "theme": {
-    "switchToLight": "Switch to light mode",
-    "switchToDark": "Switch to dark mode"
+    "switchToLight": "Athraigh go mód geal",
+    "switchToDark": "Athraigh go mód dorcha"
   },
   "hostMetrics": {
-    "title": "Event recap",
-    "aside": "pilot",
-    "players": "Players",
-    "games": "Games",
-    "gamesPerPlayer": "Games / player",
-    "waitAvg": "Wait avg",
-    "waitP95": "Wait p95",
-    "waitMax": "Wait max",
-    "rematchPairs": "Rematch pairs",
-    "flexEarned": "Flex earned",
-    "flexSeats": "Flex seats",
-    "durationAvg": "Duration avg",
-    "tablesOccupied": "Tables occupied",
-    "trackerUsed": "Tracker used",
-    "trackerUsedValue": "{{used}} used · {{skipped}} skipped",
-    "challenges": "Challenges",
-    "challengePts": "Challenge pts",
-    "podRating": "Pod rating",
-    "podSizes": "Pod sizes:",
+    "title": "Achoimre imeachta",
+    "aside": "píolótach",
+    "players": "Imreoirí",
+    "games": "Cluichí",
+    "gamesPerPlayer": "Cluichí / imreoir",
+    "waitAvg": "Meánfhanacht",
+    "waitP95": "Fanacht p95",
+    "waitMax": "Uasfhanacht",
+    "rematchPairs": "Péirí athimeartha",
+    "flexEarned": "Flex tuillte",
+    "flexSeats": "Suíocháin Flex",
+    "durationAvg": "Meánfhad",
+    "tablesOccupied": "Boird áitithe",
+    "trackerUsed": "Tracker úsáidte",
+    "trackerUsedValue": "{{used}} úsáidte · {{skipped}} scipeáilte",
+    "challenges": "Dúshláin",
+    "challengePts": "Pointí dúshláin",
+    "podRating": "Rátáil pod",
+    "podSizes": "Méideanna pod:",
     "pools": "Pools:"
   },
   "deckEditor": {
-    "title": "Commander decks",
-    "deckNamePlaceholder": "Deck name (optional)",
+    "title": "Deiceanna Commander",
+    "deckNamePlaceholder": "Ainm deice (roghnach)",
     "commander": "Commander",
-    "secondCommander": "Second commander",
-    "markPreferred": "Mark preferred",
-    "addAcceptedDeck": "Add accepted deck",
-    "hint": "Same-pool pods only. Extra decks let matching flex you into another bracket."
+    "secondCommander": "Dara commander",
+    "markPreferred": "Marcáil mar roghnaithe",
+    "addAcceptedDeck": "Cuir deic ghlactha leis",
+    "hint": "Pods den pool céanna amháin. Ligeann deiceanna breise don mheaitseáil tú a aistriú go bracket eile."
   },
   "commanderPicker": {
-    "searchCommander": "Search commander",
-    "searchPartner": "Commander that can pair with {{name}}",
-    "removeCommander": "Remove {{name}}",
-    "artworkFor": "Artwork for",
-    "loadingArtwork": "Loading artwork…"
+    "searchCommander": "Cuardaigh commander",
+    "searchPartner": "Commander atá in ann péireáil le {{name}}",
+    "removeCommander": "Bain {{name}}",
+    "artworkFor": "Saothar ealaíne do",
+    "loadingArtwork": "Á lódáil saothar ealaíne…"
   },
   "challengePack": {
-    "title": "Challenge pack",
-    "description": "Only predefined primitives. Saving writes a new version and never mutates a pack already used by this event.",
-    "copyOfficial": "Copy official",
-    "startBlank": "Start blank",
-    "saveNewVersion": "Save new version",
-    "editHint": "Copy the official pack or start blank before editing.",
-    "packName": "Pack name",
-    "descriptionLabel": "Description",
-    "addChallenge": "Add challenge",
+    "title": "Pacáiste dúshláin",
+    "description": "Primitives réamhshainithe amháin. Cruthaíonn sábháil leagan nua agus ní athraíonn sé pacáiste a d'úsáid an t-imeacht seo cheana.",
+    "copyOfficial": "Cóipeáil an ceann oifigiúil",
+    "startBlank": "Tosaigh folamh",
+    "saveNewVersion": "Sábháil leagan nua",
+    "editHint": "Cóipeáil an pacáiste oifigiúil nó tosaigh folamh sula ndéanann tú eagarthóireacht.",
+    "packName": "Ainm an phacáiste",
+    "descriptionLabel": "Cur síos",
+    "addChallenge": "Cuir dúshlán leis",
     "id": "Id",
-    "name": "Name",
-    "category": "Category",
-    "points": "Points",
+    "name": "Ainm",
+    "category": "Catagóir",
+    "points": "Pointí",
     "primitive": "Primitive",
-    "threshold": "Threshold",
-    "confirmationQuestion": "Confirmation question",
-    "defaultConfirmation": "Did this happen at the table?",
-    "newClaimName": "New claim",
-    "newClaimDescription": "Award this at the table."
+    "threshold": "Tairseach",
+    "confirmationQuestion": "Ceist deimhnithe",
+    "defaultConfirmation": "Ar tharla sé seo ag an mbord?",
+    "newClaimName": "Éileamh nua",
+    "newClaimDescription": "Bronn é seo ag an mbord."
   },
   "treacheryRole": {
-    "treachery": "Treachery",
-    "receivedRole": "You received a role",
-    "handDeviceTo": "Hand the device to {{name}}",
-    "lookAwayIdentity": "Everyone else should look away before the identity is revealed.",
-    "lookAwayScreen": "Make sure nobody else can see your screen before revealing it.",
-    "reveal": "Reveal",
-    "yourRole": "Your role",
-    "identityAlt": "{{name}}, {{role}} identity",
-    "illustratedBy": "Illustrated by {{artist}}",
-    "yourObjective": "Your objective",
-    "unveiledToTable": "Unveiled to the table",
-    "unveilWarning": "Everyone at your table will see this identity. Its ability must be resolved in the game.",
-    "confirmUnveil": "Confirm unveil",
-    "unveilToTable": "Unveil to the table",
-    "hideAndPass": "Hide & pass",
-    "hideIdentity": "Hide my identity"
+    "treachery": "Feall",
+    "receivedRole": "Fuair tú ról",
+    "handDeviceTo": "Tabhair an gléas do {{name}}",
+    "lookAwayIdentity": "Ba chóir do gach duine eile breathnú ar shiúl sula nochtar an t-aitheantas.",
+    "lookAwayScreen": "Cinntigh nach féidir le haon duine eile do scáileán a fheiceáil sula nochtann tú é.",
+    "reveal": "Nocht",
+    "yourRole": "Do ról",
+    "identityAlt": "{{name}}, aitheantas {{role}}",
+    "illustratedBy": "Maisithe ag {{artist}}",
+    "yourObjective": "Do chuspóir",
+    "unveiledToTable": "Nochtaithe don bhord",
+    "unveilWarning": "Feicfidh gach duine ag do bhord an t-aitheantas seo. Caithfear a chumas a réiteach sa chluiche.",
+    "confirmUnveil": "Deimhnigh an nochtadh",
+    "unveilToTable": "Nocht don bhord",
+    "hideAndPass": "Folaigh agus tabhair ar aghaidh",
+    "hideIdentity": "Folaigh m'aitheantas"
   },
   "modeRulesSheet": {
-    "closeRules": "Close rules",
-    "backToGame": "Back to the game"
+    "closeRules": "Dún na rialacha",
+    "backToGame": "Ar ais chuig an gcluiche"
   },
   "assassinTargets": {
-    "title": "Secret contracts",
-    "chooseOwnName": "Choose only your own name.",
-    "closeContracts": "Close contracts",
-    "handDeviceTo": "Hand the device to {{name}}",
-    "lookAway": "Everyone else should look away before the contract is revealed.",
-    "revealTarget": "Reveal my target",
-    "yourTarget": "Your target",
-    "noActiveTarget": "No active target",
-    "marksScored": "Marks scored: {{count}}",
-    "hideAndPass": "Hide & pass",
-    "allContractsChecked": "All contracts checked"
+    "title": "Conarthaí rúnda",
+    "chooseOwnName": "Roghnaigh d'ainm féin amháin.",
+    "closeContracts": "Dún na conarthaí",
+    "handDeviceTo": "Tabhair an gléas do {{name}}",
+    "lookAway": "Ba chóir do gach duine eile breathnú ar shiúl sula nochtar an conradh.",
+    "revealTarget": "Nocht mo sprioc",
+    "yourTarget": "Do sprioc",
+    "noActiveTarget": "Níl sprioc ghníomhach ann",
+    "marksScored": "Marks scóráilte: {{count}}",
+    "hideAndPass": "Folaigh agus tabhair ar aghaidh",
+    "allContractsChecked": "Gach conradh seiceáilte"
   },
   "scheme": {
     "ongoingScheme": "Ongoing scheme",
     "scheme": "Scheme",
-    "pastScheme": "Past scheme",
+    "pastScheme": "Scheme roimhe seo",
     "abandon": "Abandon {{name}}",
     "ongoingSchemes": "Ongoing schemes",
     "graveyard": "Graveyard · {{count}}",
     "nextScheme": "Next scheme",
-    "remainingInDeck": "{{count}} left in the deck",
-    "scryfallCredit": "Card image via Scryfall. Magic: The Gathering is © Wizards of the Coast."
+    "remainingInDeck": "{{count}} fágtha sa deic",
+    "scryfallCredit": "Íomhá cárta trí Scryfall. Tá Magic: The Gathering © Wizards of the Coast."
   },
   "dungeon": {
-    "takeInitiativeTitle": "Take the initiative?",
-    "takeInitiativeEnter": "This also ventures into Undercity. Only take it when the table just gave this seat the initiative.",
-    "takeInitiativeWait": "Finish or leave the current dungeon before Undercity can open. Only take the initiative when the table just gave it to this seat.",
-    "takeInitiativeAndEnter": "Take initiative & enter Undercity",
-    "takeInitiative": "Take initiative",
-    "alreadyHoldInitiative": "You already hold the initiative",
-    "takeAndEnterUndercity": "Take the initiative and enter Undercity",
-    "completed": "{{name}} (completed)",
-    "ventureInto": "Venture into {{name}}",
-    "done": "Done",
-    "ventureTo": "Venture to {{room}}: {{effect}}",
-    "releaseInitiative": "Release the initiative",
-    "undoRoom": "Undo room",
-    "closeDungeon": "Close dungeon"
+    "takeInitiativeTitle": "Glac an initiative?",
+    "takeInitiativeEnter": "Déanann sé seo venture isteach in Undercity freisin. Ná glac é ach nuair atá an bord díreach tar éis an initiative a thabhairt don suíochán seo.",
+    "takeInitiativeWait": "Críochnaigh nó fág an dungeon reatha sular féidir Undercity a oscailt. Ná glac an initiative ach nuair atá an bord díreach tar éis é a thabhairt don suíochán seo.",
+    "takeInitiativeAndEnter": "Glac an initiative agus téigh isteach in Undercity",
+    "takeInitiative": "Glac an initiative",
+    "alreadyHoldInitiative": "Tá an initiative agat cheana",
+    "takeAndEnterUndercity": "Glac an initiative agus téigh isteach in Undercity",
+    "completed": "{{name}} (críochnaithe)",
+    "ventureInto": "Venture isteach i {{name}}",
+    "done": "Déanta",
+    "ventureTo": "Venture chuig {{room}}: {{effect}}",
+    "releaseInitiative": "Scaoil an initiative",
+    "undoRoom": "Cealaigh room",
+    "closeDungeon": "Dún dungeon"
   },
   "treacheryRolesSheet": {
-    "title": "Secret identities",
-    "chooseOwnName": "Choose only your own name.",
-    "closeIdentities": "Close identities",
-    "allIdentitiesChecked": "All identities checked"
+    "title": "Aitheantais rúnda",
+    "chooseOwnName": "Roghnaigh d'ainm féin amháin.",
+    "closeIdentities": "Dún na haitheantais",
+    "allIdentitiesChecked": "Gach aitheantas seiceáilte"
   },
   "tracker": {
-    "gameRules": "Game rules",
-    "loadingRoles": "Loading roles…",
-    "start": "Start",
-    "readRules": "Read rules",
-    "readyToBegin": "Ready to begin",
-    "readyToBeginHint": "Start the match when everyone is seated, or read the rules first.",
-    "dealContracts": "Deal contracts",
-    "dealContractsTitle": "Deal secret contracts",
-    "dealContractsHint": "Every player receives one private target. The device will be passed around so each contract can be checked in secret.",
-    "dealIdentities": "Deal identities",
-    "dealIdentitiesTitle": "Deal secret identities",
-    "dealIdentitiesHint": "Every player receives one hidden identity. The device will be passed around so each one can be read in secret.",
-    "chooseStarPositions": "Choose Star positions",
-    "starPositionsHint": "Players beside each other are allies. Tap two players to exchange their positions, or randomise the whole circle.",
-    "randomPositions": "Random positions",
-    "confirmPositions": "Confirm positions",
-    "adjacentPlayersAlly": "Adjacent\nplayers ally",
-    "buildEmperorTeams": "Build the Emperor teams",
-    "chooseTeamA": "Choose three players for Team A.",
-    "randomTeams": "Random teams",
-    "resetTeams": "Reset teams",
-    "teamEmperor": "Team {{team}} Emperor",
-    "randomEmperors": "Random Emperors",
-    "confirmTeams": "Confirm teams",
-    "chooseArchenemy": "Choose the Archenemy",
-    "chooseArchenemyHint": "The Archenemy faces the other three players. Both sides share 60 life. The Archenemy goes first, draws on that turn, and sets a scheme in motion during each first main phase.",
-    "confirmArchenemy": "Confirm Archenemy",
-    "chooseAllies": "Choose the allies",
-    "chooseAlliesHint": "Select two players for the first team. The other two players become the opposing team. Teams share 60 life and turns; all other player controls stay separate.",
-    "emperor": "Emperor",
-    "emperorRange": "Emperor · range 2",
-    "leader": "Leader",
-    "general": "General",
-    "generalRange": "General · range 1",
+    "gameRules": "Rialacha cluiche",
+    "loadingRoles": "Á lódáil róil…",
+    "start": "Tosaigh",
+    "readRules": "Léigh na rialacha",
+    "readyToBegin": "Réidh le tosú",
+    "readyToBeginHint": "Tosaigh an cluiche nuair atá gach duine ina shuí, nó léigh na rialacha ar dtús.",
+    "dealContracts": "Roinn conarthaí",
+    "dealContractsTitle": "Roinn conarthaí rúnda",
+    "dealContractsHint": "Faigheann gach imreoir sprioc phríobháideach amháin. Tabharfar an gléas timpeall ionas gur féidir gach conradh a sheiceáil faoi rún.",
+    "dealIdentities": "Roinn aitheantais",
+    "dealIdentitiesTitle": "Roinn aitheantais rúnda",
+    "dealIdentitiesHint": "Faigheann gach imreoir aitheantas folaithe amháin. Tabharfar an gléas timpeall ionas gur féidir le gach duine a cheann féin a léamh faoi rún.",
+    "chooseStarPositions": "Roghnaigh suíomhanna Réalta",
+    "starPositionsHint": "Is comhghuaillithe iad imreoirí atá ina suí in aice lena chéile. Brúigh beirt imreoirí chun a suíomhanna a mhalartú, nó déan an ciorcal iomlán randamach.",
+    "randomPositions": "Suíomhanna randamacha",
+    "confirmPositions": "Deimhnigh suíomhanna",
+    "adjacentPlayersAlly": "Imreoirí\nin aice lena chéile mar chomhghuaillithe",
+    "buildEmperorTeams": "Cruthaigh foirne an Impire",
+    "chooseTeamA": "Roghnaigh triúr imreoirí d'Fhoireann A.",
+    "randomTeams": "Foirne randamacha",
+    "resetTeams": "Athshocraigh foirne",
+    "teamEmperor": "Impire Fhoireann {{team}}",
+    "randomEmperors": "Impirí randamacha",
+    "confirmTeams": "Deimhnigh foirne",
+    "chooseArchenemy": "Roghnaigh an Archenemy",
+    "chooseArchenemyHint": "Tugann an Archenemy aghaidh ar na trí imreoir eile. Tá 60 beatha ag an dá thaobh. Téann an Archenemy ar dtús, tarraingíonn sé cárta ar an mbabhta sin, agus cuireann sé scheme ar bun le linn gach first main phase.",
+    "confirmArchenemy": "Deimhnigh Archenemy",
+    "chooseAllies": "Roghnaigh na comhghuaillithe",
+    "chooseAlliesHint": "Roghnaigh beirt imreoirí don chéad fhoireann. Cruthaíonn an bheirt eile an fhoireann fhreasúrach. Roinneann foirne 60 beatha agus babhtaí; fanann gach rialú imreora eile ar leithligh.",
+    "emperor": "Impire",
+    "emperorRange": "Impire · raon 2",
+    "leader": "Ceannaire",
+    "general": "Ginearál",
+    "generalRange": "Ginearál · raon 1",
     "marks": "{{count}} marks",
-    "winner": "Winner",
-    "turnPhone": "Turn your phone for the full board",
-    "matchMenu": "Match menu",
-    "matchMenuElapsed": "Match menu. {{clock}} elapsed",
-    "matchMenuPaused": ", paused",
-    "matchMenuDayNight": ", it is {{phase}}",
-    "day": "day",
-    "night": "night",
-    "closeMatchMenu": "Close match menu",
-    "match": "Match",
-    "firstScheme": "First scheme",
-    "nextScheme": "Next scheme",
-    "resume": "Resume",
-    "pause": "Pause",
-    "undo": "Undo",
-    "challenges": "Challenges",
-    "checkTarget": "Check target",
-    "checkMyRole": "Check my role",
-    "dayButton": "Day",
-    "nightButton": "Night",
-    "playerLost": "Player lost",
-    "gameWonBy": "Game won by",
-    "won": "{{name}} won",
-    "doneRequeue": "Done & requeue",
-    "savingChallenges": "Saving challenges…",
-    "quitToHome": "Quit to home",
-    "quitHint": "The game is kept — reopen it from the home screen.",
-    "secretContracts": "Secret contracts",
-    "secretIdentities": "Secret identities",
-    "whoEliminated": "Who eliminated {{name}}?",
-    "whoEliminatedHint": "A player scores only if this was their assigned mark. The contract chain advances either way.",
-    "noPlayerUnknown": "No player / unknown",
-    "revealedIdentity": "Revealed Treachery identity",
-    "closeRevealedIdentity": "Close revealed identity",
-    "commanderChallenges": "Commander challenges",
-    "challengeCompleted": "{{name}} completed",
-    "challengeFallback": "Challenge",
-    "matchResult": "Match result",
-    "wins": "{{name}} wins",
-    "reviewBoard": "Review board",
-    "yes": "Yes",
-    "no": "No",
-    "yesTheyLost": "Yes, they lost",
-    "noStillIn": "No, still in",
-    "openCounters": "Open counters for {{name}}",
-    "commanderDamageOn": "Commander damage on {{name}}",
-    "countersFor": "Counters for {{name}}",
-    "countersTitle": "Counters for {{name}}",
-    "closeCounters": "Close counters",
-    "closeChallenges": "Close challenges",
-    "sharedCommanderDamage": "Shared commander damage",
-    "closeCommanderDamage": "Close commander damage",
-    "highestCommanderDamage": "Highest commander damage on {{name}}: {{value}} from {{commander}}",
-    "noCommanderDamage": "No commander damage on {{name}}",
-    "removeCommanderDamage": "Remove commander damage from {{owner}}'s {{name}}",
-    "addCommanderDamage": "Add commander damage from {{owner}}'s {{name}}",
-    "isMonarch": "{{name}} is the monarch",
-    "makeMonarch": "Make {{name}} the monarch",
-    "enduringStory": "{{name}} {{has}} an enduring story",
-    "cityBlessing": "{{name}} {{has}} the city's blessing",
-    "has": "has",
-    "doesNotHave": "does not have",
-    "didLose": "Did {{name}} lose the game?",
-    "thisTeam": "This team",
-    "didTheyLose": "Did they lose?",
-    "poisonPrompt": "{{name}} has {{count}} poison counters. Did they lose?",
-    "sharedPoisonPrompt": "{{subject}} has {{count}} shared poison counters. {{lose}}",
-    "hitPrompt": "{{name}} owns {{count}} exiled cards with hit counters. Did they lose?",
-    "commanderPrompt": "{{name}} has taken {{damage}} commander damage from {{from}}. Did they lose?",
-    "sharedCommanderPrompt": "{{subject}} has taken {{damage}} commander damage from {{from}}. {{lose}}",
-    "lifePrompt": "{{name}} is at {{life}} life. Did they lose?",
-    "sharedLifePrompt": "{{subject}} is at {{life}} life. {{lose}}",
-    "anotherCommander": "another commander",
-    "addLife": "Add 1 life. Long press for a larger amount.",
-    "removeLife": "Remove 1 life. Long press for a larger amount.",
-    "addLifeFor": "Add life for {{name}}",
-    "removeLifeFor": "Remove life for {{name}}",
-    "addLifeLabel": "Add life · {{name}}",
-    "removeLifeLabel": "Remove life · {{name}}",
-    "deleteDigit": "Delete digit",
-    "add": "Add",
-    "removeVerb": "Remove",
-    "lower": "Lower {{label}}",
-    "raise": "Raise {{label}}",
-    "seatColour": "Seat colour for {{name}}",
-    "dungeonFor": "Dungeon for {{name}}",
-    "dungeonInitiative": "Dungeon and initiative for {{name}}. {{title}}",
-    "dungeonInitiativeActive": "{{name}} has the initiative · {{filled}} of {{total}} unique dungeons",
-    "dungeonInitiativeCompleted": "{{name}} has completed {{filled}} of {{total}} unique dungeons",
-    "counterOn": "{{label}} on {{name}}: {{value}}",
-    "counterFor": "{{label}} for {{name}}",
-    "claimFor": "Claim for {{name}}",
-    "challengesSubtitle": "Same challenges for every player · points never affect matching",
+    "winner": "Buaiteoir",
+    "turnPhone": "Cas do ghuthán chun an bord iomlán a fheiceáil",
+    "matchMenu": "Roghchlár cluiche",
+    "matchMenuElapsed": "Roghchlár cluiche. {{clock}} caite",
+    "matchMenuPaused": ", ar sos",
+    "matchMenuDayNight": ", tá sé {{phase}}",
+    "day": "lá",
+    "night": "oíche",
+    "closeMatchMenu": "Dún roghchlár an chluiche",
+    "match": "Cluiche",
+    "firstScheme": "An chéad scheme",
+    "nextScheme": "An chéad scheme eile",
+    "resume": "Lean ar aghaidh",
+    "pause": "Sos",
+    "undo": "Cealaigh",
+    "challenges": "Dúshláin",
+    "checkTarget": "Seiceáil sprioc",
+    "checkMyRole": "Seiceáil mo ról",
+    "dayButton": "Lá",
+    "nightButton": "Oíche",
+    "playerLost": "Chaill an t-imreoir",
+    "gameWonBy": "Bhuaigh",
+    "won": "Bhuaigh {{name}}",
+    "doneRequeue": "Déanta agus ar ais sa scuaine",
+    "savingChallenges": "Á sábháil dúshláin…",
+    "quitToHome": "Scoir go Baile",
+    "quitHint": "Coinnítear an cluiche — oscail arís é ón scáileán baile.",
+    "secretContracts": "Conarthaí rúnda",
+    "secretIdentities": "Aitheantais rúnda",
+    "whoEliminated": "Cé a chuir {{name}} as an gcluiche?",
+    "whoEliminatedHint": "Ní scórálann imreoir ach amháin más é seo a mark sannta. Téann slabhra na gconarthaí ar aghaidh pé scéal é.",
+    "noPlayerUnknown": "Gan imreoir / anaithnid",
+    "revealedIdentity": "Aitheantas Treachery nochtaithe",
+    "closeRevealedIdentity": "Dún an t-aitheantas nochtaithe",
+    "commanderChallenges": "Dúshláin Commander",
+    "challengeCompleted": "{{name}} críochnaithe",
+    "challengeFallback": "Dúshlán",
+    "matchResult": "Toradh cluiche",
+    "wins": "Buann {{name}}",
+    "reviewBoard": "Athbhreithnigh an bord",
+    "yes": "Tá",
+    "no": "Níl",
+    "yesTheyLost": "Tá, chaill siad",
+    "noStillIn": "Níl, fós sa chluiche",
+    "openCounters": "Oscail counters do {{name}}",
+    "commanderDamageOn": "Commander damage ar {{name}}",
+    "countersFor": "Counters do {{name}}",
+    "countersTitle": "Counters do {{name}}",
+    "closeCounters": "Dún counters",
+    "closeChallenges": "Dún dúshláin",
+    "sharedCommanderDamage": "Commander damage comhroinnte",
+    "closeCommanderDamage": "Dún commander damage",
+    "highestCommanderDamage": "Commander damage is airde ar {{name}}: {{value}} ó {{commander}}",
+    "noCommanderDamage": "Níl commander damage ar {{name}}",
+    "removeCommanderDamage": "Bain commander damage ó {{name}} de chuid {{owner}}",
+    "addCommanderDamage": "Cuir commander damage ó {{name}} de chuid {{owner}}",
+    "isMonarch": "Is é {{name}} an monarch",
+    "makeMonarch": "Déan {{name}} mar monarch",
+    "enduringStory": "{{name}} {{has}} enduring story",
+    "cityBlessing": "{{name}} {{has}} city's blessing",
+    "has": "tá aige",
+    "doesNotHave": "níl aige",
+    "didLose": "Ar chaill {{name}} an cluiche?",
+    "thisTeam": "An fhoireann seo",
+    "didTheyLose": "Ar chaill siad?",
+    "poisonPrompt": "Tá {{count}} poison counters ag {{name}}. Ar chaill siad?",
+    "sharedPoisonPrompt": "Tá {{count}} poison counters comhroinnte ag {{subject}}. {{lose}}",
+    "hitPrompt": "Tá {{count}} cárta exiled le hit counters ag {{name}}. Ar chaill siad?",
+    "commanderPrompt": "Tá {{damage}} commander damage faighte ag {{name}} ó {{from}}. Ar chaill siad?",
+    "sharedCommanderPrompt": "Tá {{damage}} commander damage faighte ag {{subject}} ó {{from}}. {{lose}}",
+    "lifePrompt": "Tá {{name}} ag {{life}} beatha. Ar chaill siad?",
+    "sharedLifePrompt": "Tá {{subject}} ag {{life}} beatha. {{lose}}",
+    "anotherCommander": "commander eile",
+    "addLife": "Cuir 1 beatha leis. Brúigh agus coinnigh le haghaidh méid níos mó.",
+    "removeLife": "Bain 1 beatha. Brúigh agus coinnigh le haghaidh méid níos mó.",
+    "addLifeFor": "Cuir beatha le {{name}}",
+    "removeLifeFor": "Bain beatha ó {{name}}",
+    "addLifeLabel": "Cuir beatha leis · {{name}}",
+    "removeLifeLabel": "Bain beatha · {{name}}",
+    "deleteDigit": "Scrios digit",
+    "add": "Cuir leis",
+    "removeVerb": "Bain",
+    "lower": "Ísligh {{label}}",
+    "raise": "Ardaigh {{label}}",
+    "seatColour": "Dath suíocháin do {{name}}",
+    "dungeonFor": "Dungeon do {{name}}",
+    "dungeonInitiative": "Dungeon agus initiative do {{name}}. {{title}}",
+    "dungeonInitiativeActive": "Tá an initiative ag {{name}} · {{filled}} as {{total}} dungeon uathúil",
+    "dungeonInitiativeCompleted": "Tá {{filled}} as {{total}} dungeon uathúil críochnaithe ag {{name}}",
+    "counterOn": "{{label}} ar {{name}}: {{value}}",
+    "counterFor": "{{label}} do {{name}}",
+    "claimFor": "Éileamh do {{name}}",
+    "challengesSubtitle": "Na dúshláin chéanna do gach imreoir · ní théann pointí i bhfeidhm ar mheaitseáil riamh",
     "counters": {
       "poison": "Poison",
       "tax": "Commander tax",
-      "acorn": "Acorns",
-      "energy": "Energy",
-      "experience": "Experience",
+      "acorn": "Dearca",
+      "energy": "Fuinneamh",
+      "experience": "Taithí",
       "hit": "Etrata hits",
-      "rad": "Radiation",
+      "rad": "Radaíocht",
       "ring": "Ring temptation",
-      "speed": "Speed",
-      "ticket": "Tickets"
+      "speed": "Luas",
+      "ticket": "Ticéid"
     }
   }
 }

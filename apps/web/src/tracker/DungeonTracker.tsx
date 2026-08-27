@@ -9,6 +9,7 @@ import {
 } from './dungeons';
 import type { TrackerAction, TrackerState } from './engine';
 import { useBoardLandscape } from './orientation';
+import { assetUrl } from '../asset-url';
 import { Button } from '../ui/Button';
 import { cx } from '../ui/cx';
 
@@ -144,7 +145,7 @@ export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
                 }}
               >
                 <img
-                  src={dungeon.image}
+                  src={assetUrl(dungeon.image)}
                   alt={dungeon.name}
                   loading="lazy"
                   className="size-full object-cover"
@@ -195,7 +196,7 @@ export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
             }
           >
             <image
-              href={dungeon.image}
+              href={assetUrl(dungeon.image)}
               x="0"
               y="0"
               width={CARD_W}
