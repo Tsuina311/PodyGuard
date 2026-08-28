@@ -183,7 +183,7 @@
     "commander": {
       "label": "Classic",
       "hint": "Free-for-all for three to six players. Everyone starts on 40 life.",
-      "hostHint": "Classic Commander needs at least three players. Matching prefers four; leftover pods can be three or five when allowed.",
+      "hostHint": "Choose a target of three, four, or five. Matching prefers that size and automatically uses the other legal pod sizes when needed.",
       "title": "Classic",
       "summary": "Free-for-all multiplayer. Each player fights for themselves.",
       "sections": {

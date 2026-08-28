@@ -1,6 +1,11 @@
 import { performance } from 'node:perf_hooks';
 
-import { runSimulation, SIMULATION_ENGINE_VERSION, type SimulationResult } from './engine.js';
+import {
+  runSimulation,
+  SIMULATION_ENGINE_VERSION,
+  type SimulationRandomizationMode,
+  type SimulationResult,
+} from './engine.js';
 import {
   distributionMetrics,
   type EventMetricRecord,
@@ -14,6 +19,7 @@ export type BenchmarkOptions = {
   runs?: number;
   seedStart?: number;
   strategy?: MatchmakingStrategy;
+  randomizationMode?: SimulationRandomizationMode;
   onProgress?: (completed: number, total: number) => void;
 };
 
@@ -56,6 +62,7 @@ export type BenchmarkResult = {
   engineVersion: string;
   runsPerScenario: number;
   seedStart: number;
+  randomizationMode?: SimulationRandomizationMode;
   elapsedMs: number;
   records: readonly EventMetricRecord[];
   nights: readonly BenchmarkNight[];
@@ -90,6 +97,7 @@ export function benchmarkSuite(options: BenchmarkOptions = {}): BenchmarkResult 
       const result: SimulationResult = runSimulation(scenario, {
         seed,
         strategy,
+        randomizationMode: options.randomizationMode,
       });
       const runtimeMs = performance.now() - started;
       records.push(result.record);
@@ -118,6 +126,7 @@ export function benchmarkSuite(options: BenchmarkOptions = {}): BenchmarkResult 
     engineVersion: SIMULATION_ENGINE_VERSION,
     runsPerScenario: runs,
     seedStart,
+    ...(options.randomizationMode ? { randomizationMode: options.randomizationMode } : {}),
     elapsedMs: performance.now() - suiteStarted,
     records,
     nights,

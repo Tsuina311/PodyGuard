@@ -48,6 +48,7 @@ type TableStateRecord = {
   state: TableState;
   stateStartedAt: number;
   disabledUntil: number;
+  gamesStarted: number;
 };
 
 type ActiveGame = {
@@ -59,6 +60,7 @@ type EngineEvent =
   | { type: 'arrival'; participantId: string }
   | { type: 'ready'; participantId: string }
   | { type: 'match' }
+  | { type: 'match-evaluation'; at: number }
   | { type: 'game-finish'; gameId: string }
   | { type: 'resume'; participantId: string }
   | { type: 'leave-if-waiting'; participantId: string; cycle: number }
@@ -77,13 +79,20 @@ export type ReproducibilityMetadata = {
   scenarioSuiteVersion: string;
   seed: number;
   strategyId: string;
+  strategyName: string;
+  graceSeconds: number;
+  maxExistingWaitSeconds?: number;
+  randomizationMode: SimulationRandomizationMode;
   engineVersion: string;
   replay: string;
 };
 
+export type SimulationRandomizationMode = 'legacy' | 'paired-v1';
+
 export type SimulationOptions = {
   seed: number;
   strategy?: MatchmakingStrategy;
+  randomizationMode?: SimulationRandomizationMode;
   debug?: boolean;
   failOnSafetyViolation?: boolean;
   suiteVersion?: string;
@@ -139,12 +148,18 @@ class SimulationEngine {
   private readonly timeline: DebugTimelineEntry[] = [];
   private now = 0;
   private gameSequence = 0;
+  private scheduledEvaluationAt: number | undefined;
 
   constructor(
     private readonly scenario: SimulationScenario,
     private readonly options: SimulationOptions,
   ) {
     this.strategy = options.strategy ?? legacyV1Strategy;
+    if (options.randomizationMode !== undefined &&
+        options.randomizationMode !== 'legacy' &&
+        options.randomizationMode !== 'paired-v1') {
+      throw new Error(`Unknown simulation randomization mode "${String(options.randomizationMode)}".`);
+    }
     this.random = createSeededRandom(options.seed);
     this.initialize();
   }
@@ -164,13 +179,26 @@ class SimulationEngine {
     this.now = this.scenario.durationSeconds;
     this.closeEvent();
     const suiteVersion = this.options.suiteVersion ?? SCENARIO_SUITE_VERSION;
+    const strategyName = this.strategy.name ?? this.strategy.id;
+    const graceSeconds = this.strategy.graceSeconds ?? 0;
+    const maxExistingWaitSeconds = this.strategy.maxExistingWaitSeconds;
+    const randomizationMode = this.options.randomizationMode ?? 'legacy';
     const metadata: ReproducibilityMetadata = {
       scenarioId: this.scenario.id,
       scenarioSuiteVersion: suiteVersion,
       seed: this.options.seed,
       strategyId: this.strategy.id,
+      strategyName,
+      graceSeconds,
+      ...(maxExistingWaitSeconds === undefined ? {} : { maxExistingWaitSeconds }),
+      randomizationMode,
       engineVersion: SIMULATION_ENGINE_VERSION,
-      replay: `yarn simulation:run --scenario ${this.scenario.id} --seed ${this.options.seed}`,
+      replay: [
+        `yarn simulation:run --scenario ${this.scenario.id} --seed ${this.options.seed}`,
+        `--strategy ${strategyName} --grace ${graceSeconds}`,
+        maxExistingWaitSeconds === undefined ? '' : `--max-existing-wait ${maxExistingWaitSeconds}`,
+        randomizationMode === 'paired-v1' ? '--randomization paired-v1' : '',
+      ].filter(Boolean).join(' '),
     };
     const record: EventMetricRecord = {
       scenarioId: this.scenario.id,
@@ -231,6 +259,7 @@ class SimulationEngine {
         state: disabled ? 'disabled' : 'free',
         stateStartedAt: 0,
         disabledUntil: disabled ? this.scenario.durationSeconds : 0,
+        gamesStarted: 0,
       });
     }
     for (const tableBreak of this.scenario.tableBreaks) {
@@ -255,6 +284,12 @@ class SimulationEngine {
         break;
       case 'match':
         this.matchReadyPlayers();
+        break;
+      case 'match-evaluation':
+        if (event.at === this.scheduledEvaluationAt) {
+          this.scheduledEvaluationAt = undefined;
+          this.matchReadyPlayers();
+        }
         break;
       case 'game-finish':
         this.finishGame(event.gameId);
@@ -345,6 +380,7 @@ class SimulationEngine {
         allowedSizes: this.scenario.allowedPodSizes,
       },
     });
+    this.scheduleEvaluation(result.nextEvaluationAt);
     const accepted = this.validateMatches(result.matches, ready, freeTables);
     for (const match of accepted) {
       this.startGame(match);
@@ -406,11 +442,14 @@ class SimulationEngine {
     this.gameSequence += 1;
     const gameId = `game-${String(this.gameSequence).padStart(4, '0')}`;
     const participantIds = match.seats.map((seat) => seat.participantId);
-    const gameRandom = this.runtimeRandom(
-      'game',
-      [...participantIds].sort().join(','),
-      Math.max(...match.seats.map((seat) => this.requireParticipant(seat.participantId).gamesPlayed)),
-    );
+    table.gamesStarted += 1;
+    const gameRandom = this.options.randomizationMode === 'paired-v1'
+      ? this.runtimeRandom('game-table-slot', table.id, table.gamesStarted)
+      : this.runtimeRandom(
+          'game',
+          [...participantIds].sort().join(','),
+          Math.max(...match.seats.map((seat) => this.requireParticipant(seat.participantId).gamesPlayed)),
+        );
     const endedAt = this.now + sampleDistribution(this.scenario.gameDurationSeconds, gameRandom);
     const metricSeats: MetricGameSeat[] = match.seats.map((seat) => {
       const participant = this.requireParticipant(seat.participantId);
@@ -597,6 +636,28 @@ class SimulationEngine {
   private scheduleParticipant(time: number, event: EngineEvent): void {
     if (time < this.scenario.durationSeconds) {
       this.queue.schedule(time, event);
+    }
+  }
+
+  private scheduleEvaluation(nextEvaluationAt: number | undefined): void {
+    if (nextEvaluationAt === undefined) {
+      this.scheduledEvaluationAt = undefined;
+      return;
+    }
+    if (!Number.isSafeInteger(nextEvaluationAt) || nextEvaluationAt <= this.now) {
+      this.fail(
+        'INVALID_EVALUATION_TIME',
+        `Strategy evaluation time ${nextEvaluationAt} must be after ${this.now}.`,
+      );
+      return;
+    }
+    if (nextEvaluationAt === this.scheduledEvaluationAt) return;
+    this.scheduledEvaluationAt = nextEvaluationAt;
+    if (nextEvaluationAt < this.scenario.durationSeconds) {
+      this.queue.schedule(nextEvaluationAt, {
+        type: 'match-evaluation',
+        at: nextEvaluationAt,
+      });
     }
   }
 

@@ -19,7 +19,7 @@ type ScoredPlan = {
   matches: ProposedMatch[];
   unmatchedIds: string[];
   matched: number;
-  fours: number;
+  preferredPods: number;
   concessions: number;
   rematches: number;
 };
@@ -167,7 +167,7 @@ function evaluate(
       .filter((row) => !seated.has(row.id))
       .map((row) => row.id),
     matched: seated.size,
-    fours: matches.filter((row) => row.seats.length === preferredSize).length,
+    preferredPods: matches.filter((row) => row.seats.length === preferredSize).length,
     concessions: matches.reduce(
       (sum, row) => sum + row.seats.filter((seat) => seat.concession).length,
       0,
@@ -328,8 +328,8 @@ function isBetter(candidate: ScoredPlan, current: ScoredPlan): boolean {
   if (candidate.matched !== current.matched) {
     return candidate.matched > current.matched;
   }
-  if (candidate.fours !== current.fours) {
-    return candidate.fours > current.fours;
+  if (candidate.preferredPods !== current.preferredPods) {
+    return candidate.preferredPods > current.preferredPods;
   }
   if (candidate.concessions !== current.concessions) {
     return candidate.concessions < current.concessions;

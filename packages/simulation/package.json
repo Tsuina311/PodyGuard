@@ -15,6 +15,8 @@
     "test:heavy": "SIMULATION_PROPERTY_RUNS=100000 vitest run src/strategy.property.test.ts src/matcher-baseline.test.ts",
     "run": "tsx src/cli.ts run",
     "benchmark": "tsx src/cli.ts benchmark",
+    "sweep": "tsx src/cli.ts sweep",
+    "sweep-opportunity": "tsx src/cli.ts sweep-opportunity",
     "compare": "tsx src/cli.ts compare",
     "build": "tsc -p tsconfig.json --noEmit"
   },

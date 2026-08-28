@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -8,6 +8,7 @@ import type { BenchmarkMetricSummary, BenchmarkNight, BenchmarkResult } from './
 export const ARTIFACT_SCHEMA_VERSION = 1;
 export const REPOSITORY_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 export const DEFAULT_ARTIFACT_DIRECTORY = resolve(REPOSITORY_ROOT, 'artifacts/simulation');
+export const DEFAULT_BASELINE_DIRECTORY = resolve(REPOSITORY_ROOT, 'packages/simulation/baselines');
 export const LATEST_JSON_PATH = resolve(DEFAULT_ARTIFACT_DIRECTORY, 'latest.json');
 export const LATEST_CSV_PATH = resolve(DEFAULT_ARTIFACT_DIRECTORY, 'latest.csv');
 
@@ -21,6 +22,7 @@ export type SimulationArtifact = {
     runsPerScenario: number;
     seedStart: number;
     seedEnd: number;
+    randomizationMode?: BenchmarkResult['randomizationMode'];
     elapsedMs: number;
     scenarioIds: readonly string[];
     gitSha?: string;
@@ -64,6 +66,9 @@ export function createArtifact(
       runsPerScenario: benchmark.runsPerScenario,
       seedStart: benchmark.seedStart,
       seedEnd: benchmark.seedStart + benchmark.runsPerScenario - 1,
+      ...(benchmark.randomizationMode
+        ? { randomizationMode: benchmark.randomizationMode }
+        : {}),
       elapsedMs: benchmark.elapsedMs,
       scenarioIds: Object.keys(benchmark.scenarios),
       ...(gitSha ? { gitSha } : {}),
@@ -84,15 +89,67 @@ export function createArtifact(
   };
 }
 
-export function compactBaseline(artifact: SimulationArtifact): CompactBaseline {
+export function compactBaseline(
+  artifact: SimulationArtifact,
+  matcherId = artifact.metadata.strategyId,
+): CompactBaseline {
   return {
     schemaVersion: artifact.schemaVersion,
     generatedAt: artifact.generatedAt,
-    metadata: artifact.metadata,
-    definitions: artifact.definitions,
+    metadata: {
+      ...artifact.metadata,
+      strategyId: matcherId,
+    },
+    definitions: {
+      ...artifact.definitions,
+      strategy: matcherId,
+    },
     global: artifact.global,
     scenarios: artifact.scenarios,
   };
+}
+
+export function normalizeBaselineId(id: string): string {
+  const trimmed = id.trim();
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(trimmed)) {
+    throw new Error(
+      `Baseline id must be a non-empty slug of letters, numbers, dots, underscores, or hyphens, received "${id}".`,
+    );
+  }
+  return trimmed.replace(/^matcher-/, '');
+}
+
+export function committedBaselinePath(
+  id: string,
+  directory = DEFAULT_BASELINE_DIRECTORY,
+): string {
+  return resolve(directory, `matcher-${normalizeBaselineId(id)}.json`);
+}
+
+export function listCommittedBaselines(
+  directory = DEFAULT_BASELINE_DIRECTORY,
+): string[] {
+  try {
+    return readdirSync(directory)
+      .filter((name) => /^matcher-.+\.json$/.test(name))
+      .map((name) => resolve(directory, name))
+      .sort();
+  } catch {
+    return [];
+  }
+}
+
+export function writeCommittedBaseline(
+  artifact: SimulationArtifact,
+  id: string,
+  directory = DEFAULT_BASELINE_DIRECTORY,
+): { path: string; baseline: CompactBaseline } {
+  const matcherId = normalizeBaselineId(id);
+  const baseline = compactBaseline(artifact, matcherId);
+  mkdirSync(directory, { recursive: true });
+  const path = committedBaselinePath(matcherId, directory);
+  writeFileSync(path, `${JSON.stringify(baseline, null, 2)}\n`, 'utf8');
+  return { path, baseline };
 }
 
 export function writeLatestArtifacts(

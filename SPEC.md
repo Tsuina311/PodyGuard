@@ -816,17 +816,19 @@ Inside compatible pools, optimise mainly for:
 6. event-local Flex fairness;
 7. future social constraints if added later.
 
-Commander preferred pod size:
-
-4
-
-Optional allowed sizes:
+Commander host-selected target pod size:
 
 3
 4
 5
 
-3/5 support must be organiser-configurable.
+All three sizes remain legal. Matchmaking targets the host selection and uses
+the other legal sizes automatically when queue composition requires them.
+Participants do not opt into pod sizes; they only declare the other
+decks/brackets they are willing to play.
+
+Flex is awarded only when the actual pod size differs from the host target or
+the participant is assigned outside their preferred deck/bracket.
 
 ---
 
@@ -992,10 +994,9 @@ Examples:
 8 B3 players
 → two pods of 4
 
-5 players
-3/5 disabled
-→ 4 matched
-→ appropriate participant waits
+5 Commander players, target 4
+→ one legal pod of 5 when that maximises participants matched
+→ all five receive the non-target-size Flex reward
 
 Bracket 2 + Bracket 3 inflexible
 → never mixed

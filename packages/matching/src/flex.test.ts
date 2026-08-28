@@ -48,6 +48,25 @@ describe('flex credits', () => {
     ).toBe(2);
   });
 
+  it('rewards only sizes that differ from a host-selected 3-player target', () => {
+    expect(
+      computeFlexDelta({
+        concession: false,
+        podSize: 3,
+        flexCredits: 0,
+        preferredSize: 3,
+      }),
+    ).toBe(0);
+    expect(
+      computeFlexDelta({
+        concession: false,
+        podSize: 4,
+        flexCredits: 0,
+        preferredSize: 3,
+      }),
+    ).toBe(2);
+  });
+
   it('keeps wait-time dominance in the score weight', () => {
     expect(flexScore(6)).toBeLessThan(1);
   });

@@ -1252,7 +1252,7 @@ describe('event HTTP api', () => {
     await app.close();
   });
 
-  it('seats five players when 5-pods are enabled', async () => {
+  it('automatically allows Commander 3/4/5 pods around the host target', async () => {
     const app = await buildTestApp();
     const created = await app.inject({
       method: 'POST',
@@ -1261,14 +1261,25 @@ describe('event HTTP api', () => {
         name: 'Friday Commander',
         hostPin: '2468',
         tableCount: 1,
-        allowFivePods: true,
+        preferredPodSize: 5,
+        allowThreePods: false,
+        allowFivePods: false,
       },
     });
     const createdBody = created.json() as {
-      event: { joinCode: string; allowFivePods: boolean };
+      event: {
+        joinCode: string;
+        allowThreePods: boolean;
+        allowFivePods: boolean;
+        preferredPodSize: number;
+      };
       hostToken: string;
     };
-    expect(createdBody.event.allowFivePods).toBe(true);
+    expect(createdBody.event).toMatchObject({
+      allowThreePods: true,
+      allowFivePods: true,
+      preferredPodSize: 5,
+    });
     const { joinCode } = createdBody.event;
     const { hostToken } = createdBody;
 

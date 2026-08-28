@@ -14,9 +14,10 @@ export type PublicEvent = {
   status: EventStatus;
   gameMode: GameMode;
   rulesFormat: 'normal' | 'commander';
+  /** Compatibility flags describing whether the event mode permits these sizes. */
   allowThreePods: boolean;
   allowFivePods: boolean;
-  /** Target table size. Flexible modes may form smaller leftover pods. */
+  /** Host-selected target. Queue policy may form other sizes legal for the mode. */
   preferredPodSize: number;
   /** Omitted for the normal drop-in/drop-out queue. */
   tournamentFormat?: TournamentFormat;

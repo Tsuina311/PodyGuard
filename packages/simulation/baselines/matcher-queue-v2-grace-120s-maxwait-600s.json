@@ -1,0 +1,1054 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-28T10:42:30.361Z",
+  "metadata": {
+    "suiteVersion": "commander-nights-v1",
+    "strategyId": "queue-v2-grace-120s-maxwait-600s",
+    "engineVersion": "1",
+    "runsPerScenario": 1000,
+    "seedStart": 1,
+    "seedEnd": 1000,
+    "elapsedMs": 34918.343125,
+    "scenarioIds": [
+      "NORMAL_FRIDAY_40",
+      "NORMAL_FRIDAY_20",
+      "NORMAL_FRIDAY_80",
+      "LATE_ARRIVALS_40",
+      "EARLY_ARRIVALS_40",
+      "TWO_ARRIVAL_WAVES_60",
+      "TABLE_SCARCITY_50",
+      "EXCESS_TABLE_CAPACITY_30",
+      "B3_DOMINATED_40",
+      "B4_STARVATION_30",
+      "EVEN_BRACKET_SPLIT_40",
+      "HIGH_FLEX_40",
+      "ZERO_FLEX_40",
+      "HIGH_REQUEUE_40",
+      "LOW_REQUEUE_40",
+      "LONG_GAMES_40",
+      "SHORT_GAMES_40",
+      "PEOPLE_LEAVE_EARLY_40",
+      "HIGH_PAUSE_RATE_40",
+      "ODD_PLAYER_COUNTS",
+      "BROKEN_TABLE_MID_EVENT",
+      "SMALL_EVENT_8",
+      "LARGE_EVENT_120"
+    ],
+    "gitSha": "b96d139bca44a692f28541a2e3247f48c90ff25a"
+  },
+  "definitions": {
+    "suite": "commander-nights-v1",
+    "strategy": "queue-v2-grace-120s-maxwait-600s",
+    "engine": "1"
+  },
+  "global": {
+    "nights": 23000,
+    "participants": 989000,
+    "runtimeMs": 33941.20404699987,
+    "waitSeconds": {
+      "count": 2094928,
+      "median": 120,
+      "p95": 1701,
+      "max": 14194
+    },
+    "unmatched": {
+      "participants": 8111,
+      "rate": 0.008201213346814964
+    },
+    "assignment": {
+      "seats": 1827259,
+      "preferred": 1663991,
+      "preferredRate": 0.910648681987611,
+      "secondary": 163268,
+      "secondaryRate": 0.08935131801238905
+    },
+    "immediateRematch": {
+      "pairs": 352097,
+      "rate": 0.15190901776026128
+    },
+    "podDistribution": {
+      "3": 306109,
+      "4": 209188,
+      "5": 14436
+    },
+    "requeue": {
+      "count": 975400,
+      "decisions": 1827259,
+      "rate": 0.5338050052017804
+    },
+    "tables": {
+      "occupiedSeconds": 2050786601,
+      "availableSeconds": 3785302558,
+      "utilisation": 0.5417761379908168
+    },
+    "invariantFailures": 0
+  },
+  "scenarios": {
+    "NORMAL_FRIDAY_40": {
+      "nights": 1000,
+      "participants": 40000,
+      "runtimeMs": 1147.593299999999,
+      "waitSeconds": {
+        "count": 85818,
+        "median": 141,
+        "p95": 1607,
+        "max": 12433
+      },
+      "unmatched": {
+        "participants": 156,
+        "rate": 0.0039
+      },
+      "assignment": {
+        "seats": 75574,
+        "preferred": 68646,
+        "preferredRate": 0.9083282610421574,
+        "secondary": 6928,
+        "secondaryRate": 0.09167173895784264
+      },
+      "immediateRematch": {
+        "pairs": 14890,
+        "rate": 0.162639811254806
+      },
+      "podDistribution": {
+        "3": 14946,
+        "4": 7379,
+        "5": 244
+      },
+      "requeue": {
+        "count": 41380,
+        "decisions": 75574,
+        "rate": 0.5475428057268372
+      },
+      "tables": {
+        "occupiedSeconds": 87466687,
+        "availableSeconds": 144000000,
+        "utilisation": 0.6074075486111111
+      },
+      "invariantFailures": 0
+    },
+    "NORMAL_FRIDAY_20": {
+      "nights": 1000,
+      "participants": 20000,
+      "runtimeMs": 512.2893310000013,
+      "waitSeconds": {
+        "count": 39719,
+        "median": 211,
+        "p95": 2684,
+        "max": 12962
+      },
+      "unmatched": {
+        "participants": 421,
+        "rate": 0.02105
+      },
+      "assignment": {
+        "seats": 35161,
+        "preferred": 31976,
+        "preferredRate": 0.9094166832570177,
+        "secondary": 3185,
+        "secondaryRate": 0.09058331674298228
+      },
+      "immediateRematch": {
+        "pairs": 6617,
+        "rate": 0.16972324108036013
+      },
+      "podDistribution": {
+        "3": 9203,
+        "4": 1863,
+        "5": 20
+      },
+      "requeue": {
+        "count": 19244,
+        "decisions": 35161,
+        "rate": 0.5473109410995136
+      },
+      "tables": {
+        "occupiedSeconds": 42701219,
+        "availableSeconds": 72000000,
+        "utilisation": 0.5930724861111111
+      },
+      "invariantFailures": 0
+    },
+    "NORMAL_FRIDAY_80": {
+      "nights": 1000,
+      "participants": 80000,
+      "runtimeMs": 4098.762517000006,
+      "waitSeconds": {
+        "count": 178454,
+        "median": 114,
+        "p95": 836,
+        "max": 11374
+      },
+      "unmatched": {
+        "participants": 20,
+        "rate": 0.00025
+      },
+      "assignment": {
+        "seats": 157273,
+        "preferred": 143141,
+        "preferredRate": 0.9101435084216617,
+        "secondary": 14132,
+        "secondaryRate": 0.0898564915783383
+      },
+      "immediateRematch": {
+        "pairs": 29293,
+        "rate": 0.1431496540130576
+      },
+      "podDistribution": {
+        "3": 21960,
+        "4": 22017,
+        "5": 665
+      },
+      "requeue": {
+        "count": 86345,
+        "decisions": 157273,
+        "rate": 0.5490134988205223
+      },
+      "tables": {
+        "occupiedSeconds": 172505742,
+        "availableSeconds": 288000000,
+        "utilisation": 0.5989782708333333
+      },
+      "invariantFailures": 0
+    },
+    "LATE_ARRIVALS_40": {
+      "nights": 1000,
+      "participants": 40000,
+      "runtimeMs": 1141.8922139999795,
+      "waitSeconds": {
+        "count": 78634,
+        "median": 147,
+        "p95": 1477,
+        "max": 10298
+      },
+      "unmatched": {
+        "participants": 166,
+        "rate": 0.00415
+      },
+      "assignment": {
+        "seats": 64532,
+        "preferred": 58609,
+        "preferredRate": 0.9082160788446042,
+        "secondary": 5923,
+        "secondaryRate": 0.09178392115539577
+      },
+      "immediateRematch": {
+        "pairs": 10378,
+        "rate": 0.13169549382637716
+      },
+      "podDistribution": {
+        "3": 12465,
+        "4": 6433,
+        "5": 281
+      },
+      "requeue": {
+        "count": 35291,
+        "decisions": 64532,
+        "rate": 0.5468759685117461
+      },
+      "tables": {
+        "occupiedSeconds": 77426871,
+        "availableSeconds": 144000000,
+        "utilisation": 0.5376866041666667
+      },
+      "invariantFailures": 0
+    },
+    "EARLY_ARRIVALS_40": {
+      "nights": 1000,
+      "participants": 40000,
+      "runtimeMs": 1105.9098689999973,
+      "waitSeconds": {
+        "count": 88187,
+        "median": 100,
+        "p95": 2025,
+        "max": 14041
+      },
+      "unmatched": {
+        "participants": 172,
+        "rate": 0.0043
+      },
+      "assignment": {
+        "seats": 78838,
+        "preferred": 71652,
+        "preferredRate": 0.9088510616707679,
+        "secondary": 7186,
+        "secondaryRate": 0.0911489383292321
+      },
+      "immediateRematch": {
+        "pairs": 16162,
+        "rate": 0.16342420320336515
+      },
+      "podDistribution": {
+        "3": 13104,
+        "4": 9734,
+        "5": 118
+      },
+      "requeue": {
+        "count": 43207,
+        "decisions": 78838,
+        "rate": 0.548047895684822
+      },
+      "tables": {
+        "occupiedSeconds": 88202083,
+        "availableSeconds": 144000000,
+        "utilisation": 0.6125144652777778
+      },
+      "invariantFailures": 0
+    },
+    "TWO_ARRIVAL_WAVES_60": {
+      "nights": 1000,
+      "participants": 60000,
+      "runtimeMs": 1870.2694959999717,
+      "waitSeconds": {
+        "count": 127381,
+        "median": 105,
+        "p95": 1160,
+        "max": 10625
+      },
+      "unmatched": {
+        "participants": 95,
+        "rate": 0.0015833333333333333
+      },
+      "assignment": {
+        "seats": 109085,
+        "preferred": 99095,
+        "preferredRate": 0.9084200394188019,
+        "secondary": 9990,
+        "secondaryRate": 0.09157996058119815
+      },
+      "immediateRematch": {
+        "pairs": 17803,
+        "rate": 0.12801282788771284
+      },
+      "podDistribution": {
+        "3": 16592,
+        "4": 14661,
+        "5": 133
+      },
+      "requeue": {
+        "count": 59703,
+        "decisions": 109085,
+        "rate": 0.5473071458037311
+      },
+      "tables": {
+        "occupiedSeconds": 123444262,
+        "availableSeconds": 216000000,
+        "utilisation": 0.571501212962963
+      },
+      "invariantFailures": 0
+    },
+    "TABLE_SCARCITY_50": {
+      "nights": 1000,
+      "participants": 50000,
+      "runtimeMs": 4290.463575999987,
+      "waitSeconds": {
+        "count": 98996,
+        "median": 635,
+        "p95": 4554,
+        "max": 13718
+      },
+      "unmatched": {
+        "participants": 610,
+        "rate": 0.0122
+      },
+      "assignment": {
+        "seats": 81729,
+        "preferred": 77469,
+        "preferredRate": 0.9478765187387586,
+        "secondary": 4260,
+        "secondaryRate": 0.05212348126124142
+      },
+      "immediateRematch": {
+        "pairs": 19935,
+        "rate": 0.14624966986530505
+      },
+      "podDistribution": {
+        "3": 4362,
+        "4": 7032,
+        "5": 8103
+      },
+      "requeue": {
+        "count": 44751,
+        "decisions": 81729,
+        "rate": 0.5475534999816467
+      },
+      "tables": {
+        "occupiedSeconds": 79365804,
+        "availableSeconds": 86400000,
+        "utilisation": 0.9185856944444445
+      },
+      "invariantFailures": 0
+    },
+    "EXCESS_TABLE_CAPACITY_30": {
+      "nights": 1000,
+      "participants": 30000,
+      "runtimeMs": 740.5200829999849,
+      "waitSeconds": {
+        "count": 63159,
+        "median": 151,
+        "p95": 1914,
+        "max": 12404
+      },
+      "unmatched": {
+        "participants": 237,
+        "rate": 0.0079
+      },
+      "assignment": {
+        "seats": 55875,
+        "preferred": 50777,
+        "preferredRate": 0.9087606263982103,
+        "secondary": 5098,
+        "secondaryRate": 0.09123937360178971
+      },
+      "immediateRematch": {
+        "pairs": 10597,
+        "rate": 0.1646314939100174
+      },
+      "podDistribution": {
+        "3": 12988,
+        "4": 4209,
+        "5": 15
+      },
+      "requeue": {
+        "count": 30617,
+        "decisions": 55875,
+        "rate": 0.5479552572706935
+      },
+      "tables": {
+        "occupiedSeconds": 66164225,
+        "availableSeconds": 432000000,
+        "utilisation": 0.15315792824074073
+      },
+      "invariantFailures": 0
+    },
+    "B3_DOMINATED_40": {
+      "nights": 1000,
+      "participants": 40000,
+      "runtimeMs": 956.1974890000201,
+      "waitSeconds": {
+        "count": 85997,
+        "median": 120,
+        "p95": 1447,
+        "max": 13051
+      },
+      "unmatched": {
+        "participants": 201,
+        "rate": 0.005025
+      },
+      "assignment": {
+        "seats": 75848,
+        "preferred": 70486,
+        "preferredRate": 0.9293059803818162,
+        "secondary": 5362,
+        "secondaryRate": 0.07069401961818374
+      },
+      "immediateRematch": {
+        "pairs": 15078,
+        "rate": 0.1596366408334392
+      },
+      "podDistribution": {
+        "3": 13180,
+        "4": 8852,
+        "5": 180
+      },
+      "requeue": {
+        "count": 41487,
+        "decisions": 75848,
+        "rate": 0.5469755300073832
+      },
+      "tables": {
+        "occupiedSeconds": 85946985,
+        "availableSeconds": 144000000,
+        "utilisation": 0.5968540625
+      },
+      "invariantFailures": 0
+    },
+    "B4_STARVATION_30": {
+      "nights": 1000,
+      "participants": 30000,
+      "runtimeMs": 635.8543660000087,
+      "waitSeconds": {
+        "count": 62332,
+        "median": 167,
+        "p95": 2065,
+        "max": 12822
+      },
+      "unmatched": {
+        "participants": 417,
+        "rate": 0.0139
+      },
+      "assignment": {
+        "seats": 55038,
+        "preferred": 52756,
+        "preferredRate": 0.9585377375631382,
+        "secondary": 2282,
+        "secondaryRate": 0.0414622624368618
+      },
+      "immediateRematch": {
+        "pairs": 10969,
+        "rate": 0.17413598768077979
+      },
+      "podDistribution": {
+        "3": 13089,
+        "4": 3909,
+        "5": 27
+      },
+      "requeue": {
+        "count": 30147,
+        "decisions": 55038,
+        "rate": 0.5477488280824158
+      },
+      "tables": {
+        "occupiedSeconds": 65501584,
+        "availableSeconds": 115200000,
+        "utilisation": 0.5685901388888889
+      },
+      "invariantFailures": 0
+    },
+    "EVEN_BRACKET_SPLIT_40": {
+      "nights": 1000,
+      "participants": 40000,
+      "runtimeMs": 1032.7818610000068,
+      "waitSeconds": {
+        "count": 87715,
+        "median": 123,
+        "p95": 1249,
+        "max": 7137
+      },
+      "unmatched": {
+        "participants": 10,
+        "rate": 0.00025
+      },
+      "assignment": {
+        "seats": 77332,
+        "preferred": 68553,
+        "preferredRate": 0.8864764909739823,
+        "secondary": 8779,
+        "secondaryRate": 0.1135235090260177
+      },
+      "immediateRematch": {
+        "pairs": 15287,
+        "rate": 0.15834723071026818
+      },
+      "podDistribution": {
+        "3": 13433,
+        "4": 8912,
+        "5": 277
+      },
+      "requeue": {
+        "count": 42333,
+        "decisions": 77332,
+        "rate": 0.5474189210158796
+      },
+      "tables": {
+        "occupiedSeconds": 87586451,
+        "availableSeconds": 144000000,
+        "utilisation": 0.6082392430555555
+      },
+      "invariantFailures": 0
+    },
+    "HIGH_FLEX_40": {
+      "nights": 1000,
+      "participants": 40000,
+      "runtimeMs": 1367.3463899999842,
+      "waitSeconds": {
+        "count": 87842,
+        "median": 120,
+        "p95": 1175,
+        "max": 9495
+      },
+      "unmatched": {
+        "participants": 28,
+        "rate": 0.0007
+      },
+      "assignment": {
+        "seats": 77464,
+        "preferred": 60680,
+        "preferredRate": 0.7833316121036868,
+        "secondary": 16784,
+        "secondaryRate": 0.21666838789631312
+      },
+      "immediateRematch": {
+        "pairs": 14967,
+        "rate": 0.14989484226339508
+      },
+      "podDistribution": {
+        "3": 11644,
+        "4": 10073,
+        "5": 448
+      },
+      "requeue": {
+        "count": 42410,
+        "decisions": 77464,
+        "rate": 0.5474801197975834
+      },
+      "tables": {
+        "occupiedSeconds": 85734787,
+        "availableSeconds": 144000000,
+        "utilisation": 0.5953804652777778
+      },
+      "invariantFailures": 0
+    },
+    "ZERO_FLEX_40": {
+      "nights": 1000,
+      "participants": 40000,
+      "runtimeMs": 872.6243729999369,
+      "waitSeconds": {
+        "count": 83907,
+        "median": 152,
+        "p95": 1824,
+        "max": 5631
+      },
+      "unmatched": {
+        "participants": 459,
+        "rate": 0.011475
+      },
+      "assignment": {
+        "seats": 74020,
+        "preferred": 74020,
+        "preferredRate": 1,
+        "secondary": 0,
+        "secondaryRate": 0
+      },
+      "immediateRematch": {
+        "pairs": 15918,
+        "rate": 0.17780508237922368
+      },
+      "podDistribution": {
+        "3": 14595,
+        "4": 7365,
+        "5": 155
+      },
+      "requeue": {
+        "count": 40518,
+        "decisions": 74020,
+        "rate": 0.5473925965955148
+      },
+      "tables": {
+        "occupiedSeconds": 85579061,
+        "availableSeconds": 144000000,
+        "utilisation": 0.5942990347222222
+      },
+      "invariantFailures": 0
+    },
+    "HIGH_REQUEUE_40": {
+      "nights": 1000,
+      "participants": 40000,
+      "runtimeMs": 1524.5234850000597,
+      "waitSeconds": {
+        "count": 126042,
+        "median": 120,
+        "p95": 1165,
+        "max": 14194
+      },
+      "unmatched": {
+        "participants": 124,
+        "rate": 0.0031
+      },
+      "assignment": {
+        "seats": 99696,
+        "preferred": 90748,
+        "preferredRate": 0.9102471513400738,
+        "secondary": 8948,
+        "secondaryRate": 0.08975284865992618
+      },
+      "immediateRematch": {
+        "pairs": 38211,
+        "rate": 0.3024577512170024
+      },
+      "podDistribution": {
+        "3": 16401,
+        "4": 11927,
+        "5": 557
+      },
+      "requeue": {
+        "count": 84652,
+        "decisions": 99696,
+        "rate": 0.849101267854277
+      },
+      "tables": {
+        "occupiedSeconds": 117572514,
+        "availableSeconds": 144000000,
+        "utilisation": 0.8164757916666666
+      },
+      "invariantFailures": 0
+    },
+    "LOW_REQUEUE_40": {
+      "nights": 1000,
+      "participants": 40000,
+      "runtimeMs": 752.2255669999577,
+      "waitSeconds": {
+        "count": 46296,
+        "median": 144,
+        "p95": 1747,
+        "max": 8069
+      },
+      "unmatched": {
+        "participants": 544,
+        "rate": 0.0136
+      },
+      "assignment": {
+        "seats": 45987,
+        "preferred": 41785,
+        "preferredRate": 0.9086263509252615,
+        "secondary": 4202,
+        "secondaryRate": 0.09137364907473851
+      },
+      "immediateRematch": {
+        "pairs": 989,
+        "rate": 0.01758222222222222
+      },
+      "podDistribution": {
+        "3": 8742,
+        "4": 4749,
+        "5": 153
+      },
+      "requeue": {
+        "count": 4644,
+        "decisions": 45987,
+        "rate": 0.10098506099549873
+      },
+      "tables": {
+        "occupiedSeconds": 49483923,
+        "availableSeconds": 144000000,
+        "utilisation": 0.34363835416666666
+      },
+      "invariantFailures": 0
+    },
+    "LONG_GAMES_40": {
+      "nights": 1000,
+      "participants": 40000,
+      "runtimeMs": 671.6864069999901,
+      "waitSeconds": {
+        "count": 68325,
+        "median": 144,
+        "p95": 3592,
+        "max": 13260
+      },
+      "unmatched": {
+        "participants": 723,
+        "rate": 0.018075
+      },
+      "assignment": {
+        "seats": 49272,
+        "preferred": 44764,
+        "preferredRate": 0.9085078746549765,
+        "secondary": 4508,
+        "secondaryRate": 0.09149212534502354
+      },
+      "immediateRematch": {
+        "pairs": 4649,
+        "rate": 0.0753167222888248
+      },
+      "podDistribution": {
+        "3": 8548,
+        "4": 5587,
+        "5": 256
+      },
+      "requeue": {
+        "count": 26894,
+        "decisions": 49272,
+        "rate": 0.5458272446825784
+      },
+      "tables": {
+        "occupiedSeconds": 111189259,
+        "availableSeconds": 144000000,
+        "utilisation": 0.7721476319444445
+      },
+      "invariantFailures": 0
+    },
+    "SHORT_GAMES_40": {
+      "nights": 1000,
+      "participants": 40000,
+      "runtimeMs": 1383.4184210000021,
+      "waitSeconds": {
+        "count": 100944,
+        "median": 120,
+        "p95": 1027,
+        "max": 9163
+      },
+      "unmatched": {
+        "participants": 140,
+        "rate": 0.0035
+      },
+      "assignment": {
+        "seats": 98913,
+        "preferred": 89893,
+        "preferredRate": 0.9088087511247258,
+        "secondary": 9020,
+        "secondaryRate": 0.09119124887527423
+      },
+      "immediateRematch": {
+        "pairs": 22575,
+        "rate": 0.1876745810055866
+      },
+      "podDistribution": {
+        "3": 18806,
+        "4": 10560,
+        "5": 51
+      },
+      "requeue": {
+        "count": 54327,
+        "decisions": 98913,
+        "rate": 0.549240241424282
+      },
+      "tables": {
+        "occupiedSeconds": 50011047,
+        "availableSeconds": 144000000,
+        "utilisation": 0.3472989375
+      },
+      "invariantFailures": 0
+    },
+    "PEOPLE_LEAVE_EARLY_40": {
+      "nights": 1000,
+      "participants": 40000,
+      "runtimeMs": 525.3474659999883,
+      "waitSeconds": {
+        "count": 48543,
+        "median": 134,
+        "p95": 1424,
+        "max": 8912
+      },
+      "unmatched": {
+        "participants": 1997,
+        "rate": 0.049925
+      },
+      "assignment": {
+        "seats": 47980,
+        "preferred": 43511,
+        "preferredRate": 0.9068570237599,
+        "secondary": 4469,
+        "secondaryRate": 0.09314297624010004
+      },
+      "immediateRematch": {
+        "pairs": 2423,
+        "rate": 0.04166809974204643
+      },
+      "podDistribution": {
+        "3": 9320,
+        "4": 4925,
+        "5": 64
+      },
+      "requeue": {
+        "count": 11974,
+        "decisions": 47980,
+        "rate": 0.24956231763234682
+      },
+      "tables": {
+        "occupiedSeconds": 52084617,
+        "availableSeconds": 144000000,
+        "utilisation": 0.3616987291666667
+      },
+      "invariantFailures": 0
+    },
+    "HIGH_PAUSE_RATE_40": {
+      "nights": 1000,
+      "participants": 40000,
+      "runtimeMs": 1254.7969159999666,
+      "waitSeconds": {
+        "count": 102779,
+        "median": 151,
+        "p95": 1248,
+        "max": 11193
+      },
+      "unmatched": {
+        "participants": 142,
+        "rate": 0.00355
+      },
+      "assignment": {
+        "seats": 85063,
+        "preferred": 77214,
+        "preferredRate": 0.9077272139473096,
+        "secondary": 7849,
+        "secondaryRate": 0.09227278605269036
+      },
+      "immediateRematch": {
+        "pairs": 15973,
+        "rate": 0.15509724528338528
+      },
+      "podDistribution": {
+        "3": 16815,
+        "4": 8347,
+        "5": 246
+      },
+      "requeue": {
+        "count": 25544,
+        "decisions": 85063,
+        "rate": 0.30029507541469264
+      },
+      "tables": {
+        "occupiedSeconds": 101537187,
+        "availableSeconds": 144000000,
+        "utilisation": 0.7051193541666667
+      },
+      "invariantFailures": 0
+    },
+    "ODD_PLAYER_COUNTS": {
+      "nights": 1000,
+      "participants": 31000,
+      "runtimeMs": 687.7221969999991,
+      "waitSeconds": {
+        "count": 65202,
+        "median": 160,
+        "p95": 1947,
+        "max": 12034
+      },
+      "unmatched": {
+        "participants": 227,
+        "rate": 0.00732258064516129
+      },
+      "assignment": {
+        "seats": 57624,
+        "preferred": 52441,
+        "preferredRate": 0.9100548382618353,
+        "secondary": 5183,
+        "secondaryRate": 0.08994516173816465
+      },
+      "immediateRematch": {
+        "pairs": 11138,
+        "rate": 0.16620903718736943
+      },
+      "podDistribution": {
+        "3": 13056,
+        "4": 4534,
+        "5": 64
+      },
+      "requeue": {
+        "count": 31473,
+        "decisions": 57624,
+        "rate": 0.5461786755518534
+      },
+      "tables": {
+        "occupiedSeconds": 67923440,
+        "availableSeconds": 115200000,
+        "utilisation": 0.5896131944444445
+      },
+      "invariantFailures": 0
+    },
+    "BROKEN_TABLE_MID_EVENT": {
+      "nights": 1000,
+      "participants": 40000,
+      "runtimeMs": 1017.8423769999863,
+      "waitSeconds": {
+        "count": 85322,
+        "median": 167,
+        "p95": 1957,
+        "max": 11778
+      },
+      "unmatched": {
+        "participants": 184,
+        "rate": 0.0046
+      },
+      "assignment": {
+        "seats": 74716,
+        "preferred": 68252,
+        "preferredRate": 0.9134857326409337,
+        "secondary": 6464,
+        "secondaryRate": 0.08651426735906634
+      },
+      "immediateRematch": {
+        "pairs": 16205,
+        "rate": 0.16864046955001458
+      },
+      "podDistribution": {
+        "3": 12808,
+        "4": 7458,
+        "5": 1292
+      },
+      "requeue": {
+        "count": 40906,
+        "decisions": 74716,
+        "rate": 0.5474864821457252
+      },
+      "tables": {
+        "occupiedSeconds": 83915114,
+        "availableSeconds": 127702558,
+        "utilisation": 0.6571138066004911
+      },
+      "invariantFailures": 0
+    },
+    "SMALL_EVENT_8": {
+      "nights": 1000,
+      "participants": 8000,
+      "runtimeMs": 249.14384599998812,
+      "waitSeconds": {
+        "count": 12405,
+        "median": 153,
+        "p95": 3966,
+        "max": 13350
+      },
+      "unmatched": {
+        "participants": 1034,
+        "rate": 0.12925
+      },
+      "assignment": {
+        "seats": 11538,
+        "preferred": 10413,
+        "preferredRate": 0.9024960998439937,
+        "secondary": 1125,
+        "secondaryRate": 0.09750390015600624
+      },
+      "immediateRematch": {
+        "pairs": 2554,
+        "rate": 0.1945163747143945
+      },
+      "podDistribution": {
+        "3": 2788,
+        "4": 791,
+        "5": 2
+      },
+      "requeue": {
+        "count": 6360,
+        "decisions": 11538,
+        "rate": 0.5512220488819553
+      },
+      "tables": {
+        "occupiedSeconds": 13441322,
+        "availableSeconds": 28800000,
+        "utilisation": 0.46671256944444445
+      },
+      "invariantFailures": 0
+    },
+    "LARGE_EVENT_120": {
+      "nights": 1000,
+      "participants": 120000,
+      "runtimeMs": 6101.992500000044,
+      "waitSeconds": {
+        "count": 270929,
+        "median": 77,
+        "p95": 605,
+        "max": 7654
+      },
+      "unmatched": {
+        "participants": 4,
+        "rate": 0.000033333333333333335
+      },
+      "assignment": {
+        "seats": 238701,
+        "preferred": 217110,
+        "preferredRate": 0.9095479281611724,
+        "secondary": 21591,
+        "secondaryRate": 0.09045207183882766
+      },
+      "immediateRematch": {
+        "pairs": 39486,
+        "rate": 0.12344467092675729
+      },
+      "podDistribution": {
+        "3": 27264,
+        "4": 37871,
+        "5": 1085
+      },
+      "requeue": {
+        "count": 131193,
+        "decisions": 238701,
+        "rate": 0.5496122764462654
+      },
+      "tables": {
+        "occupiedSeconds": 256002417,
+        "availableSeconds": 432000000,
+        "utilisation": 0.5925981875
+      },
+      "invariantFailures": 0
+    }
+  }
+}

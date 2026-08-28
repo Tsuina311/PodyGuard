@@ -164,11 +164,11 @@ export class EventService {
       createdAt.getTime() + lifetimeHours * 60 * 60 * 1000,
     );
     const allowFivePods =
-      gameMode === 'treachery' ||
-      gameMode === 'assassin' ||
-      gameMode === 'multiplayer'
-        ? preferredPodSize >= 5
-        : gameMode === 'commander' && Boolean(input.allowFivePods);
+      gameMode === 'commander' ||
+      ((gameMode === 'treachery' ||
+        gameMode === 'assassin' ||
+        gameMode === 'multiplayer') &&
+        preferredPodSize >= 5);
     const labels = resolveTableLabels({ count: input.tableCount }, 0);
     const hostCredentialHash = await hashHostPin(hostPin);
 
@@ -184,7 +184,7 @@ export class EventService {
           allowThreePods:
             gameMode === 'assassin' ||
             gameMode === 'multiplayer' ||
-            (gameMode === 'commander' && input.allowThreePods !== false),
+            gameMode === 'commander',
           allowFivePods,
           preferredPodSize,
           tournamentFormat,
@@ -1020,9 +1020,7 @@ export class EventService {
       stored.gameMode === 'multiplayer'
         ? preferredPodSize >= 5
         : stored.gameMode === 'commander'
-          ? patch.allowFivePods === undefined
-            ? stored.allowFivePods
-            : Boolean(patch.allowFivePods)
+          ? true
           : false;
     const expiresAt =
       patch.lifetimeHours === undefined
@@ -1033,7 +1031,9 @@ export class EventService {
           );
     const updated = await this.store.updateEvent(stored.id, {
       allowThreePods:
-        stored.gameMode === 'assassin' || stored.gameMode === 'multiplayer'
+        stored.gameMode === 'assassin' ||
+        stored.gameMode === 'multiplayer' ||
+        stored.gameMode === 'commander'
           ? true
           : stored.gameMode === 'treachery' || stored.gameMode === 'duel'
             ? false
@@ -1177,7 +1177,7 @@ export class EventService {
     ).length;
     const matchOptions = eventMatchOptions(stored);
     const seatsNeeded =
-      freeTables.length * Math.max(...(matchOptions.allowedSizes ?? [4]));
+      freeTables.length * (matchOptions.preferredSize ?? 4);
     const botsToAdd = Math.max(0, seatsNeeded - readyCount);
     const taken = new Set(
       people.map((row) => row.displayName.toLowerCase()),

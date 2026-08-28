@@ -123,6 +123,16 @@ export function eventMatchOptions(input: {
       allowedSizes: [STAR_POD_SIZE],
     };
   }
+  if (input.gameMode === 'commander') {
+    const preferredSize = Math.min(
+      FIVE_POD_SIZE,
+      Math.max(FALLBACK_POD_SIZE, input.preferredPodSize ?? PREFERRED_POD_SIZE),
+    );
+    return {
+      preferredSize,
+      allowedSizes: [FIVE_POD_SIZE, PREFERRED_POD_SIZE, FALLBACK_POD_SIZE],
+    };
+  }
   if (input.gameMode === 'multiplayer') {
     const preferredSize = Math.min(
       6,

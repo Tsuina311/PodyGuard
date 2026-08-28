@@ -8,7 +8,12 @@ export {
 export { EventQueue, StableEventQueue, type ScheduledEvent } from './event-queue.js';
 export {
   LegacyV1Strategy,
+  QueueV2ExperimentalStrategy,
+  QueueV2OpportunityGraceStrategy,
+  UNLIMITED_EXISTING_WAIT,
   createLegacyV1Strategy,
+  createQueueV2ExperimentalStrategy,
+  createQueueV2OpportunityGraceStrategy,
   legacyV1,
   legacyV1Strategy,
   type MatchmakingInput,
@@ -18,6 +23,7 @@ export {
   type MatchmakingSeat,
   type MatchmakingSettings,
   type MatchmakingStrategy,
+  type MatchmakingStrategyName,
   type MatchmakingTable,
   type StrategyDeck,
 } from './strategy.js';
@@ -74,6 +80,7 @@ export {
   type DebugTimelineEntry,
   type ReproducibilityMetadata,
   type SimulationOptions,
+  type SimulationRandomizationMode,
   type SimulationResult,
 } from './engine.js';
 export {
@@ -105,15 +112,54 @@ export {
   type BenchmarkResult,
 } from './benchmark.js';
 export {
+  GRACE_SWEEP_PATH,
+  GRACE_SWEEP_SCENARIOS,
+  GRACE_SWEEP_SECONDS,
+  aggregateGraceSweepRecords,
+  formatGraceSweepReport,
+  paretoEfficientGracePeriods,
+  runGraceSweep,
+  writeGraceSweep,
+  type CountRate,
+  type GraceSweepCandidate,
+  type GraceSweepMetricSummary,
+  type GraceSweepOptions,
+  type GraceSweepResult,
+} from './grace-sweep.js';
+export {
+  CATASTROPHIC_SMALL_EVENT_SEEDS,
+  OLDEST_READY_CONTROL_GRACE_SECONDS,
+  OPPORTUNITY_GRACE_SECONDS,
+  OPPORTUNITY_GRACE_SWEEP_PATH,
+  OPPORTUNITY_MAX_EXISTING_WAIT_SECONDS,
+  createOpportunityGraceStrategy,
+  formatOpportunityGraceSweepReport,
+  opportunityGraceCandidateSpecs,
+  replayCatastrophicSeeds,
+  runOpportunityGraceSweep,
+  writeOpportunityGraceSweep,
+  type CatastrophicSeedReplay,
+  type OpportunityClock,
+  type OpportunityGraceCandidate,
+  type OpportunityGraceCandidateSpec,
+  type OpportunityGraceSweepOptions,
+  type OpportunityGraceSweepResult,
+} from './opportunity-grace-sweep.js';
+export {
   ARTIFACT_SCHEMA_VERSION,
   DEFAULT_ARTIFACT_DIRECTORY,
+  DEFAULT_BASELINE_DIRECTORY,
   LATEST_CSV_PATH,
   LATEST_JSON_PATH,
   artifactToCsv,
+  committedBaselinePath,
   compactBaseline,
   createArtifact,
   csvEscape,
+  listCommittedBaselines,
+  normalizeBaselineId,
   readArtifact,
+  writeCommittedBaseline,
   writeLatestArtifacts,
   type CompactBaseline,
   type SimulationArtifact,
@@ -121,6 +167,7 @@ export {
 export {
   compareArtifacts,
   formatComparisonReport,
+  formatSideBySideBaselines,
   type ComparisonResult,
   type MetricDelta,
 } from './compare.js';

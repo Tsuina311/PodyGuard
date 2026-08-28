@@ -538,26 +538,30 @@ export function HostPage() {
       <Panel title={t('host.podSizes')} aside={t('host.matching')}>
         {event.gameMode === 'commander' ? (
           <>
-            <label className="text-muted mb-2 flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={event.allowThreePods}
-                onChange={(change) =>
-                  void onToggleSetting({ allowThreePods: change.target.checked })
-                }
-              />
-              {t('host.allowLeftoverThree')}
-            </label>
-            <label className="text-muted flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={event.allowFivePods}
-                onChange={(change) =>
-                  void onToggleSetting({ allowFivePods: change.target.checked })
-                }
-              />
-              {t('host.allowFivePods')}
-            </label>
+            <p className="text-muted mb-3 text-sm">
+              {t('home.targetTableSize')}
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {[3, 4, 5].map((size) => (
+                <button
+                  key={size}
+                  type="button"
+                  className={`rounded-xl border p-2 text-sm font-semibold transition ${
+                    event.preferredPodSize === size
+                      ? 'border-neon bg-neon/10 text-neon'
+                      : 'border-muted/20 text-muted hover:border-muted/40'
+                  }`}
+                  onClick={() =>
+                    void onToggleSetting({ preferredPodSize: size })
+                  }
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+            <p className="text-muted mt-3 text-xs">
+              {t('host.matchingPrefers', { size: event.preferredPodSize })}
+            </p>
           </>
         ) : event.gameMode === 'treachery' ? (
           <>

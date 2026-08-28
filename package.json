@@ -19,6 +19,8 @@
     "simulation:test:heavy": "yarn workspace @podyguard/simulation test:heavy",
     "simulation:run": "tsx packages/simulation/src/cli.ts run",
     "simulation:benchmark": "tsx packages/simulation/src/cli.ts benchmark",
+    "simulation:sweep": "tsx packages/simulation/src/cli.ts sweep",
+    "simulation:sweep-opportunity": "tsx packages/simulation/src/cli.ts sweep-opportunity",
     "simulation:compare": "tsx packages/simulation/src/cli.ts compare",
     "db:generate": "yarn workspace @podyguard/server db:generate",
     "db:migrate": "yarn workspace @podyguard/server db:migrate"

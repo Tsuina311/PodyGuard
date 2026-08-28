@@ -149,7 +149,10 @@ manifest's `orientation`, so an iPhone shows a hint to turn the phone instead.
 | `yarn benchmark:matching` | Matcher timing report |
 | `yarn simulation:run --scenario NORMAL_FRIDAY_40 --seed 1` | Reproduce one simulated event night |
 | `yarn simulation:benchmark --runs 1000` | Benchmark all 23 event-night scenarios and write JSON/CSV artifacts |
+| `yarn simulation:sweep --runs 100 --seed-start 1` | Sweep queue-v2 grace periods on one paired scenario/seed grid and write the grace report |
+| `yarn simulation:benchmark --runs 1000 --save-baseline queue-v2-alpha` | Same benchmark, then save a compact committed baseline |
 | `yarn simulation:compare` | Compare the legacy baseline with the latest compatible artifact (or rerun it) |
+| `yarn simulation:compare --baseline legacy-v1 --candidate queue-v2-grace-120s-maxwait-600s` | Side-by-side committed baseline history |
 | `yarn simulation:test` | Simulation unit and property tests |
 | `yarn simulation:test:heavy` | Simulation matcher baseline and heavier property tests |
 | `yarn db:generate` | Generate Drizzle migrations from schema (committed to repo) |

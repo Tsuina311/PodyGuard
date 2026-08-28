@@ -5,16 +5,42 @@ import { resolve } from 'node:path';
 import {
   LATEST_JSON_PATH,
   REPOSITORY_ROOT,
+  committedBaselinePath,
   createArtifact,
+  listCommittedBaselines,
+  normalizeBaselineId,
   readArtifact,
+  writeCommittedBaseline,
   writeLatestArtifacts,
   type CompactBaseline,
   type SimulationArtifact,
 } from './artifacts.js';
 import { benchmarkSuite, formatBenchmarkReport } from './benchmark.js';
-import { compareArtifacts, formatComparisonReport, type ComparableArtifact } from './compare.js';
-import { runSimulation } from './engine.js';
+import {
+  compareArtifacts,
+  formatComparisonReport,
+  type ComparableArtifact,
+} from './compare.js';
+import { runSimulation, type SimulationRandomizationMode } from './engine.js';
+import {
+  formatGraceSweepReport,
+  runGraceSweep,
+  writeGraceSweep,
+} from './grace-sweep.js';
+import {
+  formatOpportunityGraceSweepReport,
+  runOpportunityGraceSweep,
+  writeOpportunityGraceSweep,
+} from './opportunity-grace-sweep.js';
 import { getScenario } from './scenarios.js';
+import {
+  createQueueV2ExperimentalStrategy,
+  createQueueV2OpportunityGraceStrategy,
+  legacyV1Strategy,
+  UNLIMITED_EXISTING_WAIT,
+  type MatchmakingStrategy,
+  type MatchmakingStrategyName,
+} from './strategy.js';
 
 const DEFAULT_BASELINE = resolve(
   REPOSITORY_ROOT,
@@ -36,6 +62,12 @@ async function main(): Promise<void> {
     case 'benchmark':
       benchmarkCommand(args);
       break;
+    case 'sweep':
+      sweepCommand(args);
+      break;
+    case 'sweep-opportunity':
+      sweepOpportunityCommand(args);
+      break;
     case 'compare':
       compareCommand(args);
       break;
@@ -50,11 +82,26 @@ async function main(): Promise<void> {
 }
 
 function runCommand(args: Arguments): void {
-  assertOnlyFlags(args, ['scenario', 'seed', 'verbose']);
+  assertOnlyFlags(args, [
+    'scenario',
+    'seed',
+    'verbose',
+    'strategy',
+    'grace',
+    'max-existing-wait',
+    'randomization',
+  ]);
   const scenarioId = stringFlag(args, 'scenario') ?? 'NORMAL_FRIDAY_40';
   const seed = integerFlag(args, 'seed', 1);
   const verbose = booleanFlag(args, 'verbose');
-  const result = runSimulation(getScenario(scenarioId), { seed, debug: verbose });
+  const strategy = strategyFlag(args);
+  const randomizationMode = randomizationFlag(args);
+  const result = runSimulation(getScenario(scenarioId), {
+    seed,
+    strategy,
+    randomizationMode,
+    debug: verbose,
+  });
   const metrics = result.metrics;
   console.log(`${scenarioId} seed=${seed} strategy=${result.metadata.strategyId}`);
   console.log(
@@ -75,12 +122,26 @@ function runCommand(args: Arguments): void {
 }
 
 function benchmarkCommand(args: Arguments): SimulationArtifact {
-  assertOnlyFlags(args, ['runs', 'seed', 'seed-start']);
+  assertOnlyFlags(args, [
+    'runs',
+    'seed',
+    'seed-start',
+    'save-baseline',
+    'strategy',
+    'grace',
+    'max-existing-wait',
+    'randomization',
+  ]);
   const runs = integerFlag(args, 'runs', 1000);
   const seedStart = integerFlag(args, 'seed-start', integerFlag(args, 'seed', 1));
+  const saveBaseline = stringFlag(args, 'save-baseline');
+  const strategy = strategyFlag(args);
+  const randomizationMode = args.flags.has('randomization') ? randomizationFlag(args) : undefined;
   const benchmark = benchmarkSuite({
     runs,
     seedStart,
+    strategy,
+    randomizationMode,
     onProgress: process.stdout.isTTY
       ? (completed, total) => {
           if (completed === total || completed % Math.max(1, Math.floor(total / 20)) === 0) {
@@ -94,25 +155,83 @@ function benchmarkCommand(args: Arguments): SimulationArtifact {
   const paths = writeLatestArtifacts(artifact);
   console.log(formatBenchmarkReport(benchmark));
   console.log(`\nArtifacts: ${paths.jsonPath}\n           ${paths.csvPath}`);
+  if (saveBaseline) {
+    const committed = writeCommittedBaseline(artifact, saveBaseline);
+    console.log(`Baseline:  ${committed.path}`);
+  }
   if (benchmark.global.invariantFailures > 0) {
     process.exitCode = 1;
   }
   return artifact;
 }
 
+function sweepCommand(args: Arguments): void {
+  assertOnlyFlags(args, ['runs', 'seed', 'seed-start']);
+  const runs = integerFlag(args, 'runs', 100);
+  const seedStart = integerFlag(args, 'seed-start', integerFlag(args, 'seed', 1));
+  const result = runGraceSweep({
+    runs,
+    seedStart,
+    onProgress: process.stdout.isTTY
+      ? (completed, total) => {
+          if (completed === total || completed % Math.max(1, Math.floor(total / 100)) === 0) {
+            process.stderr.write(`\rSweeping ${completed}/${total} nights`);
+            if (completed === total) process.stderr.write('\n');
+          }
+        }
+      : undefined,
+  });
+  const path = writeGraceSweep(result);
+  console.log(formatGraceSweepReport(result));
+  console.log(`\nArtifact: ${path}`);
+  if (result.candidates.some((candidate) => candidate.global.invariantFailures > 0)) {
+    process.exitCode = 1;
+  }
+}
+
+function sweepOpportunityCommand(args: Arguments): void {
+  assertOnlyFlags(args, ['runs', 'seed', 'seed-start']);
+  const runs = integerFlag(args, 'runs', 100);
+  const seedStart = integerFlag(args, 'seed-start', integerFlag(args, 'seed', 1));
+  const result = runOpportunityGraceSweep({
+    runs,
+    seedStart,
+    onProgress: process.stdout.isTTY
+      ? (completed, total) => {
+          if (completed === total || completed % Math.max(1, Math.floor(total / 100)) === 0) {
+            process.stderr.write(`\rOpportunity sweep ${completed}/${total} nights`);
+            if (completed === total) process.stderr.write('\n');
+          }
+        }
+      : undefined,
+  });
+  const path = writeOpportunityGraceSweep(result);
+  console.log(formatOpportunityGraceSweepReport(result));
+  console.log(`\nArtifact: ${path}`);
+  if (result.candidates.some((candidate) => candidate.global.invariantFailures > 0)) {
+    process.exitCode = 1;
+  }
+}
+
 function compareCommand(args: Arguments): void {
   assertOnlyFlags(args, ['baseline', 'candidate', 'runs', 'seed', 'seed-start']);
-  const baselinePath = resolvePath(stringFlag(args, 'baseline') ?? args.positionals[0] ?? DEFAULT_BASELINE);
+  const baselinePath = resolveArtifactRef(
+    stringFlag(args, 'baseline') ?? args.positionals[0] ?? DEFAULT_BASELINE,
+  );
   if (!existsSync(baselinePath)) {
+    const available = listCommittedBaselines()
+      .map((path) => path.split('/').at(-1))
+      .join(', ');
     throw new Error(
-      `Baseline not found: ${baselinePath}. Pass --baseline <artifact.json> or add the default baseline.`,
+      `Baseline not found: ${baselinePath}. Pass --baseline <id|artifact.json>. Committed: ${available || 'none'}.`,
     );
   }
   const baseline = readArtifact(baselinePath);
+  console.log(`Baseline:  ${baselinePath}`);
   const requestedCandidate = stringFlag(args, 'candidate') ?? args.positionals[1];
   const candidate = resolveCandidate(args, baseline, requestedCandidate);
   const comparison = compareArtifacts(baseline, candidate);
-  console.log(formatComparisonReport(comparison));
+  console.log(formatComparisonReport(comparison, { baseline, candidate }));
   if (comparison.hardFailure) process.exitCode = 1;
 }
 
@@ -122,7 +241,7 @@ function resolveCandidate(
   requested: string | undefined,
 ): ComparableArtifact {
   if (requested && requested !== 'current') {
-    return readArtifact(resolvePath(requested));
+    return readArtifact(resolveArtifactRef(requested));
   }
   if (!requested && existsSync(LATEST_JSON_PATH)) {
     const latest = readArtifact(LATEST_JSON_PATH);
@@ -209,6 +328,54 @@ function integerFlag(args: Arguments, name: string, fallback: number): number {
   return value;
 }
 
+function strategyFlag(args: Arguments): MatchmakingStrategy {
+  const name = (stringFlag(args, 'strategy') ?? 'legacy-v1') as MatchmakingStrategyName;
+  const graceSeconds = integerFlag(args, 'grace', 0);
+  if (graceSeconds < 0) throw new Error('--grace must be non-negative.');
+  switch (name) {
+    case 'legacy-v1':
+      return legacyV1Strategy;
+    case 'queue-v2-experimental':
+      return createQueueV2ExperimentalStrategy(graceSeconds);
+    case 'queue-v2-opportunity-grace':
+      return createQueueV2OpportunityGraceStrategy(graceSeconds, maxExistingWaitFlag(args));
+    default:
+      throw new Error(
+        `--strategy must be legacy-v1, queue-v2-experimental, or queue-v2-opportunity-grace, received "${String(name)}".`,
+      );
+  }
+}
+
+function maxExistingWaitFlag(args: Arguments): number {
+  const raw = stringFlag(args, 'max-existing-wait');
+  if (raw === undefined || raw === 'unlimited') return UNLIMITED_EXISTING_WAIT;
+  const value = Number(raw);
+  if (!Number.isSafeInteger(value) || value < 0) {
+    throw new Error('--max-existing-wait must be a non-negative safe integer or unlimited.');
+  }
+  return value;
+}
+
+function randomizationFlag(args: Arguments): SimulationRandomizationMode {
+  const mode = stringFlag(args, 'randomization') ?? 'legacy';
+  if (mode !== 'legacy' && mode !== 'paired-v1') {
+    throw new Error(`--randomization must be legacy or paired-v1, received "${mode}".`);
+  }
+  return mode;
+}
+
+function resolveArtifactRef(ref: string): string {
+  const asPath = resolvePath(ref);
+  if (existsSync(asPath)) return asPath;
+  try {
+    const committed = committedBaselinePath(normalizeBaselineId(ref));
+    if (existsSync(committed)) return committed;
+  } catch {
+    // Fall through to the original path so the caller can emit a not-found error.
+  }
+  return asPath;
+}
+
 function resolvePath(path: string): string {
   return resolve(process.cwd(), path);
 }
@@ -224,12 +391,18 @@ function percent(value: number): string {
 function printUsage(): void {
   console.log(`PodyGuard simulation laboratory
 
-  yarn simulation:run --scenario NORMAL_FRIDAY_40 --seed 1 [--verbose]
-  yarn simulation:benchmark [--runs 1000] [--seed-start 1]
-  yarn simulation:compare [baseline.json] [candidate.json|current]
+  yarn simulation:run --scenario NORMAL_FRIDAY_40 --seed 1 [--strategy legacy-v1|queue-v2-experimental|queue-v2-opportunity-grace] [--grace 120] [--max-existing-wait 300|unlimited] [--randomization legacy|paired-v1] [--verbose]
+  yarn simulation:benchmark [--runs 1000] [--seed-start 1] [--strategy legacy-v1|queue-v2-experimental|queue-v2-opportunity-grace] [--grace 120] [--max-existing-wait 300|unlimited] [--randomization legacy|paired-v1] [--save-baseline queue-v2-alpha]
+  yarn simulation:sweep [--runs 100] [--seed-start 1]
+  yarn simulation:sweep-opportunity [--runs 100] [--seed-start 1]
+  yarn simulation:compare [baseline.json|legacy-v1] [candidate.json|queue-v2-grace-120s-maxwait-600s|current]
 
 Compare defaults to packages/simulation/baselines/matcher-legacy-v1.json and uses
-artifacts/simulation/latest.json when compatible, otherwise rerunning the suite.`);
+artifacts/simulation/latest.json when compatible, otherwise rerunning the suite.
+Committed baselines in packages/simulation/baselines/ can be named by id
+(legacy-v1 or matcher-legacy-v1) and printed side by side.
+--save-baseline writes a compact committed copy of latest.json to
+packages/simulation/baselines/matcher-<id>.json. Do not overwrite matcher-legacy-v1.json.`);
 }
 
 main().catch((error: unknown) => {

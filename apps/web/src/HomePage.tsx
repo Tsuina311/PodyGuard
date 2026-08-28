@@ -50,8 +50,7 @@ export function HomePage() {
   const [hostFamily, setHostFamily] = useState<GameModeFamily | null>(
     'commander',
   );
-  const [allowThreePods, setAllowThreePods] = useState(true);
-  const [allowFivePods, setAllowFivePods] = useState(false);
+  const [commanderPodSize, setCommanderPodSize] = useState(4);
   const [preferredPodSize, setPreferredPodSize] = useState<TreacheryPodSize>(4);
   const [assassinPodSize, setAssassinPodSize] = useState<AssassinPodSize>(5);
   const [multiplayerPodSize, setMultiplayerPodSize] = useState(4);
@@ -72,21 +71,23 @@ export function HomePage() {
   );
   const trackerSeatOptions = seatCountsForMode(trackerMode);
   const eventPodSize =
-    gameMode === 'treachery'
-      ? preferredPodSize
-      : gameMode === 'assassin'
-        ? assassinPodSize
-        : gameMode === 'multiplayer'
-          ? multiplayerPodSize
-          : gameMode === 'duel' ||
-              gameMode === 'duel-commander' ||
-              gameMode === 'brawl'
-            ? 2
-            : gameMode === 'emperor'
-              ? 6
-              : gameMode === 'star'
-                ? 5
-                : 4;
+    gameMode === 'commander'
+      ? commanderPodSize
+      : gameMode === 'treachery'
+        ? preferredPodSize
+        : gameMode === 'assassin'
+          ? assassinPodSize
+          : gameMode === 'multiplayer'
+            ? multiplayerPodSize
+            : gameMode === 'duel' ||
+                gameMode === 'duel-commander' ||
+                gameMode === 'brawl'
+              ? 2
+              : gameMode === 'emperor'
+                ? 6
+                : gameMode === 'star'
+                  ? 5
+                  : 4;
   const tournamentEligible =
     gameMode !== 'two-headed-giant' &&
     gameMode !== 'archenemy-commander' &&
@@ -149,15 +150,13 @@ export function HomePage() {
         gameMode,
         rulesFormat,
         allowThreePods:
-          gameMode === 'commander'
-            ? allowThreePods
-            : gameMode === 'multiplayer' || gameMode === 'assassin',
+          gameMode === 'multiplayer' || gameMode === 'assassin'
+            ? true
+            : undefined,
         allowFivePods:
-          gameMode === 'commander'
-            ? allowFivePods
-            : gameMode === 'multiplayer'
-              ? multiplayerPodSize >= 5
-              : undefined,
+          gameMode === 'multiplayer'
+            ? multiplayerPodSize >= 5
+            : undefined,
         preferredPodSize: eventPodSize,
         lifetimeHours: Number(lifetimeHours),
         tournamentFormat: tournamentEligible
@@ -414,24 +413,34 @@ export function HomePage() {
             </div>
           </fieldset>
           {gameMode === 'commander' ? (
-            <>
-              <label className="text-muted mb-3 flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={allowThreePods}
-                  onChange={(change) => setAllowThreePods(change.target.checked)}
-                />
-                {t('home.allowThreePods')}
-              </label>
-              <label className="text-muted mb-4 flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={allowFivePods}
-                  onChange={(change) => setAllowFivePods(change.target.checked)}
-                />
-                {t('home.allowFivePods')}
-              </label>
-            </>
+            <fieldset className="mb-4">
+              <legend className="text-muted mb-2 text-sm">
+                {t('home.targetTableSize')}
+              </legend>
+              <div className="grid grid-cols-3 gap-2">
+                {[3, 4, 5].map((size) => (
+                  <label
+                    key={size}
+                    className={cx(
+                      'cursor-pointer rounded-xl border p-2 text-center text-sm font-semibold transition',
+                      commanderPodSize === size
+                        ? 'border-neon bg-neon/10 text-neon'
+                        : 'border-muted/20 text-muted hover:border-muted/40',
+                    )}
+                  >
+                    <input
+                      type="radio"
+                      name="commanderPodSize"
+                      value={size}
+                      checked={commanderPodSize === size}
+                      onChange={() => setCommanderPodSize(size)}
+                      className="sr-only"
+                    />
+                    {size}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
           ) : gameMode === 'multiplayer' ? (
             <fieldset className="mb-4">
               <legend className="text-muted mb-2 text-sm">
@@ -629,6 +638,9 @@ function modeHintKey(mode: GameMode, family: GameModeFamily): string {
 }
 
 function modeHostHintKey(mode: GameMode, family: GameModeFamily): string {
+  if (mode === 'commander') {
+    return 'home.targetTableSize';
+  }
   if (family === 'normal' && mode !== 'duel' && mode !== 'multiplayer') {
     return `modes.${mode}.normal.hostHint`;
   }

@@ -253,8 +253,19 @@ Runtime artifacts are written to gitignored `artifacts/simulation/`:
 - `latest.csv`: one escaped row per simulated night.
 
 The curated, compact baseline is committed at
-`packages/simulation/baselines/matcher-legacy-v1.json`. Raw per-night benchmark
-rows are not committed.
+`packages/simulation/baselines/matcher-legacy-v1.json`. After Experiment 1
+validation, a second compact baseline may be committed at
+`packages/simulation/baselines/matcher-queue-v2-grace-120s-maxwait-600s.json`.
+Raw per-night benchmark rows are not committed. Save additional baselines with:
+
+```bash
+yarn simulation:benchmark --runs 1000 --save-baseline queue-v2-alpha
+yarn simulation:compare --baseline legacy-v1 --candidate queue-v2-grace-120s-maxwait-600s
+```
+
+That command writes gitignored `artifacts/simulation/latest.json` and a compact
+`packages/simulation/baselines/matcher-queue-v2-alpha.json` containing matcher
+ID, Git SHA, scenario suite, seed range, timestamp, and metrics.
 
 Comparison runs use identical scenario IDs, suite version, seed range, and
 generated random streams. The report shows global deltas and per-scenario

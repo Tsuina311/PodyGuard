@@ -1,10 +1,18 @@
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import {
   ARTIFACT_SCHEMA_VERSION,
+  committedBaselinePath,
+  compactBaseline,
   createArtifact,
   csvEscape,
+  listCommittedBaselines,
+  normalizeBaselineId,
   readArtifact,
+  writeCommittedBaseline,
 } from './artifacts.js';
 import type { BenchmarkResult } from './benchmark.js';
 
@@ -31,6 +39,61 @@ describe('simulation artifacts', () => {
 
   it('rejects unsupported artifact schema versions', () => {
     expect(() => readArtifact(new URL(import.meta.url).pathname)).toThrow();
+  });
+
+  it('maps --save-baseline ids onto matcher-<id>.json without duplicating the prefix', () => {
+    expect(normalizeBaselineId('queue-v2-alpha')).toBe('queue-v2-alpha');
+    expect(normalizeBaselineId('matcher-queue-v2-alpha')).toBe('queue-v2-alpha');
+    expect(committedBaselinePath('queue-v2-alpha', '/tmp/baselines')).toBe(
+      '/tmp/baselines/matcher-queue-v2-alpha.json',
+    );
+    expect(() => normalizeBaselineId('queue v2')).toThrow(/slug/);
+  });
+
+  it('lists committed matcher-*.json baselines', () => {
+    const directory = mkdtempSync(join(tmpdir(), 'podyguard-baselines-'));
+    try {
+      writeCommittedBaseline(createArtifact(emptyBenchmark()), 'legacy-v1', directory);
+      writeCommittedBaseline(createArtifact(emptyBenchmark()), 'queue-v2-grace-120s-maxwait-600s', directory);
+      expect(listCommittedBaselines(directory).map((path) => path.split(/[/\\]/).at(-1))).toEqual([
+        'matcher-legacy-v1.json',
+        'matcher-queue-v2-grace-120s-maxwait-600s.json',
+      ]);
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  it('writes a compact committed baseline from latest.json contents', () => {
+    const directory = mkdtempSync(join(tmpdir(), 'podyguard-baseline-'));
+    try {
+      const artifact = createArtifact(emptyBenchmark(), '2026-08-28T08:41:53.094Z');
+      artifact.metadata.gitSha = 'b13a2ef3482338180436510f3c14094ed3ba744b';
+      const { path, baseline } = writeCommittedBaseline(artifact, 'queue-v2-alpha', directory);
+      expect(path).toBe(join(directory, 'matcher-queue-v2-alpha.json'));
+      expect(baseline).toEqual(compactBaseline(artifact, 'queue-v2-alpha'));
+      expect(baseline).toMatchObject({
+        schemaVersion: ARTIFACT_SCHEMA_VERSION,
+        generatedAt: '2026-08-28T08:41:53.094Z',
+        metadata: {
+          strategyId: 'queue-v2-alpha',
+          suiteVersion: 'suite-v1',
+          seedStart: 1,
+          seedEnd: 0,
+          gitSha: 'b13a2ef3482338180436510f3c14094ed3ba744b',
+        },
+        definitions: {
+          suite: 'suite-v1',
+          strategy: 'queue-v2-alpha',
+        },
+        global: artifact.global,
+        scenarios: artifact.scenarios,
+      });
+      expect(baseline).not.toHaveProperty('nights');
+      expect(JSON.parse(readFileSync(path, 'utf8'))).toEqual(baseline);
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
   });
 });
 

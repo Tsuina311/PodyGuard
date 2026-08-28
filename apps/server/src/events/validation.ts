@@ -114,6 +114,18 @@ export function assertPreferredPodSize(
   if (gameMode === 'star') {
     return 5;
   }
+  if (gameMode === 'commander') {
+    if (value === undefined || value === null) {
+      return 4;
+    }
+    const size = typeof value === 'number' ? value : Number(value);
+    if (!Number.isInteger(size) || size < 3 || size > 5) {
+      throw new InvalidEventInputError(
+        'Choose a Commander target table size from 3 to 5 players.',
+      );
+    }
+    return size;
+  }
   if (gameMode === 'multiplayer') {
     if (value === undefined || value === null) {
       return 4;
