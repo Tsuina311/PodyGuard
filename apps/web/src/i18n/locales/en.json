@@ -45,6 +45,8 @@
       "finishTable": "Could not finish the table.",
       "cancelPod": "Could not cancel the pod.",
       "removePlayer": "Could not remove that player.",
+      "startTournament": "Could not start the tournament.",
+      "tournamentResult": "Could not record that tournament result.",
       "updateSettings": "Could not update settings.",
       "matchTables": "Could not match tables.",
       "fillBots": "Could not fill tables with bots.",
@@ -1051,6 +1053,7 @@
     "generalRange": "General · range 1",
     "marks": "{{count}} marks",
     "winner": "Winner",
+    "confirmWinner": "Confirm?",
     "turnPhone": "Turn your phone for the full board",
     "matchMenu": "Match menu",
     "matchMenuElapsed": "Match menu. {{clock}} elapsed",
@@ -1154,6 +1157,46 @@
       "ring": "Ring temptation",
       "speed": "Speed",
       "ticket": "Tickets"
+    }
+  },
+  "tournament": {
+    "eventStructure": "Event structure",
+    "casual": "Casual queue",
+    "casualHint": "Players may join later and play as many games as they like.",
+    "singleElimination": "Single elimination",
+    "singleEliminationHint": "Suggested opening wave: up to {{count}} players with these tables.",
+    "teamModeUnavailable": "Tournament trees are not yet available for team-winner modes.",
+    "registrationHint": "{{count}} ready players will enter. Starting locks registration.",
+    "playerRegistrationHint": "Mark yourself ready before the host starts the tournament.",
+    "registrationClosed": "This tournament has started and registration is closed.",
+    "start": "Start tournament",
+    "schedule": "Schedule tournament matches",
+    "round": "Round {{number}}",
+    "match": "Match {{number}}",
+    "winner": "Winner",
+    "advanced": "Advanced",
+    "champion": "Champion",
+    "eliminated": "Eliminated",
+    "notEntered": "Not entered",
+    "notEnteredHint": "Only players who were ready when the host started entered this tournament.",
+    "youWon": "You won the tournament.",
+    "eliminatedHint": "Your tournament run is complete. You can still follow the remaining bracket.",
+    "advancedHint": "You advanced. Your next match will appear when the round is complete.",
+    "currentMatch": "Your match is assigned to {{table}}.",
+    "tablePending": "a table",
+    "waiting": "Waiting",
+    "waitingHint": "The host is preparing the next tournament round.",
+    "unknownPlayer": "Unknown player",
+    "phase": {
+      "registration": "Registration",
+      "in-progress": "In progress",
+      "completed": "Completed"
+    },
+    "matchStatus": {
+      "pending": "Pending",
+      "formed": "Seated",
+      "playing": "Playing",
+      "completed": "Complete"
     }
   },
   "feedback": {

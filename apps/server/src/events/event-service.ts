@@ -9,6 +9,13 @@ import {
   parseGameMode,
   parseRulesFormat,
   resolveRulesFormat,
+  cancelTournamentMatch,
+  completeTournamentMatch,
+  createTournamentState,
+  currentTournamentRound,
+  markTournamentMatchFormed,
+  markTournamentMatchPlaying,
+  startSingleElimination,
   treacheryIdentityById,
   treacheryDistribution,
   EventStatus,
@@ -26,6 +33,8 @@ import {
   type PublicChallengeCompletion,
   type RulesFormat,
   type TreacheryRoleAssignment,
+  type TournamentFormat,
+  type TournamentState,
 } from '@podyguard/shared';
 import { randomUUID } from 'node:crypto';
 import {
@@ -82,6 +91,7 @@ export type CreateEventInput = {
   allowFivePods?: boolean;
   preferredPodSize?: number;
   lifetimeHours?: number;
+  tournamentFormat?: TournamentFormat;
 };
 
 export type CreateEventResult = {
@@ -134,6 +144,20 @@ export class EventService {
       gameMode,
       input.preferredPodSize,
     );
+    const tournamentFormat =
+      input.tournamentFormat === 'single-elimination'
+        ? input.tournamentFormat
+        : undefined;
+    if (
+      tournamentFormat &&
+      (gameMode === 'two-headed-giant' ||
+        gameMode === 'archenemy-commander' ||
+        gameMode === 'emperor')
+    ) {
+      throw new InvalidEventInputError(
+        'Single-elimination tournaments currently require individual winners.',
+      );
+    }
     const lifetimeHours = assertLifetimeHours(input.lifetimeHours);
     const createdAt = this.now();
     const expiresAt = new Date(
@@ -163,6 +187,10 @@ export class EventService {
             (gameMode === 'commander' && input.allowThreePods !== false),
           allowFivePods,
           preferredPodSize,
+          tournamentFormat,
+          tournamentState: tournamentFormat
+            ? createTournamentState(tournamentFormat, preferredPodSize)
+            : undefined,
           expiresAt,
           createdAt,
         });
@@ -224,7 +252,11 @@ export class EventService {
     decks?: DeckDraft[],
   ): Promise<JoinEventResult> {
     const stored = await this.requireByJoinCode(joinCode);
-    if (stored.status !== EventStatus.Open) {
+    if (
+      stored.status !== EventStatus.Open ||
+      (stored.tournamentState &&
+        stored.tournamentState.phase !== 'registration')
+    ) {
       throw new EventNotJoinableError();
     }
     const name = assertDisplayName(displayName);
@@ -564,6 +596,100 @@ export class EventService {
     return { event, participants, tables };
   }
 
+  async startTournament(
+    joinCode: string,
+    hostToken: string,
+  ): Promise<PublicEvent> {
+    const stored = await this.requireHostToken(joinCode, hostToken);
+    if (!stored.tournamentState) {
+      throw new InvalidParticipantTransitionError(
+        'This is a casual event, not a tournament.',
+      );
+    }
+    if (stored.tournamentState.phase !== 'registration') {
+      throw new InvalidParticipantTransitionError(
+        'This tournament has already started.',
+      );
+    }
+    const people = await this.store.listParticipants(stored.id);
+    const entrantIds = people
+      .filter(
+        (person) =>
+          !person.isBot && person.status === ParticipantStatus.Ready,
+      )
+      .map((person) => person.id);
+    if (entrantIds.length < 2) {
+      throw new InvalidParticipantTransitionError(
+        'At least two ready players are required to start a tournament.',
+      );
+    }
+    const tournamentState = startSingleElimination(
+      stored.tournamentState,
+      entrantIds,
+      this.now().toISOString(),
+    );
+    await this.store.updateEvent(stored.id, { tournamentState });
+    await this.scheduleTournamentMatches(stored.id, tournamentState);
+    const updated = await this.store.findEventById(stored.id);
+    if (!updated) {
+      throw new EventNotFoundError();
+    }
+    return this.presentEvent(updated);
+  }
+
+  async reportTournamentResult(
+    joinCode: string,
+    hostToken: string,
+    matchId: string,
+    winnerParticipantId: string,
+  ): Promise<PublicEvent> {
+    const stored = await this.requireHostToken(joinCode, hostToken);
+    const tournamentState = stored.tournamentState;
+    const match = tournamentState?.rounds
+      .flatMap((round) => round.matches)
+      .find((candidate) => candidate.id === matchId);
+    if (
+      !tournamentState ||
+      !match?.podId ||
+      !match.tableId ||
+      match.status !== 'playing'
+    ) {
+      throw new InvalidParticipantTransitionError(
+        'That tournament match is not ready for a result.',
+      );
+    }
+    if (!match.participantIds.includes(winnerParticipantId)) {
+      throw new InvalidEventInputError(
+        'The winner must be a player in this tournament match.',
+      );
+    }
+    const pod = await this.store.findActivePodByTableId(
+      stored.id,
+      match.tableId,
+    );
+    if (!pod || pod.id !== match.podId) {
+      throw new PodNotFoundError();
+    }
+    await this.store.completePod(pod.id, {
+      winnerParticipantId,
+      requeue: false,
+    });
+    const next = completeTournamentMatch(
+      tournamentState,
+      matchId,
+      winnerParticipantId,
+      this.now().toISOString(),
+    );
+    await this.store.updateEvent(stored.id, { tournamentState: next });
+    await this.scheduleTournamentMatches(stored.id, next);
+    await this.track(stored.id, 'game_finished');
+    const updated = await this.store.findEventById(stored.id);
+    if (!updated) {
+      throw new EventNotFoundError();
+    }
+    return this.presentEvent(updated);
+  }
+
   async listTables(joinCode: string): Promise<PublicTable[]> {
     const stored = await this.requireByJoinCode(joinCode);
     return this.listTablesByEventId(stored.id);
@@ -630,6 +756,14 @@ export class EventService {
       );
     }
     await this.store.startPod(pod.id);
+    if (stored.tournamentState && pod.tournamentMatchId) {
+      await this.store.updateEvent(stored.id, {
+        tournamentState: markTournamentMatchPlaying(
+          stored.tournamentState,
+          pod.tournamentMatchId,
+        ),
+      });
+    }
     await this.track(stored.id, 'match_confirmed');
     return this.snapshotTable(stored.id, tableId);
   }
@@ -784,14 +918,35 @@ export class EventService {
       await this.store.completePod(pod.id, {
         winnerParticipantId: input.winnerParticipantId,
         durationSeconds,
+        requeue: !pod.tournamentMatchId,
       });
     } catch (error) {
-      if (!(error instanceof PodNotFoundError)) {
+      if (
+        !(error instanceof PodNotFoundError) ||
+        pod.tournamentMatchId
+      ) {
         throw error;
       }
     }
+    if (pod.tournamentMatchId) {
+      if (!stored.tournamentState) {
+        throw new InvalidParticipantTransitionError(
+          'This tournament bracket is unavailable.',
+        );
+      }
+      const tournamentState = completeTournamentMatch(
+        stored.tournamentState,
+        pod.tournamentMatchId,
+        input.winnerParticipantId,
+        this.now().toISOString(),
+      );
+      await this.store.updateEvent(stored.id, { tournamentState });
+      await this.scheduleTournamentMatches(stored.id, tournamentState);
+    }
     await this.track(stored.id, 'game_finished');
-    await this.track(stored.id, 'requeued');
+    if (!pod.tournamentMatchId) {
+      await this.track(stored.id, 'requeued');
+    }
     const updated = await this.store.findParticipantById(participant.id);
     if (!updated) {
       throw new InvalidParticipantSessionError();
@@ -809,6 +964,11 @@ export class EventService {
     const pod = await this.store.findActivePodByTableId(stored.id, tableId);
     if (!pod) {
       throw new PodNotFoundError();
+    }
+    if (pod.tournamentMatchId) {
+      throw new InvalidParticipantTransitionError(
+        'Choose a winner for this tournament match instead of finishing it.',
+      );
     }
     await this.store.completePod(pod.id);
     await this.track(stored.id, 'game_finished');
@@ -828,6 +988,14 @@ export class EventService {
       throw new PodNotFoundError();
     }
     await this.store.cancelPod(pod.id);
+    if (stored.tournamentState && pod.tournamentMatchId) {
+      const tournamentState = cancelTournamentMatch(
+        stored.tournamentState,
+        pod.tournamentMatchId,
+      );
+      await this.store.updateEvent(stored.id, { tournamentState });
+      await this.scheduleTournamentMatches(stored.id, tournamentState);
+    }
     return this.snapshotTable(stored.id, tableId);
   }
 
@@ -967,6 +1135,18 @@ export class EventService {
 
   async matchNow(joinCode: string, hostToken: string): Promise<MatchResult> {
     const stored = await this.requireHostToken(joinCode, hostToken);
+    if (stored.tournamentState) {
+      if (stored.tournamentState.phase === 'registration') {
+        throw new InvalidParticipantTransitionError(
+          'Start the tournament before scheduling its matches.',
+        );
+      }
+      const pods = await this.scheduleTournamentMatches(
+        stored.id,
+        stored.tournamentState,
+      );
+      return { pods, botsAdded: 0 };
+    }
     const pods = await this.runMatch(stored.id);
     return { pods, botsAdded: 0 };
   }
@@ -1035,6 +1215,85 @@ export class EventService {
 
     const pods = await this.runMatch(stored.id);
     return { pods, botsAdded: botsToAdd };
+  }
+
+  private async scheduleTournamentMatches(
+    eventId: string,
+    initialState: TournamentState,
+  ): Promise<PublicPod[]> {
+    if (initialState.phase !== 'in-progress') {
+      return [];
+    }
+    const [tables, decks, event] = await Promise.all([
+      this.store.listTables(eventId),
+      this.store.listDecks(eventId),
+      this.store.findEventById(eventId),
+    ]);
+    if (!event) {
+      throw new EventNotFoundError();
+    }
+    const pending =
+      currentTournamentRound(initialState)?.matches.filter(
+        (match) => match.status === 'pending',
+      ) ?? [];
+    const freeTables = tables.filter(
+      (table) => table.status === PhysicalTableStatus.Free,
+    );
+    const byParticipant = decksMap(decks);
+    let tournamentState = initialState;
+    const created: PublicPod[] = [];
+
+    for (let index = 0; index < Math.min(pending.length, freeTables.length); index += 1) {
+      const match = pending[index];
+      const table = freeTables[index];
+      if (!match || !table) {
+        continue;
+      }
+      const treacheryRoles =
+        event.gameMode === 'treachery'
+          ? assignTreacheryRoles(match.participantIds)
+          : undefined;
+      const treacheryIdentities = treacheryRoles
+        ? assignTreacheryIdentities(treacheryRoles)
+        : undefined;
+      const pod = await this.store.createPod({
+        eventId,
+        tableId: table.id,
+        poolId: 'tournament',
+        tournamentMatchId: match.id,
+        seats: match.participantIds.map((participantId) => {
+          const options = byParticipant.get(participantId) ?? [];
+          const deck =
+            options.find((candidate) => candidate.preference === 'preferred') ??
+            options[0];
+          return {
+            participantId,
+            deckId: deck?.id ?? '',
+            assignedPoolId: deck?.poolId ?? 'open',
+            treacheryRole: treacheryRoles?.get(participantId),
+            treacheryIdentityId: treacheryIdentities?.get(participantId),
+          };
+        }),
+      });
+      tournamentState = markTournamentMatchFormed(
+        tournamentState,
+        match.id,
+        pod.id,
+        table.id,
+      );
+      await this.store.updateEvent(eventId, { tournamentState });
+      created.push({
+        id: pod.id,
+        tableLabel: pod.tableLabel,
+        playerNames: pod.playerNames,
+        status: pod.status,
+        poolId: pod.poolId,
+      });
+    }
+    if (created.length > 0) {
+      await this.track(eventId, 'match_found');
+    }
+    return created;
   }
 
   private async runMatch(eventId: string): Promise<PublicPod[]> {
@@ -1268,6 +1527,12 @@ function toPublicEvent(
     allowThreePods: event.allowThreePods,
     allowFivePods: event.allowFivePods,
     preferredPodSize: event.preferredPodSize,
+    ...(event.tournamentFormat
+      ? {
+          tournamentFormat: event.tournamentFormat,
+          tournament: event.tournamentState ?? undefined,
+        }
+      : {}),
     lifetimeHours: Math.max(
       1,
       Math.round(

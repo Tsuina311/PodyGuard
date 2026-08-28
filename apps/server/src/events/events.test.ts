@@ -620,6 +620,149 @@ describe('event HTTP api', () => {
     await app.close();
   });
 
+  it('runs a single-elimination tournament and closes late registration', async () => {
+    const app = await buildTestApp();
+    const created = await app.inject({
+      method: 'POST',
+      url: '/events',
+      payload: {
+        name: 'Friday Duel',
+        hostPin: '2468',
+        tableCount: 2,
+        gameMode: 'duel',
+        tournamentFormat: 'single-elimination',
+      },
+    });
+    expect(created.statusCode).toBe(201);
+    const createdBody = created.json() as {
+      event: {
+        joinCode: string;
+        tournament: { phase: string; rounds: unknown[] };
+      };
+      hostToken: string;
+    };
+    expect(createdBody.event.tournament).toMatchObject({
+      phase: 'registration',
+      rounds: [],
+    });
+    const { joinCode } = createdBody.event;
+    const { hostToken } = createdBody;
+    const entrants: Array<{ id: string; token: string }> = [];
+
+    for (const displayName of ['Ada', 'Bea', 'Cam', 'Drew']) {
+      const joined = await app.inject({
+        method: 'POST',
+        url: `/events/${joinCode}/join`,
+        payload: { displayName },
+      });
+      const player = joined.json() as {
+        participant: { id: string };
+        token: string;
+      };
+      entrants.push({ id: player.participant.id, token: player.token });
+      await app.inject({
+        method: 'POST',
+        url: `/events/${joinCode}/ready`,
+        headers: { authorization: `Bearer ${player.token}` },
+        payload: { ready: true },
+      });
+    }
+
+    const started = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/tournament/start`,
+      headers: { authorization: `Bearer ${hostToken}` },
+    });
+    expect(started.statusCode).toBe(200);
+    const first = (started.json() as {
+      event: {
+        tournament: {
+          phase: string;
+          rounds: Array<{
+            matches: Array<{
+              id: string;
+              tableId: string;
+              participantIds: string[];
+              status: string;
+            }>;
+          }>;
+        };
+      };
+    }).event.tournament;
+    expect(first.phase).toBe('in-progress');
+    expect(first.rounds[0]?.matches).toHaveLength(2);
+    expect(
+      first.rounds[0]?.matches.every((match) => match.status === 'formed'),
+    ).toBe(true);
+
+    const late = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/join`,
+      payload: { displayName: 'Late player' },
+    });
+    expect(late.statusCode).toBe(409);
+
+    for (const match of first.rounds[0]?.matches ?? []) {
+      await app.inject({
+        method: 'POST',
+        url: `/events/${joinCode}/tables/${match.tableId}/start`,
+        headers: { authorization: `Bearer ${hostToken}` },
+      });
+      const result = await app.inject({
+        method: 'POST',
+        url: `/events/${joinCode}/tournament/matches/${match.id}/result`,
+        headers: { authorization: `Bearer ${hostToken}` },
+        payload: { winnerParticipantId: match.participantIds[0] },
+      });
+      expect(result.statusCode).toBe(200);
+    }
+
+    const afterSemis = await app.inject({
+      method: 'GET',
+      url: `/events/${joinCode}`,
+    });
+    const bracket = (afterSemis.json() as {
+      tournament: {
+        rounds: Array<{
+          matches: Array<{
+            id: string;
+            tableId: string;
+            participantIds: string[];
+            status: string;
+          }>;
+        }>;
+      };
+    }).tournament;
+    expect(bracket.rounds).toHaveLength(2);
+    const final = bracket.rounds[1]?.matches[0];
+    expect(final).toMatchObject({ status: 'formed' });
+    if (!final) {
+      throw new Error('Tournament final was not formed.');
+    }
+    await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/tables/${final.tableId}/start`,
+      headers: { authorization: `Bearer ${hostToken}` },
+    });
+    const completed = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/tournament/matches/${final.id}/result`,
+      headers: { authorization: `Bearer ${hostToken}` },
+      payload: { winnerParticipantId: final.participantIds[0] },
+    });
+    expect(completed.statusCode).toBe(200);
+    expect(completed.json()).toMatchObject({
+      event: {
+        tournament: {
+          phase: 'completed',
+          championParticipantId: final.participantIds[0],
+        },
+      },
+    });
+
+    await app.close();
+  });
+
   it('lets the host sweep a player nobody is behind out of the queue', async () => {
     const app = await buildTestApp();
     const created = await app.inject({

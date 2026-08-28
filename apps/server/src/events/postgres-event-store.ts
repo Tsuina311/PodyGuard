@@ -62,6 +62,8 @@ export class PostgresEventStore implements EventStore {
           allowThreePods: input.allowThreePods !== false,
           allowFivePods: Boolean(input.allowFivePods),
           preferredPodSize: input.preferredPodSize ?? 4,
+          tournamentFormat: input.tournamentFormat ?? null,
+          tournamentState: input.tournamentState ?? null,
           expiresAt:
             input.expiresAt ?? new Date(Date.now() + 24 * 60 * 60 * 1000),
           ...(input.createdAt ? { createdAt: input.createdAt } : {}),
@@ -256,6 +258,7 @@ export class PostgresEventStore implements EventStore {
           eventId: input.eventId,
           tableId: input.tableId,
           poolId: input.poolId,
+          tournamentMatchId: input.tournamentMatchId ?? null,
         })
         .returning();
       if (!pod) {
@@ -325,6 +328,7 @@ export class PostgresEventStore implements EventStore {
         poolId: input.poolId,
         memberIds: participantIds,
         trackerUsed: null,
+        tournamentMatchId: pod.tournamentMatchId,
         createdAt: pod.createdAt,
       };
     });
@@ -700,8 +704,8 @@ export class PostgresEventStore implements EventStore {
         await tx
           .update(participants)
           .set({
-            status: 'ready',
-            readyAt: now,
+            status: result.requeue === false ? 'joined' : 'ready',
+            readyAt: result.requeue === false ? null : now,
             updatedAt: now,
           })
           .where(
@@ -742,6 +746,7 @@ export class PostgresEventStore implements EventStore {
         poolId: updated.poolId,
         memberIds: members.map((row) => row.id),
         trackerUsed: updated.trackerUsed,
+        tournamentMatchId: updated.tournamentMatchId,
         winnerParticipantId: updated.winnerParticipantId,
         durationSeconds: updated.durationSeconds,
         completedAt: updated.completedAt,
@@ -925,6 +930,7 @@ export class PostgresEventStore implements EventStore {
       expiresAt?: Date;
       challengePackId?: string;
       challengePackVersion?: number;
+      tournamentState?: StoredEvent['tournamentState'];
     },
   ): Promise<StoredEvent> {
     const [row] = await getDb()
@@ -948,6 +954,9 @@ export class PostgresEventStore implements EventStore {
         ...(patch.challengePackVersion === undefined
           ? {}
           : { challengePackVersion: patch.challengePackVersion }),
+        ...(patch.tournamentState === undefined
+          ? {}
+          : { tournamentState: patch.tournamentState }),
         updatedAt: new Date(),
       })
       .where(eq(events.id, id))
@@ -985,6 +994,7 @@ async function loadStoredPod(
     poolId: pod.poolId,
     memberIds: members.map((row) => row.id),
     trackerUsed: pod.trackerUsed,
+    tournamentMatchId: pod.tournamentMatchId,
   };
 }
 
@@ -1006,6 +1016,8 @@ function mapEvent(row: typeof events.$inferSelect): StoredEvent {
     allowThreePods: row.allowThreePods,
     allowFivePods: row.allowFivePods,
     preferredPodSize: row.preferredPodSize,
+    tournamentFormat: row.tournamentFormat as StoredEvent['tournamentFormat'],
+    tournamentState: row.tournamentState as StoredEvent['tournamentState'],
     expiresAt: row.expiresAt,
     challengePackId: row.challengePackId,
     challengePackVersion: row.challengePackVersion,

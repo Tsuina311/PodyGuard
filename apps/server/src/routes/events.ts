@@ -52,6 +52,7 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
       allowFivePods?: unknown;
       preferredPodSize?: unknown;
       lifetimeHours?: unknown;
+      tournamentFormat?: unknown;
     };
     try {
       const result = await app.events.createEvent({
@@ -66,6 +67,10 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
           typeof body.preferredPodSize === 'number' ? body.preferredPodSize : undefined,
         lifetimeHours:
           typeof body.lifetimeHours === 'number' ? body.lifetimeHours : undefined,
+        tournamentFormat:
+          body.tournamentFormat === 'single-elimination'
+            ? body.tournamentFormat
+            : undefined,
       });
       return reply.code(201).send(result);
     } catch (error) {
@@ -94,6 +99,47 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
       return sendEventError(reply, error);
     }
   });
+
+  app.post('/events/:joinCode/tournament/start', async (request, reply) => {
+    const { joinCode } = request.params as { joinCode: string };
+    try {
+      const event = await app.events.startTournament(
+        normalizeJoinCode(joinCode),
+        bearerToken(request.headers.authorization),
+      );
+      await app.live.publish(normalizeJoinCode(joinCode));
+      return { event };
+    } catch (error) {
+      return sendEventError(reply, error);
+    }
+  });
+
+  app.post(
+    '/events/:joinCode/tournament/matches/:matchId/result',
+    async (request, reply) => {
+      const { joinCode, matchId } = request.params as {
+        joinCode: string;
+        matchId: string;
+      };
+      const body = (request.body ?? {}) as {
+        winnerParticipantId?: unknown;
+      };
+      try {
+        const event = await app.events.reportTournamentResult(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          matchId,
+          typeof body.winnerParticipantId === 'string'
+            ? body.winnerParticipantId
+            : '',
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return { event };
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
 
   app.post('/events/:joinCode/join', async (request, reply) => {
     const { joinCode } = request.params as { joinCode: string };

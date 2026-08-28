@@ -1,75 +1,75 @@
 {
   "common": {
-    "home": "Home",
-    "cancel": "Cancel",
-    "close": "Close",
-    "save": "Save",
-    "loading": "Loading…",
-    "players": "Players",
-    "game": "Game",
-    "language": "Language",
-    "yes": "Yes",
-    "no": "No",
-    "reset": "Reset",
-    "random": "Random",
-    "remove": "Remove",
-    "empty": "Empty",
+    "home": "Bidu",
+    "cancel": "Ikkanċella",
+    "close": "Agħlaq",
+    "save": "Issejvja",
+    "loading": "Qed jitgħabba…",
+    "players": "Plejers",
+    "game": "Logħba",
+    "language": "Lingwa",
+    "yes": "Iva",
+    "no": "Le",
+    "reset": "Irrisettja",
+    "random": "Każwali",
+    "remove": "Neħħi",
+    "empty": "Vojt",
     "bot": "bot",
     "dev": "dev",
-    "official": "official",
-    "open": "Open",
-    "preferred": "preferred",
-    "player": "Player {{number}}",
-    "versus": "versus",
-    "teamA": "Team A",
-    "teamB": "Team B",
-    "working": "Working…",
-    "creating": "Creating…",
-    "checking": "Checking…",
-    "joining": "Joining…",
-    "updating": "Updating…",
-    "submitting": "Submitting…",
-    "saving": "Saving…",
-    "searching": "Searching…",
-    "unveiling": "Unveiling…",
-    "copied": "Copied",
-    "noneYet": "none yet",
+    "official": "uffiċjali",
+    "open": "Miftuħ",
+    "preferred": "preferut",
+    "player": "Plejer {{number}}",
+    "versus": "kontra",
+    "teamA": "Tim A",
+    "teamB": "Tim B",
+    "working": "Qed jaħdem…",
+    "creating": "Qed jinħoloq…",
+    "checking": "Qed jiċċekkja…",
+    "joining": "Qed jingħaqad…",
+    "updating": "Qed jaġġorna…",
+    "submitting": "Qed jibgħat…",
+    "saving": "Qed jissejvja…",
+    "searching": "Qed ifittex…",
+    "unveiling": "Qed jiżvela…",
+    "copied": "Ikkupjat",
+    "noneYet": "għadu xejn",
     "dash": "—",
     "errors": {
-      "generic": "Something went wrong.",
-      "createEvent": "Could not create event.",
-      "unlockHost": "Could not unlock host.",
-      "updateTable": "Could not update table.",
-      "startGame": "Could not start the game.",
-      "startAllGames": "Could not start all ready games.",
-      "finishTable": "Could not finish the table.",
-      "cancelPod": "Could not cancel the pod.",
-      "updateSettings": "Could not update settings.",
-      "matchTables": "Could not match tables.",
-      "fillBots": "Could not fill tables with bots.",
-      "clipboard": "Clipboard blocked — copy the link manually.",
-      "eventNotFound": "Event not found.",
-      "joinEvent": "Could not join event.",
-      "saveDecks": "Could not save decks.",
-      "updateReady": "Could not update ready.",
-      "updatePause": "Could not update pause.",
-      "leaveEvent": "Could not leave event.",
-      "trackerChoice": "Could not save the tracker choice.",
-      "saveRating": "Could not save that rating.",
-      "chooseCommander": "Choose a commander for every deck.",
-      "enterJoinCode": "Enter a join code.",
-      "sessionUnavailable": "Your event session is no longer available.",
-      "savePack": "Could not save the pack.",
-      "searchScryfall": "Could not search Scryfall.",
-      "loadArtwork": "Could not load alternate artwork.",
-      "submitResult": "Could not submit the result.",
-      "saveChallenge": "Could not save challenge progress.",
-      "unveilIdentity": "Could not unveil your identity.",
-      "apiWaking": "The host is waking up. Keep this page open — it usually takes under a minute.",
-      "apiUnreachable": "Cannot reach the API. Is the server running (yarn dev:server)?"
+      "generic": "Xi ħaġa marret ħażin.",
+      "createEvent": "Ma setax jinħoloq l-avveniment.",
+      "unlockHost": "Ma setax jinfetaħ il-pannell tal-organizzatur.",
+      "updateTable": "Ma setgħetx tiġi aġġornata l-mejda.",
+      "startGame": "Ma setgħetx tibda l-logħba.",
+      "startAllGames": "Ma setgħux jibdew il-logħob kollu lest.",
+      "finishTable": "Ma setgħetx tintemm il-logħba tal-mejda.",
+      "cancelPod": "Ma setax jiġi kkanċellat il-pod.",
+      "updateSettings": "Ma setgħux jiġu aġġornati s-settings.",
+      "matchTables": "Ma setgħux jiġu mqabbla l-imwejjed.",
+      "fillBots": "Ma setgħux jimtlew l-imwejjed bil-bots.",
+      "clipboard": "Il-clipboard huwa mblukkat — ikkopja l-link manwalment.",
+      "eventNotFound": "L-avveniment ma nstabx.",
+      "joinEvent": "Ma stajtx tingħaqad mal-avveniment.",
+      "saveDecks": "Ma setgħux jiġu ssejvjati d-decks.",
+      "updateReady": "Ma setax jiġi aġġornat l-istatus ta' lest.",
+      "updatePause": "Ma setgħetx tiġi aġġornata l-pawża.",
+      "leaveEvent": "Ma stajtx titlaq mill-avveniment.",
+      "trackerChoice": "Ma setgħetx tiġi ssejvjata l-għażla tat-tracker.",
+      "saveRating": "Ma setgħetx tiġi ssejvjata dik il-klassifikazzjoni.",
+      "chooseCommander": "Agħżel commander għal kull deck.",
+      "enterJoinCode": "Daħħal kodiċi biex tingħaqad.",
+      "sessionUnavailable": "Is-sessjoni tiegħek tal-avveniment m'għadhiex disponibbli.",
+      "savePack": "Ma setax jiġi ssejvjat il-pakkett.",
+      "searchScryfall": "Ma setgħetx issir tfittxija fuq Scryfall.",
+      "loadArtwork": "Ma setgħetx titgħabba l-illustrazzjoni alternattiva.",
+      "submitResult": "Ma setax jintbagħat ir-riżultat.",
+      "saveChallenge": "Ma setax jiġi ssejvjat il-progress tal-isfida.",
+      "unveilIdentity": "Ma setgħetx tiġi żvelata l-identità tiegħek.",
+      "apiWaking": "Is-server qed iqum. Żomm din il-paġna miftuħa — normalment jieħu inqas minn minuta.",
+      "apiUnreachable": "Ma jistax jintlaħaq l-API. Is-server qed jaħdem (yarn dev:server)?"
     },
-    "assignedAtTable": "Assigned at the table",
-    "scanToJoin": "Scan to join this event"
+    "assignedAtTable": "Assenjat mal-mejda",
+    "scanToJoin": "Skennja biex tingħaqad ma' dan l-avveniment"
   },
   "language": {
     "en": "English",
@@ -109,173 +109,173 @@
     "cy": "Cymraeg"
   },
   "families": {
-    "normal": "Normal",
+    "normal": "Normali",
     "commander": "Commander"
   },
   "modes": {
     "shared": {
-      "commanderCombat": "A player loses after taking {{commanderDamage}} combat damage from one commander.",
-      "commanderTax": "Each time a commander is recast from the command zone, it costs 2 more mana.",
-      "lifeAndLoss": "Life and loss",
-      "turns": "Turns",
+      "commanderCombat": "Plejer jitlef wara li jirċievi {{commanderDamage}} combat damage minn commander wieħed.",
+      "commanderTax": "Kull darba li commander jerġa' jintlagħab mill-command zone, jiswa 2 mana aktar.",
+      "lifeAndLoss": "Ħajja u telfa",
+      "turns": "Dawriet",
       "commanders": "Commanders",
-      "eachPlayerLife": "Each player starts at {{life}} life.",
-      "loseAtZero": "A player loses at 0 life.",
-      "loseAtPoison": "A player loses at {{poison}} poison counters.",
-      "startingPlayerRandom": "The starting player is drawn at random.",
-      "startingPlayerSkipDraw": "The starting player is drawn at random and skips the draw step on the first turn.",
-      "multiplayerFirstTurnDraw": "In multiplayer, that player draws on their first turn.",
-      "commanderFirstTurnDraw": "In multiplayer Commander, that player draws on their first turn.",
-      "commandersInZone": "Commanders begin in the command zone and may be recast from there.",
-      "commanderRulesApply": "Commander rules still apply: {{life}} starting life, {{poison}} poison, and {{commanderDamage}} combat damage from one commander are lethal."
+      "eachPlayerLife": "Kull plejer jibda b'{{life}} life.",
+      "loseAtZero": "Plejer jitlef meta jasal għal 0 life.",
+      "loseAtPoison": "Plejer jitlef meta jasal għal {{poison}} poison counters.",
+      "startingPlayerRandom": "Il-plejer li jibda jintgħażel b'mod każwali.",
+      "startingPlayerSkipDraw": "Il-plejer li jibda jintgħażel b'mod każwali u jaqbeż id-draw step fl-ewwel dawra tiegħu.",
+      "multiplayerFirstTurnDraw": "Fil-multiplayer, dak il-plejer jiġbed karta fl-ewwel dawra tiegħu.",
+      "commanderFirstTurnDraw": "Fil-multiplayer Commander, dak il-plejer jiġbed karta fl-ewwel dawra tiegħu.",
+      "commandersInZone": "Il-commanders jibdew fil-command zone u jistgħu jerġgħu jintlagħbu minn hemm.",
+      "commanderRulesApply": "Ir-regoli ta' Commander jibqgħu japplikaw: {{life}} starting life, {{poison}} poison, u {{commanderDamage}} combat damage minn commander wieħed huma fatali."
     },
     "duel": {
-      "label": "Duel",
-      "hint": "Two players. Each starts on 20 life.",
-      "hostHint": "Strict 2-player tables. Each player starts on 20 life.",
-      "hostFixedSeats": "Duel events always seat exactly two players.",
-      "title": "Duel",
-      "summary": "Two-player Magic. No commanders — just life and the board.",
+      "label": "Dwell",
+      "hint": "Żewġ plejers. Kull wieħed jibda b'20 life.",
+      "hostHint": "Imwejjed strettament għal 2 plejers. Kull plejer jibda b'20 life.",
+      "hostFixedSeats": "Il-logħob Duel dejjem ikollu eżatt żewġ plejers.",
+      "title": "Dwell",
+      "summary": "Magic għal żewġ plejers. Mingħajr commanders — biss life u l-board.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Ħajja u telfa",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters."
+            "Kull plejer jibda b'{{life}} life.",
+            "Plejer jitlef meta jasal għal 0 life.",
+            "Plejer jitlef meta jasal għal {{poison}} poison counters."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Dawriet",
           "bullets": [
-            "The starting player is drawn at random and skips the draw step on the first turn."
+            "Il-plejer li jibda jintgħażel b'mod każwali u jaqbeż id-draw step fl-ewwel dawra."
           ]
         }
       }
     },
     "multiplayer": {
       "label": "Multiplayer",
-      "hint": "Free-for-all without commanders. Everyone starts on 20 life.",
-      "hostHint": "Free-for-all without commanders. Matching fills your chosen table size; leftovers can sit as small as three.",
+      "hint": "Kulħadd kontra kulħadd mingħajr commanders. Kulħadd jibda b'20 life.",
+      "hostHint": "Kulħadd kontra kulħadd mingħajr commanders. Il-matching jimla l-ewwel id-daqs tal-mejda magħżul; l-imwejjed li jifdal jistgħu jkollhom mill-inqas tliet plejers.",
       "title": "Multiplayer",
-      "summary": "Free-for-all without the Commander format. Useful for casual multiplayer, Planechase, or any 20-life table.",
+      "summary": "Kulħadd kontra kulħadd mingħajr il-format Commander. Utli għal casual multiplayer, Planechase, jew kwalunkwe mejda b'20 life.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Ħajja u telfa",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters."
+            "Kull plejer jibda b'{{life}} life.",
+            "Plejer jitlef meta jasal għal 0 life.",
+            "Plejer jitlef meta jasal għal {{poison}} poison counters."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Dawriet",
           "bullets": [
-            "The starting player is drawn at random.",
-            "In multiplayer, that player draws on their first turn."
+            "Il-plejer li jibda jintgħażel b'mod każwali.",
+            "Fil-multiplayer, dak il-plejer jiġbed karta fl-ewwel dawra tiegħu."
           ]
         }
       }
     },
     "commander": {
-      "label": "Classic",
-      "hint": "Free-for-all. Everyone starts on 40 life.",
-      "hostHint": "Free-for-all Commander. Matching prefers four; leftover pods can be three or five when allowed.",
-      "title": "Classic",
-      "summary": "Free-for-all multiplayer. Each player fights for themselves.",
+      "label": "Klassiku",
+      "hint": "Kulħadd kontra kulħadd. Kulħadd jibda b'40 life.",
+      "hostHint": "Commander kulħadd kontra kulħadd. Il-matching jippreferi erbgħa; il-pods li jifdal jistgħu jkunu ta' tlieta jew ħamsa meta permess.",
+      "title": "Klassiku",
+      "summary": "Multiplayer kulħadd kontra kulħadd. Kull plejer jiġġieled għalih innifsu.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Ħajja u telfa",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters.",
-            "A player loses after taking {{commanderDamage}} combat damage from one commander."
+            "Kull plejer jibda b'{{life}} life.",
+            "Plejer jitlef meta jasal għal 0 life.",
+            "Plejer jitlef meta jasal għal {{poison}} poison counters.",
+            "Plejer jitlef wara li jirċievi {{commanderDamage}} combat damage minn commander wieħed."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Dawriet",
           "bullets": [
-            "The starting player is drawn at random.",
-            "In multiplayer Commander, that player draws on their first turn."
+            "Il-plejer li jibda jintgħażel b'mod każwali.",
+            "Fil-multiplayer Commander, dak il-plejer jiġbed karta fl-ewwel dawra tiegħu."
           ]
         },
         "commanders": {
           "heading": "Commanders",
           "bullets": [
-            "Commanders begin in the command zone and may be recast from there.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Il-commanders jibdew fil-command zone u jistgħu jerġgħu jintlagħbu minn hemm.",
+            "Kull darba li commander jerġa' jintlagħab mill-command zone, jiswa 2 mana aktar."
           ]
         }
       }
     },
     "treachery": {
-      "label": "Treachery",
-      "hint": "Secret identities dealt on this device. Pass it around so everyone reads their own in private.",
-      "hostHint": "Secret roles for Commander pods. Matching fills your chosen table size first; leftovers can sit as small as four.",
-      "title": "Treachery",
-      "summary": "Commander with secret identities. The Leader is public; everyone else stays hidden.",
+      "label": "Tradiment",
+      "hint": "L-identitajiet sigrieti jitqassmu fuq dan l-apparat. Għaddih madwar il-mejda biex kulħadd jaqra tiegħu fil-privat.",
+      "hostHint": "Rwoli sigrieti għal Commander pods. Il-matching jimla l-ewwel id-daqs tal-mejda magħżul; il-pods li jifdal jistgħu jkollhom mill-inqas erba' plejers.",
+      "title": "Tradiment",
+      "summary": "Commander b'identitajiet sigrieti. Il-Mexxej huwa pubbliku; l-oħrajn kollha jibqgħu moħbija.",
       "sections": {
         "commander": {
-          "heading": "Commander rules still apply",
+          "heading": "Ir-regoli ta' Commander jibqgħu japplikaw",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "The Leader takes the first turn and draws on that turn.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Kull plejer jibda b'{{life}} life.",
+            "Plejer jitlef f'0 life, {{poison}} poison, jew {{commanderDamage}} combat damage minn commander wieħed.",
+            "Il-Mexxej jieħu l-ewwel dawra u jiġbed karta f'dik id-dawra.",
+            "Kull darba li commander jerġa' jintlagħab mill-command zone, jiswa 2 mana aktar."
           ]
         },
         "identities": {
-          "heading": "Identities",
+          "heading": "Identitajiet",
           "bullets": [
-            "Open Check my role from the timer menu. Only you see that card.",
-            "On a single tracker, deal the identities at setup and pass the device around so each player reads theirs alone.",
-            "Leader: Survive until every Assassin and Traitor is eliminated. Reveal yourself to the table. The Guardians share your victory, but you do not know who they are.",
-            "Guardian: Keep the Leader alive and eliminate the Leader's enemies. Your identity is secret. You win and lose with the Leader, even if you are eliminated first.",
-            "Assassin: Eliminate the Leader. Your identity is secret. Assassins share the same objective, but you do not know who the other Assassins are.",
-            "Traitor: Be the last player standing. Your identity is secret. Keep the Leader alive until the other threats are gone, then take the throne for yourself.",
-            "Follow any extra abilities printed on your identity card."
+            "Iftaħ Iċċekkja r-rwol tiegħi mill-menu tat-timer. Dik il-karta taraha biss int.",
+            "Meta jintuża tracker wieħed, qassam l-identitajiet waqt is-setup u għaddi l-apparat madwar il-mejda biex kull plejer jaqra tiegħu waħdu.",
+            "Mexxej: Ibqa' ħaj sakemm kull Assassin u Traitor ikun eliminat. Uri lilek innifsek lill-mejda. Il-Gwardjani jaqsmu r-rebħa tiegħek, iżda ma tafx min huma.",
+            "Gwardjan: Żomm lill-Mexxej ħaj u elimina l-għedewwa tiegħu. L-identità tiegħek hija sigrieta. Tirbaħ u titlef mal-Mexxej, anke jekk tiġi eliminat l-ewwel.",
+            "Assassin: Elimina lill-Mexxej. L-identità tiegħek hija sigrieta. L-Assassins għandhom l-istess għan, iżda ma tafx min huma l-Assassins l-oħra.",
+            "Traditur: Kun l-aħħar plejer li jibqa'. L-identità tiegħek hija sigrieta. Żomm lill-Mexxej ħaj sakemm it-theddid l-ieħor jisparixxi, imbagħad ħu t-tron għalik.",
+            "Segwi kwalunkwe ability addizzjonali stampata fuq il-karta tal-identità tiegħek."
           ]
         }
       },
       "roles": {
         "leader": {
-          "name": "Leader",
-          "objective": "Survive until every Assassin and Traitor is eliminated.",
-          "guidance": "Reveal yourself to the table. The Guardians share your victory, but you do not know who they are.",
-          "publicNote": "Your role is public. Tell the table you are the Leader."
+          "name": "Mexxej",
+          "objective": "Ibqa' ħaj sakemm kull Assassin u Traitor ikun eliminat.",
+          "guidance": "Uri lilek innifsek lill-mejda. Il-Gwardjani jaqsmu r-rebħa tiegħek, iżda ma tafx min huma.",
+          "publicNote": "Ir-rwol tiegħek huwa pubbliku. Għid lill-mejda li inti l-Mexxej."
         },
         "guardian": {
-          "name": "Guardian",
-          "objective": "Keep the Leader alive and eliminate the Leader's enemies.",
-          "guidance": "Your identity is secret. You win and lose with the Leader, even if you are eliminated first.",
-          "publicNote": "Keep this role secret."
+          "name": "Gwardjan",
+          "objective": "Żomm lill-Mexxej ħaj u elimina l-għedewwa tiegħu.",
+          "guidance": "L-identità tiegħek hija sigrieta. Tirbaħ u titlef mal-Mexxej, anke jekk tiġi eliminat l-ewwel.",
+          "publicNote": "Żomm dan ir-rwol sigriet."
         },
         "assassin": {
           "name": "Assassin",
-          "objective": "Eliminate the Leader.",
-          "guidance": "Your identity is secret. Assassins share the same objective, but you do not know who the other Assassins are.",
-          "publicNote": "Keep this role secret."
+          "objective": "Elimina lill-Mexxej.",
+          "guidance": "L-identità tiegħek hija sigrieta. L-Assassins għandhom l-istess għan, iżda ma tafx min huma l-Assassins l-oħra.",
+          "publicNote": "Żomm dan ir-rwol sigriet."
         },
         "traitor": {
-          "name": "Traitor",
-          "objective": "Be the last player standing.",
-          "guidance": "Your identity is secret. Keep the Leader alive until the other threats are gone, then take the throne for yourself.",
-          "publicNote": "Keep this role secret."
+          "name": "Traditur",
+          "objective": "Kun l-aħħar plejer li jibqa'.",
+          "guidance": "L-identità tiegħek hija sigrieta. Żomm lill-Mexxej ħaj sakemm it-theddid l-ieħor jisparixxi, imbagħad ħu t-tron għalik.",
+          "publicNote": "Żomm dan ir-rwol sigriet."
         }
       },
       "normal": {
-        "hint": "Secret identities on a shared phone. Everyone starts on 20 life — no commanders.",
-        "hostHint": "Secret roles without commanders. Matching fills your chosen table size first; leftovers can sit as small as four.",
-        "summary": "Secret identities without the Commander format. The Leader is public; everyone else stays hidden.",
+        "hint": "Identitajiet sigrieti fuq telefon kondiviż. Kulħadd jibda b'20 life — mingħajr commanders.",
+        "hostHint": "Rwoli sigrieti mingħajr commanders. Il-matching jimla l-ewwel id-daqs tal-mejda magħżul; il-pods li jifdal jistgħu jkollhom mill-inqas erba' plejers.",
+        "summary": "Identitajiet sigrieti mingħajr il-format Commander. Il-Mexxej huwa pubbliku; l-oħrajn kollha jibqgħu moħbija.",
         "sections": {
           "life": {
-            "heading": "Life and loss",
+            "heading": "Ħajja u telfa",
             "bullets": [
-              "Each player starts at {{life}} life.",
-              "A player loses at 0 life.",
-              "A player loses at {{poison}} poison counters.",
-              "The Leader takes the first turn and draws on that turn."
+              "Kull plejer jibda b'{{life}} life.",
+              "Plejer jitlef meta jasal għal 0 life.",
+              "Plejer jitlef meta jasal għal {{poison}} poison counters.",
+              "Il-Mexxej jieħu l-ewwel dawra u jiġbed karta f'dik id-dawra."
             ]
           },
           "identities": null
@@ -283,63 +283,63 @@
       }
     },
     "two-headed-giant": {
-      "label": "Two-Headed Giant",
-      "hint": "Two teams of two, 60 shared life each, turns taken together.",
-      "hostHint": "Strict 4-player Commander pods. Two teams share 60 life and take their turns together.",
-      "hostFixedSeats": "Two-Headed Giant games always seat exactly four players.",
-      "title": "Two-Headed Giant",
-      "summary": "Two teams of two. Teammates share a life total and a turn.",
+      "label": "Ġgant b'Żewġt Irjus",
+      "hint": "Żewġ timijiet ta' żewġ plejers, kull wieħed b'60 shared life, u d-dawriet jittieħdu flimkien.",
+      "hostHint": "Commander pods strettament għal 4 plejers. Żewġ timijiet jaqsmu 60 life kull wieħed u jieħdu d-dawriet tagħhom flimkien.",
+      "hostFixedSeats": "Il-logħob Two-Headed Giant dejjem ikollu eżatt erba' plejers.",
+      "title": "Ġgant b'Żewġt Irjus",
+      "summary": "Żewġ timijiet ta' tnejn. Sħab tat-tim jaqsmu life total u dawra.",
       "sections": {
         "teams": {
-          "heading": "Teams",
+          "heading": "Timijiet",
           "bullets": [
-            "Pick two allies, or let the table randomise the pairs.",
-            "Each team starts at {{sharedLife}} shared life.",
-            "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+            "Agħżel żewġ alleati jew ħalli l-pari jintgħażlu b'mod każwali.",
+            "Kull tim jibda b'{{sharedLife}} shared life.",
+            "Sħab tat-tim jieħdu d-dawra tagħhom flimkien. Kull plejer xorta jkollu l-hand, library u commanders tiegħu stess."
           ]
         },
         "life": {
-          "heading": "Life and loss",
+          "heading": "Ħajja u telfa",
           "bullets": [
-            "A team loses when its shared life reaches 0.",
-            "A team loses at {{sharedPoison}} shared poison counters.",
-            "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+            "Tim jitlef meta l-shared life tiegħu jilħaq 0.",
+            "Tim jitlef f'{{sharedPoison}} shared poison counters.",
+            "Tim jitlef wara li jirċievi {{commanderDamage}} shared combat damage minn commander wieħed."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Dawriet",
           "bullets": [
-            "The starting team is drawn at random and skips the draw step on its first turn.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "It-tim li jibda jintgħażel b'mod każwali u jaqbeż id-draw step fl-ewwel dawra tiegħu.",
+            "Kull darba li commander jerġa' jintlagħab mill-command zone, jiswa 2 mana aktar."
           ]
         }
       },
       "normal": {
-        "hint": "Two teams of two, 40 shared life each, turns taken together.",
-        "hostHint": "Strict 4-player tables. Two teams share 40 life and take their turns together — no commanders.",
-        "summary": "Two teams of two. Teammates share a life total and a turn — standard decks, 20 life each in team terms.",
+        "hint": "Żewġ timijiet ta' żewġ plejers, kull wieħed b'40 shared life, u d-dawriet jittieħdu flimkien.",
+        "hostHint": "Imwejjed strettament għal 4 plejers. Żewġ timijiet jaqsmu 40 life kull wieħed u jieħdu d-dawriet flimkien — mingħajr commanders.",
+        "summary": "Żewġ timijiet ta' tnejn. Sħab tat-tim jaqsmu life total u dawra — decks standard, 20 life kull wieħed f'termini ta' tim.",
         "sections": {
           "teams": {
-            "heading": "Teams",
+            "heading": "Timijiet",
             "bullets": [
-              "Pick two allies, or let the table randomise the pairs.",
-              "Each team starts at {{sharedLife}} shared life.",
-              "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+              "Agħżel żewġ alleati jew ħalli l-pari jintgħażlu b'mod każwali.",
+              "Kull tim jibda b'{{sharedLife}} shared life.",
+              "Sħab tat-tim jieħdu d-dawra tagħhom flimkien. Kull plejer xorta jkollu l-hand, library u commanders tiegħu stess."
             ]
           },
           "life": {
-            "heading": "Life and loss",
+            "heading": "Ħajja u telfa",
             "bullets": [
-              "A team loses when its shared life reaches 0.",
-              "A team loses at {{sharedPoison}} shared poison counters.",
-              "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+              "Tim jitlef meta l-shared life tiegħu jilħaq 0.",
+              "Tim jitlef f'{{sharedPoison}} shared poison counters.",
+              "Tim jitlef wara li jirċievi {{commanderDamage}} shared combat damage minn commander wieħed."
             ]
           },
           "turns": {
-            "heading": "Turns",
+            "heading": "Dawriet",
             "bullets": [
-              "The starting team is drawn at random and skips the draw step on its first turn.",
-              "Each time a commander is recast from the command zone, it costs 2 more mana."
+              "It-tim li jibda jintgħażel b'mod każwali u jaqbeż id-draw step fl-ewwel dawra tiegħu.",
+              "Kull darba li commander jerġa' jintlagħab mill-command zone, jiswa 2 mana aktar."
             ]
           }
         }
@@ -347,221 +347,221 @@
     },
     "archenemy-commander": {
       "label": "Archenemy",
-      "hint": "One Archenemy on 60 life with a 40-card scheme deck against three heroes sharing 60 life.",
-      "hostHint": "Strict 4-player Commander pods. One 60-life Archenemy faces a three-player team with 60 shared life and a 40-card scheme deck.",
-      "hostFixedSeats": "Archenemy Commander games always seat exactly four players.",
+      "hint": "Archenemy wieħed b'60 life u scheme deck ta' 40 karta kontra tliet eroj li jaqsmu 60 life.",
+      "hostHint": "Commander pods strettament għal 4 plejers. Archenemy wieħed b'60 life jiffaċċja tim ta' tliet plejers b'60 shared life u scheme deck ta' 40 karta.",
+      "hostFixedSeats": "Il-logħob Archenemy Commander dejjem ikollu eżatt erba' plejers.",
       "title": "Archenemy Commander",
-      "summary": "One Archenemy against a team of three, with a scheme deck in motion.",
+      "summary": "Archenemy wieħed kontra tim ta' tlieta, bi scheme deck għaddej.",
       "sections": {
         "sides": {
-          "heading": "Sides",
+          "heading": "Naħat",
           "bullets": [
-            "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
-            "Both sides start at {{life}} life.",
-            "The heroes share that life total and take their turn together.",
-            "The Archenemy goes first and draws on that turn."
+            "Agħżel l-Archenemy, jew assenjah b'mod każwali. It-tliet plejers l-oħra huma l-eroj.",
+            "Iż-żewġ naħat jibdew b'{{life}} life.",
+            "L-eroj jaqsmu dak il-life total u jieħdu d-dawra tagħhom flimkien.",
+            "L-Archenemy jibda l-ewwel u jiġbed karta f'dik id-dawra."
           ]
         },
         "schemes": {
           "heading": "Schemes",
           "bullets": [
-            "The 40 Duskmourn Commander schemes are shuffled at the start.",
-            "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
-            "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
-            "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
-            "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+            "L-40 schemes ta' Duskmourn Commander jitħalltu fil-bidu.",
+            "Matul kull first main phase tal-Archenemy, iftaħ il-menu tat-timer u agħfas Next scheme biex tattiva wieħed.",
+            "Scheme li mhux ongoing jiġi resolved u mbagħad imur fil-qiegħ tas-scheme deck.",
+            "Ongoing scheme jibqa' face up sakemm il-mejda timmarkah abandoned, imbagħad imur fil-qiegħ.",
+            "Schemes face up u l-graveyard ta' dawk lesti jidhru taħt il-karta bħala miniatures; agħfas wieħed biex taqrah ikbar."
           ]
         },
         "life": {
-          "heading": "Life and loss",
+          "heading": "Ħajja u telfa",
           "bullets": [
-            "The Archenemy loses at 0 life, or when the usual poison and commander-damage limits are reached.",
-            "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
-            "A player loses after taking {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "L-Archenemy jitlef f'0 life, jew meta jintlaħqu l-limiti normali ta' poison u commander damage.",
+            "L-eroj jitilfu flimkien meta l-shared life tagħhom jilħaq 0, u jaqsmu poison u commander damage bl-istess mod.",
+            "Plejer jitlef wara li jirċievi {{commanderDamage}} combat damage minn commander wieħed.",
+            "Kull darba li commander jerġa' jintlagħab mill-command zone, jiswa 2 mana aktar."
           ]
         }
       },
       "normal": {
-        "hint": "One Archenemy on 20 life with schemes against three heroes sharing 40 life.",
-        "hostHint": "Strict 4-player tables. One Archenemy with a scheme deck against a three-player team — no commanders.",
-        "summary": "One Archenemy against a team of three, with a scheme deck in motion — standard 20-life tables.",
+        "hint": "Archenemy wieħed b'20 life u schemes kontra tliet eroj li jaqsmu 40 life.",
+        "hostHint": "Imwejjed strettament għal 4 plejers. Archenemy wieħed bi scheme deck kontra tim ta' tlieta — mingħajr commanders.",
+        "summary": "Archenemy wieħed kontra tim ta' tlieta, bi scheme deck għaddej — imwejjed standard ta' 20 life.",
         "sections": {
           "sides": {
-            "heading": "Sides",
+            "heading": "Naħat",
             "bullets": [
-              "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
-              "Both sides start at {{life}} life.",
-              "The heroes share that life total and take their turn together.",
-              "The Archenemy goes first and draws on that turn."
+              "Agħżel l-Archenemy, jew assenjah b'mod każwali. It-tliet plejers l-oħra huma l-eroj.",
+              "Iż-żewġ naħat jibdew b'{{life}} life.",
+              "L-eroj jaqsmu dak il-life total u jieħdu d-dawra tagħhom flimkien.",
+              "L-Archenemy jibda l-ewwel u jiġbed karta f'dik id-dawra."
             ]
           },
           "schemes": {
             "heading": "Schemes",
             "bullets": [
-              "The 40 Duskmourn Commander schemes are shuffled at the start.",
-              "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
-              "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
-              "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
-              "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+              "L-40 schemes ta' Duskmourn Commander jitħalltu fil-bidu.",
+              "Matul kull first main phase tal-Archenemy, iftaħ il-menu tat-timer u agħfas Next scheme biex tattiva wieħed.",
+              "Scheme li mhux ongoing jiġi resolved u mbagħad imur fil-qiegħ tas-scheme deck.",
+              "Ongoing scheme jibqa' face up sakemm il-mejda timmarkah abandoned, imbagħad imur fil-qiegħ.",
+              "Schemes face up u l-graveyard ta' dawk lesti jidhru taħt il-karta bħala miniatures; agħfas wieħed biex taqrah ikbar."
             ]
           },
           "life": {
-            "heading": "Life and loss",
+            "heading": "Ħajja u telfa",
             "bullets": [
-              "The Archenemy loses at 0 life, or when the usual poison and poison limits are reached.",
-              "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
-              "A player loses after taking {{poison}} poison counters."
+              "L-Archenemy jitlef f'0 life, jew meta jintlaħqu l-limiti normali ta' poison.",
+              "L-eroj jitilfu flimkien meta l-shared life tagħhom jilħaq 0, u jaqsmu poison u commander damage bl-istess mod.",
+              "Plejer jitlef wara li jirċievi {{poison}} poison counters."
             ]
           }
         }
       }
     },
     "emperor": {
-      "label": "Emperor",
-      "hint": "Two teams of three. Protect your Emperor using limited range of influence and deploy creatures.",
-      "hostHint": "Strict 6-player Commander pods. Two teams each place an Emperor between two Generals and play with limited range of influence.",
-      "hostFixedSeats": "Emperor games always seat exactly six players.",
-      "title": "Emperor",
-      "summary": "Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.",
+      "label": "Imperatur",
+      "hint": "Żewġ timijiet ta' tlieta. Ipproteġi lill-Imperatur tiegħek b'range of influence limitat u ċaqlaq creatures.",
+      "hostHint": "Commander pods strettament għal 6 plejers. Kull tim ipoġġi Imperatur bejn żewġ Ġenerali u jilgħab b'range of influence limitat.",
+      "hostFixedSeats": "Il-logħob Emperor dejjem ikollu eżatt sitt plejers.",
+      "title": "Imperatur",
+      "summary": "Żewġ timijiet ta' tlieta. Kull Imperatur joqgħod bejn żewġ Ġenerali, u l-eliminazzjoni ta' Imperatur tirbaħ il-logħba.",
       "sections": {
         "teams": {
-          "heading": "Teams and turns",
+          "heading": "Timijiet u dawriet",
           "bullets": [
-            "Choose both teams and each team's Emperor, or randomise either choice.",
-            "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
-            "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
-            "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+            "Agħżel iż-żewġ timijiet u l-Imperatur ta' kull tim, jew agħmel wieħed jew iż-żewġ għażliet b'mod każwali.",
+            "Kull plejer jibda b'{{life}} life u jżomm il-hand, mana, permanents, poison u d-dawra tiegħu stess.",
+            "Sħab tat-tim jistgħu jaraw il-hands ta' xulxin u jiddiskutu strateġija, iżda ma jistgħux jimmanipulaw il-karti ta' xulxin.",
+            "Agħżel b'mod każwali liema Imperatur jieħu l-ewwel dawra. Dak l-Imperatur jiġbed karta fl-ewwel dawra."
           ]
         },
         "range": {
-          "heading": "Range and combat",
+          "heading": "Range u combat",
           "bullets": [
-            "Generals have range of influence 1. Emperors have range of influence 2.",
-            "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
-            "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
-            "As players leave, the empty seats stop counting, bringing surviving players into range."
+            "Il-Ġenerali għandhom range of influence 1. L-Imperaturi għandhom range of influence 2.",
+            "Spells, abilities, effects u informazzjoni jistgħu jaffettwaw biss plejers u oġġetti fil-range tal-controller tagħhom.",
+            "Plejer jista' jattakka biss opponent li jkun bilqiegħda eżatt ħdejh, jew planeswalkers u protected battles ta' dak l-opponent.",
+            "Hekk kif plejers jitilqu mil-logħba, is-siġġijiet vojta ma jibqgħux jingħaddu, u l-plejers li jibqgħu jidħlu fil-range ta' xulxin."
           ]
         },
         "deploy": {
-          "heading": "Deploy creatures",
+          "heading": "Mexxi creatures",
           "bullets": [
-            "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
-            "This can move creatures through the team as the battle lines change."
+            "Kull creature għandu \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
+            "Dan jista' jċaqlaq creatures minn ġot-tim hekk kif jinbidlu l-linji tal-battalja."
           ]
         },
         "winning": {
-          "heading": "Winning and Commander rules",
+          "heading": "Rebħa u regoli ta' Commander",
           "bullets": [
-            "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
-            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Tim jirbaħ jekk jirbaħ l-Imperatur tiegħu u jitlef immedjatament jekk l-Imperatur tiegħu jitlef. Ġeneral jista' jiġi eliminat mingħajr ma tintemm il-logħba.",
+            "Plejer jitlef f'0 life, {{poison}} poison, jew {{commanderDamage}} combat damage minn commander wieħed.",
+            "Kull darba li commander jerġa' jintlagħab mill-command zone, jiswa 2 mana aktar."
           ]
         }
       },
       "normal": {
-        "hint": "Two teams of three on 20 life. Protect your Emperor with limited range of influence.",
-        "hostHint": "Strict 6-player tables. Two Emperors between Generals — standard 20-life decks, no commanders.",
-        "summary": "Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.",
+        "hint": "Żewġ timijiet ta' tlieta b'20 life. Ipproteġi lill-Imperatur tiegħek b'range of influence limitat.",
+        "hostHint": "Imwejjed strettament għal 6 plejers. Żewġ Imperaturi bejn Ġenerali — decks standard b'20 life, mingħajr commanders.",
+        "summary": "Żewġ timijiet ta' tlieta. Kull Imperatur joqgħod bejn żewġ Ġenerali, u l-eliminazzjoni ta' Imperatur tirbaħ il-logħba.",
         "sections": {
           "teams": {
-            "heading": "Teams and turns",
+            "heading": "Timijiet u dawriet",
             "bullets": [
-              "Choose both teams and each team's Emperor, or randomise either choice.",
-              "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
-              "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
-              "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+              "Agħżel iż-żewġ timijiet u l-Imperatur ta' kull tim, jew agħmel wieħed jew iż-żewġ għażliet b'mod każwali.",
+              "Kull plejer jibda b'{{life}} life u jżomm il-hand, mana, permanents, poison u d-dawra tiegħu stess.",
+              "Sħab tat-tim jistgħu jaraw il-hands ta' xulxin u jiddiskutu strateġija, iżda ma jistgħux jimmanipulaw il-karti ta' xulxin.",
+              "Agħżel b'mod każwali liema Imperatur jieħu l-ewwel dawra. Dak l-Imperatur jiġbed karta fl-ewwel dawra."
             ]
           },
           "range": {
-            "heading": "Range and combat",
+            "heading": "Range u combat",
             "bullets": [
-              "Generals have range of influence 1. Emperors have range of influence 2.",
-              "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
-              "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
-              "As players leave, the empty seats stop counting, bringing surviving players into range."
+              "Il-Ġenerali għandhom range of influence 1. L-Imperaturi għandhom range of influence 2.",
+              "Spells, abilities, effects u informazzjoni jistgħu jaffettwaw biss plejers u oġġetti fil-range tal-controller tagħhom.",
+              "Plejer jista' jattakka biss opponent li jkun bilqiegħda eżatt ħdejh, jew planeswalkers u protected battles ta' dak l-opponent.",
+              "Hekk kif plejers jitilqu mil-logħba, is-siġġijiet vojta ma jibqgħux jingħaddu, u l-plejers li jibqgħu jidħlu fil-range ta' xulxin."
             ]
           },
           "deploy": {
-            "heading": "Deploy creatures",
+            "heading": "Mexxi creatures",
             "bullets": [
-              "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
-              "This can move creatures through the team as the battle lines change."
+              "Kull creature għandu \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
+              "Dan jista' jċaqlaq creatures minn ġot-tim hekk kif jinbidlu l-linji tal-battalja."
             ]
           },
           "winning": {
-            "heading": "Winning and Commander rules",
+            "heading": "Rebħa u regoli ta' Commander",
             "bullets": [
-              "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
-              "A player loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+              "Tim jirbaħ jekk jirbaħ l-Imperatur tiegħu u jitlef immedjatament jekk l-Imperatur tiegħu jitlef. Ġeneral jista' jiġi eliminat mingħajr ma tintemm il-logħba.",
+              "Plejer jitlef f'0 life jew {{poison}} poison counters."
             ]
           }
         }
       }
     },
     "star": {
-      "label": "Star",
-      "hint": "Five players in a circle. Your neighbors are allies; eliminate both players across from you.",
-      "hostHint": "Strict 5-player Commander pods. Adjacent players are allies; each player wins by outlasting both opponents across the circle.",
-      "hostFixedSeats": "Star games always seat exactly five players.",
-      "title": "Star",
-      "summary": "Five players sit in a circle. Your neighbors are allies and the two players across from you are enemies.",
+      "label": "Stilla",
+      "hint": "Ħames plejers f'ċirku. Il-ġirien tiegħek huma alleati; elimina ż-żewġ plejers faċċata tiegħek.",
+      "hostHint": "Commander pods strettament għal 5 plejers. Plejers maġenb xulxin huma alleati; kull plejer jirbaħ billi jibqa' ħaj aktar miż-żewġ opponents faċċata tiegħu.",
+      "hostFixedSeats": "Il-logħob Star dejjem ikollu eżatt ħames plejers.",
+      "title": "Stilla",
+      "summary": "Ħames plejers joqogħdu f'ċirku. Il-ġirien tiegħek huma alleati u ż-żewġ plejers faċċata tiegħek huma għedewwa.",
       "sections": {
         "positions": {
-          "heading": "Positions and allies",
+          "heading": "Pożizzjonijiet u alleati",
           "bullets": [
-            "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
-            "The players immediately to your left and right are your allies.",
-            "The two nonadjacent players across the circle are your enemies.",
-            "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+            "Agħżel il-pożizzjonijiet fiċ-ċirku manwalment billi tibdel żewġ plejers, jew irranġa l-ħamsa kollha b'mod każwali.",
+            "Il-plejers immedjatament fuq ix-xellug u l-lemin tiegħek huma l-alleati tiegħek.",
+            "Iż-żewġ plejers mhux maġenbek fuq in-naħa l-oħra taċ-ċirku huma l-għedewwa tiegħek.",
+            "Il-pożizzjonijiet jibqgħu fissi meta plejer jiġi eliminat; l-alleati u l-għedewwa tiegħek ma jinbidlux."
           ]
         },
         "combat": {
-          "heading": "Combat and interaction",
+          "heading": "Combat u interazzjoni",
           "bullets": [
-            "Players cannot attack their allies by default.",
-            "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
-            "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+            "B'mod default, il-plejers ma jistgħux jattakkaw lill-alleati tagħhom.",
+            "Spells u abilities xorta jistgħu jgħinu jew jaffettwaw kwalunkwe plejer sakemm il-mejda ma taqbilx fuq varjant aktar strett.",
+            "Id-dawriet jimxu favur l-arloġġ. Agħżel il-plejer li jibda b'mod każwali; dak il-plejer jiġbed karta fl-ewwel dawra."
           ]
         },
         "winning": {
-          "heading": "Winning",
+          "heading": "Rebħa",
           "bullets": [
-            "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
-            "An eliminated player cannot win later.",
-            "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "L-ewwel plejer li jkun għadu ħaj u li ż-żewġ għedewwa tiegħu jkunu ġew eliminati jirbaħ, irrispettivament minn min eliminahom.",
+            "Plejer eliminat ma jistax jirbaħ aktar tard.",
+            "Kull plejer jibda b'{{life}} life u jitlef f'0 life, {{poison}} poison, jew {{commanderDamage}} combat damage minn commander wieħed.",
+            "Kull darba li commander jerġa' jintlagħab mill-command zone, jiswa 2 mana aktar."
           ]
         }
       },
       "normal": {
-        "hint": "Five players in a circle on 20 life. Neighbors are allies; eliminate both players across from you.",
-        "hostHint": "Strict 5-player tables. Adjacent players ally; each player wins by outlasting both opponents across the circle.",
-        "summary": "Five players sit in a circle on 20 life. Your neighbors are allies and the two players across from you are enemies.",
+        "hint": "Ħames plejers f'ċirku b'20 life. Il-ġirien huma alleati; elimina ż-żewġ plejers faċċata tiegħek.",
+        "hostHint": "Imwejjed strettament għal 5 plejers. Plejers maġenb xulxin huma alleati; kull plejer jirbaħ billi jibqa' ħaj aktar miż-żewġ opponents faċċata tiegħu.",
+        "summary": "Ħames plejers joqogħdu f'ċirku b'20 life. Il-ġirien tiegħek huma alleati u ż-żewġ plejers faċċata tiegħek huma għedewwa.",
         "sections": {
           "positions": {
-            "heading": "Positions and allies",
+            "heading": "Pożizzjonijiet u alleati",
             "bullets": [
-              "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
-              "The players immediately to your left and right are your allies.",
-              "The two nonadjacent players across the circle are your enemies.",
-              "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+              "Agħżel il-pożizzjonijiet fiċ-ċirku manwalment billi tibdel żewġ plejers, jew irranġa l-ħamsa kollha b'mod każwali.",
+              "Il-plejers immedjatament fuq ix-xellug u l-lemin tiegħek huma l-alleati tiegħek.",
+              "Iż-żewġ plejers mhux maġenbek fuq in-naħa l-oħra taċ-ċirku huma l-għedewwa tiegħek.",
+              "Il-pożizzjonijiet jibqgħu fissi meta plejer jiġi eliminat; l-alleati u l-għedewwa tiegħek ma jinbidlux."
             ]
           },
           "combat": {
-            "heading": "Combat and interaction",
+            "heading": "Combat u interazzjoni",
             "bullets": [
-              "Players cannot attack their allies by default.",
-              "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
-              "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+              "B'mod default, il-plejers ma jistgħux jattakkaw lill-alleati tagħhom.",
+              "Spells u abilities xorta jistgħu jgħinu jew jaffettwaw kwalunkwe plejer sakemm il-mejda ma taqbilx fuq varjant aktar strett.",
+              "Id-dawriet jimxu favur l-arloġġ. Agħżel il-plejer li jibda b'mod każwali; dak il-plejer jiġbed karta fl-ewwel dawra."
             ]
           },
           "winning": {
-            "heading": "Winning",
+            "heading": "Rebħa",
             "bullets": [
-              "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
-              "An eliminated player cannot win later.",
-              "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+              "L-ewwel plejer li jkun għadu ħaj u li ż-żewġ għedewwa tiegħu jkunu ġew eliminati jirbaħ, irrispettivament minn min eliminahom.",
+              "Plejer eliminat ma jistax jirbaħ aktar tard.",
+              "Kull plejer jibda b'{{life}} life u jitlef f'0 life jew {{poison}} poison counters."
             ]
           }
         }
@@ -569,64 +569,64 @@
     },
     "assassin": {
       "label": "Assassin",
-      "hint": "Secret contracts in a free-for-all. Eliminate your mark, score, and inherit their target.",
-      "hostHint": "Secret contracts for 3–8 players. Score by eliminating your mark, then inherit their target.",
+      "hint": "Kuntratti sigrieti f'logħba kulħadd kontra kulħadd. Elimina l-mira tiegħek, ġib punt, u wiret il-mira tagħha.",
+      "hostHint": "Kuntratti sigrieti għal 3–8 plejers. Ġib punt billi telimina l-mira tiegħek, imbagħad wiret il-kuntratt tagħha.",
       "title": "Assassin",
-      "summary": "A free-for-all with secret contracts. Score marks, inherit new targets, and finish with the highest score.",
+      "summary": "Kulħadd kontra kulħadd b'kuntratti sigrieti. Elimina miri, wiret oħrajn ġodda, u spiċċa bl-ogħla punteġġ.",
       "sections": {
         "contracts": {
-          "heading": "Secret contracts",
+          "heading": "Kuntratti sigrieti",
           "bullets": [
-            "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
-            "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
-            "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+            "Kull plejer jirċievi mira waħda fil-privat. Il-kuntratti jiffurmaw ċirku, għalhekk ħadd ma jimmira lilu nnifsu u kull plejer jiġi kkaċċjat darba.",
+            "Għaddi l-apparat madwar il-mejda waqt is-setup. Iftaħ Iċċekkja l-mira mill-menu tat-timer kull meta jkollok bżonn terġa' taqra l-kuntratt attwali tiegħek.",
+            "Il-plejers jistgħu jattakkaw u jaffettwaw lil kulħadd; il-kuntratt jiddetermina l-punteġġ, mhux il-miri legali."
           ]
         },
         "elimination": {
-          "heading": "Elimination and inheritance",
+          "heading": "Eliminazzjoni u wirt",
           "bullets": [
-            "When a player is eliminated, record who dealt the finishing blow.",
-            "If you personally eliminate your assigned target, you score one mark.",
-            "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+            "Meta plejer jiġi eliminat, irreġistra min ta d-daqqa finali.",
+            "Jekk personalment telimina l-mira assenjata tiegħek, tikseb mark wieħed.",
+            "Il-plejer li kien qed jikkaċċja l-mira eliminata jiret il-kuntratt tagħha, anke jekk xi ħadd ieħor ta d-daqqa finali. B'hekk kull plejer li jibqa' ħaj ikollu kuntratt attiv wieħed."
           ]
         },
         "winning": {
-          "heading": "Winning",
+          "heading": "Rebħa",
           "bullets": [
-            "Play until only one player remains. The last survivor scores one additional mark.",
-            "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
-            "Commander rules still apply: {{life}} starting life, {{poison}} poison, and {{commanderDamage}} combat damage from one commander are lethal.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Ilagħbu sakemm jibqa' plejer wieħed biss. L-aħħar wieħed li jibqa' jikseb mark addizzjonali.",
+            "Il-plejer bl-aktar marks jirbaħ; jekk l-ogħla punteġġ ikun indaqs, l-aħħar wieħed li jibqa' jirbaħ id-draw.",
+            "Ir-regoli ta' Commander jibqgħu japplikaw: {{life}} starting life, {{poison}} poison, u {{commanderDamage}} combat damage minn commander wieħed huma fatali.",
+            "Kull darba li commander jerġa' jintlagħab mill-command zone, jiswa 2 mana aktar."
           ]
         }
       },
       "normal": {
-        "hint": "Secret contracts for 3–8 players on 20 life. Score by eliminating your mark.",
-        "hostHint": "Secret contracts without commanders. Matching fills your chosen table size; leftovers can sit as small as three.",
-        "summary": "A free-for-all with secret contracts on 20 life. Score marks, inherit new targets, and finish with the highest score.",
+        "hint": "Kuntratti sigrieti għal 3–8 plejers b'20 life. Ġib punt billi telimina l-mira tiegħek.",
+        "hostHint": "Kuntratti sigrieti mingħajr commanders. Il-matching jimla d-daqs tal-mejda magħżul; iċ-ċrieki li jifdal jistgħu jkollhom mill-inqas tliet plejers.",
+        "summary": "Kulħadd kontra kulħadd b'kuntratti sigrieti u 20 life. Elimina miri, wiret oħrajn ġodda, u spiċċa bl-ogħla punteġġ.",
         "sections": {
           "contracts": {
-            "heading": "Secret contracts",
+            "heading": "Kuntratti sigrieti",
             "bullets": [
-              "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
-              "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
-              "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+              "Kull plejer jirċievi mira waħda fil-privat. Il-kuntratti jiffurmaw ċirku, għalhekk ħadd ma jimmira lilu nnifsu u kull plejer jiġi kkaċċjat darba.",
+              "Għaddi l-apparat madwar il-mejda waqt is-setup. Iftaħ Iċċekkja l-mira mill-menu tat-timer kull meta jkollok bżonn terġa' taqra l-kuntratt attwali tiegħek.",
+              "Il-plejers jistgħu jattakkaw u jaffettwaw lil kulħadd; il-kuntratt jiddetermina l-punteġġ, mhux il-miri legali."
             ]
           },
           "elimination": {
-            "heading": "Elimination and inheritance",
+            "heading": "Eliminazzjoni u wirt",
             "bullets": [
-              "When a player is eliminated, record who dealt the finishing blow.",
-              "If you personally eliminate your assigned target, you score one mark.",
-              "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+              "Meta plejer jiġi eliminat, irreġistra min ta d-daqqa finali.",
+              "Jekk personalment telimina l-mira assenjata tiegħek, tikseb mark wieħed.",
+              "Il-plejer li kien qed jikkaċċja l-mira eliminata jiret il-kuntratt tagħha, anke jekk xi ħadd ieħor ta d-daqqa finali. B'hekk kull plejer li jibqa' ħaj ikollu kuntratt attiv wieħed."
             ]
           },
           "winning": {
-            "heading": "Winning",
+            "heading": "Rebħa",
             "bullets": [
-              "Play until only one player remains. The last survivor scores one additional mark.",
-              "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
-              "{{life}} starting life, {{poison}} poison, and {{poison}} poison counters are lethal."
+              "Ilagħbu sakemm jibqa' plejer wieħed biss. L-aħħar wieħed li jibqa' jikseb mark addizzjonali.",
+              "Il-plejer bl-aktar marks jirbaħ; jekk l-ogħla punteġġ ikun indaqs, l-aħħar wieħed li jibqa' jirbaħ id-draw.",
+              "{{life}} starting life u {{poison}} poison counters huma fatali."
             ]
           }
         }
@@ -634,446 +634,446 @@
     }
   },
   "home": {
-    "taglineBefore": "Your next",
+    "taglineBefore": "Il-",
     "taglineHighlight": "pod",
-    "taglineAfter": ", sorted.",
-    "startPlaying": "Start playing",
-    "ongoingGame": "ongoing game",
-    "noEventNeeded": "no event needed",
-    "startPlayingHint": "Open a battle screen on this device. Leave and come back without losing an unfinished game.",
-    "alwaysPlayers": "Always {{count}} players in this mode.",
-    "resumeGame": "Resume game",
-    "startNewGame": "Start a new game",
-    "startGame": "Start a game",
+    "taglineAfter": " li jmiss tiegħek, lest.",
+    "startPlaying": "Ibda ilgħab",
+    "ongoingGame": "logħba għaddejja",
+    "noEventNeeded": "m'hemmx bżonn avveniment",
+    "startPlayingHint": "Iftaħ battle screen fuq dan l-apparat. Tista' titlaq u terġa' lura mingħajr ma titlef logħba mhux mitmuma.",
+    "alwaysPlayers": "Dan il-mode dejjem għandu {{count}} plejers.",
+    "resumeGame": "Kompli l-logħba",
+    "startNewGame": "Ibda logħba ġdida",
+    "startGame": "Ibda logħba",
     "commanderSetup": "Commanders",
-    "commanderSetupHint": "Search Scryfall for each player's commander. Partner pairs need both commanders.",
-    "chooseAllCommanders": "Choose a commander for every player.",
-    "advancedMatchConfig": "Advanced match config",
-    "hostEvent": "Host event",
-    "new": "new",
-    "targetTableSize": "Target table size",
-    "allowThreePods": "Allow 3-player pods",
-    "allowFivePods": "Allow 5-player pods",
-    "duelFixedSeats": "Duel events always seat exactly two players.",
-    "emperorFixedSeats": "Emperor games always seat exactly six players.",
-    "starFixedSeats": "Star games always seat exactly five players.",
-    "archenemyFixedSeats": "Archenemy Commander games always seat exactly four players.",
-    "twoHeadedFixedSeats": "Two-Headed Giant games always seat exactly four players.",
-    "eventName": "Event name",
-    "eventNamePlaceholder": "Friday Commander",
-    "tables": "Tables",
-    "tablesHint": "How many physical tables are free for this event.",
-    "eventLasts": "Event lasts",
-    "eventLastsHint": "Join code dies after this many hours. Use 48 or 72 for a weekend.",
-    "hostPin": "Host PIN",
-    "hostPinHint": "4 to 8 digits — reopens the host desk later.",
-    "createEvent": "Create event",
-    "joinWithCode": "Join with a code",
-    "playerAside": "player",
-    "joinCode": "Join code",
+    "commanderSetupHint": "Fittex fuq Scryfall għall-commander ta' kull plejer. Partner pairs jeħtieġu ż-żewġ commanders.",
+    "chooseAllCommanders": "Agħżel commander għal kull plejer.",
+    "advancedMatchConfig": "Settings avvanzati tal-logħba",
+    "hostEvent": "Organizza avveniment",
+    "new": "ġdid",
+    "targetTableSize": "Daqs mixtieq tal-mejda",
+    "allowThreePods": "Ippermetti pods ta' 3 plejers",
+    "allowFivePods": "Ippermetti pods ta' 5 plejers",
+    "duelFixedSeats": "Il-logħob Duel dejjem ikollu eżatt żewġ plejers.",
+    "emperorFixedSeats": "Il-logħob Emperor dejjem ikollu eżatt sitt plejers.",
+    "starFixedSeats": "Il-logħob Star dejjem ikollu eżatt ħames plejers.",
+    "archenemyFixedSeats": "Il-logħob Archenemy Commander dejjem ikollu eżatt erba' plejers.",
+    "twoHeadedFixedSeats": "Il-logħob Two-Headed Giant dejjem ikollu eżatt erba' plejers.",
+    "eventName": "Isem tal-avveniment",
+    "eventNamePlaceholder": "Commander tal-Ġimgħa",
+    "tables": "Imwejjed",
+    "tablesHint": "Kemm-il mejda fiżika hija disponibbli għal dan l-avveniment.",
+    "eventLasts": "Tul tal-avveniment",
+    "eventLastsHint": "Il-kodiċi biex tingħaqad jiskadi wara dan in-numru ta' sigħat. Uża 48 jew 72 għal weekend.",
+    "hostPin": "PIN tal-organizzatur",
+    "hostPinHint": "4 sa 8 ċifri — jerġa' jiftaħ il-pannell tal-organizzatur aktar tard.",
+    "createEvent": "Oħloq avveniment",
+    "joinWithCode": "Ingħaqad b'kodiċi",
+    "playerAside": "plejer",
+    "joinCode": "Kodiċi biex tingħaqad",
     "joinCodePlaceholder": "AB23CD",
-    "join": "Join",
-    "scanQr": "Scan QR",
-    "staleJoin": "That event is gone. Join with a new code, or host a new night."
+    "join": "Ingħaqad",
+    "scanQr": "Skennja QR",
+    "staleJoin": "Dak l-avveniment m'għadux jeżisti. Ingħaqad b'kodiċi ġdid, jew organizza lejla ġdida."
   },
   "host": {
-    "desk": "Host desk",
-    "locked": "Locked",
-    "hostOnly": "host only",
-    "unlockHostDesk": "Unlock host desk",
-    "playerCount": "{{count}} player",
-    "playerCount_plural": "{{count}} players",
-    "ready": "{{count}} ready",
-    "matched": "{{count}} matched",
-    "playing": "{{count}} playing",
-    "paused": "{{count}} paused",
-    "ends": "ends {{date}}",
-    "podSizes": "Pod sizes",
+    "desk": "Pannell tal-organizzatur",
+    "locked": "Imsakkar",
+    "hostOnly": "organizzatur biss",
+    "unlockHostDesk": "Iftaħ il-pannell tal-organizzatur",
+    "playerCount": "{{count}} plejer",
+    "playerCount_plural": "{{count}} plejers",
+    "ready": "{{count}} lesti",
+    "matched": "{{count}} mqabbla",
+    "playing": "{{count}} qed jilagħbu",
+    "paused": "{{count}} fuq pawża",
+    "ends": "jintemm {{date}}",
+    "podSizes": "Daqsijiet tal-pods",
     "matching": "matching",
-    "allowLeftoverThree": "Allow leftover 3-player pods",
-    "allowFivePods": "Allow 5-player pods",
-    "treacheryTargetHint": "Target table size. Leftover pods can be as small as four.",
-    "matchingPrefers": "Matching prefers {{size}}-player tables.",
-    "matchingPrefersFour": "Matching prefers 4-player tables.",
-    "assassinTargetHint": "Target table size. Leftover contract circles can be as small as three.",
-    "multiplayerTargetHint": "Target table size. Leftover tables can be as small as three.",
-    "duelMatchmaking": "Duel matchmaking seats exactly two players per game.",
-    "twoHeadedMatchmaking": "Two-Headed Giant matchmaking seats exactly four players per game.",
-    "archenemyMatchmaking": "Archenemy Commander matchmaking seats exactly four players per game: one Archenemy against a team of three.",
-    "emperorMatchmaking": "Emperor matchmaking seats exactly six players per game: two teams with an Emperor and two Generals each.",
-    "starMatchmaking": "Star matchmaking seats exactly five players in a circular order.",
-    "eventLength": "Event length",
-    "joinCodeDies": "join code dies",
-    "hoursFromStart": "Hours from start",
-    "hoursFromStartHint": "Change this for a multi-day event. After it ends, the QR opens the home page.",
-    "joinCodeTitle": "Join code",
-    "share": "share",
-    "noLanAddress": "No LAN address found — this link only works on this computer.",
-    "copyPlayerLink": "Copy player link",
-    "queue": "Queue",
-    "nobodyWaiting": "Nobody waiting.",
+    "allowLeftoverThree": "Ippermetti pods li jifdal ta' 3 plejers",
+    "allowFivePods": "Ippermetti pods ta' 5 plejers",
+    "treacheryTargetHint": "Daqs mixtieq tal-mejda. Il-pods li jifdal jistgħu jkollhom mill-inqas erba' plejers.",
+    "matchingPrefers": "Il-matching jippreferi mwejjed ta' {{size}} plejers.",
+    "matchingPrefersFour": "Il-matching jippreferi mwejjed ta' 4 plejers.",
+    "assassinTargetHint": "Daqs mixtieq tal-mejda. Iċ-ċrieki tal-kuntratti li jifdal jistgħu jkollhom mill-inqas tliet plejers.",
+    "multiplayerTargetHint": "Daqs mixtieq tal-mejda. L-imwejjed li jifdal jistgħu jkollhom mill-inqas tliet plejers.",
+    "duelMatchmaking": "Il-matching ta' Duel ipoġġi eżatt żewġ plejers f'kull logħba.",
+    "twoHeadedMatchmaking": "Il-matching ta' Two-Headed Giant ipoġġi eżatt erba' plejers f'kull logħba.",
+    "archenemyMatchmaking": "Il-matching ta' Archenemy Commander ipoġġi eżatt erba' plejers f'kull logħba: Archenemy wieħed kontra tim ta' tlieta.",
+    "emperorMatchmaking": "Il-matching ta' Emperor ipoġġi eżatt sitt plejers f'kull logħba: żewġ timijiet, kull wieħed b'Imperatur u żewġ Ġenerali.",
+    "starMatchmaking": "Il-matching ta' Star ipoġġi eżatt ħames plejers f'ordni ċirkolari.",
+    "eventLength": "Tul tal-avveniment",
+    "joinCodeDies": "il-kodiċi jiskadi",
+    "hoursFromStart": "Sigħat mill-bidu",
+    "hoursFromStartHint": "Ibdel dan għal avveniment ta' diversi jiem. Wara li jintemm, il-QR jiftaħ il-paġna tal-bidu.",
+    "joinCodeTitle": "Kodiċi biex tingħaqad",
+    "share": "aqsam",
+    "noLanAddress": "Ma nstab l-ebda indirizz LAN — din il-link taħdem biss fuq dan il-kompjuter.",
+    "copyPlayerLink": "Ikkopja l-link tal-plejers",
+    "queue": "Kju",
+    "nobodyWaiting": "Ħadd ma qed jistenna.",
     "flex": "flex {{count}}",
-    "challengePts": "{{count}} challenge pts",
-    "pts": "{{count}} pts",
-    "notReady": "Not ready",
-    "pausedTitle": "Paused",
-    "seated": "Seated",
-    "atTables": "{{count}} at tables",
-    "tablesTitle": "Tables",
-    "total": "{{count}} total",
-    "noTables": "This event was created without tables.",
-    "startingGames": "Starting games…",
-    "startAllReady": "Start all ready games ({{count}})",
-    "startGame": "Start game",
-    "finishTable": "Finish table",
-    "cancelPod": "Cancel pod",
-    "enable": "Enable",
-    "disable": "Disable",
+    "challengePts": "{{count}} punti tal-isfidi",
+    "pts": "{{count}} punti",
+    "notReady": "Mhux lest",
+    "pausedTitle": "Fuq pawża",
+    "seated": "Bilqiegħda",
+    "atTables": "{{count}} mal-imwejjed",
+    "tablesTitle": "Imwejjed",
+    "total": "{{count}} b'kollox",
+    "noTables": "Dan l-avveniment inħoloq mingħajr imwejjed.",
+    "startingGames": "Qed jibda l-logħob…",
+    "startAllReady": "Ibda l-logħob kollu lest ({{count}})",
+    "startGame": "Ibda logħba",
+    "finishTable": "Temm il-mejda",
+    "cancelPod": "Ikkanċella pod",
+    "enable": "Attiva",
+    "disable": "Iddiżattiva",
     "trackerUsed": "tracker",
-    "noTracker": "no tracker",
-    "matchNow": "Match now",
-    "fillBots": "Fill tables with bots",
-    "playerJoinPage": "Player join page"
+    "noTracker": "mingħajr tracker",
+    "matchNow": "Qabbel issa",
+    "fillBots": "Imla l-imwejjed bil-bots",
+    "playerJoinPage": "Paġna biex jingħaqdu l-plejers"
   },
   "join": {
-    "joinEvent": "Join event",
-    "takeSeat": "Take a seat",
-    "displayName": "Display name",
+    "joinEvent": "Ingħaqad mal-avveniment",
+    "takeSeat": "Ħu post",
+    "displayName": "Isem muri",
     "displayNamePlaceholder": "Alex",
-    "joinEventButton": "Join event",
-    "saveDecks": "Save decks",
-    "matchFound": "Match found",
-    "yourDeck": "Your deck",
-    "checkMyRole": "Check my role",
-    "playingWithoutTracker": "Playing without the tracker. The host can finish the table.",
-    "chooseTracker": "Choose how this pod will record its game.",
-    "useGameTracker": "Use game tracker",
-    "playWithoutTracker": "Play without tracker",
-    "atTableMarked": "You're marked as at the table on this phone. The host still starts the game from the desk.",
-    "imAtTable": "I'm at the table",
-    "leftEvent": "You left this event. Scan the QR again if you want back in.",
-    "openPool": "Open pool — any table.",
-    "ready": "Ready",
-    "waiting": "waiting",
-    "holdTight": "Hold tight — a table is coming.",
-    "flex": "Flex: {{flex}} · Challenge Points: {{points}}",
-    "howWasPod": "How was your pod?",
-    "pause": "Pause",
-    "leave": "Leave",
-    "pausedMessage": "You are paused. Resume when you can sit, or leave the event.",
-    "imReady": "I'm ready",
-    "leaveEvent": "Leave event",
-    "markReady": "Mark ready when you can sit down for a game.",
-    "matchingShortly": "Matching will send you to a table shortly.",
-    "imTheHost": "I'm the host",
-    "offlineSaved": "Saved on this phone. It will send when you are back online.",
-    "stayAtTable": "Stay at the table until the host calls the game."
+    "joinEventButton": "Ingħaqad mal-avveniment",
+    "saveDecks": "Issejvja d-decks",
+    "matchFound": "Instabet logħba",
+    "yourDeck": "Id-deck tiegħek",
+    "checkMyRole": "Iċċekkja r-rwol tiegħi",
+    "playingWithoutTracker": "Qed tilgħab mingħajr tracker. L-organizzatur jista' jtemm il-mejda.",
+    "chooseTracker": "Agħżel kif dan il-pod se jirreġistra l-logħba tiegħu.",
+    "useGameTracker": "Uża tracker tal-logħba",
+    "playWithoutTracker": "Ilgħab mingħajr tracker",
+    "atTableMarked": "Fuq dan it-telefon inti mmarkat bħala li qiegħed mal-mejda. L-organizzatur xorta jibda l-logħba mill-pannell tiegħu.",
+    "imAtTable": "Jien mal-mejda",
+    "leftEvent": "Tlaqt minn dan l-avveniment. Erġa' skennja l-QR jekk trid terġa' tidħol.",
+    "openPool": "Pool miftuħ — kwalunkwe mejda.",
+    "ready": "Lest",
+    "waiting": "qed jistenna",
+    "holdTight": "Stenna ftit — dalwaqt ikollok mejda.",
+    "flex": "Flex: {{flex}} · Punti tal-Isfidi: {{points}}",
+    "howWasPod": "Kif kien il-pod tiegħek?",
+    "pause": "Pawża",
+    "leave": "Itlaq",
+    "pausedMessage": "Inti fuq pawża. Kompli meta tkun tista' toqgħod għal logħba, jew itlaq mill-avveniment.",
+    "imReady": "Jien lest",
+    "leaveEvent": "Itlaq mill-avveniment",
+    "markReady": "Immarka lilek innifsek lest meta tkun tista' toqgħod għal logħba.",
+    "matchingShortly": "Il-matching dalwaqt jibagħtek fuq mejda.",
+    "imTheHost": "Jien l-organizzatur",
+    "offlineSaved": "Issejvjat fuq dan it-telefon. Jintbagħat meta terġa' tkun online.",
+    "stayAtTable": "Ibqa' mal-mejda sakemm l-organizzatur itemm il-logħba."
   },
   "matchConfig": {
-    "title": "Match config",
-    "description": "Sets up the fake seated pod behind /match. Nothing here touches the server, and none of it appears on the battle screen, so that route can be checked on a phone as-is.",
-    "podSetup": "Pod setup",
-    "seats": "Seats",
-    "seatsCount": "{{count}} seats",
+    "title": "Konfigurazzjoni tal-logħba",
+    "description": "Jissettja l-pod falz bilqiegħda wara /match. Xejn minn hawn ma jmiss is-server, u xejn ma jidher fuq il-battle screen, għalhekk dik ir-route tista' tiġi ċċekkjata fuq telefon kif inhi.",
+    "podSetup": "Setup tal-pod",
+    "seats": "Postijiet",
+    "seatsCount": "{{count}} postijiet",
     "bracket": "Bracket",
     "header": "Header",
-    "eventNamePlaceholder": "Event name",
-    "joinCodePlaceholder": "Join code",
-    "matchCard": "Match card",
-    "tableLabelPlaceholder": "Table label",
-    "assignedDeckPlaceholder": "Assigned deck",
-    "openBattleScreen": "Open battle screen",
-    "resetGameState": "Reset game state",
+    "eventNamePlaceholder": "Isem tal-avveniment",
+    "joinCodePlaceholder": "Kodiċi biex tingħaqad",
+    "matchCard": "Karta tal-logħba",
+    "tableLabelPlaceholder": "Tikketta tal-mejda",
+    "assignedDeckPlaceholder": "Deck assenjat",
+    "openBattleScreen": "Iftaħ il-battle screen",
+    "resetGameState": "Irrisettja l-istat tal-logħba",
     "commander": "Commander",
-    "secondCommander": "Second commander"
+    "secondCommander": "It-tieni commander"
   },
   "app": {
-    "notFound": "Not found."
+    "notFound": "Ma nstabx."
   },
   "wake": {
-    "title": "Waking the tables",
-    "message": "The free host went to sleep. Keep this page open — it usually takes under a minute."
+    "title": "Qed iqajjem l-imwejjed",
+    "message": "Is-server b'xejn mar jorqod. Żomm din il-paġna miftuħa — normalment jieħu inqas minn minuta."
   },
   "scanner": {
-    "title": "Scan QR",
-    "ariaLabel": "Scan join QR code",
-    "hint": "Point at the host desk code.",
-    "closeScanner": "Close scanner",
-    "openingCamera": "Opening camera…",
-    "noCamera": "This browser cannot open the camera. Type the join code instead.",
-    "permissionDenied": "Camera permission was denied. Type the join code, or allow the camera and try again."
+    "title": "Skennja QR",
+    "ariaLabel": "Skennja l-QR code biex tingħaqad",
+    "hint": "Ipponta l-kamera lejn il-kodiċi tal-organizzatur.",
+    "closeScanner": "Agħlaq l-iskanner",
+    "openingCamera": "Qed tiftaħ il-kamera…",
+    "noCamera": "Dan il-browser ma jistax jiftaħ il-kamera. Daħħal il-kodiċi biex tingħaqad minflok.",
+    "permissionDenied": "Il-permess tal-kamera ġie miċħud. Daħħal il-kodiċi biex tingħaqad, jew ippermetti l-kamera u erġa' pprova."
   },
   "theme": {
-    "switchToLight": "Switch to light mode",
-    "switchToDark": "Switch to dark mode"
+    "switchToLight": "Aqleb għal modalità ċara",
+    "switchToDark": "Aqleb għal modalità skura"
   },
   "hostMetrics": {
-    "title": "Event recap",
+    "title": "Sommarju tal-avveniment",
     "aside": "pilot",
-    "players": "Players",
-    "games": "Games",
-    "gamesPerPlayer": "Games / player",
-    "waitAvg": "Wait avg",
-    "waitP95": "Wait p95",
-    "waitMax": "Wait max",
-    "rematchPairs": "Rematch pairs",
-    "flexEarned": "Flex earned",
-    "flexSeats": "Flex seats",
-    "durationAvg": "Duration avg",
-    "tablesOccupied": "Tables occupied",
-    "trackerUsed": "Tracker used",
-    "trackerUsedValue": "{{used}} used · {{skipped}} skipped",
-    "challenges": "Challenges",
-    "challengePts": "Challenge pts",
-    "podRating": "Pod rating",
-    "podSizes": "Pod sizes:",
+    "players": "Plejers",
+    "games": "Logħob",
+    "gamesPerPlayer": "Logħob / plejer",
+    "waitAvg": "Stennija medja",
+    "waitP95": "Stennija p95",
+    "waitMax": "Stennija massima",
+    "rematchPairs": "Pari ta' rematch",
+    "flexEarned": "Flex miksub",
+    "flexSeats": "Postijiet Flex",
+    "durationAvg": "Tul medju",
+    "tablesOccupied": "Imwejjed okkupati",
+    "trackerUsed": "Tracker użat",
+    "trackerUsedValue": "{{used}} użaw · {{skipped}} qabżu",
+    "challenges": "Sfidi",
+    "challengePts": "Punti tal-isfidi",
+    "podRating": "Klassifikazzjoni tal-pod",
+    "podSizes": "Daqsijiet tal-pods:",
     "pools": "Pools:"
   },
   "deckEditor": {
     "title": "Commander decks",
-    "deckNamePlaceholder": "Deck name (optional)",
+    "deckNamePlaceholder": "Isem tad-deck (mhux obbligatorju)",
     "commander": "Commander",
-    "secondCommander": "Second commander",
-    "markPreferred": "Mark preferred",
-    "addAcceptedDeck": "Add accepted deck",
-    "hint": "Same-pool pods only. Extra decks let matching flex you into another bracket."
+    "secondCommander": "It-tieni commander",
+    "markPreferred": "Immarka bħala preferut",
+    "addAcceptedDeck": "Żid deck aċċettat",
+    "hint": "Pods mill-istess pool biss. Decks addizzjonali jippermettu lill-matching idaħħlek fi bracket ieħor."
   },
   "commanderPicker": {
-    "searchCommander": "Search commander",
-    "searchPartner": "Commander that can pair with {{name}}",
-    "removeCommander": "Remove {{name}}",
-    "artworkFor": "Artwork for",
-    "loadingArtwork": "Loading artwork…"
+    "searchCommander": "Fittex commander",
+    "searchPartner": "Commander li jista' jingħaqad ma' {{name}}",
+    "removeCommander": "Neħħi {{name}}",
+    "artworkFor": "Illustrazzjoni għal",
+    "loadingArtwork": "Qed titgħabba l-illustrazzjoni…"
   },
   "challengePack": {
-    "title": "Challenge pack",
-    "description": "Only predefined primitives. Saving writes a new version and never mutates a pack already used by this event.",
-    "copyOfficial": "Copy official",
-    "startBlank": "Start blank",
-    "saveNewVersion": "Save new version",
-    "editHint": "Copy the official pack or start blank before editing.",
-    "packName": "Pack name",
-    "descriptionLabel": "Description",
-    "addChallenge": "Add challenge",
+    "title": "Pakkett ta' sfidi",
+    "description": "Primitives definiti minn qabel biss. Is-sejvjar joħloq verżjoni ġdida u qatt ma jibdel pakkett li dan l-avveniment diġà uża.",
+    "copyOfficial": "Ikkopja l-uffiċjali",
+    "startBlank": "Ibda vojt",
+    "saveNewVersion": "Issejvja verżjoni ġdida",
+    "editHint": "Ikkopja l-pakkett uffiċjali jew ibda vojt qabel teditja.",
+    "packName": "Isem tal-pakkett",
+    "descriptionLabel": "Deskrizzjoni",
+    "addChallenge": "Żid sfida",
     "id": "Id",
-    "name": "Name",
-    "category": "Category",
-    "points": "Points",
+    "name": "Isem",
+    "category": "Kategorija",
+    "points": "Punti",
     "primitive": "Primitive",
-    "threshold": "Threshold",
-    "confirmationQuestion": "Confirmation question",
-    "defaultConfirmation": "Did this happen at the table?",
-    "newClaimName": "New claim",
-    "newClaimDescription": "Award this at the table."
+    "threshold": "Limitu",
+    "confirmationQuestion": "Mistoqsija ta' konferma",
+    "defaultConfirmation": "Dan ġara mal-mejda?",
+    "newClaimName": "Talba ġdida",
+    "newClaimDescription": "Agħti dan mal-mejda."
   },
   "treacheryRole": {
-    "treachery": "Treachery",
-    "receivedRole": "You received a role",
-    "handDeviceTo": "Hand the device to {{name}}",
-    "lookAwayIdentity": "Everyone else should look away before the identity is revealed.",
-    "lookAwayScreen": "Make sure nobody else can see your screen before revealing it.",
-    "reveal": "Reveal",
-    "yourRole": "Your role",
-    "identityAlt": "{{name}}, {{role}} identity",
-    "illustratedBy": "Illustrated by {{artist}}",
-    "yourObjective": "Your objective",
-    "unveiledToTable": "Unveiled to the table",
-    "unveilWarning": "Everyone at your table will see this identity. Its ability must be resolved in the game.",
-    "confirmUnveil": "Confirm unveil",
-    "unveilToTable": "Unveil to the table",
-    "hideAndPass": "Hide & pass",
-    "hideIdentity": "Hide my identity"
+    "treachery": "Tradiment",
+    "receivedRole": "Irċevejt rwol",
+    "handDeviceTo": "Agħti l-apparat lil {{name}}",
+    "lookAwayIdentity": "Kulħadd għandu jħares 'il bogħod qabel ma tiġi żvelata l-identità.",
+    "lookAwayScreen": "Kun żgur li ħadd ieħor ma jista' jara l-iskrin tiegħek qabel ma tiżvela.",
+    "reveal": "Żvela",
+    "yourRole": "Ir-rwol tiegħek",
+    "identityAlt": "{{name}}, identità {{role}}",
+    "illustratedBy": "Illustrawha {{artist}}",
+    "yourObjective": "L-għan tiegħek",
+    "unveiledToTable": "Żvelat lill-mejda",
+    "unveilWarning": "Kulħadd mal-mejda tiegħek se jara din l-identità. L-ability tagħha trid tiġi resolved fil-logħba.",
+    "confirmUnveil": "Ikkonferma ż-żvelar",
+    "unveilToTable": "Żvela lill-mejda",
+    "hideAndPass": "Aħbi u għaddi",
+    "hideIdentity": "Aħbi l-identità tiegħi"
   },
   "modeRulesSheet": {
-    "closeRules": "Close rules",
-    "backToGame": "Back to the game"
+    "closeRules": "Agħlaq ir-regoli",
+    "backToGame": "Lura għal-logħba"
   },
   "assassinTargets": {
-    "title": "Secret contracts",
-    "chooseOwnName": "Choose only your own name.",
-    "closeContracts": "Close contracts",
-    "handDeviceTo": "Hand the device to {{name}}",
-    "lookAway": "Everyone else should look away before the contract is revealed.",
-    "revealTarget": "Reveal my target",
-    "yourTarget": "Your target",
-    "noActiveTarget": "No active target",
-    "marksScored": "Marks scored: {{count}}",
-    "hideAndPass": "Hide & pass",
-    "allContractsChecked": "All contracts checked"
+    "title": "Kuntratti sigrieti",
+    "chooseOwnName": "Agħżel ismek biss.",
+    "closeContracts": "Agħlaq il-kuntratti",
+    "handDeviceTo": "Agħti l-apparat lil {{name}}",
+    "lookAway": "Kulħadd għandu jħares 'il bogħod qabel ma jiġi żvelat il-kuntratt.",
+    "revealTarget": "Żvela l-mira tiegħi",
+    "yourTarget": "Il-mira tiegħek",
+    "noActiveTarget": "L-ebda mira attiva",
+    "marksScored": "Marks miksuba: {{count}}",
+    "hideAndPass": "Aħbi u għaddi",
+    "allContractsChecked": "Il-kuntratti kollha ċċekkjati"
   },
   "scheme": {
     "ongoingScheme": "Ongoing scheme",
     "scheme": "Scheme",
-    "pastScheme": "Past scheme",
+    "pastScheme": "Scheme preċedenti",
     "abandon": "Abandon {{name}}",
     "ongoingSchemes": "Ongoing schemes",
     "graveyard": "Graveyard · {{count}}",
     "nextScheme": "Next scheme",
-    "remainingInDeck": "{{count}} left in the deck",
-    "scryfallCredit": "Card image via Scryfall. Magic: The Gathering is © Wizards of the Coast."
+    "remainingInDeck": "{{count}} fadal fid-deck",
+    "scryfallCredit": "Immaġni tal-karta permezz ta' Scryfall. Magic: The Gathering huwa © Wizards of the Coast."
   },
   "dungeon": {
-    "takeInitiativeTitle": "Take the initiative?",
-    "takeInitiativeEnter": "This also ventures into Undercity. Only take it when the table just gave this seat the initiative.",
-    "takeInitiativeWait": "Finish or leave the current dungeon before Undercity can open. Only take the initiative when the table just gave it to this seat.",
-    "takeInitiativeAndEnter": "Take initiative & enter Undercity",
-    "takeInitiative": "Take initiative",
-    "alreadyHoldInitiative": "You already hold the initiative",
-    "takeAndEnterUndercity": "Take the initiative and enter Undercity",
-    "completed": "{{name}} (completed)",
-    "ventureInto": "Venture into {{name}}",
-    "done": "Done",
-    "ventureTo": "Venture to {{room}}: {{effect}}",
-    "releaseInitiative": "Release the initiative",
-    "undoRoom": "Undo room",
-    "closeDungeon": "Close dungeon"
+    "takeInitiativeTitle": "Tieħu l-initiative?",
+    "takeInitiativeEnter": "Dan jagħmel venture wkoll fl-Undercity. Ħudha biss meta l-mejda tkun għadha kif tat l-initiative lil dan il-post.",
+    "takeInitiativeWait": "Spiċċa jew ħalli d-dungeon attwali qabel ma jkun jista' jinfetaħ l-Undercity. Ħu l-initiative biss meta l-mejda tkun għadha kif tatha lil dan il-post.",
+    "takeInitiativeAndEnter": "Ħu l-initiative u idħol fl-Undercity",
+    "takeInitiative": "Ħu l-initiative",
+    "alreadyHoldInitiative": "Diġà għandek l-initiative",
+    "takeAndEnterUndercity": "Ħu l-initiative u idħol fl-Undercity",
+    "completed": "{{name}} (komplut)",
+    "ventureInto": "Venture fi {{name}}",
+    "done": "Lest",
+    "ventureTo": "Venture lejn {{room}}: {{effect}}",
+    "releaseInitiative": "Ħalli l-initiative",
+    "undoRoom": "Ħassar l-aħħar room",
+    "closeDungeon": "Agħlaq id-dungeon"
   },
   "treacheryRolesSheet": {
-    "title": "Secret identities",
-    "chooseOwnName": "Choose only your own name.",
-    "closeIdentities": "Close identities",
-    "allIdentitiesChecked": "All identities checked"
+    "title": "Identitajiet sigrieti",
+    "chooseOwnName": "Agħżel ismek biss.",
+    "closeIdentities": "Agħlaq l-identitajiet",
+    "allIdentitiesChecked": "L-identitajiet kollha ċċekkjati"
   },
   "tracker": {
-    "gameRules": "Game rules",
-    "loadingRoles": "Loading roles…",
-    "start": "Start",
-    "readRules": "Read rules",
-    "readyToBegin": "Ready to begin",
-    "readyToBeginHint": "Start the match when everyone is seated, or read the rules first.",
-    "dealContracts": "Deal contracts",
-    "dealContractsTitle": "Deal secret contracts",
-    "dealContractsHint": "Every player receives one private target. The device will be passed around so each contract can be checked in secret.",
-    "dealIdentities": "Deal identities",
-    "dealIdentitiesTitle": "Deal secret identities",
-    "dealIdentitiesHint": "Every player receives one hidden identity. The device will be passed around so each one can be read in secret.",
-    "chooseStarPositions": "Choose Star positions",
-    "starPositionsHint": "Players beside each other are allies. Tap two players to exchange their positions, or randomise the whole circle.",
-    "randomPositions": "Random positions",
-    "confirmPositions": "Confirm positions",
-    "adjacentPlayersAlly": "Adjacent\nplayers ally",
-    "buildEmperorTeams": "Build the Emperor teams",
-    "chooseTeamA": "Choose three players for Team A.",
-    "randomTeams": "Random teams",
-    "resetTeams": "Reset teams",
-    "teamEmperor": "Team {{team}} Emperor",
-    "randomEmperors": "Random Emperors",
-    "confirmTeams": "Confirm teams",
-    "chooseArchenemy": "Choose the Archenemy",
-    "chooseArchenemyHint": "The Archenemy faces the other three players. Both sides share 60 life. The Archenemy goes first, draws on that turn, and sets a scheme in motion during each first main phase.",
-    "confirmArchenemy": "Confirm Archenemy",
-    "chooseAllies": "Choose the allies",
-    "chooseAlliesHint": "Select two players for the first team. The other two players become the opposing team. Teams share 60 life and turns; all other player controls stay separate.",
-    "emperor": "Emperor",
-    "emperorRange": "Emperor · range 2",
-    "leader": "Leader",
-    "general": "General",
-    "generalRange": "General · range 1",
+    "gameRules": "Regoli tal-logħba",
+    "loadingRoles": "Qed jitgħabbew ir-rwoli…",
+    "start": "Ibda",
+    "readRules": "Aqra r-regoli",
+    "readyToBegin": "Lest biex tibda",
+    "readyToBeginHint": "Ibda l-logħba meta kulħadd ikun bilqiegħda, jew aqra r-regoli l-ewwel.",
+    "dealContracts": "Qassam il-kuntratti",
+    "dealContractsTitle": "Qassam il-kuntratti sigrieti",
+    "dealContractsHint": "Kull plejer jirċievi mira privata waħda. L-apparat se jgħaddi madwar il-mejda biex kull kuntratt jiġi ċċekkjat fil-privat.",
+    "dealIdentities": "Qassam l-identitajiet",
+    "dealIdentitiesTitle": "Qassam l-identitajiet sigrieti",
+    "dealIdentitiesHint": "Kull plejer jirċievi identità moħbija waħda. L-apparat se jgħaddi madwar il-mejda biex kull waħda tkun tista' tinqara fil-privat.",
+    "chooseStarPositions": "Agħżel il-pożizzjonijiet ta' Star",
+    "starPositionsHint": "Plejers ħdejn xulxin huma alleati. Agħfas żewġ plejers biex tibdel il-pożizzjonijiet tagħhom, jew irranġa ċ-ċirku kollu b'mod każwali.",
+    "randomPositions": "Pożizzjonijiet każwali",
+    "confirmPositions": "Ikkonferma l-pożizzjonijiet",
+    "adjacentPlayersAlly": "Plejers\nmaġenb xulxin huma alleati",
+    "buildEmperorTeams": "Ibni t-timijiet ta' Emperor",
+    "chooseTeamA": "Agħżel tliet plejers għal Tim A.",
+    "randomTeams": "Timijiet każwali",
+    "resetTeams": "Irrisettja t-timijiet",
+    "teamEmperor": "Imperatur ta' Tim {{team}}",
+    "randomEmperors": "Imperaturi każwali",
+    "confirmTeams": "Ikkonferma t-timijiet",
+    "chooseArchenemy": "Agħżel l-Archenemy",
+    "chooseArchenemyHint": "L-Archenemy jiffaċċja t-tliet plejers l-oħra. Iż-żewġ naħat jaqsmu 60 life. L-Archenemy jibda, jiġbed karta f'dik id-dawra, u jattiva scheme matul kull first main phase.",
+    "confirmArchenemy": "Ikkonferma l-Archenemy",
+    "chooseAllies": "Agħżel l-alleati",
+    "chooseAlliesHint": "Agħżel żewġ plejers għall-ewwel tim. Iż-żewġ plejers l-oħra jsiru t-tim avversarju. It-timijiet jaqsmu 60 life u d-dawriet; il-kontrolli l-oħra tal-plejers jibqgħu separati.",
+    "emperor": "Imperatur",
+    "emperorRange": "Imperatur · range 2",
+    "leader": "Mexxej",
+    "general": "Ġeneral",
+    "generalRange": "Ġeneral · range 1",
     "marks": "{{count}} marks",
-    "winner": "Winner",
-    "turnPhone": "Turn your phone for the full board",
-    "matchMenu": "Match menu",
-    "matchMenuElapsed": "Match menu. {{clock}} elapsed",
-    "matchMenuPaused": ", paused",
-    "matchMenuDayNight": ", it is {{phase}}",
-    "day": "day",
-    "night": "night",
-    "closeMatchMenu": "Close match menu",
-    "match": "Match",
-    "firstScheme": "First scheme",
-    "nextScheme": "Next scheme",
-    "resume": "Resume",
-    "pause": "Pause",
-    "undo": "Undo",
-    "challenges": "Challenges",
-    "checkTarget": "Check target",
-    "checkMyRole": "Check my role",
-    "dayButton": "Day",
-    "nightButton": "Night",
-    "playerLost": "Player lost",
-    "gameWonBy": "Game won by",
-    "won": "{{name}} won",
-    "doneRequeue": "Done & requeue",
-    "savingChallenges": "Saving challenges…",
-    "quitToHome": "Quit to home",
-    "quitHint": "The game is kept — reopen it from the home screen.",
-    "secretContracts": "Secret contracts",
-    "secretIdentities": "Secret identities",
-    "whoEliminated": "Who eliminated {{name}}?",
-    "whoEliminatedHint": "A player scores only if this was their assigned mark. The contract chain advances either way.",
-    "noPlayerUnknown": "No player / unknown",
-    "revealedIdentity": "Revealed Treachery identity",
-    "closeRevealedIdentity": "Close revealed identity",
-    "commanderChallenges": "Commander challenges",
-    "challengeCompleted": "{{name}} completed",
-    "challengeFallback": "Challenge",
-    "matchResult": "Match result",
-    "wins": "{{name}} wins",
-    "reviewBoard": "Review board",
-    "yes": "Yes",
-    "no": "No",
-    "yesTheyLost": "Yes, they lost",
-    "noStillIn": "No, still in",
-    "openCounters": "Open counters for {{name}}",
-    "commanderDamageOn": "Commander damage on {{name}}",
-    "countersFor": "Counters for {{name}}",
-    "countersTitle": "Counters for {{name}}",
-    "closeCounters": "Close counters",
-    "closeChallenges": "Close challenges",
+    "winner": "Rebbieħ",
+    "turnPhone": "Dawwar it-telefon biex tara l-board kollu",
+    "matchMenu": "Menu tal-logħba",
+    "matchMenuElapsed": "Menu tal-logħba. Għaddew {{clock}}",
+    "matchMenuPaused": ", fuq pawża",
+    "matchMenuDayNight": ", issa huwa {{phase}}",
+    "day": "jum",
+    "night": "lejl",
+    "closeMatchMenu": "Agħlaq il-menu tal-logħba",
+    "match": "Logħba",
+    "firstScheme": "L-ewwel scheme",
+    "nextScheme": "Scheme li jmiss",
+    "resume": "Kompli",
+    "pause": "Pawża",
+    "undo": "Ħassar l-aħħar bidla",
+    "challenges": "Sfidi",
+    "checkTarget": "Iċċekkja l-mira",
+    "checkMyRole": "Iċċekkja r-rwol tiegħi",
+    "dayButton": "Jum",
+    "nightButton": "Lejl",
+    "playerLost": "Il-plejer tilef",
+    "gameWonBy": "Il-logħba ntrebħet minn",
+    "won": "{{name}} rebaħ",
+    "doneRequeue": "Lest u lura fil-kju",
+    "savingChallenges": "Qed jiġu ssejvjati l-isfidi…",
+    "quitToHome": "Oħroġ għall-bidu",
+    "quitHint": "Il-logħba tinżamm — erġa' iftaħha mill-iskrin tal-bidu.",
+    "secretContracts": "Kuntratti sigrieti",
+    "secretIdentities": "Identitajiet sigrieti",
+    "whoEliminated": "Min elimina lil {{name}}?",
+    "whoEliminatedHint": "Plejer jikseb punt biss jekk din kienet il-mira assenjata tiegħu. Il-katina tal-kuntratti tavvanza xorta waħda.",
+    "noPlayerUnknown": "L-ebda plejer / mhux magħruf",
+    "revealedIdentity": "Identità Treachery żvelata",
+    "closeRevealedIdentity": "Agħlaq l-identità żvelata",
+    "commanderChallenges": "Sfidi ta' Commander",
+    "challengeCompleted": "{{name}} komplut",
+    "challengeFallback": "Sfida",
+    "matchResult": "Riżultat tal-logħba",
+    "wins": "{{name}} jirbaħ",
+    "reviewBoard": "Irrevedi l-board",
+    "yes": "Iva",
+    "no": "Le",
+    "yesTheyLost": "Iva, tilfu",
+    "noStillIn": "Le, għadhom fil-logħba",
+    "openCounters": "Iftaħ il-counters għal {{name}}",
+    "commanderDamageOn": "Commander damage fuq {{name}}",
+    "countersFor": "Counters għal {{name}}",
+    "countersTitle": "Counters għal {{name}}",
+    "closeCounters": "Agħlaq il-counters",
+    "closeChallenges": "Agħlaq l-isfidi",
     "sharedCommanderDamage": "Shared commander damage",
-    "closeCommanderDamage": "Close commander damage",
-    "highestCommanderDamage": "Highest commander damage on {{name}}: {{value}} from {{commander}}",
-    "noCommanderDamage": "No commander damage on {{name}}",
-    "removeCommanderDamage": "Remove commander damage from {{owner}}'s {{name}}",
-    "addCommanderDamage": "Add commander damage from {{owner}}'s {{name}}",
-    "isMonarch": "{{name}} is the monarch",
-    "makeMonarch": "Make {{name}} the monarch",
-    "enduringStory": "{{name}} {{has}} an enduring story",
-    "cityBlessing": "{{name}} {{has}} the city's blessing",
-    "has": "has",
-    "doesNotHave": "does not have",
-    "didLose": "Did {{name}} lose the game?",
-    "thisTeam": "This team",
-    "didTheyLose": "Did they lose?",
-    "poisonPrompt": "{{name}} has {{count}} poison counters. Did they lose?",
-    "sharedPoisonPrompt": "{{subject}} has {{count}} shared poison counters. {{lose}}",
-    "hitPrompt": "{{name}} owns {{count}} exiled cards with hit counters. Did they lose?",
-    "commanderPrompt": "{{name}} has taken {{damage}} commander damage from {{from}}. Did they lose?",
-    "sharedCommanderPrompt": "{{subject}} has taken {{damage}} commander damage from {{from}}. {{lose}}",
-    "lifePrompt": "{{name}} is at {{life}} life. Did they lose?",
-    "sharedLifePrompt": "{{subject}} is at {{life}} life. {{lose}}",
-    "anotherCommander": "another commander",
-    "addLife": "Add 1 life. Long press for a larger amount.",
-    "removeLife": "Remove 1 life. Long press for a larger amount.",
-    "addLifeFor": "Add life for {{name}}",
-    "removeLifeFor": "Remove life for {{name}}",
-    "addLifeLabel": "Add life · {{name}}",
-    "removeLifeLabel": "Remove life · {{name}}",
-    "deleteDigit": "Delete digit",
-    "add": "Add",
-    "removeVerb": "Remove",
-    "lower": "Lower {{label}}",
-    "raise": "Raise {{label}}",
-    "seatColour": "Seat colour for {{name}}",
-    "dungeonFor": "Dungeon for {{name}}",
-    "dungeonInitiative": "Dungeon and initiative for {{name}}. {{title}}",
-    "dungeonInitiativeActive": "{{name}} has the initiative · {{filled}} of {{total}} unique dungeons",
-    "dungeonInitiativeCompleted": "{{name}} has completed {{filled}} of {{total}} unique dungeons",
-    "counterOn": "{{label}} on {{name}}: {{value}}",
-    "counterFor": "{{label}} for {{name}}",
-    "claimFor": "Claim for {{name}}",
-    "challengesSubtitle": "Same challenges for every player · points never affect matching",
+    "closeCommanderDamage": "Agħlaq il-commander damage",
+    "highestCommanderDamage": "L-ogħla commander damage fuq {{name}}: {{value}} minn {{commander}}",
+    "noCommanderDamage": "L-ebda commander damage fuq {{name}}",
+    "removeCommanderDamage": "Neħħi commander damage minn {{owner}}'s {{name}}",
+    "addCommanderDamage": "Żid commander damage minn {{owner}}'s {{name}}",
+    "isMonarch": "{{name}} huwa l-monarch",
+    "makeMonarch": "Agħmel lil {{name}} il-monarch",
+    "enduringStory": "{{name}} {{has}} enduring story",
+    "cityBlessing": "{{name}} {{has}} city's blessing",
+    "has": "għandu",
+    "doesNotHave": "m'għandux",
+    "didLose": "{{name}} tilef il-logħba?",
+    "thisTeam": "Dan it-tim",
+    "didTheyLose": "Tilfu?",
+    "poisonPrompt": "{{name}} għandu {{count}} poison counters. Tilef?",
+    "sharedPoisonPrompt": "{{subject}} għandu {{count}} shared poison counters. {{lose}}",
+    "hitPrompt": "{{name}} għandu {{count}} exiled cards b'hit counters. Tilef?",
+    "commanderPrompt": "{{name}} irċieva {{damage}} commander damage minn {{from}}. Tilef?",
+    "sharedCommanderPrompt": "{{subject}} irċieva {{damage}} commander damage minn {{from}}. {{lose}}",
+    "lifePrompt": "{{name}} għandu {{life}} life. Tilef?",
+    "sharedLifePrompt": "{{subject}} għandu {{life}} life. {{lose}}",
+    "anotherCommander": "commander ieħor",
+    "addLife": "Żid 1 life. Żomm magħfus għal ammont akbar.",
+    "removeLife": "Neħħi 1 life. Żomm magħfus għal ammont akbar.",
+    "addLifeFor": "Żid life għal {{name}}",
+    "removeLifeFor": "Neħħi life minn {{name}}",
+    "addLifeLabel": "Żid life · {{name}}",
+    "removeLifeLabel": "Neħħi life · {{name}}",
+    "deleteDigit": "Ħassar ċifra",
+    "add": "Żid",
+    "removeVerb": "Neħħi",
+    "lower": "Naqqas {{label}}",
+    "raise": "Żid {{label}}",
+    "seatColour": "Kulur tal-post għal {{name}}",
+    "dungeonFor": "Dungeon għal {{name}}",
+    "dungeonInitiative": "Dungeon u initiative għal {{name}}. {{title}}",
+    "dungeonInitiativeActive": "{{name}} għandu l-initiative · {{filled}} minn {{total}} dungeons uniċi",
+    "dungeonInitiativeCompleted": "{{name}} lesta {{filled}} minn {{total}} dungeons uniċi",
+    "counterOn": "{{label}} fuq {{name}}: {{value}}",
+    "counterFor": "{{label}} għal {{name}}",
+    "claimFor": "Talba għal {{name}}",
+    "challengesSubtitle": "L-istess sfidi għal kull plejer · il-punti qatt ma jaffettwaw il-matching",
     "counters": {
       "poison": "Poison",
       "tax": "Commander tax",
-      "acorn": "Acorns",
-      "energy": "Energy",
-      "experience": "Experience",
+      "acorn": "Ġandar",
+      "energy": "Enerġija",
+      "experience": "Esperjenza",
       "hit": "Etrata hits",
-      "rad": "Radiation",
+      "rad": "Radjazzjoni",
       "ring": "Ring temptation",
-      "speed": "Speed",
-      "ticket": "Tickets"
+      "speed": "Veloċità",
+      "ticket": "Biljetti"
     }
   }
 }

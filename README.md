@@ -147,6 +147,11 @@ manifest's `orientation`, so an iPhone shows a hint to turn the phone instead.
 | `yarn test:matching` | Matching engine unit, property, and oracle tests |
 | `yarn simulate:matching` | Seeded snapshot + event-loop simulation report |
 | `yarn benchmark:matching` | Matcher timing report |
+| `yarn simulation:run --scenario NORMAL_FRIDAY_40 --seed 1` | Reproduce one simulated event night |
+| `yarn simulation:benchmark --runs 1000` | Benchmark all 23 event-night scenarios and write JSON/CSV artifacts |
+| `yarn simulation:compare` | Compare the legacy baseline with the latest compatible artifact (or rerun it) |
+| `yarn simulation:test` | Simulation unit and property tests |
+| `yarn simulation:test:heavy` | Simulation matcher baseline and heavier property tests |
 | `yarn db:generate` | Generate Drizzle migrations from schema (committed to repo) |
 | `yarn db:migrate` | Apply migrations to the database in `DATABASE_URL` |
 
@@ -157,4 +162,10 @@ apps/web          Player + organiser UI
 apps/server       Fastify API + persistence
 packages/shared   Shared types and enums
 packages/matching Matchmaking engine + test laboratory
+packages/simulation Seeded event-night simulation, benchmarks, and reports
 ```
+
+Simulation benchmark artifacts are written under the gitignored
+`artifacts/simulation/` directory. See
+[`packages/simulation/README.md`](packages/simulation/README.md) for metrics,
+baseline comparison, and reproducibility details.

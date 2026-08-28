@@ -1,75 +1,75 @@
 {
   "common": {
-    "home": "Home",
-    "cancel": "Cancel",
-    "close": "Close",
-    "save": "Save",
-    "loading": "Loading…",
-    "players": "Players",
-    "game": "Game",
-    "language": "Language",
-    "yes": "Yes",
-    "no": "No",
-    "reset": "Reset",
-    "random": "Random",
-    "remove": "Remove",
-    "empty": "Empty",
+    "home": "Sākums",
+    "cancel": "Atcelt",
+    "close": "Aizvērt",
+    "save": "Saglabāt",
+    "loading": "Ielādē…",
+    "players": "Spēlētāji",
+    "game": "Spēle",
+    "language": "Valoda",
+    "yes": "Jā",
+    "no": "Nē",
+    "reset": "Atiestatīt",
+    "random": "Nejauši",
+    "remove": "Noņemt",
+    "empty": "Tukšs",
     "bot": "bot",
     "dev": "dev",
-    "official": "official",
-    "open": "Open",
-    "preferred": "preferred",
-    "player": "Player {{number}}",
-    "versus": "versus",
-    "teamA": "Team A",
-    "teamB": "Team B",
-    "working": "Working…",
-    "creating": "Creating…",
-    "checking": "Checking…",
-    "joining": "Joining…",
-    "updating": "Updating…",
-    "submitting": "Submitting…",
-    "saving": "Saving…",
-    "searching": "Searching…",
-    "unveiling": "Unveiling…",
-    "copied": "Copied",
-    "noneYet": "none yet",
+    "official": "oficiāls",
+    "open": "Atvērts",
+    "preferred": "vēlamais",
+    "player": "Spēlētājs {{number}}",
+    "versus": "pret",
+    "teamA": "Komanda A",
+    "teamB": "Komanda B",
+    "working": "Apstrādā…",
+    "creating": "Izveido…",
+    "checking": "Pārbauda…",
+    "joining": "Pievienojas…",
+    "updating": "Atjaunina…",
+    "submitting": "Nosūta…",
+    "saving": "Saglabā…",
+    "searching": "Meklē…",
+    "unveiling": "Atklāj…",
+    "copied": "Nokopēts",
+    "noneYet": "vēl nav",
     "dash": "—",
     "errors": {
-      "generic": "Something went wrong.",
-      "createEvent": "Could not create event.",
-      "unlockHost": "Could not unlock host.",
-      "updateTable": "Could not update table.",
-      "startGame": "Could not start the game.",
-      "startAllGames": "Could not start all ready games.",
-      "finishTable": "Could not finish the table.",
-      "cancelPod": "Could not cancel the pod.",
-      "updateSettings": "Could not update settings.",
-      "matchTables": "Could not match tables.",
-      "fillBots": "Could not fill tables with bots.",
-      "clipboard": "Clipboard blocked — copy the link manually.",
-      "eventNotFound": "Event not found.",
-      "joinEvent": "Could not join event.",
-      "saveDecks": "Could not save decks.",
-      "updateReady": "Could not update ready.",
-      "updatePause": "Could not update pause.",
-      "leaveEvent": "Could not leave event.",
-      "trackerChoice": "Could not save the tracker choice.",
-      "saveRating": "Could not save that rating.",
-      "chooseCommander": "Choose a commander for every deck.",
-      "enterJoinCode": "Enter a join code.",
-      "sessionUnavailable": "Your event session is no longer available.",
-      "savePack": "Could not save the pack.",
-      "searchScryfall": "Could not search Scryfall.",
-      "loadArtwork": "Could not load alternate artwork.",
-      "submitResult": "Could not submit the result.",
-      "saveChallenge": "Could not save challenge progress.",
-      "unveilIdentity": "Could not unveil your identity.",
-      "apiWaking": "The host is waking up. Keep this page open — it usually takes under a minute.",
-      "apiUnreachable": "Cannot reach the API. Is the server running (yarn dev:server)?"
+      "generic": "Kaut kas nogāja greizi.",
+      "createEvent": "Neizdevās izveidot pasākumu.",
+      "unlockHost": "Neizdevās atbloķēt organizatora paneli.",
+      "updateTable": "Neizdevās atjaunināt galdu.",
+      "startGame": "Neizdevās sākt spēli.",
+      "startAllGames": "Neizdevās sākt visas gatavās spēles.",
+      "finishTable": "Neizdevās pabeigt spēli pie galda.",
+      "cancelPod": "Neizdevās atcelt pod.",
+      "updateSettings": "Neizdevās atjaunināt iestatījumus.",
+      "matchTables": "Neizdevās sapārot galdus.",
+      "fillBots": "Neizdevās aizpildīt galdus ar botiem.",
+      "clipboard": "Starpliktuve ir bloķēta — nokopējiet saiti manuāli.",
+      "eventNotFound": "Pasākums nav atrasts.",
+      "joinEvent": "Neizdevās pievienoties pasākumam.",
+      "saveDecks": "Neizdevās saglabāt kavas.",
+      "updateReady": "Neizdevās atjaunināt gatavības statusu.",
+      "updatePause": "Neizdevās atjaunināt pauzi.",
+      "leaveEvent": "Neizdevās pamest pasākumu.",
+      "trackerChoice": "Neizdevās saglabāt tracker izvēli.",
+      "saveRating": "Neizdevās saglabāt šo vērtējumu.",
+      "chooseCommander": "Izvēlieties commander katrai kavai.",
+      "enterJoinCode": "Ievadiet pievienošanās kodu.",
+      "sessionUnavailable": "Jūsu pasākuma sesija vairs nav pieejama.",
+      "savePack": "Neizdevās saglabāt pakotni.",
+      "searchScryfall": "Neizdevās meklēt Scryfall.",
+      "loadArtwork": "Neizdevās ielādēt alternatīvo ilustrāciju.",
+      "submitResult": "Neizdevās iesniegt rezultātu.",
+      "saveChallenge": "Neizdevās saglabāt izaicinājuma progresu.",
+      "unveilIdentity": "Neizdevās atklāt jūsu identitāti.",
+      "apiWaking": "Serveris mostas. Atstājiet šo lapu atvērtu — parasti tas aizņem mazāk nekā minūti.",
+      "apiUnreachable": "Nevar sasniegt API. Vai serveris darbojas (yarn dev:server)?"
     },
-    "assignedAtTable": "Assigned at the table",
-    "scanToJoin": "Scan to join this event"
+    "assignedAtTable": "Piešķirts galdam",
+    "scanToJoin": "Skenējiet, lai pievienotos šim pasākumam"
   },
   "language": {
     "en": "English",
@@ -109,173 +109,173 @@
     "cy": "Cymraeg"
   },
   "families": {
-    "normal": "Normal",
+    "normal": "Parasts",
     "commander": "Commander"
   },
   "modes": {
     "shared": {
-      "commanderCombat": "A player loses after taking {{commanderDamage}} combat damage from one commander.",
-      "commanderTax": "Each time a commander is recast from the command zone, it costs 2 more mana.",
-      "lifeAndLoss": "Life and loss",
-      "turns": "Turns",
+      "commanderCombat": "Spēlētājs zaudē, saņemot {{commanderDamage}} combat damage no viena commander.",
+      "commanderTax": "Katru reizi, kad commander tiek atkārtoti izspēlēts no command zone, tas maksā par 2 mana vairāk.",
+      "lifeAndLoss": "Dzīvība un zaudējums",
+      "turns": "Gājieni",
       "commanders": "Commanders",
-      "eachPlayerLife": "Each player starts at {{life}} life.",
-      "loseAtZero": "A player loses at 0 life.",
-      "loseAtPoison": "A player loses at {{poison}} poison counters.",
-      "startingPlayerRandom": "The starting player is drawn at random.",
-      "startingPlayerSkipDraw": "The starting player is drawn at random and skips the draw step on the first turn.",
-      "multiplayerFirstTurnDraw": "In multiplayer, that player draws on their first turn.",
-      "commanderFirstTurnDraw": "In multiplayer Commander, that player draws on their first turn.",
-      "commandersInZone": "Commanders begin in the command zone and may be recast from there.",
-      "commanderRulesApply": "Commander rules still apply: {{life}} starting life, {{poison}} poison, and {{commanderDamage}} combat damage from one commander are lethal."
+      "eachPlayerLife": "Katrs spēlētājs sāk ar {{life}} dzīvības punktiem.",
+      "loseAtZero": "Spēlētājs zaudē pie 0 dzīvības punktiem.",
+      "loseAtPoison": "Spēlētājs zaudē pie {{poison}} poison counters.",
+      "startingPlayerRandom": "Sākuma spēlētājs tiek izvēlēts nejauši.",
+      "startingPlayerSkipDraw": "Sākuma spēlētājs tiek izvēlēts nejauši un pirmajā gājienā izlaiž draw step.",
+      "multiplayerFirstTurnDraw": "Multiplayer spēlē šis spēlētājs velk kārti savā pirmajā gājienā.",
+      "commanderFirstTurnDraw": "Multiplayer Commander spēlē šis spēlētājs velk kārti savā pirmajā gājienā.",
+      "commandersInZone": "Commanders sāk command zone un var tikt atkārtoti izspēlēti no turienes.",
+      "commanderRulesApply": "Commander noteikumi joprojām ir spēkā: {{life}} sākuma dzīvības punkti, {{poison}} poison un {{commanderDamage}} combat damage no viena commander ir letāli."
     },
     "duel": {
-      "label": "Duel",
-      "hint": "Two players. Each starts on 20 life.",
-      "hostHint": "Strict 2-player tables. Each player starts on 20 life.",
-      "hostFixedSeats": "Duel events always seat exactly two players.",
-      "title": "Duel",
-      "summary": "Two-player Magic. No commanders — just life and the board.",
+      "label": "Duelis",
+      "hint": "Divi spēlētāji. Katrs sāk ar 20 dzīvības punktiem.",
+      "hostHint": "Tieši 2 spēlētāji pie galda. Katrs spēlētājs sāk ar 20 dzīvības punktiem.",
+      "hostFixedSeats": "Duelī vienmēr spēlē tieši divi spēlētāji.",
+      "title": "Duelis",
+      "summary": "Magic diviem spēlētājiem. Bez commanders — tikai dzīvība un spēles laukums.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Dzīvība un zaudējums",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters."
+            "Katrs spēlētājs sāk ar {{life}} dzīvības punktiem.",
+            "Spēlētājs zaudē pie 0 dzīvības punktiem.",
+            "Spēlētājs zaudē pie {{poison}} poison counters."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Gājieni",
           "bullets": [
-            "The starting player is drawn at random and skips the draw step on the first turn."
+            "Sākuma spēlētājs tiek izvēlēts nejauši un pirmajā gājienā izlaiž draw step."
           ]
         }
       }
     },
     "multiplayer": {
       "label": "Multiplayer",
-      "hint": "Free-for-all without commanders. Everyone starts on 20 life.",
-      "hostHint": "Free-for-all without commanders. Matching fills your chosen table size; leftovers can sit as small as three.",
+      "hint": "Visi pret visiem bez commanders. Visi sāk ar 20 dzīvības punktiem.",
+      "hostHint": "Visi pret visiem bez commanders. Pārošana vispirms aizpilda izvēlēto galda izmēru; atlikušajos galdos var būt vismaz trīs spēlētāji.",
       "title": "Multiplayer",
-      "summary": "Free-for-all without the Commander format. Useful for casual multiplayer, Planechase, or any 20-life table.",
+      "summary": "Visi pret visiem bez Commander formāta. Piemērots casual multiplayer, Planechase vai jebkuram 20 dzīvības punktu galdam.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Dzīvība un zaudējums",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters."
+            "Katrs spēlētājs sāk ar {{life}} dzīvības punktiem.",
+            "Spēlētājs zaudē pie 0 dzīvības punktiem.",
+            "Spēlētājs zaudē pie {{poison}} poison counters."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Gājieni",
           "bullets": [
-            "The starting player is drawn at random.",
-            "In multiplayer, that player draws on their first turn."
+            "Sākuma spēlētājs tiek izvēlēts nejauši.",
+            "Multiplayer spēlē šis spēlētājs velk kārti savā pirmajā gājienā."
           ]
         }
       }
     },
     "commander": {
-      "label": "Classic",
-      "hint": "Free-for-all. Everyone starts on 40 life.",
-      "hostHint": "Free-for-all Commander. Matching prefers four; leftover pods can be three or five when allowed.",
-      "title": "Classic",
-      "summary": "Free-for-all multiplayer. Each player fights for themselves.",
+      "label": "Klasiskais",
+      "hint": "Visi pret visiem. Visi sāk ar 40 dzīvības punktiem.",
+      "hostHint": "Commander visi pret visiem. Pārošana dod priekšroku četriem spēlētājiem; atlikušajos pod var būt trīs vai pieci spēlētāji, ja tas ir atļauts.",
+      "title": "Klasiskais",
+      "summary": "Multiplayer visi pret visiem. Katrs spēlētājs cīnās par sevi.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Dzīvība un zaudējums",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters.",
-            "A player loses after taking {{commanderDamage}} combat damage from one commander."
+            "Katrs spēlētājs sāk ar {{life}} dzīvības punktiem.",
+            "Spēlētājs zaudē pie 0 dzīvības punktiem.",
+            "Spēlētājs zaudē pie {{poison}} poison counters.",
+            "Spēlētājs zaudē, saņemot {{commanderDamage}} combat damage no viena commander."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Gājieni",
           "bullets": [
-            "The starting player is drawn at random.",
-            "In multiplayer Commander, that player draws on their first turn."
+            "Sākuma spēlētājs tiek izvēlēts nejauši.",
+            "Multiplayer Commander spēlē šis spēlētājs velk kārti savā pirmajā gājienā."
           ]
         },
         "commanders": {
           "heading": "Commanders",
           "bullets": [
-            "Commanders begin in the command zone and may be recast from there.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Commanders sāk command zone un var tikt atkārtoti izspēlēti no turienes.",
+            "Katru reizi, kad commander tiek atkārtoti izspēlēts no command zone, tas maksā par 2 mana vairāk."
           ]
         }
       }
     },
     "treachery": {
-      "label": "Treachery",
-      "hint": "Secret identities dealt on this device. Pass it around so everyone reads their own in private.",
-      "hostHint": "Secret roles for Commander pods. Matching fills your chosen table size first; leftovers can sit as small as four.",
-      "title": "Treachery",
-      "summary": "Commander with secret identities. The Leader is public; everyone else stays hidden.",
+      "label": "Nodevība",
+      "hint": "Slepenās identitātes tiek izdalītas šajā ierīcē. Padodiet to apkārt, lai katrs varētu privāti izlasīt savējo.",
+      "hostHint": "Slepenas lomas Commander pod. Pārošana vispirms aizpilda izvēlēto galda izmēru; atlikušajos pod var būt vismaz četri spēlētāji.",
+      "title": "Nodevība",
+      "summary": "Commander ar slepenām identitātēm. Līderis ir publisks; visi pārējie paliek paslēpti.",
       "sections": {
         "commander": {
-          "heading": "Commander rules still apply",
+          "heading": "Commander noteikumi joprojām ir spēkā",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "The Leader takes the first turn and draws on that turn.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Katrs spēlētājs sāk ar {{life}} dzīvības punktiem.",
+            "Spēlētājs zaudē pie 0 dzīvības punktiem, {{poison}} poison vai pēc {{commanderDamage}} combat damage no viena commander.",
+            "Līderis spēlē pirmais un šajā gājienā velk kārti.",
+            "Katru reizi, kad commander tiek atkārtoti izspēlēts no command zone, tas maksā par 2 mana vairāk."
           ]
         },
         "identities": {
-          "heading": "Identities",
+          "heading": "Identitātes",
           "bullets": [
-            "Open Check my role from the timer menu. Only you see that card.",
-            "On a single tracker, deal the identities at setup and pass the device around so each player reads theirs alone.",
-            "Leader: Survive until every Assassin and Traitor is eliminated. Reveal yourself to the table. The Guardians share your victory, but you do not know who they are.",
-            "Guardian: Keep the Leader alive and eliminate the Leader's enemies. Your identity is secret. You win and lose with the Leader, even if you are eliminated first.",
-            "Assassin: Eliminate the Leader. Your identity is secret. Assassins share the same objective, but you do not know who the other Assassins are.",
-            "Traitor: Be the last player standing. Your identity is secret. Keep the Leader alive until the other threats are gone, then take the throne for yourself.",
-            "Follow any extra abilities printed on your identity card."
+            "Atveriet “Pārbaudīt manu lomu” timer izvēlnē. Šo kārti redzat tikai jūs.",
+            "Ja izmantojat vienu tracker, izdaliet identitātes sagatavošanas laikā un padodiet ierīci apkārt, lai katrs spēlētājs savu identitāti izlasītu vienatnē.",
+            "Līderis: Izdzīvojiet, līdz visi Slepkavas un Nodevējs ir izslēgti no spēles. Atklājiet sevi galdam. Sargi dala jūsu uzvaru, taču jūs nezināt, kuri viņi ir.",
+            "Sargs: Uzturiet Līderi dzīvu un izslēdziet viņa ienaidniekus. Jūsu identitāte ir slepena. Jūs uzvarat un zaudējat kopā ar Līderi, pat ja tiekat izslēgts pirmais.",
+            "Slepkava: Izslēdziet Līderi. Jūsu identitāte ir slepena. Slepkavām ir kopīgs mērķis, taču jūs nezināt, kuri ir pārējie Slepkavas.",
+            "Nodevējs: Palieciet pēdējais spēlētājs. Jūsu identitāte ir slepena. Uzturiet Līderi dzīvu, līdz pārējie draudi ir pazuduši, tad sagrābiet troni sev.",
+            "Ievērojiet visas papildu spējas, kas uzdrukātas uz jūsu identitātes kārts."
           ]
         }
       },
       "roles": {
         "leader": {
-          "name": "Leader",
-          "objective": "Survive until every Assassin and Traitor is eliminated.",
-          "guidance": "Reveal yourself to the table. The Guardians share your victory, but you do not know who they are.",
-          "publicNote": "Your role is public. Tell the table you are the Leader."
+          "name": "Līderis",
+          "objective": "Izdzīvojiet, līdz visi Slepkavas un Nodevējs ir izslēgti no spēles.",
+          "guidance": "Atklājiet sevi galdam. Sargi dala jūsu uzvaru, taču jūs nezināt, kuri viņi ir.",
+          "publicNote": "Jūsu loma ir publiska. Pasakiet galdam, ka esat Līderis."
         },
         "guardian": {
-          "name": "Guardian",
-          "objective": "Keep the Leader alive and eliminate the Leader's enemies.",
-          "guidance": "Your identity is secret. You win and lose with the Leader, even if you are eliminated first.",
-          "publicNote": "Keep this role secret."
+          "name": "Sargs",
+          "objective": "Uzturiet Līderi dzīvu un izslēdziet viņa ienaidniekus.",
+          "guidance": "Jūsu identitāte ir slepena. Jūs uzvarat un zaudējat kopā ar Līderi, pat ja tiekat izslēgts pirmais.",
+          "publicNote": "Turiet šo lomu slepenībā."
         },
         "assassin": {
-          "name": "Assassin",
-          "objective": "Eliminate the Leader.",
-          "guidance": "Your identity is secret. Assassins share the same objective, but you do not know who the other Assassins are.",
-          "publicNote": "Keep this role secret."
+          "name": "Slepkava",
+          "objective": "Izslēdziet Līderi.",
+          "guidance": "Jūsu identitāte ir slepena. Slepkavām ir kopīgs mērķis, taču jūs nezināt, kuri ir pārējie Slepkavas.",
+          "publicNote": "Turiet šo lomu slepenībā."
         },
         "traitor": {
-          "name": "Traitor",
-          "objective": "Be the last player standing.",
-          "guidance": "Your identity is secret. Keep the Leader alive until the other threats are gone, then take the throne for yourself.",
-          "publicNote": "Keep this role secret."
+          "name": "Nodevējs",
+          "objective": "Palieciet pēdējais spēlētājs.",
+          "guidance": "Jūsu identitāte ir slepena. Uzturiet Līderi dzīvu, līdz pārējie draudi ir pazuduši, tad sagrābiet troni sev.",
+          "publicNote": "Turiet šo lomu slepenībā."
         }
       },
       "normal": {
-        "hint": "Secret identities on a shared phone. Everyone starts on 20 life — no commanders.",
-        "hostHint": "Secret roles without commanders. Matching fills your chosen table size first; leftovers can sit as small as four.",
-        "summary": "Secret identities without the Commander format. The Leader is public; everyone else stays hidden.",
+        "hint": "Slepenas identitātes koplietotā telefonā. Visi sāk ar 20 dzīvības punktiem — bez commanders.",
+        "hostHint": "Slepenas lomas bez commanders. Pārošana vispirms aizpilda izvēlēto galda izmēru; atlikušajos pod var būt vismaz četri spēlētāji.",
+        "summary": "Slepenas identitātes bez Commander formāta. Līderis ir publisks; visi pārējie paliek paslēpti.",
         "sections": {
           "life": {
-            "heading": "Life and loss",
+            "heading": "Dzīvība un zaudējums",
             "bullets": [
-              "Each player starts at {{life}} life.",
-              "A player loses at 0 life.",
-              "A player loses at {{poison}} poison counters.",
-              "The Leader takes the first turn and draws on that turn."
+              "Katrs spēlētājs sāk ar {{life}} dzīvības punktiem.",
+              "Spēlētājs zaudē pie 0 dzīvības punktiem.",
+              "Spēlētājs zaudē pie {{poison}} poison counters.",
+              "Līderis spēlē pirmais un šajā gājienā velk kārti."
             ]
           },
           "identities": null
@@ -283,63 +283,63 @@
       }
     },
     "two-headed-giant": {
-      "label": "Two-Headed Giant",
-      "hint": "Two teams of two, 60 shared life each, turns taken together.",
-      "hostHint": "Strict 4-player Commander pods. Two teams share 60 life and take their turns together.",
-      "hostFixedSeats": "Two-Headed Giant games always seat exactly four players.",
-      "title": "Two-Headed Giant",
-      "summary": "Two teams of two. Teammates share a life total and a turn.",
+      "label": "Divgalvainais milzis",
+      "hint": "Divas komandas pa diviem spēlētājiem, katrai 60 kopīgi dzīvības punkti, un gājieni tiek veikti kopā.",
+      "hostHint": "Tieši 4 spēlētāju Commander pod. Divas komandas dala pa 60 dzīvības punktiem un savus gājienus veic kopā.",
+      "hostFixedSeats": "Divgalvainā milža spēlēs vienmēr spēlē tieši četri spēlētāji.",
+      "title": "Divgalvainais milzis",
+      "summary": "Divas komandas pa diviem spēlētājiem. Komandas biedri dala dzīvības punktus un gājienu.",
       "sections": {
         "teams": {
-          "heading": "Teams",
+          "heading": "Komandas",
           "bullets": [
-            "Pick two allies, or let the table randomise the pairs.",
-            "Each team starts at {{sharedLife}} shared life.",
-            "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+            "Izvēlieties divus sabiedrotos vai ļaujiet pārus noteikt nejauši.",
+            "Katra komanda sāk ar {{sharedLife}} kopīgiem dzīvības punktiem.",
+            "Komandas biedri savu gājienu veic kopā. Katram spēlētājam joprojām ir sava roka, library un commanders."
           ]
         },
         "life": {
-          "heading": "Life and loss",
+          "heading": "Dzīvība un zaudējums",
           "bullets": [
-            "A team loses when its shared life reaches 0.",
-            "A team loses at {{sharedPoison}} shared poison counters.",
-            "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+            "Komanda zaudē, kad tās kopīgie dzīvības punkti sasniedz 0.",
+            "Komanda zaudē pie {{sharedPoison}} kopīgiem poison counters.",
+            "Komanda zaudē, saņemot {{commanderDamage}} kopīgu combat damage no viena commander."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Gājieni",
           "bullets": [
-            "The starting team is drawn at random and skips the draw step on its first turn.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Sākuma komanda tiek izvēlēta nejauši un savā pirmajā gājienā izlaiž draw step.",
+            "Katru reizi, kad commander tiek atkārtoti izspēlēts no command zone, tas maksā par 2 mana vairāk."
           ]
         }
       },
       "normal": {
-        "hint": "Two teams of two, 40 shared life each, turns taken together.",
-        "hostHint": "Strict 4-player tables. Two teams share 40 life and take their turns together — no commanders.",
-        "summary": "Two teams of two. Teammates share a life total and a turn — standard decks, 20 life each in team terms.",
+        "hint": "Divas komandas pa diviem spēlētājiem, katrai 40 kopīgi dzīvības punkti, un gājieni tiek veikti kopā.",
+        "hostHint": "Tieši 4 spēlētāju galdi. Divas komandas dala pa 40 dzīvības punktiem un savus gājienus veic kopā — bez commanders.",
+        "summary": "Divas komandas pa diviem spēlētājiem. Komandas biedri dala dzīvības punktus un gājienu — standarta kavas, komandas izpratnē pa 20 dzīvības punktiem katram.",
         "sections": {
           "teams": {
-            "heading": "Teams",
+            "heading": "Komandas",
             "bullets": [
-              "Pick two allies, or let the table randomise the pairs.",
-              "Each team starts at {{sharedLife}} shared life.",
-              "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+              "Izvēlieties divus sabiedrotos vai ļaujiet pārus noteikt nejauši.",
+              "Katra komanda sāk ar {{sharedLife}} kopīgiem dzīvības punktiem.",
+              "Komandas biedri savu gājienu veic kopā. Katram spēlētājam joprojām ir sava roka, library un commanders."
             ]
           },
           "life": {
-            "heading": "Life and loss",
+            "heading": "Dzīvība un zaudējums",
             "bullets": [
-              "A team loses when its shared life reaches 0.",
-              "A team loses at {{sharedPoison}} shared poison counters.",
-              "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+              "Komanda zaudē, kad tās kopīgie dzīvības punkti sasniedz 0.",
+              "Komanda zaudē pie {{sharedPoison}} kopīgiem poison counters.",
+              "Komanda zaudē, saņemot {{commanderDamage}} kopīgu combat damage no viena commander."
             ]
           },
           "turns": {
-            "heading": "Turns",
+            "heading": "Gājieni",
             "bullets": [
-              "The starting team is drawn at random and skips the draw step on its first turn.",
-              "Each time a commander is recast from the command zone, it costs 2 more mana."
+              "Sākuma komanda tiek izvēlēta nejauši un savā pirmajā gājienā izlaiž draw step.",
+              "Katru reizi, kad commander tiek atkārtoti izspēlēts no command zone, tas maksā par 2 mana vairāk."
             ]
           }
         }
@@ -347,286 +347,286 @@
     },
     "archenemy-commander": {
       "label": "Archenemy",
-      "hint": "One Archenemy on 60 life with a 40-card scheme deck against three heroes sharing 60 life.",
-      "hostHint": "Strict 4-player Commander pods. One 60-life Archenemy faces a three-player team with 60 shared life and a 40-card scheme deck.",
-      "hostFixedSeats": "Archenemy Commander games always seat exactly four players.",
+      "hint": "Viens Archenemy ar 60 dzīvības punktiem un 40 kāršu scheme kavu pret trim varoņiem, kuri dala 60 dzīvības punktus.",
+      "hostHint": "Tieši 4 spēlētāju Commander pod. Viens Archenemy ar 60 dzīvības punktiem spēlē pret trīs spēlētāju komandu ar 60 kopīgiem dzīvības punktiem un 40 kāršu scheme kavu.",
+      "hostFixedSeats": "Archenemy Commander spēlēs vienmēr spēlē tieši četri spēlētāji.",
       "title": "Archenemy Commander",
-      "summary": "One Archenemy against a team of three, with a scheme deck in motion.",
+      "summary": "Viens Archenemy pret trīs spēlētāju komandu, izmantojot scheme kavu.",
       "sections": {
         "sides": {
-          "heading": "Sides",
+          "heading": "Puses",
           "bullets": [
-            "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
-            "Both sides start at {{life}} life.",
-            "The heroes share that life total and take their turn together.",
-            "The Archenemy goes first and draws on that turn."
+            "Izvēlieties Archenemy vai piešķiriet to nejauši. Pārējie trīs spēlētāji ir varoņi.",
+            "Abas puses sāk ar {{life}} dzīvības punktiem.",
+            "Varoņi dala šos dzīvības punktus un savu gājienu veic kopā.",
+            "Archenemy spēlē pirmais un šajā gājienā velk kārti."
           ]
         },
         "schemes": {
           "heading": "Schemes",
           "bullets": [
-            "The 40 Duskmourn Commander schemes are shuffled at the start.",
-            "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
-            "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
-            "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
-            "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+            "40 Duskmourn Commander schemes tiek sajaukti spēles sākumā.",
+            "Katrā Archenemy first main phase atveriet timer izvēlni un nospiediet Next scheme, lai iedarbinātu vienu scheme.",
+            "Scheme, kas nav ongoing, tiek atrisināts un pēc tam novietots scheme kavas apakšā.",
+            "Ongoing scheme paliek atvērts, līdz galds to atzīmē kā abandoned, pēc tam tas nonāk kavas apakšā.",
+            "Atvērtie schemes un pabeigto schemes graveyard tiek rādīti zem kārts kā sīktēli; nospiediet uz kāda, lai to skatītu lielāku."
           ]
         },
         "life": {
-          "heading": "Life and loss",
+          "heading": "Dzīvība un zaudējums",
           "bullets": [
-            "The Archenemy loses at 0 life, or when the usual poison and commander-damage limits are reached.",
-            "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
-            "A player loses after taking {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Archenemy zaudē pie 0 dzīvības punktiem vai sasniedzot parastos poison un commander-damage limitus.",
+            "Varoņi zaudē kopā, kad viņu kopīgie dzīvības punkti sasniedz 0, un viņi tāpat dala poison un commander damage.",
+            "Spēlētājs zaudē, saņemot {{commanderDamage}} combat damage no viena commander.",
+            "Katru reizi, kad commander tiek atkārtoti izspēlēts no command zone, tas maksā par 2 mana vairāk."
           ]
         }
       },
       "normal": {
-        "hint": "One Archenemy on 20 life with schemes against three heroes sharing 40 life.",
-        "hostHint": "Strict 4-player tables. One Archenemy with a scheme deck against a three-player team — no commanders.",
-        "summary": "One Archenemy against a team of three, with a scheme deck in motion — standard 20-life tables.",
+        "hint": "Viens Archenemy ar 20 dzīvības punktiem un schemes pret trim varoņiem, kuri dala 40 dzīvības punktus.",
+        "hostHint": "Tieši 4 spēlētāju galdi. Viens Archenemy ar scheme kavu pret trīs spēlētāju komandu — bez commanders.",
+        "summary": "Viens Archenemy pret trīs spēlētāju komandu ar scheme kavu — standarta 20 dzīvības punktu galdi.",
         "sections": {
           "sides": {
-            "heading": "Sides",
+            "heading": "Puses",
             "bullets": [
-              "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
-              "Both sides start at {{life}} life.",
-              "The heroes share that life total and take their turn together.",
-              "The Archenemy goes first and draws on that turn."
+              "Izvēlieties Archenemy vai piešķiriet to nejauši. Pārējie trīs spēlētāji ir varoņi.",
+              "Abas puses sāk ar {{life}} dzīvības punktiem.",
+              "Varoņi dala šos dzīvības punktus un savu gājienu veic kopā.",
+              "Archenemy spēlē pirmais un šajā gājienā velk kārti."
             ]
           },
           "schemes": {
             "heading": "Schemes",
             "bullets": [
-              "The 40 Duskmourn Commander schemes are shuffled at the start.",
-              "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
-              "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
-              "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
-              "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+              "40 Duskmourn Commander schemes tiek sajaukti spēles sākumā.",
+              "Katrā Archenemy first main phase atveriet timer izvēlni un nospiediet Next scheme, lai iedarbinātu vienu scheme.",
+              "Scheme, kas nav ongoing, tiek atrisināts un pēc tam novietots scheme kavas apakšā.",
+              "Ongoing scheme paliek atvērts, līdz galds to atzīmē kā abandoned, pēc tam tas nonāk kavas apakšā.",
+              "Atvērtie schemes un pabeigto schemes graveyard tiek rādīti zem kārts kā sīktēli; nospiediet uz kāda, lai to skatītu lielāku."
             ]
           },
           "life": {
-            "heading": "Life and loss",
+            "heading": "Dzīvība un zaudējums",
             "bullets": [
-              "The Archenemy loses at 0 life, or when the usual poison and poison limits are reached.",
-              "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
-              "A player loses after taking {{poison}} poison counters."
+              "Archenemy zaudē pie 0 dzīvības punktiem vai sasniedzot parastos poison limitus.",
+              "Varoņi zaudē kopā, kad viņu kopīgie dzīvības punkti sasniedz 0, un viņi tāpat dala poison un commander damage.",
+              "Spēlētājs zaudē, saņemot {{poison}} poison counters."
             ]
           }
         }
       }
     },
     "emperor": {
-      "label": "Emperor",
-      "hint": "Two teams of three. Protect your Emperor using limited range of influence and deploy creatures.",
-      "hostHint": "Strict 6-player Commander pods. Two teams each place an Emperor between two Generals and play with limited range of influence.",
-      "hostFixedSeats": "Emperor games always seat exactly six players.",
-      "title": "Emperor",
-      "summary": "Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.",
+      "label": "Imperators",
+      "hint": "Divas komandas pa trim spēlētājiem. Aizsargājiet savu Imperatoru, izmantojot ierobežotu ietekmes diapazonu un pārvietojot creatures.",
+      "hostHint": "Tieši 6 spēlētāju Commander pod. Katra komanda novieto Imperatoru starp diviem Ģenerāļiem un spēlē ar ierobežotu ietekmes diapazonu.",
+      "hostFixedSeats": "Imperatora spēlēs vienmēr spēlē tieši seši spēlētāji.",
+      "title": "Imperators",
+      "summary": "Divas komandas pa trim spēlētājiem. Katrs Imperators sēž starp diviem Ģenerāļiem, un Imperatora izslēgšana dod uzvaru.",
       "sections": {
         "teams": {
-          "heading": "Teams and turns",
+          "heading": "Komandas un gājieni",
           "bullets": [
-            "Choose both teams and each team's Emperor, or randomise either choice.",
-            "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
-            "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
-            "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+            "Izvēlieties abas komandas un katras komandas Imperatoru vai kādu no izvēlēm nosakiet nejauši.",
+            "Katrs spēlētājs sāk ar {{life}} dzīvības punktiem un saglabā savu roku, mana, permanents, poison un gājienu.",
+            "Komandas biedri drīkst skatīties viens otra rokās un apspriest stratēģiju, bet nedrīkst manipulēt ar otra kārtīm.",
+            "Nejauši izvēlieties, kurš Imperators spēlē pirmais. Šis Imperators pirmajā gājienā velk kārti."
           ]
         },
         "range": {
-          "heading": "Range and combat",
+          "heading": "Diapazons un cīņa",
           "bullets": [
-            "Generals have range of influence 1. Emperors have range of influence 2.",
-            "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
-            "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
-            "As players leave, the empty seats stop counting, bringing surviving players into range."
+            "Ģenerāļiem ietekmes diapazons ir 1. Imperatoriem ietekmes diapazons ir 2.",
+            "Spells, abilities, effects un informācija var ietekmēt tikai spēlētājus un objektus sava controller diapazonā.",
+            "Spēlētājs drīkst uzbrukt tikai pretiniekam, kas sēž tieši blakus, vai šī pretinieka planeswalkers un protected battles.",
+            "Spēlētājiem izkrītot, tukšās vietas vairs netiek skaitītas, tādējādi atlikušie spēlētāji nonāk viens otra diapazonā."
           ]
         },
         "deploy": {
-          "heading": "Deploy creatures",
+          "heading": "Pārvietot creatures",
           "bullets": [
-            "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
-            "This can move creatures through the team as the battle lines change."
+            "Katram creature ir \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
+            "Tas ļauj pārvietot creatures caur komandu, mainoties kaujas līnijām."
           ]
         },
         "winning": {
-          "heading": "Winning and Commander rules",
+          "heading": "Uzvara un Commander noteikumi",
           "bullets": [
-            "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
-            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Komanda uzvar, ja uzvar tās Imperators, un nekavējoties zaudē, ja tās Imperators zaudē. Ģenerālis var tikt izslēgts, nebeidzot spēli.",
+            "Spēlētājs zaudē pie 0 dzīvības punktiem, {{poison}} poison vai pēc {{commanderDamage}} combat damage no viena commander.",
+            "Katru reizi, kad commander tiek atkārtoti izspēlēts no command zone, tas maksā par 2 mana vairāk."
           ]
         }
       },
       "normal": {
-        "hint": "Two teams of three on 20 life. Protect your Emperor with limited range of influence.",
-        "hostHint": "Strict 6-player tables. Two Emperors between Generals — standard 20-life decks, no commanders.",
-        "summary": "Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.",
+        "hint": "Divas komandas pa trim spēlētājiem ar 20 dzīvības punktiem. Aizsargājiet savu Imperatoru ar ierobežotu ietekmes diapazonu.",
+        "hostHint": "Tieši 6 spēlētāju galdi. Divi Imperatori starp Ģenerāļiem — standarta 20 dzīvības punktu kavas, bez commanders.",
+        "summary": "Divas komandas pa trim spēlētājiem. Katrs Imperators sēž starp diviem Ģenerāļiem, un Imperatora izslēgšana dod uzvaru.",
         "sections": {
           "teams": {
-            "heading": "Teams and turns",
+            "heading": "Komandas un gājieni",
             "bullets": [
-              "Choose both teams and each team's Emperor, or randomise either choice.",
-              "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
-              "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
-              "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+              "Izvēlieties abas komandas un katras komandas Imperatoru vai kādu no izvēlēm nosakiet nejauši.",
+              "Katrs spēlētājs sāk ar {{life}} dzīvības punktiem un saglabā savu roku, mana, permanents, poison un gājienu.",
+              "Komandas biedri drīkst skatīties viens otra rokās un apspriest stratēģiju, bet nedrīkst manipulēt ar otra kārtīm.",
+              "Nejauši izvēlieties, kurš Imperators spēlē pirmais. Šis Imperators pirmajā gājienā velk kārti."
             ]
           },
           "range": {
-            "heading": "Range and combat",
+            "heading": "Diapazons un cīņa",
             "bullets": [
-              "Generals have range of influence 1. Emperors have range of influence 2.",
-              "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
-              "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
-              "As players leave, the empty seats stop counting, bringing surviving players into range."
+              "Ģenerāļiem ietekmes diapazons ir 1. Imperatoriem ietekmes diapazons ir 2.",
+              "Spells, abilities, effects un informācija var ietekmēt tikai spēlētājus un objektus sava controller diapazonā.",
+              "Spēlētājs drīkst uzbrukt tikai pretiniekam, kas sēž tieši blakus, vai šī pretinieka planeswalkers un protected battles.",
+              "Spēlētājiem izkrītot, tukšās vietas vairs netiek skaitītas, tādējādi atlikušie spēlētāji nonāk viens otra diapazonā."
             ]
           },
           "deploy": {
-            "heading": "Deploy creatures",
+            "heading": "Pārvietot creatures",
             "bullets": [
-              "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
-              "This can move creatures through the team as the battle lines change."
+              "Katram creature ir \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
+              "Tas ļauj pārvietot creatures caur komandu, mainoties kaujas līnijām."
             ]
           },
           "winning": {
-            "heading": "Winning and Commander rules",
+            "heading": "Uzvara",
             "bullets": [
-              "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
-              "A player loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+              "Komanda uzvar, ja uzvar tās Imperators, un nekavējoties zaudē, ja tās Imperators zaudē. Ģenerālis var tikt izslēgts, nebeidzot spēli.",
+              "Spēlētājs zaudē pie 0 dzīvības punktiem vai {{poison}} poison counters."
             ]
           }
         }
       }
     },
     "star": {
-      "label": "Star",
-      "hint": "Five players in a circle. Your neighbors are allies; eliminate both players across from you.",
-      "hostHint": "Strict 5-player Commander pods. Adjacent players are allies; each player wins by outlasting both opponents across the circle.",
-      "hostFixedSeats": "Star games always seat exactly five players.",
-      "title": "Star",
-      "summary": "Five players sit in a circle. Your neighbors are allies and the two players across from you are enemies.",
+      "label": "Zvaigzne",
+      "hint": "Pieci spēlētāji aplī. Jūsu kaimiņi ir sabiedrotie; izslēdziet abus spēlētājus pretējā pusē.",
+      "hostHint": "Tieši 5 spēlētāju Commander pod. Blakus esošie spēlētāji ir sabiedrotie; katrs spēlētājs uzvar, pārdzīvojot abus pretiniekus apļa otrā pusē.",
+      "hostFixedSeats": "Zvaigznes spēlēs vienmēr spēlē tieši pieci spēlētāji.",
+      "title": "Zvaigzne",
+      "summary": "Pieci spēlētāji sēž aplī. Jūsu kaimiņi ir sabiedrotie, bet divi spēlētāji pretējā pusē ir ienaidnieki.",
       "sections": {
         "positions": {
-          "heading": "Positions and allies",
+          "heading": "Pozīcijas un sabiedrotie",
           "bullets": [
-            "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
-            "The players immediately to your left and right are your allies.",
-            "The two nonadjacent players across the circle are your enemies.",
-            "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+            "Izvēlieties pozīcijas aplī manuāli, samainot divus spēlētājus vietām, vai nejauši izvietojiet visus piecus.",
+            "Spēlētāji tieši pa kreisi un pa labi no jums ir jūsu sabiedrotie.",
+            "Divi spēlētāji apļa otrā pusē, kuri nesēž jums blakus, ir jūsu ienaidnieki.",
+            "Pozīcijas paliek nemainīgas, kad spēlētājs tiek izslēgts; jūsu sabiedrotie un ienaidnieki nemainās."
           ]
         },
         "combat": {
-          "heading": "Combat and interaction",
+          "heading": "Cīņa un mijiedarbība",
           "bullets": [
-            "Players cannot attack their allies by default.",
-            "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
-            "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+            "Pēc noklusējuma spēlētāji nedrīkst uzbrukt saviem sabiedrotajiem.",
+            "Spells un abilities joprojām var palīdzēt vai ietekmēt jebkuru spēlētāju, ja vien galds nevienojas par stingrāku variantu.",
+            "Gājieni notiek pulksteņrādītāja virzienā. Nejauši izvēlieties sākuma spēlētāju; šis spēlētājs pirmajā gājienā velk kārti."
           ]
         },
         "winning": {
-          "heading": "Winning",
+          "heading": "Uzvara",
           "bullets": [
-            "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
-            "An eliminated player cannot win later.",
-            "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Uzvar pirmais vēl dzīvais spēlētājs, kura abi ienaidnieki ir izslēgti, neatkarīgi no tā, kas viņus izslēdza.",
+            "Izslēgts spēlētājs vēlāk vairs nevar uzvarēt.",
+            "Katrs spēlētājs sāk ar {{life}} dzīvības punktiem un zaudē pie 0 dzīvības punktiem, {{poison}} poison vai pēc {{commanderDamage}} combat damage no viena commander.",
+            "Katru reizi, kad commander tiek atkārtoti izspēlēts no command zone, tas maksā par 2 mana vairāk."
           ]
         }
       },
       "normal": {
-        "hint": "Five players in a circle on 20 life. Neighbors are allies; eliminate both players across from you.",
-        "hostHint": "Strict 5-player tables. Adjacent players ally; each player wins by outlasting both opponents across the circle.",
-        "summary": "Five players sit in a circle on 20 life. Your neighbors are allies and the two players across from you are enemies.",
+        "hint": "Pieci spēlētāji aplī ar 20 dzīvības punktiem. Kaimiņi ir sabiedrotie; izslēdziet abus spēlētājus pretējā pusē.",
+        "hostHint": "Tieši 5 spēlētāju galdi. Blakus esošie spēlētāji ir sabiedrotie; katrs spēlētājs uzvar, pārdzīvojot abus pretiniekus apļa otrā pusē.",
+        "summary": "Pieci spēlētāji sēž aplī ar 20 dzīvības punktiem. Jūsu kaimiņi ir sabiedrotie, bet divi spēlētāji pretējā pusē ir ienaidnieki.",
         "sections": {
           "positions": {
-            "heading": "Positions and allies",
+            "heading": "Pozīcijas un sabiedrotie",
             "bullets": [
-              "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
-              "The players immediately to your left and right are your allies.",
-              "The two nonadjacent players across the circle are your enemies.",
-              "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+              "Izvēlieties pozīcijas aplī manuāli, samainot divus spēlētājus vietām, vai nejauši izvietojiet visus piecus.",
+              "Spēlētāji tieši pa kreisi un pa labi no jums ir jūsu sabiedrotie.",
+              "Divi spēlētāji apļa otrā pusē, kuri nesēž jums blakus, ir jūsu ienaidnieki.",
+              "Pozīcijas paliek nemainīgas, kad spēlētājs tiek izslēgts; jūsu sabiedrotie un ienaidnieki nemainās."
             ]
           },
           "combat": {
-            "heading": "Combat and interaction",
+            "heading": "Cīņa un mijiedarbība",
             "bullets": [
-              "Players cannot attack their allies by default.",
-              "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
-              "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+              "Pēc noklusējuma spēlētāji nedrīkst uzbrukt saviem sabiedrotajiem.",
+              "Spells un abilities joprojām var palīdzēt vai ietekmēt jebkuru spēlētāju, ja vien galds nevienojas par stingrāku variantu.",
+              "Gājieni notiek pulksteņrādītāja virzienā. Nejauši izvēlieties sākuma spēlētāju; šis spēlētājs pirmajā gājienā velk kārti."
             ]
           },
           "winning": {
-            "heading": "Winning",
+            "heading": "Uzvara",
             "bullets": [
-              "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
-              "An eliminated player cannot win later.",
-              "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+              "Uzvar pirmais vēl dzīvais spēlētājs, kura abi ienaidnieki ir izslēgti, neatkarīgi no tā, kas viņus izslēdza.",
+              "Izslēgts spēlētājs vēlāk vairs nevar uzvarēt.",
+              "Katrs spēlētājs sāk ar {{life}} dzīvības punktiem un zaudē pie 0 dzīvības punktiem vai {{poison}} poison counters."
             ]
           }
         }
       }
     },
     "assassin": {
-      "label": "Assassin",
-      "hint": "Secret contracts in a free-for-all. Eliminate your mark, score, and inherit their target.",
-      "hostHint": "Secret contracts for 3–8 players. Score by eliminating your mark, then inherit their target.",
-      "title": "Assassin",
-      "summary": "A free-for-all with secret contracts. Score marks, inherit new targets, and finish with the highest score.",
+      "label": "Slepkava",
+      "hint": "Slepeni līgumi spēlē visi pret visiem. Izslēdziet savu mērķi, iegūstiet punktu un mantojiet viņa mērķi.",
+      "hostHint": "Slepeni līgumi 3–8 spēlētājiem. Iegūstiet punktu, izslēdzot savu mērķi, un pēc tam mantojiet viņa līgumu.",
+      "title": "Slepkava",
+      "summary": "Visi pret visiem ar slepeniem līgumiem. Izslēdziet mērķus, mantojiet jaunus un pabeidziet ar lielāko punktu skaitu.",
       "sections": {
         "contracts": {
-          "heading": "Secret contracts",
+          "heading": "Slepeni līgumi",
           "bullets": [
-            "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
-            "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
-            "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+            "Katrs spēlētājs slepeni saņem vienu mērķi. Līgumi veido apli, tāpēc neviens nemērķē pats uz sevi un katru spēlētāju medī tieši viens cits spēlētājs.",
+            "Sagatavošanas laikā padodiet ierīci apkārt. Atveriet “Pārbaudīt mērķi” timer izvēlnē, kad nepieciešams vēlreiz izlasīt savu pašreizējo līgumu.",
+            "Spēlētāji drīkst uzbrukt un ietekmēt jebkuru; līgums nosaka punktu piešķiršanu, nevis atļautos mērķus."
           ]
         },
         "elimination": {
-          "heading": "Elimination and inheritance",
+          "heading": "Izslēgšana un mantošana",
           "bullets": [
-            "When a player is eliminated, record who dealt the finishing blow.",
-            "If you personally eliminate your assigned target, you score one mark.",
-            "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+            "Kad spēlētājs tiek izslēgts, reģistrējiet, kurš izdarīja pēdējo triecienu.",
+            "Ja personīgi izslēdzat jums piešķirto mērķi, saņemat vienu mark.",
+            "Spēlētājs, kurš medīja izslēgto mērķi, manto šī mērķa līgumu, pat ja pēdējo triecienu izdarīja kāds cits. Tādējādi katram atlikušajam spēlētājam vienmēr ir viens aktīvs līgums."
           ]
         },
         "winning": {
-          "heading": "Winning",
+          "heading": "Uzvara",
           "bullets": [
-            "Play until only one player remains. The last survivor scores one additional mark.",
-            "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
-            "Commander rules still apply: {{life}} starting life, {{poison}} poison, and {{commanderDamage}} combat damage from one commander are lethal.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Spēlējiet, līdz paliek tikai viens spēlētājs. Pēdējais izdzīvojušais saņem vienu papildu mark.",
+            "Uzvar spēlētājs ar visvairāk marks; ja lielākais rezultāts ir vienāds, neizšķirtu uzvar pēdējais izdzīvojušais.",
+            "Commander noteikumi joprojām ir spēkā: {{life}} sākuma dzīvības punkti, {{poison}} poison un {{commanderDamage}} combat damage no viena commander ir letāli.",
+            "Katru reizi, kad commander tiek atkārtoti izspēlēts no command zone, tas maksā par 2 mana vairāk."
           ]
         }
       },
       "normal": {
-        "hint": "Secret contracts for 3–8 players on 20 life. Score by eliminating your mark.",
-        "hostHint": "Secret contracts without commanders. Matching fills your chosen table size; leftovers can sit as small as three.",
-        "summary": "A free-for-all with secret contracts on 20 life. Score marks, inherit new targets, and finish with the highest score.",
+        "hint": "Slepeni līgumi 3–8 spēlētājiem ar 20 dzīvības punktiem. Iegūstiet punktu, izslēdzot savu mērķi.",
+        "hostHint": "Slepeni līgumi bez commanders. Pārošana aizpilda izvēlēto galda izmēru; atlikušajos apļos var būt vismaz trīs spēlētāji.",
+        "summary": "Visi pret visiem ar slepeniem līgumiem un 20 dzīvības punktiem. Izslēdziet mērķus, mantojiet jaunus un pabeidziet ar lielāko punktu skaitu.",
         "sections": {
           "contracts": {
-            "heading": "Secret contracts",
+            "heading": "Slepeni līgumi",
             "bullets": [
-              "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
-              "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
-              "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+              "Katrs spēlētājs slepeni saņem vienu mērķi. Līgumi veido apli, tāpēc neviens nemērķē pats uz sevi un katru spēlētāju medī tieši viens cits spēlētājs.",
+              "Sagatavošanas laikā padodiet ierīci apkārt. Atveriet “Pārbaudīt mērķi” timer izvēlnē, kad nepieciešams vēlreiz izlasīt savu pašreizējo līgumu.",
+              "Spēlētāji drīkst uzbrukt un ietekmēt jebkuru; līgums nosaka punktu piešķiršanu, nevis atļautos mērķus."
             ]
           },
           "elimination": {
-            "heading": "Elimination and inheritance",
+            "heading": "Izslēgšana un mantošana",
             "bullets": [
-              "When a player is eliminated, record who dealt the finishing blow.",
-              "If you personally eliminate your assigned target, you score one mark.",
-              "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+              "Kad spēlētājs tiek izslēgts, reģistrējiet, kurš izdarīja pēdējo triecienu.",
+              "Ja personīgi izslēdzat jums piešķirto mērķi, saņemat vienu mark.",
+              "Spēlētājs, kurš medīja izslēgto mērķi, manto šī mērķa līgumu, pat ja pēdējo triecienu izdarīja kāds cits. Tādējādi katram atlikušajam spēlētājam vienmēr ir viens aktīvs līgums."
             ]
           },
           "winning": {
-            "heading": "Winning",
+            "heading": "Uzvara",
             "bullets": [
-              "Play until only one player remains. The last survivor scores one additional mark.",
-              "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
-              "{{life}} starting life, {{poison}} poison, and {{poison}} poison counters are lethal."
+              "Spēlējiet, līdz paliek tikai viens spēlētājs. Pēdējais izdzīvojušais saņem vienu papildu mark.",
+              "Uzvar spēlētājs ar visvairāk marks; ja lielākais rezultāts ir vienāds, neizšķirtu uzvar pēdējais izdzīvojušais.",
+              "{{life}} sākuma dzīvības punkti un {{poison}} poison counters ir letāli."
             ]
           }
         }
@@ -634,446 +634,446 @@
     }
   },
   "home": {
-    "taglineBefore": "Your next",
+    "taglineBefore": "Jūsu nākamais",
     "taglineHighlight": "pod",
-    "taglineAfter": ", sorted.",
-    "startPlaying": "Start playing",
-    "ongoingGame": "ongoing game",
-    "noEventNeeded": "no event needed",
-    "startPlayingHint": "Open a battle screen on this device. Leave and come back without losing an unfinished game.",
-    "alwaysPlayers": "Always {{count}} players in this mode.",
-    "resumeGame": "Resume game",
-    "startNewGame": "Start a new game",
-    "startGame": "Start a game",
+    "taglineAfter": " — nokārtots.",
+    "startPlaying": "Sākt spēlēt",
+    "ongoingGame": "notiekoša spēle",
+    "noEventNeeded": "pasākums nav nepieciešams",
+    "startPlayingHint": "Atveriet spēles ekrānu šajā ierīcē. Varat iziet un atgriezties, nezaudējot nepabeigtu spēli.",
+    "alwaysPlayers": "Šajā režīmā vienmēr ir {{count}} spēlētāji.",
+    "resumeGame": "Turpināt spēli",
+    "startNewGame": "Sākt jaunu spēli",
+    "startGame": "Sākt spēli",
     "commanderSetup": "Commanders",
-    "commanderSetupHint": "Search Scryfall for each player's commander. Partner pairs need both commanders.",
-    "chooseAllCommanders": "Choose a commander for every player.",
-    "advancedMatchConfig": "Advanced match config",
-    "hostEvent": "Host event",
-    "new": "new",
-    "targetTableSize": "Target table size",
-    "allowThreePods": "Allow 3-player pods",
-    "allowFivePods": "Allow 5-player pods",
-    "duelFixedSeats": "Duel events always seat exactly two players.",
-    "emperorFixedSeats": "Emperor games always seat exactly six players.",
-    "starFixedSeats": "Star games always seat exactly five players.",
-    "archenemyFixedSeats": "Archenemy Commander games always seat exactly four players.",
-    "twoHeadedFixedSeats": "Two-Headed Giant games always seat exactly four players.",
-    "eventName": "Event name",
-    "eventNamePlaceholder": "Friday Commander",
-    "tables": "Tables",
-    "tablesHint": "How many physical tables are free for this event.",
-    "eventLasts": "Event lasts",
-    "eventLastsHint": "Join code dies after this many hours. Use 48 or 72 for a weekend.",
-    "hostPin": "Host PIN",
-    "hostPinHint": "4 to 8 digits — reopens the host desk later.",
-    "createEvent": "Create event",
-    "joinWithCode": "Join with a code",
-    "playerAside": "player",
-    "joinCode": "Join code",
+    "commanderSetupHint": "Meklējiet katra spēlētāja commander Scryfall. Partner pāriem nepieciešami abi commanders.",
+    "chooseAllCommanders": "Izvēlieties commander katram spēlētājam.",
+    "advancedMatchConfig": "Papildu spēles iestatījumi",
+    "hostEvent": "Organizēt pasākumu",
+    "new": "jauns",
+    "targetTableSize": "Mērķa galda izmērs",
+    "allowThreePods": "Atļaut 3 spēlētāju pod",
+    "allowFivePods": "Atļaut 5 spēlētāju pod",
+    "duelFixedSeats": "Duelī vienmēr spēlē tieši divi spēlētāji.",
+    "emperorFixedSeats": "Imperatora spēlēs vienmēr spēlē tieši seši spēlētāji.",
+    "starFixedSeats": "Zvaigznes spēlēs vienmēr spēlē tieši pieci spēlētāji.",
+    "archenemyFixedSeats": "Archenemy Commander spēlēs vienmēr spēlē tieši četri spēlētāji.",
+    "twoHeadedFixedSeats": "Divgalvainā milža spēlēs vienmēr spēlē tieši četri spēlētāji.",
+    "eventName": "Pasākuma nosaukums",
+    "eventNamePlaceholder": "Piektdienas Commander",
+    "tables": "Galdi",
+    "tablesHint": "Cik fizisku galdu ir pieejami šim pasākumam.",
+    "eventLasts": "Pasākuma ilgums",
+    "eventLastsHint": "Pievienošanās kods beigs darboties pēc šī stundu skaita. Nedēļas nogalei izmantojiet 48 vai 72.",
+    "hostPin": "Organizatora PIN",
+    "hostPinHint": "4 līdz 8 cipari — vēlāk atkārtoti atver organizatora paneli.",
+    "createEvent": "Izveidot pasākumu",
+    "joinWithCode": "Pievienoties ar kodu",
+    "playerAside": "spēlētājs",
+    "joinCode": "Pievienošanās kods",
     "joinCodePlaceholder": "AB23CD",
-    "join": "Join",
-    "scanQr": "Scan QR",
-    "staleJoin": "That event is gone. Join with a new code, or host a new night."
+    "join": "Pievienoties",
+    "scanQr": "Skenēt QR",
+    "staleJoin": "Šis pasākums vairs nepastāv. Pievienojieties ar jaunu kodu vai izveidojiet jaunu spēļu vakaru."
   },
   "host": {
-    "desk": "Host desk",
-    "locked": "Locked",
-    "hostOnly": "host only",
-    "unlockHostDesk": "Unlock host desk",
-    "playerCount": "{{count}} player",
-    "playerCount_plural": "{{count}} players",
-    "ready": "{{count}} ready",
-    "matched": "{{count}} matched",
-    "playing": "{{count}} playing",
-    "paused": "{{count}} paused",
-    "ends": "ends {{date}}",
-    "podSizes": "Pod sizes",
-    "matching": "matching",
-    "allowLeftoverThree": "Allow leftover 3-player pods",
-    "allowFivePods": "Allow 5-player pods",
-    "treacheryTargetHint": "Target table size. Leftover pods can be as small as four.",
-    "matchingPrefers": "Matching prefers {{size}}-player tables.",
-    "matchingPrefersFour": "Matching prefers 4-player tables.",
-    "assassinTargetHint": "Target table size. Leftover contract circles can be as small as three.",
-    "multiplayerTargetHint": "Target table size. Leftover tables can be as small as three.",
-    "duelMatchmaking": "Duel matchmaking seats exactly two players per game.",
-    "twoHeadedMatchmaking": "Two-Headed Giant matchmaking seats exactly four players per game.",
-    "archenemyMatchmaking": "Archenemy Commander matchmaking seats exactly four players per game: one Archenemy against a team of three.",
-    "emperorMatchmaking": "Emperor matchmaking seats exactly six players per game: two teams with an Emperor and two Generals each.",
-    "starMatchmaking": "Star matchmaking seats exactly five players in a circular order.",
-    "eventLength": "Event length",
-    "joinCodeDies": "join code dies",
-    "hoursFromStart": "Hours from start",
-    "hoursFromStartHint": "Change this for a multi-day event. After it ends, the QR opens the home page.",
-    "joinCodeTitle": "Join code",
-    "share": "share",
-    "noLanAddress": "No LAN address found — this link only works on this computer.",
-    "copyPlayerLink": "Copy player link",
-    "queue": "Queue",
-    "nobodyWaiting": "Nobody waiting.",
+    "desk": "Organizatora panelis",
+    "locked": "Bloķēts",
+    "hostOnly": "tikai organizatoram",
+    "unlockHostDesk": "Atbloķēt organizatora paneli",
+    "playerCount": "{{count}} spēlētājs",
+    "playerCount_plural": "{{count}} spēlētāji",
+    "ready": "{{count}} gatavi",
+    "matched": "{{count}} sapāroti",
+    "playing": "{{count}} spēlē",
+    "paused": "{{count}} pauzē",
+    "ends": "beidzas {{date}}",
+    "podSizes": "Pod izmēri",
+    "matching": "pārošana",
+    "allowLeftoverThree": "Atļaut atlikušos 3 spēlētāju pod",
+    "allowFivePods": "Atļaut 5 spēlētāju pod",
+    "treacheryTargetHint": "Mērķa galda izmērs. Atlikušajos pod var būt vismaz četri spēlētāji.",
+    "matchingPrefers": "Pārošana dod priekšroku {{size}} spēlētāju galdiem.",
+    "matchingPrefersFour": "Pārošana dod priekšroku 4 spēlētāju galdiem.",
+    "assassinTargetHint": "Mērķa galda izmērs. Atlikušajos līgumu apļos var būt vismaz trīs spēlētāji.",
+    "multiplayerTargetHint": "Mērķa galda izmērs. Atlikušajos galdos var būt vismaz trīs spēlētāji.",
+    "duelMatchmaking": "Dueļa pārošana katrā spēlē piešķir tieši divus spēlētājus.",
+    "twoHeadedMatchmaking": "Divgalvainā milža pārošana katrā spēlē piešķir tieši četrus spēlētājus.",
+    "archenemyMatchmaking": "Archenemy Commander pārošana katrā spēlē piešķir tieši četrus spēlētājus: vienu Archenemy pret trīs spēlētāju komandu.",
+    "emperorMatchmaking": "Imperatora pārošana katrā spēlē piešķir tieši sešus spēlētājus: divas komandas, katru ar Imperatoru un diviem Ģenerāļiem.",
+    "starMatchmaking": "Zvaigznes pārošana izvieto tieši piecus spēlētājus apļa secībā.",
+    "eventLength": "Pasākuma ilgums",
+    "joinCodeDies": "pievienošanās kods beidzas",
+    "hoursFromStart": "Stundas no sākuma",
+    "hoursFromStartHint": "Mainiet šo vairāku dienu pasākumam. Pēc tā beigām QR atvērs sākuma lapu.",
+    "joinCodeTitle": "Pievienošanās kods",
+    "share": "kopīgot",
+    "noLanAddress": "LAN adrese nav atrasta — šī saite darbojas tikai šajā datorā.",
+    "copyPlayerLink": "Kopēt spēlētāju saiti",
+    "queue": "Rinda",
+    "nobodyWaiting": "Neviens negaida.",
     "flex": "flex {{count}}",
-    "challengePts": "{{count}} challenge pts",
-    "pts": "{{count}} pts",
-    "notReady": "Not ready",
-    "pausedTitle": "Paused",
-    "seated": "Seated",
-    "atTables": "{{count}} at tables",
-    "tablesTitle": "Tables",
-    "total": "{{count}} total",
-    "noTables": "This event was created without tables.",
-    "startingGames": "Starting games…",
-    "startAllReady": "Start all ready games ({{count}})",
-    "startGame": "Start game",
-    "finishTable": "Finish table",
-    "cancelPod": "Cancel pod",
-    "enable": "Enable",
-    "disable": "Disable",
+    "challengePts": "{{count}} izaicinājumu p.",
+    "pts": "{{count}} p.",
+    "notReady": "Nav gatavs",
+    "pausedTitle": "Pauzē",
+    "seated": "Pie galda",
+    "atTables": "{{count}} pie galdiem",
+    "tablesTitle": "Galdi",
+    "total": "{{count}} kopā",
+    "noTables": "Šis pasākums tika izveidots bez galdiem.",
+    "startingGames": "Sāk spēles…",
+    "startAllReady": "Sākt visas gatavās spēles ({{count}})",
+    "startGame": "Sākt spēli",
+    "finishTable": "Pabeigt galdu",
+    "cancelPod": "Atcelt pod",
+    "enable": "Iespējot",
+    "disable": "Atspējot",
     "trackerUsed": "tracker",
-    "noTracker": "no tracker",
-    "matchNow": "Match now",
-    "fillBots": "Fill tables with bots",
-    "playerJoinPage": "Player join page"
+    "noTracker": "bez tracker",
+    "matchNow": "Sapārot tagad",
+    "fillBots": "Aizpildīt galdus ar botiem",
+    "playerJoinPage": "Spēlētāju pievienošanās lapa"
   },
   "join": {
-    "joinEvent": "Join event",
-    "takeSeat": "Take a seat",
-    "displayName": "Display name",
+    "joinEvent": "Pievienoties pasākumam",
+    "takeSeat": "Ieņemt vietu",
+    "displayName": "Redzamais vārds",
     "displayNamePlaceholder": "Alex",
-    "joinEventButton": "Join event",
-    "saveDecks": "Save decks",
-    "matchFound": "Match found",
-    "yourDeck": "Your deck",
-    "checkMyRole": "Check my role",
-    "playingWithoutTracker": "Playing without the tracker. The host can finish the table.",
-    "chooseTracker": "Choose how this pod will record its game.",
-    "useGameTracker": "Use game tracker",
-    "playWithoutTracker": "Play without tracker",
-    "atTableMarked": "You're marked as at the table on this phone. The host still starts the game from the desk.",
-    "imAtTable": "I'm at the table",
-    "leftEvent": "You left this event. Scan the QR again if you want back in.",
-    "openPool": "Open pool — any table.",
-    "ready": "Ready",
-    "waiting": "waiting",
-    "holdTight": "Hold tight — a table is coming.",
-    "flex": "Flex: {{flex}} · Challenge Points: {{points}}",
-    "howWasPod": "How was your pod?",
-    "pause": "Pause",
-    "leave": "Leave",
-    "pausedMessage": "You are paused. Resume when you can sit, or leave the event.",
-    "imReady": "I'm ready",
-    "leaveEvent": "Leave event",
-    "markReady": "Mark ready when you can sit down for a game.",
-    "matchingShortly": "Matching will send you to a table shortly.",
-    "imTheHost": "I'm the host",
-    "offlineSaved": "Saved on this phone. It will send when you are back online.",
-    "stayAtTable": "Stay at the table until the host calls the game."
+    "joinEventButton": "Pievienoties pasākumam",
+    "saveDecks": "Saglabāt kavas",
+    "matchFound": "Spēle atrasta",
+    "yourDeck": "Jūsu kava",
+    "checkMyRole": "Pārbaudīt manu lomu",
+    "playingWithoutTracker": "Spēlējat bez tracker. Organizators var pabeigt galdu.",
+    "chooseTracker": "Izvēlieties, kā šis pod reģistrēs savu spēli.",
+    "useGameTracker": "Izmantot spēles tracker",
+    "playWithoutTracker": "Spēlēt bez tracker",
+    "atTableMarked": "Šajā telefonā esat atzīmēts kā esošs pie galda. Organizators joprojām sāk spēli no sava paneļa.",
+    "imAtTable": "Esmu pie galda",
+    "leftEvent": "Jūs pametāt šo pasākumu. Skenējiet QR vēlreiz, ja vēlaties atgriezties.",
+    "openPool": "Atvērts pool — jebkurš galds.",
+    "ready": "Gatavs",
+    "waiting": "gaida",
+    "holdTight": "Uzgaidiet — drīz būs galds.",
+    "flex": "Flex: {{flex}} · Izaicinājumu punkti: {{points}}",
+    "howWasPod": "Kāds bija jūsu pod?",
+    "pause": "Pauze",
+    "leave": "Pamest",
+    "pausedMessage": "Esat pauzē. Atsāciet, kad varat apsēsties spēlēt, vai pametiet pasākumu.",
+    "imReady": "Esmu gatavs",
+    "leaveEvent": "Pamest pasākumu",
+    "markReady": "Atzīmējiet sevi kā gatavu, kad varat apsēsties uz spēli.",
+    "matchingShortly": "Pārošana drīzumā nosūtīs jūs pie galda.",
+    "imTheHost": "Es esmu organizators",
+    "offlineSaved": "Saglabāts šajā telefonā. Tas tiks nosūtīts, kad atkal būsiet tiešsaistē.",
+    "stayAtTable": "Palieciet pie galda, līdz organizators pabeidz spēli."
   },
   "matchConfig": {
-    "title": "Match config",
-    "description": "Sets up the fake seated pod behind /match. Nothing here touches the server, and none of it appears on the battle screen, so that route can be checked on a phone as-is.",
-    "podSetup": "Pod setup",
-    "seats": "Seats",
-    "seatsCount": "{{count}} seats",
+    "title": "Spēles konfigurācija",
+    "description": "Iestata testa pod aiz /match. Nekas šeit nesazinās ar serveri un nekas neparādās spēles ekrānā, tāpēc šo route var pārbaudīt telefonā tādu, kāds tas ir.",
+    "podSetup": "Pod iestatīšana",
+    "seats": "Vietas",
+    "seatsCount": "{{count}} vietas",
     "bracket": "Bracket",
-    "header": "Header",
-    "eventNamePlaceholder": "Event name",
-    "joinCodePlaceholder": "Join code",
-    "matchCard": "Match card",
-    "tableLabelPlaceholder": "Table label",
-    "assignedDeckPlaceholder": "Assigned deck",
-    "openBattleScreen": "Open battle screen",
-    "resetGameState": "Reset game state",
+    "header": "Virsraksts",
+    "eventNamePlaceholder": "Pasākuma nosaukums",
+    "joinCodePlaceholder": "Pievienošanās kods",
+    "matchCard": "Spēles kartīte",
+    "tableLabelPlaceholder": "Galda apzīmējums",
+    "assignedDeckPlaceholder": "Piešķirtā kava",
+    "openBattleScreen": "Atvērt spēles ekrānu",
+    "resetGameState": "Atiestatīt spēles stāvokli",
     "commander": "Commander",
-    "secondCommander": "Second commander"
+    "secondCommander": "Otrais commander"
   },
   "app": {
-    "notFound": "Not found."
+    "notFound": "Nav atrasts."
   },
   "wake": {
-    "title": "Waking the tables",
-    "message": "The free host went to sleep. Keep this page open — it usually takes under a minute."
+    "title": "Modina galdus",
+    "message": "Bezmaksas serveris ir aizmidzis. Atstājiet šo lapu atvērtu — parasti tas aizņem mazāk nekā minūti."
   },
   "scanner": {
-    "title": "Scan QR",
-    "ariaLabel": "Scan join QR code",
-    "hint": "Point at the host desk code.",
-    "closeScanner": "Close scanner",
-    "openingCamera": "Opening camera…",
-    "noCamera": "This browser cannot open the camera. Type the join code instead.",
-    "permissionDenied": "Camera permission was denied. Type the join code, or allow the camera and try again."
+    "title": "Skenēt QR",
+    "ariaLabel": "Skenēt pievienošanās QR kodu",
+    "hint": "Pavērsiet kameru pret organizatora kodu.",
+    "closeScanner": "Aizvērt skeneri",
+    "openingCamera": "Atver kameru…",
+    "noCamera": "Šī pārlūkprogramma nevar atvērt kameru. Tā vietā ievadiet pievienošanās kodu.",
+    "permissionDenied": "Kameras atļauja tika noraidīta. Ievadiet pievienošanās kodu vai atļaujiet kameru un mēģiniet vēlreiz."
   },
   "theme": {
-    "switchToLight": "Switch to light mode",
-    "switchToDark": "Switch to dark mode"
+    "switchToLight": "Pārslēgties uz gaišo režīmu",
+    "switchToDark": "Pārslēgties uz tumšo režīmu"
   },
   "hostMetrics": {
-    "title": "Event recap",
-    "aside": "pilot",
-    "players": "Players",
-    "games": "Games",
-    "gamesPerPlayer": "Games / player",
-    "waitAvg": "Wait avg",
-    "waitP95": "Wait p95",
-    "waitMax": "Wait max",
-    "rematchPairs": "Rematch pairs",
-    "flexEarned": "Flex earned",
-    "flexSeats": "Flex seats",
-    "durationAvg": "Duration avg",
-    "tablesOccupied": "Tables occupied",
-    "trackerUsed": "Tracker used",
-    "trackerUsedValue": "{{used}} used · {{skipped}} skipped",
-    "challenges": "Challenges",
-    "challengePts": "Challenge pts",
-    "podRating": "Pod rating",
-    "podSizes": "Pod sizes:",
+    "title": "Pasākuma kopsavilkums",
+    "aside": "izmēģinājums",
+    "players": "Spēlētāji",
+    "games": "Spēles",
+    "gamesPerPlayer": "Spēles / spēlētājs",
+    "waitAvg": "Vid. gaidīšana",
+    "waitP95": "Gaidīšana p95",
+    "waitMax": "Maks. gaidīšana",
+    "rematchPairs": "Atkārtoto pāru skaits",
+    "flexEarned": "Iegūtais Flex",
+    "flexSeats": "Flex vietas",
+    "durationAvg": "Vid. ilgums",
+    "tablesOccupied": "Aizņemtie galdi",
+    "trackerUsed": "Izmantots tracker",
+    "trackerUsedValue": "{{used}} izmantots · {{skipped}} izlaists",
+    "challenges": "Izaicinājumi",
+    "challengePts": "Izaicinājumu p.",
+    "podRating": "Pod vērtējums",
+    "podSizes": "Pod izmēri:",
     "pools": "Pools:"
   },
   "deckEditor": {
-    "title": "Commander decks",
-    "deckNamePlaceholder": "Deck name (optional)",
+    "title": "Commander kavas",
+    "deckNamePlaceholder": "Kavas nosaukums (neobligāts)",
     "commander": "Commander",
-    "secondCommander": "Second commander",
-    "markPreferred": "Mark preferred",
-    "addAcceptedDeck": "Add accepted deck",
-    "hint": "Same-pool pods only. Extra decks let matching flex you into another bracket."
+    "secondCommander": "Otrais commander",
+    "markPreferred": "Atzīmēt kā vēlamo",
+    "addAcceptedDeck": "Pievienot pieņemamu kavu",
+    "hint": "Tikai viena pool pod. Papildu kavas ļauj pārošanai pārvietot jūs uz citu bracket."
   },
   "commanderPicker": {
-    "searchCommander": "Search commander",
-    "searchPartner": "Commander that can pair with {{name}}",
-    "removeCommander": "Remove {{name}}",
-    "artworkFor": "Artwork for",
-    "loadingArtwork": "Loading artwork…"
+    "searchCommander": "Meklēt commander",
+    "searchPartner": "Commander, ko var savienot pārī ar {{name}}",
+    "removeCommander": "Noņemt {{name}}",
+    "artworkFor": "Ilustrācija:",
+    "loadingArtwork": "Ielādē ilustrāciju…"
   },
   "challengePack": {
-    "title": "Challenge pack",
-    "description": "Only predefined primitives. Saving writes a new version and never mutates a pack already used by this event.",
-    "copyOfficial": "Copy official",
-    "startBlank": "Start blank",
-    "saveNewVersion": "Save new version",
-    "editHint": "Copy the official pack or start blank before editing.",
-    "packName": "Pack name",
-    "descriptionLabel": "Description",
-    "addChallenge": "Add challenge",
+    "title": "Izaicinājumu pakotne",
+    "description": "Tikai iepriekš definēti primitives. Saglabājot tiek izveidota jauna versija un nekad netiek mainīta pakotne, ko šis pasākums jau ir izmantojis.",
+    "copyOfficial": "Kopēt oficiālo",
+    "startBlank": "Sākt tukšu",
+    "saveNewVersion": "Saglabāt jaunu versiju",
+    "editHint": "Pirms rediģēšanas kopējiet oficiālo pakotni vai sāciet ar tukšu.",
+    "packName": "Pakotnes nosaukums",
+    "descriptionLabel": "Apraksts",
+    "addChallenge": "Pievienot izaicinājumu",
     "id": "Id",
-    "name": "Name",
-    "category": "Category",
-    "points": "Points",
+    "name": "Nosaukums",
+    "category": "Kategorija",
+    "points": "Punkti",
     "primitive": "Primitive",
-    "threshold": "Threshold",
-    "confirmationQuestion": "Confirmation question",
-    "defaultConfirmation": "Did this happen at the table?",
-    "newClaimName": "New claim",
-    "newClaimDescription": "Award this at the table."
+    "threshold": "Slieksnis",
+    "confirmationQuestion": "Apstiprinājuma jautājums",
+    "defaultConfirmation": "Vai tas notika pie galda?",
+    "newClaimName": "Jauns sasniegums",
+    "newClaimDescription": "Piešķiriet to pie galda."
   },
   "treacheryRole": {
-    "treachery": "Treachery",
-    "receivedRole": "You received a role",
-    "handDeviceTo": "Hand the device to {{name}}",
-    "lookAwayIdentity": "Everyone else should look away before the identity is revealed.",
-    "lookAwayScreen": "Make sure nobody else can see your screen before revealing it.",
-    "reveal": "Reveal",
-    "yourRole": "Your role",
-    "identityAlt": "{{name}}, {{role}} identity",
-    "illustratedBy": "Illustrated by {{artist}}",
-    "yourObjective": "Your objective",
-    "unveiledToTable": "Unveiled to the table",
-    "unveilWarning": "Everyone at your table will see this identity. Its ability must be resolved in the game.",
-    "confirmUnveil": "Confirm unveil",
-    "unveilToTable": "Unveil to the table",
-    "hideAndPass": "Hide & pass",
-    "hideIdentity": "Hide my identity"
+    "treachery": "Nodevība",
+    "receivedRole": "Jūs saņēmāt lomu",
+    "handDeviceTo": "Padodiet ierīci spēlētājam {{name}}",
+    "lookAwayIdentity": "Visiem pārējiem jānovēršas, pirms identitāte tiek atklāta.",
+    "lookAwayScreen": "Pirms atklāšanas pārliecinieties, ka neviens cits neredz jūsu ekrānu.",
+    "reveal": "Atklāt",
+    "yourRole": "Jūsu loma",
+    "identityAlt": "{{name}}, {{role}} identitāte",
+    "illustratedBy": "Ilustrēja {{artist}}",
+    "yourObjective": "Jūsu mērķis",
+    "unveiledToTable": "Atklāts galdam",
+    "unveilWarning": "Visi pie jūsu galda redzēs šo identitāti. Tās spēja ir jāatrisina spēlē.",
+    "confirmUnveil": "Apstiprināt atklāšanu",
+    "unveilToTable": "Atklāt galdam",
+    "hideAndPass": "Paslēpt un padot tālāk",
+    "hideIdentity": "Paslēpt manu identitāti"
   },
   "modeRulesSheet": {
-    "closeRules": "Close rules",
-    "backToGame": "Back to the game"
+    "closeRules": "Aizvērt noteikumus",
+    "backToGame": "Atpakaļ uz spēli"
   },
   "assassinTargets": {
-    "title": "Secret contracts",
-    "chooseOwnName": "Choose only your own name.",
-    "closeContracts": "Close contracts",
-    "handDeviceTo": "Hand the device to {{name}}",
-    "lookAway": "Everyone else should look away before the contract is revealed.",
-    "revealTarget": "Reveal my target",
-    "yourTarget": "Your target",
-    "noActiveTarget": "No active target",
-    "marksScored": "Marks scored: {{count}}",
-    "hideAndPass": "Hide & pass",
-    "allContractsChecked": "All contracts checked"
+    "title": "Slepeni līgumi",
+    "chooseOwnName": "Izvēlieties tikai savu vārdu.",
+    "closeContracts": "Aizvērt līgumus",
+    "handDeviceTo": "Padodiet ierīci spēlētājam {{name}}",
+    "lookAway": "Visiem pārējiem jānovēršas, pirms līgums tiek atklāts.",
+    "revealTarget": "Atklāt manu mērķi",
+    "yourTarget": "Jūsu mērķis",
+    "noActiveTarget": "Nav aktīva mērķa",
+    "marksScored": "Iegūtie marks: {{count}}",
+    "hideAndPass": "Paslēpt un padot tālāk",
+    "allContractsChecked": "Visi līgumi pārbaudīti"
   },
   "scheme": {
     "ongoingScheme": "Ongoing scheme",
     "scheme": "Scheme",
-    "pastScheme": "Past scheme",
+    "pastScheme": "Iepriekšējais scheme",
     "abandon": "Abandon {{name}}",
     "ongoingSchemes": "Ongoing schemes",
     "graveyard": "Graveyard · {{count}}",
     "nextScheme": "Next scheme",
-    "remainingInDeck": "{{count}} left in the deck",
-    "scryfallCredit": "Card image via Scryfall. Magic: The Gathering is © Wizards of the Coast."
+    "remainingInDeck": "{{count}} palikuši kavā",
+    "scryfallCredit": "Kārts attēls no Scryfall. Magic: The Gathering ir © Wizards of the Coast."
   },
   "dungeon": {
-    "takeInitiativeTitle": "Take the initiative?",
-    "takeInitiativeEnter": "This also ventures into Undercity. Only take it when the table just gave this seat the initiative.",
-    "takeInitiativeWait": "Finish or leave the current dungeon before Undercity can open. Only take the initiative when the table just gave it to this seat.",
-    "takeInitiativeAndEnter": "Take initiative & enter Undercity",
-    "takeInitiative": "Take initiative",
-    "alreadyHoldInitiative": "You already hold the initiative",
-    "takeAndEnterUndercity": "Take the initiative and enter Undercity",
-    "completed": "{{name}} (completed)",
-    "ventureInto": "Venture into {{name}}",
-    "done": "Done",
-    "ventureTo": "Venture to {{room}}: {{effect}}",
-    "releaseInitiative": "Release the initiative",
-    "undoRoom": "Undo room",
-    "closeDungeon": "Close dungeon"
+    "takeInitiativeTitle": "Pārņemt initiative?",
+    "takeInitiativeEnter": "Tas arī veic venture uz Undercity. Pārņemiet initiative tikai tad, kad galds tikko to ir piešķīris šai vietai.",
+    "takeInitiativeWait": "Pabeidziet vai pametiet pašreizējo dungeon, pirms var atvērties Undercity. Pārņemiet initiative tikai tad, kad galds tikko to ir piešķīris šai vietai.",
+    "takeInitiativeAndEnter": "Pārņemt initiative un ieiet Undercity",
+    "takeInitiative": "Pārņemt initiative",
+    "alreadyHoldInitiative": "Jums jau ir initiative",
+    "takeAndEnterUndercity": "Pārņemt initiative un ieiet Undercity",
+    "completed": "{{name}} (pabeigts)",
+    "ventureInto": "Venture uz {{name}}",
+    "done": "Gatavs",
+    "ventureTo": "Venture uz {{room}}: {{effect}}",
+    "releaseInitiative": "Atlaist initiative",
+    "undoRoom": "Atsaukt room",
+    "closeDungeon": "Aizvērt dungeon"
   },
   "treacheryRolesSheet": {
-    "title": "Secret identities",
-    "chooseOwnName": "Choose only your own name.",
-    "closeIdentities": "Close identities",
-    "allIdentitiesChecked": "All identities checked"
+    "title": "Slepenas identitātes",
+    "chooseOwnName": "Izvēlieties tikai savu vārdu.",
+    "closeIdentities": "Aizvērt identitātes",
+    "allIdentitiesChecked": "Visas identitātes pārbaudītas"
   },
   "tracker": {
-    "gameRules": "Game rules",
-    "loadingRoles": "Loading roles…",
-    "start": "Start",
-    "readRules": "Read rules",
-    "readyToBegin": "Ready to begin",
-    "readyToBeginHint": "Start the match when everyone is seated, or read the rules first.",
-    "dealContracts": "Deal contracts",
-    "dealContractsTitle": "Deal secret contracts",
-    "dealContractsHint": "Every player receives one private target. The device will be passed around so each contract can be checked in secret.",
-    "dealIdentities": "Deal identities",
-    "dealIdentitiesTitle": "Deal secret identities",
-    "dealIdentitiesHint": "Every player receives one hidden identity. The device will be passed around so each one can be read in secret.",
-    "chooseStarPositions": "Choose Star positions",
-    "starPositionsHint": "Players beside each other are allies. Tap two players to exchange their positions, or randomise the whole circle.",
-    "randomPositions": "Random positions",
-    "confirmPositions": "Confirm positions",
-    "adjacentPlayersAlly": "Adjacent\nplayers ally",
-    "buildEmperorTeams": "Build the Emperor teams",
-    "chooseTeamA": "Choose three players for Team A.",
-    "randomTeams": "Random teams",
-    "resetTeams": "Reset teams",
-    "teamEmperor": "Team {{team}} Emperor",
-    "randomEmperors": "Random Emperors",
-    "confirmTeams": "Confirm teams",
-    "chooseArchenemy": "Choose the Archenemy",
-    "chooseArchenemyHint": "The Archenemy faces the other three players. Both sides share 60 life. The Archenemy goes first, draws on that turn, and sets a scheme in motion during each first main phase.",
-    "confirmArchenemy": "Confirm Archenemy",
-    "chooseAllies": "Choose the allies",
-    "chooseAlliesHint": "Select two players for the first team. The other two players become the opposing team. Teams share 60 life and turns; all other player controls stay separate.",
-    "emperor": "Emperor",
-    "emperorRange": "Emperor · range 2",
-    "leader": "Leader",
-    "general": "General",
-    "generalRange": "General · range 1",
+    "gameRules": "Spēles noteikumi",
+    "loadingRoles": "Ielādē lomas…",
+    "start": "Sākt",
+    "readRules": "Lasīt noteikumus",
+    "readyToBegin": "Gatavs sākt",
+    "readyToBeginHint": "Sāciet spēli, kad visi ir apsēdušies, vai vispirms izlasiet noteikumus.",
+    "dealContracts": "Izdalīt līgumus",
+    "dealContractsTitle": "Izdalīt slepenos līgumus",
+    "dealContractsHint": "Katrs spēlētājs saņem vienu slepenu mērķi. Ierīce tiks padota apkārt, lai katru līgumu varētu pārbaudīt slepenībā.",
+    "dealIdentities": "Izdalīt identitātes",
+    "dealIdentitiesTitle": "Izdalīt slepenās identitātes",
+    "dealIdentitiesHint": "Katrs spēlētājs saņem vienu slepenu identitāti. Ierīce tiks padota apkārt, lai katrs varētu slepenībā izlasīt savējo.",
+    "chooseStarPositions": "Izvēlēties Zvaigznes pozīcijas",
+    "starPositionsHint": "Blakus sēdošie spēlētāji ir sabiedrotie. Nospiediet uz diviem spēlētājiem, lai samainītu viņu vietas, vai nejauši izvietojiet visu apli.",
+    "randomPositions": "Nejaušas pozīcijas",
+    "confirmPositions": "Apstiprināt pozīcijas",
+    "adjacentPlayersAlly": "Blakus esošie\nspēlētāji ir sabiedrotie",
+    "buildEmperorTeams": "Izveidot Imperatora komandas",
+    "chooseTeamA": "Izvēlieties trīs spēlētājus Komandai A.",
+    "randomTeams": "Nejaušas komandas",
+    "resetTeams": "Atiestatīt komandas",
+    "teamEmperor": "Komandas {{team}} Imperators",
+    "randomEmperors": "Nejauši Imperatori",
+    "confirmTeams": "Apstiprināt komandas",
+    "chooseArchenemy": "Izvēlēties Archenemy",
+    "chooseArchenemyHint": "Archenemy spēlē pret pārējiem trim spēlētājiem. Abām pusēm ir 60 dzīvības punkti. Archenemy spēlē pirmais, šajā gājienā velk kārti un katrā first main phase iedarbina scheme.",
+    "confirmArchenemy": "Apstiprināt Archenemy",
+    "chooseAllies": "Izvēlēties sabiedrotos",
+    "chooseAlliesHint": "Izvēlieties divus spēlētājus pirmajai komandai. Pārējie divi spēlētāji kļūst par pretinieku komandu. Komandas dala 60 dzīvības punktus un gājienus; visas pārējās spēlētāju kontroles paliek atsevišķas.",
+    "emperor": "Imperators",
+    "emperorRange": "Imperators · diapazons 2",
+    "leader": "Līderis",
+    "general": "Ģenerālis",
+    "generalRange": "Ģenerālis · diapazons 1",
     "marks": "{{count}} marks",
-    "winner": "Winner",
-    "turnPhone": "Turn your phone for the full board",
-    "matchMenu": "Match menu",
-    "matchMenuElapsed": "Match menu. {{clock}} elapsed",
-    "matchMenuPaused": ", paused",
-    "matchMenuDayNight": ", it is {{phase}}",
-    "day": "day",
-    "night": "night",
-    "closeMatchMenu": "Close match menu",
-    "match": "Match",
-    "firstScheme": "First scheme",
-    "nextScheme": "Next scheme",
-    "resume": "Resume",
-    "pause": "Pause",
-    "undo": "Undo",
-    "challenges": "Challenges",
-    "checkTarget": "Check target",
-    "checkMyRole": "Check my role",
-    "dayButton": "Day",
-    "nightButton": "Night",
-    "playerLost": "Player lost",
-    "gameWonBy": "Game won by",
-    "won": "{{name}} won",
-    "doneRequeue": "Done & requeue",
-    "savingChallenges": "Saving challenges…",
-    "quitToHome": "Quit to home",
-    "quitHint": "The game is kept — reopen it from the home screen.",
-    "secretContracts": "Secret contracts",
-    "secretIdentities": "Secret identities",
-    "whoEliminated": "Who eliminated {{name}}?",
-    "whoEliminatedHint": "A player scores only if this was their assigned mark. The contract chain advances either way.",
-    "noPlayerUnknown": "No player / unknown",
-    "revealedIdentity": "Revealed Treachery identity",
-    "closeRevealedIdentity": "Close revealed identity",
-    "commanderChallenges": "Commander challenges",
-    "challengeCompleted": "{{name}} completed",
-    "challengeFallback": "Challenge",
-    "matchResult": "Match result",
-    "wins": "{{name}} wins",
-    "reviewBoard": "Review board",
-    "yes": "Yes",
-    "no": "No",
-    "yesTheyLost": "Yes, they lost",
-    "noStillIn": "No, still in",
-    "openCounters": "Open counters for {{name}}",
-    "commanderDamageOn": "Commander damage on {{name}}",
-    "countersFor": "Counters for {{name}}",
-    "countersTitle": "Counters for {{name}}",
-    "closeCounters": "Close counters",
-    "closeChallenges": "Close challenges",
-    "sharedCommanderDamage": "Shared commander damage",
-    "closeCommanderDamage": "Close commander damage",
-    "highestCommanderDamage": "Highest commander damage on {{name}}: {{value}} from {{commander}}",
-    "noCommanderDamage": "No commander damage on {{name}}",
-    "removeCommanderDamage": "Remove commander damage from {{owner}}'s {{name}}",
-    "addCommanderDamage": "Add commander damage from {{owner}}'s {{name}}",
-    "isMonarch": "{{name}} is the monarch",
-    "makeMonarch": "Make {{name}} the monarch",
-    "enduringStory": "{{name}} {{has}} an enduring story",
-    "cityBlessing": "{{name}} {{has}} the city's blessing",
-    "has": "has",
-    "doesNotHave": "does not have",
-    "didLose": "Did {{name}} lose the game?",
-    "thisTeam": "This team",
-    "didTheyLose": "Did they lose?",
-    "poisonPrompt": "{{name}} has {{count}} poison counters. Did they lose?",
-    "sharedPoisonPrompt": "{{subject}} has {{count}} shared poison counters. {{lose}}",
-    "hitPrompt": "{{name}} owns {{count}} exiled cards with hit counters. Did they lose?",
-    "commanderPrompt": "{{name}} has taken {{damage}} commander damage from {{from}}. Did they lose?",
-    "sharedCommanderPrompt": "{{subject}} has taken {{damage}} commander damage from {{from}}. {{lose}}",
-    "lifePrompt": "{{name}} is at {{life}} life. Did they lose?",
-    "sharedLifePrompt": "{{subject}} is at {{life}} life. {{lose}}",
-    "anotherCommander": "another commander",
-    "addLife": "Add 1 life. Long press for a larger amount.",
-    "removeLife": "Remove 1 life. Long press for a larger amount.",
-    "addLifeFor": "Add life for {{name}}",
-    "removeLifeFor": "Remove life for {{name}}",
-    "addLifeLabel": "Add life · {{name}}",
-    "removeLifeLabel": "Remove life · {{name}}",
-    "deleteDigit": "Delete digit",
-    "add": "Add",
-    "removeVerb": "Remove",
-    "lower": "Lower {{label}}",
-    "raise": "Raise {{label}}",
-    "seatColour": "Seat colour for {{name}}",
-    "dungeonFor": "Dungeon for {{name}}",
-    "dungeonInitiative": "Dungeon and initiative for {{name}}. {{title}}",
-    "dungeonInitiativeActive": "{{name}} has the initiative · {{filled}} of {{total}} unique dungeons",
-    "dungeonInitiativeCompleted": "{{name}} has completed {{filled}} of {{total}} unique dungeons",
-    "counterOn": "{{label}} on {{name}}: {{value}}",
-    "counterFor": "{{label}} for {{name}}",
-    "claimFor": "Claim for {{name}}",
-    "challengesSubtitle": "Same challenges for every player · points never affect matching",
+    "winner": "Uzvarētājs",
+    "turnPhone": "Pagrieziet telefonu, lai redzētu visu spēles laukumu",
+    "matchMenu": "Spēles izvēlne",
+    "matchMenuElapsed": "Spēles izvēlne. Pagājis {{clock}}",
+    "matchMenuPaused": ", pauzē",
+    "matchMenuDayNight": ", pašlaik ir {{phase}}",
+    "day": "diena",
+    "night": "nakts",
+    "closeMatchMenu": "Aizvērt spēles izvēlni",
+    "match": "Spēle",
+    "firstScheme": "Pirmais scheme",
+    "nextScheme": "Nākamais scheme",
+    "resume": "Turpināt",
+    "pause": "Pauze",
+    "undo": "Atsaukt",
+    "challenges": "Izaicinājumi",
+    "checkTarget": "Pārbaudīt mērķi",
+    "checkMyRole": "Pārbaudīt manu lomu",
+    "dayButton": "Diena",
+    "nightButton": "Nakts",
+    "playerLost": "Spēlētājs zaudēja",
+    "gameWonBy": "Spēli uzvarēja",
+    "won": "{{name}} uzvarēja",
+    "doneRequeue": "Pabeigts un atpakaļ rindā",
+    "savingChallenges": "Saglabā izaicinājumus…",
+    "quitToHome": "Iziet uz sākumu",
+    "quitHint": "Spēle tiek saglabāta — atveriet to vēlreiz no sākuma ekrāna.",
+    "secretContracts": "Slepeni līgumi",
+    "secretIdentities": "Slepenas identitātes",
+    "whoEliminated": "Kurš izslēdza {{name}}?",
+    "whoEliminatedHint": "Spēlētājs saņem punktu tikai tad, ja tas bija viņam piešķirtais mērķis. Līgumu ķēde turpinās jebkurā gadījumā.",
+    "noPlayerUnknown": "Neviens spēlētājs / nezināms",
+    "revealedIdentity": "Atklāta Treachery identitāte",
+    "closeRevealedIdentity": "Aizvērt atklāto identitāti",
+    "commanderChallenges": "Commander izaicinājumi",
+    "challengeCompleted": "{{name}} pabeigts",
+    "challengeFallback": "Izaicinājums",
+    "matchResult": "Spēles rezultāts",
+    "wins": "{{name}} uzvar",
+    "reviewBoard": "Pārskatīt spēles laukumu",
+    "yes": "Jā",
+    "no": "Nē",
+    "yesTheyLost": "Jā, zaudēja",
+    "noStillIn": "Nē, vēl spēlē",
+    "openCounters": "Atvērt {{name}} counters",
+    "commanderDamageOn": "Commander damage spēlētājam {{name}}",
+    "countersFor": "Counters spēlētājam {{name}}",
+    "countersTitle": "{{name}} counters",
+    "closeCounters": "Aizvērt counters",
+    "closeChallenges": "Aizvērt izaicinājumus",
+    "sharedCommanderDamage": "Kopīgs commander damage",
+    "closeCommanderDamage": "Aizvērt commander damage",
+    "highestCommanderDamage": "Lielākais commander damage spēlētājam {{name}}: {{value}} no {{commander}}",
+    "noCommanderDamage": "Nav commander damage spēlētājam {{name}}",
+    "removeCommanderDamage": "Noņemt commander damage no {{owner}} {{name}}",
+    "addCommanderDamage": "Pievienot commander damage no {{owner}} {{name}}",
+    "isMonarch": "{{name}} ir monarch",
+    "makeMonarch": "Padarīt {{name}} par monarch",
+    "enduringStory": "{{name}} {{has}} enduring story",
+    "cityBlessing": "{{name}} {{has}} city's blessing",
+    "has": "ir",
+    "doesNotHave": "nav",
+    "didLose": "Vai {{name}} zaudēja spēli?",
+    "thisTeam": "Šī komanda",
+    "didTheyLose": "Vai viņi zaudēja?",
+    "poisonPrompt": "{{name}} ir {{count}} poison counters. Vai zaudēja?",
+    "sharedPoisonPrompt": "{{subject}} ir {{count}} kopīgi poison counters. {{lose}}",
+    "hitPrompt": "{{name}} pieder {{count}} exiled kārtis ar hit counters. Vai zaudēja?",
+    "commanderPrompt": "{{name}} ir saņēmis {{damage}} commander damage no {{from}}. Vai zaudēja?",
+    "sharedCommanderPrompt": "{{subject}} ir saņēmis {{damage}} commander damage no {{from}}. {{lose}}",
+    "lifePrompt": "{{name}} ir {{life}} dzīvības punkti. Vai zaudēja?",
+    "sharedLifePrompt": "{{subject}} ir {{life}} dzīvības punkti. {{lose}}",
+    "anotherCommander": "cits commander",
+    "addLife": "Pievienot 1 dzīvības punktu. Turiet nospiestu lielākam daudzumam.",
+    "removeLife": "Atņemt 1 dzīvības punktu. Turiet nospiestu lielākam daudzumam.",
+    "addLifeFor": "Pievienot dzīvības punktus spēlētājam {{name}}",
+    "removeLifeFor": "Atņemt dzīvības punktus spēlētājam {{name}}",
+    "addLifeLabel": "Pievienot dzīvību · {{name}}",
+    "removeLifeLabel": "Atņemt dzīvību · {{name}}",
+    "deleteDigit": "Dzēst ciparu",
+    "add": "Pievienot",
+    "removeVerb": "Noņemt",
+    "lower": "Samazināt {{label}}",
+    "raise": "Palielināt {{label}}",
+    "seatColour": "Vietas krāsa spēlētājam {{name}}",
+    "dungeonFor": "Dungeon spēlētājam {{name}}",
+    "dungeonInitiative": "Dungeon un initiative spēlētājam {{name}}. {{title}}",
+    "dungeonInitiativeActive": "{{name}} ir initiative · {{filled}} no {{total}} unikāliem dungeons",
+    "dungeonInitiativeCompleted": "{{name}} ir pabeidzis {{filled}} no {{total}} unikāliem dungeons",
+    "counterOn": "{{label}} spēlētājam {{name}}: {{value}}",
+    "counterFor": "{{label}} spēlētājam {{name}}",
+    "claimFor": "Sasniegums spēlētājam {{name}}",
+    "challengesSubtitle": "Vienādi izaicinājumi katram spēlētājam · punkti nekad neietekmē pārošanu",
     "counters": {
       "poison": "Poison",
       "tax": "Commander tax",
-      "acorn": "Acorns",
-      "energy": "Energy",
-      "experience": "Experience",
+      "acorn": "Zīles",
+      "energy": "Enerģija",
+      "experience": "Pieredze",
       "hit": "Etrata hits",
-      "rad": "Radiation",
+      "rad": "Radiācija",
       "ring": "Ring temptation",
-      "speed": "Speed",
-      "ticket": "Tickets"
+      "speed": "Ātrums",
+      "ticket": "Biļetes"
     }
   }
 }

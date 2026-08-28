@@ -1,6 +1,7 @@
 import {
   boolean,
   integer,
+  index,
   jsonb,
   pgEnum,
   pgTable,
@@ -91,6 +92,13 @@ export const events = pgTable('events', {
   allowThreePods: boolean('allow_three_pods').notNull().default(true),
   allowFivePods: boolean('allow_five_pods').notNull().default(false),
   preferredPodSize: integer('preferred_pod_size').notNull().default(4),
+  /**
+   * Null keeps the established drop-in/drop-out queue. Tournament state is a
+   * versionable JSON document because each format owns a different tree shape;
+   * pod rows still hold the durable game/result records.
+   */
+  tournamentFormat: text('tournament_format'),
+  tournamentState: jsonb('tournament_state'),
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
   challengePackId: text('challenge_pack_id')
     .notNull()
@@ -165,31 +173,38 @@ export const deckOptions = pgTable('deck_options', {
     .notNull(),
 });
 
-export const pods = pgTable('pods', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  eventId: uuid('event_id')
-    .notNull()
-    .references(() => events.id, { onDelete: 'cascade' }),
-  tableId: uuid('table_id')
-    .notNull()
-    .references(() => physicalTables.id, { onDelete: 'restrict' }),
-  poolId: text('pool_id').notNull().default('open'),
-  status: podStatusEnum('status').notNull().default('formed'),
-  trackerUsed: boolean('tracker_used'),
-  winnerParticipantId: uuid('winner_participant_id').references(
-    () => participants.id,
-    { onDelete: 'set null' },
-  ),
-  durationSeconds: integer('duration_seconds'),
-  completedAt: timestamp('completed_at', { withTimezone: true }),
-  rating: integer('rating'),
-  createdAt: timestamp('created_at', { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-});
+export const pods = pgTable(
+  'pods',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    eventId: uuid('event_id')
+      .notNull()
+      .references(() => events.id, { onDelete: 'cascade' }),
+    tableId: uuid('table_id')
+      .notNull()
+      .references(() => physicalTables.id, { onDelete: 'restrict' }),
+    poolId: text('pool_id').notNull().default('open'),
+    status: podStatusEnum('status').notNull().default('formed'),
+    trackerUsed: boolean('tracker_used'),
+    tournamentMatchId: text('tournament_match_id'),
+    winnerParticipantId: uuid('winner_participant_id').references(
+      () => participants.id,
+      { onDelete: 'set null' },
+    ),
+    durationSeconds: integer('duration_seconds'),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+    rating: integer('rating'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index('pods_tournament_match_id_idx').on(table.tournamentMatchId),
+  ],
+);
 
 export const podMembers = pgTable(
   'pod_members',

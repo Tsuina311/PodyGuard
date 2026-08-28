@@ -77,6 +77,26 @@ export type {
 } from './event-api';
 
 export {
+  cancelTournamentMatch,
+  completeTournamentMatch,
+  createTournamentState,
+  currentTournamentRound,
+  markTournamentMatchFormed,
+  markTournamentMatchPlaying,
+  startSingleElimination,
+  tournamentMatchByPod,
+} from './tournament';
+
+export type {
+  TournamentFormat,
+  TournamentMatch,
+  TournamentMatchStatus,
+  TournamentPhase,
+  TournamentRound,
+  TournamentState,
+} from './tournament';
+
+export {
   GAME_MODES,
   MODES_BY_FAMILY,
   ASSASSIN_POD_SIZES,

@@ -7,6 +7,7 @@ import {
   type AssassinPodSize,
   type GameMode,
   type GameModeFamily,
+  type TournamentFormat,
   type TreacheryPodSize,
 } from '@podyguard/shared';
 import { ChevronDown, Play, QrCode, Radio } from 'lucide-react';
@@ -55,6 +56,8 @@ export function HomePage() {
   const [assassinPodSize, setAssassinPodSize] = useState<AssassinPodSize>(5);
   const [multiplayerPodSize, setMultiplayerPodSize] = useState(4);
   const [lifetimeHours, setLifetimeHours] = useState('24');
+  const [tournamentFormat, setTournamentFormat] =
+    useState<TournamentFormat | null>(null);
   const [joinCode, setJoinCode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -68,6 +71,26 @@ export function HomePage() {
     () => loadMatchConfig().seatCount,
   );
   const trackerSeatOptions = seatCountsForMode(trackerMode);
+  const eventPodSize =
+    gameMode === 'treachery'
+      ? preferredPodSize
+      : gameMode === 'assassin'
+        ? assassinPodSize
+        : gameMode === 'multiplayer'
+          ? multiplayerPodSize
+          : gameMode === 'duel' ||
+              gameMode === 'duel-commander' ||
+              gameMode === 'brawl'
+            ? 2
+            : gameMode === 'emperor'
+              ? 6
+              : gameMode === 'star'
+                ? 5
+                : 4;
+  const tournamentEligible =
+    gameMode !== 'two-headed-giant' &&
+    gameMode !== 'archenemy-commander' &&
+    gameMode !== 'emperor';
 
   function toggle(section: ExpandedSection) {
     setExpanded((current) => (current === section ? null : section));
@@ -135,23 +158,11 @@ export function HomePage() {
             : gameMode === 'multiplayer'
               ? multiplayerPodSize >= 5
               : undefined,
-        preferredPodSize:
-          gameMode === 'treachery'
-            ? preferredPodSize
-            : gameMode === 'assassin'
-              ? assassinPodSize
-              : gameMode === 'multiplayer'
-                ? multiplayerPodSize
-                : gameMode === 'duel' ||
-                    gameMode === 'duel-commander' ||
-                    gameMode === 'brawl'
-                  ? 2
-                  : gameMode === 'emperor'
-                    ? 6
-                    : gameMode === 'star'
-                      ? 5
-                      : 4,
+        preferredPodSize: eventPodSize,
         lifetimeHours: Number(lifetimeHours),
+        tournamentFormat: tournamentEligible
+          ? tournamentFormat ?? undefined
+          : undefined,
       });
       saveHostToken(result.event.joinCode, result.hostToken);
       void navigate(`/host/${result.event.joinCode}`);
@@ -299,6 +310,7 @@ export function HomePage() {
           onToggle={() => toggle('host')}
           onSubmit={onCreate}
         >
+          {tournamentEligible ? (
           <fieldset className="mb-4">
             <legend className="text-muted mb-2 text-sm">{t('common.game')}</legend>
             <FormatFamilyPicker
@@ -322,6 +334,11 @@ export function HomePage() {
               )}
             />
           </fieldset>
+          ) : (
+            <p className="text-muted mb-4 text-xs">
+              {t('tournament.teamModeUnavailable')}
+            </p>
+          )}
           <Field
             label={t('home.eventName')}
             value={name}
@@ -341,6 +358,61 @@ export function HomePage() {
             max={40}
             required
           />
+          <fieldset className="mb-4">
+            <legend className="text-muted mb-2 text-sm">
+              {t('tournament.eventStructure')}
+            </legend>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <label
+                className={cx(
+                  'cursor-pointer rounded-xl border p-3 transition',
+                  tournamentFormat === null
+                    ? 'border-neon bg-neon/10'
+                    : 'border-muted/20 hover:border-muted/40',
+                )}
+              >
+                <input
+                  className="sr-only"
+                  type="radio"
+                  name="tournamentFormat"
+                  checked={tournamentFormat === null}
+                  onChange={() => setTournamentFormat(null)}
+                />
+                <span className="block text-sm font-semibold">
+                  {t('tournament.casual')}
+                </span>
+                <span className="text-muted mt-1 block text-xs">
+                  {t('tournament.casualHint')}
+                </span>
+              </label>
+              <label
+                className={cx(
+                  'cursor-pointer rounded-xl border p-3 transition',
+                  tournamentFormat === 'single-elimination'
+                    ? 'border-neon bg-neon/10'
+                    : 'border-muted/20 hover:border-muted/40',
+                )}
+              >
+                <input
+                  className="sr-only"
+                  type="radio"
+                  name="tournamentFormat"
+                  checked={tournamentFormat === 'single-elimination'}
+                  onChange={() =>
+                    setTournamentFormat('single-elimination')
+                  }
+                />
+                <span className="block text-sm font-semibold">
+                  {t('tournament.singleElimination')}
+                </span>
+                <span className="text-muted mt-1 block text-xs">
+                  {t('tournament.singleEliminationHint', {
+                    count: Math.max(1, Number(tableCount) || 1) * eventPodSize,
+                  })}
+                </span>
+              </label>
+            </div>
+          </fieldset>
           {gameMode === 'commander' ? (
             <>
               <label className="text-muted mb-3 flex items-center gap-2 text-sm">

@@ -9,6 +9,7 @@ import {
   type PublicPod,
   type PublicTable,
   type TreacheryRoleAssignment,
+  type TournamentFormat,
 } from '@podyguard/shared';
 import { resolveApiUrl } from './api-base';
 import { readStored, removeStored, writeStored } from './device-storage';
@@ -120,6 +121,7 @@ export function createEvent(
     allowFivePods?: boolean;
     preferredPodSize?: number;
     lifetimeHours?: number;
+    tournamentFormat?: TournamentFormat;
   },
 ) {
   return request<{ event: PublicEvent; hostToken: string }>('/events', {
@@ -365,6 +367,32 @@ export function matchNow(joinCode: string, token: string) {
     {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
+    },
+  );
+}
+
+export function startTournament(joinCode: string, token: string) {
+  return request<{ event: PublicEvent }>(
+    `/events/${joinCode}/tournament/start`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
+}
+
+export function reportTournamentResult(
+  joinCode: string,
+  token: string,
+  matchId: string,
+  winnerParticipantId: string,
+) {
+  return request<{ event: PublicEvent }>(
+    `/events/${joinCode}/tournament/matches/${matchId}/result`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ winnerParticipantId }),
     },
   );
 }

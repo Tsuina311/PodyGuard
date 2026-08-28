@@ -139,7 +139,8 @@ function localeLooksTranslated(target) {
     return false;
   }
   const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-  return data.common?.home !== 'Home';
+  // Home is often left as "Home" in other languages; Cancel is not.
+  return data.common?.cancel !== 'Cancel';
 }
 
 async function translateLocale(target) {

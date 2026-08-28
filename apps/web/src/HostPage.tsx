@@ -24,9 +24,11 @@ import {
   loadHostToken,
   matchNow,
   removeParticipant,
+  reportTournamentResult,
   saveHostToken,
   setTableStatus,
   startTable,
+  startTournament,
   finishTable,
   cancelTable,
   updateMatchSettings,
@@ -50,6 +52,7 @@ import { WaitTime } from './ui/WaitTime';
 import { useEventLive } from './useEventLive';
 import { ChallengePackEditor } from './ChallengePackEditor';
 import { HostMetrics } from './HostMetrics';
+import { TournamentPanel } from './tournament/TournamentPanel';
 
 export function HostPage() {
   const { t } = useTranslation();
@@ -196,9 +199,11 @@ export function HostPage() {
     setBusy(true);
     setError(null);
     try {
-      await Promise.all(
-        readyTables.map((table) => startTable(code, hostToken, table.id)),
-      );
+      // Tournament state is a bracket document; starting sequentially keeps
+      // each match transition based on the state written by the previous one.
+      for (const table of readyTables) {
+        await startTable(code, hostToken, table.id);
+      }
       await refresh();
     } catch (caught) {
       await refresh();
@@ -318,6 +323,56 @@ export function HostPage() {
     }
   }
 
+  async function onStartTournament() {
+    if (!hostToken) {
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      const result = await startTournament(code, hostToken);
+      setEvent(result.event);
+      await refresh();
+    } catch (caught) {
+      setError(
+        caught instanceof ApiError
+          ? caught.message
+          : t('common.errors.startTournament'),
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onTournamentWinner(
+    matchId: string,
+    winnerParticipantId: string,
+  ) {
+    if (!hostToken) {
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      const result = await reportTournamentResult(
+        code,
+        hostToken,
+        matchId,
+        winnerParticipantId,
+      );
+      setEvent(result.event);
+      await refresh();
+    } catch (caught) {
+      setError(
+        caught instanceof ApiError
+          ? caught.message
+          : t('common.errors.tournamentResult'),
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function onFillBots() {
     if (!hostToken) {
       return;
@@ -394,6 +449,13 @@ export function HostPage() {
   const pausedPlayers = participants.filter((row) => row.status === 'paused');
   const lobby = participants.filter((row) => row.status === 'joined');
   const readyTables = tables.filter((table) => table.podStatus === 'formed');
+  const showLobbySections =
+    !event?.tournament || event.tournament.phase === 'registration';
+  const tournamentTableIds = new Set(
+    event?.tournament?.rounds.flatMap((round) =>
+      round.matches.flatMap((match) => (match.tableId ? [match.tableId] : [])),
+    ) ?? [],
+  );
 
   if (!event) {
     return (
@@ -631,6 +693,18 @@ export function HostPage() {
         />
       ) : null}
 
+      {event.tournament ? (
+        <TournamentPanel
+          event={event}
+          participants={participants}
+          busy={busy}
+          onStart={() => void onStartTournament()}
+          onWinner={(matchId, participantId) =>
+            void onTournamentWinner(matchId, participantId)
+          }
+        />
+      ) : null}
+
       <Panel title={t('host.joinCodeTitle')} aside={t('host.share')}>
         <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
           <JoinQr value={joinUrl} />
@@ -651,6 +725,7 @@ export function HostPage() {
         </div>
       </Panel>
 
+      {showLobbySections ? (
       <Panel title={t('host.queue')} aside={t('host.ready', { count: counts.ready })}>
         {queue.length === 0 ? (
           <p className="text-muted text-sm">{t('host.nobodyWaiting')}</p>
@@ -694,8 +769,9 @@ export function HostPage() {
           </ul>
         )}
       </Panel>
+      ) : null}
 
-      {lobby.length > 0 ? (
+      {showLobbySections && lobby.length > 0 ? (
         <Panel title={t('host.notReady')} aside={String(lobby.length)}>
           <ul className="divide-y divide-white/5">
             {lobby.map((row) => (
@@ -716,7 +792,7 @@ export function HostPage() {
         </Panel>
       ) : null}
 
-      {pausedPlayers.length > 0 ? (
+      {showLobbySections && pausedPlayers.length > 0 ? (
         <Panel title={t('host.pausedTitle')} aside={String(pausedPlayers.length)}>
           <ul className="divide-y divide-white/5">
             {pausedPlayers.map((row) => (
@@ -833,14 +909,16 @@ export function HostPage() {
                   ) : null}
                   {table.podStatus === 'formed' || table.podStatus === 'playing' ? (
                     <>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={busy}
-                      onClick={() => void onFinishTable(table)}
-                    >
-                      {t('host.finishTable')}
-                    </Button>
+                    {!tournamentTableIds.has(table.id) ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={busy}
+                        onClick={() => void onFinishTable(table)}
+                      >
+                        {t('host.finishTable')}
+                      </Button>
+                    ) : null}
                     <Button
                       variant="ghost"
                       size="sm"
@@ -870,10 +948,17 @@ export function HostPage() {
         )}
 
         <div className="mb-5 flex flex-wrap gap-2.5">
-          <Button disabled={busy} onClick={() => void onMatch()}>
-            {busy ? t('common.working') : t('host.matchNow')}
-          </Button>
-          {import.meta.env.DEV ? (
+          {!event.tournament ||
+          event.tournament.phase === 'in-progress' ? (
+            <Button disabled={busy} onClick={() => void onMatch()}>
+              {busy
+                ? t('common.working')
+                : event.tournament
+                  ? t('tournament.schedule')
+                  : t('host.matchNow')}
+            </Button>
+          ) : null}
+          {!event.tournament && import.meta.env.DEV ? (
             <Button
               variant="outline"
               className="border-dashed"

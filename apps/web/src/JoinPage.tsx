@@ -44,6 +44,7 @@ import { ThemeToggleCorner } from './ui/ThemeToggle';
 import { WaitTime } from './ui/WaitTime';
 import { assignedDeckLine, tableForParticipant } from './match-view';
 import { TrackerView } from './tracker/TrackerView';
+import { TournamentPlayerStatus } from './tournament/TournamentPlayerStatus';
 import { TreacheryRoleDialog } from './TreacheryRoleDialog';
 import { useEventLive } from './useEventLive';
 import { forgetActiveMatch, rememberActiveMatch } from './active-match';
@@ -635,7 +636,17 @@ export function JoinPage() {
           title={participant.displayName}
           aside={<Badge tone={statusTone(participant.status)}>{participant.status}</Badge>}
         >
-          {participant.status === 'joined' || participant.status === 'paused' ? (
+          {event?.tournament ? (
+            <TournamentPlayerStatus
+              event={event}
+              participant={participant}
+              tables={snapshot?.tables ?? []}
+            />
+          ) : null}
+          {(participant.status === 'joined' ||
+            participant.status === 'paused') &&
+          (!event?.tournament ||
+            event.tournament.phase === 'registration') ? (
             <div className="mb-4">
               <DeckEditor
                 decks={decks}
@@ -737,7 +748,8 @@ export function JoinPage() {
                 </Button>
               )}
             </div>
-          ) : hasLeft ? (
+          ) : event?.tournament &&
+            event.tournament.phase !== 'registration' ? null : hasLeft ? (
             <div>
               <p className="text-muted mb-4 text-sm">{t('join.leftEvent')}</p>
               {/* The seat is gone, by their own hand or the host's, so the way
@@ -920,31 +932,40 @@ export function JoinPage() {
         </Panel>
       ) : (
         <Panel title={t('join.takeSeat')} onSubmit={onJoin}>
-          <Field
-            label={t('join.displayName')}
-            value={displayName}
-            onChange={(change) => setDisplayName(change.target.value)}
-            placeholder={t('join.displayNamePlaceholder')}
-            autoComplete="nickname"
-            required
-          />
-          <DeckEditor
-            decks={decks}
-            onChange={setDeckRows}
-            disabled={busy}
-            requireCommanders={commanderRules}
-            searchProfile={
-              event ? commanderSearchProfile(event.gameMode) : 'commander'
-            }
-          />
-          <Button
-            type="submit"
-            size="lg"
-            block
-            disabled={busy || !canJoin}
-          >
-            {busy ? t('common.joining') : t('join.joinEventButton')}
-          </Button>
+          {event?.tournament &&
+          event.tournament.phase !== 'registration' ? (
+            <p className="text-muted text-sm">
+              {t('tournament.registrationClosed')}
+            </p>
+          ) : (
+            <>
+              <Field
+                label={t('join.displayName')}
+                value={displayName}
+                onChange={(change) => setDisplayName(change.target.value)}
+                placeholder={t('join.displayNamePlaceholder')}
+                autoComplete="nickname"
+                required
+              />
+              <DeckEditor
+                decks={decks}
+                onChange={setDeckRows}
+                disabled={busy}
+                requireCommanders={commanderRules}
+                searchProfile={
+                  event ? commanderSearchProfile(event.gameMode) : 'commander'
+                }
+              />
+              <Button
+                type="submit"
+                size="lg"
+                block
+                disabled={busy || !canJoin}
+              >
+                {busy ? t('common.joining') : t('join.joinEventButton')}
+              </Button>
+            </>
+          )}
         </Panel>
       )}
 

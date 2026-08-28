@@ -1,75 +1,75 @@
 {
   "common": {
-    "home": "Home",
-    "cancel": "Cancel",
-    "close": "Close",
-    "save": "Save",
-    "loading": "Loading…",
-    "players": "Players",
-    "game": "Game",
-    "language": "Language",
-    "yes": "Yes",
-    "no": "No",
-    "reset": "Reset",
-    "random": "Random",
-    "remove": "Remove",
-    "empty": "Empty",
+    "home": "Acasă",
+    "cancel": "Anulează",
+    "close": "Închide",
+    "save": "Salvează",
+    "loading": "Se încarcă…",
+    "players": "Jucători",
+    "game": "Joc",
+    "language": "Limbă",
+    "yes": "Da",
+    "no": "Nu",
+    "reset": "Resetează",
+    "random": "Aleatoriu",
+    "remove": "Elimină",
+    "empty": "Gol",
     "bot": "bot",
     "dev": "dev",
-    "official": "official",
-    "open": "Open",
-    "preferred": "preferred",
-    "player": "Player {{number}}",
-    "versus": "versus",
-    "teamA": "Team A",
-    "teamB": "Team B",
-    "working": "Working…",
-    "creating": "Creating…",
-    "checking": "Checking…",
-    "joining": "Joining…",
-    "updating": "Updating…",
-    "submitting": "Submitting…",
-    "saving": "Saving…",
-    "searching": "Searching…",
-    "unveiling": "Unveiling…",
-    "copied": "Copied",
-    "noneYet": "none yet",
+    "official": "oficial",
+    "open": "Deschis",
+    "preferred": "preferat",
+    "player": "Jucător {{number}}",
+    "versus": "contra",
+    "teamA": "Echipa A",
+    "teamB": "Echipa B",
+    "working": "Se procesează…",
+    "creating": "Se creează…",
+    "checking": "Se verifică…",
+    "joining": "Se conectează…",
+    "updating": "Se actualizează…",
+    "submitting": "Se trimite…",
+    "saving": "Se salvează…",
+    "searching": "Se caută…",
+    "unveiling": "Se dezvăluie…",
+    "copied": "Copiat",
+    "noneYet": "nimic încă",
     "dash": "—",
     "errors": {
-      "generic": "Something went wrong.",
-      "createEvent": "Could not create event.",
-      "unlockHost": "Could not unlock host.",
-      "updateTable": "Could not update table.",
-      "startGame": "Could not start the game.",
-      "startAllGames": "Could not start all ready games.",
-      "finishTable": "Could not finish the table.",
-      "cancelPod": "Could not cancel the pod.",
-      "updateSettings": "Could not update settings.",
-      "matchTables": "Could not match tables.",
-      "fillBots": "Could not fill tables with bots.",
-      "clipboard": "Clipboard blocked — copy the link manually.",
-      "eventNotFound": "Event not found.",
-      "joinEvent": "Could not join event.",
-      "saveDecks": "Could not save decks.",
-      "updateReady": "Could not update ready.",
-      "updatePause": "Could not update pause.",
-      "leaveEvent": "Could not leave event.",
-      "trackerChoice": "Could not save the tracker choice.",
-      "saveRating": "Could not save that rating.",
-      "chooseCommander": "Choose a commander for every deck.",
-      "enterJoinCode": "Enter a join code.",
-      "sessionUnavailable": "Your event session is no longer available.",
-      "savePack": "Could not save the pack.",
-      "searchScryfall": "Could not search Scryfall.",
-      "loadArtwork": "Could not load alternate artwork.",
-      "submitResult": "Could not submit the result.",
-      "saveChallenge": "Could not save challenge progress.",
-      "unveilIdentity": "Could not unveil your identity.",
-      "apiWaking": "The host is waking up. Keep this page open — it usually takes under a minute.",
-      "apiUnreachable": "Cannot reach the API. Is the server running (yarn dev:server)?"
+      "generic": "Ceva nu a mers bine.",
+      "createEvent": "Evenimentul nu a putut fi creat.",
+      "unlockHost": "Panoul organizatorului nu a putut fi deblocat.",
+      "updateTable": "Masa nu a putut fi actualizată.",
+      "startGame": "Jocul nu a putut fi pornit.",
+      "startAllGames": "Nu au putut fi pornite toate jocurile pregătite.",
+      "finishTable": "Jocul de la masă nu a putut fi încheiat.",
+      "cancelPod": "Podul nu a putut fi anulat.",
+      "updateSettings": "Setările nu au putut fi actualizate.",
+      "matchTables": "Mesele nu au putut fi asociate.",
+      "fillBots": "Mesele nu au putut fi completate cu boți.",
+      "clipboard": "Clipboardul este blocat — copiază manual linkul.",
+      "eventNotFound": "Evenimentul nu a fost găsit.",
+      "joinEvent": "Nu te-ai putut alătura evenimentului.",
+      "saveDecks": "Pachetele nu au putut fi salvate.",
+      "updateReady": "Starea de pregătire nu a putut fi actualizată.",
+      "updatePause": "Pauza nu a putut fi actualizată.",
+      "leaveEvent": "Nu ai putut părăsi evenimentul.",
+      "trackerChoice": "Alegerea trackerului nu a putut fi salvată.",
+      "saveRating": "Evaluarea nu a putut fi salvată.",
+      "chooseCommander": "Alege un commander pentru fiecare pachet.",
+      "enterJoinCode": "Introdu un cod de acces.",
+      "sessionUnavailable": "Sesiunea ta pentru acest eveniment nu mai este disponibilă.",
+      "savePack": "Pachetul nu a putut fi salvat.",
+      "searchScryfall": "Nu s-a putut căuta pe Scryfall.",
+      "loadArtwork": "Ilustrația alternativă nu a putut fi încărcată.",
+      "submitResult": "Rezultatul nu a putut fi trimis.",
+      "saveChallenge": "Progresul provocării nu a putut fi salvat.",
+      "unveilIdentity": "Identitatea ta nu a putut fi dezvăluită.",
+      "apiWaking": "Serverul se trezește. Lasă această pagină deschisă — de obicei durează mai puțin de un minut.",
+      "apiUnreachable": "API-ul nu poate fi accesat. Serverul rulează (yarn dev:server)?"
     },
-    "assignedAtTable": "Assigned at the table",
-    "scanToJoin": "Scan to join this event"
+    "assignedAtTable": "Alocat la masă",
+    "scanToJoin": "Scanează pentru a te alătura acestui eveniment"
   },
   "language": {
     "en": "English",
@@ -114,168 +114,168 @@
   },
   "modes": {
     "shared": {
-      "commanderCombat": "A player loses after taking {{commanderDamage}} combat damage from one commander.",
-      "commanderTax": "Each time a commander is recast from the command zone, it costs 2 more mana.",
-      "lifeAndLoss": "Life and loss",
-      "turns": "Turns",
+      "commanderCombat": "Un jucător pierde după ce primește {{commanderDamage}} combat damage de la un singur commander.",
+      "commanderTax": "De fiecare dată când un commander este jucat din nou din command zone, costă cu 2 mana mai mult.",
+      "lifeAndLoss": "Viață și înfrângere",
+      "turns": "Ture",
       "commanders": "Commanders",
-      "eachPlayerLife": "Each player starts at {{life}} life.",
-      "loseAtZero": "A player loses at 0 life.",
-      "loseAtPoison": "A player loses at {{poison}} poison counters.",
-      "startingPlayerRandom": "The starting player is drawn at random.",
-      "startingPlayerSkipDraw": "The starting player is drawn at random and skips the draw step on the first turn.",
-      "multiplayerFirstTurnDraw": "In multiplayer, that player draws on their first turn.",
-      "commanderFirstTurnDraw": "In multiplayer Commander, that player draws on their first turn.",
-      "commandersInZone": "Commanders begin in the command zone and may be recast from there.",
-      "commanderRulesApply": "Commander rules still apply: {{life}} starting life, {{poison}} poison, and {{commanderDamage}} combat damage from one commander are lethal."
+      "eachPlayerLife": "Fiecare jucător începe cu {{life}} puncte de viață.",
+      "loseAtZero": "Un jucător pierde la 0 puncte de viață.",
+      "loseAtPoison": "Un jucător pierde la {{poison}} poison counters.",
+      "startingPlayerRandom": "Jucătorul care începe este ales aleatoriu.",
+      "startingPlayerSkipDraw": "Jucătorul care începe este ales aleatoriu și sare peste draw step în prima sa tură.",
+      "multiplayerFirstTurnDraw": "În multiplayer, acel jucător trage o carte în prima sa tură.",
+      "commanderFirstTurnDraw": "În multiplayer Commander, acel jucător trage o carte în prima sa tură.",
+      "commandersInZone": "Commanders încep în command zone și pot fi jucați din nou de acolo.",
+      "commanderRulesApply": "Regulile Commander se aplică în continuare: {{life}} puncte de viață inițiale, {{poison}} poison și {{commanderDamage}} combat damage de la un singur commander sunt letale."
     },
     "duel": {
       "label": "Duel",
-      "hint": "Two players. Each starts on 20 life.",
-      "hostHint": "Strict 2-player tables. Each player starts on 20 life.",
-      "hostFixedSeats": "Duel events always seat exactly two players.",
+      "hint": "Doi jucători. Fiecare începe cu 20 de puncte de viață.",
+      "hostHint": "Mese strict pentru 2 jucători. Fiecare jucător începe cu 20 de puncte de viață.",
+      "hostFixedSeats": "Jocurile Duel au întotdeauna exact doi jucători.",
       "title": "Duel",
-      "summary": "Two-player Magic. No commanders — just life and the board.",
+      "summary": "Magic pentru doi jucători. Fără commanders — doar viață și tabla de joc.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Viață și înfrângere",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters."
+            "Fiecare jucător începe cu {{life}} puncte de viață.",
+            "Un jucător pierde la 0 puncte de viață.",
+            "Un jucător pierde la {{poison}} poison counters."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Ture",
           "bullets": [
-            "The starting player is drawn at random and skips the draw step on the first turn."
+            "Jucătorul care începe este ales aleatoriu și sare peste draw step în prima sa tură."
           ]
         }
       }
     },
     "multiplayer": {
       "label": "Multiplayer",
-      "hint": "Free-for-all without commanders. Everyone starts on 20 life.",
-      "hostHint": "Free-for-all without commanders. Matching fills your chosen table size; leftovers can sit as small as three.",
+      "hint": "Toți contra tuturor fără commanders. Toți încep cu 20 de puncte de viață.",
+      "hostHint": "Toți contra tuturor fără commanders. Asocierea completează mai întâi dimensiunea de masă aleasă; mesele rămase pot avea minimum trei jucători.",
       "title": "Multiplayer",
-      "summary": "Free-for-all without the Commander format. Useful for casual multiplayer, Planechase, or any 20-life table.",
+      "summary": "Toți contra tuturor fără formatul Commander. Util pentru casual multiplayer, Planechase sau orice masă cu 20 de puncte de viață.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Viață și înfrângere",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters."
+            "Fiecare jucător începe cu {{life}} puncte de viață.",
+            "Un jucător pierde la 0 puncte de viață.",
+            "Un jucător pierde la {{poison}} poison counters."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Ture",
           "bullets": [
-            "The starting player is drawn at random.",
-            "In multiplayer, that player draws on their first turn."
+            "Jucătorul care începe este ales aleatoriu.",
+            "În multiplayer, acel jucător trage o carte în prima sa tură."
           ]
         }
       }
     },
     "commander": {
-      "label": "Classic",
-      "hint": "Free-for-all. Everyone starts on 40 life.",
-      "hostHint": "Free-for-all Commander. Matching prefers four; leftover pods can be three or five when allowed.",
-      "title": "Classic",
-      "summary": "Free-for-all multiplayer. Each player fights for themselves.",
+      "label": "Clasic",
+      "hint": "Toți contra tuturor. Toți încep cu 40 de puncte de viață.",
+      "hostHint": "Commander toți contra tuturor. Asocierea preferă grupuri de patru; podurile rămase pot avea trei sau cinci jucători când este permis.",
+      "title": "Clasic",
+      "summary": "Multiplayer toți contra tuturor. Fiecare jucător luptă pentru sine.",
       "sections": {
         "life": {
-          "heading": "Life and loss",
+          "heading": "Viață și înfrângere",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life.",
-            "A player loses at {{poison}} poison counters.",
-            "A player loses after taking {{commanderDamage}} combat damage from one commander."
+            "Fiecare jucător începe cu {{life}} puncte de viață.",
+            "Un jucător pierde la 0 puncte de viață.",
+            "Un jucător pierde la {{poison}} poison counters.",
+            "Un jucător pierde după ce primește {{commanderDamage}} combat damage de la un singur commander."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Ture",
           "bullets": [
-            "The starting player is drawn at random.",
-            "In multiplayer Commander, that player draws on their first turn."
+            "Jucătorul care începe este ales aleatoriu.",
+            "În multiplayer Commander, acel jucător trage o carte în prima sa tură."
           ]
         },
         "commanders": {
           "heading": "Commanders",
           "bullets": [
-            "Commanders begin in the command zone and may be recast from there.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Commanders încep în command zone și pot fi jucați din nou de acolo.",
+            "De fiecare dată când un commander este jucat din nou din command zone, costă cu 2 mana mai mult."
           ]
         }
       }
     },
     "treachery": {
-      "label": "Treachery",
-      "hint": "Secret identities dealt on this device. Pass it around so everyone reads their own in private.",
-      "hostHint": "Secret roles for Commander pods. Matching fills your chosen table size first; leftovers can sit as small as four.",
-      "title": "Treachery",
-      "summary": "Commander with secret identities. The Leader is public; everyone else stays hidden.",
+      "label": "Trădare",
+      "hint": "Identitățile secrete sunt distribuite pe acest dispozitiv. Pasează-l pentru ca fiecare să-și citească identitatea în privat.",
+      "hostHint": "Roluri secrete pentru poduri Commander. Asocierea completează mai întâi dimensiunea de masă aleasă; podurile rămase pot avea minimum patru jucători.",
+      "title": "Trădare",
+      "summary": "Commander cu identități secrete. Liderul este public; toți ceilalți rămân ascunși.",
       "sections": {
         "commander": {
-          "heading": "Commander rules still apply",
+          "heading": "Regulile Commander se aplică în continuare",
           "bullets": [
-            "Each player starts at {{life}} life.",
-            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "The Leader takes the first turn and draws on that turn.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Fiecare jucător începe cu {{life}} puncte de viață.",
+            "Un jucător pierde la 0 puncte de viață, {{poison}} poison sau {{commanderDamage}} combat damage de la un singur commander.",
+            "Liderul joacă primul și trage o carte în acea tură.",
+            "De fiecare dată când un commander este jucat din nou din command zone, costă cu 2 mana mai mult."
           ]
         },
         "identities": {
-          "heading": "Identities",
+          "heading": "Identități",
           "bullets": [
-            "Open Check my role from the timer menu. Only you see that card.",
-            "On a single tracker, deal the identities at setup and pass the device around so each player reads theirs alone.",
-            "Leader: Survive until every Assassin and Traitor is eliminated. Reveal yourself to the table. The Guardians share your victory, but you do not know who they are.",
-            "Guardian: Keep the Leader alive and eliminate the Leader's enemies. Your identity is secret. You win and lose with the Leader, even if you are eliminated first.",
-            "Assassin: Eliminate the Leader. Your identity is secret. Assassins share the same objective, but you do not know who the other Assassins are.",
-            "Traitor: Be the last player standing. Your identity is secret. Keep the Leader alive until the other threats are gone, then take the throne for yourself.",
-            "Follow any extra abilities printed on your identity card."
+            "Deschide Verifică rolul meu din meniul timerului. Numai tu vezi acea carte.",
+            "Dacă folosiți un singur tracker, distribuiți identitățile la configurare și pasați dispozitivul pentru ca fiecare jucător să și-o citească singur.",
+            "Lider: Supraviețuiește până când toți Asasinii și Trădătorul sunt eliminați. Dezvăluie-te mesei. Gardienii împart victoria ta, dar nu știi cine sunt.",
+            "Gardian: Ține Liderul în viață și elimină-i inamicii. Identitatea ta este secretă. Câștigi și pierzi împreună cu Liderul, chiar dacă ești eliminat primul.",
+            "Asasin: Elimină Liderul. Identitatea ta este secretă. Asasinii au același obiectiv, dar nu știi cine sunt ceilalți Asasini.",
+            "Trădător: Fii ultimul jucător rămas. Identitatea ta este secretă. Ține Liderul în viață până când dispar celelalte amenințări, apoi ia tronul pentru tine.",
+            "Respectă orice abilități suplimentare tipărite pe cartea ta de identitate."
           ]
         }
       },
       "roles": {
         "leader": {
-          "name": "Leader",
-          "objective": "Survive until every Assassin and Traitor is eliminated.",
-          "guidance": "Reveal yourself to the table. The Guardians share your victory, but you do not know who they are.",
-          "publicNote": "Your role is public. Tell the table you are the Leader."
+          "name": "Lider",
+          "objective": "Supraviețuiește până când toți Asasinii și Trădătorul sunt eliminați.",
+          "guidance": "Dezvăluie-te mesei. Gardienii împart victoria ta, dar nu știi cine sunt.",
+          "publicNote": "Rolul tău este public. Spune mesei că ești Liderul."
         },
         "guardian": {
-          "name": "Guardian",
-          "objective": "Keep the Leader alive and eliminate the Leader's enemies.",
-          "guidance": "Your identity is secret. You win and lose with the Leader, even if you are eliminated first.",
-          "publicNote": "Keep this role secret."
+          "name": "Gardian",
+          "objective": "Ține Liderul în viață și elimină-i inamicii.",
+          "guidance": "Identitatea ta este secretă. Câștigi și pierzi împreună cu Liderul, chiar dacă ești eliminat primul.",
+          "publicNote": "Păstrează acest rol secret."
         },
         "assassin": {
-          "name": "Assassin",
-          "objective": "Eliminate the Leader.",
-          "guidance": "Your identity is secret. Assassins share the same objective, but you do not know who the other Assassins are.",
-          "publicNote": "Keep this role secret."
+          "name": "Asasin",
+          "objective": "Elimină Liderul.",
+          "guidance": "Identitatea ta este secretă. Asasinii au același obiectiv, dar nu știi cine sunt ceilalți Asasini.",
+          "publicNote": "Păstrează acest rol secret."
         },
         "traitor": {
-          "name": "Traitor",
-          "objective": "Be the last player standing.",
-          "guidance": "Your identity is secret. Keep the Leader alive until the other threats are gone, then take the throne for yourself.",
-          "publicNote": "Keep this role secret."
+          "name": "Trădător",
+          "objective": "Fii ultimul jucător rămas.",
+          "guidance": "Identitatea ta este secretă. Ține Liderul în viață până când dispar celelalte amenințări, apoi ia tronul pentru tine.",
+          "publicNote": "Păstrează acest rol secret."
         }
       },
       "normal": {
-        "hint": "Secret identities on a shared phone. Everyone starts on 20 life — no commanders.",
-        "hostHint": "Secret roles without commanders. Matching fills your chosen table size first; leftovers can sit as small as four.",
-        "summary": "Secret identities without the Commander format. The Leader is public; everyone else stays hidden.",
+        "hint": "Identități secrete pe un telefon comun. Toți încep cu 20 de puncte de viață — fără commanders.",
+        "hostHint": "Roluri secrete fără commanders. Asocierea completează mai întâi dimensiunea de masă aleasă; podurile rămase pot avea minimum patru jucători.",
+        "summary": "Identități secrete fără formatul Commander. Liderul este public; toți ceilalți rămân ascunși.",
         "sections": {
           "life": {
-            "heading": "Life and loss",
+            "heading": "Viață și înfrângere",
             "bullets": [
-              "Each player starts at {{life}} life.",
-              "A player loses at 0 life.",
-              "A player loses at {{poison}} poison counters.",
-              "The Leader takes the first turn and draws on that turn."
+              "Fiecare jucător începe cu {{life}} puncte de viață.",
+              "Un jucător pierde la 0 puncte de viață.",
+              "Un jucător pierde la {{poison}} poison counters.",
+              "Liderul joacă primul și trage o carte în acea tură."
             ]
           },
           "identities": null
@@ -283,63 +283,63 @@
       }
     },
     "two-headed-giant": {
-      "label": "Two-Headed Giant",
-      "hint": "Two teams of two, 60 shared life each, turns taken together.",
-      "hostHint": "Strict 4-player Commander pods. Two teams share 60 life and take their turns together.",
-      "hostFixedSeats": "Two-Headed Giant games always seat exactly four players.",
-      "title": "Two-Headed Giant",
-      "summary": "Two teams of two. Teammates share a life total and a turn.",
+      "label": "Uriaș cu Două Capete",
+      "hint": "Două echipe de câte doi, fiecare cu 60 de puncte de viață comune, iar turele sunt jucate împreună.",
+      "hostHint": "Poduri Commander strict pentru 4 jucători. Două echipe împart câte 60 de puncte de viață și își joacă turele împreună.",
+      "hostFixedSeats": "Jocurile Uriaș cu Două Capete au întotdeauna exact patru jucători.",
+      "title": "Uriaș cu Două Capete",
+      "summary": "Două echipe de câte doi. Coechipierii împart totalul de viață și o tură.",
       "sections": {
         "teams": {
-          "heading": "Teams",
+          "heading": "Echipe",
           "bullets": [
-            "Pick two allies, or let the table randomise the pairs.",
-            "Each team starts at {{sharedLife}} shared life.",
-            "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+            "Alege doi aliați sau lasă perechile să fie stabilite aleatoriu.",
+            "Fiecare echipă începe cu {{sharedLife}} puncte de viață comune.",
+            "Coechipierii își joacă tura împreună. Fiecare jucător are în continuare propria mână, library și commanders."
           ]
         },
         "life": {
-          "heading": "Life and loss",
+          "heading": "Viață și înfrângere",
           "bullets": [
-            "A team loses when its shared life reaches 0.",
-            "A team loses at {{sharedPoison}} shared poison counters.",
-            "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+            "O echipă pierde când punctele sale de viață comune ajung la 0.",
+            "O echipă pierde la {{sharedPoison}} poison counters comune.",
+            "O echipă pierde după ce primește {{commanderDamage}} combat damage comun de la un singur commander."
           ]
         },
         "turns": {
-          "heading": "Turns",
+          "heading": "Ture",
           "bullets": [
-            "The starting team is drawn at random and skips the draw step on its first turn.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Echipa care începe este aleasă aleatoriu și sare peste draw step în prima sa tură.",
+            "De fiecare dată când un commander este jucat din nou din command zone, costă cu 2 mana mai mult."
           ]
         }
       },
       "normal": {
-        "hint": "Two teams of two, 40 shared life each, turns taken together.",
-        "hostHint": "Strict 4-player tables. Two teams share 40 life and take their turns together — no commanders.",
-        "summary": "Two teams of two. Teammates share a life total and a turn — standard decks, 20 life each in team terms.",
+        "hint": "Două echipe de câte doi, fiecare cu 40 de puncte de viață comune, iar turele sunt jucate împreună.",
+        "hostHint": "Mese strict pentru 4 jucători. Două echipe împart câte 40 de puncte de viață și își joacă turele împreună — fără commanders.",
+        "summary": "Două echipe de câte doi. Coechipierii împart totalul de viață și o tură — pachete standard, echivalentul a 20 de puncte de viață pentru fiecare jucător.",
         "sections": {
           "teams": {
-            "heading": "Teams",
+            "heading": "Echipe",
             "bullets": [
-              "Pick two allies, or let the table randomise the pairs.",
-              "Each team starts at {{sharedLife}} shared life.",
-              "Teammates take their turn together. Each player still has their own hand, library, and commanders."
+              "Alege doi aliați sau lasă perechile să fie stabilite aleatoriu.",
+              "Fiecare echipă începe cu {{sharedLife}} puncte de viață comune.",
+              "Coechipierii își joacă tura împreună. Fiecare jucător are în continuare propria mână, library și commanders."
             ]
           },
           "life": {
-            "heading": "Life and loss",
+            "heading": "Viață și înfrângere",
             "bullets": [
-              "A team loses when its shared life reaches 0.",
-              "A team loses at {{sharedPoison}} shared poison counters.",
-              "A team loses after taking {{commanderDamage}} shared combat damage from one commander."
+              "O echipă pierde când punctele sale de viață comune ajung la 0.",
+              "O echipă pierde la {{sharedPoison}} poison counters comune.",
+              "O echipă pierde după ce primește {{commanderDamage}} combat damage comun de la un singur commander."
             ]
           },
           "turns": {
-            "heading": "Turns",
+            "heading": "Ture",
             "bullets": [
-              "The starting team is drawn at random and skips the draw step on its first turn.",
-              "Each time a commander is recast from the command zone, it costs 2 more mana."
+              "Echipa care începe este aleasă aleatoriu și sare peste draw step în prima sa tură.",
+              "De fiecare dată când un commander este jucat din nou din command zone, costă cu 2 mana mai mult."
             ]
           }
         }
@@ -347,286 +347,286 @@
     },
     "archenemy-commander": {
       "label": "Archenemy",
-      "hint": "One Archenemy on 60 life with a 40-card scheme deck against three heroes sharing 60 life.",
-      "hostHint": "Strict 4-player Commander pods. One 60-life Archenemy faces a three-player team with 60 shared life and a 40-card scheme deck.",
-      "hostFixedSeats": "Archenemy Commander games always seat exactly four players.",
+      "hint": "Un Archenemy cu 60 de puncte de viață și un pachet de 40 de scheme împotriva a trei eroi care împart 60 de puncte de viață.",
+      "hostHint": "Poduri Commander strict pentru 4 jucători. Un Archenemy cu 60 de puncte de viață înfruntă o echipă de trei jucători cu 60 de puncte de viață comune și un pachet de 40 de scheme.",
+      "hostFixedSeats": "Jocurile Archenemy Commander au întotdeauna exact patru jucători.",
       "title": "Archenemy Commander",
-      "summary": "One Archenemy against a team of three, with a scheme deck in motion.",
+      "summary": "Un Archenemy împotriva unei echipe de trei, cu un pachet de scheme activ.",
       "sections": {
         "sides": {
-          "heading": "Sides",
+          "heading": "Tabere",
           "bullets": [
-            "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
-            "Both sides start at {{life}} life.",
-            "The heroes share that life total and take their turn together.",
-            "The Archenemy goes first and draws on that turn."
+            "Alege Archenemy sau desemnează unul aleatoriu. Ceilalți trei jucători sunt eroii.",
+            "Ambele tabere încep cu {{life}} puncte de viață.",
+            "Eroii împart acel total de viață și își joacă tura împreună.",
+            "Archenemy joacă primul și trage o carte în acea tură."
           ]
         },
         "schemes": {
           "heading": "Schemes",
           "bullets": [
-            "The 40 Duskmourn Commander schemes are shuffled at the start.",
-            "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
-            "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
-            "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
-            "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+            "Cele 40 de schemes din Duskmourn Commander sunt amestecate la început.",
+            "În fiecare first main phase al Archenemy, deschide meniul timerului și apasă Next scheme pentru a pune una în mișcare.",
+            "Un scheme care nu este ongoing se rezolvă, apoi merge la baza pachetului de scheme.",
+            "Un ongoing scheme rămâne cu fața în sus până când masa îl marchează abandoned, apoi merge la baza pachetului.",
+            "Schemes cu fața în sus și graveyard-ul celor încheiate apar sub carte ca miniaturi; apasă unul pentru a-l vedea mărit."
           ]
         },
         "life": {
-          "heading": "Life and loss",
+          "heading": "Viață și înfrângere",
           "bullets": [
-            "The Archenemy loses at 0 life, or when the usual poison and commander-damage limits are reached.",
-            "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
-            "A player loses after taking {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Archenemy pierde la 0 puncte de viață sau când sunt atinse limitele obișnuite de poison și commander damage.",
+            "Eroii pierd împreună când punctele lor de viață comune ajung la 0 și împart în același mod poison și commander damage.",
+            "Un jucător pierde după ce primește {{commanderDamage}} combat damage de la un singur commander.",
+            "De fiecare dată când un commander este jucat din nou din command zone, costă cu 2 mana mai mult."
           ]
         }
       },
       "normal": {
-        "hint": "One Archenemy on 20 life with schemes against three heroes sharing 40 life.",
-        "hostHint": "Strict 4-player tables. One Archenemy with a scheme deck against a three-player team — no commanders.",
-        "summary": "One Archenemy against a team of three, with a scheme deck in motion — standard 20-life tables.",
+        "hint": "Un Archenemy cu 20 de puncte de viață și schemes împotriva a trei eroi care împart 40 de puncte de viață.",
+        "hostHint": "Mese strict pentru 4 jucători. Un Archenemy cu un pachet de scheme împotriva unei echipe de trei — fără commanders.",
+        "summary": "Un Archenemy împotriva unei echipe de trei, cu un pachet de scheme activ — mese standard cu 20 de puncte de viață.",
         "sections": {
           "sides": {
-            "heading": "Sides",
+            "heading": "Tabere",
             "bullets": [
-              "Choose the Archenemy, or assign one at random. The other three players are the heroes.",
-              "Both sides start at {{life}} life.",
-              "The heroes share that life total and take their turn together.",
-              "The Archenemy goes first and draws on that turn."
+              "Alege Archenemy sau desemnează unul aleatoriu. Ceilalți trei jucători sunt eroii.",
+              "Ambele tabere încep cu {{life}} puncte de viață.",
+              "Eroii împart acel total de viață și își joacă tura împreună.",
+              "Archenemy joacă primul și trage o carte în acea tură."
             ]
           },
           "schemes": {
             "heading": "Schemes",
             "bullets": [
-              "The 40 Duskmourn Commander schemes are shuffled at the start.",
-              "During each of the Archenemy's first main phases, open the timer menu and tap Next scheme to set one in motion.",
-              "A scheme that is not ongoing resolves, then goes to the bottom of the scheme deck.",
-              "An ongoing scheme stays face up until the table marks it abandoned, then it goes to the bottom.",
-              "Face-up schemes and the graveyard of finished ones sit under the card as miniatures; tap one to read it large."
+              "Cele 40 de schemes din Duskmourn Commander sunt amestecate la început.",
+              "În fiecare first main phase al Archenemy, deschide meniul timerului și apasă Next scheme pentru a pune una în mișcare.",
+              "Un scheme care nu este ongoing se rezolvă, apoi merge la baza pachetului de scheme.",
+              "Un ongoing scheme rămâne cu fața în sus până când masa îl marchează abandoned, apoi merge la baza pachetului.",
+              "Schemes cu fața în sus și graveyard-ul celor încheiate apar sub carte ca miniaturi; apasă unul pentru a-l vedea mărit."
             ]
           },
           "life": {
-            "heading": "Life and loss",
+            "heading": "Viață și înfrângere",
             "bullets": [
-              "The Archenemy loses at 0 life, or when the usual poison and poison limits are reached.",
-              "The heroes lose together when their shared life reaches 0, and they share poison and commander damage the same way.",
-              "A player loses after taking {{poison}} poison counters."
+              "Archenemy pierde la 0 puncte de viață sau când sunt atinse limitele obișnuite de poison și poison.",
+              "Eroii pierd împreună când punctele lor de viață comune ajung la 0 și împart în același mod poison și commander damage.",
+              "Un jucător pierde după ce primește {{poison}} poison counters."
             ]
           }
         }
       }
     },
     "emperor": {
-      "label": "Emperor",
-      "hint": "Two teams of three. Protect your Emperor using limited range of influence and deploy creatures.",
-      "hostHint": "Strict 6-player Commander pods. Two teams each place an Emperor between two Generals and play with limited range of influence.",
-      "hostFixedSeats": "Emperor games always seat exactly six players.",
-      "title": "Emperor",
-      "summary": "Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.",
+      "label": "Împărat",
+      "hint": "Două echipe de câte trei. Protejează-ți Împăratul folosind o rază de influență limitată și mutând creatures.",
+      "hostHint": "Poduri Commander strict pentru 6 jucători. Fiecare echipă plasează un Împărat între doi Generali și joacă cu o rază de influență limitată.",
+      "hostFixedSeats": "Jocurile Împărat au întotdeauna exact șase jucători.",
+      "title": "Împărat",
+      "summary": "Două echipe de câte trei. Fiecare Împărat stă între doi Generali, iar eliminarea unui Împărat câștigă jocul.",
       "sections": {
         "teams": {
-          "heading": "Teams and turns",
+          "heading": "Echipe și ture",
           "bullets": [
-            "Choose both teams and each team's Emperor, or randomise either choice.",
-            "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
-            "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
-            "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+            "Alege ambele echipe și Împăratul fiecărei echipe sau randomizează oricare dintre alegeri.",
+            "Fiecare jucător începe cu {{life}} puncte de viață și își păstrează propria mână, mana, permanents, poison și tură.",
+            "Coechipierii pot vedea mâinile celorlalți și pot discuta strategia, dar nu pot manipula cărțile coechipierilor.",
+            "Alege aleatoriu care Împărat joacă primul. Acel Împărat trage o carte în prima tură."
           ]
         },
         "range": {
-          "heading": "Range and combat",
+          "heading": "Rază și luptă",
           "bullets": [
-            "Generals have range of influence 1. Emperors have range of influence 2.",
-            "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
-            "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
-            "As players leave, the empty seats stop counting, bringing surviving players into range."
+            "Generalii au o rază de influență 1. Împărații au o rază de influență 2.",
+            "Spells, abilities, effects și informațiile pot afecta doar jucătorii și obiectele aflate în raza controllerului lor.",
+            "Un jucător poate ataca doar un adversar așezat imediat lângă el sau planeswalkers și protected battles ale acelui adversar.",
+            "Pe măsură ce jucătorii părăsesc jocul, locurile goale nu mai sunt numărate, aducând jucătorii rămași în raza celorlalți."
           ]
         },
         "deploy": {
-          "heading": "Deploy creatures",
+          "heading": "Mută creatures",
           "bullets": [
-            "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
-            "This can move creatures through the team as the battle lines change."
+            "Fiecare creature are \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
+            "Acest lucru permite mutarea creatures prin echipă pe măsură ce liniile de luptă se schimbă."
           ]
         },
         "winning": {
-          "heading": "Winning and Commander rules",
+          "heading": "Victorie și reguli Commander",
           "bullets": [
-            "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
-            "A player loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "O echipă câștigă dacă Împăratul său câștigă și pierde imediat dacă Împăratul său pierde. Un General poate fi eliminat fără ca jocul să se încheie.",
+            "Un jucător pierde la 0 puncte de viață, {{poison}} poison sau {{commanderDamage}} combat damage de la un singur commander.",
+            "De fiecare dată când un commander este jucat din nou din command zone, costă cu 2 mana mai mult."
           ]
         }
       },
       "normal": {
-        "hint": "Two teams of three on 20 life. Protect your Emperor with limited range of influence.",
-        "hostHint": "Strict 6-player tables. Two Emperors between Generals — standard 20-life decks, no commanders.",
-        "summary": "Two teams of three. Each Emperor sits between two Generals, and eliminating an Emperor wins the game.",
+        "hint": "Două echipe de câte trei cu 20 de puncte de viață. Protejează-ți Împăratul cu o rază de influență limitată.",
+        "hostHint": "Mese strict pentru 6 jucători. Doi Împărați între Generali — pachete standard cu 20 de puncte de viață, fără commanders.",
+        "summary": "Două echipe de câte trei. Fiecare Împărat stă între doi Generali, iar eliminarea unui Împărat câștigă jocul.",
         "sections": {
           "teams": {
-            "heading": "Teams and turns",
+            "heading": "Echipe și ture",
             "bullets": [
-              "Choose both teams and each team's Emperor, or randomise either choice.",
-              "Every player starts at {{life}} life and keeps their own hand, mana, permanents, poison, and turn.",
-              "Teammates may look at one another's hands and discuss strategy, but may not manipulate one another's cards.",
-              "Randomly choose which Emperor takes the first turn. That Emperor draws on the first turn."
+              "Alege ambele echipe și Împăratul fiecărei echipe sau randomizează oricare dintre alegeri.",
+              "Fiecare jucător începe cu {{life}} puncte de viață și își păstrează propria mână, mana, permanents, poison și tură.",
+              "Coechipierii pot vedea mâinile celorlalți și pot discuta strategia, dar nu pot manipula cărțile coechipierilor.",
+              "Alege aleatoriu care Împărat joacă primul. Acel Împărat trage o carte în prima tură."
             ]
           },
           "range": {
-            "heading": "Range and combat",
+            "heading": "Rază și luptă",
             "bullets": [
-              "Generals have range of influence 1. Emperors have range of influence 2.",
-              "Spells, abilities, effects, and information can affect only players and objects within their controller's range.",
-              "A player may attack only an opponent seated immediately next to them, or that opponent's planeswalkers and protected battles.",
-              "As players leave, the empty seats stop counting, bringing surviving players into range."
+              "Generalii au o rază de influență 1. Împărații au o rază de influență 2.",
+              "Spells, abilities, effects și informațiile pot afecta doar jucătorii și obiectele aflate în raza controllerului lor.",
+              "Un jucător poate ataca doar un adversar așezat imediat lângă el sau planeswalkers și protected battles ale acelui adversar.",
+              "Pe măsură ce jucătorii părăsesc jocul, locurile goale nu mai sunt numărate, aducând jucătorii rămași în raza celorlalți."
             ]
           },
           "deploy": {
-            "heading": "Deploy creatures",
+            "heading": "Mută creatures",
             "bullets": [
-              "Every creature has \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
-              "This can move creatures through the team as the battle lines change."
+              "Fiecare creature are \"Tap: Target teammate gains control of this creature. Activate only as a sorcery.\"",
+              "Acest lucru permite mutarea creatures prin echipă pe măsură ce liniile de luptă se schimbă."
             ]
           },
           "winning": {
-            "heading": "Winning and Commander rules",
+            "heading": "Victorie și reguli Commander",
             "bullets": [
-              "A team wins if its Emperor wins and loses immediately if its Emperor loses. A General may be eliminated without ending the game.",
-              "A player loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+              "O echipă câștigă dacă Împăratul său câștigă și pierde imediat dacă Împăratul său pierde. Un General poate fi eliminat fără ca jocul să se încheie.",
+              "Un jucător pierde la 0 puncte de viață, {{poison}} poison sau {{poison}} poison counters."
             ]
           }
         }
       }
     },
     "star": {
-      "label": "Star",
-      "hint": "Five players in a circle. Your neighbors are allies; eliminate both players across from you.",
-      "hostHint": "Strict 5-player Commander pods. Adjacent players are allies; each player wins by outlasting both opponents across the circle.",
-      "hostFixedSeats": "Star games always seat exactly five players.",
-      "title": "Star",
-      "summary": "Five players sit in a circle. Your neighbors are allies and the two players across from you are enemies.",
+      "label": "Stea",
+      "hint": "Cinci jucători într-un cerc. Vecinii tăi sunt aliați; elimină ambii jucători de vizavi.",
+      "hostHint": "Poduri Commander strict pentru 5 jucători. Jucătorii adiacenți sunt aliați; fiecare jucător câștigă supraviețuind ambilor adversari de vizavi.",
+      "hostFixedSeats": "Jocurile Stea au întotdeauna exact cinci jucători.",
+      "title": "Stea",
+      "summary": "Cinci jucători stau într-un cerc. Vecinii tăi sunt aliați, iar cei doi jucători de vizavi sunt inamicii tăi.",
       "sections": {
         "positions": {
-          "heading": "Positions and allies",
+          "heading": "Poziții și aliați",
           "bullets": [
-            "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
-            "The players immediately to your left and right are your allies.",
-            "The two nonadjacent players across the circle are your enemies.",
-            "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+            "Alege manual pozițiile în cerc schimbând doi jucători între ei sau randomizează toate cele cinci poziții.",
+            "Jucătorii aflați imediat în stânga și dreapta ta sunt aliații tăi.",
+            "Cei doi jucători neadiacenți de cealaltă parte a cercului sunt inamicii tăi.",
+            "Pozițiile rămân fixe atunci când un jucător este eliminat; aliații și inamicii tăi nu se schimbă."
           ]
         },
         "combat": {
-          "heading": "Combat and interaction",
+          "heading": "Luptă și interacțiune",
           "bullets": [
-            "Players cannot attack their allies by default.",
-            "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
-            "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+            "În mod implicit, jucătorii nu își pot ataca aliații.",
+            "Spells și abilities pot totuși ajuta sau afecta orice jucător, dacă masa nu stabilește o variantă mai strictă.",
+            "Turele se desfășoară în sensul acelor de ceasornic. Alege aleatoriu jucătorul care începe; acel jucător trage o carte în prima tură."
           ]
         },
         "winning": {
-          "heading": "Winning",
+          "heading": "Victorie",
           "bullets": [
-            "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
-            "An eliminated player cannot win later.",
-            "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{commanderDamage}} combat damage from one commander.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Primul jucător încă în viață ai cărui doi inamici au fost eliminați câștigă, indiferent cine i-a eliminat.",
+            "Un jucător eliminat nu mai poate câștiga ulterior.",
+            "Fiecare jucător începe cu {{life}} puncte de viață și pierde la 0 puncte de viață, {{poison}} poison sau {{commanderDamage}} combat damage de la un singur commander.",
+            "De fiecare dată când un commander este jucat din nou din command zone, costă cu 2 mana mai mult."
           ]
         }
       },
       "normal": {
-        "hint": "Five players in a circle on 20 life. Neighbors are allies; eliminate both players across from you.",
-        "hostHint": "Strict 5-player tables. Adjacent players ally; each player wins by outlasting both opponents across the circle.",
-        "summary": "Five players sit in a circle on 20 life. Your neighbors are allies and the two players across from you are enemies.",
+        "hint": "Cinci jucători într-un cerc cu 20 de puncte de viață. Vecinii sunt aliați; elimină ambii jucători de vizavi.",
+        "hostHint": "Mese strict pentru 5 jucători. Jucătorii adiacenți sunt aliați; fiecare jucător câștigă supraviețuind ambilor adversari de vizavi.",
+        "summary": "Cinci jucători stau într-un cerc cu 20 de puncte de viață. Vecinii tăi sunt aliați, iar cei doi jucători de vizavi sunt inamicii tăi.",
         "sections": {
           "positions": {
-            "heading": "Positions and allies",
+            "heading": "Poziții și aliați",
             "bullets": [
-              "Choose the circular positions manually by exchanging two players, or randomise all five positions.",
-              "The players immediately to your left and right are your allies.",
-              "The two nonadjacent players across the circle are your enemies.",
-              "Positions stay fixed when a player is eliminated; your allies and enemies do not change."
+              "Alege manual pozițiile în cerc schimbând doi jucători între ei sau randomizează toate cele cinci poziții.",
+              "Jucătorii aflați imediat în stânga și dreapta ta sunt aliații tăi.",
+              "Cei doi jucători neadiacenți de cealaltă parte a cercului sunt inamicii tăi.",
+              "Pozițiile rămân fixe atunci când un jucător este eliminat; aliații și inamicii tăi nu se schimbă."
             ]
           },
           "combat": {
-            "heading": "Combat and interaction",
+            "heading": "Luptă și interacțiune",
             "bullets": [
-              "Players cannot attack their allies by default.",
-              "Spells and abilities may still help or affect any player unless the table agrees on a stricter variant.",
-              "Turns proceed clockwise. Randomly choose the starting player; that player draws on the first turn."
+              "În mod implicit, jucătorii nu își pot ataca aliații.",
+              "Spells și abilities pot totuși ajuta sau afecta orice jucător, dacă masa nu stabilește o variantă mai strictă.",
+              "Turele se desfășoară în sensul acelor de ceasornic. Alege aleatoriu jucătorul care începe; acel jucător trage o carte în prima tură."
             ]
           },
           "winning": {
-            "heading": "Winning",
+            "heading": "Victorie",
             "bullets": [
-              "The first surviving player whose two enemies have both been eliminated wins, regardless of who eliminated them.",
-              "An eliminated player cannot win later.",
-              "Every player starts at {{life}} life and loses at 0 life, {{poison}} poison, or {{poison}} poison counters."
+              "Primul jucător încă în viață ai cărui doi inamici au fost eliminați câștigă, indiferent cine i-a eliminat.",
+              "Un jucător eliminat nu mai poate câștiga ulterior.",
+              "Fiecare jucător începe cu {{life}} puncte de viață și pierde la 0 puncte de viață, {{poison}} poison sau {{poison}} poison counters."
             ]
           }
         }
       }
     },
     "assassin": {
-      "label": "Assassin",
-      "hint": "Secret contracts in a free-for-all. Eliminate your mark, score, and inherit their target.",
-      "hostHint": "Secret contracts for 3–8 players. Score by eliminating your mark, then inherit their target.",
-      "title": "Assassin",
-      "summary": "A free-for-all with secret contracts. Score marks, inherit new targets, and finish with the highest score.",
+      "label": "Asasin",
+      "hint": "Contracte secrete într-un joc toți contra tuturor. Elimină-ți ținta, obține un punct și moștenește ținta acesteia.",
+      "hostHint": "Contracte secrete pentru 3–8 jucători. Obține un punct eliminându-ți ținta, apoi moștenește contractul acesteia.",
+      "title": "Asasin",
+      "summary": "Toți contra tuturor cu contracte secrete. Elimină ținte, moștenește unele noi și încheie cu cel mai mare scor.",
       "sections": {
         "contracts": {
-          "heading": "Secret contracts",
+          "heading": "Contracte secrete",
           "bullets": [
-            "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
-            "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
-            "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+            "Fiecare jucător primește în privat o țintă. Contractele formează un cerc, astfel încât nimeni nu se țintește pe sine și fiecare jucător este vânat o singură dată.",
+            "Pasează dispozitivul în timpul configurării. Deschide Verifică ținta din meniul timerului ori de câte ori trebuie să îți recitești contractul actual.",
+            "Jucătorii pot ataca și afecta pe oricine; contractul determină punctajul, nu țintele permise."
           ]
         },
         "elimination": {
-          "heading": "Elimination and inheritance",
+          "heading": "Eliminare și moștenire",
           "bullets": [
-            "When a player is eliminated, record who dealt the finishing blow.",
-            "If you personally eliminate your assigned target, you score one mark.",
-            "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+            "Când un jucător este eliminat, înregistrează cine a dat lovitura finală.",
+            "Dacă îți elimini personal ținta atribuită, obții un mark.",
+            "Jucătorul care vâna ținta eliminată moștenește contractul acesteia, chiar dacă altcineva a dat lovitura finală. Astfel, fiecare jucător rămas în viață păstrează un contract activ."
           ]
         },
         "winning": {
-          "heading": "Winning",
+          "heading": "Victorie",
           "bullets": [
-            "Play until only one player remains. The last survivor scores one additional mark.",
-            "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
-            "Commander rules still apply: {{life}} starting life, {{poison}} poison, and {{commanderDamage}} combat damage from one commander are lethal.",
-            "Each time a commander is recast from the command zone, it costs 2 more mana."
+            "Jucați până când rămâne un singur jucător. Ultimul supraviețuitor obține un mark suplimentar.",
+            "Jucătorul cu cele mai multe marks câștigă; dacă cel mai mare scor este egal, ultimul supraviețuitor câștigă departajarea.",
+            "Regulile Commander se aplică în continuare: {{life}} puncte de viață inițiale, {{poison}} poison și {{commanderDamage}} combat damage de la un singur commander sunt letale.",
+            "De fiecare dată când un commander este jucat din nou din command zone, costă cu 2 mana mai mult."
           ]
         }
       },
       "normal": {
-        "hint": "Secret contracts for 3–8 players on 20 life. Score by eliminating your mark.",
-        "hostHint": "Secret contracts without commanders. Matching fills your chosen table size; leftovers can sit as small as three.",
-        "summary": "A free-for-all with secret contracts on 20 life. Score marks, inherit new targets, and finish with the highest score.",
+        "hint": "Contracte secrete pentru 3–8 jucători cu 20 de puncte de viață. Obține un punct eliminându-ți ținta.",
+        "hostHint": "Contracte secrete fără commanders. Asocierea completează dimensiunea de masă aleasă; grupurile rămase pot avea minimum trei jucători.",
+        "summary": "Toți contra tuturor cu contracte secrete și 20 de puncte de viață. Elimină ținte, moștenește unele noi și încheie cu cel mai mare scor.",
         "sections": {
           "contracts": {
-            "heading": "Secret contracts",
+            "heading": "Contracte secrete",
             "bullets": [
-              "Each player privately receives one target. Contracts form a circle, so nobody targets themselves and everyone is hunted once.",
-              "Pass the device around at setup. Open Check target from the timer menu whenever you need to read your current contract again.",
-              "Players may attack and affect anyone; the contract determines scoring, not legal targets."
+              "Fiecare jucător primește în privat o țintă. Contractele formează un cerc, astfel încât nimeni nu se țintește pe sine și fiecare jucător este vânat o singură dată.",
+              "Pasează dispozitivul în timpul configurării. Deschide Verifică ținta din meniul timerului ori de câte ori trebuie să îți recitești contractul actual.",
+              "Jucătorii pot ataca și afecta pe oricine; contractul determină punctajul, nu țintele permise."
             ]
           },
           "elimination": {
-            "heading": "Elimination and inheritance",
+            "heading": "Eliminare și moștenire",
             "bullets": [
-              "When a player is eliminated, record who dealt the finishing blow.",
-              "If you personally eliminate your assigned target, you score one mark.",
-              "The player who was hunting the eliminated target inherits that target's contract, even if somebody else dealt the finishing blow. This keeps one live contract per surviving player."
+              "Când un jucător este eliminat, înregistrează cine a dat lovitura finală.",
+              "Dacă îți elimini personal ținta atribuită, obții un mark.",
+              "Jucătorul care vâna ținta eliminată moștenește contractul acesteia, chiar dacă altcineva a dat lovitura finală. Astfel, fiecare jucător rămas în viață păstrează un contract activ."
             ]
           },
           "winning": {
-            "heading": "Winning",
+            "heading": "Victorie",
             "bullets": [
-              "Play until only one player remains. The last survivor scores one additional mark.",
-              "The player with the most marks wins; if the highest score is tied, the last survivor wins that tie.",
-              "{{life}} starting life, {{poison}} poison, and {{poison}} poison counters are lethal."
+              "Jucați până când rămâne un singur jucător. Ultimul supraviețuitor obține un mark suplimentar.",
+              "Jucătorul cu cele mai multe marks câștigă; dacă cel mai mare scor este egal, ultimul supraviețuitor câștigă departajarea.",
+              "{{life}} puncte de viață inițiale, {{poison}} poison și {{poison}} poison counters sunt letale."
             ]
           }
         }
@@ -634,446 +634,446 @@
     }
   },
   "home": {
-    "taglineBefore": "Your next",
+    "taglineBefore": "Următorul tău",
     "taglineHighlight": "pod",
-    "taglineAfter": ", sorted.",
-    "startPlaying": "Start playing",
-    "ongoingGame": "ongoing game",
-    "noEventNeeded": "no event needed",
-    "startPlayingHint": "Open a battle screen on this device. Leave and come back without losing an unfinished game.",
-    "alwaysPlayers": "Always {{count}} players in this mode.",
-    "resumeGame": "Resume game",
-    "startNewGame": "Start a new game",
-    "startGame": "Start a game",
+    "taglineAfter": ", rezolvat.",
+    "startPlaying": "Începe să joci",
+    "ongoingGame": "joc în desfășurare",
+    "noEventNeeded": "nu este necesar un eveniment",
+    "startPlayingHint": "Deschide un ecran de joc pe acest dispozitiv. Poți pleca și reveni fără să pierzi un joc neterminat.",
+    "alwaysPlayers": "Acest mod are întotdeauna {{count}} jucători.",
+    "resumeGame": "Continuă jocul",
+    "startNewGame": "Începe un joc nou",
+    "startGame": "Începe un joc",
     "commanderSetup": "Commanders",
-    "commanderSetupHint": "Search Scryfall for each player's commander. Partner pairs need both commanders.",
-    "chooseAllCommanders": "Choose a commander for every player.",
-    "advancedMatchConfig": "Advanced match config",
-    "hostEvent": "Host event",
-    "new": "new",
-    "targetTableSize": "Target table size",
-    "allowThreePods": "Allow 3-player pods",
-    "allowFivePods": "Allow 5-player pods",
-    "duelFixedSeats": "Duel events always seat exactly two players.",
-    "emperorFixedSeats": "Emperor games always seat exactly six players.",
-    "starFixedSeats": "Star games always seat exactly five players.",
-    "archenemyFixedSeats": "Archenemy Commander games always seat exactly four players.",
-    "twoHeadedFixedSeats": "Two-Headed Giant games always seat exactly four players.",
-    "eventName": "Event name",
-    "eventNamePlaceholder": "Friday Commander",
-    "tables": "Tables",
-    "tablesHint": "How many physical tables are free for this event.",
-    "eventLasts": "Event lasts",
-    "eventLastsHint": "Join code dies after this many hours. Use 48 or 72 for a weekend.",
-    "hostPin": "Host PIN",
-    "hostPinHint": "4 to 8 digits — reopens the host desk later.",
-    "createEvent": "Create event",
-    "joinWithCode": "Join with a code",
-    "playerAside": "player",
-    "joinCode": "Join code",
+    "commanderSetupHint": "Caută pe Scryfall commanderul fiecărui jucător. Perechile Partner au nevoie de ambii commanders.",
+    "chooseAllCommanders": "Alege un commander pentru fiecare jucător.",
+    "advancedMatchConfig": "Configurare avansată a jocului",
+    "hostEvent": "Organizează un eveniment",
+    "new": "nou",
+    "targetTableSize": "Dimensiunea țintă a mesei",
+    "allowThreePods": "Permite poduri de 3 jucători",
+    "allowFivePods": "Permite poduri de 5 jucători",
+    "duelFixedSeats": "Jocurile Duel au întotdeauna exact doi jucători.",
+    "emperorFixedSeats": "Jocurile Împărat au întotdeauna exact șase jucători.",
+    "starFixedSeats": "Jocurile Stea au întotdeauna exact cinci jucători.",
+    "archenemyFixedSeats": "Jocurile Archenemy Commander au întotdeauna exact patru jucători.",
+    "twoHeadedFixedSeats": "Jocurile Uriaș cu Două Capete au întotdeauna exact patru jucători.",
+    "eventName": "Numele evenimentului",
+    "eventNamePlaceholder": "Commander de vineri",
+    "tables": "Mese",
+    "tablesHint": "Câte mese fizice sunt disponibile pentru acest eveniment.",
+    "eventLasts": "Durata evenimentului",
+    "eventLastsHint": "Codul de acces expiră după acest număr de ore. Folosește 48 sau 72 pentru un weekend.",
+    "hostPin": "PIN organizator",
+    "hostPinHint": "4 până la 8 cifre — redeschide ulterior panoul organizatorului.",
+    "createEvent": "Creează eveniment",
+    "joinWithCode": "Alătură-te cu un cod",
+    "playerAside": "jucător",
+    "joinCode": "Cod de acces",
     "joinCodePlaceholder": "AB23CD",
-    "join": "Join",
-    "scanQr": "Scan QR",
-    "staleJoin": "That event is gone. Join with a new code, or host a new night."
+    "join": "Alătură-te",
+    "scanQr": "Scanează QR",
+    "staleJoin": "Evenimentul nu mai există. Alătură-te cu un cod nou sau organizează o seară nouă."
   },
   "host": {
-    "desk": "Host desk",
-    "locked": "Locked",
-    "hostOnly": "host only",
-    "unlockHostDesk": "Unlock host desk",
-    "playerCount": "{{count}} player",
-    "playerCount_plural": "{{count}} players",
-    "ready": "{{count}} ready",
-    "matched": "{{count}} matched",
-    "playing": "{{count}} playing",
-    "paused": "{{count}} paused",
-    "ends": "ends {{date}}",
-    "podSizes": "Pod sizes",
-    "matching": "matching",
-    "allowLeftoverThree": "Allow leftover 3-player pods",
-    "allowFivePods": "Allow 5-player pods",
-    "treacheryTargetHint": "Target table size. Leftover pods can be as small as four.",
-    "matchingPrefers": "Matching prefers {{size}}-player tables.",
-    "matchingPrefersFour": "Matching prefers 4-player tables.",
-    "assassinTargetHint": "Target table size. Leftover contract circles can be as small as three.",
-    "multiplayerTargetHint": "Target table size. Leftover tables can be as small as three.",
-    "duelMatchmaking": "Duel matchmaking seats exactly two players per game.",
-    "twoHeadedMatchmaking": "Two-Headed Giant matchmaking seats exactly four players per game.",
-    "archenemyMatchmaking": "Archenemy Commander matchmaking seats exactly four players per game: one Archenemy against a team of three.",
-    "emperorMatchmaking": "Emperor matchmaking seats exactly six players per game: two teams with an Emperor and two Generals each.",
-    "starMatchmaking": "Star matchmaking seats exactly five players in a circular order.",
-    "eventLength": "Event length",
-    "joinCodeDies": "join code dies",
-    "hoursFromStart": "Hours from start",
-    "hoursFromStartHint": "Change this for a multi-day event. After it ends, the QR opens the home page.",
-    "joinCodeTitle": "Join code",
-    "share": "share",
-    "noLanAddress": "No LAN address found — this link only works on this computer.",
-    "copyPlayerLink": "Copy player link",
-    "queue": "Queue",
-    "nobodyWaiting": "Nobody waiting.",
+    "desk": "Panoul organizatorului",
+    "locked": "Blocat",
+    "hostOnly": "doar organizator",
+    "unlockHostDesk": "Deblochează panoul organizatorului",
+    "playerCount": "{{count}} jucător",
+    "playerCount_plural": "{{count}} jucători",
+    "ready": "{{count}} pregătiți",
+    "matched": "{{count}} asociați",
+    "playing": "{{count}} joacă",
+    "paused": "{{count}} în pauză",
+    "ends": "se încheie {{date}}",
+    "podSizes": "Dimensiuni pod",
+    "matching": "asociere",
+    "allowLeftoverThree": "Permite poduri rămase de 3 jucători",
+    "allowFivePods": "Permite poduri de 5 jucători",
+    "treacheryTargetHint": "Dimensiunea țintă a mesei. Podurile rămase pot avea minimum patru jucători.",
+    "matchingPrefers": "Asocierea preferă mese de {{size}} jucători.",
+    "matchingPrefersFour": "Asocierea preferă mese de 4 jucători.",
+    "assassinTargetHint": "Dimensiunea țintă a mesei. Cercurile de contracte rămase pot avea minimum trei jucători.",
+    "multiplayerTargetHint": "Dimensiunea țintă a mesei. Mesele rămase pot avea minimum trei jucători.",
+    "duelMatchmaking": "Asocierea Duel așază exact doi jucători în fiecare joc.",
+    "twoHeadedMatchmaking": "Asocierea Uriaș cu Două Capete așază exact patru jucători în fiecare joc.",
+    "archenemyMatchmaking": "Asocierea Archenemy Commander așază exact patru jucători în fiecare joc: un Archenemy împotriva unei echipe de trei.",
+    "emperorMatchmaking": "Asocierea Împărat așază exact șase jucători în fiecare joc: două echipe, fiecare cu un Împărat și doi Generali.",
+    "starMatchmaking": "Asocierea Stea așază exact cinci jucători într-o ordine circulară.",
+    "eventLength": "Durata evenimentului",
+    "joinCodeDies": "codul de acces expiră",
+    "hoursFromStart": "Ore de la început",
+    "hoursFromStartHint": "Modifică pentru un eveniment de mai multe zile. După încheiere, codul QR deschide pagina principală.",
+    "joinCodeTitle": "Cod de acces",
+    "share": "distribuie",
+    "noLanAddress": "Nu s-a găsit nicio adresă LAN — acest link funcționează doar pe acest computer.",
+    "copyPlayerLink": "Copiază linkul jucătorilor",
+    "queue": "Coadă",
+    "nobodyWaiting": "Nimeni nu așteaptă.",
     "flex": "flex {{count}}",
-    "challengePts": "{{count}} challenge pts",
-    "pts": "{{count}} pts",
-    "notReady": "Not ready",
-    "pausedTitle": "Paused",
-    "seated": "Seated",
-    "atTables": "{{count}} at tables",
-    "tablesTitle": "Tables",
+    "challengePts": "{{count}} pct. provocări",
+    "pts": "{{count}} pct.",
+    "notReady": "Nepregătit",
+    "pausedTitle": "În pauză",
+    "seated": "Așezat",
+    "atTables": "{{count}} la mese",
+    "tablesTitle": "Mese",
     "total": "{{count}} total",
-    "noTables": "This event was created without tables.",
-    "startingGames": "Starting games…",
-    "startAllReady": "Start all ready games ({{count}})",
-    "startGame": "Start game",
-    "finishTable": "Finish table",
-    "cancelPod": "Cancel pod",
-    "enable": "Enable",
-    "disable": "Disable",
+    "noTables": "Acest eveniment a fost creat fără mese.",
+    "startingGames": "Se pornesc jocurile…",
+    "startAllReady": "Pornește toate jocurile pregătite ({{count}})",
+    "startGame": "Pornește jocul",
+    "finishTable": "Încheie masa",
+    "cancelPod": "Anulează podul",
+    "enable": "Activează",
+    "disable": "Dezactivează",
     "trackerUsed": "tracker",
-    "noTracker": "no tracker",
-    "matchNow": "Match now",
-    "fillBots": "Fill tables with bots",
-    "playerJoinPage": "Player join page"
+    "noTracker": "fără tracker",
+    "matchNow": "Asociază acum",
+    "fillBots": "Completează mesele cu boți",
+    "playerJoinPage": "Pagina de acces a jucătorilor"
   },
   "join": {
-    "joinEvent": "Join event",
-    "takeSeat": "Take a seat",
-    "displayName": "Display name",
+    "joinEvent": "Alătură-te evenimentului",
+    "takeSeat": "Ocupă un loc",
+    "displayName": "Nume afișat",
     "displayNamePlaceholder": "Alex",
-    "joinEventButton": "Join event",
-    "saveDecks": "Save decks",
-    "matchFound": "Match found",
-    "yourDeck": "Your deck",
-    "checkMyRole": "Check my role",
-    "playingWithoutTracker": "Playing without the tracker. The host can finish the table.",
-    "chooseTracker": "Choose how this pod will record its game.",
-    "useGameTracker": "Use game tracker",
-    "playWithoutTracker": "Play without tracker",
-    "atTableMarked": "You're marked as at the table on this phone. The host still starts the game from the desk.",
-    "imAtTable": "I'm at the table",
-    "leftEvent": "You left this event. Scan the QR again if you want back in.",
-    "openPool": "Open pool — any table.",
-    "ready": "Ready",
-    "waiting": "waiting",
-    "holdTight": "Hold tight — a table is coming.",
-    "flex": "Flex: {{flex}} · Challenge Points: {{points}}",
-    "howWasPod": "How was your pod?",
-    "pause": "Pause",
-    "leave": "Leave",
-    "pausedMessage": "You are paused. Resume when you can sit, or leave the event.",
-    "imReady": "I'm ready",
-    "leaveEvent": "Leave event",
-    "markReady": "Mark ready when you can sit down for a game.",
-    "matchingShortly": "Matching will send you to a table shortly.",
-    "imTheHost": "I'm the host",
-    "offlineSaved": "Saved on this phone. It will send when you are back online.",
-    "stayAtTable": "Stay at the table until the host calls the game."
+    "joinEventButton": "Alătură-te evenimentului",
+    "saveDecks": "Salvează pachetele",
+    "matchFound": "Joc găsit",
+    "yourDeck": "Pachetul tău",
+    "checkMyRole": "Verifică rolul meu",
+    "playingWithoutTracker": "Joci fără tracker. Organizatorul poate încheia masa.",
+    "chooseTracker": "Alege cum va înregistra acest pod jocul.",
+    "useGameTracker": "Folosește trackerul de joc",
+    "playWithoutTracker": "Joacă fără tracker",
+    "atTableMarked": "Pe acest telefon ești marcat ca fiind la masă. Organizatorul pornește în continuare jocul din panoul său.",
+    "imAtTable": "Sunt la masă",
+    "leftEvent": "Ai părăsit acest eveniment. Scanează din nou codul QR dacă vrei să revii.",
+    "openPool": "Pool deschis — orice masă.",
+    "ready": "Pregătit",
+    "waiting": "așteaptă",
+    "holdTight": "Mai așteaptă puțin — urmează să primești o masă.",
+    "flex": "Flex: {{flex}} · Puncte provocări: {{points}}",
+    "howWasPod": "Cum a fost podul tău?",
+    "pause": "Pauză",
+    "leave": "Pleacă",
+    "pausedMessage": "Ești în pauză. Reia când poți ocupa un loc sau părăsește evenimentul.",
+    "imReady": "Sunt pregătit",
+    "leaveEvent": "Părăsește evenimentul",
+    "markReady": "Marchează-te pregătit când poți ocupa un loc pentru un joc.",
+    "matchingShortly": "Asocierea te va trimite în curând la o masă.",
+    "imTheHost": "Eu sunt organizatorul",
+    "offlineSaved": "Salvat pe acest telefon. Va fi trimis când revii online.",
+    "stayAtTable": "Rămâi la masă până când organizatorul declară jocul încheiat."
   },
   "matchConfig": {
-    "title": "Match config",
-    "description": "Sets up the fake seated pod behind /match. Nothing here touches the server, and none of it appears on the battle screen, so that route can be checked on a phone as-is.",
-    "podSetup": "Pod setup",
-    "seats": "Seats",
-    "seatsCount": "{{count}} seats",
+    "title": "Configurarea jocului",
+    "description": "Configurează podul fictiv așezat în spatele /match. Nimic de aici nu afectează serverul și nimic nu apare pe ecranul de joc, astfel încât ruta poate fi verificată pe telefon exact așa.",
+    "podSetup": "Configurare pod",
+    "seats": "Locuri",
+    "seatsCount": "{{count}} locuri",
     "bracket": "Bracket",
-    "header": "Header",
-    "eventNamePlaceholder": "Event name",
-    "joinCodePlaceholder": "Join code",
-    "matchCard": "Match card",
-    "tableLabelPlaceholder": "Table label",
-    "assignedDeckPlaceholder": "Assigned deck",
-    "openBattleScreen": "Open battle screen",
-    "resetGameState": "Reset game state",
+    "header": "Antet",
+    "eventNamePlaceholder": "Numele evenimentului",
+    "joinCodePlaceholder": "Cod de acces",
+    "matchCard": "Cardul jocului",
+    "tableLabelPlaceholder": "Eticheta mesei",
+    "assignedDeckPlaceholder": "Pachet atribuit",
+    "openBattleScreen": "Deschide ecranul de joc",
+    "resetGameState": "Resetează starea jocului",
     "commander": "Commander",
-    "secondCommander": "Second commander"
+    "secondCommander": "Al doilea commander"
   },
   "app": {
-    "notFound": "Not found."
+    "notFound": "Nu a fost găsit."
   },
   "wake": {
-    "title": "Waking the tables",
-    "message": "The free host went to sleep. Keep this page open — it usually takes under a minute."
+    "title": "Se trezesc mesele",
+    "message": "Serverul gratuit a adormit. Lasă această pagină deschisă — de obicei durează mai puțin de un minut."
   },
   "scanner": {
-    "title": "Scan QR",
-    "ariaLabel": "Scan join QR code",
-    "hint": "Point at the host desk code.",
-    "closeScanner": "Close scanner",
-    "openingCamera": "Opening camera…",
-    "noCamera": "This browser cannot open the camera. Type the join code instead.",
-    "permissionDenied": "Camera permission was denied. Type the join code, or allow the camera and try again."
+    "title": "Scanează QR",
+    "ariaLabel": "Scanează codul QR de acces",
+    "hint": "Îndreaptă camera către codul organizatorului.",
+    "closeScanner": "Închide scanerul",
+    "openingCamera": "Se deschide camera…",
+    "noCamera": "Acest browser nu poate deschide camera. Introdu codul de acces în schimb.",
+    "permissionDenied": "Accesul la cameră a fost refuzat. Introdu codul de acces sau permite accesul la cameră și încearcă din nou."
   },
   "theme": {
-    "switchToLight": "Switch to light mode",
-    "switchToDark": "Switch to dark mode"
+    "switchToLight": "Comută la modul luminos",
+    "switchToDark": "Comută la modul întunecat"
   },
   "hostMetrics": {
-    "title": "Event recap",
+    "title": "Rezumatul evenimentului",
     "aside": "pilot",
-    "players": "Players",
-    "games": "Games",
-    "gamesPerPlayer": "Games / player",
-    "waitAvg": "Wait avg",
-    "waitP95": "Wait p95",
-    "waitMax": "Wait max",
-    "rematchPairs": "Rematch pairs",
-    "flexEarned": "Flex earned",
-    "flexSeats": "Flex seats",
-    "durationAvg": "Duration avg",
-    "tablesOccupied": "Tables occupied",
-    "trackerUsed": "Tracker used",
-    "trackerUsedValue": "{{used}} used · {{skipped}} skipped",
-    "challenges": "Challenges",
-    "challengePts": "Challenge pts",
-    "podRating": "Pod rating",
-    "podSizes": "Pod sizes:",
+    "players": "Jucători",
+    "games": "Jocuri",
+    "gamesPerPlayer": "Jocuri / jucător",
+    "waitAvg": "Așteptare medie",
+    "waitP95": "Așteptare p95",
+    "waitMax": "Așteptare maximă",
+    "rematchPairs": "Perechi rejucate",
+    "flexEarned": "Flex obținut",
+    "flexSeats": "Locuri Flex",
+    "durationAvg": "Durată medie",
+    "tablesOccupied": "Mese ocupate",
+    "trackerUsed": "Tracker folosit",
+    "trackerUsedValue": "{{used}} folosite · {{skipped}} omise",
+    "challenges": "Provocări",
+    "challengePts": "Pct. provocări",
+    "podRating": "Evaluarea podului",
+    "podSizes": "Dimensiuni pod:",
     "pools": "Pools:"
   },
   "deckEditor": {
-    "title": "Commander decks",
-    "deckNamePlaceholder": "Deck name (optional)",
+    "title": "Pachete Commander",
+    "deckNamePlaceholder": "Numele pachetului (opțional)",
     "commander": "Commander",
-    "secondCommander": "Second commander",
-    "markPreferred": "Mark preferred",
-    "addAcceptedDeck": "Add accepted deck",
-    "hint": "Same-pool pods only. Extra decks let matching flex you into another bracket."
+    "secondCommander": "Al doilea commander",
+    "markPreferred": "Marchează ca preferat",
+    "addAcceptedDeck": "Adaugă pachet acceptat",
+    "hint": "Doar poduri din același pool. Pachetele suplimentare permit asocierii să te mute flexibil într-un alt bracket."
   },
   "commanderPicker": {
-    "searchCommander": "Search commander",
-    "searchPartner": "Commander that can pair with {{name}}",
-    "removeCommander": "Remove {{name}}",
-    "artworkFor": "Artwork for",
-    "loadingArtwork": "Loading artwork…"
+    "searchCommander": "Caută commander",
+    "searchPartner": "Commander care poate fi asociat cu {{name}}",
+    "removeCommander": "Elimină {{name}}",
+    "artworkFor": "Ilustrație pentru",
+    "loadingArtwork": "Se încarcă ilustrația…"
   },
   "challengePack": {
-    "title": "Challenge pack",
-    "description": "Only predefined primitives. Saving writes a new version and never mutates a pack already used by this event.",
-    "copyOfficial": "Copy official",
-    "startBlank": "Start blank",
-    "saveNewVersion": "Save new version",
-    "editHint": "Copy the official pack or start blank before editing.",
-    "packName": "Pack name",
-    "descriptionLabel": "Description",
-    "addChallenge": "Add challenge",
+    "title": "Pachet de provocări",
+    "description": "Doar primitives predefinite. Salvarea creează o versiune nouă și nu modifică niciodată un pachet deja folosit de acest eveniment.",
+    "copyOfficial": "Copiază versiunea oficială",
+    "startBlank": "Începe de la zero",
+    "saveNewVersion": "Salvează versiunea nouă",
+    "editHint": "Copiază pachetul oficial sau începe de la zero înainte de editare.",
+    "packName": "Numele pachetului",
+    "descriptionLabel": "Descriere",
+    "addChallenge": "Adaugă provocare",
     "id": "Id",
-    "name": "Name",
-    "category": "Category",
-    "points": "Points",
+    "name": "Nume",
+    "category": "Categorie",
+    "points": "Puncte",
     "primitive": "Primitive",
-    "threshold": "Threshold",
-    "confirmationQuestion": "Confirmation question",
-    "defaultConfirmation": "Did this happen at the table?",
-    "newClaimName": "New claim",
-    "newClaimDescription": "Award this at the table."
+    "threshold": "Prag",
+    "confirmationQuestion": "Întrebare de confirmare",
+    "defaultConfirmation": "S-a întâmplat asta la masă?",
+    "newClaimName": "Realizare nouă",
+    "newClaimDescription": "Acordă aceasta la masă."
   },
   "treacheryRole": {
-    "treachery": "Treachery",
-    "receivedRole": "You received a role",
-    "handDeviceTo": "Hand the device to {{name}}",
-    "lookAwayIdentity": "Everyone else should look away before the identity is revealed.",
-    "lookAwayScreen": "Make sure nobody else can see your screen before revealing it.",
-    "reveal": "Reveal",
-    "yourRole": "Your role",
-    "identityAlt": "{{name}}, {{role}} identity",
-    "illustratedBy": "Illustrated by {{artist}}",
-    "yourObjective": "Your objective",
-    "unveiledToTable": "Unveiled to the table",
-    "unveilWarning": "Everyone at your table will see this identity. Its ability must be resolved in the game.",
-    "confirmUnveil": "Confirm unveil",
-    "unveilToTable": "Unveil to the table",
-    "hideAndPass": "Hide & pass",
-    "hideIdentity": "Hide my identity"
+    "treachery": "Trădare",
+    "receivedRole": "Ai primit un rol",
+    "handDeviceTo": "Dă dispozitivul lui {{name}}",
+    "lookAwayIdentity": "Toți ceilalți trebuie să privească în altă parte înainte ca identitatea să fie dezvăluită.",
+    "lookAwayScreen": "Asigură-te că nimeni altcineva nu îți poate vedea ecranul înainte de dezvăluire.",
+    "reveal": "Dezvăluie",
+    "yourRole": "Rolul tău",
+    "identityAlt": "{{name}}, identitate {{role}}",
+    "illustratedBy": "Ilustrat de {{artist}}",
+    "yourObjective": "Obiectivul tău",
+    "unveiledToTable": "Dezvăluit mesei",
+    "unveilWarning": "Toți cei de la masa ta vor vedea această identitate. Abilitatea ei trebuie rezolvată în joc.",
+    "confirmUnveil": "Confirmă dezvăluirea",
+    "unveilToTable": "Dezvăluie mesei",
+    "hideAndPass": "Ascunde și pasează",
+    "hideIdentity": "Ascunde identitatea mea"
   },
   "modeRulesSheet": {
-    "closeRules": "Close rules",
-    "backToGame": "Back to the game"
+    "closeRules": "Închide regulile",
+    "backToGame": "Înapoi la joc"
   },
   "assassinTargets": {
-    "title": "Secret contracts",
-    "chooseOwnName": "Choose only your own name.",
-    "closeContracts": "Close contracts",
-    "handDeviceTo": "Hand the device to {{name}}",
-    "lookAway": "Everyone else should look away before the contract is revealed.",
-    "revealTarget": "Reveal my target",
-    "yourTarget": "Your target",
-    "noActiveTarget": "No active target",
-    "marksScored": "Marks scored: {{count}}",
-    "hideAndPass": "Hide & pass",
-    "allContractsChecked": "All contracts checked"
+    "title": "Contracte secrete",
+    "chooseOwnName": "Alege doar propriul nume.",
+    "closeContracts": "Închide contractele",
+    "handDeviceTo": "Dă dispozitivul lui {{name}}",
+    "lookAway": "Toți ceilalți trebuie să privească în altă parte înainte ca contractul să fie dezvăluit.",
+    "revealTarget": "Dezvăluie ținta mea",
+    "yourTarget": "Ținta ta",
+    "noActiveTarget": "Nicio țintă activă",
+    "marksScored": "Marks obținute: {{count}}",
+    "hideAndPass": "Ascunde și pasează",
+    "allContractsChecked": "Toate contractele au fost verificate"
   },
   "scheme": {
     "ongoingScheme": "Ongoing scheme",
     "scheme": "Scheme",
-    "pastScheme": "Past scheme",
+    "pastScheme": "Scheme anterior",
     "abandon": "Abandon {{name}}",
     "ongoingSchemes": "Ongoing schemes",
     "graveyard": "Graveyard · {{count}}",
     "nextScheme": "Next scheme",
-    "remainingInDeck": "{{count}} left in the deck",
-    "scryfallCredit": "Card image via Scryfall. Magic: The Gathering is © Wizards of the Coast."
+    "remainingInDeck": "{{count}} rămase în pachet",
+    "scryfallCredit": "Imaginea cărții prin Scryfall. Magic: The Gathering este © Wizards of the Coast."
   },
   "dungeon": {
-    "takeInitiativeTitle": "Take the initiative?",
-    "takeInitiativeEnter": "This also ventures into Undercity. Only take it when the table just gave this seat the initiative.",
-    "takeInitiativeWait": "Finish or leave the current dungeon before Undercity can open. Only take the initiative when the table just gave it to this seat.",
-    "takeInitiativeAndEnter": "Take initiative & enter Undercity",
-    "takeInitiative": "Take initiative",
-    "alreadyHoldInitiative": "You already hold the initiative",
-    "takeAndEnterUndercity": "Take the initiative and enter Undercity",
-    "completed": "{{name}} (completed)",
-    "ventureInto": "Venture into {{name}}",
-    "done": "Done",
-    "ventureTo": "Venture to {{room}}: {{effect}}",
-    "releaseInitiative": "Release the initiative",
-    "undoRoom": "Undo room",
-    "closeDungeon": "Close dungeon"
+    "takeInitiativeTitle": "Preiei initiative?",
+    "takeInitiativeEnter": "Acest lucru face și venture în Undercity. Preia initiative doar când masa tocmai a acordat-o acestui loc.",
+    "takeInitiativeWait": "Finalizează sau părăsește dungeon-ul curent înainte ca Undercity să poată fi deschis. Preia initiative doar când masa tocmai a acordat-o acestui loc.",
+    "takeInitiativeAndEnter": "Preia initiative și intră în Undercity",
+    "takeInitiative": "Preia initiative",
+    "alreadyHoldInitiative": "Ai deja initiative",
+    "takeAndEnterUndercity": "Preia initiative și intră în Undercity",
+    "completed": "{{name}} (finalizat)",
+    "ventureInto": "Venture în {{name}}",
+    "done": "Gata",
+    "ventureTo": "Venture către {{room}}: {{effect}}",
+    "releaseInitiative": "Renunță la initiative",
+    "undoRoom": "Anulează room",
+    "closeDungeon": "Închide dungeon"
   },
   "treacheryRolesSheet": {
-    "title": "Secret identities",
-    "chooseOwnName": "Choose only your own name.",
-    "closeIdentities": "Close identities",
-    "allIdentitiesChecked": "All identities checked"
+    "title": "Identități secrete",
+    "chooseOwnName": "Alege doar propriul nume.",
+    "closeIdentities": "Închide identitățile",
+    "allIdentitiesChecked": "Toate identitățile au fost verificate"
   },
   "tracker": {
-    "gameRules": "Game rules",
-    "loadingRoles": "Loading roles…",
-    "start": "Start",
-    "readRules": "Read rules",
-    "readyToBegin": "Ready to begin",
-    "readyToBeginHint": "Start the match when everyone is seated, or read the rules first.",
-    "dealContracts": "Deal contracts",
-    "dealContractsTitle": "Deal secret contracts",
-    "dealContractsHint": "Every player receives one private target. The device will be passed around so each contract can be checked in secret.",
-    "dealIdentities": "Deal identities",
-    "dealIdentitiesTitle": "Deal secret identities",
-    "dealIdentitiesHint": "Every player receives one hidden identity. The device will be passed around so each one can be read in secret.",
-    "chooseStarPositions": "Choose Star positions",
-    "starPositionsHint": "Players beside each other are allies. Tap two players to exchange their positions, or randomise the whole circle.",
-    "randomPositions": "Random positions",
-    "confirmPositions": "Confirm positions",
-    "adjacentPlayersAlly": "Adjacent\nplayers ally",
-    "buildEmperorTeams": "Build the Emperor teams",
-    "chooseTeamA": "Choose three players for Team A.",
-    "randomTeams": "Random teams",
-    "resetTeams": "Reset teams",
-    "teamEmperor": "Team {{team}} Emperor",
-    "randomEmperors": "Random Emperors",
-    "confirmTeams": "Confirm teams",
-    "chooseArchenemy": "Choose the Archenemy",
-    "chooseArchenemyHint": "The Archenemy faces the other three players. Both sides share 60 life. The Archenemy goes first, draws on that turn, and sets a scheme in motion during each first main phase.",
-    "confirmArchenemy": "Confirm Archenemy",
-    "chooseAllies": "Choose the allies",
-    "chooseAlliesHint": "Select two players for the first team. The other two players become the opposing team. Teams share 60 life and turns; all other player controls stay separate.",
-    "emperor": "Emperor",
-    "emperorRange": "Emperor · range 2",
-    "leader": "Leader",
+    "gameRules": "Regulile jocului",
+    "loadingRoles": "Se încarcă rolurile…",
+    "start": "Începe",
+    "readRules": "Citește regulile",
+    "readyToBegin": "Gata de început",
+    "readyToBeginHint": "Pornește jocul când toți sunt așezați sau citește mai întâi regulile.",
+    "dealContracts": "Distribuie contractele",
+    "dealContractsTitle": "Distribuie contractele secrete",
+    "dealContractsHint": "Fiecare jucător primește o țintă privată. Dispozitivul va fi pasat pentru ca fiecare contract să poată fi verificat în secret.",
+    "dealIdentities": "Distribuie identitățile",
+    "dealIdentitiesTitle": "Distribuie identitățile secrete",
+    "dealIdentitiesHint": "Fiecare jucător primește o identitate ascunsă. Dispozitivul va fi pasat pentru ca fiecare să poată fi citită în secret.",
+    "chooseStarPositions": "Alege pozițiile Stea",
+    "starPositionsHint": "Jucătorii așezați unul lângă altul sunt aliați. Apasă doi jucători pentru a le schimba pozițiile sau randomizează întregul cerc.",
+    "randomPositions": "Poziții aleatorii",
+    "confirmPositions": "Confirmă pozițiile",
+    "adjacentPlayersAlly": "Jucătorii\nadiacenți sunt aliați",
+    "buildEmperorTeams": "Construiește echipele Împărat",
+    "chooseTeamA": "Alege trei jucători pentru Echipa A.",
+    "randomTeams": "Echipe aleatorii",
+    "resetTeams": "Resetează echipele",
+    "teamEmperor": "Împăratul Echipei {{team}}",
+    "randomEmperors": "Împărați aleatorii",
+    "confirmTeams": "Confirmă echipele",
+    "chooseArchenemy": "Alege Archenemy",
+    "chooseArchenemyHint": "Archenemy îi înfruntă pe ceilalți trei jucători. Ambele tabere au 60 de puncte de viață. Archenemy joacă primul, trage o carte în acea tură și pune un scheme în mișcare în fiecare first main phase.",
+    "confirmArchenemy": "Confirmă Archenemy",
+    "chooseAllies": "Alege aliații",
+    "chooseAlliesHint": "Selectează doi jucători pentru prima echipă. Ceilalți doi devin echipa adversă. Echipele împart 60 de puncte de viață și turele; toate celelalte controale ale jucătorilor rămân separate.",
+    "emperor": "Împărat",
+    "emperorRange": "Împărat · rază 2",
+    "leader": "Lider",
     "general": "General",
-    "generalRange": "General · range 1",
+    "generalRange": "General · rază 1",
     "marks": "{{count}} marks",
-    "winner": "Winner",
-    "turnPhone": "Turn your phone for the full board",
-    "matchMenu": "Match menu",
-    "matchMenuElapsed": "Match menu. {{clock}} elapsed",
-    "matchMenuPaused": ", paused",
-    "matchMenuDayNight": ", it is {{phase}}",
-    "day": "day",
-    "night": "night",
-    "closeMatchMenu": "Close match menu",
-    "match": "Match",
-    "firstScheme": "First scheme",
-    "nextScheme": "Next scheme",
-    "resume": "Resume",
-    "pause": "Pause",
-    "undo": "Undo",
-    "challenges": "Challenges",
-    "checkTarget": "Check target",
-    "checkMyRole": "Check my role",
-    "dayButton": "Day",
-    "nightButton": "Night",
-    "playerLost": "Player lost",
-    "gameWonBy": "Game won by",
-    "won": "{{name}} won",
-    "doneRequeue": "Done & requeue",
-    "savingChallenges": "Saving challenges…",
-    "quitToHome": "Quit to home",
-    "quitHint": "The game is kept — reopen it from the home screen.",
-    "secretContracts": "Secret contracts",
-    "secretIdentities": "Secret identities",
-    "whoEliminated": "Who eliminated {{name}}?",
-    "whoEliminatedHint": "A player scores only if this was their assigned mark. The contract chain advances either way.",
-    "noPlayerUnknown": "No player / unknown",
-    "revealedIdentity": "Revealed Treachery identity",
-    "closeRevealedIdentity": "Close revealed identity",
-    "commanderChallenges": "Commander challenges",
-    "challengeCompleted": "{{name}} completed",
-    "challengeFallback": "Challenge",
-    "matchResult": "Match result",
-    "wins": "{{name}} wins",
-    "reviewBoard": "Review board",
-    "yes": "Yes",
-    "no": "No",
-    "yesTheyLost": "Yes, they lost",
-    "noStillIn": "No, still in",
-    "openCounters": "Open counters for {{name}}",
-    "commanderDamageOn": "Commander damage on {{name}}",
-    "countersFor": "Counters for {{name}}",
-    "countersTitle": "Counters for {{name}}",
-    "closeCounters": "Close counters",
-    "closeChallenges": "Close challenges",
-    "sharedCommanderDamage": "Shared commander damage",
-    "closeCommanderDamage": "Close commander damage",
-    "highestCommanderDamage": "Highest commander damage on {{name}}: {{value}} from {{commander}}",
-    "noCommanderDamage": "No commander damage on {{name}}",
-    "removeCommanderDamage": "Remove commander damage from {{owner}}'s {{name}}",
-    "addCommanderDamage": "Add commander damage from {{owner}}'s {{name}}",
-    "isMonarch": "{{name}} is the monarch",
-    "makeMonarch": "Make {{name}} the monarch",
+    "winner": "Câștigător",
+    "turnPhone": "Rotește telefonul pentru a vedea întreaga tablă",
+    "matchMenu": "Meniul jocului",
+    "matchMenuElapsed": "Meniul jocului. Au trecut {{clock}}",
+    "matchMenuPaused": ", în pauză",
+    "matchMenuDayNight": ", acum este {{phase}}",
+    "day": "zi",
+    "night": "noapte",
+    "closeMatchMenu": "Închide meniul jocului",
+    "match": "Joc",
+    "firstScheme": "Primul scheme",
+    "nextScheme": "Următorul scheme",
+    "resume": "Continuă",
+    "pause": "Pauză",
+    "undo": "Anulează",
+    "challenges": "Provocări",
+    "checkTarget": "Verifică ținta",
+    "checkMyRole": "Verifică rolul meu",
+    "dayButton": "Zi",
+    "nightButton": "Noapte",
+    "playerLost": "Jucătorul a pierdut",
+    "gameWonBy": "Joc câștigat de",
+    "won": "{{name}} a câștigat",
+    "doneRequeue": "Gata și înapoi în coadă",
+    "savingChallenges": "Se salvează provocările…",
+    "quitToHome": "Ieși la pagina principală",
+    "quitHint": "Jocul este păstrat — redeschide-l din ecranul principal.",
+    "secretContracts": "Contracte secrete",
+    "secretIdentities": "Identități secrete",
+    "whoEliminated": "Cine l-a eliminat pe {{name}}?",
+    "whoEliminatedHint": "Un jucător primește un punct doar dacă aceasta era ținta atribuită. Lanțul contractelor avansează în orice caz.",
+    "noPlayerUnknown": "Niciun jucător / necunoscut",
+    "revealedIdentity": "Identitate Treachery dezvăluită",
+    "closeRevealedIdentity": "Închide identitatea dezvăluită",
+    "commanderChallenges": "Provocări Commander",
+    "challengeCompleted": "{{name}} finalizat",
+    "challengeFallback": "Provocare",
+    "matchResult": "Rezultatul jocului",
+    "wins": "{{name}} câștigă",
+    "reviewBoard": "Revizuiește tabla",
+    "yes": "Da",
+    "no": "Nu",
+    "yesTheyLost": "Da, au pierdut",
+    "noStillIn": "Nu, încă este în joc",
+    "openCounters": "Deschide counters pentru {{name}}",
+    "commanderDamageOn": "Commander damage pe {{name}}",
+    "countersFor": "Counters pentru {{name}}",
+    "countersTitle": "Counters pentru {{name}}",
+    "closeCounters": "Închide counters",
+    "closeChallenges": "Închide provocările",
+    "sharedCommanderDamage": "Commander damage comun",
+    "closeCommanderDamage": "Închide commander damage",
+    "highestCommanderDamage": "Cel mai mare commander damage pe {{name}}: {{value}} de la {{commander}}",
+    "noCommanderDamage": "Niciun commander damage pe {{name}}",
+    "removeCommanderDamage": "Elimină commander damage de la {{owner}}'s {{name}}",
+    "addCommanderDamage": "Adaugă commander damage de la {{owner}}'s {{name}}",
+    "isMonarch": "{{name}} este monarch",
+    "makeMonarch": "Fă-l pe {{name}} monarch",
     "enduringStory": "{{name}} {{has}} an enduring story",
     "cityBlessing": "{{name}} {{has}} the city's blessing",
-    "has": "has",
-    "doesNotHave": "does not have",
-    "didLose": "Did {{name}} lose the game?",
-    "thisTeam": "This team",
-    "didTheyLose": "Did they lose?",
-    "poisonPrompt": "{{name}} has {{count}} poison counters. Did they lose?",
-    "sharedPoisonPrompt": "{{subject}} has {{count}} shared poison counters. {{lose}}",
-    "hitPrompt": "{{name}} owns {{count}} exiled cards with hit counters. Did they lose?",
-    "commanderPrompt": "{{name}} has taken {{damage}} commander damage from {{from}}. Did they lose?",
-    "sharedCommanderPrompt": "{{subject}} has taken {{damage}} commander damage from {{from}}. {{lose}}",
-    "lifePrompt": "{{name}} is at {{life}} life. Did they lose?",
-    "sharedLifePrompt": "{{subject}} is at {{life}} life. {{lose}}",
-    "anotherCommander": "another commander",
-    "addLife": "Add 1 life. Long press for a larger amount.",
-    "removeLife": "Remove 1 life. Long press for a larger amount.",
-    "addLifeFor": "Add life for {{name}}",
-    "removeLifeFor": "Remove life for {{name}}",
-    "addLifeLabel": "Add life · {{name}}",
-    "removeLifeLabel": "Remove life · {{name}}",
-    "deleteDigit": "Delete digit",
-    "add": "Add",
-    "removeVerb": "Remove",
-    "lower": "Lower {{label}}",
-    "raise": "Raise {{label}}",
-    "seatColour": "Seat colour for {{name}}",
-    "dungeonFor": "Dungeon for {{name}}",
-    "dungeonInitiative": "Dungeon and initiative for {{name}}. {{title}}",
-    "dungeonInitiativeActive": "{{name}} has the initiative · {{filled}} of {{total}} unique dungeons",
-    "dungeonInitiativeCompleted": "{{name}} has completed {{filled}} of {{total}} unique dungeons",
-    "counterOn": "{{label}} on {{name}}: {{value}}",
-    "counterFor": "{{label}} for {{name}}",
-    "claimFor": "Claim for {{name}}",
-    "challengesSubtitle": "Same challenges for every player · points never affect matching",
+    "has": "are",
+    "doesNotHave": "nu are",
+    "didLose": "{{name}} a pierdut jocul?",
+    "thisTeam": "Această echipă",
+    "didTheyLose": "Au pierdut?",
+    "poisonPrompt": "{{name}} are {{count}} poison counters. A pierdut?",
+    "sharedPoisonPrompt": "{{subject}} are {{count}} poison counters comune. {{lose}}",
+    "hitPrompt": "{{name}} deține {{count}} cărți exiled cu hit counters. A pierdut?",
+    "commanderPrompt": "{{name}} a primit {{damage}} commander damage de la {{from}}. A pierdut?",
+    "sharedCommanderPrompt": "{{subject}} a primit {{damage}} commander damage de la {{from}}. {{lose}}",
+    "lifePrompt": "{{name}} are {{life}} puncte de viață. A pierdut?",
+    "sharedLifePrompt": "{{subject}} are {{life}} puncte de viață. {{lose}}",
+    "anotherCommander": "alt commander",
+    "addLife": "Adaugă 1 punct de viață. Ține apăsat pentru o valoare mai mare.",
+    "removeLife": "Elimină 1 punct de viață. Ține apăsat pentru o valoare mai mare.",
+    "addLifeFor": "Adaugă viață pentru {{name}}",
+    "removeLifeFor": "Elimină viață pentru {{name}}",
+    "addLifeLabel": "Adaugă viață · {{name}}",
+    "removeLifeLabel": "Elimină viață · {{name}}",
+    "deleteDigit": "Șterge cifra",
+    "add": "Adaugă",
+    "removeVerb": "Elimină",
+    "lower": "Scade {{label}}",
+    "raise": "Crește {{label}}",
+    "seatColour": "Culoarea locului pentru {{name}}",
+    "dungeonFor": "Dungeon pentru {{name}}",
+    "dungeonInitiative": "Dungeon și initiative pentru {{name}}. {{title}}",
+    "dungeonInitiativeActive": "{{name}} are initiative · {{filled}} din {{total}} dungeons unice",
+    "dungeonInitiativeCompleted": "{{name}} a finalizat {{filled}} din {{total}} dungeons unice",
+    "counterOn": "{{label}} pe {{name}}: {{value}}",
+    "counterFor": "{{label}} pentru {{name}}",
+    "claimFor": "Realizare pentru {{name}}",
+    "challengesSubtitle": "Aceleași provocări pentru fiecare jucător · punctele nu influențează niciodată asocierea",
     "counters": {
       "poison": "Poison",
       "tax": "Commander tax",
-      "acorn": "Acorns",
-      "energy": "Energy",
-      "experience": "Experience",
+      "acorn": "Ghinde",
+      "energy": "Energie",
+      "experience": "Experiență",
       "hit": "Etrata hits",
-      "rad": "Radiation",
+      "rad": "Radiație",
       "ring": "Ring temptation",
-      "speed": "Speed",
-      "ticket": "Tickets"
+      "speed": "Viteză",
+      "ticket": "Bilete"
     }
   }
 }

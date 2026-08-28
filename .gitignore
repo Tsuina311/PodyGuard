@@ -10,6 +10,7 @@ build
 coverage
 .vite
 *.tsbuildinfo
+artifacts/simulation/
 
 # Yarn
 .pnp.*

@@ -57,6 +57,8 @@ export class MemoryEventStore implements EventStore {
       allowThreePods: input.allowThreePods !== false,
       allowFivePods: Boolean(input.allowFivePods),
       preferredPodSize: input.preferredPodSize ?? 4,
+      tournamentFormat: input.tournamentFormat ?? null,
+      tournamentState: input.tournamentState ?? null,
       expiresAt: input.expiresAt ?? new Date(Date.now() + 24 * 60 * 60 * 1000),
       challengePackId: 'classic-commander-v1',
       challengePackVersion: 1,
@@ -223,6 +225,7 @@ export class MemoryEventStore implements EventStore {
       poolId: input.poolId,
       memberIds,
       trackerUsed: null,
+      tournamentMatchId: input.tournamentMatchId ?? null,
       createdAt,
       winnerParticipantId: null,
       durationSeconds: null,
@@ -434,8 +437,8 @@ export class MemoryEventStore implements EventStore {
       if (!participant) {
         continue;
       }
-      participant.status = 'ready';
-      participant.readyAt = new Date();
+      participant.status = result.requeue === false ? 'joined' : 'ready';
+      participant.readyAt = result.requeue === false ? null : new Date();
     }
     this.assignments.set(
       pod.eventId,
@@ -544,6 +547,7 @@ export class MemoryEventStore implements EventStore {
       expiresAt?: Date;
       challengePackId?: string;
       challengePackVersion?: number;
+      tournamentState?: StoredEvent['tournamentState'];
     },
   ): Promise<StoredEvent> {
     const event = this.events.get(id);
@@ -567,6 +571,9 @@ export class MemoryEventStore implements EventStore {
     }
     if (patch.challengePackVersion !== undefined) {
       event.challengePackVersion = patch.challengePackVersion;
+    }
+    if (patch.tournamentState !== undefined) {
+      event.tournamentState = patch.tournamentState;
     }
     return event;
   }

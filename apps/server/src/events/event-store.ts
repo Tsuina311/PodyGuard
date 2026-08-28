@@ -9,6 +9,8 @@ import type {
   PublicTable,
   PublicChallengeCompletion,
   RulesFormat,
+  TournamentFormat,
+  TournamentState,
   TreacheryRole,
 } from '@podyguard/shared';
 
@@ -104,6 +106,8 @@ export type StoredEvent = {
   allowThreePods: boolean;
   allowFivePods: boolean;
   preferredPodSize: number;
+  tournamentFormat: TournamentFormat | null;
+  tournamentState: TournamentState | null;
   expiresAt: Date;
   challengePackId: string;
   challengePackVersion: number;
@@ -159,6 +163,7 @@ export type StoredPod = PublicPod & {
   tableId: string;
   memberIds: string[];
   trackerUsed: boolean | null;
+  tournamentMatchId?: string | null;
   winnerParticipantId?: string | null;
   durationSeconds?: number | null;
   completedAt?: Date | null;
@@ -190,6 +195,8 @@ export type StoredCompletedGame = {
 export type CompletePodInput = {
   winnerParticipantId?: string;
   durationSeconds?: number;
+  /** Tournament progression owns participant state after this game. */
+  requeue?: boolean;
 };
 
 export type StoredChallengeCompletion = PublicChallengeCompletion & {
@@ -233,6 +240,8 @@ export type NewStoredEvent = {
   allowThreePods?: boolean;
   allowFivePods?: boolean;
   preferredPodSize?: number;
+  tournamentFormat?: TournamentFormat;
+  tournamentState?: TournamentState;
   expiresAt?: Date;
   createdAt?: Date;
 };
@@ -249,6 +258,7 @@ export type NewStoredPod = {
   eventId: string;
   tableId: string;
   poolId: string;
+  tournamentMatchId?: string;
   seats: Array<{
     participantId: string;
     deckId: string;
@@ -340,6 +350,7 @@ export interface EventStore {
       expiresAt?: Date;
       challengePackId?: string;
       challengePackVersion?: number;
+      tournamentState?: TournamentState | null;
     },
   ): Promise<StoredEvent>;
 }

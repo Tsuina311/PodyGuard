@@ -1206,6 +1206,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@podyguard/simulation@workspace:packages/simulation":
+  version: 0.0.0-use.local
+  resolution: "@podyguard/simulation@workspace:packages/simulation"
+  dependencies:
+    "@podyguard/matching": "workspace:*"
+    "@types/node": ^22.13.10
+    fast-check: ^4.1.1
+    tsx: ^4.23.12
+    typescript: ^5.8.2
+    vitest: ^3.0.8
+  languageName: unknown
+  linkType: soft
+
 "@podyguard/web@workspace:apps/web":
   version: 0.0.0-use.local
   resolution: "@podyguard/web@workspace:apps/web"
@@ -3378,6 +3391,8 @@ __metadata:
 "podyguard@workspace:.":
   version: 0.0.0-use.local
   resolution: "podyguard@workspace:."
+  dependencies:
+    tsx: ^4.23.12
   languageName: unknown
   linkType: soft
 

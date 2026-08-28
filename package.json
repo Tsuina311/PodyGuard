@@ -9,13 +9,21 @@
   "scripts": {
     "dev:web": "yarn workspace @podyguard/web dev",
     "dev:server": "yarn workspace @podyguard/server dev",
-    "build": "yarn workspace @podyguard/shared build && yarn workspace @podyguard/matching build && yarn workspace @podyguard/server build && yarn workspace @podyguard/web build",
-    "typecheck": "yarn workspace @podyguard/shared typecheck && yarn workspace @podyguard/matching typecheck && yarn workspace @podyguard/server typecheck && yarn workspace @podyguard/web typecheck",
-    "test": "yarn workspace @podyguard/shared test && yarn workspace @podyguard/matching test && yarn workspace @podyguard/server test && yarn workspace @podyguard/web test",
+    "build": "yarn workspace @podyguard/shared build && yarn workspace @podyguard/matching build && yarn workspace @podyguard/simulation build && yarn workspace @podyguard/server build && yarn workspace @podyguard/web build",
+    "typecheck": "yarn workspace @podyguard/shared typecheck && yarn workspace @podyguard/matching typecheck && yarn workspace @podyguard/simulation typecheck && yarn workspace @podyguard/server typecheck && yarn workspace @podyguard/web typecheck",
+    "test": "yarn workspace @podyguard/shared test && yarn workspace @podyguard/matching test && yarn workspace @podyguard/simulation test && yarn workspace @podyguard/server test && yarn workspace @podyguard/web test",
     "test:matching": "yarn workspace @podyguard/matching test",
     "simulate:matching": "yarn workspace @podyguard/matching simulate",
     "benchmark:matching": "yarn workspace @podyguard/matching benchmark",
+    "simulation:test": "yarn workspace @podyguard/simulation test",
+    "simulation:test:heavy": "yarn workspace @podyguard/simulation test:heavy",
+    "simulation:run": "tsx packages/simulation/src/cli.ts run",
+    "simulation:benchmark": "tsx packages/simulation/src/cli.ts benchmark",
+    "simulation:compare": "tsx packages/simulation/src/cli.ts compare",
     "db:generate": "yarn workspace @podyguard/server db:generate",
     "db:migrate": "yarn workspace @podyguard/server db:migrate"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.12"
   }
 }

@@ -5,6 +5,7 @@ import type {
 } from './enums';
 import type { ChallengePack, PublicChallengeCompletion } from './challenges';
 import type { GameMode, PublicTreacheryIdentity } from './treachery';
+import type { TournamentFormat, TournamentState } from './tournament';
 
 export type PublicEvent = {
   id: string;
@@ -17,6 +18,10 @@ export type PublicEvent = {
   allowFivePods: boolean;
   /** Target table size. Flexible modes may form smaller leftover pods. */
   preferredPodSize: number;
+  /** Omitted for the normal drop-in/drop-out queue. */
+  tournamentFormat?: TournamentFormat;
+  /** Registration, rounds, and progression for tournament events. */
+  tournament?: TournamentState;
   /** Total hours from creation until the join code dies. */
   lifetimeHours: number;
   expiresAt: string;
