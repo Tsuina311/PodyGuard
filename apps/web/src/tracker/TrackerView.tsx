@@ -635,7 +635,7 @@ export function TrackerView({
     };
     for (const playerId of state.treacheryUnveiled ?? []) {
       const identity = treacheryIdentityById(
-        state.treacheryIdentities[playerId] ?? -1,
+        state.treacheryIdentities?.[playerId] ?? -1,
       );
       if (identity) {
         merged[playerId] = {
@@ -656,9 +656,9 @@ export function TrackerView({
     for (const detected of detectAutomaticChallenges(state, challengePack)) {
       const key = `${detected.participantId}:${detected.challenge.id}`;
       const completed =
-        challengeProgress[
-          detected.participantId
-        ]?.completedChallengeIds.includes(detected.challenge.id) ?? false;
+        challengeProgress?.[detected.participantId]?.completedChallengeIds.includes(
+          detected.challenge.id,
+        ) ?? false;
       if (completed || attemptedChallenges.current.has(key)) {
         continue;
       }
@@ -1723,7 +1723,7 @@ export function TrackerView({
                 <DungeonButton
                   name={player.name}
                   completed={uniqueCompletedDungeonCount(
-                    state.completedDungeons[player.id],
+                    state.completedDungeons?.[player.id],
                   )}
                   active={player.id === state.initiativeId}
                   disabled={Boolean(state.winnerId)}
@@ -2410,7 +2410,7 @@ export function TrackerView({
                 {deviceTreachery ? (
                   <ul className="border-muted/20 mb-3 space-y-1 rounded-xl border p-3 text-left text-xs">
                     {state.players.map((player) => {
-                      const role = state.treacheryRoles[player.id];
+                      const role = state.treacheryRoles?.[player.id];
                       return role ? (
                         <li
                           key={player.id}
@@ -2426,9 +2426,8 @@ export function TrackerView({
                   </ul>
                 ) : null}
                 {confirmation &&
-                !(challengeProgress[
-                  confirmation.participantId
-                ]?.completedChallengeIds.includes(
+                !(challengeProgress?.[confirmation.participantId]
+                  ?.completedChallengeIds.includes(
                   confirmation.challenge.id,
                 ) ?? false) &&
                 !attemptedChallenges.current.has(

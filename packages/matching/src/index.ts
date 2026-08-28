@@ -1,4 +1,7 @@
-export { createMatches } from './create-matches.js';
+export {
+  createMatches,
+  createMatchesWithForcedPools,
+} from './create-matches.js';
 export {
   CLEAN_FOUR_SPEND,
   FLEX_CAP,

@@ -32,6 +32,14 @@ import {
   runOpportunityGraceSweep,
   writeOpportunityGraceSweep,
 } from './opportunity-grace-sweep.js';
+import { runScarcitySweep, writeScarcitySweep } from './scarcity-sweep.js';
+import {
+  runSeatLossSweep,
+  writeSeatLossSweep,
+} from './scarcity-seat-loss-sweep.js';
+import { runWeightedSweep, writeWeightedSweep } from './weighted-sweep.js';
+import { runPairwiseSweep, writePairwiseSweep } from './pairwise-sweep.js';
+import { runWaitCauseSweep, writeWaitCauseSweep, formatWaitCauseReport } from './wait-cause-sweep.js';
 import { getScenario } from './scenarios.js';
 import {
   createQueueV2ExperimentalStrategy,
@@ -67,6 +75,21 @@ async function main(): Promise<void> {
       break;
     case 'sweep-opportunity':
       sweepOpportunityCommand(args);
+      break;
+    case 'sweep-scarcity':
+      sweepScarcityCommand(args);
+      break;
+    case 'sweep-seat-loss':
+      sweepSeatLossCommand(args);
+      break;
+    case 'sweep-weighted':
+      sweepWeightedCommand(args);
+      break;
+    case 'sweep-pairwise':
+      sweepPairwiseCommand(args);
+      break;
+    case 'sweep-wait-cause':
+      sweepWaitCauseCommand(args);
       break;
     case 'compare':
       compareCommand(args);
@@ -209,6 +232,227 @@ function sweepOpportunityCommand(args: Arguments): void {
   console.log(formatOpportunityGraceSweepReport(result));
   console.log(`\nArtifact: ${path}`);
   if (result.candidates.some((candidate) => candidate.global.invariantFailures > 0)) {
+    process.exitCode = 1;
+  }
+}
+
+function sweepScarcityCommand(args: Arguments): void {
+  assertOnlyFlags(args, ['runs', 'seed', 'seed-start']);
+  const runs = integerFlag(args, 'runs', 100);
+  const seedStart = integerFlag(
+    args,
+    'seed-start',
+    integerFlag(args, 'seed', 1),
+  );
+  const result = runScarcitySweep(
+    runs,
+    seedStart,
+    process.stdout.isTTY
+      ? (completed, total) => {
+          if (
+            completed === total ||
+            completed % Math.max(1, Math.floor(total / 100)) === 0
+          ) {
+            process.stderr.write(
+              `\rScarcity sweep ${completed}/${total} nights`,
+            );
+            if (completed === total) process.stderr.write('\n');
+          }
+        }
+      : undefined,
+  );
+  const path = writeScarcitySweep(result);
+  for (const candidate of result.candidates) {
+    console.log(
+      `${candidate.label}: p95=${minutes(candidate.global.existing.matchedWaitSeconds.p95)} ` +
+        `never=${percent(candidate.global.existing.neverMatched.rate)} ` +
+        `B4-exclusive-p95=${minutes(candidate.global.scarcity.b4Exclusive.matchedWait.p95)} ` +
+        `reallocations=${candidate.global.scarcity.diagnostics.scarcityReallocations}`,
+    );
+  }
+  console.log(`\nPareto: ${result.paretoEfficientLabels.join(', ')}`);
+  console.log(`Artifact: ${path}`);
+  if (
+    result.candidates.some(
+      (candidate) => candidate.global.existing.invariantFailures > 0,
+    )
+  ) {
+    process.exitCode = 1;
+  }
+}
+
+function sweepSeatLossCommand(args: Arguments): void {
+  assertOnlyFlags(args, ['runs', 'seed', 'seed-start']);
+  const runs = integerFlag(args, 'runs', 100);
+  const seedStart = integerFlag(
+    args,
+    'seed-start',
+    integerFlag(args, 'seed', 1),
+  );
+  const result = runSeatLossSweep(
+    runs,
+    seedStart,
+    process.stdout.isTTY
+      ? (completed, total) => {
+          if (
+            completed === total ||
+            completed % Math.max(1, Math.floor(total / 100)) === 0
+          ) {
+            process.stderr.write(
+              `\rSeat-loss sweep ${completed}/${total} nights`,
+            );
+            if (completed === total) process.stderr.write('\n');
+          }
+        }
+      : undefined,
+  );
+  const path = writeSeatLossSweep(result);
+  for (const candidate of result.candidates) {
+    const starvation = candidate.global.starvation;
+    const diagnostics = candidate.global.scarcity.diagnostics;
+    console.log(
+      `${candidate.label}: p95=${minutes(candidate.global.existing.matchedWaitSeconds.p95)} ` +
+        `never=${percent(starvation.all.neverMatched.rate)} ` +
+        `worst>30m=${percent(starvation.worstExclusivePool.over30Minutes.rate)} ` +
+        `one-seat-loss=${diagnostics.oneSeatLossRedirects} ` +
+        `sacrificed=${diagnostics.totalImmediateSeatsSacrificed}`,
+    );
+  }
+  console.log(`\nPareto: ${result.paretoEfficientLabels.join(', ')}`);
+  console.log(`Artifact: ${path}`);
+  if (
+    result.candidates.some(
+      (candidate) => candidate.global.existing.invariantFailures > 0,
+    )
+  ) {
+    process.exitCode = 1;
+  }
+}
+
+function sweepWeightedCommand(args: Arguments): void {
+  assertOnlyFlags(args, ['runs', 'seed', 'seed-start']);
+  const runs = integerFlag(args, 'runs', 100);
+  const seedStart = integerFlag(
+    args,
+    'seed-start',
+    integerFlag(args, 'seed', 1),
+  );
+  const result = runWeightedSweep(
+    runs,
+    seedStart,
+    process.stdout.isTTY
+      ? (completed, total) => {
+          if (
+            completed === total ||
+            completed % Math.max(1, Math.floor(total / 100)) === 0
+          ) {
+            process.stderr.write(
+              `\rWeighted sweep ${completed}/${total} nights`,
+            );
+            if (completed === total) process.stderr.write('\n');
+          }
+        }
+      : undefined,
+  );
+  const path = writeWeightedSweep(result);
+  for (const candidate of result.candidates) {
+    const weighted = candidate.global.weighted;
+    console.log(
+      `${candidate.label}: p95=${minutes(candidate.global.existing.matchedWaitSeconds.p95)} ` +
+        `never=${percent(candidate.global.starvation.all.neverMatched.rate)} ` +
+        `worst>30m=${percent(candidate.global.starvation.worstExclusivePool.over30Minutes.rate)} ` +
+        `changed=${weighted.changedFromFrozenControl} ` +
+        `forgone=${weighted.totalImmediateSeatsForgone}`,
+    );
+  }
+  console.log(`\nPareto: ${result.paretoEfficientLabels.join(', ')}`);
+  console.log(`Dominated: ${result.dominatedLabels.join(', ') || 'none'}`);
+  console.log(`Artifact: ${path}`);
+  if (
+    result.candidates.some(
+      (candidate) => candidate.global.existing.invariantFailures > 0,
+    )
+  ) {
+    process.exitCode = 1;
+  }
+}
+
+function sweepWaitCauseCommand(args: Arguments): void {
+  assertOnlyFlags(args, ['runs', 'seed', 'seed-start']);
+  const runs = integerFlag(args, 'runs', 100);
+  const seedStart = integerFlag(
+    args,
+    'seed-start',
+    integerFlag(args, 'seed', 1),
+  );
+  const result = runWaitCauseSweep(
+    runs,
+    seedStart,
+    process.stdout.isTTY
+      ? (completed, total) => {
+          if (
+            completed === total ||
+            completed % Math.max(1, Math.floor(total / 100)) === 0
+          ) {
+            process.stderr.write(
+              `\rWait-cause sweep ${completed}/${total} nights`,
+            );
+            if (completed === total) process.stderr.write('\n');
+          }
+        }
+      : undefined,
+  );
+  const path = writeWaitCauseSweep(result);
+  console.log(formatWaitCauseReport(result));
+  console.log(`\nArtifact: ${path}`);
+  if (result.summary.accountingFailures > 0) {
+    process.exitCode = 1;
+  }
+}
+
+function sweepPairwiseCommand(args: Arguments): void {
+  assertOnlyFlags(args, ['runs', 'seed', 'seed-start']);
+  const runs = integerFlag(args, 'runs', 100);
+  const seedStart = integerFlag(
+    args,
+    'seed-start',
+    integerFlag(args, 'seed', 1),
+  );
+  const result = runPairwiseSweep(
+    runs,
+    seedStart,
+    process.stdout.isTTY
+      ? (completed, total) => {
+          if (
+            completed === total ||
+            completed % Math.max(1, Math.floor(total / 100)) === 0
+          ) {
+            process.stderr.write(
+              `\rPairwise sweep ${completed}/${total} nights`,
+            );
+            if (completed === total) process.stderr.write('\n');
+          }
+        }
+      : undefined,
+  );
+  const path = writePairwiseSweep(result);
+  for (const candidate of result.candidates) {
+    const generator = candidate.global.weighted.generator;
+    console.log(
+      `${candidate.label}: p95=${minutes(candidate.global.existing.matchedWaitSeconds.p95)} ` +
+        `never=${percent(candidate.global.starvation.all.neverMatched.rate)} ` +
+        `pair-selected=${generator.selectedPlansRequiringTwoForces} ` +
+        `candidates-p95=${generator.candidateCountP95} ` +
+        `runtime=${candidate.wallTimeMs.toFixed(0)}ms ` +
+        `multiplier=${candidate.runtimeMultiplierVsSingle.toFixed(2)}x`,
+    );
+  }
+  console.log(`Artifact: ${path}`);
+  if (
+    result.candidates.some(
+      (candidate) => candidate.global.existing.invariantFailures > 0,
+    )
+  ) {
     process.exitCode = 1;
   }
 }
@@ -395,6 +639,11 @@ function printUsage(): void {
   yarn simulation:benchmark [--runs 1000] [--seed-start 1] [--strategy legacy-v1|queue-v2-experimental|queue-v2-opportunity-grace] [--grace 120] [--max-existing-wait 300|unlimited] [--randomization legacy|paired-v1] [--save-baseline queue-v2-alpha]
   yarn simulation:sweep [--runs 100] [--seed-start 1]
   yarn simulation:sweep-opportunity [--runs 100] [--seed-start 1]
+  yarn simulation:sweep-scarcity [--runs 100] [--seed-start 1]
+  yarn simulation:sweep-seat-loss [--runs 100] [--seed-start 1]
+  yarn simulation:sweep-weighted [--runs 100] [--seed-start 1]
+  yarn simulation:sweep-pairwise [--runs 100] [--seed-start 1]
+  yarn simulation:sweep-wait-cause [--runs 100] [--seed-start 1]
   yarn simulation:compare [baseline.json|legacy-v1] [candidate.json|queue-v2-grace-120s-maxwait-600s|current]
 
 Compare defaults to packages/simulation/baselines/matcher-legacy-v1.json and uses

@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type {
   EventMetrics,
   PublicEvent,
   PublicParticipant,
   PublicTable,
+  SeriesLength,
 } from '@podyguard/shared';
 import {
   ASSASSIN_POD_SIZES,
@@ -16,6 +17,7 @@ import {
 import { countByStatus, queueByWait } from './match-view';
 import {
   ApiError,
+  cancelEvent,
   clearHostToken,
   fillTablesWithBots,
   getEventMetrics,
@@ -27,6 +29,7 @@ import {
   reportTournamentResult,
   saveHostToken,
   setTableStatus,
+  setTournamentMatchBestOf,
   startTable,
   startTournament,
   finishTable,
@@ -39,6 +42,7 @@ import {
   isLocalHostname,
   joinLinkParts,
   lanHostFromBuild,
+  phoneJoinLinkParts,
   playerJoinUrl,
 } from './join-url';
 import { Badge, statusTone } from './ui/Badge';
@@ -56,6 +60,7 @@ import { TournamentPanel } from './tournament/TournamentPanel';
 
 export function HostPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { joinCode = '' } = useParams();
   const code = joinCode.toUpperCase();
   const [event, setEvent] = useState<PublicEvent | null>(null);
@@ -69,6 +74,7 @@ export function HostPage() {
   const [metrics, setMetrics] = useState<EventMetrics | null>(null);
   const [hoursDraft, setHoursDraft] = useState('24');
   const [removeArmed, setRemoveArmed] = useState<string | null>(null);
+  const [cancelArmed, setCancelArmed] = useState(false);
 
   const refresh = useCallback(async () => {
     const [roster, tableList] = await Promise.all([
@@ -278,6 +284,32 @@ export function HostPage() {
     }
   }
 
+  async function onCancelEvent() {
+    if (!hostToken) {
+      return;
+    }
+    if (!cancelArmed) {
+      setCancelArmed(true);
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      await cancelEvent(code, hostToken);
+      clearHostToken(code);
+      void navigate('/', { replace: true });
+    } catch (caught) {
+      setCancelArmed(false);
+      setError(
+        caught instanceof ApiError
+          ? caught.message
+          : t('common.errors.cancelEvent'),
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function onToggleSetting(
     patch: {
       allowThreePods?: boolean;
@@ -373,6 +405,32 @@ export function HostPage() {
     }
   }
 
+  async function onTournamentBestOf(matchId: string, bestOf: SeriesLength) {
+    if (!hostToken) {
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      const result = await setTournamentMatchBestOf(
+        code,
+        hostToken,
+        matchId,
+        bestOf,
+      );
+      setEvent(result.event);
+      await refresh();
+    } catch (caught) {
+      setError(
+        caught instanceof ApiError
+          ? caught.message
+          : t('common.errors.tournamentBestOf'),
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function onFillBots() {
     if (!hostToken) {
       return;
@@ -393,6 +451,7 @@ export function HostPage() {
     }
   }
 
+  const joinCodeValue = event?.joinCode ?? code;
   const joinUrl =
     typeof window === 'undefined'
       ? ''
@@ -402,11 +461,18 @@ export function HostPage() {
             lanHostFromBuild(),
             import.meta.env.VITE_PUBLIC_ORIGIN,
           );
-          return playerJoinUrl(
-            link.origin,
-            link.pathname,
-            event?.joinCode ?? code,
+          return playerJoinUrl(link.origin, link.pathname, joinCodeValue);
+        })();
+  const phoneJoinUrl =
+    typeof window === 'undefined'
+      ? ''
+      : (() => {
+          const link = phoneJoinLinkParts(
+            window.location,
+            lanHostFromBuild(),
+            import.meta.env.VITE_PUBLIC_ORIGIN,
           );
+          return playerJoinUrl(link.origin, link.pathname, joinCodeValue);
         })();
 
   const unreachableFromPhones =
@@ -706,12 +772,15 @@ export function HostPage() {
           onWinner={(matchId, participantId) =>
             void onTournamentWinner(matchId, participantId)
           }
+          onBestOf={(matchId, bestOf) =>
+            void onTournamentBestOf(matchId, bestOf)
+          }
         />
       ) : null}
 
       <Panel title={t('host.joinCodeTitle')} aside={t('host.share')}>
         <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
-          <JoinQr value={joinUrl} />
+          <JoinQr value={phoneJoinUrl} />
           <div className="min-w-0">
             <p className="font-display text-neon mb-3 text-4xl font-bold tracking-[0.2em] drop-shadow-[0_0_18px_var(--color-neon)]">
               {event.joinCode}
@@ -720,6 +789,10 @@ export function HostPage() {
             {unreachableFromPhones ? (
               <p className="text-warning mb-4 text-xs">
                 {t('host.noLanAddress')}
+              </p>
+            ) : phoneJoinUrl !== joinUrl ? (
+              <p className="text-muted mb-4 text-xs">
+                {t('host.qrUsesLan', { url: phoneJoinUrl })}
               </p>
             ) : null}
             <Button variant="glass" size="sm" onClick={() => void onCopyLink()}>
@@ -962,7 +1035,7 @@ export function HostPage() {
                   : t('host.matchNow')}
             </Button>
           ) : null}
-          {!event.tournament && import.meta.env.DEV ? (
+          {import.meta.env.DEV ? (
             <Button
               variant="outline"
               className="border-dashed"
@@ -976,6 +1049,22 @@ export function HostPage() {
       </Panel>
 
       {error ? <p className="text-danger text-sm">{error}</p> : null}
+
+      <Panel title={t('host.dangerZone')} aside={t('host.irreversible')}>
+        <p className="text-muted mb-3 text-sm">{t('host.cancelEventHint')}</p>
+        <Button
+          variant="danger"
+          disabled={busy}
+          onClick={() => void onCancelEvent()}
+          onBlur={() => setCancelArmed(false)}
+        >
+          {busy
+            ? t('common.working')
+            : cancelArmed
+              ? t('host.cancelEventConfirm')
+              : t('host.cancelEvent')}
+        </Button>
+      </Panel>
 
       <p className="text-muted/70 text-xs">
         <Link className="hover:text-ink" to="/">

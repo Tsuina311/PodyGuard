@@ -53,6 +53,7 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
       preferredPodSize?: unknown;
       lifetimeHours?: unknown;
       tournamentFormat?: unknown;
+      tournamentOptions?: unknown;
     };
     try {
       const result = await app.events.createEvent({
@@ -68,8 +69,18 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
         lifetimeHours:
           typeof body.lifetimeHours === 'number' ? body.lifetimeHours : undefined,
         tournamentFormat:
-          body.tournamentFormat === 'single-elimination'
+          body.tournamentFormat === 'single-elimination' ||
+          body.tournamentFormat === 'swiss'
             ? body.tournamentFormat
+            : undefined,
+        tournamentOptions:
+          body.tournamentOptions && typeof body.tournamentOptions === 'object'
+            ? (body.tournamentOptions as {
+                matchSize?: number;
+                defaultBestOf?: 1 | 3 | 5;
+                finalBestOf?: 1 | 3 | 5;
+                swissRounds?: number;
+              })
             : undefined,
       });
       return reply.code(201).send(result);
@@ -132,6 +143,33 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
           typeof body.winnerParticipantId === 'string'
             ? body.winnerParticipantId
             : '',
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return { event };
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
+  app.post(
+    '/events/:joinCode/tournament/matches/:matchId/best-of',
+    async (request, reply) => {
+      const { joinCode, matchId } = request.params as {
+        joinCode: string;
+        matchId: string;
+      };
+      const body = (request.body ?? {}) as { bestOf?: unknown };
+      const bestOf = body.bestOf;
+      if (bestOf !== 1 && bestOf !== 3 && bestOf !== 5) {
+        return reply.code(400).send({ error: 'bestOf must be 1, 3, or 5.' });
+      }
+      try {
+        const event = await app.events.setTournamentMatchBestOf(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          matchId,
+          bestOf,
         );
         await app.live.publish(normalizeJoinCode(joinCode));
         return { event };
@@ -548,6 +586,20 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
         typeof body.hostPin === 'string' ? body.hostPin : '',
       );
       return result;
+    } catch (error) {
+      return sendEventError(reply, error);
+    }
+  });
+
+  app.post('/events/:joinCode/host/cancel', async (request, reply) => {
+    const { joinCode } = request.params as { joinCode: string };
+    try {
+      const event = await app.events.cancelEvent(
+        normalizeJoinCode(joinCode),
+        bearerToken(request.headers.authorization),
+      );
+      await app.live.publish(normalizeJoinCode(joinCode));
+      return { event };
     } catch (error) {
       return sendEventError(reply, error);
     }

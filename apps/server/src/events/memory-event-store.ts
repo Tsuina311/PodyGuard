@@ -541,6 +541,7 @@ export class MemoryEventStore implements EventStore {
   async updateEvent(
     id: string,
     patch: {
+      status?: StoredEvent['status'];
       allowThreePods?: boolean;
       allowFivePods?: boolean;
       preferredPodSize?: number;
@@ -553,6 +554,9 @@ export class MemoryEventStore implements EventStore {
     const event = this.events.get(id);
     if (!event) {
       throw new Error('Event not found.');
+    }
+    if (patch.status !== undefined) {
+      event.status = patch.status;
     }
     if (patch.allowThreePods !== undefined) {
       event.allowThreePods = patch.allowThreePods;

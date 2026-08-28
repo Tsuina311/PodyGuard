@@ -6,7 +6,10 @@ import {
   currentTournamentRound,
   markTournamentMatchFormed,
   markTournamentMatchPlaying,
+  recordTournamentGame,
+  setTournamentMatchBestOf,
   startSingleElimination,
+  startSwiss,
   tournamentMatchByPod,
   type TournamentState,
 } from './tournament';
@@ -56,8 +59,26 @@ describe('createTournamentState', () => {
       format: 'single-elimination',
       phase: 'registration',
       podSize: 4,
+      defaultBestOf: 1,
+      finalBestOf: 1,
       entrantIds: [],
       rounds: [],
+      records: {},
+    });
+  });
+
+  it('stores series defaults and swiss round count', () => {
+    const state = createTournamentState('swiss', 2, {
+      defaultBestOf: 3,
+      finalBestOf: 5,
+      swissRounds: 3,
+    });
+    expect(state).toMatchObject({
+      format: 'swiss',
+      podSize: 2,
+      defaultBestOf: 3,
+      finalBestOf: 5,
+      swissRounds: 3,
     });
   });
 
@@ -207,6 +228,8 @@ describe('match lifecycle', () => {
       position: 0,
       participantIds: ['p1', 'p2', 'p3', 'p4'],
       status: 'pending',
+      bestOf: 1,
+      seriesWins: { p1: 0, p2: 0, p3: 0, p4: 0 },
     });
     expect(tournamentMatchByPod(cancelled, 'pod-a')).toBeUndefined();
 
@@ -397,5 +420,138 @@ describe('round advancement', () => {
     expect(() =>
       completeTournamentMatch(state, 'round-1-match-0', 'outsider'),
     ).toThrow(/not a participant/);
+  });
+
+  it('builds a classic 4-player tree of two semis and one final', () => {
+    let state = startSingleElimination(
+      createTournamentState('single-elimination', 2, {
+        defaultBestOf: 1,
+        finalBestOf: 3,
+      }),
+      ids(4),
+      NOW,
+    );
+    expect(requireRound(state, 0).matches).toHaveLength(2);
+    expect(requireRound(state, 0).matches.map((match) => match.bestOf)).toEqual([
+      1, 1,
+    ]);
+    for (const match of requireRound(state, 0).matches) {
+      state = markTournamentMatchFormed(
+        state,
+        match.id,
+        `pod-${match.position}`,
+        `t-${match.position}`,
+      );
+    }
+    state = completeAll(state, {
+      'round-1-match-0': 'p1',
+      'round-1-match-1': 'p2',
+    });
+    expect(requireMatch(state, 1, 0)).toMatchObject({
+      participantIds: ['p1', 'p2'],
+      bestOf: 3,
+      status: 'pending',
+    });
+  });
+});
+
+describe('best-of series', () => {
+  it('records a win on a legacy match that lacks seriesWins', () => {
+    let state = startSingleElimination(
+      createTournamentState('single-elimination', 2),
+      ids(2),
+      NOW,
+    );
+    state = markTournamentMatchFormed(state, 'round-1-match-0', 'pod-a', 't1');
+    const legacy = structuredClone(state);
+    delete (legacy.rounds[0]!.matches[0] as { seriesWins?: unknown }).seriesWins;
+    const recorded = recordTournamentGame(legacy, 'round-1-match-0', 'p1', LATER);
+    expect(recorded.seriesComplete).toBe(true);
+    expect(recorded.state.championParticipantId).toBe('p1');
+  });
+
+  it('keeps a BO3 match open until one player reaches two wins', () => {
+    let state = startSingleElimination(
+      createTournamentState('single-elimination', 2, { defaultBestOf: 3 }),
+      ids(2),
+      NOW,
+    );
+    const matchId = 'round-1-match-0';
+    state = setTournamentMatchBestOf(state, matchId, 3);
+    state = markTournamentMatchFormed(state, matchId, 'pod-a', 't1');
+    const first = recordTournamentGame(state, matchId, 'p1', LATER);
+    expect(first.seriesComplete).toBe(false);
+    expect(requireMatch(first.state, 0, 0)).toMatchObject({
+      status: 'pending',
+      seriesWins: { p1: 1, p2: 0 },
+    });
+    expect(first.state.phase).toBe('in-progress');
+    expect(first.state.championParticipantId).toBeUndefined();
+
+    state = markTournamentMatchFormed(first.state, matchId, 'pod-b', 't2');
+    const second = recordTournamentGame(state, matchId, 'p2', LATER);
+    expect(second.seriesComplete).toBe(false);
+    expect(requireMatch(second.state, 0, 0).seriesWins).toEqual({ p1: 1, p2: 1 });
+
+    state = markTournamentMatchFormed(second.state, matchId, 'pod-c', 't3');
+    const third = recordTournamentGame(state, matchId, 'p1', LATER);
+    expect(third.seriesComplete).toBe(true);
+    expect(third.state.phase).toBe('completed');
+    expect(third.state.championParticipantId).toBe('p1');
+  });
+});
+
+describe('swiss', () => {
+  it('runs a 4-player swiss stage and crowns the win leader', () => {
+    let state = startSwiss(
+      createTournamentState('swiss', 2, { swissRounds: 2, defaultBestOf: 1 }),
+      ids(4),
+      NOW,
+    );
+    expect(state.swissRounds).toBe(2);
+    expect(requireRound(state, 0).matches).toHaveLength(2);
+
+    for (const match of requireRound(state, 0).matches) {
+      state = markTournamentMatchFormed(
+        state,
+        match.id,
+        `pod-${match.position}`,
+        `t-${match.position}`,
+      );
+    }
+    const round1 = requireRound(state, 0).matches;
+    const w0 = round1[0]?.participantIds[0];
+    const w1 = round1[1]?.participantIds[0];
+    if (!w0 || !w1) {
+      throw new Error('Expected swiss participants.');
+    }
+    state = completeAll(state, {
+      [round1[0]!.id]: w0,
+      [round1[1]!.id]: w1,
+    });
+    expect(state.rounds).toHaveLength(2);
+    expect(state.phase).toBe('in-progress');
+
+    for (const match of requireRound(state, 1).matches) {
+      state = markTournamentMatchFormed(
+        state,
+        match.id,
+        `pod2-${match.position}`,
+        `t2-${match.position}`,
+      );
+    }
+    const round2 = requireRound(state, 1).matches;
+    const f0 = round2[0]?.participantIds[0];
+    const f1 = round2[1]?.participantIds[0];
+    if (!f0 || !f1) {
+      throw new Error('Expected swiss final-round participants.');
+    }
+    state = completeAll(state, {
+      [round2[0]!.id]: f0,
+      [round2[1]!.id]: f1,
+    });
+    expect(state.phase).toBe('completed');
+    expect(state.championParticipantId).toBeTruthy();
+    expect(state.records[state.championParticipantId!]?.wins).toBeGreaterThan(0);
   });
 });

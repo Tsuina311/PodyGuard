@@ -30,6 +30,44 @@ export function createMatches(
   history: MatchHistory = { groups: [] },
   options: MatchOptions = {},
 ): MatchResult {
+  return createMatchesWithAssignment(participants, tables, history, options, new Map());
+}
+
+/**
+ * Experimental laboratory entry point. Existing matcher behavior is unchanged
+ * when no forced assignments are supplied.
+ */
+export function createMatchesWithForcedPools(
+  participants: ReadyParticipant[],
+  tables: AvailableTable[],
+  history: MatchHistory,
+  options: MatchOptions,
+  forcedPoolIds: ReadonlyMap<string, string>,
+): MatchResult {
+  for (const [participantId, poolId] of forcedPoolIds) {
+    const participant = participants.find((row) => row.id === participantId);
+    if (!participant || !eligiblePools(participant).includes(poolId)) {
+      throw new Error(
+        `Cannot force participant ${participantId} into unaccepted pool ${poolId}.`,
+      );
+    }
+  }
+  return createMatchesWithAssignment(
+    participants,
+    tables,
+    history,
+    options,
+    forcedPoolIds,
+  );
+}
+
+function createMatchesWithAssignment(
+  participants: ReadyParticipant[],
+  tables: AvailableTable[],
+  history: MatchHistory,
+  options: MatchOptions,
+  forcedPoolIds: ReadonlyMap<string, string>,
+): MatchResult {
   const preferredSize = options.preferredSize ?? PREFERRED_POD_SIZE;
   const allowedSizes = [...(options.allowedSizes ?? [preferredSize, FALLBACK_POD_SIZE])].sort(
     (left, right) => right - left,
@@ -41,7 +79,10 @@ export function createMatches(
 
   const pairHistory = buildPairHistory(history.groups);
   let assignment: Assignment = new Map(
-    participants.map((row) => [row.id, preferredPool(row)]),
+    participants.map((row) => [
+      row.id,
+      forcedPoolIds.get(row.id) ?? preferredPool(row),
+    ]),
   );
   let best = evaluate(
     participants,
@@ -54,7 +95,9 @@ export function createMatches(
   );
 
   const flexible = participants
-    .filter((row) => eligiblePools(row).length > 1)
+    .filter(
+      (row) => eligiblePools(row).length > 1 && !forcedPoolIds.has(row.id),
+    )
     .sort(byReadyAt);
 
   let improved = true;

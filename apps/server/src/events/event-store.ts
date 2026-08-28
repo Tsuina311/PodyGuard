@@ -344,6 +344,7 @@ export interface EventStore {
   updateEvent(
     id: string,
     patch: {
+      status?: StoredEvent['status'];
       allowThreePods?: boolean;
       allowFivePods?: boolean;
       preferredPodSize?: number;

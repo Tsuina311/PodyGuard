@@ -21,6 +21,11 @@
     "simulation:benchmark": "tsx packages/simulation/src/cli.ts benchmark",
     "simulation:sweep": "tsx packages/simulation/src/cli.ts sweep",
     "simulation:sweep-opportunity": "tsx packages/simulation/src/cli.ts sweep-opportunity",
+    "simulation:sweep-scarcity": "tsx packages/simulation/src/cli.ts sweep-scarcity",
+    "simulation:sweep-seat-loss": "tsx packages/simulation/src/cli.ts sweep-seat-loss",
+    "simulation:sweep-weighted": "tsx packages/simulation/src/cli.ts sweep-weighted",
+    "simulation:sweep-pairwise": "tsx packages/simulation/src/cli.ts sweep-pairwise",
+    "simulation:sweep-wait-cause": "tsx packages/simulation/src/cli.ts sweep-wait-cause",
     "simulation:compare": "tsx packages/simulation/src/cli.ts compare",
     "db:generate": "yarn workspace @podyguard/server db:generate",
     "db:migrate": "yarn workspace @podyguard/server db:migrate"

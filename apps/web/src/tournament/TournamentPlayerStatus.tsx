@@ -5,6 +5,7 @@ import type {
 } from '@podyguard/shared';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '../ui/Badge';
+import { seriesHasProgress, seriesScoreLine } from './series-score';
 
 export function TournamentPlayerStatus({
   event,
@@ -32,26 +33,43 @@ export function TournamentPlayerStatus({
     latest.winnerParticipantId !== participant.id;
   const champion = tournament.championParticipantId === participant.id;
   const entered = tournament.entrantIds.includes(participant.id);
+  const seriesScore =
+    latest && latest.bestOf > 1 ? seriesScoreLine(latest) : null;
+  const seriesLive =
+    Boolean(seriesScore) &&
+    latest !== undefined &&
+    latest.status !== 'completed' &&
+    (seriesHasProgress(latest) || latest.status !== 'pending');
+
+  const formatLabel =
+    tournament.format === 'swiss'
+      ? t('tournament.swiss')
+      : t('tournament.singleElimination');
 
   return (
     <div className="border-neon/25 bg-neon/5 mb-4 rounded-xl border p-3">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-sm font-semibold">
-          {t('tournament.singleElimination')}
-        </span>
-        <Badge tone={champion ? 'live' : undefined}>
-          {champion
-            ? t('tournament.champion')
-            : !entered && tournament.phase !== 'registration'
-              ? t('tournament.notEntered')
-            : eliminated
-              ? t('tournament.eliminated')
-              : tournament.phase === 'registration'
-                ? t('tournament.phase.registration')
-                : latest
-                  ? t('tournament.round', { number: latest.round })
-                  : t('tournament.waiting')}
-        </Badge>
+        <span className="text-sm font-semibold">{formatLabel}</span>
+        <div className="flex items-center gap-1.5">
+          {seriesScore && (seriesLive || latest?.status === 'completed') ? (
+            <span className="text-neon font-mono text-xs font-semibold tracking-normal tabular-nums whitespace-nowrap">
+              {seriesScore}
+            </span>
+          ) : null}
+          <Badge tone={champion ? 'live' : undefined}>
+            {champion
+              ? t('tournament.champion')
+              : !entered && tournament.phase !== 'registration'
+                ? t('tournament.notEntered')
+              : eliminated
+                ? t('tournament.eliminated')
+                : tournament.phase === 'registration'
+                  ? t('tournament.phase.registration')
+                  : latest
+                    ? t('tournament.round', { number: latest.round })
+                    : t('tournament.waiting')}
+          </Badge>
+        </div>
       </div>
       <p className="text-muted mt-2 text-xs">
         {champion
@@ -61,11 +79,26 @@ export function TournamentPlayerStatus({
           : eliminated
             ? t('tournament.eliminatedHint')
             : latest?.status === 'formed' || latest?.status === 'playing'
-              ? t('tournament.currentMatch', {
-                  table: table?.label ?? t('tournament.tablePending'),
-                })
+              ? seriesScore
+                ? t('tournament.currentMatchSeries', {
+                    table: table?.label ?? t('tournament.tablePending'),
+                    score: seriesScore,
+                    bestOf: latest.bestOf,
+                  })
+                : t('tournament.currentMatch', {
+                    table: table?.label ?? t('tournament.tablePending'),
+                  })
               : latest?.status === 'completed'
-                ? t('tournament.advancedHint')
+                ? seriesScore
+                  ? t('tournament.advancedSeriesHint', { score: seriesScore })
+                  : t('tournament.advancedHint')
+                : latest?.status === 'pending' &&
+                    seriesScore &&
+                    seriesHasProgress(latest)
+                  ? t('tournament.seriesInProgress', {
+                      score: seriesScore,
+                      bestOf: latest.bestOf,
+                    })
                 : tournament.phase === 'registration'
                   ? t('tournament.playerRegistrationHint')
                   : t('tournament.waitingHint')}

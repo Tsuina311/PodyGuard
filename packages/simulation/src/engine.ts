@@ -7,6 +7,8 @@ import {
   type MetricGameSeat,
   type MetricParticipant,
   type MetricQueueCycle,
+  type MetricScarcityDiagnostic,
+  type MetricWeightedDecision,
   type MetricTablePeriod,
   type QueueCycleEndReason,
   type SafetyViolation,
@@ -26,6 +28,12 @@ import {
   type MatchmakingStrategy,
   type StrategyDeck,
 } from './strategy.js';
+import {
+  waitCauseAccountingHolds,
+  WaitCauseAccumulator,
+  type WaitCausePlayingParticipant,
+  type WaitCauseSettings,
+} from './wait-cause.js';
 
 type ParticipantStatus = 'joined' | 'ready' | 'playing' | 'paused' | 'left';
 type TableState = 'free' | 'occupied' | 'disabled';
@@ -141,11 +149,14 @@ class SimulationEngine {
   private readonly tables = new Map<string, TableStateRecord>();
   private readonly activeGames = new Map<string, ActiveGame>();
   private readonly completedGames: MetricGame[] = [];
+  private readonly scarcityDiagnostics: MetricScarcityDiagnostic[] = [];
+  private readonly weightedDecisions: MetricWeightedDecision[] = [];
   private readonly priorGroups: string[][] = [];
   private readonly queueCycles: MetricQueueCycle[] = [];
   private readonly tablePeriods: MetricTablePeriod[] = [];
   private readonly violations: SafetyViolation[] = [];
   private readonly timeline: DebugTimelineEntry[] = [];
+  private readonly waitCauses: WaitCauseAccumulator;
   private now = 0;
   private gameSequence = 0;
   private scheduledEvaluationAt: number | undefined;
@@ -161,6 +172,7 @@ class SimulationEngine {
       throw new Error(`Unknown simulation randomization mode "${String(options.randomizationMode)}".`);
     }
     this.random = createSeededRandom(options.seed);
+    this.waitCauses = new WaitCauseAccumulator(options.debug === true);
     this.initialize();
   }
 
@@ -174,6 +186,7 @@ class SimulationEngine {
         this.fail('TIME_REVERSED', `Event at ${scheduled.time} followed time ${this.now}.`);
       }
       this.now = scheduled.time;
+      this.waitCauses.flush(this.waitCauseSettings());
       this.handle(scheduled.value);
     }
     this.now = this.scenario.durationSeconds;
@@ -211,6 +224,15 @@ class SimulationEngine {
       games: this.completedGames,
       tablePeriods: this.tablePeriods,
       safetyViolations: this.violations,
+      ...(this.scarcityDiagnostics.length > 0
+        ? { scarcityDiagnostics: this.scarcityDiagnostics }
+        : {}),
+      ...(this.weightedDecisions.length > 0
+        ? { weightedDecisions: this.weightedDecisions }
+        : {}),
+      ...(this.waitCauses.lockoutEvents.length > 0
+        ? { connectorLockoutEvents: this.waitCauses.lockoutEvents }
+        : {}),
     };
     const result: SimulationResult = {
       metadata,
@@ -334,6 +356,7 @@ class SimulationEngine {
     participant.readyAt = this.now;
     participant.cycleCount += 1;
     participant.openCycle = { cycle: participant.cycleCount, startedAt: this.now };
+    this.waitCauses.startCycle(participant.id);
     const decisionRandom = this.runtimeRandom('wait-leave', participant.id, participant.cycleCount);
     const decision = decisionRandom.next();
     if (
@@ -381,6 +404,52 @@ class SimulationEngine {
       },
     });
     this.scheduleEvaluation(result.nextEvaluationAt);
+    if (result.diagnostics) {
+      this.scarcityDiagnostics.push(...result.diagnostics);
+      for (const diagnostic of result.diagnostics) {
+        this.trace(
+          diagnostic.type,
+          `${diagnostic.participantId}:${diagnostic.preferredPoolId}->${diagnostic.scarcePoolId}`,
+        );
+      }
+    }
+    if (result.weightedDecision) {
+      this.weightedDecisions.push(
+        this.options.debug
+          ? result.weightedDecision
+          : {
+              ...result.weightedDecision,
+              candidates: result.weightedDecision.candidates.filter(
+                (candidate) =>
+                  candidate.selected ||
+                  candidate.key ===
+                    result.weightedDecision
+                      ?.singleGeneratorSelectedCandidateKey,
+              ),
+            },
+      );
+      if (this.options.debug) {
+        for (const candidate of result.weightedDecision.candidates) {
+          this.trace(
+            'weighted-score',
+            JSON.stringify({
+              profile: result.weightedDecision.profileId,
+              candidate: candidate.key,
+              source: candidate.source,
+              forcedAssignments: candidate.forcedAssignments,
+              seats: candidate.seats,
+              delta: candidate.immediateSeatDelta,
+              components: candidate.components,
+              weights: candidate.weights,
+              total: candidate.weightedTotal,
+              selected: candidate.selected,
+              plan: candidate.plan,
+              residual: candidate.residual,
+            }),
+          );
+        }
+      }
+    }
     const accepted = this.validateMatches(result.matches, ready, freeTables);
     for (const match of accepted) {
       this.startGame(match);
@@ -570,18 +639,73 @@ class SimulationEngine {
       this.fail('MISSING_QUEUE_CYCLE', `Participant ${participant.id} has no open queue cycle.`);
       return;
     }
+    const attributed = this.waitCauses.endCycle(participant.id, this.waitCauseSettings());
     const cycle: MetricQueueCycle = {
       participantId: participant.id,
       cycle: open.cycle,
       startedAt: open.startedAt,
       endedAt: this.now,
       reason,
+      waitCauses: attributed.seconds,
+      ...(this.options.debug && attributed.intervals.length > 0
+        ? { waitCauseIntervals: attributed.intervals }
+        : {}),
     };
+    if (!waitCauseAccountingHolds(this.now - open.startedAt, attributed.seconds)) {
+      this.recordViolation(
+        'WAIT_CAUSE_ACCOUNTING',
+        `${participant.id} cycle ${open.cycle} wait ${this.now - open.startedAt}s accounted ${
+          attributed.seconds.structuralScarcity +
+          attributed.seconds.tableCapacity +
+          attributed.seconds.matcherChoice +
+          attributed.seconds.connectorLockoutOtherPool +
+          attributed.seconds.connectorLockoutSamePool +
+          attributed.seconds.opportunityGrace +
+          attributed.seconds.unknown
+        }s.`,
+      );
+    }
     if (reason !== 'matched') {
       cycle.diagnostic = this.classifyWait(participant);
     }
     this.queueCycles.push(cycle);
     participant.openCycle = undefined;
+  }
+
+  private waitCauseSettings(): WaitCauseSettings {
+    const ready = [...this.participants.values()]
+      .filter((participant) => participant.status === 'ready' && participant.readyAt !== undefined)
+      .map((participant) => ({
+        id: participant.id,
+        readyAt: participant.readyAt ?? this.now,
+        poolIds: [...new Set(participant.decks.map((deck) => deck.poolId))],
+        preferredPoolId: participant.preferredPoolId,
+      }));
+    const playing: WaitCausePlayingParticipant[] = [];
+    for (const game of this.activeGames.values()) {
+      for (const seat of game.metric.seats) {
+        const participant = this.participants.get(seat.participantId);
+        if (!participant || participant.status !== 'playing') continue;
+        playing.push({
+          id: participant.id,
+          poolIds: [...new Set(participant.decks.map((deck) => deck.poolId))],
+          preferredPoolId: participant.preferredPoolId,
+          assignedPoolId: seat.assignedPoolId,
+          gameStartedAt: game.metric.startedAt,
+          gameEndedAt: game.metric.endedAt,
+        });
+      }
+    }
+    return {
+      now: this.now,
+      minPodSize: Math.min(...this.scenario.allowedPodSizes),
+      preferredPodSize: this.scenario.preferredPodSize,
+      graceSeconds: this.strategy.graceSeconds ?? 0,
+      maxExistingWaitSeconds: this.strategy.maxExistingWaitSeconds,
+      freeTableCount: [...this.tables.values()].filter((table) => table.state === 'free').length,
+      ready,
+      playing,
+    };
   }
 
   private classifyWait(participant: ParticipantState): WaitDiagnostic {
@@ -602,6 +726,7 @@ class SimulationEngine {
   }
 
   private closeEvent(): void {
+    this.waitCauses.flush(this.waitCauseSettings());
     for (const participant of this.participants.values()) {
       if (participant.status === 'ready') {
         this.endCycle(participant, 'event-closed');
@@ -714,6 +839,8 @@ function toMetricParticipant(participant: ParticipantState): MetricParticipant {
     id: participant.id,
     arrivedAt: participant.arrivedAt,
     finalStatus: participant.status,
+    preferredPoolId: participant.preferredPoolId,
+    acceptedPoolIds: participant.decks.map((deck) => deck.poolId),
   };
 }
 

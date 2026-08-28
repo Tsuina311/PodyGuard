@@ -29,7 +29,8 @@ export function playerJoinUrl(
 
 /**
  * Production join links should hit the always-on static site, even if the host
- * still has the Render URL open. Locally we ignore that and keep LAN sharing.
+ * still has the Render URL open. Locally we ignore that and keep the tab origin
+ * for copy/paste; phones get a separate LAN origin via shareableOrigin.
  */
 export function joinLinkParts(
   location: {
@@ -55,8 +56,33 @@ export function joinLinkParts(
     }
   }
   return {
-    origin: shareableOrigin(location, lanHost),
+    origin: location.origin,
     pathname: location.pathname,
+  };
+}
+
+/**
+ * QR codes need an address phones can open. Same inputs as joinLinkParts, but
+ * localhost is swapped for the machine's LAN IP when one is known.
+ */
+export function phoneJoinLinkParts(
+  location: {
+    protocol: string;
+    hostname: string;
+    port: string;
+    origin: string;
+    pathname: string;
+  },
+  lanHost: string,
+  publicSiteUrl?: string,
+): { origin: string; pathname: string } {
+  const link = joinLinkParts(location, lanHost, publicSiteUrl);
+  if (!isLocalHostname(location.hostname)) {
+    return link;
+  }
+  return {
+    origin: shareableOrigin(location, lanHost),
+    pathname: link.pathname,
   };
 }
 

@@ -17,6 +17,11 @@
     "benchmark": "tsx src/cli.ts benchmark",
     "sweep": "tsx src/cli.ts sweep",
     "sweep-opportunity": "tsx src/cli.ts sweep-opportunity",
+    "sweep-scarcity": "tsx src/cli.ts sweep-scarcity",
+    "sweep-seat-loss": "tsx src/cli.ts sweep-seat-loss",
+    "sweep-weighted": "tsx src/cli.ts sweep-weighted",
+    "sweep-pairwise": "tsx src/cli.ts sweep-pairwise",
+    "sweep-wait-cause": "tsx src/cli.ts sweep-wait-cause",
     "compare": "tsx src/cli.ts compare",
     "build": "tsc -p tsconfig.json --noEmit"
   },

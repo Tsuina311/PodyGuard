@@ -7,6 +7,7 @@ import {
   type AssassinPodSize,
   type GameMode,
   type GameModeFamily,
+  type SeriesLength,
   type TournamentFormat,
   type TreacheryPodSize,
 } from '@podyguard/shared';
@@ -57,6 +58,10 @@ export function HomePage() {
   const [lifetimeHours, setLifetimeHours] = useState('24');
   const [tournamentFormat, setTournamentFormat] =
     useState<TournamentFormat | null>(null);
+  const [tournamentMatchSize, setTournamentMatchSize] = useState(2);
+  const [defaultBestOf, setDefaultBestOf] = useState<SeriesLength>(1);
+  const [finalBestOf, setFinalBestOf] = useState<SeriesLength>(3);
+  const [swissRounds, setSwissRounds] = useState('3');
   const [joinCode, setJoinCode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -162,6 +167,21 @@ export function HomePage() {
         tournamentFormat: tournamentEligible
           ? tournamentFormat ?? undefined
           : undefined,
+        tournamentOptions:
+          tournamentEligible && tournamentFormat
+            ? {
+                matchSize: tournamentMatchSize,
+                defaultBestOf,
+                finalBestOf:
+                  tournamentFormat === 'single-elimination'
+                    ? finalBestOf
+                    : defaultBestOf,
+                swissRounds:
+                  tournamentFormat === 'swiss'
+                    ? Math.max(1, Number(swissRounds) || 1)
+                    : undefined,
+              }
+            : undefined,
       });
       saveHostToken(result.event.joinCode, result.hostToken);
       void navigate(`/host/${result.event.joinCode}`);
@@ -361,7 +381,7 @@ export function HomePage() {
             <legend className="text-muted mb-2 text-sm">
               {t('tournament.eventStructure')}
             </legend>
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid gap-2 sm:grid-cols-3">
               <label
                 className={cx(
                   'cursor-pointer rounded-xl border p-3 transition',
@@ -406,11 +426,144 @@ export function HomePage() {
                 </span>
                 <span className="text-muted mt-1 block text-xs">
                   {t('tournament.singleEliminationHint', {
-                    count: Math.max(1, Number(tableCount) || 1) * eventPodSize,
+                    size: tournamentMatchSize,
                   })}
                 </span>
               </label>
+              <label
+                className={cx(
+                  'cursor-pointer rounded-xl border p-3 transition',
+                  tournamentFormat === 'swiss'
+                    ? 'border-neon bg-neon/10'
+                    : 'border-muted/20 hover:border-muted/40',
+                )}
+              >
+                <input
+                  className="sr-only"
+                  type="radio"
+                  name="tournamentFormat"
+                  checked={tournamentFormat === 'swiss'}
+                  onChange={() => setTournamentFormat('swiss')}
+                />
+                <span className="block text-sm font-semibold">
+                  {t('tournament.swiss')}
+                </span>
+                <span className="text-muted mt-1 block text-xs">
+                  {t('tournament.swissHint')}
+                </span>
+              </label>
             </div>
+            {tournamentFormat ? (
+              <div className="mt-3 space-y-3 rounded-xl border border-white/10 bg-white/[0.025] p-3">
+                <fieldset>
+                  <legend className="text-muted mb-2 text-xs tracking-wide uppercase">
+                    {t('tournament.matchSize')}
+                  </legend>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[2, 3, 4, 5].map((size) => (
+                      <label
+                        key={size}
+                        className={cx(
+                          'cursor-pointer rounded-lg border p-2 text-center text-sm font-semibold transition',
+                          tournamentMatchSize === size
+                            ? 'border-neon bg-neon/10 text-neon'
+                            : 'border-muted/20 text-muted hover:border-muted/40',
+                        )}
+                      >
+                        <input
+                          type="radio"
+                          name="tournamentMatchSize"
+                          value={size}
+                          checked={tournamentMatchSize === size}
+                          onChange={() => setTournamentMatchSize(size)}
+                          className="sr-only"
+                        />
+                        {size}
+                      </label>
+                    ))}
+                  </div>
+                  <p className="text-muted mt-2 text-xs">
+                    {tournamentMatchSize === 2
+                      ? t('tournament.matchSizeDuelHint')
+                      : t('tournament.matchSizePodHint', {
+                          size: tournamentMatchSize,
+                        })}
+                  </p>
+                </fieldset>
+                <fieldset>
+                  <legend className="text-muted mb-2 text-xs tracking-wide uppercase">
+                    {tournamentFormat === 'single-elimination'
+                      ? t('tournament.openingBestOf')
+                      : t('tournament.roundBestOf')}
+                  </legend>
+                  <div className="grid grid-cols-3 gap-2">
+                    {([1, 3, 5] as SeriesLength[]).map((bestOf) => (
+                      <label
+                        key={bestOf}
+                        className={cx(
+                          'cursor-pointer rounded-lg border p-2 text-center text-sm font-semibold transition',
+                          defaultBestOf === bestOf
+                            ? 'border-neon bg-neon/10 text-neon'
+                            : 'border-muted/20 text-muted hover:border-muted/40',
+                        )}
+                      >
+                        <input
+                          type="radio"
+                          name="defaultBestOf"
+                          value={bestOf}
+                          checked={defaultBestOf === bestOf}
+                          onChange={() => setDefaultBestOf(bestOf)}
+                          className="sr-only"
+                        />
+                        {t('tournament.bestOf', { count: bestOf })}
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+                {tournamentFormat === 'single-elimination' ? (
+                  <fieldset>
+                    <legend className="text-muted mb-2 text-xs tracking-wide uppercase">
+                      {t('tournament.finalBestOf')}
+                    </legend>
+                    <div className="grid grid-cols-3 gap-2">
+                      {([1, 3, 5] as SeriesLength[]).map((bestOf) => (
+                        <label
+                          key={bestOf}
+                          className={cx(
+                            'cursor-pointer rounded-lg border p-2 text-center text-sm font-semibold transition',
+                            finalBestOf === bestOf
+                              ? 'border-neon bg-neon/10 text-neon'
+                              : 'border-muted/20 text-muted hover:border-muted/40',
+                          )}
+                        >
+                          <input
+                            type="radio"
+                            name="finalBestOf"
+                            value={bestOf}
+                            checked={finalBestOf === bestOf}
+                            onChange={() => setFinalBestOf(bestOf)}
+                            className="sr-only"
+                          />
+                          {t('tournament.bestOf', { count: bestOf })}
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+                ) : (
+                  <Field
+                    label={t('tournament.swissRounds')}
+                    hint={t('tournament.swissRoundsHint')}
+                    value={swissRounds}
+                    onChange={(change) => setSwissRounds(change.target.value)}
+                    type="number"
+                    inputMode="numeric"
+                    min={1}
+                    max={16}
+                    required
+                  />
+                )}
+              </div>
+            ) : null}
           </fieldset>
           {gameMode === 'commander' ? (
             <fieldset className="mb-4">

@@ -113,6 +113,65 @@ describe('event HTTP api', () => {
     await app.close();
   });
 
+  it('lets the host cancel an event entirely', async () => {
+    const app = await buildTestApp();
+    const created = await app.inject({
+      method: 'POST',
+      url: '/events',
+      payload: {
+        name: 'Friday Commander',
+        hostPin: '2468',
+        tableCount: 2,
+      },
+    });
+    expect(created.statusCode).toBe(201);
+    const createdBody = created.json() as {
+      event: { joinCode: string };
+      hostToken: string;
+    };
+    const { joinCode } = createdBody.event;
+    const { hostToken } = createdBody;
+
+    const joined = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/join`,
+      payload: { displayName: 'Ada' },
+    });
+    expect(joined.statusCode).toBe(201);
+    const player = joined.json() as { token: string };
+    await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/ready`,
+      headers: { authorization: `Bearer ${player.token}` },
+      payload: { ready: true },
+    });
+
+    const cancelled = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/host/cancel`,
+      headers: { authorization: `Bearer ${hostToken}` },
+    });
+    expect(cancelled.statusCode).toBe(200);
+    expect(
+      (cancelled.json() as { event: { status: string } }).event.status,
+    ).toBe('closed');
+
+    const gone = await app.inject({
+      method: 'GET',
+      url: `/events/${joinCode}`,
+    });
+    expect(gone.statusCode).toBe(404);
+
+    const blocked = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/join`,
+      payload: { displayName: 'Bea' },
+    });
+    expect(blocked.statusCode).toBe(404);
+
+    await app.close();
+  });
+
   it('rejects an unknown join code', async () => {
     const app = await buildTestApp();
     const response = await app.inject({

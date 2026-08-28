@@ -83,15 +83,24 @@ export {
   currentTournamentRound,
   markTournamentMatchFormed,
   markTournamentMatchPlaying,
+  recordTournamentGame,
+  seriesWinsNeeded,
+  setTournamentMatchBestOf,
   startSingleElimination,
+  startSwiss,
+  startTournament,
+  normalizeTournamentState,
   tournamentMatchByPod,
 } from './tournament';
 
 export type {
+  SeriesLength,
   TournamentFormat,
   TournamentMatch,
   TournamentMatchStatus,
+  TournamentOptions,
   TournamentPhase,
+  TournamentRecord,
   TournamentRound,
   TournamentState,
 } from './tournament';

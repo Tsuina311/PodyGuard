@@ -68,7 +68,6 @@ export function JoinPage() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [snapshot, setSnapshot] = useState<EventSnapshot | null>(null);
-  const [atTable, setAtTable] = useState(false);
   const [showTracker, setShowTracker] = useState(false);
   const [askRating, setAskRating] = useState(false);
   const [treacheryRole, setTreacheryRole] =
@@ -544,10 +543,6 @@ export function JoinPage() {
     }
   }
 
-  useEffect(() => {
-    setAtTable(false);
-  }, [participant?.tableLabel]);
-
   /*
     While a game is running the tracker is the entire screen. The event header
     and the match card are pre-game context, and on a phone they push the life
@@ -733,19 +728,10 @@ export function JoinPage() {
                     ) : null}
                   </div>
                 </>
-              ) : atTable ? (
-                <p className="text-muted text-center text-sm">
-                  {t('join.atTableMarked')}
-                </p>
               ) : (
-                <Button
-                  variant="neon"
-                  size="lg"
-                  block
-                  onClick={() => setAtTable(true)}
-                >
-                  {t('join.imAtTable')}
-                </Button>
+                <p className="text-muted text-center text-sm">
+                  {t('join.stayAtTable')}
+                </p>
               )}
             </div>
           ) : event?.tournament &&

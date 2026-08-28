@@ -924,6 +924,7 @@ export class PostgresEventStore implements EventStore {
   async updateEvent(
     id: string,
     patch: {
+      status?: StoredEvent['status'];
       allowThreePods?: boolean;
       allowFivePods?: boolean;
       preferredPodSize?: number;
@@ -936,6 +937,7 @@ export class PostgresEventStore implements EventStore {
     const [row] = await getDb()
       .update(events)
       .set({
+        ...(patch.status === undefined ? {} : { status: patch.status }),
         ...(patch.allowThreePods === undefined
           ? {}
           : { allowThreePods: patch.allowThreePods }),

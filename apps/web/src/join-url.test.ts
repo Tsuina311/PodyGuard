@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   joinCodeFromScan,
   joinLinkParts,
+  phoneJoinLinkParts,
   playerJoinUrl,
   shareableOrigin,
 } from './join-url';
@@ -75,7 +76,7 @@ describe('shareableOrigin', () => {
 });
 
 describe('joinLinkParts', () => {
-  it('ignores the public site while developing on localhost', () => {
+  it('keeps localhost for copy/paste while developing locally', () => {
     expect(
       joinLinkParts(
         {
@@ -89,7 +90,7 @@ describe('joinLinkParts', () => {
         'https://tsuina311.github.io/PodyGuard',
       ),
     ).toEqual({
-      origin: 'http://192.168.1.101:5173',
+      origin: 'http://localhost:5173',
       pathname: '/',
     });
   });
@@ -110,6 +111,27 @@ describe('joinLinkParts', () => {
     ).toEqual({
       origin: 'https://tsuina311.github.io',
       pathname: '/PodyGuard/',
+    });
+  });
+});
+
+describe('phoneJoinLinkParts', () => {
+  it('swaps localhost for the LAN address so phone QR codes work', () => {
+    expect(
+      phoneJoinLinkParts(
+        {
+          protocol: 'http:',
+          hostname: 'localhost',
+          port: '5173',
+          origin: 'http://localhost:5173',
+          pathname: '/',
+        },
+        '192.168.1.101',
+        'https://tsuina311.github.io/PodyGuard',
+      ),
+    ).toEqual({
+      origin: 'http://192.168.1.101:5173',
+      pathname: '/',
     });
   });
 });

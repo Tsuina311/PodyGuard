@@ -9,11 +9,19 @@ export { EventQueue, StableEventQueue, type ScheduledEvent } from './event-queue
 export {
   LegacyV1Strategy,
   QueueV2ExperimentalStrategy,
+  QueueV2BoundedSeatLossStrategy,
   QueueV2OpportunityGraceStrategy,
+  QueueV2ScarcityExperimentalStrategy,
+  QUEUE_V2_GRACE_SECONDS,
+  QUEUE_V2_MAX_EXISTING_WAIT_SECONDS,
   UNLIMITED_EXISTING_WAIT,
+  createFrozenQueueV2GraceStrategy,
   createLegacyV1Strategy,
+  createQueueV2GraceDiagnosticControl,
   createQueueV2ExperimentalStrategy,
+  createQueueV2BoundedSeatLossStrategy,
   createQueueV2OpportunityGraceStrategy,
+  createQueueV2ScarcityExperimentalStrategy,
   legacyV1,
   legacyV1Strategy,
   type MatchmakingInput,
@@ -25,6 +33,8 @@ export {
   type MatchmakingStrategy,
   type MatchmakingStrategyName,
   type MatchmakingTable,
+  type ScarcityDiagnostic,
+  type ScarcityDiagnosticType,
   type StrategyDeck,
 } from './strategy.js';
 export {
@@ -97,11 +107,132 @@ export {
   type MetricGameSeat,
   type MetricParticipant,
   type MetricQueueCycle,
+  type MetricScarcityDiagnostic,
+  type MetricWeightedCandidateExplanation,
+  type MetricWeightedDecision,
   type MetricTablePeriod,
   type QueueCycleEndReason,
   type SafetyViolation,
   type WaitDiagnostic,
 } from './metrics.js';
+export {
+  DEFAULT_WAIT_URGENCY_CURVE,
+  DEFAULT_WEIGHTED_GENERATOR_CONFIG,
+  QueueV2WeightedAssignmentStrategy,
+  WEIGHTED_PROFILES,
+  createWeightedStrategy,
+  exclusiveUnlockComponent,
+  preferenceComponent,
+  residualPoolDiagnostics,
+  scarcityForAssignment,
+  seatingComponent,
+  waitUrgency,
+  weightedTotal,
+  type WaitUrgencyPoint,
+  type ResidualPoolDiagnostics,
+  type ResidualPoolState,
+  type WeightedCandidateGeneratorConfig,
+  type WeightedCandidateExplanation,
+  type WeightedDecisionDiagnostic,
+  type WeightedForcedAssignment,
+  type WeightedGeneratorMode,
+  type WeightedMatchingConfig,
+  type WeightedProfile,
+  type WeightedPlanMatch,
+  type WeightedScoreComponents,
+} from './weighted-strategy.js';
+export {
+  aggregateWeightedDecisions,
+  type WeightedDecisionSummary,
+} from './weighted-metrics.js';
+export {
+  aggregateResidualPoolComparisons,
+  type ResidualPoolComparisonSummary,
+} from './residual-pool-metrics.js';
+export {
+  WEIGHTED_FOCUS_SCENARIOS,
+  WEIGHTED_REFERENCE_PATH,
+  WEIGHTED_REPLAY_SEEDS,
+  WEIGHTED_SWEEP_PATH,
+  runWeightedSweep,
+  writeWeightedSweep,
+  type WeightedMetricSet,
+  type WeightedReference,
+  type WeightedSeedReplay,
+  type WeightedSweepCandidate,
+  type WeightedSweepResult,
+} from './weighted-sweep.js';
+export {
+  PAIRWISE_CANDIDATE_PLAN_CEILING,
+  PAIRWISE_REPLAY_SEEDS,
+  PAIRWISE_SWEEP_PATH,
+  runPairwiseSweep,
+  writePairwiseSweep,
+  type PairwiseMetricSet,
+  type PairwiseSeedReplay,
+  type PairwiseSweepCandidate,
+  type PairwiseSweepResult,
+  type ReplayResult as PairwiseReplayResult,
+} from './pairwise-sweep.js';
+export {
+  classifyWaitCause,
+  waitCauseAccountingHolds,
+  type WaitCauseClassification,
+  type WaitCauseKind,
+  type WaitCauseSeconds,
+  type WaitCauseSettings,
+} from './wait-cause.js';
+export {
+  aggregateWaitCauses,
+  type AddressableWaitSummary,
+  type ConnectorLockoutSummary,
+  type WaitCauseShare,
+} from './wait-cause-metrics.js';
+export {
+  WAIT_CAUSE_REPLAYS,
+  WAIT_CAUSE_SWEEP_PATH,
+  formatWaitCauseReport,
+  runWaitCauseSweep,
+  writeWaitCauseSweep,
+} from './wait-cause-sweep.js';
+export {
+  aggregateScarcityMetrics,
+  type ScarcityDiagnosticSummary,
+  type ScarcityMetricSummary,
+  type ScarcityParticipantSummary,
+} from './scarcity-metrics.js';
+export {
+  SCARCITY_FOCUS_SCENARIOS,
+  SCARCITY_REPLAY_SEEDS,
+  SCARCITY_SWEEP_PATH,
+  SCARCITY_WAIT_THRESHOLDS,
+  runScarcitySweep,
+  writeScarcitySweep,
+  type ScarcityReplayAssignment,
+  type ScarcitySeedReplay,
+  type ScarcitySweepCandidate,
+  type ScarcitySweepResult,
+} from './scarcity-sweep.js';
+export {
+  STARVATION_WAIT_THRESHOLDS,
+  aggregateStarvationMetrics,
+  type StarvationGroupSummary,
+  type StarvationMetricSummary,
+} from './starvation-metrics.js';
+export {
+  SEAT_LOSS_FOCUS_SCENARIOS,
+  SEAT_LOSS_REPLAY_SEEDS,
+  SEAT_LOSS_STARVATION_THRESHOLDS,
+  SEAT_LOSS_SWEEP_PATH,
+  runSeatLossSweep,
+  writeSeatLossSweep,
+  type RescueEfficiency,
+  type SeatLossCandidateSummary,
+  type SeatLossMetricSet,
+  type SeatLossReplayDecision,
+  type SeatLossSeedReplay,
+  type SeatLossSweepResult,
+} from './scarcity-seat-loss-sweep.js';
 export {
   aggregateRecords,
   benchmarkSuite,

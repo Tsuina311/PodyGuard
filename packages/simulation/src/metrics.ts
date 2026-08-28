@@ -1,3 +1,14 @@
+import type {
+  WeightedCandidateExplanation,
+  WeightedDecisionDiagnostic,
+} from './weighted-strategy.js';
+import type {
+  ConnectorLockoutEvent,
+  WaitCauseInterval,
+  WaitCauseKind,
+  WaitCauseSeconds,
+} from './wait-cause.js';
+
 export type QueueCycleEndReason = 'matched' | 'paused' | 'left' | 'event-closed';
 export type WaitDiagnostic =
   | 'WAITING_FOR_TABLE'
@@ -6,6 +17,11 @@ export type WaitDiagnostic =
   | 'MATCH_AVAILABLE_BUT_NOT_SELECTED'
   | 'UNKNOWN';
 
+export type { WaitCauseKind };
+export type MetricWaitCauseSeconds = WaitCauseSeconds;
+export type MetricWaitCauseInterval = WaitCauseInterval;
+export type MetricConnectorLockoutEvent = ConnectorLockoutEvent;
+
 export type MetricQueueCycle = {
   participantId: string;
   cycle: number;
@@ -13,6 +29,8 @@ export type MetricQueueCycle = {
   endedAt: number;
   reason: QueueCycleEndReason;
   diagnostic?: WaitDiagnostic;
+  waitCauses?: MetricWaitCauseSeconds;
+  waitCauseIntervals?: readonly MetricWaitCauseInterval[];
 };
 
 export type MetricGameSeat = {
@@ -39,7 +57,36 @@ export type MetricParticipant = {
   id: string;
   arrivedAt: number;
   finalStatus: 'joined' | 'ready' | 'playing' | 'paused' | 'left';
+  /** Added diagnostic dimensions; absent in older frozen artifacts. */
+  preferredPoolId?: string;
+  acceptedPoolIds?: readonly string[];
 };
+
+export type MetricScarcityDiagnostic = {
+  type:
+    | 'MISSED_SCARCE_POOL_UNLOCK'
+    | 'SCARCITY_REALLOCATION'
+    | 'SCARCITY_BOUNDED_SEAT_LOSS_REALLOCATION';
+  at: number;
+  participantId: string;
+  preferredPoolId: string;
+  scarcePoolId: string;
+  exclusiveParticipantIds: readonly string[];
+  oldestExclusiveWaitSeconds: number;
+  preferredPoolAlternativeCount: number;
+  baselineSeatedCount: number;
+  candidateSeatedCount: number;
+  explicitlyAccepted: true;
+  physicalTableAvailable: true;
+  controlPoolId?: string;
+  immediateSeatLoss?: 0 | 1;
+  newlySeatedExclusiveParticipantIds?: readonly string[];
+  scarcePoolSubstituteCount?: number;
+};
+
+export type MetricWeightedCandidateExplanation =
+  WeightedCandidateExplanation;
+export type MetricWeightedDecision = WeightedDecisionDiagnostic;
 
 export type MetricTablePeriod = {
   tableId: string;
@@ -66,6 +113,9 @@ export type EventMetricRecord = {
   games: readonly MetricGame[];
   tablePeriods: readonly MetricTablePeriod[];
   safetyViolations: readonly SafetyViolation[];
+  scarcityDiagnostics?: readonly MetricScarcityDiagnostic[];
+  weightedDecisions?: readonly MetricWeightedDecision[];
+  connectorLockoutEvents?: readonly MetricConnectorLockoutEvent[];
 };
 
 export type DistributionMetrics = {
@@ -383,6 +433,21 @@ function validateMetricRecord(record: EventMetricRecord): void {
   for (const cycle of record.queueCycles) {
     if (cycle.endedAt < cycle.startedAt) {
       throw new Error(`Queue cycle ends before it starts for ${cycle.participantId}.`);
+    }
+    if (cycle.waitCauses) {
+      const accounted =
+        cycle.waitCauses.structuralScarcity +
+        cycle.waitCauses.tableCapacity +
+        cycle.waitCauses.matcherChoice +
+        cycle.waitCauses.connectorLockoutOtherPool +
+        cycle.waitCauses.connectorLockoutSamePool +
+        cycle.waitCauses.opportunityGrace +
+        cycle.waitCauses.unknown;
+      if (Math.abs(accounted - (cycle.endedAt - cycle.startedAt)) > 0) {
+        throw new Error(
+          `Wait-cause accounting mismatch for ${cycle.participantId} cycle ${cycle.cycle}: ${accounted} != ${cycle.endedAt - cycle.startedAt}.`,
+        );
+      }
     }
   }
   for (const game of record.games) {
