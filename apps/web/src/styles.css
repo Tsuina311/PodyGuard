@@ -38,6 +38,11 @@
   html {
     color-scheme: dark;
     background: var(--color-void);
+    /*
+      Accidental pull-to-refresh on a phone wipes in-progress forms (commander
+      search, names). Contain overscroll so that gesture does not reload the app.
+    */
+    overscroll-behavior-y: none;
   }
 
   html[data-theme='light'] {
@@ -62,6 +67,7 @@
     color: var(--color-ink);
     background-color: var(--color-void);
     -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: none;
   }
 
   body,

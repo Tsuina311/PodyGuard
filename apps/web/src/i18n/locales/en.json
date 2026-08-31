@@ -1086,6 +1086,8 @@
     "start": "Start",
     "readRules": "Read rules",
     "diceTools": "Dice & coins",
+    "rearrangeSeats": "Rearrange seats",
+    "rearrangeSeatsHint": "Tap two players to swap their places on the board so the phone matches the table.",
     "closeDiceTools": "Close dice and coins",
     "diceToolsHint": "Flip a coin or pick a die from d2 to d50.",
     "flipCoin": "Flip coin",

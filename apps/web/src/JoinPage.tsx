@@ -49,7 +49,7 @@ import { LimitedPlayerPanel } from './limited/LimitedPlayerPanel';
 import { TreacheryRoleDialog } from './TreacheryRoleDialog';
 import { useEventLive } from './useEventLive';
 import { forgetActiveMatch, rememberActiveMatch } from './active-match';
-import { readStored, writeStored } from './device-storage';
+import { readStored, removeStored, writeStored } from './device-storage';
 import {
   enqueuePending,
   flushPending,
@@ -57,13 +57,47 @@ import {
   type PendingOp,
 } from './offline-queue';
 
+function joinDraftStorageKey(joinCode: string): string {
+  return `podyguard.join.draft.${joinCode.trim().toUpperCase()}`;
+}
+
+function loadJoinDraft(joinCode: string): {
+  displayName: string;
+  decks: DeckFormRow[];
+} {
+  const raw = readStored(joinDraftStorageKey(joinCode));
+  if (!raw) {
+    return { displayName: '', decks: defaultDeckRows() };
+  }
+  try {
+    const parsed = JSON.parse(raw) as {
+      displayName?: string;
+      decks?: DeckFormRow[];
+    };
+    return {
+      displayName:
+        typeof parsed.displayName === 'string' ? parsed.displayName : '',
+      decks:
+        Array.isArray(parsed.decks) && parsed.decks.length > 0
+          ? parsed.decks
+          : defaultDeckRows(),
+    };
+  } catch {
+    return { displayName: '', decks: defaultDeckRows() };
+  }
+}
+
 export function JoinPage() {
   const { t } = useTranslation();
   const { joinCode = '' } = useParams();
   const navigate = useNavigate();
   const [event, setEvent] = useState<PublicEvent | null>(null);
-  const [displayName, setDisplayName] = useState('');
-  const [decks, setDeckRows] = useState<DeckFormRow[]>(defaultDeckRows);
+  const [displayName, setDisplayName] = useState(
+    () => loadJoinDraft(joinCode).displayName,
+  );
+  const [decks, setDeckRows] = useState<DeckFormRow[]>(
+    () => loadJoinDraft(joinCode).decks,
+  );
   const [participant, setParticipant] = useState<PublicParticipant | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -76,6 +110,14 @@ export function JoinPage() {
   const [roleOpen, setRoleOpen] = useState(false);
   const [roleRevealed, setRoleRevealed] = useState(false);
   const rolePod = useRef<string | null>(null);
+  const joinDraftKey = joinDraftStorageKey(joinCode);
+
+  useEffect(() => {
+    if (!joinCode || participant) {
+      return;
+    }
+    writeStored(joinDraftKey, JSON.stringify({ displayName, decks }));
+  }, [decks, displayName, joinCode, joinDraftKey, participant]);
 
   useEffect(() => {
     let cancelled = false;
@@ -289,6 +331,7 @@ export function JoinPage() {
         token: result.token,
         displayName: result.participant.displayName,
       });
+      removeStored(joinDraftKey);
       setToken(result.token);
       setParticipant(result.participant);
       if (result.participant.decks.length > 0) {

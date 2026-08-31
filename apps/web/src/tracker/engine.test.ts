@@ -1157,6 +1157,27 @@ describe('commander tracker', () => {
     });
     expect(state.initiativeId).toBe('a');
   });
+
+  it('reorders seats without dropping player state', () => {
+    let state = createTracker([
+      { id: 'a', name: 'Ada' },
+      { id: 'b', name: 'Bea' },
+      { id: 'c', name: 'Cam' },
+    ]);
+    state = applyTrackerAction(state, {
+      type: 'life',
+      playerId: 'a',
+      delta: -7,
+    });
+    state = applyTrackerAction(state, {
+      type: 'reorderPlayers',
+      order: ['c', 'a', 'b'],
+    });
+    expect(state.players.map((player) => player.id)).toEqual(['c', 'a', 'b']);
+    expect(state.players.find((player) => player.id === 'a')?.life).toBe(
+      STARTING_LIFE - 7,
+    );
+  });
 });
 
 function commander(cardId: string, name: string) {

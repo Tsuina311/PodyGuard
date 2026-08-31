@@ -92,6 +92,20 @@ export function CommanderPicker({
   async function chooseCard(card: CommanderCandidate) {
     setResults([]);
     setQuery(card.name);
+    /*
+      Commit the pick before artwork loads. Waiting until a print is chosen meant
+      a mid-setup reload (common with accidental pull-to-refresh) dropped the
+      commander entirely.
+    */
+    onChange({
+      oracleId: card.oracleId,
+      cardId: card.cardId,
+      name: card.name,
+      artCropUri: card.artCropUri,
+      typeLine: card.typeLine,
+      oracleText: card.oracleText,
+      keywords: card.keywords,
+    });
     setArtCard(card);
     setArtwork([]);
     setLoadingArt(true);

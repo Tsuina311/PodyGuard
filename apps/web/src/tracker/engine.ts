@@ -220,7 +220,8 @@ export type TrackerAction =
   | { type: 'declineLoss'; playerId: string }
   | { type: 'winner'; playerId: string }
   | { type: 'first'; playerId: string }
-  | { type: 'pause' };
+  | { type: 'pause' }
+  | { type: 'reorderPlayers'; order: string[] };
 
 export function createTracker(
   names: TrackerSeed[],
@@ -686,6 +687,23 @@ export function applyTrackerAction(
         next.pausedAt = now;
       }
       break;
+    case 'reorderPlayers': {
+      const ids = action.order;
+      if (
+        ids.length !== next.players.length ||
+        new Set(ids).size !== next.players.length ||
+        ids.some((id) => !next.players.some((player) => player.id === id))
+      ) {
+        break;
+      }
+      next.players.sort(
+        (left, right) => ids.indexOf(left.id) - ids.indexOf(right.id),
+      );
+      if (next.starOrder.length === ids.length) {
+        next.starOrder = [...ids];
+      }
+      break;
+    }
     default:
       break;
   }

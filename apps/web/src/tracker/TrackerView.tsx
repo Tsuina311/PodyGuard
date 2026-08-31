@@ -11,6 +11,7 @@ import type { TFunction } from 'i18next';
 import { createPortal } from 'react-dom';
 import {
   Award,
+  ArrowUpDown,
   BookOpen,
   Building2,
   Coins,
@@ -110,6 +111,7 @@ import { SchemeSheet } from './SchemeSheet';
 import { AssassinTargetsSheet } from './AssassinTargetsSheet';
 import { TreacheryRolesSheet } from './TreacheryRolesSheet';
 import { useBoardLandscape, useOrientationLock } from './orientation';
+import { useWakeLock } from './wake-lock';
 import {
   detectAutomaticChallenges,
   detectedConfirmation,
@@ -367,6 +369,34 @@ function seatPlacementClass(
 }
 
 /**
+ * Seats on the far side of the phone (top of a landscape board) are rotated
+ * so the player across the table can read their life total upright.
+ */
+function seatFacesAway(
+  count: number,
+  index: number,
+  layout: 'default' | 'star' = 'default',
+  options: { archenemy?: boolean; archenemyId?: string | null; playerId?: string } = {},
+): boolean {
+  if (options.archenemy) {
+    return options.playerId === options.archenemyId;
+  }
+  if (count <= 3) {
+    return false;
+  }
+  if (layout === 'star' && count === 5) {
+    return index === 0 || index === 1 || index === 4;
+  }
+  if (count === 4) {
+    return index < 2;
+  }
+  if (count === 5) {
+    return index < 3;
+  }
+  return index < Math.ceil(count / 2);
+}
+
+/**
  * Where the dial sits on the board. Most pods meet in the middle; five- and
  * six-player boards need it off that seam so it does not cover the chrome.
  */
@@ -576,6 +606,7 @@ export function TrackerView({
   useOrientationLock(
     boardLive ? (readingIdentity ? 'portrait' : 'landscape') : null,
   );
+  useWakeLock(boardLive && !readingIdentity);
   const screenClass = cx(
     boardScreenClass(boardLive && forceRotate),
     boardLive && forceRotate && 'board-landscape',
@@ -1531,14 +1562,27 @@ export function TrackerView({
             : seatGridClass(state.players.length),
         )}
       >
-        {state.players.map((player, index) => (
+        {state.players.map((player, index) => {
+          const facesAway = seatFacesAway(
+            state.players.length,
+            index,
+            seatLayout,
+            {
+              archenemy: archenemyBoard,
+              archenemyId: state.archenemyId,
+              playerId: player.id,
+            },
+          );
+          return (
           <article
             key={player.id}
             data-seat-id={player.id}
             className={cx(
               'border-muted/20 relative flex min-h-0 flex-col overflow-hidden rounded-xl border p-2 transition-transform duration-200',
               player.eliminated ? 'opacity-50' : 'bg-ink/[0.03]',
-              archenemyBoard && index === 0 && 'landscape:col-span-3',
+              archenemyBoard &&
+                player.id === state.archenemyId &&
+                'landscape:col-span-3',
               seatPlacementClass(state.players.length, index, seatLayout),
               spotlightIds.has(player.id) && spotlightCard,
               spotlightIds.has(player.id) &&
@@ -1547,6 +1591,12 @@ export function TrackerView({
                   : spotlightLanded[spotlight.phase]),
             )}
           >
+            <div
+              className={cx(
+                'relative flex min-h-0 flex-1 flex-col',
+                facesAway && 'landscape:rotate-180',
+              )}
+            >
             <CommanderArt
               commanders={player.commanders}
               eliminated={player.eliminated}
@@ -1823,8 +1873,10 @@ export function TrackerView({
                 </div>
               </div>
             ) : null}
+            </div>
           </article>
-        ))}
+          );
+        })}
         <AllyArrows
           pairs={allyPairs}
           containerRef={boardRef}
@@ -2766,12 +2818,77 @@ function MatchMenu({
 }) {
   const { t } = useTranslation();
   const { openFeedback } = useFeedback();
+  const [arrangeSeats, setArrangeSeats] = useState(false);
+  const [selectedSeatId, setSelectedSeatId] = useState<string | null>(null);
   const paused = Boolean(state.pausedAt);
   const decided = Boolean(state.winnerId);
   const winner = state.players.find((row) => row.id === state.winnerId) ?? null;
   const menuWinnerTeam = winner ? teamForPlayer(state, winner.id) : [];
   const menuWinnerIds = new Set(menuWinnerTeam.map((player) => player.id));
   const menuWinnerName = menuWinnerTeam.map((player) => player.name).join(' & ');
+
+  if (arrangeSeats) {
+    return (
+      <section className="flex h-full w-full flex-col">
+        <header className="mb-1 flex shrink-0 items-center justify-between gap-3">
+          <h4 className="font-display truncate text-sm leading-tight font-bold">
+            {t('tracker.rearrangeSeats')}
+          </h4>
+          <button
+            type="button"
+            aria-label={t('common.close')}
+            onClick={() => {
+              setArrangeSeats(false);
+              setSelectedSeatId(null);
+            }}
+            className="border-muted/25 text-muted hover:text-ink hover:border-muted/50 flex size-8 shrink-0 items-center justify-center rounded-full border transition"
+          >
+            <X size={18} aria-hidden />
+          </button>
+        </header>
+        <p className="text-muted mb-3 text-center text-xs">
+          {t('tracker.rearrangeSeatsHint')}
+        </p>
+        <div className="flex min-h-0 flex-1 flex-col items-stretch justify-center gap-2 overflow-y-auto">
+          {state.players.map((seat, index) => (
+            <button
+              key={seat.id}
+              type="button"
+              onClick={() => {
+                if (!selectedSeatId) {
+                  setSelectedSeatId(seat.id);
+                  return;
+                }
+                if (selectedSeatId === seat.id) {
+                  setSelectedSeatId(null);
+                  return;
+                }
+                const order = swapStarSeats(
+                  state.players.map((player) => player.id),
+                  selectedSeatId,
+                  seat.id,
+                );
+                dispatch({ type: 'reorderPlayers', order });
+                setSelectedSeatId(null);
+              }}
+              className={cx(
+                'rounded-xl border px-3 py-3 text-left text-sm font-semibold transition',
+                selectedSeatId === seat.id
+                  ? 'border-warning bg-warning/15 text-warning'
+                  : 'border-muted/20 text-ink hover:border-muted/40',
+              )}
+            >
+              <span className="text-muted mr-2 font-mono text-xs">
+                {index + 1}
+              </span>
+              {seat.name}
+            </button>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="flex h-full w-full flex-col">
       <header className="mb-1 flex shrink-0 items-center justify-between gap-3">
@@ -2836,6 +2953,18 @@ function MatchMenu({
           <Button size="sm" variant="glass" disabled={!canUndo} onClick={onUndo}>
             <Undo2 size={14} aria-hidden />
             {t('tracker.undo')}
+          </Button>
+          <Button
+            size="sm"
+            variant="glass"
+            disabled={decided || state.players.length < 2}
+            onClick={() => {
+              setSelectedSeatId(null);
+              setArrangeSeats(true);
+            }}
+          >
+            <ArrowUpDown size={14} aria-hidden />
+            {t('tracker.rearrangeSeats')}
           </Button>
           {onChallenges ? (
             <Button size="sm" variant="glass" onClick={onChallenges}>
