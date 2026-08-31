@@ -396,6 +396,37 @@ function seatFacesAway(
   return index < Math.ceil(count / 2);
 }
 
+function playerSeatFacesAway(
+  players: Array<{ id: string }>,
+  playerId: string,
+  layout: 'default' | 'star',
+  options: { archenemy?: boolean; archenemyId?: string | null } = {},
+): boolean {
+  const index = players.findIndex((player) => player.id === playerId);
+  if (index < 0) {
+    return false;
+  }
+  return seatFacesAway(players.length, index, layout, {
+    ...options,
+    playerId,
+  });
+}
+
+/**
+ * Full-screen seat sheets portaled to `document.body` sit outside the board
+ * shell. Tag them with `board-landscape` under force-rotate so `landscape:`
+ * utilities still fire, and flip 180° when the opening seat faces away.
+ */
+function seatFacingPortalClass(
+  facesAway: boolean,
+  forceRotate: boolean,
+): string {
+  return cx(
+    forceRotate && 'board-landscape',
+    facesAway && 'landscape:rotate-180',
+  );
+}
+
 /**
  * Where the dial sits on the board. Most pods meet in the middle; five- and
  * six-player boards need it off that seam so it does not cover the chrome.
@@ -2049,6 +2080,16 @@ export function TrackerView({
                 state.players.find((player) => player.id === lifeEntry.playerId)
                   ?.name ?? 'player'
               }
+              facesAway={playerSeatFacesAway(
+                state.players,
+                lifeEntry.playerId,
+                seatLayout,
+                {
+                  archenemy: archenemyBoard,
+                  archenemyId: state.archenemyId,
+                },
+              )}
+              forceRotate={forceRotate}
               onConfirm={(amount) => {
                 send({
                   type: 'action',
@@ -2089,6 +2130,15 @@ export function TrackerView({
       {commanderDamageRules
         ? state.players.map((seat) => {
         const open = commanderPlayerId === seat.id;
+        const facesAway = playerSeatFacesAway(
+          state.players,
+          seat.id,
+          seatLayout,
+          {
+            archenemy: archenemyBoard,
+            archenemyId: state.archenemyId,
+          },
+        );
         return createPortal(
           <div
             role="dialog"
@@ -2099,6 +2149,7 @@ export function TrackerView({
             className={cx(
               'bg-void/95 fixed inset-x-0 top-0 flex h-[100dvh] p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm',
               open ? 'z-50' : 'pointer-events-none z-30',
+              seatFacingPortalClass(facesAway, forceRotate),
             )}
             onClick={(event) => {
               if (open && event.target === event.currentTarget) {
@@ -2125,7 +2176,21 @@ export function TrackerView({
               role="dialog"
               aria-modal="true"
               aria-label={t('tracker.countersFor', { name: counterPlayer.name })}
-              className="bg-void/95 fixed inset-x-0 top-0 z-50 flex h-[100dvh] p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm"
+              className={cx(
+                'bg-void/95 fixed inset-x-0 top-0 z-50 flex h-[100dvh] p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm',
+                seatFacingPortalClass(
+                  playerSeatFacesAway(
+                    state.players,
+                    counterPlayer.id,
+                    seatLayout,
+                    {
+                      archenemy: archenemyBoard,
+                      archenemyId: state.archenemyId,
+                    },
+                  ),
+                  forceRotate,
+                ),
+              )}
               onClick={(event) => {
                 if (event.target === event.currentTarget) {
                   setCounterPlayerId(null);
@@ -2160,6 +2225,9 @@ export function TrackerView({
                 state={state}
                 elapsed={elapsed}
                 canUndo={past.length > 0}
+                seatLayout={seatLayout}
+                archenemyBoard={archenemyBoard}
+                forceRotate={forceRotate}
                 dispatch={(action) => send({ type: 'action', action })}
                 onUndo={() => {
                   send({ type: 'undo' });
@@ -2787,6 +2855,9 @@ function MatchMenu({
   state,
   elapsed,
   canUndo,
+  seatLayout,
+  archenemyBoard,
+  forceRotate,
   dispatch,
   onUndo,
   onFinish,
@@ -2803,6 +2874,9 @@ function MatchMenu({
   state: TrackerState;
   elapsed: number;
   canUndo: boolean;
+  seatLayout: 'default' | 'star';
+  archenemyBoard: boolean;
+  forceRotate: boolean;
   dispatch: (action: TrackerAction) => void;
   onUndo: () => void;
   onFinish: () => Promise<void>;
@@ -2846,44 +2920,87 @@ function MatchMenu({
             <X size={18} aria-hidden />
           </button>
         </header>
-        <p className="text-muted mb-3 text-center text-xs">
+        <p className="text-muted mb-2 shrink-0 text-center text-xs">
           {t('tracker.rearrangeSeatsHint')}
         </p>
-        <div className="flex min-h-0 flex-1 flex-col items-stretch justify-center gap-2 overflow-y-auto">
-          {state.players.map((seat, index) => (
-            <button
-              key={seat.id}
-              type="button"
-              onClick={() => {
-                if (!selectedSeatId) {
-                  setSelectedSeatId(seat.id);
-                  return;
-                }
-                if (selectedSeatId === seat.id) {
+        <div
+          className={cx(
+            'relative grid min-h-0 flex-1 auto-rows-fr gap-2',
+            forceRotate && 'board-landscape',
+            archenemyBoard
+              ? 'grid-cols-1 landscape:grid-cols-3'
+              : seatGridClass(state.players.length),
+          )}
+        >
+          {state.players.map((seat, index) => {
+            const color = seatColor(index);
+            const selected = selectedSeatId === seat.id;
+            const facesAway = seatFacesAway(
+              state.players.length,
+              index,
+              seatLayout,
+              {
+                archenemy: archenemyBoard,
+                archenemyId: state.archenemyId,
+                playerId: seat.id,
+              },
+            );
+            return (
+              <button
+                key={seat.id}
+                type="button"
+                onClick={() => {
+                  if (!selectedSeatId) {
+                    setSelectedSeatId(seat.id);
+                    return;
+                  }
+                  if (selectedSeatId === seat.id) {
+                    setSelectedSeatId(null);
+                    return;
+                  }
+                  const order = swapStarSeats(
+                    state.players.map((player) => player.id),
+                    selectedSeatId,
+                    seat.id,
+                  );
+                  dispatch({ type: 'reorderPlayers', order });
                   setSelectedSeatId(null);
-                  return;
-                }
-                const order = swapStarSeats(
-                  state.players.map((player) => player.id),
-                  selectedSeatId,
-                  seat.id,
-                );
-                dispatch({ type: 'reorderPlayers', order });
-                setSelectedSeatId(null);
-              }}
-              className={cx(
-                'rounded-xl border px-3 py-3 text-left text-sm font-semibold transition',
-                selectedSeatId === seat.id
-                  ? 'border-warning bg-warning/15 text-warning'
-                  : 'border-muted/20 text-ink hover:border-muted/40',
-              )}
-            >
-              <span className="text-muted mr-2 font-mono text-xs">
-                {index + 1}
-              </span>
-              {seat.name}
-            </button>
-          ))}
+                }}
+                className={cx(
+                  'relative flex min-h-0 flex-col items-center justify-center overflow-hidden rounded-xl border p-2 transition',
+                  archenemyBoard &&
+                    seat.id === state.archenemyId &&
+                    'landscape:col-span-3',
+                  seatPlacementClass(state.players.length, index, seatLayout),
+                  selected
+                    ? 'border-warning bg-warning/20 ring-warning/40 ring-2'
+                    : 'border-muted/25 hover:border-muted/50',
+                )}
+                style={{
+                  backgroundColor: selected ? undefined : `${color}28`,
+                  boxShadow: selected
+                    ? undefined
+                    : `inset 0 0 0 1px ${color}66`,
+                }}
+              >
+                <span
+                  className={cx(
+                    'flex max-w-full flex-col items-center gap-1.5',
+                    facesAway && 'landscape:rotate-180',
+                  )}
+                >
+                  <span
+                    className="size-3.5 shrink-0 rounded-full shadow-[0_0_0_1px_rgba(0,0,0,0.35)]"
+                    style={{ backgroundColor: color }}
+                    aria-hidden
+                  />
+                  <span className="font-display truncate text-sm font-bold">
+                    {seat.name}
+                  </span>
+                </span>
+              </button>
+            );
+          })}
         </div>
       </section>
     );
@@ -3211,15 +3328,15 @@ function LifeRow({
       >
         <p
           className={cx(
-            'font-display w-[6.5rem] shrink-0 text-center leading-none font-bold tabular-nums landscape:w-[7.5rem]',
+            'font-display w-[8.5rem] shrink-0 text-center leading-none font-bold tabular-nums landscape:w-[10.5rem]',
             !lifeStyle && 'text-neon',
             digits >= 5
-              ? 'text-[clamp(0.85rem,3.2vh,1.35rem)] landscape:text-[clamp(0.85rem,5vh,1.35rem)]'
+              ? 'text-[clamp(1.1rem,4.5vh,2rem)] landscape:text-[clamp(1.15rem,7vh,2.1rem)]'
               : digits >= 4
-                ? 'text-[clamp(1rem,3.8vh,1.65rem)] landscape:text-[clamp(1rem,6vh,1.65rem)]'
+                ? 'text-[clamp(1.4rem,5.5vh,2.6rem)] landscape:text-[clamp(1.5rem,9vh,2.85rem)]'
                 : digits >= 3
-                  ? 'text-[clamp(1.2rem,4.6vh,2.2rem)] landscape:text-[clamp(1.2rem,7.5vh,2.2rem)]'
-                  : 'text-[clamp(1.75rem,6.5vh,3.25rem)] landscape:text-[clamp(1.75rem,11vh,3.25rem)]',
+                  ? 'text-[clamp(1.85rem,7.5vh,3.5rem)] landscape:text-[clamp(2rem,12vh,4rem)]'
+                  : 'text-[clamp(2.75rem,11vh,5.25rem)] landscape:text-[clamp(3rem,18vh,5.75rem)]',
             onArt,
           )}
           style={lifeStyle}
@@ -3313,8 +3430,8 @@ function LifeButton({
       onContextMenu={(event) => event.preventDefault()}
       className={cx(
         plateAccent,
-        'font-display border-neon/50 text-neon flex w-14 shrink-0 items-center justify-center rounded-xl border text-lg font-bold transition select-none disabled:opacity-40',
-        compact ? 'h-9' : 'h-full max-h-16 min-h-9',
+        'font-display border-neon/50 text-neon flex w-16 shrink-0 items-center justify-center rounded-xl border text-xl font-bold transition select-none disabled:opacity-40',
+        compact ? 'h-10' : 'h-full max-h-20 min-h-11',
       )}
     >
       {delta > 0 ? '+1' : '-1'}
@@ -3325,11 +3442,15 @@ function LifeButton({
 function LifeAmountPad({
   sign,
   playerName,
+  facesAway = false,
+  forceRotate = false,
   onConfirm,
   onClose,
 }: {
   sign: 1 | -1;
   playerName: string;
+  facesAway?: boolean;
+  forceRotate?: boolean;
   onConfirm: (amount: number) => void;
   onClose: () => void;
 }) {
@@ -3348,7 +3469,10 @@ function LifeAmountPad({
           ? t('tracker.addLifeFor', { name: playerName })
           : t('tracker.removeLifeFor', { name: playerName })
       }
-      className="bg-void/95 fixed inset-0 z-[80] flex items-center justify-center p-4 backdrop-blur-md"
+      className={cx(
+        'bg-void/95 fixed inset-0 z-[80] flex items-center justify-center p-4 backdrop-blur-md',
+        seatFacingPortalClass(facesAway, forceRotate),
+      )}
       onClick={(event) => {
         if (event.target === event.currentTarget) {
           onClose();
