@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type {
+  EventSnapshot,
   EventMetrics,
   PublicEvent,
   PublicParticipant,
@@ -57,6 +58,7 @@ import { useEventLive } from './useEventLive';
 import { ChallengePackEditor } from './ChallengePackEditor';
 import { HostMetrics } from './HostMetrics';
 import { TournamentPanel } from './tournament/TournamentPanel';
+import { LimitedHostPanel } from './limited/LimitedHostPanel';
 
 export function HostPage() {
   const { t } = useTranslation();
@@ -67,6 +69,7 @@ export function HostPage() {
   const [hostToken, setHostToken] = useState<string | null>(null);
   const [participants, setParticipants] = useState<PublicParticipant[]>([]);
   const [tables, setTables] = useState<PublicTable[]>([]);
+  const [limitedSnapshot, setLimitedSnapshot] = useState<EventSnapshot | null>(null);
   const [hostPin, setHostPin] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -95,10 +98,11 @@ export function HostPage() {
   }, [code]);
 
   const onSnapshot = useCallback(
-    (snapshot: { event: PublicEvent; participants: PublicParticipant[]; tables: PublicTable[] }) => {
+    (snapshot: EventSnapshot) => {
       setEvent(snapshot.event);
       setParticipants(snapshot.participants);
       setTables(snapshot.tables);
+      setLimitedSnapshot(snapshot);
     },
     [],
   );
@@ -778,6 +782,37 @@ export function HostPage() {
         />
       ) : null}
 
+      {hostToken && event.limitedModeConfigs?.some((config) => config.enabled) ? (
+        <LimitedHostPanel
+          joinCode={code}
+          hostToken={hostToken}
+          snapshot={{
+            event,
+            participants,
+            tables,
+            ...(limitedSnapshot?.limitedQueues
+              ? { limitedQueues: limitedSnapshot.limitedQueues }
+              : {}),
+            ...(limitedSnapshot?.limitedSessions
+              ? { limitedSessions: limitedSnapshot.limitedSessions }
+              : {}),
+          }}
+          onSession={(session) =>
+            setLimitedSnapshot((current) => ({
+              event,
+              participants,
+              tables,
+              ...(current?.limitedQueues ? { limitedQueues: current.limitedQueues } : {}),
+              limitedSessions: [
+                ...(current?.limitedSessions ?? []).filter((row) => row.id !== session.id),
+                session,
+              ],
+            }))
+          }
+          onError={setError}
+        />
+      ) : null}
+
       <Panel title={t('host.joinCodeTitle')} aside={t('host.share')}>
         <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
           <JoinQr value={phoneJoinUrl} />
@@ -1074,6 +1109,14 @@ export function HostPage() {
         <Link className="hover:text-ink" to={`/e/${code}`}>
           {t('host.playerJoinPage')}
         </Link>
+        {event.limitedModeConfigs?.some((config) => config.enabled) ? (
+          <>
+            <span className="mx-2">·</span>
+            <Link className="hover:text-ink" to={`/display/${code}`}>
+              Limited floor display
+            </Link>
+          </>
+        ) : null}
       </p>
     </>
   );

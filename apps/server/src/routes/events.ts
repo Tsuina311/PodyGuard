@@ -3,7 +3,13 @@ import {
   normalizeJoinCode,
   parseGameMode,
   parseRulesFormat,
+  isLimitedMode,
+  defaultLimitedEventModeConfig,
   type CommanderSelection,
+  type LimitedEventModeConfig,
+  type LimitedMatchOutcome,
+  type LimitedSessionStatus,
+  type LimitedTimerPhase,
 } from '@podyguard/shared';
 import {
   EventNotFoundError,
@@ -13,8 +19,10 @@ import {
   ParticipantNotFoundError,
   TableNotFoundError,
   DevToolsDisabledError,
+  LimitedPersistenceConflictError,
   PodNotFoundError,
 } from '../events/event-store.js';
+import { LimitedSessionNotFoundError } from '../events/event-service.js';
 import { InvalidEventInputError } from '../events/validation.js';
 import {
   InvalidHostEventSessionError,
@@ -54,6 +62,7 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
       lifetimeHours?: unknown;
       tournamentFormat?: unknown;
       tournamentOptions?: unknown;
+      limitedModeConfigs?: unknown;
     };
     try {
       const result = await app.events.createEvent({
@@ -82,6 +91,7 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
                 swissRounds?: number;
               })
             : undefined,
+        limitedModeConfigs: parseLimitedModeConfigs(body.limitedModeConfigs),
       });
       return reply.code(201).send(result);
     } catch (error) {
@@ -288,6 +298,393 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
       return sendEventError(reply, error);
     }
   });
+
+  app.put('/events/:joinCode/limited/queue', async (request, reply) => {
+    const { joinCode } = request.params as { joinCode: string };
+    const body = (request.body ?? {}) as { mode?: unknown };
+    try {
+      if (!isLimitedMode(body.mode)) {
+        throw new InvalidEventInputError('Choose a valid Limited mode.');
+      }
+      const snapshot = await app.events.joinLimitedQueue(
+        normalizeJoinCode(joinCode),
+        bearerToken(request.headers.authorization),
+        body.mode,
+      );
+      await app.live.publish(normalizeJoinCode(joinCode));
+      return { snapshot };
+    } catch (error) {
+      return sendEventError(reply, error);
+    }
+  });
+
+  app.delete('/events/:joinCode/limited/queue', async (request, reply) => {
+    const { joinCode } = request.params as { joinCode: string };
+    try {
+      const snapshot = await app.events.leaveLimitedQueue(
+        normalizeJoinCode(joinCode),
+        bearerToken(request.headers.authorization),
+      );
+      await app.live.publish(normalizeJoinCode(joinCode));
+      return { snapshot };
+    } catch (error) {
+      return sendEventError(reply, error);
+    }
+  });
+
+  app.post('/events/:joinCode/limited/sessions', async (request, reply) => {
+    const { joinCode } = request.params as { joinCode: string };
+    const body = (request.body ?? {}) as {
+      mode?: unknown;
+      participantCount?: unknown;
+      allowUndersizedLaunch?: unknown;
+      label?: unknown;
+      draftTableIds?: unknown;
+    };
+    try {
+      if (!isLimitedMode(body.mode)) {
+        throw new InvalidEventInputError('Choose a valid Limited mode.');
+      }
+      const session = await app.events.createLimitedSession(
+        normalizeJoinCode(joinCode),
+        bearerToken(request.headers.authorization),
+        {
+          mode: body.mode,
+          participantCount:
+            typeof body.participantCount === 'number'
+              ? body.participantCount
+              : undefined,
+          allowUndersizedLaunch: body.allowUndersizedLaunch === true,
+          label: typeof body.label === 'string' ? body.label : undefined,
+          draftTableIds: stringArray(body.draftTableIds, 'draftTableIds'),
+        },
+      );
+      await app.live.publish(normalizeJoinCode(joinCode));
+      return reply.code(201).send({ session });
+    } catch (error) {
+      return sendEventError(reply, error);
+    }
+  });
+
+  app.post(
+    '/events/:joinCode/limited/sessions/:sessionId/launch',
+    async (request, reply) => {
+      const { joinCode, sessionId } = request.params as {
+        joinCode: string;
+        sessionId: string;
+      };
+      try {
+        const session = await app.events.launchLimitedSession(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          sessionId,
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return { session };
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
+  app.put(
+    '/events/:joinCode/limited/sessions/:sessionId/roster',
+    async (request, reply) => {
+      const { joinCode, sessionId } = request.params as {
+        joinCode: string;
+        sessionId: string;
+      };
+      const body = (request.body ?? {}) as { participantIds?: unknown };
+      try {
+        const participantIds = stringArray(
+          body.participantIds,
+          'participantIds',
+        );
+        if (!participantIds) {
+          throw new InvalidEventInputError(
+            'participantIds must be a list of strings.',
+          );
+        }
+        const session = await app.events.replaceLimitedSessionRoster(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          sessionId,
+          participantIds,
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return { session };
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
+  app.put(
+    '/events/:joinCode/limited/sessions/:sessionId/tables',
+    async (request, reply) => {
+      const { joinCode, sessionId } = request.params as {
+        joinCode: string;
+        sessionId: string;
+      };
+      const body = (request.body ?? {}) as { tableIds?: unknown };
+      try {
+        const tableIds = stringArray(body.tableIds, 'tableIds');
+        if (!tableIds) {
+          throw new InvalidEventInputError(
+            'tableIds must be a list of strings.',
+          );
+        }
+        const session = await app.events.replaceLimitedDraftTables(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          sessionId,
+          tableIds,
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return { session };
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
+  app.post(
+    '/events/:joinCode/limited/sessions/:sessionId/phase',
+    async (request, reply) => {
+      const { joinCode, sessionId } = request.params as {
+        joinCode: string;
+        sessionId: string;
+      };
+      const body = (request.body ?? {}) as {
+        status?: unknown;
+        durationSeconds?: unknown;
+      };
+      try {
+        const status = parseLimitedSessionStatus(body.status);
+        const session = await app.events.advanceLimitedSession(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          sessionId,
+          status,
+          typeof body.durationSeconds === 'number'
+            ? body.durationSeconds
+            : undefined,
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return { session };
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
+  app.post(
+    '/events/:joinCode/limited/sessions/:sessionId/timer',
+    async (request, reply) => {
+      const { joinCode, sessionId } = request.params as {
+        joinCode: string;
+        sessionId: string;
+      };
+      const body = (request.body ?? {}) as {
+        action?: unknown;
+        durationSeconds?: unknown;
+        seconds?: unknown;
+        phase?: unknown;
+      };
+      try {
+        const action =
+          body.action === 'START' ||
+          body.action === 'PAUSE' ||
+          body.action === 'RESUME' ||
+          body.action === 'ADD'
+            ? body.action
+            : undefined;
+        if (!action) {
+          throw new InvalidEventInputError('Choose a Limited timer action.');
+        }
+        const session = await app.events.updateLimitedTimer(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          sessionId,
+          action,
+          {
+            durationSeconds:
+              typeof body.durationSeconds === 'number'
+                ? body.durationSeconds
+                : undefined,
+            seconds: typeof body.seconds === 'number' ? body.seconds : undefined,
+            phase: parseLimitedTimerPhase(body.phase),
+          },
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return { session };
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
+  app.post(
+    '/events/:joinCode/limited/sessions/:sessionId/rounds',
+    async (request, reply) => {
+      const { joinCode, sessionId } = request.params as {
+        joinCode: string;
+        sessionId: string;
+      };
+      try {
+        const session = await app.events.startLimitedRound(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          sessionId,
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return reply.code(201).send({ session });
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
+  app.post(
+    '/events/:joinCode/limited/sessions/:sessionId/matches/:matchId/result',
+    async (request, reply) => {
+      const { joinCode, sessionId, matchId } = request.params as {
+        joinCode: string;
+        sessionId: string;
+        matchId: string;
+      };
+      try {
+        const session = await app.events.reportLimitedResult(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          sessionId,
+          matchId,
+          parseLimitedResult(request.body),
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return { session };
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
+  app.post(
+    '/events/:joinCode/limited/sessions/:sessionId/matches/:matchId/correct',
+    async (request, reply) => {
+      const { joinCode, sessionId, matchId } = request.params as {
+        joinCode: string;
+        sessionId: string;
+        matchId: string;
+      };
+      const body = (request.body ?? {}) as { correctionReason?: unknown };
+      try {
+        const session = await app.events.correctLimitedResult(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          sessionId,
+          matchId,
+          {
+            ...parseLimitedResult(body),
+            correctionReason:
+              typeof body.correctionReason === 'string'
+                ? body.correctionReason
+                : '',
+          },
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return { session };
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
+  app.post(
+    '/events/:joinCode/limited/sessions/:sessionId/drop',
+    async (request, reply) => {
+      const { joinCode, sessionId } = request.params as {
+        joinCode: string;
+        sessionId: string;
+      };
+      try {
+        const session = await app.events.dropLimitedPlayer(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          sessionId,
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return { session };
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
+  app.post(
+    '/events/:joinCode/limited/sessions/:sessionId/participants/:participantId/drop',
+    async (request, reply) => {
+      const { joinCode, sessionId, participantId } = request.params as {
+        joinCode: string;
+        sessionId: string;
+        participantId: string;
+      };
+      try {
+        const session = await app.events.dropLimitedPlayer(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          sessionId,
+          participantId,
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return { session };
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
+  app.post(
+    '/events/:joinCode/limited/sessions/:sessionId/cancel',
+    async (request, reply) => {
+      const { joinCode, sessionId } = request.params as {
+        joinCode: string;
+        sessionId: string;
+      };
+      try {
+        const session = await app.events.cancelLimitedSession(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          sessionId,
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return { session };
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
+  app.post(
+    '/events/:joinCode/limited/sessions/:sessionId/complete',
+    async (request, reply) => {
+      const { joinCode, sessionId } = request.params as {
+        joinCode: string;
+        sessionId: string;
+      };
+      try {
+        const session = await app.events.completeLimitedSession(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          sessionId,
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return { session };
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
 
   app.post('/events/:joinCode/leave', async (request, reply) => {
     const { joinCode } = request.params as { joinCode: string };
@@ -730,6 +1127,117 @@ function parseDeckDrafts(
   });
 }
 
+function parseLimitedModeConfigs(value: unknown): LimitedEventModeConfig[] | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (!Array.isArray(value)) {
+    throw new InvalidEventInputError('Limited mode configs must be a list.');
+  }
+  return value.map((item) => {
+    if (!item || typeof item !== 'object') {
+      throw new InvalidEventInputError('Each Limited mode config is invalid.');
+    }
+    const row = item as Record<string, unknown>;
+    if (!isLimitedMode(row.mode)) {
+      throw new InvalidEventInputError('Choose a valid Limited mode.');
+    }
+    const defaults = defaultLimitedEventModeConfig(row.mode);
+    return {
+      ...defaults,
+      enabled: row.enabled === undefined ? defaults.enabled : row.enabled === true,
+      matchStructure:
+        row.matchStructure === 'BO1' || row.matchStructure === 'BO3'
+          ? row.matchStructure
+          : defaults.matchStructure,
+      preferredCohortSize:
+        typeof row.preferredCohortSize === 'number'
+          ? row.preferredCohortSize
+          : defaults.preferredCohortSize,
+      minCohortSize:
+        typeof row.minCohortSize === 'number'
+          ? row.minCohortSize
+          : defaults.minCohortSize,
+      maxCohortSize:
+        typeof row.maxCohortSize === 'number'
+          ? row.maxCohortSize
+          : defaults.maxCohortSize,
+      allowUndersizedLaunch:
+        row.allowUndersizedLaunch === undefined
+          ? defaults.allowUndersizedLaunch
+          : row.allowUndersizedLaunch === true,
+      totalRounds:
+        row.totalRounds === 'AUTO' || typeof row.totalRounds === 'number'
+          ? row.totalRounds
+          : defaults.totalRounds,
+      draftMinutes:
+        typeof row.draftMinutes === 'number'
+          ? row.draftMinutes
+          : defaults.draftMinutes,
+      deckbuildingMinutes:
+        typeof row.deckbuildingMinutes === 'number'
+          ? row.deckbuildingMinutes
+          : defaults.deckbuildingMinutes,
+      roundMinutes:
+        typeof row.roundMinutes === 'number'
+          ? row.roundMinutes
+          : defaults.roundMinutes,
+    };
+  });
+}
+
+function stringArray(value: unknown, field: string): string[] | undefined {
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value) || value.some((item) => typeof item !== 'string')) {
+    throw new InvalidEventInputError(`${field} must be a list of strings.`);
+  }
+  return value as string[];
+}
+
+function parseLimitedSessionStatus(value: unknown): LimitedSessionStatus {
+  const allowed: LimitedSessionStatus[] = [
+    'DRAFTING',
+    'DECKBUILDING',
+    'BETWEEN_ROUNDS',
+  ];
+  if (!allowed.includes(value as LimitedSessionStatus)) {
+    throw new InvalidEventInputError('Choose a valid next Limited phase.');
+  }
+  return value as LimitedSessionStatus;
+}
+
+function parseLimitedTimerPhase(value: unknown): LimitedTimerPhase | undefined {
+  return value === 'DRAFTING' || value === 'DECKBUILDING' || value === 'ROUND'
+    ? value
+    : undefined;
+}
+
+function parseLimitedResult(value: unknown): {
+  outcome: LimitedMatchOutcome;
+  playerAGameWins: number;
+  playerBGameWins: number;
+} {
+  const body = (value ?? {}) as Record<string, unknown>;
+  const outcomes: LimitedMatchOutcome[] = [
+    'PLAYER_A_WIN',
+    'PLAYER_B_WIN',
+    'DRAW',
+    'DOUBLE_LOSS',
+  ];
+  if (!outcomes.includes(body.outcome as LimitedMatchOutcome)) {
+    throw new InvalidEventInputError('Choose a valid Limited result.');
+  }
+  return {
+    outcome: body.outcome as LimitedMatchOutcome,
+    playerAGameWins:
+      typeof body.playerAGameWins === 'number'
+        ? body.playerAGameWins
+        : Number.NaN,
+    playerBGameWins:
+      typeof body.playerBGameWins === 'number'
+        ? body.playerBGameWins
+        : Number.NaN,
+  };
+}
+
 function parseCommanders(value: unknown): CommanderSelection[] {
   if (!Array.isArray(value)) {
     throw new InvalidEventInputError('Commanders must be a list.');
@@ -776,13 +1284,15 @@ function sendEventError(
     error instanceof EventNotFoundError ||
     error instanceof TableNotFoundError ||
     error instanceof PodNotFoundError ||
-    error instanceof ParticipantNotFoundError
+    error instanceof ParticipantNotFoundError ||
+    error instanceof LimitedSessionNotFoundError
   ) {
     return reply.code(404).send(errorBody(error.code, error.message));
   }
   if (
     error instanceof EventNotJoinableError ||
-    error instanceof InvalidParticipantTransitionError
+    error instanceof InvalidParticipantTransitionError ||
+    error instanceof LimitedPersistenceConflictError
   ) {
     return reply.code(409).send(errorBody(error.code, error.message));
   }

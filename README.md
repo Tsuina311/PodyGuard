@@ -172,3 +172,7 @@ Simulation benchmark artifacts are written under the gitignored
 `artifacts/simulation/` directory. See
 [`packages/simulation/README.md`](packages/simulation/README.md) for metrics,
 baseline comparison, and reproducibility details.
+
+Physical Booster Draft, Pick-Two Draft, and Sealed event architecture,
+lifecycles, API routes, and MVP boundaries are documented in
+[`LIMITED_EVENTS.md`](LIMITED_EVENTS.md).

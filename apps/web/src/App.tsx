@@ -15,18 +15,23 @@ import { HostPage } from './HostPage';
 import { JoinPage } from './JoinPage';
 import { MatchConfigPage } from './MatchConfigPage';
 import { MatchSandboxPage } from './MatchSandboxPage';
+import { LimitedDisplayPage } from './limited/LimitedDisplayPage';
+import { LocalLimitedPage } from './limited/LocalLimitedPage';
 import { cx } from './ui/cx';
 import { ServerWakeScreen } from './ui/ServerWakeScreen';
 
 export function App() {
   const { t } = useTranslation();
   // `/match` deliberately shares the player layout so it matches a real phone.
-  const wide = Boolean(useMatch('/host/:joinCode'));
+  const host = useMatch('/host/:joinCode');
+  const display = useMatch('/display/:joinCode');
+  const wide = Boolean(host || display);
   // Both routes are probed on every render: `||` would skip the second hook.
   const sandbox = useMatch('/match');
   const sandboxConfig = useMatch('/match-config');
+  const localLimited = useMatch('/limited');
   const home = useMatch({ path: '/', end: true });
-  const localOnly = Boolean(sandbox || sandboxConfig);
+  const localOnly = Boolean(sandbox || sandboxConfig || localLimited);
   const waking = useServerWake() && !localOnly;
   return (
     <FeedbackProvider>
@@ -48,8 +53,10 @@ export function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/e/:joinCode" element={<JoinPage />} />
             <Route path="/host/:joinCode" element={<HostPage />} />
+            <Route path="/display/:joinCode" element={<LimitedDisplayPage />} />
             <Route path="/match" element={<MatchSandboxPage />} />
             <Route path="/match-config" element={<MatchConfigPage />} />
+            <Route path="/limited" element={<LocalLimitedPage />} />
             <Route
               path="*"
               element={

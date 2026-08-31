@@ -145,6 +145,83 @@ export function modeUsesFamily(
   return MODES_BY_FAMILY[family].includes(mode);
 }
 
+/**
+ * One picker row for constructed play/host. Duel and multiplayer resolve to
+ * their commander twins when the Classic/Commander switch is on; other modes
+ * keep the same id and only flip rulesFormat.
+ */
+export const CONSTRUCTED_BASE_MODES = [
+  'duel',
+  'multiplayer',
+  'brawl',
+  'treachery',
+  'two-headed-giant',
+  'archenemy-commander',
+  'emperor',
+  'star',
+  'assassin',
+] as const;
+
+export type ConstructedBaseMode = (typeof CONSTRUCTED_BASE_MODES)[number];
+
+export function baseModeFromGameMode(mode: GameMode): ConstructedBaseMode {
+  if (mode === 'duel-commander') {
+    return 'duel';
+  }
+  if (mode === 'commander') {
+    return 'multiplayer';
+  }
+  if ((CONSTRUCTED_BASE_MODES as readonly string[]).includes(mode)) {
+    return mode as ConstructedBaseMode;
+  }
+  return 'multiplayer';
+}
+
+/** Brawl has no Classic twin — only offered while Commander rules are on. */
+export function baseModeRequiresCommander(base: ConstructedBaseMode): boolean {
+  return base === 'brawl';
+}
+
+export function resolveConstructedMode(
+  base: ConstructedBaseMode,
+  commander: boolean,
+): { gameMode: GameMode; rulesFormat: RulesFormat } {
+  if (base === 'duel') {
+    return commander
+      ? { gameMode: 'duel-commander', rulesFormat: 'commander' }
+      : { gameMode: 'duel', rulesFormat: 'normal' };
+  }
+  if (base === 'multiplayer') {
+    return commander
+      ? { gameMode: 'commander', rulesFormat: 'commander' }
+      : { gameMode: 'multiplayer', rulesFormat: 'normal' };
+  }
+  if (base === 'brawl') {
+    return { gameMode: 'brawl', rulesFormat: 'commander' };
+  }
+  return {
+    gameMode: base,
+    rulesFormat: commander ? 'commander' : 'normal',
+  };
+}
+
+export function isCommanderEnabled(
+  mode: GameMode,
+  rulesFormat?: RulesFormat,
+): boolean {
+  if (mode === 'duel' || mode === 'multiplayer') {
+    return false;
+  }
+  if (
+    mode === 'duel-commander' ||
+    mode === 'commander' ||
+    mode === 'brawl'
+  ) {
+    return true;
+  }
+  return (rulesFormat ?? 'commander') === 'commander';
+}
+
 export const SEAT_COUNTS = [2, 3, 4, 5, 6];
 export const CLASSIC_COMMANDER_SEAT_COUNTS = [3, 4, 5, 6] as const;
 const DUEL_SEAT_COUNT = 2;

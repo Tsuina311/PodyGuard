@@ -15,6 +15,7 @@ import {
   worstCommanderDamage,
 } from './engine';
 import { dealTreacheryIdentities } from './treachery';
+import { legalNextRoomIds } from './dungeons';
 
 function twoHeadedGiant() {
   let state = createTracker([
@@ -1119,6 +1120,42 @@ describe('commander tracker', () => {
     });
     expect(initiative.dungeons.b?.dungeonId).toBe('undercity');
     expect(initiative.dungeons.b?.roomId).toBe('secret');
+  });
+
+  it('re-enters Undercity while still holding the initiative after finishing it', () => {
+    let state = createTracker([{ id: 'a', name: 'Ada' }]);
+    state = applyTrackerAction(state, {
+      type: 'initiative',
+      playerId: 'a',
+    });
+    expect(state.dungeons.a?.dungeonId).toBe('undercity');
+    expect(state.initiativeId).toBe('a');
+
+    while (state.dungeons.a && !state.dungeons.a.completed) {
+      const nextRooms = legalNextRoomIds(state.dungeons.a);
+      expect(nextRooms.length).toBeGreaterThan(0);
+      state = applyTrackerAction(state, {
+        type: 'advanceDungeon',
+        playerId: 'a',
+        roomId: nextRooms[0]!,
+      });
+    }
+    expect(state.dungeons.a?.completed).toBe(true);
+    expect(state.initiativeId).toBe('a');
+
+    state = applyTrackerAction(state, {
+      type: 'enterDungeon',
+      playerId: 'a',
+      dungeonId: 'undercity',
+      viaInitiative: true,
+    });
+    expect(state.dungeons.a).toMatchObject({
+      dungeonId: 'undercity',
+      roomId: 'secret',
+      completed: false,
+      visitedRoomIds: ['secret'],
+    });
+    expect(state.initiativeId).toBe('a');
   });
 });
 

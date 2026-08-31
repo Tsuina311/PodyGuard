@@ -6,6 +6,12 @@ import type {
 import type { ChallengePack, PublicChallengeCompletion } from './challenges';
 import type { GameMode, PublicTreacheryIdentity } from './treachery';
 import type { TournamentFormat, TournamentState } from './tournament';
+import type {
+  LimitedEventModeConfig,
+  LimitedMode,
+  LimitedQueueSummary,
+  PublicLimitedSession,
+} from './limited';
 
 export type PublicEvent = {
   id: string;
@@ -23,6 +29,8 @@ export type PublicEvent = {
   tournamentFormat?: TournamentFormat;
   /** Registration, rounds, and progression for tournament events. */
   tournament?: TournamentState;
+  /** Independently enabled rolling Limited queues for this global event. */
+  limitedModeConfigs?: LimitedEventModeConfig[];
   /** Total hours from creation until the join code dies. */
   lifetimeHours: number;
   expiresAt: string;
@@ -56,6 +64,8 @@ export type PublicParticipant = {
   isBot: boolean;
   tableLabel?: string;
   readyAt?: string;
+  limitedQueueMode?: LimitedMode;
+  limitedQueuedAt?: string;
   decks: PublicDeck[];
   assignedPoolId?: string;
   assignedDeckName?: string;
@@ -84,6 +94,8 @@ export type EventSnapshot = {
   event: PublicEvent;
   participants: PublicParticipant[];
   tables: PublicTable[];
+  limitedQueues?: LimitedQueueSummary[];
+  limitedSessions?: PublicLimitedSession[];
 };
 
 export type PublicPod = {
@@ -110,7 +122,16 @@ export type ProductEventName =
   | 'challenge_completed'
   | 'flex_concession_used'
   | 'identity_unveiled'
-  | 'pod_rated';
+  | 'pod_rated'
+  | 'limited_queued'
+  | 'limited_session_created'
+  | 'limited_phase_changed'
+  | 'limited_round_created'
+  | 'limited_result_reported'
+  | 'limited_result_corrected'
+  | 'limited_participant_dropped'
+  | 'limited_session_completed'
+  | 'limited_host_override';
 
 export type EventMetrics = {
   participants: number;
@@ -128,4 +149,16 @@ export type EventMetrics = {
   challengeCompletions: number;
   challengePoints: number;
   podRating: { average: number; count: number } | null;
+  limited: {
+    sessions: number;
+    completedSessions: number;
+    cancelledSessions: number;
+    droppedParticipants: number;
+    undersizedLaunches: number;
+    resultCorrections: number;
+    averageCohortSize: number | null;
+    queueWaitSeconds: { average: number; p95: number; max: number } | null;
+    formationSeconds: { average: number; count: number } | null;
+    roundDurationSeconds: { average: number; count: number } | null;
+  };
 };

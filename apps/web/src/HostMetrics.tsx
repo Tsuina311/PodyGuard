@@ -60,6 +60,37 @@ export function HostMetrics({ metrics }: { metrics: EventMetrics }) {
               : t('common.dash')
           }
         />
+        {metrics.limited.sessions > 0 ? (
+          <>
+            <Metric label="Limited sessions" value={metrics.limited.sessions} />
+            <Metric
+              label="Limited completed"
+              value={metrics.limited.completedSessions}
+            />
+            <Metric
+              label="Limited queue avg"
+              value={seconds(
+                metrics.limited.queueWaitSeconds?.average,
+                t('common.dash'),
+              )}
+            />
+            <Metric
+              label="Limited round avg"
+              value={seconds(
+                metrics.limited.roundDurationSeconds?.average,
+                t('common.dash'),
+              )}
+            />
+            <Metric
+              label="Limited drops"
+              value={metrics.limited.droppedParticipants}
+            />
+            <Metric
+              label="Result corrections"
+              value={metrics.limited.resultCorrections}
+            />
+          </>
+        ) : null}
       </dl>
       <p className="text-muted mt-3 text-xs">
         {t('hostMetrics.podSizes')}{' '}

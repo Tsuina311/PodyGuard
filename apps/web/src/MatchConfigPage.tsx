@@ -1,23 +1,27 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { COMMANDER_POOLS, usesCommanderRules, type RulesFormat } from '@podyguard/shared';
+import { COMMANDER_POOLS, usesCommanderRules } from '@podyguard/shared';
 import { useTranslation } from 'react-i18next';
 import {
   CommanderSeatPickers,
   commandersCompleteForSeats,
 } from './CommanderSeatPickers';
 import {
+  CONSTRUCTED_BASE_MODES,
+  baseModeFromGameMode,
+  baseModeRequiresCommander,
   commanderSearchProfileForConfig,
   defaultSeatNames,
+  isCommanderEnabled,
   loadMatchConfig,
   matchPlayers,
-  modesForFamily,
+  resolveConstructedMode,
   saveMatchConfig,
   seatCountForMode,
   seatCountsForMode,
   trackerStorageKey,
+  type ConstructedBaseMode,
   type MatchConfig,
-  type StandaloneGameMode,
 } from './match-config';
 import { removeStored } from './device-storage';
 import { Badge } from './ui/Badge';
@@ -45,6 +49,8 @@ export function MatchConfigPage() {
     config.seatCount,
     config.commanders,
   );
+  const baseMode = baseModeFromGameMode(config.gameMode);
+  const commanderOn = isCommanderEnabled(config.gameMode, config.rulesFormat);
 
   function update(patch: Partial<MatchConfig>) {
     setConfig((current) => {
@@ -54,11 +60,17 @@ export function MatchConfigPage() {
     });
   }
 
-  function setGameMode(gameMode: StandaloneGameMode, rulesFormat: RulesFormat) {
+  function applyConstructed(base: ConstructedBaseMode, commander: boolean) {
+    if (baseModeRequiresCommander(base) && !commander) {
+      return;
+    }
+    const resolvedBase =
+      !commander && baseModeRequiresCommander(base) ? 'duel' : base;
+    const resolved = resolveConstructedMode(resolvedBase, commander);
     update({
-      gameMode,
-      rulesFormat,
-      seatCount: seatCountForMode(gameMode, config.seatCount),
+      gameMode: resolved.gameMode,
+      rulesFormat: resolved.rulesFormat,
+      seatCount: seatCountForMode(resolved.gameMode, config.seatCount),
     });
   }
 
@@ -111,36 +123,66 @@ export function MatchConfigPage() {
           <summary className="text-muted cursor-pointer px-3 py-2 text-xs font-medium tracking-[0.14em] uppercase">
             {t('matchConfig.changeMode')}
           </summary>
-          <div className="border-muted/15 space-y-4 border-t px-3 py-3">
-            {(
-              [
-                ['normal', 'families.normal'],
-                ['commander', 'families.commander'],
-              ] as const
-            ).map(([family, labelKey]) => (
-              <div key={family}>
-                <p className="text-muted mb-2 text-xs font-medium tracking-[0.14em] uppercase">
-                  {t(labelKey)}
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {modesForFamily(family).map((mode) => (
-                    <Button
-                      key={`${family}-${mode.id}`}
-                      size="sm"
-                      variant={
-                        config.gameMode === mode.id &&
-                        config.rulesFormat === family
-                          ? 'neon'
-                          : 'glass'
-                      }
-                      onClick={() => setGameMode(mode.id, family)}
-                    >
-                      {t(`modes.${mode.id}.label`)}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            ))}
+          <div className="border-muted/15 space-y-3 border-t px-3 py-3">
+            <div
+              role="group"
+              aria-label={t('home.rulesFormat')}
+              className="border-muted/20 grid grid-cols-2 gap-1 rounded-xl border p-1"
+            >
+              <button
+                type="button"
+                aria-pressed={!commanderOn}
+                onClick={() =>
+                  applyConstructed(
+                    baseModeRequiresCommander(baseMode) ? 'duel' : baseMode,
+                    false,
+                  )
+                }
+                className={cx(
+                  'rounded-lg px-3 py-2 text-sm font-semibold transition',
+                  !commanderOn
+                    ? 'bg-neon/15 text-neon'
+                    : 'text-muted hover:text-ink',
+                )}
+              >
+                {t('home.classicRules')}
+              </button>
+              <button
+                type="button"
+                aria-pressed={commanderOn}
+                onClick={() => applyConstructed(baseMode, true)}
+                className={cx(
+                  'rounded-lg px-3 py-2 text-sm font-semibold transition',
+                  commanderOn
+                    ? 'bg-neon/15 text-neon'
+                    : 'text-muted hover:text-ink',
+                )}
+              >
+                {t('home.commanderRules')}
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {CONSTRUCTED_BASE_MODES.map((mode) => {
+                const disabled =
+                  baseModeRequiresCommander(mode) && !commanderOn;
+                return (
+                  <Button
+                    key={mode}
+                    size="sm"
+                    variant={baseMode === mode ? 'neon' : 'glass'}
+                    disabled={disabled}
+                    title={
+                      disabled
+                        ? t('home.brawlRequiresCommander')
+                        : undefined
+                    }
+                    onClick={() => applyConstructed(mode, commanderOn)}
+                  >
+                    {t(`modes.${mode}.label`)}
+                  </Button>
+                );
+              })}
+            </div>
             <div>
               <p className="text-muted mb-2 text-xs font-medium tracking-[0.14em] uppercase">
                 {t('matchConfig.seats')}

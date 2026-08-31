@@ -6,6 +6,7 @@ export function computeEventMetrics(input: {
   tables: StoredTable[];
   games: StoredCompletedGame[];
   challengeCompletions: Array<{ points: number }>;
+  limited?: EventMetrics['limited'];
 }): EventMetrics {
   const humans = input.participants.filter((row) => !row.isBot);
   const waits = input.games.flatMap((game) =>
@@ -92,6 +93,18 @@ export function computeEventMetrics(input: {
       ratings.length === 0
         ? null
         : { average: average(ratings), count: ratings.length },
+    limited: input.limited ?? {
+      sessions: 0,
+      completedSessions: 0,
+      cancelledSessions: 0,
+      droppedParticipants: 0,
+      undersizedLaunches: 0,
+      resultCorrections: 0,
+      averageCohortSize: null,
+      queueWaitSeconds: null,
+      formationSeconds: null,
+      roundDurationSeconds: null,
+    },
   };
 }
 

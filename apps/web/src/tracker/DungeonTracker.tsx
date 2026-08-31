@@ -107,15 +107,20 @@ export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
         <div className="relative grid min-h-0 flex-1 grid-cols-2 place-items-center gap-1 landscape:grid-cols-4">
           {DUNGEONS.map((dungeon) => {
             const isUndercity = dungeon.initiativeOnly;
-            const lockedOut = isUndercity && holdsInitiative;
+            /*
+              After finishing Undercity you still have the initiative until
+              someone takes it. Tapping Undercity again ventures from the start
+              (same as the upkeep venture).
+            */
+            const undercityReenter = isUndercity && holdsInitiative;
             return (
               <button
                 key={dungeon.id}
                 type="button"
                 title={
                   isUndercity
-                    ? holdsInitiative
-                      ? t('dungeon.alreadyHoldInitiative')
+                    ? undercityReenter
+                      ? t('dungeon.reenterUndercity')
                       : t('dungeon.takeAndEnterUndercity')
                     : completedIds.has(dungeon.id)
                       ? t('dungeon.completed', { name: dungeon.name })
@@ -125,16 +130,21 @@ export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
                   'border-muted/20 relative aspect-[488/680] h-auto max-h-full w-full max-w-full min-h-0 overflow-hidden rounded-lg border transition',
                   isUndercity && !holdsInitiative
                     ? 'hover:border-warning/70 hover:shadow-[0_0_22px_-8px_var(--color-warning)]'
-                    : lockedOut
-                      ? 'cursor-default opacity-55'
-                      : 'hover:border-neon/60 hover:shadow-[0_0_22px_-8px_var(--color-neon)]',
+                    : 'hover:border-neon/60 hover:shadow-[0_0_22px_-8px_var(--color-neon)]',
                   completedIds.has(dungeon.id) && 'border-amber-400/50',
                 )}
                 onClick={() => {
                   if (isUndercity) {
                     if (!holdsInitiative) {
                       setConfirmInitiative(true);
+                      return;
                     }
+                    dispatch({
+                      type: 'enterDungeon',
+                      playerId,
+                      dungeonId: 'undercity',
+                      viaInitiative: true,
+                    });
                     return;
                   }
                   dispatch({

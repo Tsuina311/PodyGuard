@@ -148,6 +148,13 @@
       "when": 1787899200000,
       "tag": "0020_tournament_foundation",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1788166800000,
+      "tag": "0021_limited_persistence",
+      "breakpoints": true
     }
   ]
 }

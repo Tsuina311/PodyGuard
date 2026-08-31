@@ -9,6 +9,15 @@ import type {
   PublicTable,
   PublicChallengeCompletion,
   RulesFormat,
+  LimitedMatchOutcome,
+  LimitedMatchStatus,
+  LimitedEventModeConfig,
+  LimitedMode,
+  LimitedPairingPolicy,
+  LimitedParticipantStatus,
+  LimitedRound,
+  LimitedSessionStatus,
+  LimitedTimer,
   TournamentFormat,
   TournamentState,
   TreacheryRole,
@@ -108,6 +117,7 @@ export type StoredEvent = {
   preferredPodSize: number;
   tournamentFormat: TournamentFormat | null;
   tournamentState: TournamentState | null;
+  limitedModeConfigs: LimitedEventModeConfig[];
   expiresAt: Date;
   challengePackId: string;
   challengePackVersion: number;
@@ -121,6 +131,8 @@ export type StoredParticipant = {
   isBot: boolean;
   status: PublicParticipant['status'];
   readyAt: Date | null;
+  limitedQueueMode: LimitedMode | null;
+  limitedQueuedAt: Date | null;
   flexCredits: number;
   createdAt: Date;
 };
@@ -242,6 +254,7 @@ export type NewStoredEvent = {
   preferredPodSize?: number;
   tournamentFormat?: TournamentFormat;
   tournamentState?: TournamentState;
+  limitedModeConfigs?: LimitedEventModeConfig[];
   expiresAt?: Date;
   createdAt?: Date;
 };
@@ -274,6 +287,154 @@ export type NewStoredTable = {
   sortOrder: number;
 };
 
+export type StoredLimitedParticipant = {
+  participantId: string;
+  displayName: string;
+  status: LimitedParticipantStatus;
+  draftSeat: number | null;
+  joinedAt: Date;
+  assignedAt: Date | null;
+  droppedAt: Date | null;
+};
+
+export type StoredLimitedMatch = {
+  id: string;
+  roundId: string;
+  roundNumber: number;
+  position: number;
+  playerAId: string;
+  playerBId: string | null;
+  tableId: string | null;
+  tableLabel: string | null;
+  status: LimitedMatchStatus;
+  bestOf: 1 | 3;
+  outcome: LimitedMatchOutcome | null;
+  playerAGameWins: number | null;
+  playerBGameWins: number | null;
+  reportedAt: Date | null;
+};
+
+export type StoredLimitedRound = {
+  id: string;
+  sessionId: string;
+  number: number;
+  status: LimitedRound['status'];
+  matches: StoredLimitedMatch[];
+  createdAt: Date;
+  startedAt: Date | null;
+  completedAt: Date | null;
+};
+
+export type StoredLimitedSession = {
+  id: string;
+  eventId: string;
+  mode: LimitedMode;
+  status: LimitedSessionStatus;
+  label: string;
+  participants: StoredLimitedParticipant[];
+  rounds: StoredLimitedRound[];
+  matchStructure: 'BO1' | 'BO3';
+  pairingPolicy: LimitedPairingPolicy;
+  preferredCohortSize: number | null;
+  minCohortSize: number;
+  maxCohortSize: number | null;
+  allowUndersizedLaunch: boolean;
+  currentRound: number | null;
+  totalRounds: number;
+  draftTableIds: string[];
+  timer: LimitedTimer | null;
+  createdAt: Date;
+  startedAt: Date | null;
+  completedAt: Date | null;
+};
+
+export type NewStoredLimitedSession = {
+  eventId: string;
+  mode: LimitedMode;
+  label: string;
+  matchStructure: 'BO1' | 'BO3';
+  pairingPolicy: LimitedPairingPolicy;
+  preferredCohortSize?: number;
+  minCohortSize: number;
+  maxCohortSize?: number;
+  allowUndersizedLaunch?: boolean;
+  totalRounds: number;
+  participants: Array<{
+    participantId: string;
+    draftSeat?: number;
+    status?: LimitedParticipantStatus;
+    queuedAt?: Date;
+  }>;
+  draftTableIds?: string[];
+  createdAt?: Date;
+};
+
+export type LimitedSessionPhasePatch = {
+  status: LimitedSessionStatus;
+  timer?: LimitedTimer | null;
+  currentRound?: number | null;
+  startedAt?: Date;
+  completedAt?: Date | null;
+};
+
+export type NewStoredLimitedRound = {
+  sessionId: string;
+  number: number;
+  status?: LimitedRound['status'];
+  startedAt?: Date;
+  matches: Array<{
+    position: number;
+    playerAId: string;
+    playerBId?: string;
+    tableId?: string;
+    status?: LimitedMatchStatus;
+    bestOf: 1 | 3;
+    outcome?: LimitedMatchOutcome;
+    playerAGameWins?: number;
+    playerBGameWins?: number;
+    reportedAt?: Date;
+  }>;
+};
+
+export type LimitedRoundPatch = {
+  status: LimitedRound['status'];
+  startedAt?: Date;
+  completedAt?: Date | null;
+};
+
+export type FinalizeLimitedMatchResultInput = {
+  matchId: string;
+  outcome: LimitedMatchOutcome;
+  playerAGameWins: number;
+  playerBGameWins: number;
+  reportedAt?: Date;
+  correctionReason?: string;
+  correctedByParticipantId?: string;
+};
+
+export type StoredLimitedResultAudit = {
+  id: string;
+  matchId: string;
+  previousOutcome: LimitedMatchOutcome | null;
+  previousPlayerAGameWins: number | null;
+  previousPlayerBGameWins: number | null;
+  outcome: LimitedMatchOutcome;
+  playerAGameWins: number;
+  playerBGameWins: number;
+  correctionReason: string | null;
+  correctedByParticipantId: string | null;
+  createdAt: Date;
+};
+
+export class LimitedPersistenceConflictError extends Error {
+  readonly code = 'LIMITED_PERSISTENCE_CONFLICT';
+
+  constructor(message: string) {
+    super(message);
+    this.name = 'LimitedPersistenceConflictError';
+  }
+}
+
 export interface EventStore {
   insertEvent(input: NewStoredEvent): Promise<StoredEvent>;
   findEventByJoinCode(joinCode: string): Promise<StoredEvent | undefined>;
@@ -287,6 +448,8 @@ export interface EventStore {
       status: StoredParticipant['status'];
       readyAt: Date | null;
       flexCredits?: number;
+      limitedQueueMode?: LimitedMode | null;
+      limitedQueuedAt?: Date | null;
     },
   ): Promise<StoredParticipant>;
   insertTable(input: NewStoredTable): Promise<StoredTable>;
@@ -354,4 +517,50 @@ export interface EventStore {
       tournamentState?: TournamentState | null;
     },
   ): Promise<StoredEvent>;
+  createLimitedSession(
+    input: NewStoredLimitedSession,
+  ): Promise<StoredLimitedSession>;
+  findLimitedSessionById(
+    id: string,
+  ): Promise<StoredLimitedSession | undefined>;
+  listLimitedSessions(eventId: string): Promise<StoredLimitedSession[]>;
+  replaceLimitedSessionRoster(
+    id: string,
+    participants: Array<{ participantId: string; draftSeat?: number }>,
+  ): Promise<StoredLimitedSession>;
+  replaceLimitedDraftTables(
+    id: string,
+    tableIds: string[],
+  ): Promise<StoredLimitedSession>;
+  updateLimitedSessionPhase(
+    id: string,
+    patch: LimitedSessionPhasePatch,
+  ): Promise<StoredLimitedSession>;
+  createLimitedRound(
+    input: NewStoredLimitedRound,
+  ): Promise<StoredLimitedRound>;
+  updateLimitedRound(
+    id: string,
+    patch: LimitedRoundPatch,
+  ): Promise<StoredLimitedRound>;
+  finalizeLimitedMatchResult(
+    input: FinalizeLimitedMatchResultInput,
+  ): Promise<{
+    match: StoredLimitedMatch;
+    audit: StoredLimitedResultAudit;
+    corrected: boolean;
+  }>;
+  listLimitedResultAudits(
+    eventId: string,
+  ): Promise<StoredLimitedResultAudit[]>;
+  dropLimitedParticipant(
+    sessionId: string,
+    participantId: string,
+    droppedAt?: Date,
+  ): Promise<StoredLimitedParticipant>;
+  finishLimitedSession(
+    id: string,
+    status: 'COMPLETED' | 'CANCELLED',
+    completedAt?: Date,
+  ): Promise<StoredLimitedSession>;
 }

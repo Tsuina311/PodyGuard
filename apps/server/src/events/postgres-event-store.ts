@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNull, or } from 'drizzle-orm';
 import { getDb } from '../db/client.js';
 import {
   events,
@@ -7,6 +7,14 @@ import {
   challengePackVersions,
   matchHistory,
   matchHistoryMembers,
+  limitedSessions,
+  limitedSessionParticipants,
+  draftSeats,
+  limitedRounds,
+  limitedMatches,
+  limitedMatchParticipants,
+  limitedResultAudits,
+  tableReservations,
   participants,
   physicalTables,
   podMembers,
@@ -18,6 +26,7 @@ import { parseChallengePack } from '@podyguard/shared';
 import {
   EventNotFoundError,
   JoinCodeConflictError,
+  LimitedPersistenceConflictError,
   PodNotFoundError,
   TableNotFoundError,
   type EventStore,
@@ -28,6 +37,11 @@ import {
   type NewStoredParticipant,
   type NewStoredPod,
   type NewStoredTable,
+  type NewStoredLimitedSession,
+  type NewStoredLimitedRound,
+  type LimitedRoundPatch,
+  type LimitedSessionPhasePatch,
+  type FinalizeLimitedMatchResultInput,
   type StoredAssignment,
   type StoredCompletedGame,
   type StoredDeck,
@@ -37,6 +51,11 @@ import {
   type StoredPod,
   type StoredTable,
   type StoredTreacheryAssignment,
+  type StoredLimitedSession,
+  type StoredLimitedRound,
+  type StoredLimitedMatch,
+  type StoredLimitedParticipant,
+  type StoredLimitedResultAudit,
 } from './event-store.js';
 
 function isUniqueViolation(error: unknown): boolean {
@@ -64,6 +83,7 @@ export class PostgresEventStore implements EventStore {
           preferredPodSize: input.preferredPodSize ?? 4,
           tournamentFormat: input.tournamentFormat ?? null,
           tournamentState: input.tournamentState ?? null,
+          limitedModeConfigs: input.limitedModeConfigs ?? [],
           expiresAt:
             input.expiresAt ?? new Date(Date.now() + 24 * 60 * 60 * 1000),
           ...(input.createdAt ? { createdAt: input.createdAt } : {}),
@@ -142,6 +162,8 @@ export class PostgresEventStore implements EventStore {
       status: StoredParticipant['status'];
       readyAt: Date | null;
       flexCredits?: number;
+      limitedQueueMode?: StoredParticipant['limitedQueueMode'];
+      limitedQueuedAt?: Date | null;
     },
   ): Promise<StoredParticipant> {
     const [row] = await getDb()
@@ -152,6 +174,12 @@ export class PostgresEventStore implements EventStore {
         ...(patch.flexCredits === undefined
           ? {}
           : { flexCredits: patch.flexCredits }),
+        ...(patch.limitedQueueMode === undefined
+          ? {}
+          : { limitedQueueMode: patch.limitedQueueMode }),
+        ...(patch.limitedQueuedAt === undefined
+          ? {}
+          : { limitedQueuedAt: patch.limitedQueuedAt }),
         updatedAt: new Date(),
       })
       .where(eq(participants.id, id))
@@ -220,9 +248,15 @@ export class PostgresEventStore implements EventStore {
         .select()
         .from(physicalTables)
         .where(eq(physicalTables.id, input.tableId))
-        .limit(1);
+        .limit(1)
+        .for('update');
       if (!table || table.eventId !== input.eventId) {
         throw new TableNotFoundError();
+      }
+      if (table.status !== 'free') {
+        throw new LimitedPersistenceConflictError(
+          'The requested physical table is not available.',
+        );
       }
 
       const participantIds = input.seats.map((seat) => seat.participantId);
@@ -968,6 +1002,1370 @@ export class PostgresEventStore implements EventStore {
     }
     return mapEvent(row);
   }
+
+  async createLimitedSession(
+    input: NewStoredLimitedSession,
+  ): Promise<StoredLimitedSession> {
+    let sessionId: string;
+    try {
+      sessionId = await getDb().transaction(async (tx) => {
+        const participantIds = input.participants.map(
+          (row) => row.participantId,
+        );
+        assertUniqueLimited(participantIds, 'Limited session participant');
+        assertUniqueLimited(
+          input.participants
+            .map((row) => row.draftSeat)
+            .filter((seat): seat is number => seat !== undefined),
+          'Limited draft seat',
+        );
+        const draftTableIds = input.draftTableIds ?? [];
+        assertUniqueLimited(draftTableIds, 'Limited draft table');
+        const people = participantIds.length
+          ? await tx
+              .select({ id: participants.id })
+              .from(participants)
+              .where(
+                and(
+                  eq(participants.eventId, input.eventId),
+                  inArray(participants.id, participantIds),
+                ),
+              )
+          : [];
+        if (people.length !== participantIds.length) {
+          throw new Error('Limited participant does not belong to the event.');
+        }
+        const tables = draftTableIds.length
+          ? await tx
+              .select({
+                id: physicalTables.id,
+                status: physicalTables.status,
+              })
+              .from(physicalTables)
+              .where(
+                and(
+                  eq(physicalTables.eventId, input.eventId),
+                  inArray(physicalTables.id, draftTableIds),
+                ),
+              )
+              .for('update')
+          : [];
+        if (tables.length !== draftTableIds.length) throw new TableNotFoundError();
+        if (tables.some((table) => table.status !== 'free')) {
+          throw new LimitedPersistenceConflictError(
+            'A requested physical table is not available.',
+          );
+        }
+        const [session] = await tx
+          .insert(limitedSessions)
+          .values({
+            eventId: input.eventId,
+            mode: input.mode,
+            label: input.label,
+            matchStructure: input.matchStructure,
+            pairingPolicy: input.pairingPolicy,
+            preferredCohortSize: input.preferredCohortSize ?? null,
+            minCohortSize: input.minCohortSize,
+            maxCohortSize: input.maxCohortSize ?? null,
+            allowUndersizedLaunch: input.allowUndersizedLaunch ?? false,
+            totalRounds: input.totalRounds,
+            draftTableIds,
+            ...(input.createdAt ? { createdAt: input.createdAt } : {}),
+          })
+          .returning({ id: limitedSessions.id });
+        if (!session) throw new Error('Limited session insert returned no row.');
+        if (input.participants.length) {
+          const assignedAt = input.createdAt ?? new Date();
+          await tx.insert(limitedSessionParticipants).values(
+            input.participants.map((row) => ({
+              sessionId: session.id,
+              participantId: row.participantId,
+              status: row.status ?? 'ASSIGNED',
+              draftSeat: row.draftSeat ?? null,
+              joinedAt: row.queuedAt ?? assignedAt,
+              assignedAt,
+            })),
+          );
+          const seats = input.participants.filter(
+            (row): row is typeof row & { draftSeat: number } =>
+              row.draftSeat !== undefined,
+          );
+          if (seats.length) {
+            await tx.insert(draftSeats).values(
+              seats.map((row) => ({
+                sessionId: session.id,
+                participantId: row.participantId,
+                seat: row.draftSeat,
+              })),
+            );
+          }
+        }
+        if (draftTableIds.length) {
+          await tx.insert(tableReservations).values(
+            draftTableIds.map((tableId) => ({
+              eventId: input.eventId,
+              tableId,
+              ownerType: 'LIMITED_SESSION',
+              ownerId: session.id,
+              purpose: 'DRAFT',
+            })),
+          );
+          await tx
+            .update(physicalTables)
+            .set({ status: 'occupied', updatedAt: new Date() })
+            .where(inArray(physicalTables.id, draftTableIds));
+        }
+        if (participantIds.length) {
+          await tx
+            .update(participants)
+            .set({
+              status: 'matched',
+              readyAt: null,
+              limitedQueueMode: null,
+              limitedQueuedAt: null,
+              updatedAt: new Date(),
+            })
+            .where(inArray(participants.id, participantIds));
+        }
+        return session.id;
+      });
+    } catch (error) {
+      if (isUniqueViolation(error)) {
+        throw new LimitedPersistenceConflictError(
+          'Limited membership, seat, round, or table reservation conflicts.',
+        );
+      }
+      throw error;
+    }
+    const stored = await loadLimitedSession(sessionId);
+    if (!stored) throw new Error('Limited session disappeared after creation.');
+    return stored;
+  }
+
+  async findLimitedSessionById(
+    id: string,
+  ): Promise<StoredLimitedSession | undefined> {
+    return loadLimitedSession(id);
+  }
+
+  async listLimitedSessions(eventId: string): Promise<StoredLimitedSession[]> {
+    const rows = await getDb()
+      .select({ id: limitedSessions.id })
+      .from(limitedSessions)
+      .where(eq(limitedSessions.eventId, eventId))
+      .orderBy(asc(limitedSessions.createdAt));
+    return Promise.all(rows.map((row) => loadLimitedSessionRequired(row.id)));
+  }
+
+  async replaceLimitedSessionRoster(
+    id: string,
+    input: Array<{ participantId: string; draftSeat?: number }>,
+  ): Promise<StoredLimitedSession> {
+    try {
+      await getDb().transaction(async (tx) => {
+        const [session] = await tx
+          .select()
+          .from(limitedSessions)
+          .where(eq(limitedSessions.id, id))
+          .limit(1)
+          .for('update');
+        if (!session) throw new Error('Limited session not found.');
+        if (session.status !== 'FORMING') {
+          throw new LimitedPersistenceConflictError(
+            'Only a forming Limited session can change its roster.',
+          );
+        }
+        const participantIds = input.map((row) => row.participantId);
+        assertUniqueLimited(participantIds, 'Limited session participant');
+        assertUniqueLimited(
+          input
+            .map((row) => row.draftSeat)
+            .filter((seat): seat is number => seat !== undefined),
+          'Limited draft seat',
+        );
+        const people = participantIds.length
+          ? await tx
+              .select({ id: participants.id })
+              .from(participants)
+              .where(
+                and(
+                  eq(participants.eventId, session.eventId),
+                  inArray(participants.id, participantIds),
+                ),
+              )
+          : [];
+        if (people.length !== participantIds.length) {
+          throw new Error('Limited participant does not belong to the event.');
+        }
+        const previous = await tx
+          .select()
+          .from(limitedSessionParticipants)
+          .where(eq(limitedSessionParticipants.sessionId, id));
+        const nextIds = new Set(participantIds);
+        const removed = previous.filter(
+          (row) => !nextIds.has(row.participantId),
+        );
+        await tx
+          .delete(limitedSessionParticipants)
+          .where(eq(limitedSessionParticipants.sessionId, id));
+        await tx.delete(draftSeats).where(eq(draftSeats.sessionId, id));
+        const now = new Date();
+        if (removed.length) {
+          await tx
+            .update(participants)
+            .set({
+              status: 'joined',
+              readyAt: null,
+              limitedQueueMode: session.mode,
+              limitedQueuedAt: now,
+              updatedAt: now,
+            })
+            .where(
+              inArray(
+                participants.id,
+                removed.map((row) => row.participantId),
+              ),
+            );
+        }
+        if (input.length) {
+          const previousById = new Map(
+            previous.map((row) => [row.participantId, row]),
+          );
+          await tx.insert(limitedSessionParticipants).values(
+            input.map((row) => ({
+              sessionId: id,
+              participantId: row.participantId,
+              status: 'ASSIGNED' as const,
+              draftSeat: row.draftSeat ?? null,
+              joinedAt: previousById.get(row.participantId)?.joinedAt ?? now,
+              assignedAt: now,
+            })),
+          );
+          const seats = input.filter(
+            (row): row is typeof row & { draftSeat: number } =>
+              row.draftSeat !== undefined,
+          );
+          if (seats.length) {
+            await tx.insert(draftSeats).values(
+              seats.map((row) => ({
+                sessionId: id,
+                participantId: row.participantId,
+                seat: row.draftSeat,
+              })),
+            );
+          }
+          await tx
+            .update(participants)
+            .set({
+              status: 'matched',
+              readyAt: null,
+              limitedQueueMode: null,
+              limitedQueuedAt: null,
+              updatedAt: now,
+            })
+            .where(inArray(participants.id, participantIds));
+        }
+      });
+    } catch (error) {
+      if (isUniqueViolation(error)) {
+        throw new LimitedPersistenceConflictError(
+          'Limited membership or draft seat conflicts.',
+        );
+      }
+      throw error;
+    }
+    return loadLimitedSessionRequired(id);
+  }
+
+  async replaceLimitedDraftTables(
+    id: string,
+    tableIds: string[],
+  ): Promise<StoredLimitedSession> {
+    assertUniqueLimited(tableIds, 'Limited draft table');
+    try {
+      await getDb().transaction(async (tx) => {
+        const [session] = await tx
+          .select()
+          .from(limitedSessions)
+          .where(eq(limitedSessions.id, id))
+          .limit(1)
+          .for('update');
+        if (!session) throw new Error('Limited session not found.');
+        if (session.status !== 'FORMING') {
+          throw new LimitedPersistenceConflictError(
+            'Only a forming Limited session can change draft tables.',
+          );
+        }
+        const previous = await tx
+          .select({ tableId: tableReservations.tableId })
+          .from(tableReservations)
+          .where(
+            and(
+              eq(tableReservations.ownerType, 'LIMITED_SESSION'),
+              eq(tableReservations.ownerId, id),
+              isNull(tableReservations.releasedAt),
+            ),
+          );
+        const previousIds = new Set(previous.map((row) => row.tableId));
+        const lockIds = [...new Set([...previousIds, ...tableIds])];
+        const tableRows = lockIds.length
+          ? await tx
+              .select({
+                id: physicalTables.id,
+                eventId: physicalTables.eventId,
+                status: physicalTables.status,
+              })
+              .from(physicalTables)
+              .where(inArray(physicalTables.id, lockIds))
+              .for('update')
+          : [];
+        const requested = tableRows.filter((table) =>
+          tableIds.includes(table.id),
+        );
+        if (
+          requested.length !== tableIds.length ||
+          requested.some((table) => table.eventId !== session.eventId)
+        ) {
+          throw new TableNotFoundError();
+        }
+        if (
+          requested.some(
+            (table) =>
+              table.status !== 'free' && !previousIds.has(table.id),
+          )
+        ) {
+          throw new LimitedPersistenceConflictError(
+            'A requested physical table is not available.',
+          );
+        }
+        const conflictingReservations = tableIds.length
+          ? await tx
+              .select({ tableId: tableReservations.tableId })
+              .from(tableReservations)
+              .where(
+                and(
+                  inArray(tableReservations.tableId, tableIds),
+                  isNull(tableReservations.releasedAt),
+                ),
+              )
+          : [];
+        if (
+          conflictingReservations.some(
+            (reservation) => !previousIds.has(reservation.tableId),
+          )
+        ) {
+          throw new LimitedPersistenceConflictError(
+            'A requested physical table is already reserved.',
+          );
+        }
+        const now = new Date();
+        await tx
+          .update(tableReservations)
+          .set({ releasedAt: now })
+          .where(
+            and(
+              eq(tableReservations.ownerType, 'LIMITED_SESSION'),
+              eq(tableReservations.ownerId, id),
+              isNull(tableReservations.releasedAt),
+            ),
+          );
+        if (previousIds.size) {
+          await tx
+            .update(physicalTables)
+            .set({ status: 'free', updatedAt: now })
+            .where(inArray(physicalTables.id, [...previousIds]));
+        }
+        if (tableIds.length) {
+          await tx.insert(tableReservations).values(
+            tableIds.map((tableId) => ({
+              eventId: session.eventId,
+              tableId,
+              ownerType: 'LIMITED_SESSION',
+              ownerId: id,
+              purpose: 'DRAFT',
+            })),
+          );
+          await tx
+            .update(physicalTables)
+            .set({ status: 'occupied', updatedAt: now })
+            .where(inArray(physicalTables.id, tableIds));
+        }
+        await tx
+          .update(limitedSessions)
+          .set({ draftTableIds: tableIds, updatedAt: now })
+          .where(eq(limitedSessions.id, id));
+      });
+    } catch (error) {
+      if (isUniqueViolation(error)) {
+        throw new LimitedPersistenceConflictError(
+          'A requested physical table is already reserved.',
+        );
+      }
+      throw error;
+    }
+    return loadLimitedSessionRequired(id);
+  }
+
+  async updateLimitedSessionPhase(
+    id: string,
+    patch: LimitedSessionPhasePatch,
+  ): Promise<StoredLimitedSession> {
+    await getDb().transaction(async (tx) => {
+      const timer = patch.timer;
+      const [updated] = await tx
+        .update(limitedSessions)
+        .set({
+          status: patch.status,
+          ...(!('timer' in patch)
+            ? {}
+            : timer
+              ? {
+                  timerPhase: timer.phase,
+                  timerStatus: timer.status,
+                  timerDurationSeconds: timer.durationSeconds,
+                  timerStartedAt: new Date(timer.startedAt),
+                  timerTargetAt: new Date(timer.targetAt),
+                  timerPausedAt: timer.pausedAt
+                    ? new Date(timer.pausedAt)
+                    : null,
+                  timerRemainingSecondsWhenPaused:
+                    timer.remainingSecondsWhenPaused ?? null,
+                }
+              : {
+                  timerPhase: null,
+                  timerStatus: null,
+                  timerDurationSeconds: null,
+                  timerStartedAt: null,
+                  timerTargetAt: null,
+                  timerPausedAt: null,
+                  timerRemainingSecondsWhenPaused: null,
+                }),
+          ...(!('currentRound' in patch)
+            ? {}
+            : { currentRound: patch.currentRound ?? null }),
+          ...(patch.startedAt === undefined
+            ? {}
+            : { startedAt: patch.startedAt }),
+          ...(!('completedAt' in patch)
+            ? {}
+            : { completedAt: patch.completedAt ?? null }),
+          updatedAt: new Date(),
+        })
+        .where(eq(limitedSessions.id, id))
+        .returning({
+          id: limitedSessions.id,
+          eventId: limitedSessions.eventId,
+        });
+      if (!updated) throw new Error('Limited session not found.');
+      const participantStatus =
+        patch.status === 'DRAFTING'
+          ? 'DRAFTING'
+          : patch.status === 'DECKBUILDING'
+            ? 'DECKBUILDING'
+            : patch.status === 'ROUND_ACTIVE'
+              ? 'PLAYING'
+              : patch.status === 'BETWEEN_ROUNDS'
+                ? 'WAITING_FOR_ROUND'
+                : patch.status === 'SEATING'
+                  ? 'ASSIGNED'
+                  : null;
+      if (participantStatus) {
+        await tx
+          .update(limitedSessionParticipants)
+          .set({ status: participantStatus, updatedAt: new Date() })
+          .where(
+            and(
+              eq(limitedSessionParticipants.sessionId, id),
+              inArray(limitedSessionParticipants.status, [
+                'QUEUED',
+                'ASSIGNED',
+                'DRAFTING',
+                'DECKBUILDING',
+                'WAITING_FOR_ROUND',
+                'PLAYING',
+              ]),
+            ),
+          );
+      }
+      if (!['SEATING', 'DRAFTING', 'DECKBUILDING'].includes(patch.status)) {
+        const reservations = await tx
+          .select({ tableId: tableReservations.tableId })
+          .from(tableReservations)
+          .where(
+            and(
+              eq(tableReservations.ownerType, 'LIMITED_SESSION'),
+              eq(tableReservations.ownerId, id),
+              isNull(tableReservations.releasedAt),
+            ),
+          );
+        await tx
+          .update(tableReservations)
+          .set({ releasedAt: new Date() })
+          .where(
+            and(
+              eq(tableReservations.ownerType, 'LIMITED_SESSION'),
+              eq(tableReservations.ownerId, id),
+              isNull(tableReservations.releasedAt),
+            ),
+          );
+        if (reservations.length) {
+          await tx
+            .update(physicalTables)
+            .set({ status: 'free', updatedAt: new Date() })
+            .where(
+              inArray(
+                physicalTables.id,
+                reservations.map((row) => row.tableId),
+              ),
+            );
+        }
+      }
+    });
+    return loadLimitedSessionRequired(id);
+  }
+
+  async createLimitedRound(
+    input: NewStoredLimitedRound,
+  ): Promise<StoredLimitedRound> {
+    let roundId: string;
+    try {
+      roundId = await getDb().transaction(async (tx) => {
+        const [session] = await tx
+          .select()
+          .from(limitedSessions)
+          .where(eq(limitedSessions.id, input.sessionId))
+          .limit(1);
+        if (!session) throw new Error('Limited session not found.');
+        assertUniqueLimited(
+          input.matches.map((match) => match.position),
+          'Limited match position',
+        );
+        const participantIds = input.matches.flatMap((match) => [
+          match.playerAId,
+          ...(match.playerBId ? [match.playerBId] : []),
+        ]);
+        assertUniqueLimited(participantIds, 'Limited round participant');
+        const memberRows = participantIds.length
+          ? await tx
+              .select({
+                participantId: limitedSessionParticipants.participantId,
+                status: limitedSessionParticipants.status,
+              })
+              .from(limitedSessionParticipants)
+              .where(
+                and(
+                  eq(limitedSessionParticipants.sessionId, session.id),
+                  inArray(
+                    limitedSessionParticipants.participantId,
+                    participantIds,
+                  ),
+                ),
+              )
+          : [];
+        if (
+          memberRows.length !== participantIds.length ||
+          memberRows.some((row) => row.status === 'DROPPED')
+        ) {
+          throw new Error(
+            'Limited match participant is not active in the session.',
+          );
+        }
+        const tableIds = input.matches
+          .map((match) => match.tableId)
+          .filter((id): id is string => id !== undefined);
+        assertUniqueLimited(tableIds, 'Limited match table');
+        const tableRows = tableIds.length
+          ? await tx
+              .select({
+                id: physicalTables.id,
+                status: physicalTables.status,
+              })
+              .from(physicalTables)
+              .where(
+                and(
+                  eq(physicalTables.eventId, session.eventId),
+                  inArray(physicalTables.id, tableIds),
+                ),
+              )
+              .for('update')
+          : [];
+        if (tableRows.length !== tableIds.length) throw new TableNotFoundError();
+        const activeReservations = tableIds.length
+          ? await tx
+              .select({
+                tableId: tableReservations.tableId,
+                ownerType: tableReservations.ownerType,
+                ownerId: tableReservations.ownerId,
+              })
+              .from(tableReservations)
+              .where(
+                and(
+                  inArray(tableReservations.tableId, tableIds),
+                  isNull(tableReservations.releasedAt),
+                ),
+              )
+          : [];
+        const ownDraftTableIds = new Set(
+          activeReservations
+            .filter(
+              (reservation) =>
+                reservation.ownerType === 'LIMITED_SESSION' &&
+                reservation.ownerId === session.id,
+            )
+            .map((reservation) => reservation.tableId),
+        );
+        if (
+          tableRows.some(
+            (table) =>
+              table.status !== 'free' && !ownDraftTableIds.has(table.id),
+          )
+        ) {
+          throw new LimitedPersistenceConflictError(
+            'A requested physical table is not available.',
+          );
+        }
+        if (
+          activeReservations.some(
+            (reservation) =>
+              reservation.ownerType !== 'LIMITED_SESSION' ||
+              reservation.ownerId !== session.id,
+          )
+        ) {
+          throw new LimitedPersistenceConflictError(
+            'A requested physical table is already reserved.',
+          );
+        }
+        if (ownDraftTableIds.size) {
+          await tx
+            .update(tableReservations)
+            .set({ releasedAt: new Date() })
+            .where(
+              and(
+                eq(tableReservations.ownerType, 'LIMITED_SESSION'),
+                eq(tableReservations.ownerId, session.id),
+                isNull(tableReservations.releasedAt),
+              ),
+            );
+        }
+
+        const previousRounds = await tx
+          .select({ id: limitedRounds.id })
+          .from(limitedRounds)
+          .where(eq(limitedRounds.sessionId, session.id));
+        if (previousRounds.length) {
+          const previousMatches = await tx
+            .select({ id: limitedMatches.id })
+            .from(limitedMatches)
+            .where(
+              inArray(
+                limitedMatches.roundId,
+                previousRounds.map((row) => row.id),
+              ),
+            );
+          if (previousMatches.length) {
+            const previousReservations = await tx
+              .select({ tableId: tableReservations.tableId })
+              .from(tableReservations)
+              .where(
+                and(
+                  eq(tableReservations.ownerType, 'LIMITED_MATCH'),
+                  inArray(
+                    tableReservations.ownerId,
+                    previousMatches.map((row) => row.id),
+                  ),
+                  isNull(tableReservations.releasedAt),
+                ),
+              );
+            await tx
+              .update(tableReservations)
+              .set({ releasedAt: new Date() })
+              .where(
+                and(
+                  eq(tableReservations.ownerType, 'LIMITED_MATCH'),
+                  inArray(
+                    tableReservations.ownerId,
+                    previousMatches.map((row) => row.id),
+                  ),
+                  isNull(tableReservations.releasedAt),
+                ),
+              );
+            if (previousReservations.length) {
+              await tx
+                .update(physicalTables)
+                .set({ status: 'free', updatedAt: new Date() })
+                .where(
+                  inArray(
+                    physicalTables.id,
+                    previousReservations.map((row) => row.tableId),
+                  ),
+                );
+            }
+          }
+        }
+
+        const createdAt = input.startedAt ?? new Date();
+        const [round] = await tx
+          .insert(limitedRounds)
+          .values({
+            sessionId: session.id,
+            number: input.number,
+            status: input.status ?? 'PENDING',
+            createdAt,
+            startedAt: input.startedAt ?? null,
+          })
+          .returning({ id: limitedRounds.id });
+        if (!round) throw new Error('Limited round insert returned no row.');
+        for (const matchInput of input.matches) {
+          if (matchInput.playerAId === matchInput.playerBId) {
+            throw new Error('Limited participant cannot play themselves.');
+          }
+          if (!matchInput.playerBId && matchInput.outcome !== 'BYE') {
+            throw new Error('A one-player Limited match must be a bye.');
+          }
+          const [match] = await tx
+            .insert(limitedMatches)
+            .values({
+              roundId: round.id,
+              position: matchInput.position,
+              status:
+                matchInput.status ??
+                (matchInput.outcome ? 'COMPLETED' : 'PENDING'),
+              bestOf: matchInput.bestOf,
+              outcome: matchInput.outcome ?? null,
+              playerAGameWins: matchInput.playerAGameWins ?? null,
+              playerBGameWins: matchInput.playerBGameWins ?? null,
+              reportedAt:
+                matchInput.reportedAt ??
+                (matchInput.outcome ? createdAt : null),
+            })
+            .returning({ id: limitedMatches.id });
+          if (!match) throw new Error('Limited match insert returned no row.');
+          await tx.insert(limitedMatchParticipants).values([
+            {
+              roundId: round.id,
+              matchId: match.id,
+              participantId: matchInput.playerAId,
+              slot: 'A',
+            },
+            ...(matchInput.playerBId
+              ? [
+                  {
+                    roundId: round.id,
+                    matchId: match.id,
+                    participantId: matchInput.playerBId,
+                    slot: 'B',
+                  },
+                ]
+              : []),
+          ]);
+          if (matchInput.outcome) {
+            await tx.insert(limitedResultAudits).values({
+              matchId: match.id,
+              outcome: matchInput.outcome,
+              playerAGameWins: matchInput.playerAGameWins ?? 0,
+              playerBGameWins: matchInput.playerBGameWins ?? 0,
+            });
+          }
+          if (matchInput.tableId) {
+            await tx.insert(tableReservations).values({
+              eventId: session.eventId,
+              tableId: matchInput.tableId,
+              ownerType: 'LIMITED_MATCH',
+              ownerId: match.id,
+              purpose: 'MATCH',
+            });
+            await tx
+              .update(physicalTables)
+              .set({ status: 'occupied', updatedAt: new Date() })
+              .where(eq(physicalTables.id, matchInput.tableId));
+          }
+        }
+        await tx
+          .update(limitedSessions)
+          .set({ currentRound: input.number, updatedAt: new Date() })
+          .where(eq(limitedSessions.id, session.id));
+        return round.id;
+      });
+    } catch (error) {
+      if (isUniqueViolation(error)) {
+        throw new LimitedPersistenceConflictError(
+          'Limited membership, seat, round, participant, or table reservation conflicts.',
+        );
+      }
+      throw error;
+    }
+    return loadLimitedRoundRequired(roundId);
+  }
+
+  async updateLimitedRound(
+    id: string,
+    patch: LimitedRoundPatch,
+  ): Promise<StoredLimitedRound> {
+    await getDb().transaction(async (tx) => {
+      const [round] = await tx
+        .update(limitedRounds)
+        .set({
+          status: patch.status,
+          ...(patch.startedAt === undefined
+            ? {}
+            : { startedAt: patch.startedAt }),
+          ...(!('completedAt' in patch)
+            ? {}
+            : { completedAt: patch.completedAt ?? null }),
+        })
+        .where(eq(limitedRounds.id, id))
+        .returning({ id: limitedRounds.id });
+      if (!round) throw new Error('Limited round not found.');
+      if (patch.status === 'COMPLETED') {
+        const matches = await tx
+          .select({ id: limitedMatches.id })
+          .from(limitedMatches)
+          .where(eq(limitedMatches.roundId, id));
+        if (matches.length) {
+          const reservations = await tx
+            .select({ tableId: tableReservations.tableId })
+            .from(tableReservations)
+            .where(
+              and(
+                eq(tableReservations.ownerType, 'LIMITED_MATCH'),
+                inArray(
+                  tableReservations.ownerId,
+                  matches.map((match) => match.id),
+                ),
+                isNull(tableReservations.releasedAt),
+              ),
+            );
+          await tx
+            .update(tableReservations)
+            .set({ releasedAt: patch.completedAt ?? new Date() })
+            .where(
+              and(
+                eq(tableReservations.ownerType, 'LIMITED_MATCH'),
+                inArray(
+                  tableReservations.ownerId,
+                  matches.map((match) => match.id),
+                ),
+                isNull(tableReservations.releasedAt),
+              ),
+            );
+          if (reservations.length) {
+            await tx
+              .update(physicalTables)
+              .set({ status: 'free', updatedAt: new Date() })
+              .where(
+                inArray(
+                  physicalTables.id,
+                  reservations.map((row) => row.tableId),
+                ),
+              );
+          }
+        }
+      }
+    });
+    return loadLimitedRoundRequired(id);
+  }
+
+  async finalizeLimitedMatchResult(
+    input: FinalizeLimitedMatchResultInput,
+  ): Promise<{
+    match: StoredLimitedMatch;
+    audit: StoredLimitedResultAudit;
+    corrected: boolean;
+  }> {
+    const result = await getDb().transaction(async (tx) => {
+      const [match] = await tx
+        .select()
+        .from(limitedMatches)
+        .where(eq(limitedMatches.id, input.matchId))
+        .limit(1)
+        .for('update');
+      if (!match) throw new Error('Limited match not found.');
+      const players = await tx
+        .select({ slot: limitedMatchParticipants.slot })
+        .from(limitedMatchParticipants)
+        .where(eq(limitedMatchParticipants.matchId, match.id));
+      const hasPlayerB = players.some((row) => row.slot === 'B');
+      if ((input.outcome === 'BYE') === hasPlayerB) {
+        throw new Error('Limited result does not match the pairing.');
+      }
+      const corrected = match.outcome !== null;
+      if (corrected && !input.correctionReason?.trim()) {
+        throw new Error('A correction reason is required to change a result.');
+      }
+      const [audit] = await tx
+        .insert(limitedResultAudits)
+        .values({
+          matchId: match.id,
+          previousOutcome: match.outcome,
+          previousPlayerAGameWins: match.playerAGameWins,
+          previousPlayerBGameWins: match.playerBGameWins,
+          outcome: input.outcome,
+          playerAGameWins: input.playerAGameWins,
+          playerBGameWins: input.playerBGameWins,
+          correctionReason: input.correctionReason ?? null,
+          correctedByParticipantId: input.correctedByParticipantId ?? null,
+          ...(input.reportedAt ? { createdAt: input.reportedAt } : {}),
+        })
+        .returning();
+      if (!audit) throw new Error('Limited result audit insert returned no row.');
+      await tx
+        .update(limitedMatches)
+        .set({
+          status: 'COMPLETED',
+          outcome: input.outcome,
+          playerAGameWins: input.playerAGameWins,
+          playerBGameWins: input.playerBGameWins,
+          reportedAt: input.reportedAt ?? new Date(),
+          updatedAt: new Date(),
+        })
+        .where(eq(limitedMatches.id, match.id));
+      const reservations = await tx
+        .select({ tableId: tableReservations.tableId })
+        .from(tableReservations)
+        .where(
+          and(
+            eq(tableReservations.ownerType, 'LIMITED_MATCH'),
+            eq(tableReservations.ownerId, match.id),
+            isNull(tableReservations.releasedAt),
+          ),
+        );
+      await tx
+        .update(tableReservations)
+        .set({ releasedAt: input.reportedAt ?? new Date() })
+        .where(
+          and(
+            eq(tableReservations.ownerType, 'LIMITED_MATCH'),
+            eq(tableReservations.ownerId, match.id),
+            isNull(tableReservations.releasedAt),
+          ),
+        );
+      if (reservations.length) {
+        await tx
+          .update(physicalTables)
+          .set({ status: 'free', updatedAt: new Date() })
+          .where(
+            inArray(
+              physicalTables.id,
+              reservations.map((row) => row.tableId),
+            ),
+          );
+      }
+      return { corrected, audit: mapLimitedAudit(audit) };
+    });
+    return {
+      match: await loadLimitedMatchRequired(input.matchId),
+      audit: result.audit,
+      corrected: result.corrected,
+    };
+  }
+
+  async listLimitedResultAudits(
+    eventId: string,
+  ): Promise<StoredLimitedResultAudit[]> {
+    const rows = await getDb()
+      .select({ audit: limitedResultAudits })
+      .from(limitedResultAudits)
+      .innerJoin(
+        limitedMatches,
+        eq(limitedResultAudits.matchId, limitedMatches.id),
+      )
+      .innerJoin(limitedRounds, eq(limitedMatches.roundId, limitedRounds.id))
+      .innerJoin(
+        limitedSessions,
+        eq(limitedRounds.sessionId, limitedSessions.id),
+      )
+      .where(eq(limitedSessions.eventId, eventId))
+      .orderBy(asc(limitedResultAudits.createdAt));
+    return rows.map((row) => mapLimitedAudit(row.audit));
+  }
+
+  async dropLimitedParticipant(
+    sessionId: string,
+    participantId: string,
+    droppedAt = new Date(),
+  ): Promise<StoredLimitedParticipant> {
+    const [row] = await getDb()
+      .update(limitedSessionParticipants)
+      .set({ status: 'DROPPED', droppedAt, updatedAt: droppedAt })
+      .where(
+        and(
+          eq(limitedSessionParticipants.sessionId, sessionId),
+          eq(limitedSessionParticipants.participantId, participantId),
+        ),
+      )
+      .returning();
+    if (!row) throw new Error('Limited participant not found.');
+    await getDb()
+      .update(participants)
+      .set({ status: 'joined', updatedAt: droppedAt })
+      .where(eq(participants.id, participantId));
+    const [person] = await getDb()
+      .select({ displayName: participants.displayName })
+      .from(participants)
+      .where(eq(participants.id, participantId))
+      .limit(1);
+    return mapLimitedParticipant(row, person?.displayName ?? '');
+  }
+
+  async finishLimitedSession(
+    id: string,
+    status: 'COMPLETED' | 'CANCELLED',
+    completedAt = new Date(),
+  ): Promise<StoredLimitedSession> {
+    await getDb().transaction(async (tx) => {
+      const [session] = await tx
+        .update(limitedSessions)
+        .set({
+          status,
+          completedAt,
+          timerPhase: null,
+          timerStatus: null,
+          timerDurationSeconds: null,
+          timerStartedAt: null,
+          timerTargetAt: null,
+          timerPausedAt: null,
+          timerRemainingSecondsWhenPaused: null,
+          updatedAt: completedAt,
+        })
+        .where(eq(limitedSessions.id, id))
+        .returning({ id: limitedSessions.id });
+      if (!session) throw new Error('Limited session not found.');
+      await tx
+        .update(limitedSessionParticipants)
+        .set({ status: 'COMPLETED', updatedAt: completedAt })
+        .where(
+          and(
+            eq(limitedSessionParticipants.sessionId, id),
+            // Do not erase the durable fact that somebody dropped.
+            inArray(limitedSessionParticipants.status, [
+              'QUEUED',
+              'ASSIGNED',
+              'DRAFTING',
+              'DECKBUILDING',
+              'WAITING_FOR_ROUND',
+              'PLAYING',
+              'COMPLETED',
+            ]),
+          ),
+        );
+      const rounds = await tx
+        .select({ id: limitedRounds.id })
+        .from(limitedRounds)
+        .where(eq(limitedRounds.sessionId, id));
+      const matches = rounds.length
+        ? await tx
+            .select({ id: limitedMatches.id })
+            .from(limitedMatches)
+            .where(
+              inArray(
+                limitedMatches.roundId,
+                rounds.map((row) => row.id),
+              ),
+            )
+        : [];
+      const participantRows = await tx
+        .select({ participantId: limitedSessionParticipants.participantId })
+        .from(limitedSessionParticipants)
+        .where(eq(limitedSessionParticipants.sessionId, id));
+      if (participantRows.length) {
+        await tx
+          .update(participants)
+          .set({
+            status: 'joined',
+            readyAt: null,
+            limitedQueueMode: null,
+            limitedQueuedAt: null,
+            updatedAt: completedAt,
+          })
+          .where(
+            inArray(
+              participants.id,
+              participantRows.map((row) => row.participantId),
+            ),
+          );
+      }
+      const activeReservations = await tx
+        .select({ tableId: tableReservations.tableId })
+        .from(tableReservations)
+        .where(
+          and(
+            matches.length
+              ? or(
+                  and(
+                    eq(tableReservations.ownerType, 'LIMITED_SESSION'),
+                    eq(tableReservations.ownerId, id),
+                  ),
+                  and(
+                    eq(tableReservations.ownerType, 'LIMITED_MATCH'),
+                    inArray(
+                      tableReservations.ownerId,
+                      matches.map((row) => row.id),
+                    ),
+                  ),
+                )
+              : and(
+                  eq(tableReservations.ownerType, 'LIMITED_SESSION'),
+                  eq(tableReservations.ownerId, id),
+                ),
+            isNull(tableReservations.releasedAt),
+          ),
+        );
+      await tx
+        .update(tableReservations)
+        .set({ releasedAt: completedAt })
+        .where(
+          and(
+            eq(tableReservations.ownerType, 'LIMITED_SESSION'),
+            eq(tableReservations.ownerId, id),
+            isNull(tableReservations.releasedAt),
+          ),
+        );
+      if (matches.length) {
+        await tx
+          .update(tableReservations)
+          .set({ releasedAt: completedAt })
+          .where(
+            and(
+              eq(tableReservations.ownerType, 'LIMITED_MATCH'),
+              inArray(
+                tableReservations.ownerId,
+                matches.map((row) => row.id),
+              ),
+              isNull(tableReservations.releasedAt),
+            ),
+          );
+      }
+      if (activeReservations.length) {
+        await tx
+          .update(physicalTables)
+          .set({ status: 'free', updatedAt: completedAt })
+          .where(
+            inArray(
+              physicalTables.id,
+              activeReservations.map((row) => row.tableId),
+            ),
+          );
+      }
+    });
+    return loadLimitedSessionRequired(id);
+  }
+}
+
+async function loadLimitedSessionRequired(
+  id: string,
+): Promise<StoredLimitedSession> {
+  const session = await loadLimitedSession(id);
+  if (!session) throw new Error('Limited session not found.');
+  return session;
+}
+
+async function loadLimitedSession(
+  id: string,
+): Promise<StoredLimitedSession | undefined> {
+  const [row] = await getDb()
+    .select()
+    .from(limitedSessions)
+    .where(eq(limitedSessions.id, id))
+    .limit(1);
+  if (!row) return undefined;
+  const memberRows = await getDb()
+    .select({
+      member: limitedSessionParticipants,
+      displayName: participants.displayName,
+    })
+    .from(limitedSessionParticipants)
+    .innerJoin(
+      participants,
+      eq(limitedSessionParticipants.participantId, participants.id),
+    )
+    .where(eq(limitedSessionParticipants.sessionId, id))
+    .orderBy(
+      asc(limitedSessionParticipants.draftSeat),
+      asc(limitedSessionParticipants.joinedAt),
+    );
+  const roundRows = await getDb()
+    .select({ id: limitedRounds.id })
+    .from(limitedRounds)
+    .where(eq(limitedRounds.sessionId, id))
+    .orderBy(asc(limitedRounds.number));
+  const timer =
+    row.timerPhase &&
+    row.timerStatus &&
+    row.timerDurationSeconds !== null &&
+    row.timerStartedAt &&
+    row.timerTargetAt
+      ? {
+          phase: row.timerPhase,
+          status: row.timerStatus,
+          durationSeconds: row.timerDurationSeconds,
+          startedAt: row.timerStartedAt.toISOString(),
+          targetAt: row.timerTargetAt.toISOString(),
+          ...(row.timerPausedAt
+            ? { pausedAt: row.timerPausedAt.toISOString() }
+            : {}),
+          ...(row.timerRemainingSecondsWhenPaused === null
+            ? {}
+            : {
+                remainingSecondsWhenPaused:
+                  row.timerRemainingSecondsWhenPaused,
+              }),
+        }
+      : null;
+  return {
+    id: row.id,
+    eventId: row.eventId,
+    mode: row.mode,
+    status: row.status,
+    label: row.label,
+    participants: memberRows.map(({ member, displayName }) =>
+      mapLimitedParticipant(member, displayName),
+    ),
+    rounds: await Promise.all(
+      roundRows.map((round) => loadLimitedRoundRequired(round.id)),
+    ),
+    matchStructure: row.matchStructure === 'BO1' ? 'BO1' : 'BO3',
+    pairingPolicy:
+      row.pairingPolicy === 'PICK_TWO_FOUR_PLAYER'
+        ? 'PICK_TWO_FOUR_PLAYER'
+        : 'SWISS',
+    preferredCohortSize: row.preferredCohortSize,
+    minCohortSize: row.minCohortSize,
+    maxCohortSize: row.maxCohortSize,
+    allowUndersizedLaunch: row.allowUndersizedLaunch,
+    currentRound: row.currentRound,
+    totalRounds: row.totalRounds,
+    draftTableIds: row.draftTableIds,
+    timer,
+    createdAt: row.createdAt,
+    startedAt: row.startedAt,
+    completedAt: row.completedAt,
+  };
+}
+
+function mapLimitedParticipant(
+  row: typeof limitedSessionParticipants.$inferSelect,
+  displayName: string,
+): StoredLimitedParticipant {
+  return {
+    participantId: row.participantId,
+    displayName,
+    status: row.status,
+    draftSeat: row.draftSeat,
+    joinedAt: row.joinedAt,
+    assignedAt: row.assignedAt,
+    droppedAt: row.droppedAt,
+  };
+}
+
+async function loadLimitedRoundRequired(
+  id: string,
+): Promise<StoredLimitedRound> {
+  const [row] = await getDb()
+    .select()
+    .from(limitedRounds)
+    .where(eq(limitedRounds.id, id))
+    .limit(1);
+  if (!row) throw new Error('Limited round not found.');
+  const matchRows = await getDb()
+    .select({ id: limitedMatches.id })
+    .from(limitedMatches)
+    .where(eq(limitedMatches.roundId, id))
+    .orderBy(asc(limitedMatches.position));
+  return {
+    id: row.id,
+    sessionId: row.sessionId,
+    number: row.number,
+    status: row.status,
+    matches: await Promise.all(
+      matchRows.map((match) => loadLimitedMatchRequired(match.id)),
+    ),
+    createdAt: row.createdAt,
+    startedAt: row.startedAt,
+    completedAt: row.completedAt,
+  };
+}
+
+async function loadLimitedMatchRequired(
+  id: string,
+): Promise<StoredLimitedMatch> {
+  const [row] = await getDb()
+    .select({
+      match: limitedMatches,
+      roundNumber: limitedRounds.number,
+    })
+    .from(limitedMatches)
+    .innerJoin(limitedRounds, eq(limitedMatches.roundId, limitedRounds.id))
+    .where(eq(limitedMatches.id, id))
+    .limit(1);
+  if (!row) throw new Error('Limited match not found.');
+  const playerRows = await getDb()
+    .select({
+      participantId: limitedMatchParticipants.participantId,
+      slot: limitedMatchParticipants.slot,
+    })
+    .from(limitedMatchParticipants)
+    .where(eq(limitedMatchParticipants.matchId, id));
+  const [reservation] = await getDb()
+    .select({
+      tableId: tableReservations.tableId,
+      tableLabel: physicalTables.label,
+    })
+    .from(tableReservations)
+    .innerJoin(
+      physicalTables,
+      eq(tableReservations.tableId, physicalTables.id),
+    )
+    .where(
+      and(
+        eq(tableReservations.ownerType, 'LIMITED_MATCH'),
+        eq(tableReservations.ownerId, id),
+      ),
+    )
+    .orderBy(desc(tableReservations.createdAt))
+    .limit(1);
+  const playerA = playerRows.find((player) => player.slot === 'A');
+  const playerB = playerRows.find((player) => player.slot === 'B');
+  if (!playerA) throw new Error('Limited match has no player A.');
+  return {
+    id: row.match.id,
+    roundId: row.match.roundId,
+    roundNumber: row.roundNumber,
+    position: row.match.position,
+    playerAId: playerA.participantId,
+    playerBId: playerB?.participantId ?? null,
+    tableId: reservation?.tableId ?? null,
+    tableLabel: reservation?.tableLabel ?? null,
+    status: row.match.status,
+    bestOf: row.match.bestOf === 1 ? 1 : 3,
+    outcome: row.match.outcome,
+    playerAGameWins: row.match.playerAGameWins,
+    playerBGameWins: row.match.playerBGameWins,
+    reportedAt: row.match.reportedAt,
+  };
+}
+
+function mapLimitedAudit(
+  row: typeof limitedResultAudits.$inferSelect,
+): StoredLimitedResultAudit {
+  return {
+    id: row.id,
+    matchId: row.matchId,
+    previousOutcome: row.previousOutcome,
+    previousPlayerAGameWins: row.previousPlayerAGameWins,
+    previousPlayerBGameWins: row.previousPlayerBGameWins,
+    outcome: row.outcome,
+    playerAGameWins: row.playerAGameWins,
+    playerBGameWins: row.playerBGameWins,
+    correctionReason: row.correctionReason,
+    correctedByParticipantId: row.correctedByParticipantId,
+    createdAt: row.createdAt,
+  };
+}
+
+function assertUniqueLimited<T>(values: readonly T[], label: string): void {
+  if (new Set(values).size !== values.length) {
+    throw new LimitedPersistenceConflictError(`${label} must be unique.`);
+  }
 }
 
 async function loadStoredPod(
@@ -1020,6 +2418,7 @@ function mapEvent(row: typeof events.$inferSelect): StoredEvent {
     preferredPodSize: row.preferredPodSize,
     tournamentFormat: row.tournamentFormat as StoredEvent['tournamentFormat'],
     tournamentState: row.tournamentState as StoredEvent['tournamentState'],
+    limitedModeConfigs: row.limitedModeConfigs,
     expiresAt: row.expiresAt,
     challengePackId: row.challengePackId,
     challengePackVersion: row.challengePackVersion,
@@ -1037,6 +2436,8 @@ function mapParticipant(
     isBot: row.isBot,
     status: row.status,
     readyAt: row.readyAt ?? null,
+    limitedQueueMode: row.limitedQueueMode ?? null,
+    limitedQueuedAt: row.limitedQueuedAt ?? null,
     flexCredits: row.flexCredits,
     createdAt: row.createdAt,
   };

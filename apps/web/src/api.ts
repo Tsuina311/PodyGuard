@@ -2,6 +2,12 @@ import {
   normalizeJoinCode,
   type EventMetrics,
   type GameMode,
+  type EventSnapshot,
+  type LimitedEventModeConfig,
+  type LimitedMatchOutcome,
+  type LimitedMode,
+  type LimitedSessionStatus,
+  type LimitedTimerPhase,
   type PodRating,
   type PublicEvent,
   type PublicChallengeCompletion,
@@ -125,6 +131,7 @@ export function createEvent(
     lifetimeHours?: number;
     tournamentFormat?: TournamentFormat;
     tournamentOptions?: TournamentOptions;
+    limitedModeConfigs?: LimitedEventModeConfig[];
   },
 ) {
   return request<{ event: PublicEvent; hostToken: string }>('/events', {
@@ -264,6 +271,184 @@ export function leaveEvent(joinCode: string, token: string) {
       headers: { Authorization: `Bearer ${token}` },
     },
   );
+}
+
+type LimitedResultInput = {
+  outcome: Exclude<LimitedMatchOutcome, 'BYE'>;
+  playerAGameWins: number;
+  playerBGameWins: number;
+};
+
+export function joinLimitedQueue(
+  joinCode: string,
+  token: string,
+  mode: LimitedMode,
+) {
+  return request<{ snapshot: EventSnapshot }>(
+    `/events/${joinCode}/limited/queue`,
+    {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ mode }),
+    },
+  );
+}
+
+export function leaveLimitedQueue(joinCode: string, token: string) {
+  return request<{ snapshot: EventSnapshot }>(
+    `/events/${joinCode}/limited/queue`,
+    {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
+}
+
+export function createLimitedSession(
+  joinCode: string,
+  token: string,
+  input: {
+    mode: LimitedMode;
+    participantCount?: number;
+    allowUndersizedLaunch?: boolean;
+    label?: string;
+    draftTableIds?: string[];
+  },
+) {
+  return request<{ session: import('@podyguard/shared').PublicLimitedSession }>(
+    `/events/${joinCode}/limited/sessions`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(input),
+    },
+  );
+}
+
+function limitedSessionRequest(
+  joinCode: string,
+  token: string,
+  sessionId: string,
+  suffix: string,
+  init: RequestInit,
+) {
+  return request<{ session: import('@podyguard/shared').PublicLimitedSession }>(
+    `/events/${joinCode}/limited/sessions/${sessionId}${suffix}`,
+    {
+      ...init,
+      headers: { Authorization: `Bearer ${token}`, ...(init.headers ?? {}) },
+    },
+  );
+}
+
+export function launchLimitedSession(joinCode: string, token: string, sessionId: string) {
+  return limitedSessionRequest(joinCode, token, sessionId, '/launch', { method: 'POST' });
+}
+
+export function replaceLimitedRoster(
+  joinCode: string,
+  token: string,
+  sessionId: string,
+  participantIds: string[],
+) {
+  return limitedSessionRequest(joinCode, token, sessionId, '/roster', {
+    method: 'PUT',
+    body: JSON.stringify({ participantIds }),
+  });
+}
+
+export function replaceLimitedDraftTables(
+  joinCode: string,
+  token: string,
+  sessionId: string,
+  tableIds: string[],
+) {
+  return limitedSessionRequest(joinCode, token, sessionId, '/tables', {
+    method: 'PUT',
+    body: JSON.stringify({ tableIds }),
+  });
+}
+
+export function advanceLimitedPhase(
+  joinCode: string,
+  token: string,
+  sessionId: string,
+  status: LimitedSessionStatus,
+  durationSeconds?: number,
+) {
+  return limitedSessionRequest(joinCode, token, sessionId, '/phase', {
+    method: 'POST',
+    body: JSON.stringify({ status, durationSeconds }),
+  });
+}
+
+export function updateLimitedTimer(
+  joinCode: string,
+  token: string,
+  sessionId: string,
+  action: 'START' | 'PAUSE' | 'RESUME' | 'ADD',
+  input: { durationSeconds?: number; seconds?: number; phase?: LimitedTimerPhase } = {},
+) {
+  return limitedSessionRequest(joinCode, token, sessionId, '/timer', {
+    method: 'POST',
+    body: JSON.stringify({ action, ...input }),
+  });
+}
+
+export function startLimitedRound(joinCode: string, token: string, sessionId: string) {
+  return limitedSessionRequest(joinCode, token, sessionId, '/rounds', { method: 'POST' });
+}
+
+export function reportLimitedResult(
+  joinCode: string,
+  token: string,
+  sessionId: string,
+  matchId: string,
+  result: LimitedResultInput,
+) {
+  return limitedSessionRequest(
+    joinCode,
+    token,
+    sessionId,
+    `/matches/${matchId}/result`,
+    { method: 'POST', body: JSON.stringify(result) },
+  );
+}
+
+export function correctLimitedResult(
+  joinCode: string,
+  token: string,
+  sessionId: string,
+  matchId: string,
+  result: LimitedResultInput & { correctionReason: string },
+) {
+  return limitedSessionRequest(
+    joinCode,
+    token,
+    sessionId,
+    `/matches/${matchId}/correct`,
+    { method: 'POST', body: JSON.stringify(result) },
+  );
+}
+
+export function dropLimitedParticipant(
+  joinCode: string,
+  token: string,
+  sessionId: string,
+  participantId?: string,
+) {
+  const suffix = participantId
+    ? `/participants/${participantId}/drop`
+    : '/drop';
+  return limitedSessionRequest(joinCode, token, sessionId, suffix, { method: 'POST' });
+}
+
+export function cancelLimitedSession(joinCode: string, token: string, sessionId: string) {
+  return limitedSessionRequest(joinCode, token, sessionId, '/cancel', { method: 'POST' });
+}
+
+export function completeLimitedSession(joinCode: string, token: string, sessionId: string) {
+  return limitedSessionRequest(joinCode, token, sessionId, '/complete', { method: 'POST' });
 }
 
 /** Host-only: drops a player the pod has given up on from the roster. */

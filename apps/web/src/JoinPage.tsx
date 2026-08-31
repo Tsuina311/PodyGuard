@@ -45,6 +45,7 @@ import { WaitTime } from './ui/WaitTime';
 import { assignedDeckLine, tableForParticipant } from './match-view';
 import { TrackerView } from './tracker/TrackerView';
 import { TournamentPlayerStatus } from './tournament/TournamentPlayerStatus';
+import { LimitedPlayerPanel } from './limited/LimitedPlayerPanel';
 import { TreacheryRoleDialog } from './TreacheryRoleDialog';
 import { useEventLive } from './useEventLive';
 import { forgetActiveMatch, rememberActiveMatch } from './active-match';
@@ -744,6 +745,10 @@ export function JoinPage() {
                 {t('join.joinAgain')}
               </Button>
             </div>
+          ) : participant.limitedQueueMode ? (
+            <p className="text-muted text-sm">
+              You are waiting in a Limited queue. Manage that queue below.
+            </p>
           ) : isReady ? (
             <>
               {participant.decks.length > 0 ? (
@@ -954,6 +959,16 @@ export function JoinPage() {
           )}
         </Panel>
       )}
+
+      {participant && token && snapshot && event?.limitedModeConfigs?.some((config) => config.enabled) ? (
+        <LimitedPlayerPanel
+          snapshot={snapshot}
+          participant={participant}
+          token={token}
+          onSnapshot={onSnapshot}
+          onError={setError}
+        />
+      ) : null}
 
       {error ? <p className="text-danger text-sm">{error}</p> : null}
 

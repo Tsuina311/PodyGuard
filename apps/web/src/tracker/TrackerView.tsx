@@ -18,6 +18,7 @@ import {
   Check,
   Crown,
   Delete,
+  Dices,
   Eye,
   Gauge,
   Minus,
@@ -103,6 +104,7 @@ import { dealAssassinContracts } from './assassin';
 import { dealTreacheryIdentities } from './treachery';
 import { planFirstPlayerReveal, type RevealHop } from './first-player-reveal';
 import { DungeonTracker } from './DungeonTracker';
+import { DiceToolsSheet } from './DiceToolsSheet';
 import { ModeRulesSheet } from './ModeRulesSheet';
 import { SchemeSheet } from './SchemeSheet';
 import { AssassinTargetsSheet } from './AssassinTargetsSheet';
@@ -524,6 +526,7 @@ export function TrackerView({
   );
   const [counterPlayerId, setCounterPlayerId] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [diceToolsOpen, setDiceToolsOpen] = useState(false);
   const [challengesOpen, setChallengesOpen] = useState(false);
   const [resultHidden, setResultHidden] = useState(false);
   const [finishing, setFinishing] = useState(false);
@@ -705,6 +708,7 @@ export function TrackerView({
       return;
     }
     setMenuOpen(false);
+    setDiceToolsOpen(false);
     setChallengesOpen(false);
     setCommanderPlayerId(null);
     setCounterPlayerId(null);
@@ -2127,6 +2131,10 @@ export function TrackerView({
                   setMenuOpen(false);
                   setRulesOpen(true);
                 }}
+                onDiceTools={() => {
+                  setMenuOpen(false);
+                  setDiceToolsOpen(true);
+                }}
                 onScheme={
                   archenemyBoard
                     ? () => {
@@ -2154,6 +2162,24 @@ export function TrackerView({
                 }
                 onClose={() => setMenuOpen(false)}
               />
+            </div>,
+            document.body,
+          )
+        : null}
+      {diceToolsOpen
+        ? createPortal(
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label={t('tracker.diceTools')}
+              className="bg-void/95 fixed inset-x-0 top-0 z-50 flex h-[100dvh] p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm"
+              onClick={(event) => {
+                if (event.target === event.currentTarget) {
+                  setDiceToolsOpen(false);
+                }
+              }}
+            >
+              <DiceToolsSheet onClose={() => setDiceToolsOpen(false)} />
             </div>,
             document.body,
           )
@@ -2716,6 +2742,7 @@ function MatchMenu({
   onCheckRole,
   onChallenges,
   onRules,
+  onDiceTools,
   onScheme,
   onTargets,
   onPlayerLost,
@@ -2731,6 +2758,7 @@ function MatchMenu({
   onCheckRole?: () => void;
   onChallenges?: () => void;
   onRules: () => void;
+  onDiceTools: () => void;
   onScheme?: () => void;
   onTargets?: () => void;
   onPlayerLost?: (playerId: string) => void;
@@ -2818,6 +2846,10 @@ function MatchMenu({
           <Button size="sm" variant="glass" onClick={onRules}>
             <BookOpen size={14} aria-hidden />
             {t('tracker.readRules')}
+          </Button>
+          <Button size="sm" variant="glass" onClick={onDiceTools}>
+            <Dices size={14} aria-hidden />
+            {t('tracker.diceTools')}
           </Button>
           <Button
             size="sm"

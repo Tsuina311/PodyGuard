@@ -23,12 +23,30 @@ import {
   EventStatus,
   ParticipantStatus,
   PhysicalTableStatus,
+  addLimitedTimerSeconds,
+  calculateLimitedStandings,
+  defaultLimitedRounds,
+  deterministicDraftSeats,
+  isLimitedMode,
+  limitedModeConfig,
+  pairLimitedRound,
+  pauseLimitedTimer,
+  resumeLimitedTimer,
+  startLimitedTimer,
+  validateLimitedCohortSize,
   type ChallengePack,
   type EventMetrics,
   type GameMode,
+  type EventSnapshot,
+  type LimitedEventModeConfig,
+  type LimitedMatchOutcome,
+  type LimitedMode,
+  type LimitedSessionStatus,
+  type LimitedTimerPhase,
   type PodRating,
   type ProductEventName,
   type PublicEvent,
+  type PublicLimitedSession,
   type PublicParticipant,
   type PublicPod,
   type PublicTable,
@@ -56,6 +74,7 @@ import {
   InvalidHostPinError,
   InvalidParticipantTransitionError,
   JoinCodeConflictError,
+  LimitedPersistenceConflictError,
   ParticipantNotFoundError,
   TableNotFoundError,
   PodNotFoundError,
@@ -64,6 +83,8 @@ import {
   type StoredCompletedGame,
   type StoredDeck,
   type StoredEvent,
+  type StoredLimitedMatch,
+  type StoredLimitedSession,
   type StoredParticipant,
   type StoredTable,
 } from './event-store.js';
@@ -85,6 +106,21 @@ import { computeEventMetrics } from './metrics.js';
 
 const JOIN_CODE_ATTEMPTS = 8;
 
+export class LimitedSessionNotFoundError extends Error {
+  readonly code = 'LIMITED_SESSION_NOT_FOUND';
+
+  constructor() {
+    super('Limited session not found.');
+    this.name = 'LimitedSessionNotFoundError';
+  }
+}
+
+export type LimitedResultInput = {
+  outcome: LimitedMatchOutcome;
+  playerAGameWins: number;
+  playerBGameWins: number;
+};
+
 export type CreateEventInput = {
   name: string;
   hostPin: string;
@@ -97,6 +133,7 @@ export type CreateEventInput = {
   lifetimeHours?: number;
   tournamentFormat?: TournamentFormat;
   tournamentOptions?: TournamentOptions;
+  limitedModeConfigs?: LimitedEventModeConfig[];
 };
 
 export type CreateEventResult = {
@@ -161,6 +198,9 @@ export class EventService {
       );
     }
     const tournamentOptions = parseTournamentOptions(input.tournamentOptions);
+    const limitedModeConfigs = normalizeLimitedModeConfigs(
+      input.limitedModeConfigs,
+    );
     const lifetimeHours = assertLifetimeHours(input.lifetimeHours);
     const createdAt = this.now();
     const expiresAt = new Date(
@@ -206,6 +246,7 @@ export class EventService {
           preferredPodSize,
           tournamentFormat,
           tournamentState: initialTournamentState,
+          limitedModeConfigs,
           expiresAt,
           createdAt,
         });
@@ -446,6 +487,11 @@ export class EventService {
     );
 
     if (ready) {
+      if (participant.limitedQueueMode) {
+        throw new InvalidParticipantTransitionError(
+          'Leave the Limited queue before joining normal matchmaking.',
+        );
+      }
       if (
         participant.status !== ParticipantStatus.Joined &&
         participant.status !== ParticipantStatus.Paused
@@ -486,6 +532,11 @@ export class EventService {
     );
 
     if (paused) {
+      if (participant.limitedQueueMode) {
+        throw new InvalidParticipantTransitionError(
+          'Leave the Limited queue before pausing normal matchmaking.',
+        );
+      }
       if (
         participant.status !== ParticipantStatus.Joined &&
         participant.status !== ParticipantStatus.Ready
@@ -551,6 +602,8 @@ export class EventService {
     const updated = await this.store.updateParticipant(participant.id, {
       status: ParticipantStatus.Left,
       readyAt: null,
+      limitedQueueMode: null,
+      limitedQueuedAt: null,
     });
     await this.track(stored.id, 'left_event');
     return this.present(updated);
@@ -593,22 +646,611 @@ export class EventService {
     const updated = await this.store.updateParticipant(participant.id, {
       status: ParticipantStatus.Left,
       readyAt: null,
+      limitedQueueMode: null,
+      limitedQueuedAt: null,
     });
     await this.track(stored.id, 'left_event');
     return this.present(updated);
   }
 
-  async getSnapshot(joinCode: string): Promise<{
-    event: PublicEvent;
-    participants: PublicParticipant[];
-    tables: PublicTable[];
-  }> {
-    const [event, participants, tables] = await Promise.all([
-      this.getEvent(joinCode),
+  async getSnapshot(joinCode: string): Promise<EventSnapshot> {
+    const stored = await this.requireByJoinCode(joinCode);
+    const [event, participants, tables, sessions, people] = await Promise.all([
+      this.presentEvent(stored),
       this.listParticipants(joinCode),
-      this.listTables(joinCode),
+      this.listTablesByEventId(stored.id),
+      this.store.listLimitedSessions(stored.id),
+      this.store.listParticipants(stored.id),
     ]);
-    return { event, participants, tables };
+    return {
+      event,
+      participants,
+      tables,
+      limitedQueues: limitedQueueSummaries(stored, people),
+      limitedSessions: sessions.map((session) =>
+        toPublicLimitedSession(session, this.now()),
+      ),
+    };
+  }
+
+  async joinLimitedQueue(
+    joinCode: string,
+    participantToken: string,
+    mode: LimitedMode,
+  ): Promise<EventSnapshot> {
+    const stored = await this.requireByJoinCode(joinCode);
+    const config = requireEnabledLimitedConfig(stored, mode);
+    const participant = await this.requireParticipant(
+      stored.id,
+      participantToken,
+    );
+    if (
+      participant.status !== ParticipantStatus.Joined &&
+      participant.status !== ParticipantStatus.Ready &&
+      participant.status !== ParticipantStatus.Paused
+    ) {
+      throw new InvalidParticipantTransitionError(
+        'Only an unseated player can join a Limited queue.',
+      );
+    }
+    await this.store.updateParticipant(participant.id, {
+      status: ParticipantStatus.Joined,
+      readyAt: null,
+      limitedQueueMode: mode,
+      limitedQueuedAt: this.now(),
+    });
+    await this.track(stored.id, 'limited_queued');
+    const target = config.preferredCohortSize ?? config.minCohortSize;
+    const queue = await this.limitedQueue(stored.id, mode);
+    if (queue.length >= target) {
+      try {
+        await this.createLimitedSessionFromQueue(stored, config, {
+          participantCount: target,
+          automatic: true,
+        });
+      } catch (error) {
+        if (!(error instanceof LimitedPersistenceConflictError)) throw error;
+      }
+    }
+    return this.getSnapshot(joinCode);
+  }
+
+  async leaveLimitedQueue(
+    joinCode: string,
+    participantToken: string,
+  ): Promise<EventSnapshot> {
+    const stored = await this.requireByJoinCode(joinCode);
+    const participant = await this.requireParticipant(
+      stored.id,
+      participantToken,
+    );
+    if (!participant.limitedQueueMode) {
+      throw new InvalidParticipantTransitionError(
+        'This player is not in a Limited queue.',
+      );
+    }
+    await this.store.updateParticipant(participant.id, {
+      status: ParticipantStatus.Joined,
+      readyAt: null,
+      limitedQueueMode: null,
+      limitedQueuedAt: null,
+    });
+    return this.getSnapshot(joinCode);
+  }
+
+  async createLimitedSession(
+    joinCode: string,
+    hostToken: string,
+    input: {
+      mode: LimitedMode;
+      participantCount?: number;
+      allowUndersizedLaunch?: boolean;
+      label?: string;
+      draftTableIds?: string[];
+    },
+  ): Promise<PublicLimitedSession> {
+    const stored = await this.requireHostToken(joinCode, hostToken);
+    const config = requireEnabledLimitedConfig(stored, input.mode);
+    return toPublicLimitedSession(
+      await this.createLimitedSessionFromQueue(stored, config, {
+        participantCount: input.participantCount,
+        allowUndersizedLaunch: input.allowUndersizedLaunch,
+        label: input.label,
+        draftTableIds: input.draftTableIds,
+        automatic: false,
+      }),
+    );
+  }
+
+  async launchLimitedSession(
+    joinCode: string,
+    hostToken: string,
+    sessionId: string,
+  ): Promise<PublicLimitedSession> {
+    const event = await this.requireHostToken(joinCode, hostToken);
+    const session = await this.requireLimitedSession(event.id, sessionId);
+    if (session.status !== 'FORMING') {
+      throw new InvalidParticipantTransitionError(
+        'Only a forming Limited session can be launched.',
+      );
+    }
+    try {
+      validateLimitedCohortSize(
+        session.mode,
+        session.participants.filter(
+          (participant) => participant.status !== 'DROPPED',
+        ).length,
+        {
+          allowUndersizedLaunch: session.allowUndersizedLaunch,
+          preferredCohortSize: session.preferredCohortSize ?? undefined,
+          minCohortSize: session.minCohortSize,
+          maxCohortSize: session.maxCohortSize ?? undefined,
+        },
+      );
+    } catch (error) {
+      throw new InvalidEventInputError(
+        error instanceof Error ? error.message : 'Invalid Limited cohort.',
+      );
+    }
+    const updated = await this.store.updateLimitedSessionPhase(session.id, {
+      status: 'SEATING',
+      startedAt: this.now(),
+    });
+    await this.track(event.id, 'limited_phase_changed');
+    return toPublicLimitedSession(updated);
+  }
+
+  async replaceLimitedSessionRoster(
+    joinCode: string,
+    hostToken: string,
+    sessionId: string,
+    participantIds: string[],
+  ): Promise<PublicLimitedSession> {
+    const event = await this.requireHostToken(joinCode, hostToken);
+    const session = await this.requireLimitedSession(event.id, sessionId);
+    if (session.status !== 'FORMING') {
+      throw new InvalidParticipantTransitionError(
+        'Only a forming Limited session can change its roster.',
+      );
+    }
+    if (new Set(participantIds).size !== participantIds.length) {
+      throw new InvalidEventInputError(
+        'A Limited roster cannot contain the same player twice.',
+      );
+    }
+    const hardMaximum = limitedModeConfig(session.mode).maxCohortSize;
+    const maximum =
+      hardMaximum === undefined
+        ? session.maxCohortSize ?? undefined
+        : Math.min(session.maxCohortSize ?? hardMaximum, hardMaximum);
+    if (
+      participantIds.length < 1 ||
+      (maximum !== undefined && participantIds.length > maximum)
+    ) {
+      throw new InvalidEventInputError(
+        maximum === undefined
+          ? 'A forming Limited roster needs at least one player.'
+          : `A forming Limited roster supports between 1 and ${maximum} players.`,
+      );
+    }
+    const currentIds = new Set(
+      session.participants.map((participant) => participant.participantId),
+    );
+    const people = await this.store.listParticipants(event.id);
+    const eligibleIds = new Set(
+      people
+        .filter(
+          (participant) =>
+            currentIds.has(participant.id) ||
+            participant.limitedQueueMode === session.mode,
+        )
+        .map((participant) => participant.id),
+    );
+    if (participantIds.some((participantId) => !eligibleIds.has(participantId))) {
+      throw new InvalidEventInputError(
+        'Added players must be waiting in this Limited mode queue.',
+      );
+    }
+    const seats =
+      session.mode === 'SEALED'
+        ? new Map<string, number>()
+        : new Map(
+            deterministicDraftSeats(participantIds).map((seat) => [
+              seat.participantId,
+              seat.seat,
+            ]),
+          );
+    const updated = await this.store.replaceLimitedSessionRoster(
+      session.id,
+      participantIds.map((participantId) => ({
+        participantId,
+        draftSeat: seats.get(participantId),
+      })),
+    );
+    await this.track(event.id, 'limited_host_override');
+    return toPublicLimitedSession(updated, this.now());
+  }
+
+  async replaceLimitedDraftTables(
+    joinCode: string,
+    hostToken: string,
+    sessionId: string,
+    tableIds: string[],
+  ): Promise<PublicLimitedSession> {
+    const event = await this.requireHostToken(joinCode, hostToken);
+    const session = await this.requireLimitedSession(event.id, sessionId);
+    if (session.mode === 'SEALED') {
+      throw new InvalidEventInputError(
+        'Sealed sessions do not use draft-table reservations.',
+      );
+    }
+    const updated = await this.store.replaceLimitedDraftTables(
+      session.id,
+      tableIds,
+    );
+    await this.track(event.id, 'limited_host_override');
+    return toPublicLimitedSession(updated, this.now());
+  }
+
+  async advanceLimitedSession(
+    joinCode: string,
+    hostToken: string,
+    sessionId: string,
+    status: LimitedSessionStatus,
+    durationSeconds?: number,
+  ): Promise<PublicLimitedSession> {
+    const event = await this.requireHostToken(joinCode, hostToken);
+    const session = await this.requireLimitedSession(event.id, sessionId);
+    const allowed = nextLimitedPhases(session);
+    if (!allowed.includes(status)) {
+      throw new InvalidParticipantTransitionError(
+        `Limited session cannot move from ${session.status} to ${status}.`,
+      );
+    }
+    const config = requireLimitedConfig(event, session.mode);
+    const timer =
+      status === 'DECKBUILDING'
+        ? startLimitedTimer(
+            'DECKBUILDING',
+            durationSeconds ?? config.deckbuildingMinutes * 60,
+            this.now().toISOString(),
+          )
+        : status === 'DRAFTING'
+          ? startLimitedTimer(
+              'DRAFTING',
+              durationSeconds ?? (config.draftMinutes ?? 50) * 60,
+              this.now().toISOString(),
+            )
+          : null;
+    const updated = await this.store.updateLimitedSessionPhase(session.id, {
+      status,
+      timer,
+    });
+    await this.track(event.id, 'limited_phase_changed');
+    return toPublicLimitedSession(updated);
+  }
+
+  async updateLimitedTimer(
+    joinCode: string,
+    hostToken: string,
+    sessionId: string,
+    action: 'START' | 'PAUSE' | 'RESUME' | 'ADD',
+    input: { durationSeconds?: number; seconds?: number; phase?: LimitedTimerPhase },
+  ): Promise<PublicLimitedSession> {
+    const event = await this.requireHostToken(joinCode, hostToken);
+    const session = await this.requireLimitedSession(event.id, sessionId);
+    const now = this.now().toISOString();
+    const expectedPhase = timerPhaseForStatus(session.status);
+    if (!expectedPhase) {
+      throw new InvalidParticipantTransitionError(
+        'This Limited phase does not use an authoritative timer.',
+      );
+    }
+    let timer = session.timer;
+    try {
+      if (action === 'START') {
+        const phase = input.phase ?? expectedPhase;
+        if (phase !== expectedPhase || !input.durationSeconds) {
+          throw new Error('Starting a timer requires a phase and duration.');
+        }
+        timer = startLimitedTimer(phase, input.durationSeconds, now);
+      } else {
+        if (!timer) throw new Error('This Limited session has no active timer.');
+        timer =
+          action === 'PAUSE'
+            ? pauseLimitedTimer(timer, now)
+            : action === 'RESUME'
+              ? resumeLimitedTimer(timer, now)
+              : addLimitedTimerSeconds(timer, input.seconds ?? 0);
+      }
+    } catch (error) {
+      throw new InvalidEventInputError(
+        error instanceof Error ? error.message : 'Invalid Limited timer action.',
+      );
+    }
+    const updated = await this.store.updateLimitedSessionPhase(session.id, {
+      status: session.status,
+      timer,
+    });
+    await this.track(event.id, 'limited_host_override');
+    return toPublicLimitedSession(updated);
+  }
+
+  async startLimitedRound(
+    joinCode: string,
+    hostToken: string,
+    sessionId: string,
+  ): Promise<PublicLimitedSession> {
+    const event = await this.requireHostToken(joinCode, hostToken);
+    const session = await this.requireLimitedSession(event.id, sessionId);
+    if (
+      session.status !== 'BETWEEN_ROUNDS' &&
+      session.status !== 'DECKBUILDING'
+    ) {
+      throw new InvalidParticipantTransitionError(
+        'A Limited round can only start after deckbuilding or between rounds.',
+      );
+    }
+    const previousRound = session.rounds.at(-1);
+    if (
+      previousRound &&
+      previousRound.matches.some((match) => match.status !== 'COMPLETED')
+    ) {
+      throw new InvalidParticipantTransitionError(
+        'Finish every match before starting the next round.',
+      );
+    }
+    const roundNumber = (session.currentRound ?? 0) + 1;
+    if (roundNumber > session.totalRounds) {
+      throw new InvalidParticipantTransitionError(
+        'All configured Limited rounds have already been played.',
+      );
+    }
+    const paired = pairLimitedRound({
+      sessionId: session.id,
+      mode: session.mode,
+      roundNumber,
+      participants: session.participants.map((participant) => ({
+        participantId: participant.participantId,
+        displayName: participant.displayName,
+        dropped: participant.status === 'DROPPED',
+      })),
+      previousMatches: session.rounds.flatMap((round) =>
+        round.matches.map(toLimitedMatch),
+      ),
+      bestOf: session.matchStructure === 'BO1' ? 1 : 3,
+    });
+    const draftTableIds = new Set(session.draftTableIds);
+    const tables = (await this.store.listTables(event.id))
+      .filter(
+        (table) =>
+          table.status === PhysicalTableStatus.Free ||
+          draftTableIds.has(table.id),
+      )
+      .sort(
+        (left, right) =>
+          left.sortOrder - right.sortOrder || left.id.localeCompare(right.id),
+      );
+    const tableMatches = paired.matches.filter((match) => match.playerBId);
+    if (tables.length < tableMatches.length) {
+      throw new InvalidParticipantTransitionError(
+        `Starting this round needs ${tableMatches.length} free tables.`,
+      );
+    }
+    let tableIndex = 0;
+    const now = this.now();
+    await this.store.createLimitedRound({
+      sessionId: session.id,
+      number: roundNumber,
+      status: 'ACTIVE',
+      startedAt: now,
+      matches: paired.matches.map((match) => {
+        const table = match.playerBId ? tables[tableIndex++] : undefined;
+        return {
+          position: match.position,
+          playerAId: match.playerAId,
+          playerBId: match.playerBId,
+          tableId: table?.id,
+          status: match.status === 'COMPLETED' ? 'COMPLETED' : 'PLAYING',
+          bestOf: match.bestOf === 1 ? 1 : 3,
+          outcome: match.outcome,
+          playerAGameWins: match.playerAGameWins,
+          playerBGameWins: match.playerBGameWins,
+          reportedAt: match.outcome ? now : undefined,
+        };
+      }),
+    });
+    const config = requireLimitedConfig(event, session.mode);
+    await this.store.updateLimitedSessionPhase(session.id, {
+      status: 'ROUND_ACTIVE',
+      currentRound: roundNumber,
+      timer: startLimitedTimer(
+        'ROUND',
+        config.roundMinutes * 60,
+        now.toISOString(),
+      ),
+    });
+    await this.track(event.id, 'limited_round_created');
+    await this.track(event.id, 'limited_phase_changed');
+    return toPublicLimitedSession(
+      (await this.store.findLimitedSessionById(session.id))!,
+    );
+  }
+
+  async reportLimitedResult(
+    joinCode: string,
+    participantToken: string,
+    sessionId: string,
+    matchId: string,
+    result: LimitedResultInput,
+  ): Promise<PublicLimitedSession> {
+    const event = await this.requireByJoinCode(joinCode);
+    const reporter = await this.requireParticipant(
+      event.id,
+      participantToken,
+    );
+    const session = await this.requireLimitedSession(event.id, sessionId);
+    if (session.status !== 'ROUND_ACTIVE') {
+      throw new InvalidParticipantTransitionError(
+        'Results can only be reported during an active Limited round.',
+      );
+    }
+    const match = requireLimitedMatch(session, matchId);
+    if (
+      reporter.id !== match.playerAId &&
+      reporter.id !== match.playerBId
+    ) {
+      throw new InvalidParticipantTransitionError(
+        'Only a player paired in this match can report its result.',
+      );
+    }
+    if (match.outcome) {
+      throw new InvalidParticipantTransitionError(
+        'Only the host can correct a reported Limited result.',
+      );
+    }
+    validateLimitedResult(match, result);
+    await this.store.finalizeLimitedMatchResult({
+      matchId,
+      ...result,
+      reportedAt: this.now(),
+      correctedByParticipantId: reporter.id,
+    });
+    await this.track(event.id, 'limited_result_reported');
+    return this.progressLimitedRound(event.id, session.id);
+  }
+
+  async correctLimitedResult(
+    joinCode: string,
+    hostToken: string,
+    sessionId: string,
+    matchId: string,
+    result: LimitedResultInput & { correctionReason: string },
+  ): Promise<PublicLimitedSession> {
+    const event = await this.requireHostToken(joinCode, hostToken);
+    const session = await this.requireLimitedSession(event.id, sessionId);
+    const match = requireLimitedMatch(session, matchId);
+    if (!match.outcome || !result.correctionReason.trim()) {
+      throw new InvalidEventInputError(
+        'A host correction requires an existing result and a reason.',
+      );
+    }
+    validateLimitedResult(match, result);
+    await this.store.finalizeLimitedMatchResult({
+      matchId,
+      ...result,
+      correctionReason: result.correctionReason.trim(),
+      reportedAt: this.now(),
+    });
+    await this.track(event.id, 'limited_result_corrected');
+    return this.progressLimitedRound(event.id, session.id);
+  }
+
+  async dropLimitedPlayer(
+    joinCode: string,
+    token: string,
+    sessionId: string,
+    participantId?: string,
+  ): Promise<PublicLimitedSession> {
+    const event = await this.requireByJoinCode(joinCode);
+    let dropId: string;
+    if (participantId) {
+      await this.requireHostToken(joinCode, token);
+      dropId = participantId;
+    } else {
+      dropId = (await this.requireParticipant(event.id, token)).id;
+    }
+    const session = await this.requireLimitedSession(event.id, sessionId);
+    if (session.status === 'COMPLETED' || session.status === 'CANCELLED') {
+      throw new InvalidParticipantTransitionError(
+        'A completed Limited session cannot accept drops.',
+      );
+    }
+    const member = session.participants.find(
+      (participant) => participant.participantId === dropId,
+    );
+    if (!member || member.status === 'DROPPED') {
+      throw new InvalidParticipantTransitionError(
+        'That player is not active in this Limited session.',
+      );
+    }
+    await this.store.dropLimitedParticipant(session.id, dropId, this.now());
+    const activeMatch = session.rounds
+      .at(-1)
+      ?.matches.find(
+        (match) =>
+          match.status !== 'COMPLETED' &&
+          (match.playerAId === dropId || match.playerBId === dropId),
+      );
+    if (activeMatch?.playerBId) {
+      const wins = activeMatch.bestOf === 1 ? 1 : 2;
+      await this.store.finalizeLimitedMatchResult({
+        matchId: activeMatch.id,
+        outcome:
+          activeMatch.playerAId === dropId
+            ? 'PLAYER_B_WIN'
+            : 'PLAYER_A_WIN',
+        playerAGameWins: activeMatch.playerAId === dropId ? 0 : wins,
+        playerBGameWins: activeMatch.playerAId === dropId ? wins : 0,
+        correctionReason: 'Automatic forfeit after player drop',
+        reportedAt: this.now(),
+      });
+    }
+    await this.track(event.id, 'limited_participant_dropped');
+    const afterDrop = await this.requireLimitedSession(event.id, session.id);
+    if (
+      afterDrop.participants.filter(
+        (participant) => participant.status !== 'DROPPED',
+      ).length < 2
+    ) {
+      const completed = await this.store.finishLimitedSession(
+        session.id,
+        'COMPLETED',
+        this.now(),
+      );
+      await this.track(event.id, 'limited_session_completed');
+      return toPublicLimitedSession(completed);
+    }
+    return this.progressLimitedRound(event.id, session.id);
+  }
+
+  async cancelLimitedSession(
+    joinCode: string,
+    hostToken: string,
+    sessionId: string,
+  ): Promise<PublicLimitedSession> {
+    const event = await this.requireHostToken(joinCode, hostToken);
+    const session = await this.requireLimitedSession(event.id, sessionId);
+    if (session.status === 'COMPLETED' || session.status === 'CANCELLED') {
+      return toPublicLimitedSession(session);
+    }
+    const cancelled = await this.store.finishLimitedSession(
+      session.id,
+      'CANCELLED',
+      this.now(),
+    );
+    await this.track(event.id, 'limited_phase_changed');
+    return toPublicLimitedSession(cancelled);
+  }
+
+  async completeLimitedSession(
+    joinCode: string,
+    hostToken: string,
+    sessionId: string,
+  ): Promise<PublicLimitedSession> {
+    const event = await this.requireHostToken(joinCode, hostToken);
+    const session = await this.requireLimitedSession(event.id, sessionId);
+    if (session.status === 'COMPLETED' || session.status === 'CANCELLED') {
+      return toPublicLimitedSession(session, this.now());
+    }
+    const completed = await this.store.finishLimitedSession(
+      session.id,
+      'COMPLETED',
+      this.now(),
+    );
+    await this.track(event.id, 'limited_session_completed');
+    await this.track(event.id, 'limited_host_override');
+    return toPublicLimitedSession(completed, this.now());
   }
 
   async startTournament(
@@ -628,7 +1270,8 @@ export class EventService {
       .filter(
         (person) =>
           (allowBots || !person.isBot) &&
-          person.status === ParticipantStatus.Ready,
+          person.status === ParticipantStatus.Ready &&
+          !person.limitedQueueMode,
       )
       .map((person) => person.id);
     if (entrantIds.length < 2) {
@@ -1111,9 +1754,10 @@ export class EventService {
       return this.presentEvent(stored);
     }
 
-    const [assignments, people] = await Promise.all([
+    const [assignments, people, limitedSessions] = await Promise.all([
       this.store.listAssignments(stored.id),
       this.store.listParticipants(stored.id),
+      this.store.listLimitedSessions(stored.id),
     ]);
     const cancelledPods = new Set<string>();
     for (const seat of assignments) {
@@ -1127,6 +1771,15 @@ export class EventService {
         if (!(error instanceof PodNotFoundError)) {
           throw error;
         }
+      }
+    }
+    for (const session of limitedSessions) {
+      if (session.status !== 'COMPLETED' && session.status !== 'CANCELLED') {
+        await this.store.finishLimitedSession(
+          session.id,
+          'CANCELLED',
+          this.now(),
+        );
       }
     }
     for (const person of people) {
@@ -1205,17 +1858,100 @@ export class EventService {
     hostToken: string,
   ): Promise<EventMetrics> {
     const stored = await this.requireHostToken(joinCode, hostToken);
-    const [people, tables, games, completions] = await Promise.all([
+    const [people, tables, games, completions, sessions, resultAudits] =
+      await Promise.all([
       this.store.listParticipants(stored.id),
       this.store.listTables(stored.id),
       this.store.listCompletedGames(stored.id),
       this.store.listChallengeCompletions(stored.id),
+      this.store.listLimitedSessions(stored.id),
+      this.store.listLimitedResultAudits(stored.id),
     ]);
+    const queueWaits = sessions.flatMap((session) =>
+      session.participants.flatMap((participant) =>
+        participant.assignedAt
+          ? [
+              Math.max(
+                0,
+                Math.round(
+                  (participant.assignedAt.getTime() -
+                    participant.joinedAt.getTime()) /
+                    1000,
+                ),
+              ),
+            ]
+          : [],
+      ),
+    );
+    const formationDurations = sessions.flatMap((session) =>
+      session.startedAt
+        ? [
+            Math.max(
+              0,
+              Math.round(
+                (session.startedAt.getTime() - session.createdAt.getTime()) /
+                  1000,
+              ),
+            ),
+          ]
+        : [],
+    );
+    const roundDurations = sessions.flatMap((session) =>
+      session.rounds.flatMap((round) =>
+        round.startedAt && round.completedAt
+          ? [
+              Math.max(
+                0,
+                Math.round(
+                  (round.completedAt.getTime() - round.startedAt.getTime()) /
+                    1000,
+                ),
+              ),
+            ]
+          : [],
+      ),
+    );
     return computeEventMetrics({
       participants: people,
       tables,
       games,
       challengeCompletions: completions,
+      limited: {
+        sessions: sessions.length,
+        completedSessions: sessions.filter(
+          (session) => session.status === 'COMPLETED',
+        ).length,
+        cancelledSessions: sessions.filter(
+          (session) => session.status === 'CANCELLED',
+        ).length,
+        droppedParticipants: sessions.reduce(
+          (count, session) =>
+            count +
+            session.participants.filter(
+              (participant) => participant.status === 'DROPPED',
+            ).length,
+          0,
+        ),
+        undersizedLaunches: sessions.filter(
+          (session) =>
+            session.allowUndersizedLaunch &&
+            session.preferredCohortSize !== null &&
+            session.participants.length < session.preferredCohortSize,
+        ).length,
+        resultCorrections: resultAudits.filter(
+          (audit) => audit.previousOutcome !== null,
+        ).length,
+        averageCohortSize:
+          sessions.length === 0
+            ? null
+            : sessions.reduce(
+                (sum, session) => sum + session.participants.length,
+                0,
+              ) / sessions.length,
+        queueWaitSeconds: summarizeLimitedMetric(queueWaits),
+        formationSeconds: averageLimitedMetric(formationDurations),
+        roundDurationSeconds: averageLimitedMetric(roundDurations),
+      },
     });
   }
 
@@ -1284,7 +2020,8 @@ export class EventService {
     }
 
     const readyCount = people.filter(
-      (row) => row.status === ParticipantStatus.Ready,
+      (row) =>
+        row.status === ParticipantStatus.Ready && !row.limitedQueueMode,
     ).length;
     const matchOptions = eventMatchOptions(stored);
     const tournamentMatchSize = stored.tournamentState?.podSize;
@@ -1300,7 +2037,10 @@ export class EventService {
     );
 
     const readyHumans = people.filter(
-      (row) => row.status === ParticipantStatus.Ready && !row.isBot,
+      (row) =>
+        row.status === ParticipantStatus.Ready &&
+        !row.isBot &&
+        !row.limitedQueueMode,
     );
     const decks = await this.store.listDecks(stored.id);
     const botPoolId = majorityPreferredPool(
@@ -1342,6 +2082,141 @@ export class EventService {
 
     const pods = await this.runMatch(stored.id);
     return { pods, botsAdded: botsToAdd };
+  }
+
+  private async limitedQueue(
+    eventId: string,
+    mode: LimitedMode,
+  ): Promise<StoredParticipant[]> {
+    return (await this.store.listParticipants(eventId))
+      .filter((participant) => participant.limitedQueueMode === mode)
+      .sort(compareLimitedQueueOrder);
+  }
+
+  private async createLimitedSessionFromQueue(
+    event: StoredEvent,
+    config: LimitedEventModeConfig,
+    options: {
+      participantCount?: number;
+      allowUndersizedLaunch?: boolean;
+      label?: string;
+      draftTableIds?: string[];
+      automatic: boolean;
+    },
+  ): Promise<StoredLimitedSession> {
+    const queue = await this.limitedQueue(event.id, config.mode);
+    const target =
+      options.participantCount ??
+      config.preferredCohortSize ??
+      config.minCohortSize;
+    if (!Number.isInteger(target) || target < 1 || queue.length < target) {
+      throw new InvalidParticipantTransitionError(
+        `The ${config.mode} queue does not have ${target} waiting players.`,
+      );
+    }
+    const allowUndersizedLaunch =
+      !options.automatic &&
+      options.allowUndersizedLaunch === true &&
+      config.allowUndersizedLaunch;
+    try {
+      validateLimitedCohortSize(config.mode, target, {
+        allowUndersizedLaunch,
+        preferredCohortSize: config.preferredCohortSize,
+        minCohortSize: config.minCohortSize,
+        maxCohortSize: config.maxCohortSize,
+      });
+    } catch (error) {
+      throw new InvalidEventInputError(
+        error instanceof Error ? error.message : 'Invalid Limited cohort.',
+      );
+    }
+    const selected = queue.slice(0, target);
+    const seats = config.mode === 'SEALED'
+      ? new Map<string, number>()
+      : new Map(
+          deterministicDraftSeats(selected.map((person) => person.id)).map(
+            (seat) => [seat.participantId, seat.seat],
+          ),
+        );
+    const totalRounds =
+      config.totalRounds === 'AUTO'
+        ? defaultLimitedRounds(selected.length)
+        : config.totalRounds;
+    const sequence = (await this.store.listLimitedSessions(event.id)).filter(
+      (session) => session.mode === config.mode,
+    ).length + 1;
+    const session = await this.store.createLimitedSession({
+      eventId: event.id,
+      mode: config.mode,
+      label: options.label?.trim() || `${limitedModeLabel(config.mode)} ${sequence}`,
+      matchStructure: config.matchStructure,
+      pairingPolicy: limitedModeConfig(config.mode).pairingPolicy,
+      preferredCohortSize: config.preferredCohortSize,
+      minCohortSize: config.minCohortSize,
+      maxCohortSize: config.maxCohortSize,
+      allowUndersizedLaunch,
+      totalRounds,
+      participants: selected.map((person) => ({
+        participantId: person.id,
+        draftSeat: seats.get(person.id),
+        queuedAt: person.limitedQueuedAt ?? undefined,
+      })),
+      draftTableIds: options.draftTableIds,
+      createdAt: this.now(),
+    });
+    await this.track(event.id, 'limited_session_created');
+    if (allowUndersizedLaunch) {
+      await this.track(event.id, 'limited_host_override');
+    }
+    return session;
+  }
+
+  private async requireLimitedSession(
+    eventId: string,
+    sessionId: string,
+  ): Promise<StoredLimitedSession> {
+    const session = await this.store.findLimitedSessionById(sessionId);
+    if (!session || session.eventId !== eventId) {
+      throw new LimitedSessionNotFoundError();
+    }
+    return session;
+  }
+
+  private async progressLimitedRound(
+    eventId: string,
+    sessionId: string,
+  ): Promise<PublicLimitedSession> {
+    let session = await this.requireLimitedSession(eventId, sessionId);
+    const round = session.rounds.find(
+      (candidate) => candidate.number === session.currentRound,
+    );
+    if (
+      !round ||
+      round.matches.some((match) => match.status !== 'COMPLETED')
+    ) {
+      return toPublicLimitedSession(session);
+    }
+    if (round.status !== 'COMPLETED') {
+      await this.store.updateLimitedRound(round.id, {
+        status: 'COMPLETED',
+        completedAt: this.now(),
+      });
+    }
+    if (round.number >= session.totalRounds) {
+      session = await this.store.finishLimitedSession(
+        session.id,
+        'COMPLETED',
+        this.now(),
+      );
+      await this.track(eventId, 'limited_session_completed');
+    } else {
+      session = await this.store.updateLimitedSessionPhase(session.id, {
+        status: 'BETWEEN_ROUNDS',
+        timer: null,
+      });
+      await this.track(eventId, 'limited_phase_changed');
+    }
+    return toPublicLimitedSession(session);
   }
 
   private async scheduleTournamentMatches(
@@ -1440,7 +2315,10 @@ export class EventService {
     );
     const byParticipant = decksMap(decks);
     const ready = people
-      .filter((row) => row.status === ParticipantStatus.Ready)
+      .filter(
+        (row) =>
+          row.status === ParticipantStatus.Ready && !row.limitedQueueMode,
+      )
       .sort(compareReadyOrder);
     const result = createMatches(
       ready.map((row) => ({
@@ -1649,6 +2527,346 @@ export class EventService {
   }
 }
 
+function normalizeLimitedModeConfigs(
+  input: LimitedEventModeConfig[] | undefined,
+): LimitedEventModeConfig[] {
+  if (!input) return [];
+  const seen = new Set<LimitedMode>();
+  return input.map((config) => {
+    if (!isLimitedMode(config.mode) || seen.has(config.mode)) {
+      throw new InvalidEventInputError(
+        'Each Limited mode may be configured once.',
+      );
+    }
+    seen.add(config.mode);
+    const domain = limitedModeConfig(config.mode);
+    if (!domain.supportedMatchStructures.includes(config.matchStructure)) {
+      throw new InvalidEventInputError(
+        `${config.mode} does not support that match structure.`,
+      );
+    }
+    const integers = [
+      config.minCohortSize,
+      ...(config.draftMinutes === undefined ? [] : [config.draftMinutes]),
+      config.deckbuildingMinutes,
+      config.roundMinutes,
+    ];
+    if (integers.some((value) => !Number.isInteger(value) || value < 1)) {
+      throw new InvalidEventInputError(
+        'Limited sizes and timer minutes must be positive integers.',
+      );
+    }
+    if (
+      config.preferredCohortSize !== undefined &&
+      (!Number.isInteger(config.preferredCohortSize) ||
+        config.preferredCohortSize < config.minCohortSize)
+    ) {
+      throw new InvalidEventInputError(
+        'Limited preferred cohort size must meet its minimum.',
+      );
+    }
+    if (
+      config.maxCohortSize !== undefined &&
+      (config.maxCohortSize < config.minCohortSize ||
+        (config.preferredCohortSize !== undefined &&
+          config.preferredCohortSize > config.maxCohortSize))
+    ) {
+      throw new InvalidEventInputError(
+        'Limited cohort sizes must be ordered minimum, preferred, maximum.',
+      );
+    }
+    if (
+      config.totalRounds !== 'AUTO' &&
+      (!Number.isInteger(config.totalRounds) || config.totalRounds < 1)
+    ) {
+      throw new InvalidEventInputError(
+        'Limited rounds must be AUTO or a positive integer.',
+      );
+    }
+    try {
+      validateLimitedCohortSize(config.mode, config.minCohortSize, {
+        allowUndersizedLaunch: true,
+        preferredCohortSize: config.preferredCohortSize,
+        minCohortSize: config.minCohortSize,
+        maxCohortSize: config.maxCohortSize,
+      });
+      if (config.maxCohortSize !== undefined) {
+        validateLimitedCohortSize(config.mode, config.maxCohortSize, {
+          allowUndersizedLaunch: true,
+          preferredCohortSize: config.preferredCohortSize,
+          minCohortSize: config.minCohortSize,
+          maxCohortSize: config.maxCohortSize,
+        });
+      }
+    } catch (error) {
+      throw new InvalidEventInputError(
+        error instanceof Error ? error.message : 'Invalid Limited cohort sizes.',
+      );
+    }
+    return {
+      ...config,
+      enabled: config.enabled === true,
+      allowUndersizedLaunch: config.allowUndersizedLaunch === true,
+    };
+  });
+}
+
+function requireLimitedConfig(
+  event: StoredEvent,
+  mode: LimitedMode,
+): LimitedEventModeConfig {
+  const config = event.limitedModeConfigs.find((row) => row.mode === mode);
+  if (!config) {
+    throw new InvalidParticipantTransitionError(
+      `${mode} is not configured for this event.`,
+    );
+  }
+  return config;
+}
+
+function requireEnabledLimitedConfig(
+  event: StoredEvent,
+  mode: LimitedMode,
+): LimitedEventModeConfig {
+  const config = requireLimitedConfig(event, mode);
+  if (!config.enabled) {
+    throw new InvalidParticipantTransitionError(
+      `${mode} is not enabled for this event.`,
+    );
+  }
+  return config;
+}
+
+function compareLimitedQueueOrder(
+  left: StoredParticipant,
+  right: StoredParticipant,
+): number {
+  return (
+    (left.limitedQueuedAt?.getTime() ?? left.createdAt.getTime()) -
+      (right.limitedQueuedAt?.getTime() ?? right.createdAt.getTime()) ||
+    left.id.localeCompare(right.id)
+  );
+}
+
+function limitedQueueSummaries(
+  event: StoredEvent,
+  participants: StoredParticipant[],
+) {
+  return event.limitedModeConfigs.map((config) => {
+    const queue = participants
+      .filter((participant) => participant.limitedQueueMode === config.mode)
+      .sort(compareLimitedQueueOrder);
+    return {
+      mode: config.mode,
+      participantIds: queue.map((participant) => participant.id),
+      waitingCount: queue.length,
+      preferredCohortSize: config.preferredCohortSize,
+      oldestReadyAt: queue[0]?.limitedQueuedAt?.toISOString(),
+    };
+  });
+}
+
+function toLimitedMatch(match: StoredLimitedMatch) {
+  return {
+    id: match.id,
+    roundNumber: match.roundNumber,
+    position: match.position,
+    playerAId: match.playerAId,
+    playerBId: match.playerBId ?? undefined,
+    tableId: match.tableId ?? undefined,
+    tableLabel: match.tableLabel ?? undefined,
+    status: match.status,
+    bestOf: match.bestOf,
+    outcome: match.outcome ?? undefined,
+    playerAGameWins: match.playerAGameWins ?? undefined,
+    playerBGameWins: match.playerBGameWins ?? undefined,
+    reportedAt: match.reportedAt?.toISOString(),
+  };
+}
+
+function toPublicLimitedSession(
+  session: StoredLimitedSession,
+  now?: Date,
+): PublicLimitedSession {
+  const rounds = session.rounds.map((round) => ({
+    id: round.id,
+    number: round.number,
+    status: round.status,
+    matches: round.matches.map(toLimitedMatch),
+    createdAt: round.createdAt.toISOString(),
+    startedAt: round.startedAt?.toISOString(),
+    completedAt: round.completedAt?.toISOString(),
+  }));
+  return {
+    id: session.id,
+    mode: session.mode,
+    status: session.status,
+    label: session.label,
+    participants: session.participants.map((participant) => ({
+      participantId: participant.participantId,
+      displayName: participant.displayName,
+      status: participant.status,
+      joinedAt: participant.joinedAt.toISOString(),
+      assignedAt: participant.assignedAt?.toISOString(),
+      draftSeat: participant.draftSeat ?? undefined,
+      droppedAt: participant.droppedAt?.toISOString(),
+    })),
+    rounds,
+    standings: calculateLimitedStandings(
+      session.participants.map((participant) => ({
+        participantId: participant.participantId,
+        displayName: participant.displayName,
+        dropped: participant.status === 'DROPPED',
+      })),
+      rounds.flatMap((round) => round.matches),
+    ),
+    matchStructure: session.matchStructure,
+    pairingPolicy: session.pairingPolicy,
+    preferredCohortSize: session.preferredCohortSize ?? undefined,
+    minCohortSize: session.minCohortSize,
+    maxCohortSize: session.maxCohortSize ?? undefined,
+    allowUndersizedLaunch: session.allowUndersizedLaunch,
+    currentRound: session.currentRound ?? undefined,
+    totalRounds: session.totalRounds,
+    draftTableIds: session.draftTableIds,
+    draftPod:
+      session.mode === 'SEALED'
+        ? undefined
+        : {
+            id: session.id,
+            sessionId: session.id,
+            tableIds: session.draftTableIds,
+            seats: session.participants
+              .filter(
+                (participant) =>
+                  participant.draftSeat !== null &&
+                  participant.status !== 'DROPPED',
+              )
+              .map((participant) => ({
+                participantId: participant.participantId,
+                seat: participant.draftSeat!,
+              }))
+              .sort((left, right) => left.seat - right.seat),
+          },
+    timer:
+      session.timer &&
+      now &&
+      session.timer.status === 'RUNNING' &&
+      new Date(session.timer.targetAt).getTime() <= now.getTime()
+        ? { ...session.timer, status: 'EXPIRED' }
+        : session.timer ?? undefined,
+    createdAt: session.createdAt.toISOString(),
+    startedAt: session.startedAt?.toISOString(),
+    completedAt: session.completedAt?.toISOString(),
+  };
+}
+
+function nextLimitedPhases(
+  session: StoredLimitedSession,
+): LimitedSessionStatus[] {
+  if (session.status === 'SEATING') {
+    return [session.mode === 'SEALED' ? 'DECKBUILDING' : 'DRAFTING'];
+  }
+  if (session.status === 'DRAFTING') return ['DECKBUILDING'];
+  if (session.status === 'DECKBUILDING') return ['BETWEEN_ROUNDS'];
+  return [];
+}
+
+function timerPhaseForStatus(
+  status: LimitedSessionStatus,
+): LimitedTimerPhase | undefined {
+  if (status === 'DRAFTING') return 'DRAFTING';
+  if (status === 'DECKBUILDING') return 'DECKBUILDING';
+  if (status === 'ROUND_ACTIVE') return 'ROUND';
+  return undefined;
+}
+
+function requireLimitedMatch(
+  session: StoredLimitedSession,
+  matchId: string,
+): StoredLimitedMatch {
+  const match = session.rounds
+    .flatMap((round) => round.matches)
+    .find((candidate) => candidate.id === matchId);
+  if (!match) throw new LimitedSessionNotFoundError();
+  return match;
+}
+
+function validateLimitedResult(
+  match: StoredLimitedMatch,
+  result: LimitedResultInput,
+): void {
+  if (!match.playerBId || result.outcome === 'BYE') {
+    throw new InvalidEventInputError('A played match cannot be reported as a bye.');
+  }
+  if (
+    !Number.isInteger(result.playerAGameWins) ||
+    !Number.isInteger(result.playerBGameWins) ||
+    result.playerAGameWins < 0 ||
+    result.playerBGameWins < 0
+  ) {
+    throw new InvalidEventInputError('Limited game wins must be non-negative integers.');
+  }
+  const winsNeeded = match.bestOf === 1 ? 1 : 2;
+  if (
+    result.playerAGameWins > winsNeeded ||
+    result.playerBGameWins > winsNeeded ||
+    result.playerAGameWins + result.playerBGameWins > match.bestOf
+  ) {
+    throw new InvalidEventInputError('Limited game wins exceed the match structure.');
+  }
+  if (
+    (result.outcome === 'PLAYER_A_WIN' &&
+      (result.playerAGameWins !== winsNeeded ||
+        result.playerAGameWins <= result.playerBGameWins)) ||
+    (result.outcome === 'PLAYER_B_WIN' &&
+      (result.playerBGameWins !== winsNeeded ||
+        result.playerBGameWins <= result.playerAGameWins)) ||
+    (result.outcome === 'DRAW' &&
+      result.playerAGameWins !== result.playerBGameWins) ||
+    (result.outcome === 'DOUBLE_LOSS' &&
+      (result.playerAGameWins !== 0 || result.playerBGameWins !== 0))
+  ) {
+    throw new InvalidEventInputError('Limited result and game wins disagree.');
+  }
+}
+
+function limitedModeLabel(mode: LimitedMode): string {
+  return mode === 'BOOSTER_DRAFT'
+    ? 'Booster Draft'
+    : mode === 'PICK_TWO_DRAFT'
+      ? 'Pick-Two Draft'
+      : 'Sealed';
+}
+
+function averageLimitedMetric(
+  values: number[],
+): { average: number; count: number } | null {
+  return values.length === 0
+    ? null
+    : {
+        average:
+          values.reduce((sum, value) => sum + value, 0) / values.length,
+        count: values.length,
+      };
+}
+
+function summarizeLimitedMetric(
+  values: number[],
+): { average: number; p95: number; max: number } | null {
+  if (values.length === 0) return null;
+  const sorted = [...values].sort((left, right) => left - right);
+  const p95Index = Math.min(
+    sorted.length - 1,
+    Math.ceil(sorted.length * 0.95) - 1,
+  );
+  return {
+    average: sorted.reduce((sum, value) => sum + value, 0) / sorted.length,
+    p95: sorted[p95Index] ?? 0,
+    max: sorted.at(-1) ?? 0,
+  };
+}
+
 function toPublicEvent(
   event: StoredEvent,
   pack: ChallengePack = OFFICIAL_COMMANDER_CHALLENGES,
@@ -1671,6 +2889,7 @@ function toPublicEvent(
             : undefined,
         }
       : {}),
+    limitedModeConfigs: event.limitedModeConfigs,
     lifetimeHours: Math.max(
       1,
       Math.round(
@@ -1697,6 +2916,8 @@ function toPublicParticipant(
     isBot: row.isBot,
     tableLabel: assignment?.tableLabel,
     readyAt: row.readyAt?.toISOString(),
+    limitedQueueMode: row.limitedQueueMode ?? undefined,
+    limitedQueuedAt: row.limitedQueuedAt?.toISOString(),
     decks: decks.map((deck) => ({
       id: deck.id,
       name: deck.name ?? undefined,
