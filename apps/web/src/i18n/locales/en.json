@@ -1136,6 +1136,8 @@
     "matchMenuElapsed": "Match menu. {{clock}} elapsed",
     "matchMenuPaused": ", paused",
     "matchMenuDayNight": ", it is {{phase}}",
+    "showControls": "Show seat controls",
+    "showControlsElapsed": "Show seat controls. {{clock}} elapsed",
     "day": "day",
     "night": "night",
     "closeMatchMenu": "Close match menu",

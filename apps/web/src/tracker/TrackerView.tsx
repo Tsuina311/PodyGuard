@@ -426,17 +426,12 @@ function seatFacingPortalClass(
 }
 
 /**
- * Where the dial sits on the board. Most pods meet in the middle; five- and
- * six-player boards need it off that seam so it does not cover the chrome.
+ * Where the dial sits. Even pods: true screen centre. Odd pods (5+) leave an
+ * empty cell on the board — park the dial there instead of on a life total.
  */
 function clockPositionClass(count: number): string {
-  if (count === 5) {
-    // Sit high in the empty bottom-centre cell so the ally arrow between the
-    // bottom seats can clear underneath it.
+  if (count % 2 === 1 && count >= 5) {
     return 'top-1/2 left-1/2 landscape:top-[62%]';
-  }
-  if (count === 6) {
-    return 'top-1/2 left-1/2 landscape:top-[56.5%]';
   }
   return 'top-1/2 left-1/2';
 }
@@ -564,27 +559,56 @@ export function TrackerView({
   /*
     Consecutive life taps accumulate into a single flash under the total. Any
     other tracker action clears it, so the figure always describes the burst
-    that just happened and not the whole game.
+    that just happened and not the whole game. After 5s it fades out.
   */
+  const lifeDeltaTimer = useRef<number | null>(null);
+  function clearLifeDeltaTimer() {
+    if (lifeDeltaTimer.current !== null) {
+      window.clearTimeout(lifeDeltaTimer.current);
+      lifeDeltaTimer.current = null;
+    }
+  }
+  function dismissLifeDelta(immediate = false) {
+    clearLifeDeltaTimer();
+    if (immediate) {
+      setLifeDeltaFading(false);
+      setLifeDelta(null);
+      return;
+    }
+    setLifeDeltaFading(true);
+    lifeDeltaTimer.current = window.setTimeout(() => {
+      setLifeDelta(null);
+      setLifeDeltaFading(false);
+      lifeDeltaTimer.current = null;
+    }, 300);
+  }
   function send(message: Msg) {
     if (message.type === 'action' && message.action.type === 'life') {
       const { playerId, delta } = message.action;
+      setLifeDeltaFading(false);
       setLifeDelta((current) =>
         current?.playerId === playerId
           ? { playerId, amount: current.amount + delta }
           : { playerId, amount: delta },
       );
+      clearLifeDeltaTimer();
+      lifeDeltaTimer.current = window.setTimeout(() => {
+        dismissLifeDelta();
+      }, 5000);
     } else {
-      setLifeDelta(null);
+      dismissLifeDelta(true);
     }
     dispatch(message);
   }
+  useEffect(() => () => clearLifeDeltaTimer(), []);
   const [dungeonPlayerId, setDungeonPlayerId] = useState<string | null>(null);
   const [commanderPlayerId, setCommanderPlayerId] = useState<string | null>(
     null,
   );
   const [counterPlayerId, setCounterPlayerId] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [controlsVisible, setControlsVisible] = useState(false);
+  const controlsHideTimer = useRef<number | null>(null);
   const [diceToolsOpen, setDiceToolsOpen] = useState(false);
   const [challengesOpen, setChallengesOpen] = useState(false);
   const [resultHidden, setResultHidden] = useState(false);
@@ -620,6 +644,7 @@ export function TrackerView({
     playerId: string;
     amount: number;
   } | null>(null);
+  const [lifeDeltaFading, setLifeDeltaFading] = useState(false);
   const [lifeEntry, setLifeEntry] = useState<{
     playerId: string;
     sign: 1 | -1;
@@ -768,6 +793,7 @@ export function TrackerView({
       return;
     }
     setMenuOpen(false);
+    setControlsVisible(false);
     setDiceToolsOpen(false);
     setChallengesOpen(false);
     setCommanderPlayerId(null);
@@ -775,6 +801,24 @@ export function TrackerView({
     setDungeonPlayerId(null);
     setSchemeOpen(false);
   }, [state.winnerId]);
+
+  function clearControlsHideTimer() {
+    if (controlsHideTimer.current !== null) {
+      window.clearTimeout(controlsHideTimer.current);
+      controlsHideTimer.current = null;
+    }
+  }
+
+  function revealSeatControls() {
+    setControlsVisible(true);
+    clearControlsHideTimer();
+    controlsHideTimer.current = window.setTimeout(() => {
+      setControlsVisible(false);
+      controlsHideTimer.current = null;
+    }, 3000);
+  }
+
+  useEffect(() => () => clearControlsHideTimer(), []);
 
   /*
     The snapshot is dropped on the way out: the next game at this table is a new
@@ -1607,12 +1651,15 @@ export function TrackerView({
             key={player.id}
             data-seat-id={player.id}
             className={cx(
-              'border-muted/20 relative flex min-h-0 flex-col overflow-hidden rounded-xl border p-2 transition-transform duration-200',
+              'border-muted/20 relative flex h-full min-h-0 flex-col overflow-hidden rounded-xl border p-2 transition-transform duration-200',
               player.eliminated ? 'opacity-50' : 'bg-ink/[0.03]',
               archenemyBoard &&
                 player.id === state.archenemyId &&
                 'landscape:col-span-3',
               seatPlacementClass(state.players.length, index, seatLayout),
+              // Shared life floats above the grid; seats pass taps through to it
+              // except on chrome, which stacks above so designations still work.
+              sharedLifeBoard && 'pointer-events-none z-20',
               spotlightIds.has(player.id) && spotlightCard,
               spotlightIds.has(player.id) &&
                 (spotlight.phase === 'sweep'
@@ -1622,7 +1669,7 @@ export function TrackerView({
           >
             <div
               className={cx(
-                'relative flex min-h-0 flex-1 flex-col',
+                'absolute inset-0',
                 facesAway && 'landscape:rotate-180',
               )}
             >
@@ -1670,36 +1717,72 @@ export function TrackerView({
               </span>
             ) : null}
             {/*
-              Life runs top-to-bottom (+ / total / −) so it stays usable when the
-              seat is rotated for the player across the table. Action icons sit
-              on the sides instead of flanking the total left/right. Counter
-              chips float over the + half so they never shrink the life column.
+              Life hit targets fill the whole seat. Chrome sits above and keeps
+              its own taps; hidden icons use pointer-events-none so life still
+              receives presses underneath.
             */}
-            <div
-              className={cx(
-                'relative z-10 flex min-h-0 flex-1 gap-1.5',
-                archenemyBoard
-                  ? ''
-                  : cx(
-                      clockClearance(
-                        state.players.length,
-                        index,
-                        'top',
-                        seatLayout,
-                      ),
-                      clockClearance(
-                        state.players.length,
-                        index,
-                        'bottom',
-                        seatLayout,
-                      ),
-                    ),
-              )}
-            >
-              <div className="flex shrink-0 flex-col items-center gap-1 overflow-y-auto py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {!sharedLifeBoard ? (
+              <LifeRow
+                life={player.life}
+                flash={
+                  lifeDelta?.playerId === player.id
+                    ? lifeDelta.amount
+                    : null
+                }
+                flashFading={
+                  lifeDelta?.playerId === player.id && lifeDeltaFading
+                }
+                color={seatColor(index)}
+                disabled={Boolean(state.winnerId)}
+                onStep={(delta) =>
+                  send({
+                    type: 'action',
+                    action: { type: 'life', playerId: player.id, delta },
+                  })
+                }
+                onEnter={(sign) =>
+                  setLifeEntry({ playerId: player.id, sign })
+                }
+              />
+            ) : null}
+
+              <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-2 px-10 py-0.5">
+                <span className="pointer-events-auto flex min-w-0 flex-1 gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  <CounterBadges
+                    player={player}
+                    disabled={Boolean(state.winnerId)}
+                    hidePoison={sharedLifeBoard}
+                    hideTax={!commanderRules}
+                    onOpen={() => setCounterPlayerId(player.id)}
+                  />
+                </span>
+                <span className="pointer-events-auto flex shrink-0 flex-wrap justify-end gap-1">
+                  {emperorBoard && !state.emperorIds.includes(player.id) ? (
+                    <Badge tone="idle" title={t('tracker.generalRange')}>
+                      <span className="sr-only">{t('tracker.general')}</span>
+                      G
+                    </Badge>
+                  ) : null}
+                  {publicIdentities[player.id] ? (
+                    <button
+                      type="button"
+                      className="border-warning/50 bg-warning/15 text-warning rounded-full border px-2 py-0.5 text-[0.65rem] font-bold"
+                      onClick={() => setPublicIdentityPlayerId(player.id)}
+                    >
+                      {publicIdentities[player.id]?.name}
+                    </button>
+                  ) : null}
+                  {winnerIds.has(player.id) ? (
+                    <Badge tone="live">{t('tracker.winner')}</Badge>
+                  ) : null}
+                </span>
+              </div>
+
+              <div className="pointer-events-none absolute inset-y-0 left-0 z-20 flex w-9 flex-col items-center gap-1 overflow-y-auto py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 <IconButton
                   title={t('tracker.openCounters', { name: player.name })}
                   disabled={Boolean(state.winnerId)}
+                  revealed={controlsVisible}
                   onClick={() => setCounterPlayerId(player.id)}
                 >
                   <SlidersHorizontal size={18} aria-hidden />
@@ -1709,69 +1792,13 @@ export function TrackerView({
                     state={state}
                     player={player}
                     disabled={Boolean(state.winnerId)}
+                    revealed={controlsVisible}
                     onOpen={() => setCommanderPlayerId(player.id)}
                   />
                 ) : null}
               </div>
 
-              <div className="relative min-h-0 min-w-0 flex-1">
-                <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-2 p-0.5">
-                  <span className="pointer-events-auto flex min-w-0 flex-1 gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                    <CounterBadges
-                      player={player}
-                      disabled={Boolean(state.winnerId)}
-                      hidePoison={sharedLifeBoard}
-                      hideTax={!commanderRules}
-                      onOpen={() => setCounterPlayerId(player.id)}
-                    />
-                  </span>
-                  <span className="pointer-events-auto flex shrink-0 flex-wrap justify-end gap-1">
-                    {emperorBoard && !state.emperorIds.includes(player.id) ? (
-                      <Badge tone="idle" title={t('tracker.generalRange')}>
-                        <span className="sr-only">{t('tracker.general')}</span>
-                        G
-                      </Badge>
-                    ) : null}
-                    {publicIdentities[player.id] ? (
-                      <button
-                        type="button"
-                        className="border-warning/50 bg-warning/15 text-warning rounded-full border px-2 py-0.5 text-[0.65rem] font-bold"
-                        onClick={() => setPublicIdentityPlayerId(player.id)}
-                      >
-                        {publicIdentities[player.id]?.name}
-                      </button>
-                    ) : null}
-                    {winnerIds.has(player.id) ? (
-                      <Badge tone="live">{t('tracker.winner')}</Badge>
-                    ) : null}
-                  </span>
-                </div>
-                {!sharedLifeBoard ? (
-                  <LifeRow
-                    life={player.life}
-                    flash={
-                      lifeDelta?.playerId === player.id
-                        ? lifeDelta.amount
-                        : null
-                    }
-                    color={seatColor(index)}
-                    disabled={Boolean(state.winnerId)}
-                    onStep={(delta) =>
-                      send({
-                        type: 'action',
-                        action: { type: 'life', playerId: player.id, delta },
-                      })
-                    }
-                    onEnter={(sign) =>
-                      setLifeEntry({ playerId: player.id, sign })
-                    }
-                  />
-                ) : (
-                  <div className="min-h-0 h-full flex-1" aria-hidden />
-                )}
-              </div>
-
-              <div className="flex shrink-0 flex-col items-center gap-1 overflow-y-auto py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="pointer-events-none absolute inset-y-0 right-0 z-20 flex w-9 flex-col items-center gap-1 overflow-y-auto py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 <IconButton
                   title={
                     player.id === state.monarchId
@@ -1779,6 +1806,7 @@ export function TrackerView({
                       : t('tracker.makeMonarch', { name: player.name })
                   }
                   active={player.id === state.monarchId}
+                  revealed={controlsVisible}
                   disabled={Boolean(state.winnerId)}
                   onClick={() =>
                     send({
@@ -1795,6 +1823,7 @@ export function TrackerView({
                     state.completedDungeons?.[player.id],
                   )}
                   active={player.id === state.initiativeId}
+                  revealed={controlsVisible}
                   disabled={Boolean(state.winnerId)}
                   onClick={() => setDungeonPlayerId(player.id)}
                 />
@@ -1806,6 +1835,7 @@ export function TrackerView({
                     ),
                   })}
                   active={player.enduringStory}
+                  revealed={controlsVisible}
                   disabled={Boolean(state.winnerId)}
                   onClick={() =>
                     send({
@@ -1829,6 +1859,7 @@ export function TrackerView({
                     ),
                   })}
                   active={player.cityBlessing}
+                  revealed={controlsVisible}
                   disabled={Boolean(state.winnerId)}
                   onClick={() =>
                     send({
@@ -1851,7 +1882,7 @@ export function TrackerView({
                 role="dialog"
                 aria-modal="true"
                 aria-label={t('tracker.didLose', { name: player.name })}
-                className="bg-void/90 absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 overflow-auto rounded-xl p-4 text-center backdrop-blur-sm"
+                className="bg-void/90 pointer-events-auto absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 overflow-auto rounded-xl p-4 text-center backdrop-blur-sm"
               >
                 <p className="font-display text-base font-semibold">
                   {lossPrompt(player, state, t)}
@@ -1888,7 +1919,6 @@ export function TrackerView({
                 </div>
               </div>
             ) : null}
-            </div>
           </article>
           );
         })}
@@ -1915,10 +1945,12 @@ export function TrackerView({
                 <div
                   key={team.join(':')}
                   className={cx(
-                    'absolute left-1/2 z-20 flex w-[min(12rem,42vw)] -translate-x-1/2 -translate-y-[58%] flex-col items-stretch gap-1 px-1',
-                    // Both sides shift toward the bottom of their row so the
-                    // total clears the ally mark above (not mirrored about centre).
-                    index === 0 ? 'top-[30%]' : 'top-[80%]',
+                    'pointer-events-none absolute inset-x-2 z-10 flex h-[min(36%,12rem)] flex-col items-stretch gap-1',
+                    // Span the team row (archenemy’s full-width seat included).
+                    // Stay clear of the match dial on the seam.
+                    index === 0
+                      ? 'top-[6%] bottom-auto'
+                      : 'top-auto bottom-[6%]',
                   )}
                 >
                   <LifeRow
@@ -1927,6 +1959,9 @@ export function TrackerView({
                       lifeDelta?.playerId === first.id
                         ? lifeDelta.amount
                         : null
+                    }
+                    flashFading={
+                      lifeDelta?.playerId === first.id && lifeDeltaFading
                     }
                     compact
                     colors={team.map((id) =>
@@ -1952,21 +1987,24 @@ export function TrackerView({
                     Poison only appears when the side has any; it sits to the
                     left and nudges the damage chip off centre.
                   */}
-                  <div className="flex items-center justify-center gap-3 translate-x-1.5">
-                    <CounterBadges
-                      player={first}
-                      disabled={Boolean(state.winnerId)}
-                      onlyPoison
-                      onOpen={() => setCounterPlayerId(first.id)}
-                    />
-                    {commanderDamageRules ? (
-                      <CommanderDamageChip
-                        state={state}
+                  <div className="pointer-events-none absolute inset-x-10 bottom-0 z-20 flex items-center justify-center gap-3">
+                    <div className="pointer-events-auto flex items-center gap-3">
+                      <CounterBadges
                         player={first}
                         disabled={Boolean(state.winnerId)}
-                        onOpen={() => setCommanderPlayerId(first.id)}
+                        onlyPoison
+                        onOpen={() => setCounterPlayerId(first.id)}
                       />
-                    ) : null}
+                      {commanderDamageRules ? (
+                        <CommanderDamageChip
+                          state={state}
+                          player={first}
+                          disabled={Boolean(state.winnerId)}
+                          revealed={controlsVisible}
+                          onOpen={() => setCommanderPlayerId(first.id)}
+                        />
+                      ) : null}
+                    </div>
                   </div>
                 </div>
               );
@@ -1974,17 +2012,28 @@ export function TrackerView({
           : null}
       </div>
       {/*
-        The clock rides the seam between the seats, which is the one piece of
-        the board no seat owns and the one place every player can reach. It is
-        also the only match-wide control left on this screen, so it doubles as
-        the way into the menu behind it.
+        The dial sits at the screen centre so every seat can reach it. Odd pods
+        (5+) leave an empty board cell — the dial parks there instead.
       */}
       <button
         type="button"
-        title={t('tracker.matchMenu')}
-        aria-label={`${t('tracker.matchMenuElapsed', { clock: formatClock(elapsed) })}${state.pausedAt ? t('tracker.matchMenuPaused') : ''}${state.dayNight ? t('tracker.matchMenuDayNight', { phase: t(state.dayNight === 'day' ? 'tracker.day' : 'tracker.night') }) : ''}`}
+        title={
+          controlsVisible ? t('tracker.matchMenu') : t('tracker.showControls')
+        }
+        aria-label={
+          controlsVisible
+            ? `${t('tracker.matchMenuElapsed', { clock: formatClock(elapsed) })}${state.pausedAt ? t('tracker.matchMenuPaused') : ''}${state.dayNight ? t('tracker.matchMenuDayNight', { phase: t(state.dayNight === 'day' ? 'tracker.day' : 'tracker.night') }) : ''}`
+            : t('tracker.showControlsElapsed', { clock: formatClock(elapsed) })
+        }
+        aria-expanded={controlsVisible}
         onClick={() => {
-          setMenuOpen(true);
+          if (controlsVisible) {
+            clearControlsHideTimer();
+            setControlsVisible(false);
+            setMenuOpen(true);
+            return;
+          }
+          revealSeatControls();
         }}
         className={cx(
           plate,
@@ -3257,6 +3306,7 @@ function playerSeatIndex(
 function LifeRow({
   life,
   flash,
+  flashFading = false,
   disabled,
   onStep,
   onEnter,
@@ -3266,6 +3316,7 @@ function LifeRow({
 }: {
   life: number;
   flash: number | null;
+  flashFading?: boolean;
   disabled: boolean;
   onStep: (delta: number) => void;
   onEnter: (sign: 1 | -1) => void;
@@ -3276,7 +3327,7 @@ function LifeRow({
   /** Shared-life sides: blend every teammate’s colour across the total. */
   colors?: string[];
 }) {
-  // Slot is always five tabular digits wide; denser totals shrink to fit it.
+  // Size from digit count only — same rules on every board and phone.
   const digits = String(Math.abs(life)).length;
   const palette = colors?.length ? colors : color ? [color] : [];
   const lifeStyle =
@@ -3290,63 +3341,63 @@ function LifeRow({
       : palette[0]
         ? { color: palette[0] }
         : undefined;
+  const lifeSize =
+    digits >= 5
+      ? 'text-[clamp(1.25rem,5.5vh,2.35rem)] landscape:text-[clamp(1.35rem,8vh,2.5rem)]'
+      : digits >= 4
+        ? 'text-[clamp(1.65rem,6.5vh,3.1rem)] landscape:text-[clamp(1.75rem,10vh,3.4rem)]'
+        : digits >= 3
+          ? 'text-[clamp(2rem,8vh,3.75rem)] landscape:text-[clamp(2.25rem,12vh,4.25rem)]'
+          : 'text-[clamp(2.5rem,11vh,5rem)] landscape:text-[clamp(2.75rem,16vh,5.5rem)]';
   return (
     <div
       className={cx(
-        'relative z-10 min-h-0 min-w-0',
-        // Parent is not a flex column — flex-1 alone would leave this at 0
-        // height (all children are absolute) and park the total at the top.
-        compact ? 'h-28' : 'h-full',
+        // Fills the seat card. Top half / bottom half are the hit zones; the
+        // total is centred in the same box and does not affect layout.
+        'absolute inset-0 z-10 flex min-h-0 min-w-0 flex-col',
+        compact && 'relative inset-auto h-full w-full',
       )}
     >
-      {/*
-        Invisible half-height hit targets fill the column between the side
-        icon rails. + owns the top half, − the bottom — usable even when the
-        seat is rotated for the player across the table.
-      */}
       <LifeButton
         delta={1}
         disabled={disabled}
-        className="absolute inset-x-0 top-0 z-10 h-1/2"
+        className="h-1/2 min-h-0 w-full shrink-0 items-start pt-3"
         onClick={() => onStep(1)}
         onLongPress={() => onEnter(1)}
       />
       <LifeButton
         delta={-1}
         disabled={disabled}
-        className="absolute inset-x-0 bottom-0 z-10 h-1/2"
+        className="h-1/2 min-h-0 w-full shrink-0 items-end pb-3"
         onClick={() => onStep(-1)}
         onLongPress={() => onEnter(-1)}
       />
-      <div className="pointer-events-none absolute inset-0 z-0 flex flex-col items-center justify-center">
-        <p
-          className={cx(
-            'font-display w-full max-w-[12rem] shrink-0 text-center leading-none font-bold tabular-nums',
-            !lifeStyle && 'text-neon',
-            digits >= 5
-              ? 'text-[clamp(1.25rem,5.5vh,2.35rem)] landscape:text-[clamp(1.35rem,8.5vh,2.5rem)]'
-              : digits >= 4
-                ? 'text-[clamp(1.65rem,6.5vh,3.1rem)] landscape:text-[clamp(1.75rem,11vh,3.4rem)]'
-                : digits >= 3
-                  ? 'text-[clamp(2.25rem,9vh,4.25rem)] landscape:text-[clamp(2.5rem,14vh,4.75rem)]'
-                  : 'text-[clamp(3.5rem,14vh,6.5rem)] landscape:text-[clamp(3.75rem,22vh,7.25rem)]',
-            onArt,
-          )}
-          style={lifeStyle}
-        >
-          {life}
-        </p>
-        {flash && flash !== 0 ? (
+      <div className="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center">
+        <div className="relative flex flex-col items-center">
           <p
             className={cx(
-              'font-display absolute top-[calc(50%+1.45em)] text-sm leading-none font-bold tabular-nums',
-              flash > 0 ? 'text-gain' : 'text-danger',
+              'font-display w-full max-w-[12rem] shrink-0 text-center leading-none font-bold tabular-nums',
+              !lifeStyle && 'text-neon',
+              lifeSize,
               onArt,
             )}
+            style={lifeStyle}
           >
-            {flash > 0 ? `+${String(flash)}` : String(flash)}
+            {life}
           </p>
-        ) : null}
+          {flash && flash !== 0 ? (
+            <p
+              className={cx(
+                'font-display absolute top-full mt-1 text-sm leading-none font-bold tabular-nums transition-opacity duration-300',
+                flash > 0 ? 'text-gain' : 'text-danger',
+                flashFading ? 'opacity-0' : 'opacity-100',
+                onArt,
+              )}
+            >
+              {flash > 0 ? `+${String(flash)}` : String(flash)}
+            </p>
+          ) : null}
+        </div>
       </div>
     </div>
   );
@@ -3368,6 +3419,7 @@ function LifeButton({
   const { t } = useTranslation();
   const timer = useRef<number | null>(null);
   const longPressed = useRef(false);
+  const [pressed, setPressed] = useState(false);
 
   function clearTimer() {
     if (timer.current !== null) {
@@ -3388,6 +3440,7 @@ function LifeButton({
           return;
         }
         longPressed.current = false;
+        setPressed(true);
         clearTimer();
         event.currentTarget.setPointerCapture(event.pointerId);
         timer.current = window.setTimeout(() => {
@@ -3398,6 +3451,7 @@ function LifeButton({
       onPointerUp={(event) => {
         const wasLong = longPressed.current;
         clearTimer();
+        setPressed(false);
         if (event.currentTarget.hasPointerCapture(event.pointerId)) {
           event.currentTarget.releasePointerCapture(event.pointerId);
         }
@@ -3408,6 +3462,7 @@ function LifeButton({
       }}
       onPointerCancel={(event) => {
         clearTimer();
+        setPressed(false);
         longPressed.current = false;
         if (event.currentTarget.hasPointerCapture(event.pointerId)) {
           event.currentTarget.releasePointerCapture(event.pointerId);
@@ -3415,8 +3470,11 @@ function LifeButton({
       }}
       onContextMenu={(event) => event.preventDefault()}
       className={cx(
-        'font-display text-muted/35 flex items-center justify-center text-2xl font-bold transition select-none disabled:opacity-40',
-        delta > 0 ? 'items-start pt-1' : 'items-end pb-1',
+        'font-display text-muted/35 flex justify-center text-2xl font-bold transition-[background-color,color] duration-150 select-none disabled:opacity-40',
+        pressed &&
+          (delta > 0
+            ? 'bg-gain/25 text-gain/80'
+            : 'bg-danger/25 text-danger/80'),
         className,
       )}
     >
@@ -3543,11 +3601,13 @@ function Chip({
   title,
   disabled,
   onClick,
+  className,
   children,
 }: {
   title: string;
   disabled: boolean;
   onClick: () => void;
+  className?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -3556,10 +3616,17 @@ function Chip({
       title={title}
       aria-label={title}
       disabled={disabled}
-      onClick={onClick}
+      onPointerDown={(event) => {
+        event.stopPropagation();
+      }}
+      onClick={(event) => {
+        event.stopPropagation();
+        onClick();
+      }}
       className={cx(
         plate,
         'border-muted/25 hover:border-neon/50 flex shrink-0 items-center gap-1 rounded-lg border px-2 py-1 font-mono text-xs transition disabled:opacity-40',
+        className,
       )}
     >
       {children}
@@ -3813,7 +3880,13 @@ function CounterBadges({
             value,
           })}
           disabled={disabled}
-          onClick={onOpen}
+          onPointerDown={(event) => {
+            event.stopPropagation();
+          }}
+          onClick={(event) => {
+            event.stopPropagation();
+            onOpen();
+          }}
           /*
             Readouts rather than controls, so they are pill-shaped and a size
             down from the buttons along the bottom. They still open the sheet,
@@ -4017,16 +4090,19 @@ function CommanderDamageChip({
   state,
   player,
   disabled,
+  revealed = true,
   onOpen,
 }: {
   state: TrackerState;
   player: TrackerPlayer;
   disabled: boolean;
+  revealed?: boolean;
   onOpen: () => void;
 }) {
   const { t } = useTranslation();
   const worst = worstCommanderDamage(state, player);
   const value = worst?.value ?? 0;
+  const hidden = !revealed && value <= 0;
   return (
     <Chip
       title={
@@ -4040,6 +4116,11 @@ function CommanderDamageChip({
       }
       disabled={disabled}
       onClick={onOpen}
+      className={
+        hidden
+          ? 'pointer-events-none opacity-0'
+          : 'pointer-events-auto'
+      }
     >
       <Shield size={14} aria-hidden />
       <span
@@ -4061,29 +4142,54 @@ function CommanderDamageChip({
 function IconButton({
   title,
   active = false,
+  revealed = true,
   disabled,
   onClick,
   children,
 }: {
   title: string;
   active?: boolean;
+  /** Seat chrome from the dial; inactive icons hide until then. */
+  revealed?: boolean;
   disabled: boolean;
   onClick: () => void;
   children: React.ReactNode;
 }) {
+  // Active designations stay as a bare gold icon so the table can still see
+  // who holds them without waking every seat control.
+  const peek = active && !revealed;
+  const hidden = !revealed && !active;
   return (
     <button
       type="button"
       title={title}
       aria-label={title}
       aria-pressed={active}
+      aria-hidden={hidden || undefined}
       disabled={disabled}
-      onClick={onClick}
+      onPointerDown={(event) => {
+        if (!hidden) {
+          event.stopPropagation();
+        }
+      }}
+      onClick={(event) => {
+        event.stopPropagation();
+        onClick();
+      }}
       className={cx(
-        'flex size-9 items-center justify-center rounded-lg border text-sm transition disabled:opacity-40',
-        active
-          ? cx(plateGold, gilded)
-          : cx(plate, 'border-muted/25 text-muted hover:border-muted/45 hover:text-ink'),
+        'flex size-9 items-center justify-center rounded-lg text-sm transition disabled:opacity-40',
+        hidden
+          ? 'pointer-events-none opacity-0'
+          : 'pointer-events-auto',
+        peek &&
+          'border-0 bg-transparent text-warning shadow-none [&>svg]:fill-warning/35',
+        revealed &&
+          (active
+            ? cx(plateGold, gilded, 'border')
+            : cx(
+                plate,
+                'border-muted/25 text-muted hover:border-muted/45 hover:text-ink border',
+              )),
       )}
     >
       {children}
@@ -4123,7 +4229,7 @@ function CommanderArt({
     return null;
   }
   return (
-    <div className="absolute inset-0 z-0" aria-hidden>
+    <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
       <div className="flex size-full gap-px">
         {art.map((entry) => (
           <img
@@ -4144,12 +4250,14 @@ function DungeonButton({
   name,
   completed,
   active,
+  revealed = true,
   disabled,
   onClick,
 }: {
   name: string;
   completed: number;
   active: boolean;
+  revealed?: boolean;
   disabled: boolean;
   onClick: () => void;
 }) {
@@ -4166,22 +4274,46 @@ function DungeonButton({
         filled,
         total: DUNGEON_COUNT,
       });
+  // Progress dots stay on the board whenever any dungeon is done; the active
+  // initiative marker peeks the same way as other designations.
+  const peek = !revealed && (active || filled > 0);
+  const hidden = !revealed && !active && filled === 0;
   return (
     <button
       type="button"
       title={title}
       aria-label={t('tracker.dungeonInitiative', { name, title })}
       aria-pressed={active}
+      aria-hidden={hidden || undefined}
       disabled={disabled}
-      onClick={onClick}
+      onPointerDown={(event) => {
+        if (!hidden) {
+          event.stopPropagation();
+        }
+      }}
+      onClick={(event) => {
+        event.stopPropagation();
+        onClick();
+      }}
       className={cx(
-        'flex min-h-9 w-9 flex-col items-center justify-center gap-0.5 rounded-lg border py-0.5 transition disabled:opacity-40',
-        active
-          ? cx(
-              plateGold,
-              'border-warning/60 text-warning shadow-[0_0_14px_-4px_var(--color-warning)] [&>svg]:fill-warning',
-            )
-          : cx(plate, 'border-muted/25 text-muted hover:border-muted/45 hover:text-ink'),
+        'flex min-h-9 w-9 flex-col items-center justify-center gap-0.5 rounded-lg py-0.5 transition disabled:opacity-40',
+        hidden
+          ? 'pointer-events-none opacity-0'
+          : 'pointer-events-auto',
+        peek &&
+          (active
+            ? 'border-0 bg-transparent text-warning shadow-none [&>svg]:fill-warning/35'
+            : 'border-0 bg-transparent text-neon shadow-none'),
+        revealed &&
+          (active
+            ? cx(
+                plateGold,
+                'border-warning/60 text-warning border shadow-[0_0_14px_-4px_var(--color-warning)] [&>svg]:fill-warning',
+              )
+            : cx(
+                plate,
+                'border-muted/25 text-muted hover:border-muted/45 hover:text-ink border',
+              )),
       )}
     >
       <DungeonIcon size={20} />
@@ -4195,7 +4327,9 @@ function DungeonButton({
                 ? active
                   ? 'bg-warning'
                   : 'bg-neon'
-                : 'bg-muted/35',
+                : peek || revealed
+                  ? 'bg-muted/35'
+                  : 'bg-transparent',
             )}
           />
         ))}
