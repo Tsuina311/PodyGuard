@@ -57,6 +57,7 @@ import {
   type TournamentFormat,
   type TournamentOptions,
   type TournamentState,
+  normalizeJoinCode,
 } from '@podyguard/shared';
 import { randomUUID } from 'node:crypto';
 import {
@@ -671,6 +672,65 @@ export class EventService {
         toPublicLimitedSession(session, this.now()),
       ),
     };
+  }
+
+  /**
+   * Canonical event state plus pod activity timestamps for the public TV
+   * projection. Does not authorize the caller — DisplayService gates access.
+   */
+  async getDisplaySource(joinCode: string): Promise<{
+    eventId: string;
+    joinCode: string;
+    snapshot: EventSnapshot;
+    pods: Array<{
+      tableId: string;
+      tableLabel: string;
+      status: 'formed' | 'playing';
+      playerNames: string[];
+      poolId?: string;
+      createdAt: Date;
+    }>;
+  }> {
+    const stored = await this.requireByJoinCode(joinCode);
+    const snapshot = await this.getSnapshot(joinCode);
+    const pods = [];
+    for (const table of snapshot.tables) {
+      if (table.seatedNames.length === 0 && table.status !== 'occupied') {
+        continue;
+      }
+      const pod = await this.store.findActivePodByTableId(stored.id, table.id);
+      if (!pod) {
+        continue;
+      }
+      pods.push({
+        tableId: table.id,
+        tableLabel: table.label,
+        status: (pod.status === 'playing' ? 'playing' : 'formed') as
+          | 'formed'
+          | 'playing',
+        playerNames: pod.playerNames,
+        ...(pod.poolId ? { poolId: pod.poolId } : {}),
+        createdAt: pod.createdAt ?? stored.createdAt,
+      });
+    }
+    return {
+      eventId: stored.id,
+      joinCode: stored.joinCode,
+      snapshot,
+      pods,
+    };
+  }
+
+  async findEventIdByJoinCode(joinCode: string): Promise<string | undefined> {
+    const stored = await this.store.findEventByJoinCode(
+      normalizeJoinCode(joinCode),
+    );
+    return stored?.id;
+  }
+
+  async getJoinCodeByEventId(eventId: string): Promise<string | undefined> {
+    const stored = await this.store.findEventById(eventId);
+    return stored?.joinCode;
   }
 
   async joinLimitedQueue(
@@ -1715,14 +1775,20 @@ export class EventService {
       patch.preferredPodSize === undefined
         ? stored.preferredPodSize
         : assertPreferredPodSize(stored.gameMode, patch.preferredPodSize);
-    const allowFivePods =
-      stored.gameMode === 'treachery' ||
-      stored.gameMode === 'assassin' ||
-      stored.gameMode === 'multiplayer'
-        ? preferredPodSize >= 5
-        : stored.gameMode === 'commander'
-          ? true
-          : false;
+    const allowThreePods = resolveAllowThreePods(
+      stored.gameMode,
+      preferredPodSize,
+      patch.allowThreePods === undefined
+        ? stored.allowThreePods
+        : Boolean(patch.allowThreePods),
+    );
+    const allowFivePods = resolveAllowFivePods(
+      stored.gameMode,
+      preferredPodSize,
+      patch.allowFivePods === undefined
+        ? stored.allowFivePods
+        : Boolean(patch.allowFivePods),
+    );
     const expiresAt =
       patch.lifetimeHours === undefined
         ? stored.expiresAt
@@ -1731,16 +1797,7 @@ export class EventService {
               assertLifetimeHours(patch.lifetimeHours) * 60 * 60 * 1000,
           );
     const updated = await this.store.updateEvent(stored.id, {
-      allowThreePods:
-        stored.gameMode === 'assassin' ||
-        stored.gameMode === 'multiplayer' ||
-        stored.gameMode === 'commander'
-          ? true
-          : stored.gameMode === 'treachery' || stored.gameMode === 'duel'
-            ? false
-            : patch.allowThreePods === undefined
-              ? stored.allowThreePods
-              : Boolean(patch.allowThreePods),
+      allowThreePods,
       allowFivePods,
       preferredPodSize,
       expiresAt,
@@ -2525,6 +2582,50 @@ export class EventService {
     }
     return stored;
   }
+}
+
+/** Host can toggle leftover 3s for Commander; other modes keep fixed policies. */
+function resolveAllowThreePods(
+  gameMode: GameMode,
+  preferredPodSize: number,
+  requested: boolean,
+): boolean {
+  if (
+    gameMode === 'assassin' ||
+    gameMode === 'multiplayer' ||
+    gameMode === 'commander'
+  ) {
+    return gameMode === 'commander' ? requested : true;
+  }
+  if (
+    gameMode === 'treachery' ||
+    gameMode === 'duel' ||
+    gameMode === 'duel-commander' ||
+    gameMode === 'brawl'
+  ) {
+    return false;
+  }
+  void preferredPodSize;
+  return requested;
+}
+
+/** Host can toggle 5-pods for Commander; size-gated modes follow preferred size. */
+function resolveAllowFivePods(
+  gameMode: GameMode,
+  preferredPodSize: number,
+  requested: boolean,
+): boolean {
+  if (gameMode === 'commander') {
+    return requested;
+  }
+  if (
+    gameMode === 'treachery' ||
+    gameMode === 'assassin' ||
+    gameMode === 'multiplayer'
+  ) {
+    return preferredPodSize >= 5;
+  }
+  return false;
 }
 
 function normalizeLimitedModeConfigs(

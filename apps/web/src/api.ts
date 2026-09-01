@@ -1,14 +1,18 @@
 import {
   normalizeJoinCode,
+  type DisplayMode,
   type EventMetrics,
   type GameMode,
   type EventSnapshot,
+  type HostDisplaySession,
   type LimitedEventModeConfig,
   type LimitedMatchOutcome,
   type LimitedMode,
   type LimitedSessionStatus,
   type LimitedTimerPhase,
   type PodRating,
+  type PublicDisplayAnnouncement,
+  type PublicDisplayEventState,
   type PublicEvent,
   type PublicChallengeCompletion,
   type PublicParticipant,
@@ -742,4 +746,146 @@ export function loadPlayerSession(joinCode: string) {
  */
 export function clearPlayerSession(joinCode: string) {
   removeStored(PLAYER_KEY(joinCode));
+}
+
+const DISPLAY_TOKEN_KEY = 'podyguard.display.token';
+const DISPLAY_SESSION_KEY = 'podyguard.display.sessionId';
+
+export function saveDisplayToken(token: string, sessionId?: string) {
+  writeStored(DISPLAY_TOKEN_KEY, token);
+  if (sessionId) {
+    writeStored(DISPLAY_SESSION_KEY, sessionId);
+  }
+}
+
+export function loadDisplayToken() {
+  return readStored(DISPLAY_TOKEN_KEY);
+}
+
+export function loadDisplaySessionId() {
+  return readStored(DISPLAY_SESSION_KEY);
+}
+
+export function clearDisplayToken() {
+  removeStored(DISPLAY_TOKEN_KEY);
+  removeStored(DISPLAY_SESSION_KEY);
+}
+
+export function beginDisplayPairing() {
+  return request<{
+    sessionId: string;
+    pairingCode: string;
+    expiresAt: string;
+  }>('/displays/pair', { method: 'POST' });
+}
+
+export function pollDisplayPairing(sessionId: string) {
+  return request<{
+    status: 'PENDING' | 'ACTIVE' | 'EXPIRED' | 'REVOKED';
+    expiresAt?: string;
+  }>(`/displays/pair/${sessionId}`);
+}
+
+export function claimDisplayToken(sessionId: string) {
+  return request<{ token: string }>(`/displays/pair/${sessionId}/claim`, {
+    method: 'POST',
+  });
+}
+
+export function getDisplayState(token: string) {
+  return request<{ state: PublicDisplayEventState }>('/displays/state', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export function approveDisplay(
+  joinCode: string,
+  hostToken: string,
+  input: {
+    pairingCode: string;
+    label?: string;
+    mode?: DisplayMode;
+    showPlayerNames?: boolean;
+  },
+) {
+  return request<{ display: HostDisplaySession }>(
+    `/events/${joinCode}/displays/approve`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${hostToken}` },
+      body: JSON.stringify(input),
+    },
+  );
+}
+
+export function listDisplays(joinCode: string, hostToken: string) {
+  return request<{ displays: HostDisplaySession[] }>(
+    `/events/${joinCode}/displays`,
+    { headers: { Authorization: `Bearer ${hostToken}` } },
+  );
+}
+
+export function updateDisplay(
+  joinCode: string,
+  hostToken: string,
+  displayId: string,
+  patch: {
+    label?: string;
+    mode?: DisplayMode;
+    showPlayerNames?: boolean;
+    showQueues?: boolean;
+    showTimers?: boolean;
+  },
+) {
+  return request<{ display: HostDisplaySession }>(
+    `/events/${joinCode}/displays/${displayId}`,
+    {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${hostToken}` },
+      body: JSON.stringify(patch),
+    },
+  );
+}
+
+export function revokeDisplay(
+  joinCode: string,
+  hostToken: string,
+  displayId: string,
+) {
+  return request<{ display: HostDisplaySession }>(
+    `/events/${joinCode}/displays/${displayId}/revoke`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${hostToken}` },
+    },
+  );
+}
+
+export function createDisplayAnnouncement(
+  joinCode: string,
+  hostToken: string,
+  input: { message: string; durationSeconds?: number },
+) {
+  return request<{ announcement: PublicDisplayAnnouncement }>(
+    `/events/${joinCode}/announcements`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${hostToken}` },
+      body: JSON.stringify(input),
+    },
+  );
+}
+
+export function cancelDisplayAnnouncement(
+  joinCode: string,
+  hostToken: string,
+  announcementId: string,
+) {
+  return request<{ ok: true }>(
+    `/events/${joinCode}/announcements/${announcementId}/cancel`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${hostToken}` },
+    },
+  );
 }

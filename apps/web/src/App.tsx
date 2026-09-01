@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, Route, Routes, useMatch } from 'react-router-dom';
+import { Link, Navigate, Route, Routes, useMatch, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { checkHealth } from './api';
 import { FeedbackProvider } from './feedback/FeedbackContext';
@@ -15,17 +15,30 @@ import { HostPage } from './HostPage';
 import { JoinPage } from './JoinPage';
 import { MatchConfigPage } from './MatchConfigPage';
 import { MatchSandboxPage } from './MatchSandboxPage';
+import { DisplayLivePage } from './display/DisplayLivePage';
+import { DisplayPairPage } from './display/DisplayPairPage';
 import { LimitedDisplayPage } from './limited/LimitedDisplayPage';
 import { LocalLimitedPage } from './limited/LocalLimitedPage';
 import { cx } from './ui/cx';
 import { ServerWakeScreen } from './ui/ServerWakeScreen';
 
+function LegacyLimitedDisplayRedirect() {
+  const { joinCode = '' } = useParams();
+  return <Navigate to={`/display/event/${joinCode}`} replace />;
+}
+
 export function App() {
   const { t } = useTranslation();
   // `/match` deliberately shares the player layout so it matches a real phone.
   const host = useMatch('/host/:joinCode');
-  const display = useMatch('/display/:joinCode');
-  const wide = Boolean(host || display);
+  const displayPair = useMatch({ path: '/display', end: true });
+  const displayLive = useMatch('/display/live');
+  const displayEvent = useMatch('/display/event/:joinCode');
+  const displayLegacy = useMatch('/display/:joinCode');
+  const publicDisplay = Boolean(
+    displayPair || displayLive || displayEvent || displayLegacy,
+  );
+  const wide = Boolean(host || publicDisplay);
   // Both routes are probed on every render: `||` would skip the second hook.
   const sandbox = useMatch('/match');
   const sandboxConfig = useMatch('/match-config');
@@ -45,7 +58,11 @@ export function App() {
           className={cx(
             'relative mx-auto flex min-h-screen w-full flex-col gap-5 px-5',
             home ? 'justify-start py-8' : 'py-14',
-            wide ? 'max-w-4xl justify-start' : 'max-w-2xl',
+            publicDisplay
+              ? 'max-w-7xl justify-start'
+              : wide
+                ? 'max-w-4xl justify-start'
+                : 'max-w-2xl',
             !wide && !home && 'justify-center',
           )}
         >
@@ -53,7 +70,16 @@ export function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/e/:joinCode" element={<JoinPage />} />
             <Route path="/host/:joinCode" element={<HostPage />} />
-            <Route path="/display/:joinCode" element={<LimitedDisplayPage />} />
+            <Route path="/display" element={<DisplayPairPage />} />
+            <Route path="/display/live" element={<DisplayLivePage />} />
+            <Route
+              path="/display/event/:joinCode"
+              element={<LimitedDisplayPage />}
+            />
+            <Route
+              path="/display/:joinCode"
+              element={<LegacyLimitedDisplayRedirect />}
+            />
             <Route path="/match" element={<MatchSandboxPage />} />
             <Route path="/match-config" element={<MatchConfigPage />} />
             <Route path="/limited" element={<LocalLimitedPage />} />

@@ -33,6 +33,7 @@ export {
   TREACHERY_MAX_POD_SIZE,
   TREACHERY_MIN_POD_SIZE,
   allowedPodSizes,
+  commanderAllowedSizes,
   eventMatchOptions,
 } from './types.js';
 export type {

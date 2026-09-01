@@ -4,7 +4,11 @@ const ACTIVE_MATCH_KEY = 'podyguard.active-match';
 
 export function activeMatchPath(): string | null {
   const path = readStored(ACTIVE_MATCH_KEY);
-  return path === '/match' || path?.startsWith('/e/') ? path : null;
+  return path === '/match' ||
+    path?.startsWith('/e/') ||
+    path?.startsWith('/host/')
+    ? path
+    : null;
 }
 
 export function rememberActiveMatch(path: string): void {

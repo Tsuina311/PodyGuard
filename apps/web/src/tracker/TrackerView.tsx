@@ -26,6 +26,7 @@ import {
   MessageSquare,
   Moon,
   MoreHorizontal,
+  LayoutDashboard,
   Nut,
   LogOut,
   Pause,
@@ -143,6 +144,11 @@ type Props = {
   onFinish: (winnerId: string, durationSeconds: number) => Promise<void>;
   /** Leaves the screen without ending or clearing the current game. */
   onQuit: () => void;
+  /**
+   * Host-as-player: switch back to the host desk without leaving the match.
+   * Shown in the match menu so it never covers the board.
+   */
+  onOpenDesk?: () => void;
   /**
    * Event pods requeue after a called game. Local casual play just leaves home —
    * there was never a queue to return to.
@@ -530,6 +536,7 @@ export function TrackerView({
   persist = true,
   onFinish,
   onQuit,
+  onOpenDesk,
   requeueOnFinish = true,
   challengeProgress = {},
   onChallengeComplete,
@@ -2295,6 +2302,7 @@ export function TrackerView({
                 }}
                 onFinish={finish}
                 onQuit={onQuit}
+                onOpenDesk={onOpenDesk}
                 onCheckRole={
                   deviceTreachery
                     ? () => setTreacheryRolesOpen(true)
@@ -2989,6 +2997,7 @@ function MatchMenu({
   onUndo,
   onFinish,
   onQuit,
+  onOpenDesk,
   onCheckRole,
   onChallenges,
   onRules,
@@ -3009,6 +3018,7 @@ function MatchMenu({
   onUndo: () => void;
   onFinish: () => Promise<void>;
   onQuit: () => void;
+  onOpenDesk?: () => void;
   onCheckRole?: () => void;
   onChallenges?: () => void;
   onRules: () => void;
@@ -3455,6 +3465,20 @@ function MatchMenu({
               >
                 <Eye size={14} aria-hidden />
                 {t('tracker.checkMyRole')}
+              </Button>
+            ) : null}
+            {onOpenDesk ? (
+              <Button
+                size="sm"
+                variant="glass"
+                className="h-9 w-full justify-start px-2.5"
+                onClick={() => {
+                  onClose();
+                  onOpenDesk();
+                }}
+              >
+                <LayoutDashboard size={14} aria-hidden />
+                {t('host.deskTab')}
               </Button>
             ) : null}
             <Button

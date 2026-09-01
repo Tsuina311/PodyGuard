@@ -21,7 +21,7 @@ type Result =
 
 const DIE_SIDES = [4, 6, 8, 10, 12, 20];
 const MAX_COUNT = 10;
-const COIN_FLIP_MS = 900;
+const COIN_FLIP_MS = 1000;
 const DIE_TUMBLE_MS = 1000;
 const STAGGER_MS = 70;
 
@@ -114,7 +114,7 @@ export function DiceToolsSheet({ focus, onClose }: Props) {
       <div className="mb-3 flex min-h-0 shrink-0 items-stretch gap-2">
         <div
           aria-live="polite"
-          className="border-muted/20 bg-black/20 flex min-h-40 min-w-0 flex-1 flex-col items-center justify-center gap-2 rounded-2xl border px-2 py-2 text-center"
+          className="border-muted/20 bg-black/20 relative flex min-h-40 min-w-0 flex-1 flex-col items-center justify-center rounded-2xl border px-2 py-2 text-center"
         >
           {result === null ? (
             <p className="text-muted text-sm">
@@ -134,7 +134,7 @@ export function DiceToolsSheet({ focus, onClose }: Props) {
                 ))}
               </div>
               {!spinning && result.faces.length > 1 ? (
-                <p className="text-muted font-mono text-[0.7rem] tracking-wide uppercase">
+                <p className="text-muted bg-hull/85 pointer-events-none absolute inset-x-0 top-1/2 z-10 mx-auto w-fit -translate-y-1/2 rounded-full px-2.5 py-1 font-mono text-[0.7rem] tracking-wide uppercase">
                   {t('tracker.coinTally', { heads, tails })}
                 </p>
               ) : null}

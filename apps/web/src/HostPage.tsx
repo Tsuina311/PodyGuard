@@ -25,6 +25,7 @@ import {
   listParticipants,
   listTables,
   loadHostToken,
+  loadPlayerSession,
   matchNow,
   removeParticipant,
   reportTournamentResult,
@@ -59,6 +60,11 @@ import { ChallengePackEditor } from './ChallengePackEditor';
 import { HostMetrics } from './HostMetrics';
 import { TournamentPanel } from './tournament/TournamentPanel';
 import { LimitedHostPanel } from './limited/LimitedHostPanel';
+import { HostDisplaysPanel } from './display/HostDisplaysPanel';
+import { JoinPage } from './JoinPage';
+import { cx } from './ui/cx';
+
+type HostTab = 'desk' | 'play';
 
 export function HostPage() {
   const { t } = useTranslation();
@@ -78,6 +84,18 @@ export function HostPage() {
   const [hoursDraft, setHoursDraft] = useState('24');
   const [removeArmed, setRemoveArmed] = useState<string | null>(null);
   const [cancelArmed, setCancelArmed] = useState(false);
+  const [tab, setTab] = useState<HostTab>('desk');
+  const [playTrackerActive, setPlayTrackerActive] = useState(false);
+  const [displayRefreshKey, setDisplayRefreshKey] = useState(0);
+  const hasPlayerSeat = Boolean(loadPlayerSession(code));
+
+  const openDesk = useCallback(() => {
+    setTab('desk');
+  }, []);
+
+  const onPlayTrackerActiveChange = useCallback((active: boolean) => {
+    setPlayTrackerActive(active);
+  }, []);
 
   const refresh = useCallback(async () => {
     const [roster, tableList] = await Promise.all([
@@ -103,6 +121,7 @@ export function HostPage() {
       setParticipants(snapshot.participants);
       setTables(snapshot.tables);
       setLimitedSnapshot(snapshot);
+      setDisplayRefreshKey((n) => n + 1);
     },
     [],
   );
@@ -567,44 +586,89 @@ export function HostPage() {
     );
   }
 
+  const hideHostChrome = tab === 'play' && playTrackerActive;
+
   return (
     <>
-      <ThemeToggleCorner
-        feedbackContext={{ gameMode: event.gameMode }}
-      />
-      <header>
-        <Brand className="mb-6" />
-        <h1 className="font-display mb-2 text-3xl font-bold tracking-tight">
-          {event.name}
-        </h1>
-        <div className="text-muted mb-8 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-          <span>
-            {t('host.playerCount', { count: participants.length })}
-          </span>
-          <span className="text-neon">
-            {t('host.ready', { count: counts.ready })}
-          </span>
-          <span>{t('host.matched', { count: counts.matched })}</span>
-          <span>{t('host.playing', { count: counts.playing })}</span>
-          <span>{t('host.paused', { count: counts.paused })}</span>
-          <span>
-            {t('host.ends', {
-              date: new Date(event.expiresAt).toLocaleString(undefined, {
-                weekday: 'short',
-                hour: 'numeric',
-                minute: '2-digit',
-              }),
-            })}
-          </span>
-          <Badge tone={event.gameMode === 'treachery' ? 'dev' : 'idle'}>
-            {t(`modes.${event.gameMode}.label`)}
-          </Badge>
-          <Badge tone={event.rulesFormat === 'normal' ? 'live' : 'idle'}>
-            {t(`families.${event.rulesFormat}`)}
-          </Badge>
-        </div>
-      </header>
+      {!hideHostChrome ? (
+        <>
+          <ThemeToggleCorner
+            feedbackContext={{ gameMode: event.gameMode }}
+          />
+          <header>
+            <Brand className="mb-6" />
+            <h1 className="font-display mb-2 text-3xl font-bold tracking-tight">
+              {event.name}
+            </h1>
+            <div className="text-muted mb-6 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+              <span>
+                {t('host.playerCount', { count: participants.length })}
+              </span>
+              <span className="text-neon">
+                {t('host.ready', { count: counts.ready })}
+              </span>
+              <span>{t('host.matched', { count: counts.matched })}</span>
+              <span>{t('host.playing', { count: counts.playing })}</span>
+              <span>{t('host.paused', { count: counts.paused })}</span>
+              <span>
+                {t('host.ends', {
+                  date: new Date(event.expiresAt).toLocaleString(undefined, {
+                    weekday: 'short',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                  }),
+                })}
+              </span>
+              <Badge tone={event.gameMode === 'treachery' ? 'dev' : 'idle'}>
+                {t(`modes.${event.gameMode}.label`)}
+              </Badge>
+              <Badge tone={event.rulesFormat === 'normal' ? 'live' : 'idle'}>
+                {t(`families.${event.rulesFormat}`)}
+              </Badge>
+            </div>
+          </header>
 
+          <div
+            role="tablist"
+            aria-label={t('host.shellTabs')}
+            className="border-muted/20 bg-ink/[0.03] mb-6 grid grid-cols-2 gap-1 rounded-2xl border p-1"
+          >
+            <button
+              type="button"
+              role="tab"
+              aria-selected={tab === 'desk'}
+              onClick={() => setTab('desk')}
+              className={cx(
+                'rounded-xl px-3 py-2.5 font-mono text-[0.7rem] tracking-wide uppercase transition',
+                tab === 'desk'
+                  ? 'bg-neon/15 text-neon'
+                  : 'text-muted hover:text-ink',
+              )}
+            >
+              {t('host.deskTab')}
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={tab === 'play'}
+              onClick={() => setTab('play')}
+              className={cx(
+                'rounded-xl px-3 py-2.5 font-mono text-[0.7rem] tracking-wide uppercase transition',
+                tab === 'play'
+                  ? 'bg-neon/15 text-neon'
+                  : 'text-muted hover:text-ink',
+              )}
+            >
+              {t('host.playTab')}
+              {hasPlayerSeat ? (
+                <span className="bg-neon ml-2 inline-block size-1.5 rounded-full" />
+              ) : null}
+            </button>
+          </div>
+        </>
+      ) : null}
+
+      <div className={cx(tab === 'desk' ? 'contents' : 'hidden')}>
       <Panel title={t('host.podSizes')} aside={t('host.matching')}>
         {event.gameMode === 'commander' ? (
           <>
@@ -629,8 +693,50 @@ export function HostPage() {
                 </button>
               ))}
             </div>
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              <label className="border-muted/20 hover:border-muted/40 flex cursor-pointer items-start gap-3 rounded-xl border p-3 text-sm transition">
+                <input
+                  type="checkbox"
+                  className="accent-neon mt-0.5"
+                  checked={event.allowThreePods}
+                  onChange={(change) =>
+                    void onToggleSetting({
+                      allowThreePods: change.target.checked,
+                    })
+                  }
+                />
+                <span>
+                  <span className="text-ink font-medium">
+                    {t('host.allowThreePods')}
+                  </span>
+                  <span className="text-muted mt-1 block text-xs">
+                    {t('host.allowThreePodsHint')}
+                  </span>
+                </span>
+              </label>
+              <label className="border-muted/20 hover:border-muted/40 flex cursor-pointer items-start gap-3 rounded-xl border p-3 text-sm transition">
+                <input
+                  type="checkbox"
+                  className="accent-neon mt-0.5"
+                  checked={event.allowFivePods}
+                  onChange={(change) =>
+                    void onToggleSetting({
+                      allowFivePods: change.target.checked,
+                    })
+                  }
+                />
+                <span>
+                  <span className="text-ink font-medium">
+                    {t('host.allowFivePods')}
+                  </span>
+                  <span className="text-muted mt-1 block text-xs">
+                    {t('host.allowFivePodsHint')}
+                  </span>
+                </span>
+              </label>
+            </div>
             <p className="text-muted mt-3 text-xs">
-              {t('host.matchingPrefers', { size: event.preferredPodSize })}
+              {commanderMatchHint(event, t)}
             </p>
           </>
         ) : event.gameMode === 'treachery' ? (
@@ -836,6 +942,25 @@ export function HostPage() {
           </div>
         </div>
       </Panel>
+
+      <Panel title={t('host.playInEvent')} aside={t('host.samePhone')}>
+        <p className="text-muted mb-3 text-sm">{t('host.playInEventHint')}</p>
+        <Button
+          variant="neon"
+          block
+          onClick={() => setTab('play')}
+        >
+          {hasPlayerSeat ? t('host.openPlayTab') : t('host.joinAsPlayer')}
+        </Button>
+      </Panel>
+
+      {hostToken ? (
+        <HostDisplaysPanel
+          joinCode={code}
+          hostToken={hostToken}
+          refreshKey={displayRefreshKey}
+        />
+      ) : null}
 
       {showLobbySections ? (
       <Panel title={t('host.queue')} aside={t('host.ready', { count: counts.ready })}>
@@ -1106,18 +1231,60 @@ export function HostPage() {
           {t('common.home')}
         </Link>
         <span className="mx-2">·</span>
-        <Link className="hover:text-ink" to={`/e/${code}`}>
-          {t('host.playerJoinPage')}
+        <button
+          type="button"
+          className="hover:text-ink"
+          onClick={() => setTab('play')}
+        >
+          {t('host.playTab')}
+        </button>
+        <span className="mx-2">·</span>
+        <Link className="hover:text-ink" to="/display">
+          {t('host.displaysPairLink')}
         </Link>
         {event.limitedModeConfigs?.some((config) => config.enabled) ? (
           <>
             <span className="mx-2">·</span>
-            <Link className="hover:text-ink" to={`/display/${code}`}>
-              Limited floor display
+            <Link className="hover:text-ink" to={`/display/event/${code}`}>
+              {t('host.limitedFloorDisplay')}
             </Link>
           </>
         ) : null}
       </p>
+      </div>
+
+      <div className={cx(tab === 'play' ? 'contents' : 'hidden')}>
+        <JoinPage
+          embeddedHost={{
+            onOpenDesk: openDesk,
+            onTrackerActiveChange: onPlayTrackerActiveChange,
+          }}
+        />
+      </div>
     </>
   );
+}
+
+function commanderMatchHint(
+  event: PublicEvent,
+  t: (key: string, options?: Record<string, unknown>) => string,
+): string {
+  const sizes = new Set<number>([event.preferredPodSize]);
+  if (event.allowThreePods) sizes.add(3);
+  if (event.allowFivePods) sizes.add(5);
+  if (event.preferredPodSize === 4 || sizes.size > 1) sizes.add(4);
+  const sorted = [...sizes].sort((left, right) => left - right);
+  if (sorted.length === 1) {
+    return t('host.matchingForcedSize', { size: sorted[0] });
+  }
+  if (!event.allowThreePods && event.preferredPodSize >= 4) {
+    return t('host.matchingWaitForFuller', {
+      size: event.preferredPodSize,
+      sizes: sorted.join('/'),
+    });
+  }
+  return t('host.matchingPrefersFlexible', {
+    size: event.preferredPodSize,
+    sizes: sorted.join('/'),
+  });
 }

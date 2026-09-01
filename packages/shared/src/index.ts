@@ -193,3 +193,27 @@ export type {
   TreacheryIdentityCard,
   PublicTreacheryIdentity,
 } from './treachery';
+
+export {
+  DEFAULT_DISPLAY_CONFIG,
+  DISPLAY_ASSIGNMENT_HIGHLIGHT_MS,
+  DISPLAY_AUTO_ROTATE_MS,
+  DISPLAY_MODES,
+  DISPLAY_SESSION_STATUSES,
+} from './display';
+
+export type {
+  DisplayConfig,
+  DisplayMode,
+  DisplaySessionStatus,
+  HostDisplaySession,
+  PublicDisplayAnnouncement,
+  PublicDisplayAssignment,
+  PublicDisplayEventState,
+  PublicDisplayEventSummary,
+  PublicDisplayLimitedMatch,
+  PublicDisplayLimitedSession,
+  PublicDisplayQueue,
+  PublicDisplayTable,
+  PublicDisplayTableActivity,
+} from './display';

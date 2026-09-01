@@ -4,6 +4,10 @@ import rateLimit from '@fastify/rate-limit';
 import fastifyStatic from '@fastify/static';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { DisplayService } from './display/display-service.js';
+import type { DisplayStore } from './display/display-store.js';
+import { MemoryDisplayStore } from './display/memory-display-store.js';
+import { PostgresDisplayStore } from './display/postgres-display-store.js';
 import { EventService } from './events/event-service.js';
 import { PostgresEventStore } from './events/postgres-event-store.js';
 import { githubFeedbackTransportFromEnvironment } from './feedback/github-transport.js';
@@ -14,6 +18,7 @@ import {
   type IdentityBoundary,
 } from './identity/index.js';
 import { attachLive } from './live.js';
+import { displayRoutes } from './routes/displays.js';
 import { eventRoutes } from './routes/events.js';
 import { feedbackRoutes } from './routes/feedback.js';
 import { healthRoutes } from './routes/health.js';
@@ -23,6 +28,8 @@ import type { ScryfallClient } from './scryfall/scryfall-client.js';
 export type BuildAppOptions = {
   identity?: IdentityBoundary;
   events?: EventService;
+  displays?: DisplayService;
+  displayStore?: DisplayStore;
   feedbackTransport?: FeedbackTransport | null;
   scryfall?: ScryfallClient;
   logger?: boolean;
@@ -36,6 +43,16 @@ export async function buildApp(options: BuildAppOptions = {}) {
   const events =
     options.events ??
     new EventService(new PostgresEventStore(), identity, { isDev });
+  const displayStore =
+    options.displayStore ??
+    (options.events ? new MemoryDisplayStore() : new PostgresDisplayStore());
+  const displays =
+    options.displays ??
+    new DisplayService(
+      displayStore,
+      events,
+      process.env.PARTICIPANT_SESSION_SECRET?.trim() || 'dev-display-secret',
+    );
   const feedbackTransport =
     options.feedbackTransport === undefined
       ? githubFeedbackTransportFromEnvironment()
@@ -60,6 +77,7 @@ export async function buildApp(options: BuildAppOptions = {}) {
 
   app.decorate('identity', identity);
   app.decorate('events', events);
+  app.decorate('displays', displays);
   app.decorate('live', attachLive(app));
 
   await app.register(cors, {
@@ -71,6 +89,7 @@ export async function buildApp(options: BuildAppOptions = {}) {
 
   await app.register(healthRoutes);
   await app.register(eventRoutes);
+  await app.register(displayRoutes);
   await app.register(feedbackRoutes, {
     service: new FeedbackService(feedbackTransport),
   });

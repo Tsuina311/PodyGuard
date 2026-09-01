@@ -87,7 +87,17 @@ function loadJoinDraft(joinCode: string): {
   }
 }
 
-export function JoinPage() {
+type HostShellBridge = {
+  onOpenDesk: () => void;
+  onTrackerActiveChange?: (active: boolean) => void;
+};
+
+export function JoinPage({
+  embeddedHost,
+}: {
+  /** Host desk embeds Play here so the organiser can join their own event. */
+  embeddedHost?: HostShellBridge;
+} = {}) {
   const { t } = useTranslation();
   const { joinCode = '' } = useParams();
   const navigate = useNavigate();
@@ -268,13 +278,25 @@ export function JoinPage() {
     if (!event || !participant) {
       return;
     }
-    const path = `/e/${event.joinCode}`;
+    const path = embeddedHost
+      ? `/host/${event.joinCode}`
+      : `/e/${event.joinCode}`;
     if (participant.status === 'playing' && showTracker) {
       rememberActiveMatch(path);
     } else if (participant.status !== 'playing') {
       forgetActiveMatch(path);
     }
-  }, [event, participant, showTracker]);
+  }, [embeddedHost, event, participant, showTracker]);
+
+  useEffect(() => {
+    embeddedHost?.onTrackerActiveChange?.(
+      Boolean(
+        participant &&
+          participant.status === 'playing' &&
+          showTracker,
+      ),
+    );
+  }, [embeddedHost, participant, showTracker]);
 
   useEffect(() => {
     if (!event || !token) {
@@ -605,7 +627,21 @@ export function JoinPage() {
               commanders: row.assignedCommanders ?? [],
             }))}
           onFinish={onTrackerFinished}
-          onQuit={() => void navigate('/')}
+          onQuit={() => {
+            if (embeddedHost) {
+              setShowTracker(false);
+              embeddedHost.onOpenDesk();
+              return;
+            }
+            void navigate('/');
+          }}
+          onOpenDesk={
+            embeddedHost
+              ? () => {
+                  embeddedHost.onOpenDesk();
+                }
+              : undefined
+          }
           {...(commanderRules
             ? {
                 challengeProgress,
@@ -654,14 +690,16 @@ export function JoinPage() {
 
   return (
     <>
-      <ThemeToggleCorner
-        feedbackContext={{
-          ...(participant ? { participantStatus: participant.status } : {}),
-          ...(event ? { gameMode: event.gameMode } : {}),
-        }}
-      />
+      {!embeddedHost ? (
+        <ThemeToggleCorner
+          feedbackContext={{
+            ...(participant ? { participantStatus: participant.status } : {}),
+            ...(event ? { gameMode: event.gameMode } : {}),
+          }}
+        />
+      ) : null}
       <header>
-        <Brand className="mb-6" />
+        {!embeddedHost ? <Brand className="mb-6" /> : null}
         <h1 className="font-display mb-2 text-3xl font-bold tracking-tight">
           {event?.name ?? t('join.joinEvent')}
         </h1>
@@ -1038,12 +1076,22 @@ export function JoinPage() {
           {t('common.home')}
         </Link>
         <span className="mx-2">·</span>
-        <Link
-          className="hover:text-ink"
-          to={`/host/${event?.joinCode ?? joinCode}`}
-        >
-          {t('join.imTheHost')}
-        </Link>
+        {embeddedHost ? (
+          <button
+            type="button"
+            className="hover:text-ink"
+            onClick={embeddedHost.onOpenDesk}
+          >
+            {t('host.deskTab')}
+          </button>
+        ) : (
+          <Link
+            className="hover:text-ink"
+            to={`/host/${event?.joinCode ?? joinCode}`}
+          >
+            {t('join.imTheHost')}
+          </Link>
+        )}
       </p>
     </>
   );

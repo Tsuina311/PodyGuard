@@ -65,8 +65,8 @@ describe('createMatches', () => {
       { groups: [] },
       eventMatchOptions({
         gameMode: 'commander',
-        allowThreePods: false,
-        allowFivePods: false,
+        allowThreePods: true,
+        allowFivePods: true,
         preferredPodSize: 4,
       }),
     );
@@ -79,13 +79,27 @@ describe('createMatches', () => {
       { groups: [] },
       eventMatchOptions({
         gameMode: 'commander',
-        allowThreePods: false,
-        allowFivePods: false,
+        allowThreePods: true,
+        allowFivePods: true,
         preferredPodSize: 5,
       }),
     );
     expect(targetFive.matches[0]?.seats).toHaveLength(5);
     expect(targetFive.matches[0]?.seats.every((seat) => seat.flexDelta === 0)).toBe(true);
+
+    const waitForFour = createMatches(
+      people,
+      tables(1),
+      { groups: [] },
+      eventMatchOptions({
+        gameMode: 'commander',
+        allowThreePods: false,
+        allowFivePods: false,
+        preferredPodSize: 4,
+      }),
+    );
+    expect(waitForFour.matches[0]?.seats).toHaveLength(4);
+    expect(waitForFour.unmatchedIds).toEqual(['p5']);
   });
 
   it('fills tables of 4 then a leftover 3 when nobody registered decks', () => {
@@ -293,19 +307,19 @@ describe('createMatches', () => {
 });
 
 describe('eventMatchOptions', () => {
-  it('automatically allows Commander 3/4/5 pods while preserving the host target', () => {
+  it('lets the Commander host constrain 3/4/5 while preserving the target', () => {
     expect(
       eventMatchOptions({
         gameMode: 'commander',
-        allowThreePods: false,
-        allowFivePods: false,
+        allowThreePods: true,
+        allowFivePods: true,
       }),
     ).toEqual({ preferredSize: 4, allowedSizes: [5, 4, 3] });
     expect(
       eventMatchOptions({
         gameMode: 'commander',
-        allowThreePods: false,
-        allowFivePods: false,
+        allowThreePods: true,
+        allowFivePods: true,
         preferredPodSize: 3,
       }),
     ).toEqual({ preferredSize: 3, allowedSizes: [5, 4, 3] });
@@ -317,6 +331,38 @@ describe('eventMatchOptions', () => {
         preferredPodSize: 5,
       }),
     ).toEqual({ preferredSize: 5, allowedSizes: [5, 4, 3] });
+    expect(
+      eventMatchOptions({
+        gameMode: 'commander',
+        allowThreePods: false,
+        allowFivePods: false,
+        preferredPodSize: 4,
+      }),
+    ).toEqual({ preferredSize: 4, allowedSizes: [4] });
+    expect(
+      eventMatchOptions({
+        gameMode: 'commander',
+        allowThreePods: false,
+        allowFivePods: false,
+        preferredPodSize: 5,
+      }),
+    ).toEqual({ preferredSize: 5, allowedSizes: [5] });
+    expect(
+      eventMatchOptions({
+        gameMode: 'commander',
+        allowThreePods: false,
+        allowFivePods: false,
+        preferredPodSize: 3,
+      }),
+    ).toEqual({ preferredSize: 3, allowedSizes: [3] });
+    expect(
+      eventMatchOptions({
+        gameMode: 'commander',
+        allowThreePods: false,
+        allowFivePods: true,
+        preferredPodSize: 4,
+      }),
+    ).toEqual({ preferredSize: 4, allowedSizes: [5, 4] });
   });
 
   it('lets treachery prefer 5+ with leftover 4s', () => {

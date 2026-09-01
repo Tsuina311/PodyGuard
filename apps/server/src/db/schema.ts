@@ -669,3 +669,73 @@ export const tableReservations = pgTable(
   ],
 );
 
+export const displaySessionStatusEnum = pgEnum('display_session_status', [
+  'PENDING',
+  'ACTIVE',
+  'REVOKED',
+]);
+
+export const displayModeEnum = pgEnum('display_mode', [
+  'FLOOR',
+  'QUEUES',
+  'LIMITED',
+  'AUTO',
+]);
+
+/**
+ * Event-scoped read-only TV / projector sessions.
+ * Permanent tokens are stored hashed; pairing codes are short-lived and single-use.
+ */
+export const displaySessions = pgTable(
+  'display_sessions',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    eventId: uuid('event_id').references(() => events.id, {
+      onDelete: 'cascade',
+    }),
+    tokenHash: text('token_hash'),
+    pairingCodeHash: text('pairing_code_hash'),
+    pairingCodeLookup: text('pairing_code_lookup'),
+    pairingExpiresAt: timestamp('pairing_expires_at', { withTimezone: true }),
+    pairingAttempts: integer('pairing_attempts').notNull().default(0),
+    status: displaySessionStatusEnum('status').notNull().default('PENDING'),
+    label: text('label').notNull().default('Display'),
+    mode: displayModeEnum('mode').notNull().default('FLOOR'),
+    showPlayerNames: boolean('show_player_names').notNull().default(true),
+    showQueues: boolean('show_queues').notNull().default(true),
+    showTimers: boolean('show_timers').notNull().default(true),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    approvedAt: timestamp('approved_at', { withTimezone: true }),
+    lastSeenAt: timestamp('last_seen_at', { withTimezone: true }),
+    revokedAt: timestamp('revoked_at', { withTimezone: true }),
+  },
+  (table) => [
+    index('display_sessions_event_id_idx').on(table.eventId),
+    uniqueIndex('display_sessions_token_hash_unique')
+      .on(table.tokenHash)
+      .where(sql`${table.tokenHash} is not null`),
+    uniqueIndex('display_sessions_pairing_lookup_unique')
+      .on(table.pairingCodeLookup)
+      .where(sql`${table.pairingCodeLookup} is not null`),
+  ],
+);
+
+export const displayAnnouncements = pgTable(
+  'display_announcements',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    eventId: uuid('event_id')
+      .notNull()
+      .references(() => events.id, { onDelete: 'cascade' }),
+    message: text('message').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    endsAt: timestamp('ends_at', { withTimezone: true }).notNull(),
+    cancelledAt: timestamp('cancelled_at', { withTimezone: true }),
+  },
+  (table) => [index('display_announcements_event_id_idx').on(table.eventId)],
+);
+

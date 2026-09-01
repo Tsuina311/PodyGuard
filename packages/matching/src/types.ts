@@ -79,6 +79,37 @@ export function allowedPodSizes(flags: {
   return [...new Set(sizes)].sort((left, right) => right - left);
 }
 
+/**
+ * Commander host controls:
+ * - preferred size is always legal;
+ * - allowThree / allowFive add 3 and 5;
+ * - 4 is included whenever more than one size is legal, or when 4 is preferred
+ *   (so "wait for full tables" = preferred 4 with both allows off → [4] only;
+ *   "force 5" = preferred 5 with allowThree off → [5];
+ *   "force 3" = preferred 3 with allowFive off → [3]).
+ */
+export function commanderAllowedSizes(
+  preferredSize: number,
+  allowThreePods: boolean,
+  allowFivePods: boolean,
+): number[] {
+  const preferred = Math.min(
+    FIVE_POD_SIZE,
+    Math.max(FALLBACK_POD_SIZE, preferredSize),
+  );
+  const sizes = new Set<number>([preferred]);
+  if (allowThreePods) {
+    sizes.add(FALLBACK_POD_SIZE);
+  }
+  if (allowFivePods) {
+    sizes.add(FIVE_POD_SIZE);
+  }
+  if (preferred === PREFERRED_POD_SIZE || sizes.size > 1) {
+    sizes.add(PREFERRED_POD_SIZE);
+  }
+  return [...sizes].sort((left, right) => right - left);
+}
+
 export function eventMatchOptions(input: {
   gameMode:
     | 'duel'
@@ -130,7 +161,11 @@ export function eventMatchOptions(input: {
     );
     return {
       preferredSize,
-      allowedSizes: [FIVE_POD_SIZE, PREFERRED_POD_SIZE, FALLBACK_POD_SIZE],
+      allowedSizes: commanderAllowedSizes(
+        preferredSize,
+        input.allowThreePods,
+        input.allowFivePods,
+      ),
     };
   }
   if (input.gameMode === 'multiplayer') {
