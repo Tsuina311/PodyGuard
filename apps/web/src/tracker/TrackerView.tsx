@@ -250,8 +250,6 @@ function PreGameScreen({
   instead of layering a tint over it. Both read correctly in either theme.
 */
 const plate = 'bg-void/85';
-const plateAccent =
-  'bg-[color-mix(in_oklab,var(--color-neon)_18%,var(--color-void))]';
 
 /*
   A designation a seat is holding is worth more than an accent: the icon fills
@@ -1671,98 +1669,34 @@ export function TrackerView({
                 </Badge>
               </span>
             ) : null}
-            <div
-              className={cx(
-                'relative z-10 flex shrink-0 items-start justify-between gap-2',
-                archenemyBoard
-                  ? ''
-                  : clockClearance(state.players.length, index, 'top', seatLayout),
-              )}
-            >
-              {/*
-                The counters take the top line, where the name used to sit. The
-                commander art already says whose seat this is, and this is the
-                first place the eye lands. It scrolls sideways rather than
-                wrapping, so a hoard of counters can never push into the life
-                total below.
-              */}
-              <span className="flex min-w-0 flex-1 gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                <CounterBadges
-                  player={player}
-                  disabled={Boolean(state.winnerId)}
-                  hidePoison={sharedLifeBoard}
-                  hideTax={!commanderRules}
-                  onOpen={() => setCounterPlayerId(player.id)}
-                />
-              </span>
-              <span className="flex shrink-0 flex-wrap justify-end gap-1">
-                {emperorBoard && !state.emperorIds.includes(player.id) ? (
-                  <Badge tone="idle" title={t('tracker.generalRange')}>
-                    <span className="sr-only">{t('tracker.general')}</span>
-                    G
-                  </Badge>
-                ) : null}
-                {publicIdentities[player.id] ? (
-                  <button
-                    type="button"
-                    className="border-warning/50 bg-warning/15 text-warning rounded-full border px-2 py-0.5 text-[0.65rem] font-bold"
-                    onClick={() => setPublicIdentityPlayerId(player.id)}
-                  >
-                    {publicIdentities[player.id]?.name}
-                  </button>
-                ) : null}
-                {winnerIds.has(player.id) ? (
-                  <Badge tone="live">{t('tracker.winner')}</Badge>
-                ) : null}
-              </span>
-            </div>
-
             {/*
-              Life owns the card: it takes every pixel the rest leaves over.
-              The buttons grow with the row up to their cap, and centring keeps
-              them on the row's midline once the cap is reached instead of
-              leaving them hanging from the top.
-            */}
-            {!sharedLifeBoard ? (
-              <LifeRow
-                life={player.life}
-                flash={
-                  lifeDelta?.playerId === player.id ? lifeDelta.amount : null
-                }
-                color={seatColor(index)}
-                disabled={Boolean(state.winnerId)}
-                onStep={(delta) =>
-                  send({
-                    type: 'action',
-                    action: { type: 'life', playerId: player.id, delta },
-                  })
-                }
-                onEnter={(sign) =>
-                  setLifeEntry({ playerId: player.id, sign })
-                }
-              />
-            ) : (
-              <div className="min-h-0 flex-1" aria-hidden />
-            )}
-
-            {/*
-              Laid flat there is width to spare and no height to waste, so the
-              counters and the icon strip share a single row.
+              Life runs top-to-bottom (+ / total / −) so it stays usable when the
+              seat is rotated for the player across the table. Action icons sit
+              on the sides instead of flanking the total left/right. Counter
+              chips float over the + half so they never shrink the life column.
             */}
             <div
               className={cx(
-                'relative z-10 flex shrink-0 flex-col landscape:flex-row landscape:items-center landscape:gap-2',
+                'relative z-10 flex min-h-0 flex-1 gap-1.5',
                 archenemyBoard
                   ? ''
-                  : clockClearance(
-                      state.players.length,
-                      index,
-                      'bottom',
-                      seatLayout,
+                  : cx(
+                      clockClearance(
+                        state.players.length,
+                        index,
+                        'top',
+                        seatLayout,
+                      ),
+                      clockClearance(
+                        state.players.length,
+                        index,
+                        'bottom',
+                        seatLayout,
+                      ),
                     ),
               )}
             >
-              <div className="flex min-w-0 shrink-0 gap-1 overflow-x-auto [scrollbar-width:none] landscape:flex-1 [&::-webkit-scrollbar]:hidden">
+              <div className="flex shrink-0 flex-col items-center gap-1 overflow-y-auto py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 <IconButton
                   title={t('tracker.openCounters', { name: player.name })}
                   disabled={Boolean(state.winnerId)}
@@ -1780,14 +1714,64 @@ export function TrackerView({
                 ) : null}
               </div>
 
-              {/*
-                Only the two toggles that are not counters, kept as a thin
-                strip. Knocking a player out and naming a winner used to live
-                here, a tap away from the life buttons, which made them easy to
-                hit by accident and cost room the counters needed. Both are
-                reached through the loss prompt instead.
-              */}
-              <div className="border-muted/15 mt-1.5 flex shrink-0 justify-end gap-1.5 border-t pt-1.5 landscape:mt-0 landscape:border-t-0 landscape:pt-0">
+              <div className="relative min-h-0 min-w-0 flex-1">
+                <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-2 p-0.5">
+                  <span className="pointer-events-auto flex min-w-0 flex-1 gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    <CounterBadges
+                      player={player}
+                      disabled={Boolean(state.winnerId)}
+                      hidePoison={sharedLifeBoard}
+                      hideTax={!commanderRules}
+                      onOpen={() => setCounterPlayerId(player.id)}
+                    />
+                  </span>
+                  <span className="pointer-events-auto flex shrink-0 flex-wrap justify-end gap-1">
+                    {emperorBoard && !state.emperorIds.includes(player.id) ? (
+                      <Badge tone="idle" title={t('tracker.generalRange')}>
+                        <span className="sr-only">{t('tracker.general')}</span>
+                        G
+                      </Badge>
+                    ) : null}
+                    {publicIdentities[player.id] ? (
+                      <button
+                        type="button"
+                        className="border-warning/50 bg-warning/15 text-warning rounded-full border px-2 py-0.5 text-[0.65rem] font-bold"
+                        onClick={() => setPublicIdentityPlayerId(player.id)}
+                      >
+                        {publicIdentities[player.id]?.name}
+                      </button>
+                    ) : null}
+                    {winnerIds.has(player.id) ? (
+                      <Badge tone="live">{t('tracker.winner')}</Badge>
+                    ) : null}
+                  </span>
+                </div>
+                {!sharedLifeBoard ? (
+                  <LifeRow
+                    life={player.life}
+                    flash={
+                      lifeDelta?.playerId === player.id
+                        ? lifeDelta.amount
+                        : null
+                    }
+                    color={seatColor(index)}
+                    disabled={Boolean(state.winnerId)}
+                    onStep={(delta) =>
+                      send({
+                        type: 'action',
+                        action: { type: 'life', playerId: player.id, delta },
+                      })
+                    }
+                    onEnter={(sign) =>
+                      setLifeEntry({ playerId: player.id, sign })
+                    }
+                  />
+                ) : (
+                  <div className="min-h-0 h-full flex-1" aria-hidden />
+                )}
+              </div>
+
+              <div className="flex shrink-0 flex-col items-center gap-1 overflow-y-auto py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 <IconButton
                   title={
                     player.id === state.monarchId
@@ -1914,10 +1898,10 @@ export function TrackerView({
           layoutKey={`${landscape ? 'l' : 'p'}:${forceRotate ? 'r' : 'n'}:${String(state.players.length)}`}
         />
         {/*
-          A team's life reads like a single seat's: the total in the middle of
-          the row with the buttons around it. It floats over the row rather than
-          living in a card, so it is measured against the grid instead of the
-          screen or it drifts down onto the seat controls.
+          A team's life reads like a single seat's: + above the total and −
+          below it. It floats over the row rather than living in a card, so it
+          is measured against the grid instead of the screen or it drifts down
+          onto the seat controls.
         */}
         {sharedLifeBoard && state.teams
           ? state.teams.map((team, index) => {
@@ -1931,7 +1915,7 @@ export function TrackerView({
                 <div
                   key={team.join(':')}
                   className={cx(
-                    'absolute left-1/2 z-20 flex w-[min(34rem,78vw)] -translate-x-1/2 -translate-y-[58%] flex-col items-stretch gap-0 px-1',
+                    'absolute left-1/2 z-20 flex w-[min(12rem,42vw)] -translate-x-1/2 -translate-y-[58%] flex-col items-stretch gap-1 px-1',
                     // Both sides shift toward the bottom of their row so the
                     // total clears the ally mark above (not mirrored about centre).
                     index === 0 ? 'top-[30%]' : 'top-[80%]',
@@ -3309,34 +3293,43 @@ function LifeRow({
   return (
     <div
       className={cx(
-        'relative z-10 flex min-h-0 items-center',
-        compact ? 'gap-1' : 'flex-1 gap-1.5 py-1',
+        'relative z-10 min-h-0 min-w-0',
+        // Parent is not a flex column — flex-1 alone would leave this at 0
+        // height (all children are absolute) and park the total at the top.
+        compact ? 'h-28' : 'h-full',
       )}
     >
+      {/*
+        Invisible half-height hit targets fill the column between the side
+        icon rails. + owns the top half, − the bottom — usable even when the
+        seat is rotated for the player across the table.
+      */}
+      <LifeButton
+        delta={1}
+        disabled={disabled}
+        className="absolute inset-x-0 top-0 z-10 h-1/2"
+        onClick={() => onStep(1)}
+        onLongPress={() => onEnter(1)}
+      />
       <LifeButton
         delta={-1}
         disabled={disabled}
-        compact={compact}
+        className="absolute inset-x-0 bottom-0 z-10 h-1/2"
         onClick={() => onStep(-1)}
         onLongPress={() => onEnter(-1)}
       />
-      <div
-        className={cx(
-          'relative flex min-w-0 flex-1 flex-col items-center justify-center',
-          !compact && 'self-stretch',
-        )}
-      >
+      <div className="pointer-events-none absolute inset-0 z-0 flex flex-col items-center justify-center">
         <p
           className={cx(
-            'font-display w-[8.5rem] shrink-0 text-center leading-none font-bold tabular-nums landscape:w-[10.5rem]',
+            'font-display w-full max-w-[12rem] shrink-0 text-center leading-none font-bold tabular-nums',
             !lifeStyle && 'text-neon',
             digits >= 5
-              ? 'text-[clamp(1.1rem,4.5vh,2rem)] landscape:text-[clamp(1.15rem,7vh,2.1rem)]'
+              ? 'text-[clamp(1.25rem,5.5vh,2.35rem)] landscape:text-[clamp(1.35rem,8.5vh,2.5rem)]'
               : digits >= 4
-                ? 'text-[clamp(1.4rem,5.5vh,2.6rem)] landscape:text-[clamp(1.5rem,9vh,2.85rem)]'
+                ? 'text-[clamp(1.65rem,6.5vh,3.1rem)] landscape:text-[clamp(1.75rem,11vh,3.4rem)]'
                 : digits >= 3
-                  ? 'text-[clamp(1.85rem,7.5vh,3.5rem)] landscape:text-[clamp(2rem,12vh,4rem)]'
-                  : 'text-[clamp(2.75rem,11vh,5.25rem)] landscape:text-[clamp(3rem,18vh,5.75rem)]',
+                  ? 'text-[clamp(2.25rem,9vh,4.25rem)] landscape:text-[clamp(2.5rem,14vh,4.75rem)]'
+                  : 'text-[clamp(3.5rem,14vh,6.5rem)] landscape:text-[clamp(3.75rem,22vh,7.25rem)]',
             onArt,
           )}
           style={lifeStyle}
@@ -3355,13 +3348,6 @@ function LifeRow({
           </p>
         ) : null}
       </div>
-      <LifeButton
-        delta={1}
-        disabled={disabled}
-        compact={compact}
-        onClick={() => onStep(1)}
-        onLongPress={() => onEnter(1)}
-      />
     </div>
   );
 }
@@ -3371,13 +3357,13 @@ function LifeButton({
   disabled,
   onClick,
   onLongPress,
-  compact = false,
+  className,
 }: {
   delta: number;
   disabled: boolean;
   onClick: () => void;
   onLongPress: () => void;
-  compact?: boolean;
+  className?: string;
 }) {
   const { t } = useTranslation();
   const timer = useRef<number | null>(null);
@@ -3429,12 +3415,12 @@ function LifeButton({
       }}
       onContextMenu={(event) => event.preventDefault()}
       className={cx(
-        plateAccent,
-        'font-display border-neon/50 text-neon flex w-16 shrink-0 items-center justify-center rounded-xl border text-xl font-bold transition select-none disabled:opacity-40',
-        compact ? 'h-10' : 'h-full max-h-20 min-h-11',
+        'font-display text-muted/35 flex items-center justify-center text-2xl font-bold transition select-none disabled:opacity-40',
+        delta > 0 ? 'items-start pt-1' : 'items-end pb-1',
+        className,
       )}
     >
-      {delta > 0 ? '+1' : '-1'}
+      <span aria-hidden>{delta > 0 ? '+' : '−'}</span>
     </button>
   );
 }
