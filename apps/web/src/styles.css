@@ -208,3 +208,252 @@
     transform: translateX(2rem);
   }
 }
+
+/*
+  Table tools: CSS-only coin flip and die tumble. No WebGL — keeps the match
+  menu light and themed to the hull/neon palette. Reduced motion skips to the
+  settled face.
+*/
+@keyframes table-coin-flip-heads {
+  0% {
+    transform: rotateY(0deg) translateY(0);
+  }
+  35% {
+    transform: rotateY(720deg) translateY(-18px);
+  }
+  70% {
+    transform: rotateY(1260deg) translateY(-6px);
+  }
+  100% {
+    transform: rotateY(1440deg) translateY(0);
+  }
+}
+
+@keyframes table-coin-flip-tails {
+  0% {
+    transform: rotateY(0deg) translateY(0);
+  }
+  35% {
+    transform: rotateY(720deg) translateY(-18px);
+  }
+  70% {
+    transform: rotateY(1260deg) translateY(-6px);
+  }
+  100% {
+    transform: rotateY(1620deg) translateY(0);
+  }
+}
+
+@keyframes table-die-tumble {
+  0% {
+    transform: translateY(0) rotate(-8deg) scale(0.96);
+  }
+  25% {
+    transform: translateY(-14px) rotate(172deg) scale(1.03);
+  }
+  50% {
+    transform: translateY(-5px) rotate(350deg) scale(1);
+  }
+  75% {
+    transform: translateY(-10px) rotate(530deg) scale(1.02);
+  }
+  100% {
+    transform: translateY(0) rotate(720deg) scale(1);
+  }
+}
+
+@keyframes table-die-settle {
+  0% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/*
+  Stages reserve room above for the bounce while the die spins on its centre.
+*/
+.table-coin-stage,
+.table-die-stage {
+  position: relative;
+  display: grid;
+  place-items: end center;
+  width: 5rem;
+  height: 5.25rem;
+  /* Keep shadow/bounce paint inside the stage so parents never grow a scrollbar. */
+  overflow: hidden;
+}
+
+.table-coin {
+  position: relative;
+  width: 3.25rem;
+  height: 3.25rem;
+  perspective: 600px;
+}
+
+.table-coin__spinner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.table-coin__spinner.is-flipping-heads {
+  animation: table-coin-flip-heads 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.table-coin__spinner.is-flipping-tails {
+  animation: table-coin-flip-tails 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.table-coin__face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 2px solid color-mix(in oklab, var(--color-warning) 55%, transparent);
+  background:
+    radial-gradient(
+      circle at 30% 28%,
+      color-mix(in oklab, var(--color-warning) 55%, white),
+      var(--color-warning) 55%,
+      color-mix(in oklab, var(--color-warning) 70%, var(--color-void))
+    );
+  color: var(--color-void);
+  font-family: var(--font-display, ui-sans-serif);
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  backface-visibility: hidden;
+  box-shadow:
+    0 6px 14px color-mix(in oklab, var(--color-void) 40%, transparent),
+    inset 0 1px color-mix(in oklab, white 35%, transparent);
+}
+
+.table-coin__face--tails {
+  transform: rotateY(180deg);
+  background:
+    radial-gradient(
+      circle at 30% 28%,
+      color-mix(in oklab, var(--color-beam) 45%, white),
+      var(--color-beam) 55%,
+      color-mix(in oklab, var(--color-beam) 65%, var(--color-void))
+    );
+  border-color: color-mix(in oklab, var(--color-beam) 55%, transparent);
+}
+
+.table-die {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  color: var(--color-neon);
+  /* Spin around the die’s visual centre, not a corner of the hit box. */
+  transform-origin: 50% 50%;
+  transform-box: fill-box;
+  filter: drop-shadow(
+    0 6px 10px color-mix(in oklab, var(--color-void) 45%, transparent)
+  );
+}
+
+/* Triangle mass sits on the centroid; keep the pivot there explicitly. */
+.table-die--d4 {
+  transform-origin: 50% 50%;
+}
+
+/* Tall kite art: pivot near the waist crossing of the traced outline. */
+.table-die--d10 {
+  transform-origin: 50% 55%;
+}
+
+.table-die__d10-fill {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  /* Sit just inside the traced stroke so the fill never bleeds past it. */
+  transform: scale(0.96);
+  transform-origin: center center;
+}
+
+.table-die__d10-fill .table-die__shell {
+  stroke: transparent;
+}
+
+.table-die__d10-art {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  /* Match .table-die__shell stroke weight/opacity on the other dice. */
+  background-color: color-mix(in oklab, var(--color-neon) 70%, transparent);
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+
+.table-die__d10-value {
+  position: relative;
+  z-index: 2;
+  margin-top: 0.1rem;
+  font-family: var(--font-display, ui-sans-serif);
+  font-size: 0.9rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: currentColor;
+}
+
+.table-die__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.table-die__shell {
+  fill: color-mix(in oklab, var(--color-neon) 16%, var(--color-hull));
+  stroke: color-mix(in oklab, var(--color-neon) 70%, transparent);
+  stroke-width: 2.25;
+  stroke-linejoin: round;
+}
+
+.table-die__seam {
+  fill: none;
+  stroke: color-mix(in oklab, var(--color-neon) 45%, transparent);
+  stroke-width: 1.35;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.table-die__value {
+  fill: var(--color-neon);
+  font-family: var(--font-display, ui-sans-serif);
+  font-size: 18px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.table-die.is-tumbling {
+  animation: table-die-tumble 1000ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.table-die.is-settled {
+  animation: table-die-settle 220ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .table-coin__spinner.is-flipping-heads,
+  .table-coin__spinner.is-flipping-tails,
+  .table-die.is-tumbling,
+  .table-die.is-settled {
+    animation: none;
+  }
+}
+

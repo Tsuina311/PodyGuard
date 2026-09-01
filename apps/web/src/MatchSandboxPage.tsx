@@ -62,9 +62,10 @@ export function MatchSandboxPage() {
         rulesFormat={config.rulesFormat}
         dealTreachery={config.gameMode === 'treachery'}
         players={players}
+        requeueOnFinish={false}
         onFinish={async () => {
           forgetActiveMatch('/match');
-          setShowTracker(false);
+          void navigate('/');
         }}
         onQuit={() => void navigate('/')}
         challengeProgress={challengeProgress}

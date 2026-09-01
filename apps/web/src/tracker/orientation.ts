@@ -102,11 +102,11 @@ function orientationLocker(): {
  * allows it. Pass null during pre-game deal / seating screens so those keep
  * whichever way the phone is already held.
  *
- * Chrome only grants the lock to a document in element-level fullscreen, and
- * fullscreen only off a user gesture, so the two are asked for together. The
- * gesture that opened the board pays for the first attempt; later taps retry
- * until it sticks. Coming back from another app unlocks the phone, so
- * visibility/focus also re-arms the lock.
+ * Chrome Android only grants the lock in element-level fullscreen, and
+ * fullscreen only off a user gesture, so a failed lock that asks for fullscreen
+ * is retried after `requestFullscreen`. The gesture that opened the board pays
+ * for the first attempt; later taps retry until it sticks. Coming back from
+ * another app unlocks the phone, so visibility/focus also re-arms the lock.
  *
  * Fullscreen is held across a change of target and only handed back on the way
  * out, because re-entering it costs another gesture — turning the phone for a
@@ -115,10 +115,11 @@ function orientationLocker(): {
  * WebKit has neither this lock nor a per-page manifest orientation, so on an
  * iPhone nothing here fires and `useBoardLandscape` rotates the board instead.
  *
- * Desktop Chrome with the phone emulator reports a coarse pointer and can enter
- * fullscreen, but orientation.lock still rejects — without a bail-out every
- * click would keep toggling fullscreen. Once fullscreen is entered and lock
- * still fails, we stop and leave the window alone.
+ * Desktop Chrome (and DevTools phone mode) exposes `orientation.lock` but always
+ * rejects with NotSupportedError. Asking for fullscreen first made every dial
+ * tap enter/exit fullscreen. Try the lock bare first; only enter fullscreen when
+ * the refusal is the mobile “need fullscreen” error, and never again once the
+ * platform has said the lock is unavailable.
  */
 export function useOrientationLock(target: OrientationTarget | null): void {
   const unsupported = useRef(false);
@@ -159,6 +160,23 @@ export function useOrientationLock(target: OrientationTarget | null): void {
       inflight = true;
       let enteredFullscreen = false;
       try {
+        try {
+          await lock(requested);
+          locked = true;
+          return;
+        } catch (error) {
+          if (cancelled) {
+            return;
+          }
+          if (orientationLockUnavailable(error)) {
+            unsupported.current = true;
+            return;
+          }
+          if (!orientationLockNeedsFullscreen(error)) {
+            unsupported.current = true;
+            return;
+          }
+        }
         if (!document.fullscreenElement) {
           await document.documentElement.requestFullscreen({
             navigationUI: 'hide',
@@ -170,17 +188,13 @@ export function useOrientationLock(target: OrientationTarget | null): void {
         }
         await lock(requested);
         locked = true;
-      } catch {
+      } catch (error) {
         locked = false;
-        // Entering fullscreen and still being refused the lock is desktop /
-        // DevTools noise: give the window back and do not ask again on every
-        // pointerdown. A refusal while already fullscreen is left to retry,
-        // since that is the path a target change takes.
-        if (enteredFullscreen) {
+        if (orientationLockUnavailable(error) || enteredFullscreen) {
           unsupported.current = true;
-          if (document.fullscreenElement) {
-            void document.exitFullscreen().catch(() => undefined);
-          }
+        }
+        if (enteredFullscreen && document.fullscreenElement) {
+          void document.exitFullscreen().catch(() => undefined);
         }
       } finally {
         inflight = false;
@@ -215,4 +229,29 @@ export function useOrientationLock(target: OrientationTarget | null): void {
       window.removeEventListener('focus', onVisible);
     };
   }, [target]);
+}
+
+/** Desktop browsers: lock exists but will never succeed on this device. */
+function orientationLockUnavailable(error: unknown): boolean {
+  if (!(error instanceof DOMException)) {
+    return false;
+  }
+  if (error.name === 'NotSupportedError') {
+    return true;
+  }
+  return /not available on this device/i.test(error.message);
+}
+
+/** Mobile Chrome: lock is supported once the document is fullscreen. */
+function orientationLockNeedsFullscreen(error: unknown): boolean {
+  if (!(error instanceof DOMException)) {
+    return false;
+  }
+  if (error.name === 'NotAllowedError') {
+    return true;
+  }
+  if (error.name === 'SecurityError') {
+    return /fullscreen/i.test(error.message);
+  }
+  return false;
 }

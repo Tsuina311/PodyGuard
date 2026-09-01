@@ -164,7 +164,8 @@ export type TrackerState = {
   initiativeId: string | null;
   firstPlayerId: string | null;
   winnerId: string | null;
-  startedAt: number;
+  /** Null until the table taps Start after the opening draw. */
+  startedAt: number | null;
   pausedAt: number | null;
   accumulatedPausedMs: number;
   /** Confirmed eliminations retained for challenge detection and final recap. */
@@ -220,6 +221,7 @@ export type TrackerAction =
   | { type: 'declineLoss'; playerId: string }
   | { type: 'winner'; playerId: string }
   | { type: 'first'; playerId: string }
+  | { type: 'begin' }
   | { type: 'pause' }
   | { type: 'reorderPlayers'; order: string[] };
 
@@ -275,7 +277,7 @@ export function createTracker(
     initiativeId: null,
     firstPlayerId: null,
     winnerId: null,
-    startedAt: now,
+    startedAt: null,
     pausedAt: null,
     accumulatedPausedMs: 0,
     eliminations: [],
@@ -283,7 +285,7 @@ export function createTracker(
 }
 
 export function elapsedMs(state: TrackerState, now = Date.now()): number {
-  if (!state.firstPlayerId) {
+  if (!state.firstPlayerId || state.startedAt == null) {
     return 0;
   }
   const paused = state.pausedAt
@@ -449,9 +451,6 @@ export function applyTrackerAction(
       }
       if (next.archenemyId) {
         next.firstPlayerId = next.archenemyId;
-        next.startedAt = now;
-        next.pausedAt = null;
-        next.accumulatedPausedMs = 0;
       }
       break;
     }
@@ -672,14 +671,19 @@ export function applyTrackerAction(
       next.pausedAt = now;
       break;
     case 'first':
-      if (!next.firstPlayerId) {
+      next.firstPlayerId = action.playerId;
+      break;
+    case 'begin':
+      if (next.firstPlayerId && next.startedAt == null) {
         next.startedAt = now;
         next.pausedAt = null;
         next.accumulatedPausedMs = 0;
       }
-      next.firstPlayerId = action.playerId;
       break;
     case 'pause':
+      if (next.startedAt == null) {
+        break;
+      }
       if (next.pausedAt) {
         next.accumulatedPausedMs += now - next.pausedAt;
         next.pausedAt = null;

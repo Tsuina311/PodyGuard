@@ -892,8 +892,11 @@ describe('commander tracker', () => {
     expect(elapsedMs(start, 1500)).toBe(0);
     const picked = pickFirstPlayer(start, () => 0, 5000);
     expect(picked.firstPlayerId).toBe('a');
-    expect(picked.startedAt).toBe(5000);
-    expect(elapsedMs(picked, 6500)).toBe(1500);
+    expect(picked.startedAt).toBeNull();
+    expect(elapsedMs(picked, 6500)).toBe(0);
+    const begun = applyTrackerAction(picked, { type: 'begin' }, 5000);
+    expect(begun.startedAt).toBe(5000);
+    expect(elapsedMs(begun, 6500)).toBe(1500);
   });
 
   it('tracks day and night', () => {

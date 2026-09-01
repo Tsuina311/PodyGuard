@@ -16,11 +16,12 @@ describe('match clock', () => {
   });
 
   it('freezes while paused and picks up again on resume', () => {
-    const start = pickFirstPlayer(
+    const drawn = pickFirstPlayer(
       createTracker([{ id: 'a', name: 'Ada' }], 0),
       () => 0,
       0,
     );
+    const start = applyTrackerAction(drawn, { type: 'begin' }, 0);
     expect(formatClock(elapsedMs(start, 30_000))).toBe('0:30');
 
     const paused = applyTrackerAction(start, { type: 'pause' }, 30_000);

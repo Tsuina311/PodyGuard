@@ -143,6 +143,11 @@ type Props = {
   onFinish: (winnerId: string, durationSeconds: number) => Promise<void>;
   /** Leaves the screen without ending or clearing the current game. */
   onQuit: () => void;
+  /**
+   * Event pods requeue after a called game. Local casual play just leaves home —
+   * there was never a queue to return to.
+   */
+  requeueOnFinish?: boolean;
   challengeProgress?: Record<
     string,
     { points: number; completedChallengeIds: string[] }
@@ -525,6 +530,7 @@ export function TrackerView({
   persist = true,
   onFinish,
   onQuit,
+  requeueOnFinish = true,
   challengeProgress = {},
   onChallengeComplete,
   challengePack = OFFICIAL_COMMANDER_CHALLENGES,
@@ -609,7 +615,9 @@ export function TrackerView({
   const [menuOpen, setMenuOpen] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(false);
   const controlsHideTimer = useRef<number | null>(null);
-  const [diceToolsOpen, setDiceToolsOpen] = useState(false);
+  const [diceToolsOpen, setDiceToolsOpen] = useState<
+    false | 'coin' | 'dice'
+  >(false);
   const [challengesOpen, setChallengesOpen] = useState(false);
   const [resultHidden, setResultHidden] = useState(false);
   const [finishing, setFinishing] = useState(false);
@@ -679,11 +687,6 @@ export function TrackerView({
   const winnerIds = new Set(
     winner ? teamForPlayer(state, winner.id).map((player) => player.id) : [],
   );
-  const winnerName = winner
-    ? teamForPlayer(state, winner.id)
-        .map((player) => player.name)
-        .join(' & ')
-    : null;
   const confirmation = detectedConfirmation(state, challengePack);
   const commanderRules = usesCommanderRules(gameMode, rulesFormat);
   const commanderDamageRules = usesCommanderDamage(gameMode, rulesFormat);
@@ -1141,9 +1144,6 @@ export function TrackerView({
               />
             </svg>
             {starOrder.map((playerId, index) => {
-              const player = state.players.find(
-                (row) => row.id === playerId,
-              );
               return (
                 <button
                   key={playerId}
@@ -1172,9 +1172,16 @@ export function TrackerView({
                       : 'border-neon/40 bg-void/95 text-ink',
                   )}
                 >
-                  <SeatLabel
-                    index={playerSeatIndex(state.players, playerId)}
-                    name={player?.name ?? playerId}
+                  <span
+                    className="size-5 shrink-0 rounded-full shadow-[0_0_0_1px_rgba(0,0,0,0.35)]"
+                    style={{
+                      backgroundColor: seatColor(
+                        playerSeatIndex(state.players, playerId),
+                      ),
+                    }}
+                    aria-label={t('tracker.seatN', {
+                      n: playerSeatIndex(state.players, playerId) + 1,
+                    })}
                   />
                 </button>
               );
@@ -1600,7 +1607,7 @@ export function TrackerView({
               >
                 {gameMode === 'treachery' && !firstSeatId
                   ? t('tracker.loadingRoles')
-                  : t('tracker.start')}
+                  : t('tracker.revealStartingPlayer')}
               </Button>
             </>
           }
@@ -1746,16 +1753,7 @@ export function TrackerView({
               />
             ) : null}
 
-              <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-2 px-10 py-0.5">
-                <span className="pointer-events-auto flex min-w-0 flex-1 gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                  <CounterBadges
-                    player={player}
-                    disabled={Boolean(state.winnerId)}
-                    hidePoison={sharedLifeBoard}
-                    hideTax={!commanderRules}
-                    onOpen={() => setCounterPlayerId(player.id)}
-                  />
-                </span>
+              <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-end gap-2 px-9 py-0.5">
                 <span className="pointer-events-auto flex shrink-0 flex-wrap justify-end gap-1">
                   {emperorBoard && !state.emperorIds.includes(player.id) ? (
                     <Badge tone="idle" title={t('tracker.generalRange')}>
@@ -1775,6 +1773,18 @@ export function TrackerView({
                   {winnerIds.has(player.id) ? (
                     <Badge tone="live">{t('tracker.winner')}</Badge>
                   ) : null}
+                </span>
+              </div>
+
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 px-1.5 py-0.5">
+                <span className="pointer-events-auto flex w-full min-w-0 items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  <CounterBadges
+                    player={player}
+                    disabled={Boolean(state.winnerId)}
+                    hidePoison={sharedLifeBoard}
+                    hideTax={!commanderRules}
+                    onOpen={() => setCounterPlayerId(player.id)}
+                  />
                 </span>
               </div>
 
@@ -2013,8 +2023,24 @@ export function TrackerView({
       </div>
       {/*
         The dial sits at the screen centre so every seat can reach it. Odd pods
-        (5+) leave an empty board cell — the dial parks there instead.
+        (5+) leave an empty board cell — the dial parks there instead. Before
+        kickoff it is a Start control: the draw has landed, the clock has not.
       */}
+      {spotlight.kickoffReady ? (
+        <button
+          type="button"
+          aria-label={t('tracker.start')}
+          onClick={() =>
+            send({ type: 'action', action: { type: 'begin' } })
+          }
+          className={cx(
+            'bg-neon text-void hover:bg-neon/90 absolute z-30 flex min-h-16 min-w-28 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full px-6 font-display text-lg font-bold shadow-[0_10px_30px_-8px_var(--color-void)] transition',
+            clockPositionClass(state.players.length),
+          )}
+        >
+          {t('tracker.start')}
+        </button>
+      ) : (
       <button
         type="button"
         title={
@@ -2079,6 +2105,7 @@ export function TrackerView({
           <MoreHorizontal size={12} className="text-muted" aria-hidden />
         )}
       </button>
+      )}
       {schemeOpen && currentScheme ? (
         <div
           role="dialog"
@@ -2261,6 +2288,7 @@ export function TrackerView({
                 seatLayout={seatLayout}
                 archenemyBoard={archenemyBoard}
                 forceRotate={forceRotate}
+                requeueOnFinish={requeueOnFinish}
                 dispatch={(action) => send({ type: 'action', action })}
                 onUndo={() => {
                   send({ type: 'undo' });
@@ -2284,9 +2312,9 @@ export function TrackerView({
                   setMenuOpen(false);
                   setRulesOpen(true);
                 }}
-                onDiceTools={() => {
+                onDiceTools={(tool) => {
                   setMenuOpen(false);
-                  setDiceToolsOpen(true);
+                  setDiceToolsOpen(tool);
                 }}
                 onScheme={
                   archenemyBoard
@@ -2324,7 +2352,11 @@ export function TrackerView({
             <div
               role="dialog"
               aria-modal="true"
-              aria-label={t('tracker.diceTools')}
+              aria-label={
+                diceToolsOpen === 'coin'
+                  ? t('tracker.coins')
+                  : t('tracker.dice')
+              }
               className="bg-void/95 fixed inset-x-0 top-0 z-50 flex h-[100dvh] p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm"
               onClick={(event) => {
                 if (event.target === event.currentTarget) {
@@ -2332,7 +2364,10 @@ export function TrackerView({
                 }
               }}
             >
-              <DiceToolsSheet onClose={() => setDiceToolsOpen(false)} />
+              <DiceToolsSheet
+                focus={diceToolsOpen}
+                onClose={() => setDiceToolsOpen(false)}
+              />
             </div>,
             document.body,
           )
@@ -2386,49 +2421,74 @@ export function TrackerView({
             <div
               role="dialog"
               aria-modal="true"
-              aria-label={t('tracker.whoEliminated', { name: assassinVictim.name })}
+              aria-label={t('tracker.whoEliminatedSeat', {
+                n:
+                  playerSeatIndex(state.players, assassinVictim.id) + 1,
+              })}
               className="bg-void/95 fixed inset-0 z-[75] flex items-center justify-center p-4 backdrop-blur-sm"
             >
-              <section className="border-muted/25 bg-hull w-full max-w-md rounded-2xl border p-5 text-center">
+              <section className="border-muted/25 bg-hull flex h-[min(36rem,90dvh)] w-full max-w-lg flex-col rounded-2xl border p-5 text-center">
                 <Crosshair
                   size={28}
                   aria-hidden
-                  className="text-danger mx-auto mb-2"
+                  className="text-danger mx-auto mb-2 shrink-0"
                 />
-                <h4 className="font-display mb-1 text-lg font-bold">
-                  {t('tracker.whoEliminated', { name: assassinVictim.name })}
+                <h4 className="font-display mb-1 flex shrink-0 items-center justify-center gap-2 text-lg font-bold">
+                  <span>{t('tracker.whoEliminatedPrompt')}</span>
+                  <span
+                    className="size-4 rounded-full shadow-[0_0_0_1px_rgba(0,0,0,0.35)]"
+                    style={{
+                      backgroundColor: seatColor(
+                        playerSeatIndex(state.players, assassinVictim.id),
+                      ),
+                    }}
+                    aria-label={t('tracker.seatN', {
+                      n:
+                        playerSeatIndex(state.players, assassinVictim.id) +
+                        1,
+                    })}
+                  />
+                  <span className="sr-only">
+                    {t('tracker.seatN', {
+                      n:
+                        playerSeatIndex(state.players, assassinVictim.id) +
+                        1,
+                    })}
+                  </span>
                 </h4>
-                <p className="text-muted mb-4 text-sm">
+                <p className="text-muted mb-4 shrink-0 text-sm">
                   {t('tracker.whoEliminatedHint')}
                 </p>
-                <div className="mb-3 grid grid-cols-2 gap-2">
-                  {state.players
-                    .filter(
-                      (player) =>
-                        player.id !== assassinVictim.id && !player.eliminated,
-                    )
-                    .map((player) => (
-                      <Button
-                        key={player.id}
-                        variant="glass"
-                        onClick={() => {
-                          send({
-                            type: 'action',
-                            action: {
-                              type: 'assassinate',
-                              victimId: assassinVictim.id,
-                              killerId: player.id,
-                            },
-                          });
-                          setAssassinVictimId(null);
-                        }}
-                      >
-                        {player.name}
-                      </Button>
-                    ))}
-                </div>
+                <SeatPickBoard
+                  players={state.players}
+                  seatLayout={seatLayout}
+                  archenemyBoard={archenemyBoard}
+                  archenemyId={state.archenemyId}
+                  forceRotate={forceRotate}
+                  selectedIds={new Set([assassinVictim.id])}
+                  disabledIds={
+                    new Set([
+                      assassinVictim.id,
+                      ...state.players
+                        .filter((player) => player.eliminated)
+                        .map((player) => player.id),
+                    ])
+                  }
+                  onSelect={(killerId) => {
+                    send({
+                      type: 'action',
+                      action: {
+                        type: 'assassinate',
+                        victimId: assassinVictim.id,
+                        killerId,
+                      },
+                    });
+                    setAssassinVictimId(null);
+                  }}
+                />
                 <Button
                   variant="ghost"
+                  className="mt-3 shrink-0"
                   onClick={() => {
                     send({
                       type: 'action',
@@ -2576,8 +2636,24 @@ export function TrackerView({
                   aria-hidden
                   className="text-warning fill-warning/30 mx-auto mb-2"
                 />
-                <h2 className="font-display truncate text-lg leading-tight font-bold">
-                  {t('tracker.wins', { name: winnerName })}
+                <div className="mb-2 flex items-center justify-center gap-2">
+                  {teamForPlayer(state, winner.id).map((seat) => (
+                    <span
+                      key={seat.id}
+                      className="size-4 rounded-full shadow-[0_0_0_1px_rgba(0,0,0,0.35)]"
+                      style={{
+                        backgroundColor: seatColor(
+                          playerSeatIndex(state.players, seat.id),
+                        ),
+                      }}
+                      aria-label={t('tracker.seatN', {
+                        n: playerSeatIndex(state.players, seat.id) + 1,
+                      })}
+                    />
+                  ))}
+                </div>
+                <h2 className="font-display text-lg leading-tight font-bold">
+                  {t('tracker.victory')}
                 </h2>
                 <p className="text-muted mb-3 font-mono text-sm tabular-nums">
                   {formatClock(elapsed)}
@@ -2588,14 +2664,23 @@ export function TrackerView({
                 */}
                 {deviceTreachery ? (
                   <ul className="border-muted/20 mb-3 space-y-1 rounded-xl border p-3 text-left text-xs">
-                    {state.players.map((player) => {
+                    {state.players.map((player, index) => {
                       const role = state.treacheryRoles?.[player.id];
                       return role ? (
                         <li
                           key={player.id}
-                          className="flex items-baseline justify-between gap-2"
+                          className="flex items-center justify-between gap-2"
                         >
-                          <span className="truncate">{player.name}</span>
+                          <span className="flex min-w-0 items-center gap-2">
+                            <span
+                              className="size-3 shrink-0 rounded-full shadow-[0_0_0_1px_rgba(0,0,0,0.35)]"
+                              style={{ backgroundColor: seatColor(index) }}
+                              aria-hidden
+                            />
+                            <span className="text-muted truncate">
+                              {t('tracker.seatN', { n: index + 1 })}
+                            </span>
+                          </span>
                           <span className="shrink-0 font-semibold">
                             {t(`modes.treachery.roles.${role}.name`)}
                           </span>
@@ -2684,7 +2769,9 @@ export function TrackerView({
                       ? t('common.submitting')
                       : challengeSaving > 0
                         ? t('tracker.savingChallenges')
-                        : t('tracker.doneRequeue')}
+                        : requeueOnFinish
+                          ? t('tracker.doneRequeue')
+                          : t('tracker.leave')}
                   </Button>
                   {past.length > 0 ? (
                     <Button
@@ -2759,15 +2846,18 @@ const SPOTLIGHT_FLASH_MS = 450;
  * Runs the draw for the starting seat and holds the result.
  *
  * The spotlight sweeps the board, strobes on the seat the engine drew, then
- * holds until the pod touches the screen (or any accepted action lands). The
- * first tap means the table has read it and the board has better uses for the
- * light. `moves` is the history depth, which is the cheapest signal that
- * something on the board actually changed.
+ * holds until the table taps Start (which begins the clock). Restored games
+ * skip the spin. `moves` retires the glow only after the match has begun.
  */
 function useFirstPlayerSpotlight(
   state: TrackerState,
   moves: number,
-): { playerId: string | null; phase: 'sweep' | 'flash' | 'hold' } {
+): {
+  playerId: string | null;
+  phase: 'sweep' | 'flash' | 'hold';
+  /** True once the opening draw is ready for the Start button. */
+  kickoffReady: boolean;
+} {
   const [plan, setPlan] = useState<RevealHop[] | null>(null);
   const [hop, setHop] = useState(0);
   const [held, setHeld] = useState(false);
@@ -2833,37 +2923,40 @@ function useFirstPlayerSpotlight(
     return () => window.clearTimeout(timer);
   }, [landed]);
 
-  // Any accepted action retires the spotlight, mid-spin included.
+  // Kickoff clears the spotlight; later board moves do the same once the clock
+  // is running. Before Start, life taps must not steal the opening glow.
   useEffect(() => {
-    if (plan && moves !== movesAtDraw.current) {
-      setPlan(null);
-    }
-  }, [moves, plan]);
-
-  // A bare touch or key also clears it — the table has seen the result.
-  useEffect(() => {
-    if (!plan) {
+    if (state.startedAt == null || !plan) {
       return;
     }
-    const dismiss = () => setPlan(null);
-    window.addEventListener('pointerdown', dismiss, true);
-    window.addEventListener('keydown', dismiss, true);
-    return () => {
-      window.removeEventListener('pointerdown', dismiss, true);
-      window.removeEventListener('keydown', dismiss, true);
-    };
-  }, [plan]);
+    setPlan(null);
+  }, [state.startedAt, plan]);
+
+  useEffect(() => {
+    if (state.startedAt == null || !plan) {
+      return;
+    }
+    if (moves !== movesAtDraw.current) {
+      setPlan(null);
+    }
+  }, [moves, plan, state.startedAt]);
+
+  const kickoffReady =
+    Boolean(state.firstPlayerId) &&
+    state.startedAt == null &&
+    (held || (drawn.current && plan === null));
 
   return {
     playerId: plan?.[hop]?.playerId ?? null,
     phase: landed ? (held ? 'hold' : 'flash') : 'sweep',
+    kickoffReady,
   };
 }
 
 /** Ticks only while the clock is actually running, so a pause costs nothing. */
 function useMatchClock(state: TrackerState): number {
   const [now, setNow] = useState(() => Date.now());
-  const running = Boolean(state.firstPlayerId) && !state.pausedAt;
+  const running = Boolean(state.startedAt) && !state.pausedAt;
   useEffect(() => {
     if (!running) {
       return;
@@ -2891,6 +2984,7 @@ function MatchMenu({
   seatLayout,
   archenemyBoard,
   forceRotate,
+  requeueOnFinish,
   dispatch,
   onUndo,
   onFinish,
@@ -2910,6 +3004,7 @@ function MatchMenu({
   seatLayout: 'default' | 'star';
   archenemyBoard: boolean;
   forceRotate: boolean;
+  requeueOnFinish: boolean;
   dispatch: (action: TrackerAction) => void;
   onUndo: () => void;
   onFinish: () => Promise<void>;
@@ -2917,7 +3012,7 @@ function MatchMenu({
   onCheckRole?: () => void;
   onChallenges?: () => void;
   onRules: () => void;
-  onDiceTools: () => void;
+  onDiceTools: (tool: 'coin' | 'dice') => void;
   onScheme?: () => void;
   onTargets?: () => void;
   onPlayerLost?: (playerId: string) => void;
@@ -2926,122 +3021,174 @@ function MatchMenu({
   const { t } = useTranslation();
   const { openFeedback } = useFeedback();
   const [arrangeSeats, setArrangeSeats] = useState(false);
+  const [pickLoser, setPickLoser] = useState(false);
+  const [pickWinner, setPickWinner] = useState(false);
   const [selectedSeatId, setSelectedSeatId] = useState<string | null>(null);
+  const [confirmLoserId, setConfirmLoserId] = useState<string | null>(null);
+  const [confirmWinnerId, setConfirmWinnerId] = useState<string | null>(null);
   const paused = Boolean(state.pausedAt);
   const decided = Boolean(state.winnerId);
   const winner = state.players.find((row) => row.id === state.winnerId) ?? null;
   const menuWinnerTeam = winner ? teamForPlayer(state, winner.id) : [];
-  const menuWinnerIds = new Set(menuWinnerTeam.map((player) => player.id));
-  const menuWinnerName = menuWinnerTeam.map((player) => player.name).join(' & ');
 
-  if (arrangeSeats) {
+  function closeSeatPick() {
+    setArrangeSeats(false);
+    setPickLoser(false);
+    setPickWinner(false);
+    setSelectedSeatId(null);
+    setConfirmLoserId(null);
+    setConfirmWinnerId(null);
+  }
+
+  if (arrangeSeats || pickLoser || pickWinner) {
+    const title = arrangeSeats
+      ? t('tracker.rearrangeSeats')
+      : pickLoser
+        ? t('tracker.playerLost')
+        : t('tracker.gameWonBy');
+    const hint = arrangeSeats
+      ? t('tracker.rearrangeSeatsHint')
+      : pickLoser
+        ? t('tracker.pickLoserHint')
+        : t('tracker.pickWinnerHint');
+    const disabledIds = new Set(
+      state.players
+        .filter((seat) => seat.eliminated)
+        .map((seat) => seat.id),
+    );
+    const confirmId = confirmLoserId ?? confirmWinnerId;
+    const confirmingLoss = Boolean(confirmLoserId);
+    const confirmSeat = confirmId
+      ? state.players.find((seat) => seat.id === confirmId)
+      : null;
+    const confirmSeatIndex = confirmId
+      ? playerSeatIndex(state.players, confirmId)
+      : 0;
     return (
-      <section className="flex h-full w-full flex-col">
+      <section className="relative flex h-full w-full flex-col">
         <header className="mb-1 flex shrink-0 items-center justify-between gap-3">
           <h4 className="font-display truncate text-sm leading-tight font-bold">
-            {t('tracker.rearrangeSeats')}
+            {title}
           </h4>
           <button
             type="button"
             aria-label={t('common.close')}
-            onClick={() => {
-              setArrangeSeats(false);
-              setSelectedSeatId(null);
-            }}
+            onClick={onClose}
             className="border-muted/25 text-muted hover:text-ink hover:border-muted/50 flex size-8 shrink-0 items-center justify-center rounded-full border transition"
           >
             <X size={18} aria-hidden />
           </button>
         </header>
-        <p className="text-muted mb-2 shrink-0 text-center text-xs">
-          {t('tracker.rearrangeSeatsHint')}
-        </p>
-        <div
-          className={cx(
-            'relative grid min-h-0 flex-1 auto-rows-fr gap-2',
-            forceRotate && 'board-landscape',
-            archenemyBoard
-              ? 'grid-cols-1 landscape:grid-cols-3'
-              : seatGridClass(state.players.length),
-          )}
-        >
-          {state.players.map((seat, index) => {
-            const color = seatColor(index);
-            const selected = selectedSeatId === seat.id;
-            const facesAway = seatFacesAway(
-              state.players.length,
-              index,
-              seatLayout,
-              {
-                archenemy: archenemyBoard,
-                archenemyId: state.archenemyId,
-                playerId: seat.id,
-              },
-            );
-            return (
-              <button
-                key={seat.id}
-                type="button"
+        <p className="text-muted mb-2 shrink-0 text-center text-xs">{hint}</p>
+        <SeatPickBoard
+          players={state.players}
+          seatLayout={seatLayout}
+          archenemyBoard={archenemyBoard}
+          archenemyId={state.archenemyId}
+          forceRotate={forceRotate}
+          selectedIds={
+            new Set(
+              [
+                arrangeSeats ? selectedSeatId : null,
+                confirmId,
+              ].filter(Boolean) as string[],
+            )
+          }
+          disabledIds={
+            arrangeSeats ? undefined : disabledIds
+          }
+          onSelect={(seatId) => {
+            if (arrangeSeats) {
+              if (!selectedSeatId) {
+                setSelectedSeatId(seatId);
+                return;
+              }
+              if (selectedSeatId === seatId) {
+                setSelectedSeatId(null);
+                return;
+              }
+              const order = swapStarSeats(
+                state.players.map((player) => player.id),
+                selectedSeatId,
+                seatId,
+              );
+              dispatch({ type: 'reorderPlayers', order });
+              setSelectedSeatId(null);
+              return;
+            }
+            if (pickLoser) {
+              setConfirmLoserId(seatId);
+              return;
+            }
+            setConfirmWinnerId(seatId);
+          }}
+        />
+        {confirmSeat ? (
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={
+              confirmingLoss
+                ? t('tracker.confirmPlayerLost')
+                : t('tracker.confirmPlayerWon')
+            }
+            className="bg-void/90 absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 rounded-xl p-4 text-center backdrop-blur-sm"
+          >
+            <span
+              className="size-8 rounded-full shadow-[0_0_0_1px_rgba(0,0,0,0.35)]"
+              style={{ backgroundColor: seatColor(confirmSeatIndex) }}
+              aria-label={t('tracker.seatN', { n: confirmSeatIndex + 1 })}
+            />
+            <p className="font-display text-base font-semibold">
+              {confirmingLoss
+                ? t('tracker.confirmPlayerLost')
+                : t('tracker.confirmPlayerWon')}
+            </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              <Button
+                size="sm"
+                variant="primary"
                 onClick={() => {
-                  if (!selectedSeatId) {
-                    setSelectedSeatId(seat.id);
+                  const seatId = confirmSeat.id;
+                  if (confirmingLoss) {
+                    closeSeatPick();
+                    if (onPlayerLost) {
+                      onPlayerLost(seatId);
+                    } else {
+                      dispatch({ type: 'eliminate', playerId: seatId });
+                    }
                     return;
                   }
-                  if (selectedSeatId === seat.id) {
-                    setSelectedSeatId(null);
-                    return;
-                  }
-                  const order = swapStarSeats(
-                    state.players.map((player) => player.id),
-                    selectedSeatId,
-                    seat.id,
-                  );
-                  dispatch({ type: 'reorderPlayers', order });
-                  setSelectedSeatId(null);
-                }}
-                className={cx(
-                  'relative flex min-h-0 flex-col items-center justify-center overflow-hidden rounded-xl border p-2 transition',
-                  archenemyBoard &&
-                    seat.id === state.archenemyId &&
-                    'landscape:col-span-3',
-                  seatPlacementClass(state.players.length, index, seatLayout),
-                  selected
-                    ? 'border-warning bg-warning/20 ring-warning/40 ring-2'
-                    : 'border-muted/25 hover:border-muted/50',
-                )}
-                style={{
-                  backgroundColor: selected ? undefined : `${color}28`,
-                  boxShadow: selected
-                    ? undefined
-                    : `inset 0 0 0 1px ${color}66`,
+                  dispatch({ type: 'winner', playerId: seatId });
+                  closeSeatPick();
                 }}
               >
-                <span
-                  className={cx(
-                    'flex max-w-full flex-col items-center gap-1.5',
-                    facesAway && 'landscape:rotate-180',
-                  )}
-                >
-                  <span
-                    className="size-3.5 shrink-0 rounded-full shadow-[0_0_0_1px_rgba(0,0,0,0.35)]"
-                    style={{ backgroundColor: color }}
-                    aria-hidden
-                  />
-                  <span className="font-display truncate text-sm font-bold">
-                    {seat.name}
-                  </span>
-                </span>
-              </button>
-            );
-          })}
-        </div>
+                {confirmingLoss
+                  ? t('tracker.yesTheyLost')
+                  : t('tracker.yesTheyWon')}
+              </Button>
+              <Button
+                size="sm"
+                variant="glass"
+                onClick={() => {
+                  setConfirmLoserId(null);
+                  setConfirmWinnerId(null);
+                }}
+              >
+                {confirmingLoss
+                  ? t('tracker.noStillIn')
+                  : t('tracker.noNotWinner')}
+              </Button>
+            </div>
+          </div>
+        ) : null}
       </section>
     );
   }
 
   return (
     <section className="flex h-full w-full flex-col">
-      <header className="mb-1 flex shrink-0 items-center justify-between gap-3">
+      <header className="mb-2 flex shrink-0 items-center justify-between gap-3">
         <h4 className="font-display truncate text-sm leading-tight font-bold">
           {t('tracker.match')}
         </h4>
@@ -3058,25 +3205,97 @@ function MatchMenu({
           </button>
         </div>
       </header>
-      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 overflow-y-auto">
-        <p
-          className={cx(
-            'font-display text-[clamp(2rem,13vh,4rem)] leading-none font-bold tabular-nums',
-            paused ? 'text-warning' : 'text-neon',
-          )}
-        >
-          {formatClock(elapsed)}
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          {/*
-            The Archenemy turns a scheme every turn, which makes this the most
-            used control of that mode. It leads the menu rather than floating
-            over the board, because the seats own every pixel out there.
-          */}
+      <div className="grid min-h-0 flex-1 grid-cols-2 grid-rows-2 gap-2">
+        {/* Top left: dice, coins, day/night */}
+        <MatchMenuPane title={t('tracker.menuTable')} dense>
+          <div className="grid w-full grid-cols-2 gap-1.5">
+            <Button
+              size="sm"
+              variant="glass"
+              className="h-9 w-full justify-start px-2.5"
+              onClick={() => onDiceTools('dice')}
+            >
+              <Dices size={14} aria-hidden />
+              {t('tracker.dice')}
+            </Button>
+            <Button
+              size="sm"
+              variant="glass"
+              className="h-9 w-full justify-start px-2.5"
+              onClick={() => onDiceTools('coin')}
+            >
+              <Coins size={14} aria-hidden />
+              {t('tracker.coins')}
+            </Button>
+            <Button
+              size="sm"
+              variant={state.dayNight === 'day' ? 'neon' : 'glass'}
+              className="h-9 w-full justify-start px-2.5"
+              disabled={decided}
+              onClick={() => {
+                dispatch({ type: 'dayNight', value: 'day' });
+              }}
+            >
+              <Sun size={14} aria-hidden />
+              {t('tracker.dayButton')}
+            </Button>
+            <Button
+              size="sm"
+              variant={state.dayNight === 'night' ? 'neon' : 'glass'}
+              className="h-9 w-full justify-start px-2.5"
+              disabled={decided}
+              onClick={() => {
+                dispatch({ type: 'dayNight', value: 'night' });
+              }}
+            >
+              <Moon size={14} aria-hidden />
+              {t('tracker.nightButton')}
+            </Button>
+          </div>
+        </MatchMenuPane>
+
+        {/* Top right: clock + rearrange */}
+        <MatchMenuPane title={t('tracker.menuTime')} dense>
+          <p
+            className={cx(
+              'font-display text-center text-[clamp(1.5rem,7vh,2.75rem)] leading-none font-bold tabular-nums',
+              paused ? 'text-warning' : 'text-neon',
+            )}
+          >
+            {formatClock(elapsed)}
+          </p>
+          <div className="grid w-full grid-cols-2 gap-1.5">
+            <Button
+              size="sm"
+              variant={paused ? 'neon' : 'glass'}
+              className="h-9 w-full"
+              onClick={() => {
+                dispatch({ type: 'pause' });
+              }}
+            >
+              {paused ? (
+                <Play size={14} aria-hidden />
+              ) : (
+                <Pause size={14} aria-hidden />
+              )}
+              {paused ? t('tracker.resume') : t('tracker.pause')}
+            </Button>
+            <Button
+              size="sm"
+              variant="glass"
+              className="h-9 w-full"
+              disabled={!canUndo}
+              onClick={onUndo}
+            >
+              <Undo2 size={14} aria-hidden />
+              {t('tracker.undo')}
+            </Button>
+          </div>
           {onScheme ? (
             <Button
               size="sm"
               variant="neon"
+              className="h-9 w-full justify-start"
               disabled={decided || state.schemeOrder.length === 0}
               onClick={onScheme}
             >
@@ -3088,186 +3307,205 @@ function MatchMenu({
           ) : null}
           <Button
             size="sm"
-            variant={paused ? 'neon' : 'glass'}
-            onClick={() => {
-              dispatch({ type: 'pause' });
-            }}
-          >
-            {paused ? (
-              <Play size={14} aria-hidden />
-            ) : (
-              <Pause size={14} aria-hidden />
-            )}
-            {paused ? t('tracker.resume') : t('tracker.pause')}
-          </Button>
-          <Button size="sm" variant="glass" disabled={!canUndo} onClick={onUndo}>
-            <Undo2 size={14} aria-hidden />
-            {t('tracker.undo')}
-          </Button>
-          <Button
-            size="sm"
             variant="glass"
+            className="h-9 w-full justify-start"
             disabled={decided || state.players.length < 2}
             onClick={() => {
               setSelectedSeatId(null);
+              setConfirmLoserId(null);
+              setConfirmWinnerId(null);
+              setPickLoser(false);
+              setPickWinner(false);
               setArrangeSeats(true);
             }}
           >
             <ArrowUpDown size={14} aria-hidden />
             {t('tracker.rearrangeSeats')}
           </Button>
-          {onChallenges ? (
-            <Button size="sm" variant="glass" onClick={onChallenges}>
-              <Sparkles size={14} aria-hidden />
-              {t('tracker.challenges')}
-            </Button>
-          ) : null}
-          <Button size="sm" variant="glass" onClick={onRules}>
-            <BookOpen size={14} aria-hidden />
-            {t('tracker.readRules')}
-          </Button>
-          <Button size="sm" variant="glass" onClick={onDiceTools}>
-            <Dices size={14} aria-hidden />
-            {t('tracker.diceTools')}
-          </Button>
+        </MatchMenuPane>
+
+        {/* Bottom left: result */}
+        <MatchMenuPane title={t('tracker.menuOutcome')}>
           <Button
-            size="sm"
+            size="md"
             variant="glass"
-            onClick={() =>
-              openFeedback({
-                participantStatus: 'playing',
-                gameMode: state.gameMode,
-              })
-            }
-          >
-            <MessageSquare size={14} aria-hidden />
-            {t('feedback.open')}
-          </Button>
-          {onTargets ? (
-            <Button size="sm" variant="glass" onClick={onTargets}>
-              <Crosshair size={14} aria-hidden />
-              {t('tracker.checkTarget')}
-            </Button>
-          ) : null}
-          {onCheckRole ? (
-            <Button
-              size="sm"
-              variant="glass"
-              onClick={() => {
-                onClose();
-                onCheckRole();
-              }}
-            >
-              <Eye size={14} aria-hidden />
-              {t('tracker.checkMyRole')}
-            </Button>
-          ) : null}
-          {/*
-            Day and night exist only once a card has set them, and no card ever
-            takes the table back to neither, so this is a two-way switch.
-          */}
-          <Button
-            size="sm"
-            variant={state.dayNight === 'day' ? 'neon' : 'glass'}
+            className="h-11 w-full justify-start"
             disabled={decided}
             onClick={() => {
-              dispatch({ type: 'dayNight', value: 'day' });
+              setSelectedSeatId(null);
+              setConfirmLoserId(null);
+              setConfirmWinnerId(null);
+              setPickWinner(false);
+              setArrangeSeats(false);
+              setPickLoser(true);
             }}
           >
-            <Sun size={14} aria-hidden />
-            {t('tracker.dayButton')}
-          </Button>
-          <Button
-            size="sm"
-            variant={state.dayNight === 'night' ? 'neon' : 'glass'}
-            disabled={decided}
-            onClick={() => {
-              dispatch({ type: 'dayNight', value: 'night' });
-            }}
-          >
-            <Moon size={14} aria-hidden />
-            {t('tracker.nightButton')}
-          </Button>
-        </div>
-        {/*
-          Life, poison, commander damage and Etrata hits raise a prompt on the
-          card. Everything else that ends a seat — a mill-out, a concession, a
-          card that says "you lose" — has to be named from here, because the
-          board has no way to see it.
-        */}
-        <div className="flex flex-wrap items-center justify-center gap-2 border-t border-muted/15 pt-3">
-          <span className="text-muted font-mono text-[0.68rem] tracking-wide uppercase">
+            <UserX size={16} aria-hidden />
             {t('tracker.playerLost')}
-          </span>
-          {state.players.map((seat) => (
+          </Button>
+          <Button
+            size="md"
+            variant={decided ? 'neon' : 'glass'}
+            className="h-11 w-full justify-start"
+            disabled={decided}
+            onClick={() => {
+              setSelectedSeatId(null);
+              setConfirmLoserId(null);
+              setConfirmWinnerId(null);
+              setPickLoser(false);
+              setArrangeSeats(false);
+              setPickWinner(true);
+            }}
+          >
+            <Trophy size={16} aria-hidden />
+            {t('tracker.gameWonBy')}
+          </Button>
+          {decided ? (
+            <div className="flex w-full flex-col items-stretch gap-2 pt-1">
+              <span className="flex items-center justify-center gap-1.5">
+                {menuWinnerTeam.map((seat) => (
+                  <span
+                    key={seat.id}
+                    className="size-3.5 rounded-full shadow-[0_0_0_1px_rgba(0,0,0,0.35)]"
+                    style={{
+                      backgroundColor: seatColor(
+                        playerSeatIndex(state.players, seat.id),
+                      ),
+                    }}
+                    aria-label={t('tracker.seatN', {
+                      n: playerSeatIndex(state.players, seat.id) + 1,
+                    })}
+                  />
+                ))}
+                <span className="text-muted font-mono text-[0.68rem] tracking-wide uppercase">
+                  {t('tracker.victory')}
+                </span>
+              </span>
+              <Button
+                size="md"
+                variant="neon"
+                className="h-11 w-full"
+                onClick={() => void onFinish()}
+              >
+                {requeueOnFinish
+                  ? t('tracker.doneRequeue')
+                  : t('tracker.leave')}
+              </Button>
+            </div>
+          ) : null}
+        </MatchMenuPane>
+
+        {/* Bottom right: help + quit */}
+        <MatchMenuPane title={t('tracker.menuSupport')} dense>
+          <div className="grid w-full grid-cols-2 gap-1.5">
             <Button
-              key={seat.id}
               size="sm"
               variant="glass"
-              disabled={decided || seat.eliminated}
-              onClick={() => {
-                if (onPlayerLost) {
-                  onPlayerLost(seat.id);
-                } else {
-                  dispatch({ type: 'eliminate', playerId: seat.id });
-                }
-              }}
+              className="h-9 w-full justify-start px-2.5"
+              onClick={onRules}
             >
-              <UserX size={14} aria-hidden />
-              {seat.name}
+              <BookOpen size={14} aria-hidden />
+              {t('tracker.readRules')}
             </Button>
-          ))}
-        </div>
-        {/*
-          A pod usually ends by concession rather than by the last blow, and the
-          board can only name a winner on its own once every other seat is out.
-          Calling it freezes the clock and the board, which undo can lift.
-        */}
-        <div className="flex flex-wrap items-center justify-center gap-2 border-t border-muted/15 pt-3">
-          <span className="text-muted font-mono text-[0.68rem] tracking-wide uppercase">
-            {menuWinnerName
-              ? t('tracker.won', { name: menuWinnerName })
-              : t('tracker.gameWonBy')}
-          </span>
-          {state.players.map((seat) => (
-            <Button
-              key={seat.id}
-              size="sm"
-              variant={menuWinnerIds.has(seat.id) ? 'neon' : 'glass'}
-              disabled={decided || seat.eliminated}
-              onClick={() => {
-                dispatch({ type: 'winner', playerId: seat.id });
-              }}
-            >
-              <Trophy size={14} aria-hidden />
-              {seat.name}
-            </Button>
-          ))}
-          {/* The way out, for a pod that dismissed the result to read the board. */}
-          {decided ? (
             <Button
               size="sm"
-              variant="neon"
-              onClick={() => void onFinish()}
+              variant="glass"
+              className="h-9 w-full justify-start px-2.5"
+              onClick={() =>
+                openFeedback({
+                  participantStatus: 'playing',
+                  gameMode: state.gameMode,
+                })
+              }
             >
-              {t('tracker.doneRequeue')}
+              <MessageSquare size={14} aria-hidden />
+              {t('feedback.open')}
             </Button>
-          ) : null}
-        </div>
-        {/*
-          Leaving is the one control here that abandons the screen rather than
-          changing the board, so it sits apart from the table controls and wears
-          the danger colour. The game itself survives, which the note says.
-        */}
-        <div className="border-danger/25 flex w-full flex-col items-center gap-1.5 border-t pt-3">
-          <Button size="sm" variant="danger" onClick={onQuit}>
-            <LogOut size={14} aria-hidden />
-            {t('tracker.quitToHome')}
-          </Button>
-          <p className="text-muted text-center text-[0.65rem]">
-            {t('tracker.quitHint')}
-          </p>
-        </div>
+            {onChallenges ? (
+              <Button
+                size="sm"
+                variant="glass"
+                className="h-9 w-full justify-start px-2.5"
+                onClick={onChallenges}
+              >
+                <Sparkles size={14} aria-hidden />
+                {t('tracker.challenges')}
+              </Button>
+            ) : null}
+            {onTargets ? (
+              <Button
+                size="sm"
+                variant="glass"
+                className="h-9 w-full justify-start px-2.5"
+                onClick={onTargets}
+              >
+                <Crosshair size={14} aria-hidden />
+                {t('tracker.checkTarget')}
+              </Button>
+            ) : null}
+            {onCheckRole ? (
+              <Button
+                size="sm"
+                variant="glass"
+                className="h-9 w-full justify-start px-2.5"
+                onClick={() => {
+                  onClose();
+                  onCheckRole();
+                }}
+              >
+                <Eye size={14} aria-hidden />
+                {t('tracker.checkMyRole')}
+              </Button>
+            ) : null}
+            <Button
+              size="sm"
+              variant="danger"
+              className="h-9 w-full justify-start px-2.5"
+              title={t('tracker.quitHint')}
+              onClick={onQuit}
+            >
+              <LogOut size={14} aria-hidden />
+              {t('tracker.quitToHome')}
+            </Button>
+          </div>
+        </MatchMenuPane>
+      </div>
+    </section>
+  );
+}
+
+/** One quadrant of the match menu: labelled pane with a consistent action stack. */
+function MatchMenuPane({
+  title,
+  footer = false,
+  dense = false,
+  children,
+}: {
+  title: string;
+  /** Pin trailing content (e.g. quit) to the bottom of the pane. */
+  footer?: boolean;
+  /** Tighter padding/gaps for denser panes (Time, Support). */
+  dense?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <section
+      className={cx(
+        'border-muted/20 bg-hull/40 flex min-h-0 flex-col overflow-hidden rounded-2xl border backdrop-blur-sm',
+        dense ? 'gap-1.5 p-2.5' : 'gap-2 p-3',
+      )}
+    >
+      <h5 className="text-muted shrink-0 font-mono text-[0.65rem] font-semibold tracking-[0.18em] uppercase">
+        {title}
+      </h5>
+      <div
+        className={cx(
+          'flex min-h-0 flex-1 flex-col overflow-hidden',
+          dense ? 'gap-1.5' : 'gap-2',
+          footer ? 'justify-between' : 'justify-center',
+        )}
+      >
+        {children}
       </div>
     </section>
   );
@@ -3295,6 +3533,93 @@ function SeatLabel({
   );
 }
 
+/**
+ * Life-tracker seat grid for picking by place — commander art + life total,
+ * whole card is the only control (no +/- or chrome).
+ */
+function SeatPickBoard({
+  players,
+  seatLayout,
+  archenemyBoard,
+  archenemyId,
+  forceRotate,
+  selectedIds,
+  disabledIds,
+  onSelect,
+}: {
+  players: TrackerPlayer[];
+  seatLayout: 'default' | 'star';
+  archenemyBoard: boolean;
+  archenemyId?: string | null;
+  forceRotate: boolean;
+  selectedIds?: ReadonlySet<string>;
+  disabledIds?: ReadonlySet<string>;
+  onSelect: (playerId: string) => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <div
+      className={cx(
+        'relative grid min-h-0 flex-1 auto-rows-fr gap-2',
+        forceRotate && 'board-landscape',
+        archenemyBoard
+          ? 'grid-cols-1 landscape:grid-cols-3'
+          : seatGridClass(players.length),
+      )}
+    >
+      {players.map((seat, index) => {
+        const color = seatColor(index);
+        const selected = selectedIds?.has(seat.id) ?? false;
+        const disabled = disabledIds?.has(seat.id) ?? false;
+        const facesAway = seatFacesAway(players.length, index, seatLayout, {
+          archenemy: archenemyBoard,
+          archenemyId,
+          playerId: seat.id,
+        });
+        return (
+          <button
+            key={seat.id}
+            type="button"
+            disabled={disabled}
+            aria-label={t('tracker.seatN', { n: index + 1 })}
+            aria-pressed={selected}
+            onClick={() => onSelect(seat.id)}
+            className={cx(
+              'relative flex h-full min-h-0 flex-col overflow-hidden rounded-xl border p-2 transition disabled:opacity-40',
+              seat.eliminated ? 'opacity-50' : 'bg-ink/[0.03]',
+              archenemyBoard &&
+                seat.id === archenemyId &&
+                'landscape:col-span-3',
+              seatPlacementClass(players.length, index, seatLayout),
+              selected
+                ? 'border-warning ring-warning/50 ring-2'
+                : 'border-muted/20 hover:border-muted/50',
+            )}
+          >
+            <span
+              className={cx(
+                'absolute inset-0',
+                facesAway && 'landscape:rotate-180',
+              )}
+            >
+              <CommanderArt
+                commanders={seat.commanders}
+                eliminated={seat.eliminated}
+              />
+              <LifeRow
+                life={seat.life}
+                flash={null}
+                color={color}
+                interactive={false}
+              />
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function playerSeatIndex(
   players: Array<{ id: string }>,
   playerId: string,
@@ -3307,21 +3632,24 @@ function LifeRow({
   life,
   flash,
   flashFading = false,
-  disabled,
+  disabled = false,
   onStep,
   onEnter,
   compact = false,
+  interactive = true,
   color,
   colors,
 }: {
   life: number;
   flash: number | null;
   flashFading?: boolean;
-  disabled: boolean;
-  onStep: (delta: number) => void;
-  onEnter: (sign: 1 | -1) => void;
+  disabled?: boolean;
+  onStep?: (delta: number) => void;
+  onEnter?: (sign: 1 | -1) => void;
   /** Shared-life chrome: no spare vertical padding around the total. */
   compact?: boolean;
+  /** When false, only the life total is shown (seat pickers). */
+  interactive?: boolean;
   /** Seat colour for a single life total. */
   color?: string;
   /** Shared-life sides: blend every teammate’s colour across the total. */
@@ -3358,20 +3686,24 @@ function LifeRow({
         compact && 'relative inset-auto h-full w-full',
       )}
     >
-      <LifeButton
-        delta={1}
-        disabled={disabled}
-        className="h-1/2 min-h-0 w-full shrink-0 items-start pt-3"
-        onClick={() => onStep(1)}
-        onLongPress={() => onEnter(1)}
-      />
-      <LifeButton
-        delta={-1}
-        disabled={disabled}
-        className="h-1/2 min-h-0 w-full shrink-0 items-end pb-3"
-        onClick={() => onStep(-1)}
-        onLongPress={() => onEnter(-1)}
-      />
+      {interactive ? (
+        <>
+          <LifeButton
+            delta={1}
+            disabled={disabled}
+            className="h-1/2 min-h-0 w-full shrink-0 items-start pt-3"
+            onClick={() => onStep?.(1)}
+            onLongPress={() => onEnter?.(1)}
+          />
+          <LifeButton
+            delta={-1}
+            disabled={disabled}
+            className="h-1/2 min-h-0 w-full shrink-0 items-end pb-3"
+            onClick={() => onStep?.(-1)}
+            onLongPress={() => onEnter?.(-1)}
+          />
+        </>
+      ) : null}
       <div className="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center">
         <div className="relative flex flex-col items-center">
           <p
