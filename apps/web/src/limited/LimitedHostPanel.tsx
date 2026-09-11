@@ -78,8 +78,9 @@ export function LimitedHostPanel({
                 </Badge>
               </div>
               <p className="text-muted mb-3 text-xs">
-                {config.matchStructure} · {config.totalRounds === 'AUTO' ? 'Auto' : config.totalRounds} rounds ·{' '}
-                {podSize} players
+                {config.matchStructure} ·{' '}
+                {config.totalRounds === 'AUTO' ? 'Auto' : config.totalRounds}{' '}
+                rounds · {podSize} players · Swiss 1v1
               </p>
               {config.mode !== 'SEALED' ? (
                 <fieldset className="mb-3">

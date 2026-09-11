@@ -9,7 +9,6 @@ import {
   type AssassinPodSize,
   type GameMode,
   type LimitedEventModeConfig,
-  type LimitedMode,
   type RulesFormat,
   type SeriesLength,
   type TournamentFormat,
@@ -38,7 +37,13 @@ import { Panel } from './ui/Panel';
 import { QrScannerDialog } from './ui/QrScannerDialog';
 import { ThemeToggleCorner } from './ui/ThemeToggle';
 import { cx } from './ui/cx';
-import { LIMITED_MODE_LABELS } from './limited/limited-view';
+import {
+  LimitedFormatTiles,
+  LimitedTimingControls,
+  focusedHostLimitedConfig,
+  patchHostLimitedConfig,
+  selectExclusiveHostLimitedMode,
+} from './limited/LimitedFormatPicker';
 import {
   createLocalLimitedSession,
   defaultLocalLimitedConfig,
@@ -55,7 +60,8 @@ type FormatTab = 'constructed' | 'limited';
 function disabledLimitedConfigs(): LimitedEventModeConfig[] {
   return LIMITED_MODES.map((mode) => ({
     ...defaultLimitedEventModeConfig(mode),
-    enabled: false,
+    // Match play-mode defaults: one format selected (Booster Draft).
+    enabled: mode === 'BOOSTER_DRAFT',
   }));
 }
 
@@ -496,115 +502,20 @@ export function HomePage() {
             <legend className="text-muted mb-2 text-sm">
               {t('home.limitedFormat')}
             </legend>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-              {LIMITED_MODES.map((mode) => (
-                <label
-                  key={mode}
-                  className={cx(
-                    'cursor-pointer rounded-xl border p-2.5 text-center text-sm font-semibold transition',
-                    playLimited.mode === mode
-                      ? 'border-neon bg-neon/10 text-neon'
-                      : 'border-muted/20 text-muted hover:border-muted/40',
-                  )}
-                >
-                  <input
-                    type="radio"
-                    name="playLimitedMode"
-                    value={mode}
-                    checked={playLimited.mode === mode}
-                    onChange={() => updatePlayLimited({ mode })}
-                    className="sr-only"
-                  />
-                  {LIMITED_MODE_LABELS[mode]}
-                </label>
-              ))}
-            </div>
+            <LimitedFormatTiles
+              name="playLimitedMode"
+              modes={LIMITED_MODES}
+              selected={playLimited.mode}
+              onSelect={(mode) => updatePlayLimited({ mode })}
+            />
           </fieldset>
           <p className="text-muted mb-4 text-xs">
-            {t('home.alwaysPlayers', { count: playLimited.playerCount })}
+            {t('home.limitedCohortHint', { count: playLimited.playerCount })}
           </p>
-          <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <label className="text-muted text-xs">
-              {t('home.limitedMatch')}
-              <select
-                className="mt-1 w-full rounded-lg border border-muted/20 bg-hull p-2 text-ink"
-                value={playLimited.matchStructure}
-                onChange={(event) =>
-                  updatePlayLimited({
-                    matchStructure: event.target.value as 'BO1' | 'BO3',
-                  })
-                }
-              >
-                <option value="BO1">BO1</option>
-                <option value="BO3">BO3</option>
-              </select>
-            </label>
-            <label className="text-muted text-xs">
-              {t('home.limitedRounds')}
-              <input
-                className="mt-1 w-full rounded-lg border border-muted/20 bg-hull p-2 text-ink"
-                type="number"
-                min={1}
-                value={
-                  playLimited.totalRounds === 'AUTO'
-                    ? ''
-                    : playLimited.totalRounds
-                }
-                placeholder={t('home.limitedRoundsAuto')}
-                onChange={(event) =>
-                  updatePlayLimited({
-                    totalRounds: event.target.value
-                      ? Number(event.target.value)
-                      : 'AUTO',
-                  })
-                }
-              />
-            </label>
-            <label className="text-muted text-xs">
-              {t('home.limitedRoundMinutes')}
-              <input
-                className="mt-1 w-full rounded-lg border border-muted/20 bg-hull p-2 text-ink"
-                type="number"
-                min={1}
-                value={playLimited.roundMinutes}
-                onChange={(event) =>
-                  updatePlayLimited({
-                    roundMinutes: Number(event.target.value),
-                  })
-                }
-              />
-            </label>
-            <label className="text-muted text-xs">
-              {t('home.limitedDeckMinutes')}
-              <input
-                className="mt-1 w-full rounded-lg border border-muted/20 bg-hull p-2 text-ink"
-                type="number"
-                min={1}
-                value={playLimited.deckbuildingMinutes}
-                onChange={(event) =>
-                  updatePlayLimited({
-                    deckbuildingMinutes: Number(event.target.value),
-                  })
-                }
-              />
-            </label>
-            {playLimited.mode !== 'SEALED' ? (
-              <label className="text-muted text-xs">
-                {t('home.limitedDraftMinutes')}
-                <input
-                  className="mt-1 w-full rounded-lg border border-muted/20 bg-hull p-2 text-ink"
-                  type="number"
-                  min={1}
-                  value={playLimited.draftMinutes ?? 50}
-                  onChange={(event) =>
-                    updatePlayLimited({
-                      draftMinutes: Number(event.target.value),
-                    })
-                  }
-                />
-              </label>
-            ) : null}
-          </div>
+          <LimitedTimingControls
+            value={playLimited}
+            onChange={(patch) => updatePlayLimited(patch)}
+          />
           <Button
             type="button"
             variant="neon"
@@ -1064,27 +975,48 @@ export function HomePage() {
           />
           <fieldset className="mb-4">
             <legend className="text-muted mb-2 text-sm">
-              {t('home.limitedQueues')}
+              {t('home.limitedFormat')}
             </legend>
             <p className="text-muted mb-3 text-xs">
-              {t('home.limitedQueuesHint')}
+              {t('home.limitedHostFormatHint')}
             </p>
-            <div className="space-y-2">
-              {limitedConfigs.map((config) => (
-                <LimitedModeConfigurator
-                  key={config.mode}
-                  config={config}
-                  onChange={(next) =>
+            <LimitedFormatTiles
+              name="hostLimitedMode"
+              modes={LIMITED_MODES}
+              selected={
+                focusedHostLimitedConfig(limitedConfigs)?.mode ??
+                'BOOSTER_DRAFT'
+              }
+              onSelect={(mode) =>
+                setLimitedConfigs((current) =>
+                  selectExclusiveHostLimitedMode(current, mode),
+                )
+              }
+            />
+          </fieldset>
+          {(() => {
+            const focused = focusedHostLimitedConfig(limitedConfigs);
+            if (!focused) {
+              return null;
+            }
+            const playerCount =
+              focused.preferredCohortSize ?? focused.minCohortSize;
+            return (
+              <>
+                <p className="text-muted mb-4 text-xs">
+                  {t('home.limitedCohortHint', { count: playerCount })}
+                </p>
+                <LimitedTimingControls
+                  value={focused}
+                  onChange={(patch) =>
                     setLimitedConfigs((current) =>
-                      current.map((row) =>
-                        row.mode === next.mode ? next : row,
-                      ),
+                      patchHostLimitedConfig(current, focused.mode, patch),
                     )
                   }
                 />
-              ))}
-            </div>
-          </fieldset>
+              </>
+            );
+          })()}
           <Field
             label={t('home.eventLasts')}
             hint={t('home.eventLastsHint')}
@@ -1175,129 +1107,6 @@ export function HomePage() {
         />
       ) : null}
     </>
-  );
-}
-
-const limitedLabels: Record<LimitedMode, string> = {
-  BOOSTER_DRAFT: 'Booster Draft',
-  PICK_TWO_DRAFT: 'Pick-Two Draft',
-  SEALED: 'Sealed',
-};
-
-function LimitedModeConfigurator({
-  config,
-  onChange,
-}: {
-  config: LimitedEventModeConfig;
-  onChange: (config: LimitedEventModeConfig) => void;
-}) {
-  return (
-    <div className="rounded-xl border border-muted/20 p-3">
-      <label className="flex cursor-pointer items-center justify-between gap-3">
-        <span>
-          <span className="block text-sm font-semibold">
-            {limitedLabels[config.mode]}
-          </span>
-          <span className="text-muted block text-xs">
-            {config.preferredCohortSize ?? config.minCohortSize} players ·{' '}
-            {config.roundMinutes} minute rounds
-          </span>
-        </span>
-        <input
-          type="checkbox"
-          checked={config.enabled}
-          onChange={(event) =>
-            onChange({ ...config, enabled: event.target.checked })
-          }
-          className="size-5 accent-[var(--color-neon)]"
-        />
-      </label>
-      {config.enabled ? (
-        <div className="mt-3 grid grid-cols-2 gap-3 border-t border-white/10 pt-3 sm:grid-cols-4">
-          <label className="text-muted text-xs">
-            Match
-            <select
-              className="mt-1 w-full rounded-lg border border-muted/20 bg-hull p-2 text-ink"
-              value={config.matchStructure}
-              onChange={(event) =>
-                onChange({
-                  ...config,
-                  matchStructure: event.target.value as 'BO1' | 'BO3',
-                })
-              }
-            >
-              <option value="BO1">BO1</option>
-              <option value="BO3">BO3</option>
-            </select>
-          </label>
-          <label className="text-muted text-xs">
-            Rounds
-            <input
-              className="mt-1 w-full rounded-lg border border-muted/20 bg-hull p-2 text-ink"
-              type="number"
-              min={1}
-              value={config.totalRounds === 'AUTO' ? '' : config.totalRounds}
-              placeholder="Auto"
-              onChange={(event) =>
-                onChange({
-                  ...config,
-                  totalRounds: event.target.value
-                    ? Number(event.target.value)
-                    : 'AUTO',
-                })
-              }
-            />
-          </label>
-          <label className="text-muted text-xs">
-            Round minutes
-            <input
-              className="mt-1 w-full rounded-lg border border-muted/20 bg-hull p-2 text-ink"
-              type="number"
-              min={1}
-              value={config.roundMinutes}
-              onChange={(event) =>
-                onChange({
-                  ...config,
-                  roundMinutes: Number(event.target.value),
-                })
-              }
-            />
-          </label>
-          <label className="text-muted text-xs">
-            Deckbuilding minutes
-            <input
-              className="mt-1 w-full rounded-lg border border-muted/20 bg-hull p-2 text-ink"
-              type="number"
-              min={1}
-              value={config.deckbuildingMinutes}
-              onChange={(event) =>
-                onChange({
-                  ...config,
-                  deckbuildingMinutes: Number(event.target.value),
-                })
-              }
-            />
-          </label>
-          {config.mode !== 'SEALED' ? (
-            <label className="text-muted text-xs">
-              Draft minutes
-              <input
-                className="mt-1 w-full rounded-lg border border-muted/20 bg-hull p-2 text-ink"
-                type="number"
-                min={1}
-                value={config.draftMinutes ?? 50}
-                onChange={(event) =>
-                  onChange({
-                    ...config,
-                    draftMinutes: Number(event.target.value),
-                  })
-                }
-              />
-            </label>
-          ) : null}
-        </div>
-      ) : null}
-    </div>
   );
 }
 

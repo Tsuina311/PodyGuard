@@ -192,7 +192,9 @@ export function LimitedPlayerPanel({
                 />
                 {LIMITED_MODE_LABELS[config.mode]}
                 <span className="mt-1 block text-xs font-normal">
-                  {config.matchStructure} · target {config.preferredCohortSize ?? config.minCohortSize}
+                  {config.matchStructure} ·{' '}
+                  {config.preferredCohortSize ?? config.minCohortSize} players ·
+                  Swiss 1v1
                 </span>
               </label>
             ))}
