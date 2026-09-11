@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   OFFICIAL_COMMANDER_CHALLENGES,
+  parseEventOperationMode,
   poolLabel,
   usesCommanderRules,
   commanderSearchProfile,
@@ -46,6 +47,7 @@ import { assignedDeckLine, tableForParticipant } from './match-view';
 import { TrackerView } from './tracker/TrackerView';
 import { TournamentPlayerStatus } from './tournament/TournamentPlayerStatus';
 import { LimitedPlayerPanel } from './limited/LimitedPlayerPanel';
+import { RoundPlayerStatus } from './rounds/RoundPlayerStatus';
 import { TreacheryRoleDialog } from './TreacheryRoleDialog';
 import { useEventLive } from './useEventLive';
 import { forgetActiveMatch, rememberActiveMatch } from './active-match';
@@ -761,6 +763,15 @@ export function JoinPage({
               tables={snapshot?.tables ?? []}
             />
           ) : null}
+          {event && parseEventOperationMode(event.operationMode) === 'ROUNDS' ? (
+            <RoundPlayerStatus
+              event={event}
+              participant={participant}
+              participants={snapshot?.participants ?? [participant]}
+              busy={busy}
+              onLeave={() => void onLeave()}
+            />
+          ) : null}
           {(participant.status === 'joined' ||
             participant.status === 'paused') &&
           (!event?.tournament ||
@@ -867,7 +878,7 @@ export function JoinPage({
                 {t('join.joinAgain')}
               </Button>
             </div>
-          ) : participant.limitedQueueMode ? (
+          ) : parseEventOperationMode(event?.operationMode) === 'ROUNDS' ? null : participant.limitedQueueMode ? (
             <p className="text-muted text-sm">
               You are waiting in a Limited queue. Manage that queue below.
             </p>

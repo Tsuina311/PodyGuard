@@ -26,6 +26,7 @@ import {
   type StoredParticipant,
   type StoredPod,
   type StoredTable,
+  type StoredTableReservation,
   type StoredTreacheryAssignment,
   type StoredLimitedSession,
   type StoredLimitedRound,
@@ -33,6 +34,10 @@ import {
   type StoredLimitedParticipant,
   type StoredLimitedResultAudit,
 } from './event-store.js';
+import {
+  TableConflictError,
+  tableConflictMessage,
+} from './table-authority.js';
 
 export class MemoryEventStore implements EventStore {
   private readonly events = new Map<string, StoredEvent>();
@@ -57,10 +62,7 @@ export class MemoryEventStore implements EventStore {
     string,
     StoredLimitedResultAudit[]
   >();
-  private readonly tableReservations = new Map<
-    string,
-    { eventId: string; ownerType: 'LIMITED_SESSION' | 'LIMITED_MATCH'; ownerId: string }
-  >();
+  private readonly tableReservations = new Map<string, StoredTableReservation>();
 
   async insertEvent(input: NewStoredEvent): Promise<StoredEvent> {
     if (this.byJoinCode.has(input.joinCode)) {
@@ -80,6 +82,8 @@ export class MemoryEventStore implements EventStore {
       tournamentFormat: input.tournamentFormat ?? null,
       tournamentState: input.tournamentState ?? null,
       limitedModeConfigs: input.limitedModeConfigs ?? [],
+      operationMode: input.operationMode ?? 'ROLLING',
+      roundState: input.roundState ?? null,
       expiresAt: input.expiresAt ?? new Date(Date.now() + 24 * 60 * 60 * 1000),
       challengePackId: 'classic-commander-v1',
       challengePackVersion: 1,
@@ -119,6 +123,9 @@ export class MemoryEventStore implements EventStore {
       readyAt: input.readyAt ?? null,
       limitedQueueMode: null,
       limitedQueuedAt: null,
+      tablePreference: 'none',
+      lockedTableId: null,
+      preferredTableId: null,
       flexCredits: 0,
       createdAt: new Date(),
     };
@@ -150,6 +157,9 @@ export class MemoryEventStore implements EventStore {
       flexCredits?: number;
       limitedQueueMode?: StoredParticipant['limitedQueueMode'];
       limitedQueuedAt?: Date | null;
+      tablePreference?: StoredParticipant['tablePreference'];
+      lockedTableId?: string | null;
+      preferredTableId?: string | null;
     },
   ): Promise<StoredParticipant> {
     const existing = await this.findParticipantById(id);
@@ -166,6 +176,15 @@ export class MemoryEventStore implements EventStore {
     }
     if (patch.limitedQueuedAt !== undefined) {
       existing.limitedQueuedAt = patch.limitedQueuedAt;
+    }
+    if (patch.tablePreference !== undefined) {
+      existing.tablePreference = patch.tablePreference;
+    }
+    if (patch.lockedTableId !== undefined) {
+      existing.lockedTableId = patch.lockedTableId;
+    }
+    if (patch.preferredTableId !== undefined) {
+      existing.preferredTableId = patch.preferredTableId;
     }
     return existing;
   }
@@ -269,6 +288,15 @@ export class MemoryEventStore implements EventStore {
       rating: null,
       seats,
     };
+    this.tableReservations.set(table.id, {
+      id: randomUUID(),
+      eventId: input.eventId,
+      tableId: table.id,
+      ownerType: 'POD',
+      ownerId: pod.id,
+      purpose: 'PLAY',
+      createdAt,
+    });
     const pods = this.pods.get(input.eventId) ?? [];
     pods.push(pod);
     this.pods.set(input.eventId, pods);
@@ -493,9 +521,16 @@ export class MemoryEventStore implements EventStore {
       pod.eventId,
       assignments.filter((row) => row.podId !== pod.id),
     );
-    const table = await this.findTableById(pod.tableId);
-    if (table) {
-      table.status = 'free';
+    const released = await this.releaseTableIfOwned({
+      tableId: pod.tableId,
+      ownerType: 'POD',
+      ownerId: pod.id,
+    });
+    if (!released) {
+      const table = await this.findTableById(pod.tableId);
+      if (table && !this.tableReservations.has(table.id)) {
+        table.status = 'free';
+      }
     }
     pod.status = 'completed';
     pod.playerNames = [];
@@ -524,9 +559,16 @@ export class MemoryEventStore implements EventStore {
       pod.eventId,
       assignments.filter((row) => row.podId !== pod.id),
     );
-    const table = await this.findTableById(pod.tableId);
-    if (table) {
-      table.status = 'free';
+    const released = await this.releaseTableIfOwned({
+      tableId: pod.tableId,
+      ownerType: 'POD',
+      ownerId: pod.id,
+    });
+    if (!released) {
+      const table = await this.findTableById(pod.tableId);
+      if (table && !this.tableReservations.has(table.id)) {
+        table.status = 'free';
+      }
     }
     pod.status = 'cancelled';
     pod.playerNames = [];
@@ -598,6 +640,8 @@ export class MemoryEventStore implements EventStore {
       challengePackId?: string;
       challengePackVersion?: number;
       tournamentState?: StoredEvent['tournamentState'];
+      operationMode?: StoredEvent['operationMode'];
+      roundState?: StoredEvent['roundState'];
     },
   ): Promise<StoredEvent> {
     const event = this.events.get(id);
@@ -627,6 +671,12 @@ export class MemoryEventStore implements EventStore {
     }
     if (patch.tournamentState !== undefined) {
       event.tournamentState = patch.tournamentState;
+    }
+    if (patch.operationMode !== undefined) {
+      event.operationMode = patch.operationMode;
+    }
+    if (patch.roundState !== undefined) {
+      event.roundState = patch.roundState;
     }
     return event;
   }
@@ -722,9 +772,13 @@ export class MemoryEventStore implements EventStore {
     this.limitedSessions.set(id, session);
     for (const tableId of draftTableIds) {
       this.tableReservations.set(tableId, {
+        id: randomUUID(),
         eventId: input.eventId,
+        tableId,
         ownerType: 'LIMITED_SESSION',
         ownerId: id,
+        purpose: 'DRAFT',
+        createdAt,
       });
       const table = await this.findTableById(tableId);
       if (table) table.status = 'occupied';
@@ -871,9 +925,13 @@ export class MemoryEventStore implements EventStore {
     session.draftTableIds = [...tableIds];
     for (const tableId of tableIds) {
       this.tableReservations.set(tableId, {
+        id: randomUUID(),
         eventId: session.eventId,
+        tableId,
         ownerType: 'LIMITED_SESSION',
         ownerId: id,
+        purpose: 'DRAFT',
+        createdAt: new Date(),
       });
       const table = await this.findTableById(tableId);
       if (table) table.status = 'occupied';
@@ -1049,9 +1107,13 @@ export class MemoryEventStore implements EventStore {
       }
       if (match.tableId) {
         this.tableReservations.set(match.tableId, {
+          id: randomUUID(),
           eventId: session.eventId,
+          tableId: match.tableId,
           ownerType: 'LIMITED_MATCH',
           ownerId: match.id,
+          purpose: 'MATCH',
+          createdAt: new Date(),
         });
         const table = await this.findTableById(match.tableId);
         if (table) table.status = 'occupied';
@@ -1202,11 +1264,7 @@ export class MemoryEventStore implements EventStore {
   }
 
   private releaseMemoryReservations(
-    predicate: (reservation: {
-      eventId: string;
-      ownerType: 'LIMITED_SESSION' | 'LIMITED_MATCH';
-      ownerId: string;
-    }) => boolean,
+    predicate: (reservation: StoredTableReservation) => boolean,
   ): void {
     for (const [tableId, reservation] of this.tableReservations) {
       if (predicate(reservation)) {
@@ -1217,6 +1275,122 @@ export class MemoryEventStore implements EventStore {
         }
       }
     }
+  }
+
+  async listActiveTableReservations(
+    eventId: string,
+  ): Promise<StoredTableReservation[]> {
+    return [...this.tableReservations.values()].filter(
+      (reservation) => reservation.eventId === eventId,
+    );
+  }
+
+  async claimTable(input: {
+    eventId: string;
+    tableId: string;
+    ownerType: string;
+    ownerId: string;
+    purpose: string;
+  }): Promise<StoredTableReservation> {
+    const table = await this.findTableById(input.tableId);
+    if (!table || table.eventId !== input.eventId) {
+      throw new TableNotFoundError();
+    }
+    const existing = this.tableReservations.get(input.tableId);
+    if (existing) {
+      throw new TableConflictError(
+        tableConflictMessage(table.label, existing.ownerType),
+        input.tableId,
+        {
+          ownerType: existing.ownerType,
+          ownerId: existing.ownerId,
+        },
+      );
+    }
+    if (table.status === 'disabled' || table.status === 'occupied') {
+      throw new TableConflictError(
+        tableConflictMessage(
+          table.label,
+          table.status === 'disabled' ? 'MANUAL_RESERVATION' : 'POD',
+        ),
+        input.tableId,
+      );
+    }
+    const reservation: StoredTableReservation = {
+      id: randomUUID(),
+      eventId: input.eventId,
+      tableId: input.tableId,
+      ownerType: input.ownerType,
+      ownerId: input.ownerId,
+      purpose: input.purpose,
+      createdAt: new Date(),
+    };
+    this.tableReservations.set(input.tableId, reservation);
+    table.status = 'occupied';
+    return reservation;
+  }
+
+  async releaseTableIfOwned(input: {
+    tableId: string;
+    ownerType: string;
+    ownerId: string;
+  }): Promise<boolean> {
+    const reservation = this.tableReservations.get(input.tableId);
+    if (
+      !reservation ||
+      reservation.ownerType !== input.ownerType ||
+      reservation.ownerId !== input.ownerId
+    ) {
+      return false;
+    }
+    this.tableReservations.delete(input.tableId);
+    const table = await this.findTableById(input.tableId);
+    if (table && !this.tableReservations.has(input.tableId)) {
+      table.status = 'free';
+    }
+    return true;
+  }
+
+  async releaseAllOwnedTables(input: {
+    eventId: string;
+    ownerType: string;
+    ownerId: string;
+  }): Promise<string[]> {
+    const released: string[] = [];
+    for (const [tableId, reservation] of [...this.tableReservations]) {
+      if (
+        reservation.eventId === input.eventId &&
+        reservation.ownerType === input.ownerType &&
+        reservation.ownerId === input.ownerId
+      ) {
+        this.tableReservations.delete(tableId);
+        released.push(tableId);
+        const table = await this.findTableById(tableId);
+        if (table) table.status = 'free';
+      }
+    }
+    return released;
+  }
+
+  async releaseRoundAssignmentClaims(
+    eventId: string,
+    roundId: string,
+  ): Promise<string[]> {
+    const prefix = `${roundId}:`;
+    const released: string[] = [];
+    for (const [tableId, reservation] of [...this.tableReservations]) {
+      if (
+        reservation.eventId === eventId &&
+        reservation.ownerType === 'ROUND_ASSIGNMENT' &&
+        reservation.ownerId.startsWith(prefix)
+      ) {
+        this.tableReservations.delete(tableId);
+        released.push(tableId);
+        const table = await this.findTableById(tableId);
+        if (table) table.status = 'free';
+      }
+    }
+    return released;
   }
 
   private findPod(podId: string): StoredPod | undefined {

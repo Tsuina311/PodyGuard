@@ -12,6 +12,7 @@ import type {
   LimitedQueueSummary,
   PublicLimitedSession,
 } from './limited';
+import type { EventOperationMode, RoundEventState } from './rounds';
 import type { GameDurationHint } from './table-availability-hint';
 
 export type { GameDurationHint } from './table-availability-hint';
@@ -28,6 +29,14 @@ export type PublicEvent = {
   allowFivePods: boolean;
   /** Host-selected target. Queue policy may form other sizes legal for the mode. */
   preferredPodSize: number;
+  /**
+   * How the night runs: drop-in rolling queue (default) or synchronized rounds.
+   * Orthogonal to game mode — Commander may be ROLLING or ROUNDS.
+   * Omitted / unknown values should be treated as ROLLING.
+   */
+  operationMode?: EventOperationMode;
+  /** Present when operationMode is ROUNDS (server snapshot). */
+  rounds?: RoundEventState;
   /** Omitted for the normal drop-in/drop-out queue. */
   tournamentFormat?: TournamentFormat;
   /** Registration, rounds, and progression for tournament events. */
@@ -138,7 +147,20 @@ export type ProductEventName =
   | 'limited_result_corrected'
   | 'limited_participant_dropped'
   | 'limited_session_completed'
-  | 'limited_host_override';
+  | 'limited_host_override'
+  | 'round_generated'
+  | 'round_published'
+  | 'round_started'
+  | 'round_completed'
+  | 'round_repaired'
+  | 'round_players_swapped'
+  | 'round_result_reported'
+  | 'round_result_corrected'
+  | 'round_participant_dropped'
+  | 'round_participant_marked_missing'
+  | 'round_late_registered'
+  | 'round_table_lock_set'
+  | 'round_stale_basis_resolved';
 
 export type EventMetrics = {
   participants: number;

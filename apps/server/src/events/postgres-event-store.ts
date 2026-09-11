@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray, isNull, or } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNull, like, or } from 'drizzle-orm';
 import { getDb } from '../db/client.js';
 import {
   events,
@@ -50,6 +50,7 @@ import {
   type StoredParticipant,
   type StoredPod,
   type StoredTable,
+  type StoredTableReservation,
   type StoredTreacheryAssignment,
   type StoredLimitedSession,
   type StoredLimitedRound,
@@ -57,6 +58,10 @@ import {
   type StoredLimitedParticipant,
   type StoredLimitedResultAudit,
 } from './event-store.js';
+import {
+  TableConflictError,
+  tableConflictMessage,
+} from './table-authority.js';
 
 function isUniqueViolation(error: unknown): boolean {
   return (
@@ -84,6 +89,8 @@ export class PostgresEventStore implements EventStore {
           tournamentFormat: input.tournamentFormat ?? null,
           tournamentState: input.tournamentState ?? null,
           limitedModeConfigs: input.limitedModeConfigs ?? [],
+          operationMode: input.operationMode ?? 'ROLLING',
+          roundState: input.roundState ?? null,
           expiresAt:
             input.expiresAt ?? new Date(Date.now() + 24 * 60 * 60 * 1000),
           ...(input.createdAt ? { createdAt: input.createdAt } : {}),
@@ -164,6 +171,9 @@ export class PostgresEventStore implements EventStore {
       flexCredits?: number;
       limitedQueueMode?: StoredParticipant['limitedQueueMode'];
       limitedQueuedAt?: Date | null;
+      tablePreference?: StoredParticipant['tablePreference'];
+      lockedTableId?: string | null;
+      preferredTableId?: string | null;
     },
   ): Promise<StoredParticipant> {
     const [row] = await getDb()
@@ -180,6 +190,15 @@ export class PostgresEventStore implements EventStore {
         ...(patch.limitedQueuedAt === undefined
           ? {}
           : { limitedQueuedAt: patch.limitedQueuedAt }),
+        ...(patch.tablePreference === undefined
+          ? {}
+          : { tablePreference: patch.tablePreference }),
+        ...(patch.lockedTableId === undefined
+          ? {}
+          : { lockedTableId: patch.lockedTableId }),
+        ...(patch.preferredTableId === undefined
+          ? {}
+          : { preferredTableId: patch.preferredTableId }),
         updatedAt: new Date(),
       })
       .where(eq(participants.id, id))
@@ -253,7 +272,17 @@ export class PostgresEventStore implements EventStore {
       if (!table || table.eventId !== input.eventId) {
         throw new TableNotFoundError();
       }
-      if (table.status !== 'free') {
+      const [activeReservation] = await tx
+        .select()
+        .from(tableReservations)
+        .where(
+          and(
+            eq(tableReservations.tableId, input.tableId),
+            isNull(tableReservations.releasedAt),
+          ),
+        )
+        .limit(1);
+      if (table.status !== 'free' || activeReservation) {
         throw new LimitedPersistenceConflictError(
           'The requested physical table is not available.',
         );
@@ -349,6 +378,14 @@ export class PostgresEventStore implements EventStore {
           updatedAt: new Date(),
         })
         .where(eq(physicalTables.id, input.tableId));
+
+      await tx.insert(tableReservations).values({
+        eventId: input.eventId,
+        tableId: input.tableId,
+        ownerType: 'POD',
+        ownerId: pod.id,
+        purpose: 'PLAY',
+      });
 
       return {
         id: pod.id,
@@ -763,6 +800,17 @@ export class PostgresEventStore implements EventStore {
           updatedAt: now,
         })
         .where(eq(physicalTables.id, pod.tableId));
+      await tx
+        .update(tableReservations)
+        .set({ releasedAt: now })
+        .where(
+          and(
+            eq(tableReservations.tableId, pod.tableId),
+            eq(tableReservations.ownerType, 'POD'),
+            eq(tableReservations.ownerId, pod.id),
+            isNull(tableReservations.releasedAt),
+          ),
+        );
       const [updated] = await tx
         .update(pods)
         .set({
@@ -828,6 +876,17 @@ export class PostgresEventStore implements EventStore {
           updatedAt: now,
         })
         .where(eq(physicalTables.id, pod.tableId));
+      await tx
+        .update(tableReservations)
+        .set({ releasedAt: now })
+        .where(
+          and(
+            eq(tableReservations.tableId, pod.tableId),
+            eq(tableReservations.ownerType, 'POD'),
+            eq(tableReservations.ownerId, pod.id),
+            isNull(tableReservations.releasedAt),
+          ),
+        );
       await tx.delete(podMembers).where(eq(podMembers.podId, pod.id));
       const [updated] = await tx
         .update(pods)
@@ -973,6 +1032,8 @@ export class PostgresEventStore implements EventStore {
       challengePackId?: string;
       challengePackVersion?: number;
       tournamentState?: StoredEvent['tournamentState'];
+      operationMode?: StoredEvent['operationMode'];
+      roundState?: StoredEvent['roundState'];
     },
   ): Promise<StoredEvent> {
     const [row] = await getDb()
@@ -1000,6 +1061,12 @@ export class PostgresEventStore implements EventStore {
         ...(patch.tournamentState === undefined
           ? {}
           : { tournamentState: patch.tournamentState }),
+        ...(patch.operationMode === undefined
+          ? {}
+          : { operationMode: patch.operationMode }),
+        ...(patch.roundState === undefined
+          ? {}
+          : { roundState: patch.roundState }),
         updatedAt: new Date(),
       })
       .where(eq(events.id, id))
@@ -2156,6 +2223,200 @@ export class PostgresEventStore implements EventStore {
     });
     return loadLimitedSessionRequired(id);
   }
+
+  async listActiveTableReservations(
+    eventId: string,
+  ): Promise<StoredTableReservation[]> {
+    const rows = await getDb()
+      .select()
+      .from(tableReservations)
+      .where(
+        and(
+          eq(tableReservations.eventId, eventId),
+          isNull(tableReservations.releasedAt),
+        ),
+      );
+    return rows.map(mapTableReservation);
+  }
+
+  async claimTable(input: {
+    eventId: string;
+    tableId: string;
+    ownerType: string;
+    ownerId: string;
+    purpose: string;
+  }): Promise<StoredTableReservation> {
+    const db = getDb();
+    return db.transaction(async (tx) => {
+      const [table] = await tx
+        .select()
+        .from(physicalTables)
+        .where(eq(physicalTables.id, input.tableId))
+        .limit(1)
+        .for('update');
+      if (!table || table.eventId !== input.eventId) {
+        throw new TableNotFoundError();
+      }
+      const [existing] = await tx
+        .select()
+        .from(tableReservations)
+        .where(
+          and(
+            eq(tableReservations.tableId, input.tableId),
+            isNull(tableReservations.releasedAt),
+          ),
+        )
+        .limit(1);
+      if (existing) {
+        throw new TableConflictError(
+          tableConflictMessage(table.label, existing.ownerType),
+          input.tableId,
+          {
+            ownerType: existing.ownerType,
+            ownerId: existing.ownerId,
+          },
+        );
+      }
+      if (table.status === 'disabled' || table.status === 'occupied') {
+        throw new TableConflictError(
+          tableConflictMessage(
+            table.label,
+            table.status === 'disabled' ? 'MANUAL_RESERVATION' : 'POD',
+          ),
+          input.tableId,
+        );
+      }
+      try {
+        const [row] = await tx
+          .insert(tableReservations)
+          .values({
+            eventId: input.eventId,
+            tableId: input.tableId,
+            ownerType: input.ownerType,
+            ownerId: input.ownerId,
+            purpose: input.purpose,
+          })
+          .returning();
+        if (!row) {
+          throw new Error('Table reservation insert returned no row.');
+        }
+        await tx
+          .update(physicalTables)
+          .set({ status: 'occupied', updatedAt: new Date() })
+          .where(eq(physicalTables.id, input.tableId));
+        return mapTableReservation(row);
+      } catch (error) {
+        if (isUniqueViolation(error)) {
+          throw new TableConflictError(
+            tableConflictMessage(table.label, 'MANUAL_RESERVATION'),
+            input.tableId,
+          );
+        }
+        throw error;
+      }
+    });
+  }
+
+  async releaseTableIfOwned(input: {
+    tableId: string;
+    ownerType: string;
+    ownerId: string;
+  }): Promise<boolean> {
+    const db = getDb();
+    return db.transaction(async (tx) => {
+      const released = await tx
+        .update(tableReservations)
+        .set({ releasedAt: new Date() })
+        .where(
+          and(
+            eq(tableReservations.tableId, input.tableId),
+            eq(tableReservations.ownerType, input.ownerType),
+            eq(tableReservations.ownerId, input.ownerId),
+            isNull(tableReservations.releasedAt),
+          ),
+        )
+        .returning({ tableId: tableReservations.tableId });
+      if (released.length === 0) {
+        return false;
+      }
+      const [stillActive] = await tx
+        .select({ tableId: tableReservations.tableId })
+        .from(tableReservations)
+        .where(
+          and(
+            eq(tableReservations.tableId, input.tableId),
+            isNull(tableReservations.releasedAt),
+          ),
+        )
+        .limit(1);
+      if (!stillActive) {
+        await tx
+          .update(physicalTables)
+          .set({ status: 'free', updatedAt: new Date() })
+          .where(eq(physicalTables.id, input.tableId));
+      }
+      return true;
+    });
+  }
+
+  async releaseAllOwnedTables(input: {
+    eventId: string;
+    ownerType: string;
+    ownerId: string;
+  }): Promise<string[]> {
+    const db = getDb();
+    return db.transaction(async (tx) => {
+      const released = await tx
+        .update(tableReservations)
+        .set({ releasedAt: new Date() })
+        .where(
+          and(
+            eq(tableReservations.eventId, input.eventId),
+            eq(tableReservations.ownerType, input.ownerType),
+            eq(tableReservations.ownerId, input.ownerId),
+            isNull(tableReservations.releasedAt),
+          ),
+        )
+        .returning({ tableId: tableReservations.tableId });
+      const tableIds = released.map((row) => row.tableId);
+      if (tableIds.length > 0) {
+        await tx
+          .update(physicalTables)
+          .set({ status: 'free', updatedAt: new Date() })
+          .where(inArray(physicalTables.id, tableIds));
+      }
+      return tableIds;
+    });
+  }
+
+  async releaseRoundAssignmentClaims(
+    eventId: string,
+    roundId: string,
+  ): Promise<string[]> {
+    const db = getDb();
+    return db.transaction(async (tx) => {
+      const released = await tx
+        .update(tableReservations)
+        .set({ releasedAt: new Date() })
+        .where(
+          and(
+            eq(tableReservations.eventId, eventId),
+            eq(tableReservations.ownerType, 'ROUND_ASSIGNMENT'),
+            like(tableReservations.ownerId, `${roundId}:%`),
+            isNull(tableReservations.releasedAt),
+          ),
+        )
+        .returning({ tableId: tableReservations.tableId });
+      const tableIds = released.map((row) => row.tableId);
+      if (tableIds.length > 0) {
+        await tx
+          .update(physicalTables)
+          .set({ status: 'free', updatedAt: new Date() })
+          .where(inArray(physicalTables.id, tableIds));
+      }
+      return tableIds;
+    });
+  }
 }
 
 async function loadLimitedSessionRequired(
@@ -2428,6 +2689,8 @@ function mapEvent(row: typeof events.$inferSelect): StoredEvent {
     tournamentFormat: row.tournamentFormat as StoredEvent['tournamentFormat'],
     tournamentState: row.tournamentState as StoredEvent['tournamentState'],
     limitedModeConfigs: row.limitedModeConfigs,
+    operationMode: (row.operationMode as StoredEvent['operationMode']) ?? 'ROLLING',
+    roundState: (row.roundState as StoredEvent['roundState']) ?? null,
     expiresAt: row.expiresAt,
     challengePackId: row.challengePackId,
     challengePackVersion: row.challengePackVersion,
@@ -2438,6 +2701,7 @@ function mapEvent(row: typeof events.$inferSelect): StoredEvent {
 function mapParticipant(
   row: typeof participants.$inferSelect,
 ): StoredParticipant {
+  const preference = row.tablePreference;
   return {
     id: row.id,
     eventId: row.eventId,
@@ -2447,6 +2711,10 @@ function mapParticipant(
     readyAt: row.readyAt ?? null,
     limitedQueueMode: row.limitedQueueMode ?? null,
     limitedQueuedAt: row.limitedQueuedAt ?? null,
+    tablePreference:
+      preference === 'preferred' || preference === 'locked' ? preference : 'none',
+    lockedTableId: row.lockedTableId ?? null,
+    preferredTableId: row.preferredTableId ?? null,
     flexCredits: row.flexCredits,
     createdAt: row.createdAt,
   };
@@ -2474,6 +2742,21 @@ function mapTable(row: typeof physicalTables.$inferSelect): StoredTable {
     label: row.label,
     sortOrder: row.sortOrder,
     status: row.status,
+    zone: row.zone ?? null,
+    createdAt: row.createdAt,
+  };
+}
+
+function mapTableReservation(
+  row: typeof tableReservations.$inferSelect,
+): StoredTableReservation {
+  return {
+    id: row.id,
+    eventId: row.eventId,
+    tableId: row.tableId,
+    ownerType: row.ownerType,
+    ownerId: row.ownerId,
+    purpose: row.purpose,
     createdAt: row.createdAt,
   };
 }

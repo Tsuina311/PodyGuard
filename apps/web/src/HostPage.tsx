@@ -12,6 +12,7 @@ import type {
 import {
   ASSASSIN_POD_SIZES,
   defaultGameDurationSeconds,
+  parseEventOperationMode,
   poolShortLabel,
   tableAvailabilityHint,
   TREACHERY_POD_SIZES,
@@ -61,6 +62,7 @@ import { ChallengePackEditor } from './ChallengePackEditor';
 import { HostMetrics } from './HostMetrics';
 import { TournamentPanel } from './tournament/TournamentPanel';
 import { LimitedHostPanel } from './limited/LimitedHostPanel';
+import { RoundHostPanel } from './rounds/RoundHostPanel';
 import { HostDisplaysPanel } from './display/HostDisplaysPanel';
 import { JoinPage } from './JoinPage';
 import { cx } from './ui/cx';
@@ -581,6 +583,8 @@ export function HostPage() {
   ).length;
   const showLobbySections =
     !event?.tournament || event.tournament.phase === 'registration';
+  const isRoundsMode =
+    event !== null && parseEventOperationMode(event.operationMode) === 'ROUNDS';
   const tournamentTableIds = new Set(
     event?.tournament?.rounds.flatMap((round) =>
       round.matches.flatMap((match) => (match.tableId ? [match.tableId] : [])),
@@ -974,6 +978,17 @@ export function HostPage() {
         />
       ) : null}
 
+      {hostToken && isRoundsMode ? (
+        <RoundHostPanel
+          joinCode={code}
+          hostToken={hostToken}
+          event={event}
+          participants={participants}
+          onEvent={setEvent}
+          onError={setError}
+        />
+      ) : null}
+
       {hostToken && event.limitedModeConfigs?.some((config) => config.enabled) ? (
         <LimitedHostPanel
           joinCode={code}
@@ -1061,7 +1076,7 @@ export function HostPage() {
         />
       ) : null}
 
-      {showLobbySections ? (
+      {showLobbySections && !isRoundsMode ? (
       <Panel title={t('host.queue')} aside={t('host.ready', { count: counts.ready })}>
         {queue.length > 0 && likelyFreeSoonCount > 0 ? (
           <p className="text-neon mb-3 text-xs">
@@ -1112,7 +1127,7 @@ export function HostPage() {
       </Panel>
       ) : null}
 
-      {showLobbySections && lobby.length > 0 ? (
+      {showLobbySections && !isRoundsMode && lobby.length > 0 ? (
         <Panel title={t('host.notReady')} aside={String(lobby.length)}>
           <ul className="divide-y divide-white/5">
             {lobby.map((row) => (
@@ -1195,6 +1210,12 @@ export function HostPage() {
           <p className="text-muted text-sm">{t('host.noTables')}</p>
         ) : (
           <>
+          {isRoundsMode ? (
+            <p className="text-muted mb-5 text-sm">
+              Table starts are driven by the synchronized round (Publish → Start).
+              Rolling “start all ready” is not used here.
+            </p>
+          ) : (
           <Button
             block
             size="lg"
@@ -1206,6 +1227,7 @@ export function HostPage() {
               ? t('host.startingGames')
               : t('host.startAllReady', { count: readyTables.length })}
           </Button>
+          )}
           <ul className="mb-5 grid gap-3 sm:grid-cols-2">
             {tables.map((table) => (
               <li
@@ -1309,8 +1331,13 @@ export function HostPage() {
         )}
 
         <div className="mb-5 flex flex-wrap gap-2.5">
-          {!event.tournament ||
-          event.tournament.phase === 'in-progress' ? (
+          {isRoundsMode ? (
+            <p className="text-muted text-sm">
+              Match Now is off in synchronized rounds — use Generate / Publish /
+              Start on the rounds panel above.
+            </p>
+          ) : !event.tournament ||
+            event.tournament.phase === 'in-progress' ? (
             <Button disabled={busy} onClick={() => void onMatch()}>
               {busy
                 ? t('common.working')

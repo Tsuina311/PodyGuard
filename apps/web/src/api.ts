@@ -1,7 +1,9 @@
 import {
   normalizeJoinCode,
   type DisplayMode,
+  type DuelMatchOutcome,
   type EventMetrics,
+  type EventOperationMode,
   type GameMode,
   type EventSnapshot,
   type HostDisplaySession,
@@ -133,6 +135,8 @@ export function createEvent(
     allowFivePods?: boolean;
     preferredPodSize?: number;
     lifetimeHours?: number;
+    /** ROLLING (default) or ROUNDS — synchronized night. */
+    operationMode?: EventOperationMode;
     tournamentFormat?: TournamentFormat;
     tournamentOptions?: TournamentOptions;
     limitedModeConfigs?: LimitedEventModeConfig[];
@@ -560,6 +564,175 @@ export function matchNow(joinCode: string, token: string) {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
     },
+  );
+}
+
+type RoundSnapshotResult = {
+  event: PublicEvent;
+};
+
+function roundMutation(
+  joinCode: string,
+  token: string,
+  path: string,
+  body?: Record<string, unknown>,
+) {
+  return request<RoundSnapshotResult>(`/events/${joinCode}/rounds${path}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+}
+
+/** Generate (or regenerate) the next synchronized round plan. */
+export function generateEventRound(
+  joinCode: string,
+  token: string,
+  expectedVersion?: number,
+) {
+  return roundMutation(
+    joinCode,
+    token,
+    '/generate',
+    expectedVersion === undefined ? undefined : { expectedVersion },
+  );
+}
+
+export function publishEventRound(
+  joinCode: string,
+  token: string,
+  expectedVersion: number,
+) {
+  return roundMutation(joinCode, token, '/publish', { expectedVersion });
+}
+
+export function startEventRound(
+  joinCode: string,
+  token: string,
+  expectedVersion: number,
+) {
+  return roundMutation(joinCode, token, '/start', { expectedVersion });
+}
+
+export function completeEventRound(
+  joinCode: string,
+  token: string,
+  expectedVersion: number,
+  options?: { force?: boolean; forceReason?: string },
+) {
+  return roundMutation(joinCode, token, '/complete', {
+    expectedVersion,
+    ...options,
+  });
+}
+
+/** Unlock selected assignments and re-optimize the rest (surgical repair). */
+export function repairEventRound(
+  joinCode: string,
+  token: string,
+  expectedVersion: number,
+  unlockedAssignmentIds: string[],
+) {
+  return roundMutation(joinCode, token, '/repair', {
+    expectedVersion,
+    unlockedAssignmentIds,
+  });
+}
+
+export function previewRepairEventRound(
+  joinCode: string,
+  token: string,
+  expectedVersion: number,
+  unlockedAssignmentIds: string[],
+) {
+  return request<{
+    before: import('@podyguard/shared').PublicEventRound;
+    after: import('@podyguard/shared').PublicEventRound;
+    affectedAssignmentIds: string[];
+    movingParticipantIds: string[];
+  }>(`/events/${joinCode}/rounds/repair/preview`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ expectedVersion, unlockedAssignmentIds }),
+  });
+}
+
+export function resolveEventRoundStaleBasis(
+  joinCode: string,
+  token: string,
+  expectedVersion: number,
+  decision: 'keep' | 'regenerate',
+) {
+  return roundMutation(joinCode, token, '/stale-basis', {
+    expectedVersion,
+    decision,
+  });
+}
+
+export function swapEventRoundPlayers(
+  joinCode: string,
+  token: string,
+  expectedVersion: number,
+  leftAssignmentId: string,
+  leftParticipantId: string,
+  rightAssignmentId: string,
+  rightParticipantId: string,
+) {
+  return roundMutation(joinCode, token, '/swap', {
+    expectedVersion,
+    leftAssignmentId,
+    leftParticipantId,
+    rightAssignmentId,
+    rightParticipantId,
+  });
+}
+
+export function reportEventRoundResult(
+  joinCode: string,
+  token: string,
+  assignmentId: string,
+  body: {
+    expectedVersion: number;
+    outcome?: DuelMatchOutcome;
+    playerAGameWins?: number;
+    playerBGameWins?: number;
+  },
+) {
+  return request<RoundSnapshotResult>(
+    `/events/${joinCode}/rounds/assignments/${assignmentId}/result`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(body),
+    },
+  );
+}
+
+export function dropEventRoundParticipant(
+  joinCode: string,
+  token: string,
+  participantId: string,
+  expectedVersion: number,
+) {
+  return roundMutation(
+    joinCode,
+    token,
+    `/participants/${participantId}/drop`,
+    { expectedVersion },
+  );
+}
+
+export function markMissingEventRoundParticipant(
+  joinCode: string,
+  token: string,
+  participantId: string,
+  expectedVersion: number,
+) {
+  return roundMutation(
+    joinCode,
+    token,
+    `/participants/${participantId}/mark-missing`,
+    { expectedVersion },
   );
 }
 

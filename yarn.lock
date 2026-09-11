@@ -1201,6 +1201,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@podyguard/shared@workspace:packages/shared"
   dependencies:
+    fast-check: ^4.1.1
     typescript: ^5.8.2
     vitest: ^3.0.8
   languageName: unknown

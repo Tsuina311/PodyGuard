@@ -1,6 +1,7 @@
 import type {
   ChallengePack,
   CommanderSelection,
+  EventOperationMode,
   GameMode,
   ProductEventName,
   PublicEvent,
@@ -8,6 +9,7 @@ import type {
   PublicPod,
   PublicTable,
   PublicChallengeCompletion,
+  RoundEventState,
   RulesFormat,
   LimitedMatchOutcome,
   LimitedMatchStatus,
@@ -18,6 +20,7 @@ import type {
   LimitedRound,
   LimitedSessionStatus,
   LimitedTimer,
+  TablePreferenceKind,
   TournamentFormat,
   TournamentState,
   TreacheryRole,
@@ -118,6 +121,8 @@ export type StoredEvent = {
   tournamentFormat: TournamentFormat | null;
   tournamentState: TournamentState | null;
   limitedModeConfigs: LimitedEventModeConfig[];
+  operationMode: EventOperationMode;
+  roundState: RoundEventState | null;
   expiresAt: Date;
   challengePackId: string;
   challengePackVersion: number;
@@ -133,6 +138,9 @@ export type StoredParticipant = {
   readyAt: Date | null;
   limitedQueueMode: LimitedMode | null;
   limitedQueuedAt: Date | null;
+  tablePreference: TablePreferenceKind;
+  lockedTableId: string | null;
+  preferredTableId: string | null;
   flexCredits: number;
   createdAt: Date;
 };
@@ -243,6 +251,7 @@ export type StoredTable = {
   label: string;
   sortOrder: number;
   status: PublicTable['status'];
+  zone?: string | null;
   createdAt: Date;
 };
 
@@ -258,6 +267,8 @@ export type NewStoredEvent = {
   tournamentFormat?: TournamentFormat;
   tournamentState?: TournamentState;
   limitedModeConfigs?: LimitedEventModeConfig[];
+  operationMode?: EventOperationMode;
+  roundState?: RoundEventState | null;
   expiresAt?: Date;
   createdAt?: Date;
 };
@@ -438,6 +449,16 @@ export class LimitedPersistenceConflictError extends Error {
   }
 }
 
+export type StoredTableReservation = {
+  id: string;
+  eventId: string;
+  tableId: string;
+  ownerType: string;
+  ownerId: string;
+  purpose: string;
+  createdAt: Date;
+};
+
 export interface EventStore {
   insertEvent(input: NewStoredEvent): Promise<StoredEvent>;
   findEventByJoinCode(joinCode: string): Promise<StoredEvent | undefined>;
@@ -453,6 +474,9 @@ export interface EventStore {
       flexCredits?: number;
       limitedQueueMode?: LimitedMode | null;
       limitedQueuedAt?: Date | null;
+      tablePreference?: TablePreferenceKind;
+      lockedTableId?: string | null;
+      preferredTableId?: string | null;
     },
   ): Promise<StoredParticipant>;
   insertTable(input: NewStoredTable): Promise<StoredTable>;
@@ -518,6 +542,8 @@ export interface EventStore {
       challengePackId?: string;
       challengePackVersion?: number;
       tournamentState?: TournamentState | null;
+      operationMode?: EventOperationMode;
+      roundState?: RoundEventState | null;
     },
   ): Promise<StoredEvent>;
   createLimitedSession(
@@ -566,4 +592,30 @@ export interface EventStore {
     status: 'COMPLETED' | 'CANCELLED',
     completedAt?: Date,
   ): Promise<StoredLimitedSession>;
+  listActiveTableReservations(
+    eventId: string,
+  ): Promise<StoredTableReservation[]>;
+  claimTable(input: {
+    eventId: string;
+    tableId: string;
+    ownerType: string;
+    ownerId: string;
+    purpose: string;
+  }): Promise<StoredTableReservation>;
+  /** Release only if current active claim matches ownerType+ownerId. */
+  releaseTableIfOwned(input: {
+    tableId: string;
+    ownerType: string;
+    ownerId: string;
+  }): Promise<boolean>;
+  releaseAllOwnedTables(input: {
+    eventId: string;
+    ownerType: string;
+    ownerId: string;
+  }): Promise<string[]>;
+  /** Release ROUND_ASSIGNMENT claims whose ownerId starts with `${roundId}:`. */
+  releaseRoundAssignmentClaims(
+    eventId: string,
+    roundId: string,
+  ): Promise<string[]>;
 }

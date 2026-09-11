@@ -23,6 +23,13 @@ import {
   PodNotFoundError,
 } from '../events/event-store.js';
 import { LimitedSessionNotFoundError } from '../events/event-service.js';
+import {
+  parseOperationModeInput,
+  parseRoundCountInput,
+  RoundModeRequiredError,
+  RoundVersionConflictError,
+} from '../events/round-orchestration.js';
+import { TableConflictError } from '../events/table-authority.js';
 import { InvalidEventInputError } from '../events/validation.js';
 import {
   InvalidHostEventSessionError,
@@ -63,6 +70,8 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
       tournamentFormat?: unknown;
       tournamentOptions?: unknown;
       limitedModeConfigs?: unknown;
+      operationMode?: unknown;
+      roundCount?: unknown;
     };
     try {
       const result = await app.events.createEvent({
@@ -92,6 +101,8 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
               })
             : undefined,
         limitedModeConfigs: parseLimitedModeConfigs(body.limitedModeConfigs),
+        operationMode: parseOperationModeInput(body.operationMode),
+        roundCount: parseRoundCountInput(body.roundCount),
       });
       return reply.code(201).send(result);
     } catch (error) {
@@ -946,6 +957,396 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
     }
   });
 
+  app.post('/events/:joinCode/rounds/generate', async (request, reply) => {
+    const { joinCode } = request.params as { joinCode: string };
+    const body = (request.body ?? {}) as { expectedVersion?: unknown };
+    try {
+      const snapshot = await app.events.generateRound(
+        normalizeJoinCode(joinCode),
+        bearerToken(request.headers.authorization),
+        body.expectedVersion === undefined || body.expectedVersion === null
+          ? undefined
+          : parseExpectedVersion(body.expectedVersion),
+      );
+      await app.live.publish(normalizeJoinCode(joinCode));
+      return snapshot;
+    } catch (error) {
+      return sendEventError(reply, error);
+    }
+  });
+
+  app.post('/events/:joinCode/rounds/publish', async (request, reply) => {
+    const { joinCode } = request.params as { joinCode: string };
+    const body = (request.body ?? {}) as { expectedVersion?: unknown };
+    try {
+      const snapshot = await app.events.publishRound(
+        normalizeJoinCode(joinCode),
+        bearerToken(request.headers.authorization),
+        parseExpectedVersion(body.expectedVersion),
+      );
+      await app.live.publish(normalizeJoinCode(joinCode));
+      return snapshot;
+    } catch (error) {
+      return sendEventError(reply, error);
+    }
+  });
+
+  app.post('/events/:joinCode/rounds/start', async (request, reply) => {
+    const { joinCode } = request.params as { joinCode: string };
+    const body = (request.body ?? {}) as { expectedVersion?: unknown };
+    try {
+      const snapshot = await app.events.startRound(
+        normalizeJoinCode(joinCode),
+        bearerToken(request.headers.authorization),
+        parseExpectedVersion(body.expectedVersion),
+      );
+      await app.live.publish(normalizeJoinCode(joinCode));
+      return snapshot;
+    } catch (error) {
+      return sendEventError(reply, error);
+    }
+  });
+
+  app.post('/events/:joinCode/rounds/complete', async (request, reply) => {
+    const { joinCode } = request.params as { joinCode: string };
+    const body = (request.body ?? {}) as {
+      expectedVersion?: unknown;
+      force?: unknown;
+      forceReason?: unknown;
+    };
+    try {
+      const snapshot = await app.events.completeRound(
+        normalizeJoinCode(joinCode),
+        bearerToken(request.headers.authorization),
+        parseExpectedVersion(body.expectedVersion),
+        {
+          force: body.force === true,
+          forceReason:
+            typeof body.forceReason === 'string' ? body.forceReason : undefined,
+        },
+      );
+      await app.live.publish(normalizeJoinCode(joinCode));
+      return snapshot;
+    } catch (error) {
+      return sendEventError(reply, error);
+    }
+  });
+
+  app.post('/events/:joinCode/rounds/repair/preview', async (request, reply) => {
+    const { joinCode } = request.params as { joinCode: string };
+    const body = (request.body ?? {}) as {
+      expectedVersion?: unknown;
+      unlockedAssignmentIds?: unknown;
+    };
+    try {
+      return await app.events.previewRepairRound(
+        normalizeJoinCode(joinCode),
+        bearerToken(request.headers.authorization),
+        {
+          expectedVersion: parseExpectedVersion(body.expectedVersion),
+          unlockedAssignmentIds: parseStringList(
+            body.unlockedAssignmentIds,
+            'unlockedAssignmentIds',
+          ),
+        },
+      );
+    } catch (error) {
+      return sendEventError(reply, error);
+    }
+  });
+
+  app.post('/events/:joinCode/rounds/repair', async (request, reply) => {
+    const { joinCode } = request.params as { joinCode: string };
+    const body = (request.body ?? {}) as {
+      expectedVersion?: unknown;
+      unlockedAssignmentIds?: unknown;
+    };
+    try {
+      const snapshot = await app.events.repairRound(
+        normalizeJoinCode(joinCode),
+        bearerToken(request.headers.authorization),
+        {
+          expectedVersion: parseExpectedVersion(body.expectedVersion),
+          unlockedAssignmentIds: parseStringList(
+            body.unlockedAssignmentIds,
+            'unlockedAssignmentIds',
+          ),
+        },
+      );
+      await app.live.publish(normalizeJoinCode(joinCode));
+      return snapshot;
+    } catch (error) {
+      return sendEventError(reply, error);
+    }
+  });
+
+  app.post('/events/:joinCode/rounds/stale-basis', async (request, reply) => {
+    const { joinCode } = request.params as { joinCode: string };
+    const body = (request.body ?? {}) as {
+      expectedVersion?: unknown;
+      decision?: unknown;
+    };
+    try {
+      if (body.decision !== 'keep' && body.decision !== 'regenerate') {
+        throw new InvalidEventInputError('decision must be keep or regenerate.');
+      }
+      const snapshot = await app.events.resolveRoundStaleBasis(
+        normalizeJoinCode(joinCode),
+        bearerToken(request.headers.authorization),
+        {
+          expectedVersion: parseExpectedVersion(body.expectedVersion),
+          decision: body.decision,
+        },
+      );
+      await app.live.publish(normalizeJoinCode(joinCode));
+      return snapshot;
+    } catch (error) {
+      return sendEventError(reply, error);
+    }
+  });
+
+  app.post('/events/:joinCode/rounds/swap', async (request, reply) => {
+    const { joinCode } = request.params as { joinCode: string };
+    const body = (request.body ?? {}) as {
+      expectedVersion?: unknown;
+      leftAssignmentId?: unknown;
+      leftParticipantId?: unknown;
+      rightAssignmentId?: unknown;
+      rightParticipantId?: unknown;
+    };
+    try {
+      const snapshot = await app.events.swapRoundPlayers(
+        normalizeJoinCode(joinCode),
+        bearerToken(request.headers.authorization),
+        {
+          expectedVersion: parseExpectedVersion(body.expectedVersion),
+          leftAssignmentId: parseRequiredString(
+            body.leftAssignmentId,
+            'leftAssignmentId',
+          ),
+          leftParticipantId: parseRequiredString(
+            body.leftParticipantId,
+            'leftParticipantId',
+          ),
+          rightAssignmentId: parseRequiredString(
+            body.rightAssignmentId,
+            'rightAssignmentId',
+          ),
+          rightParticipantId: parseRequiredString(
+            body.rightParticipantId,
+            'rightParticipantId',
+          ),
+        },
+      );
+      await app.live.publish(normalizeJoinCode(joinCode));
+      return snapshot;
+    } catch (error) {
+      return sendEventError(reply, error);
+    }
+  });
+
+  app.post(
+    '/events/:joinCode/rounds/assignments/:assignmentId/result',
+    async (request, reply) => {
+      const { joinCode, assignmentId } = request.params as {
+        joinCode: string;
+        assignmentId: string;
+      };
+      const body = (request.body ?? {}) as {
+        expectedVersion?: unknown;
+        outcome?: unknown;
+        playerAGameWins?: unknown;
+        playerBGameWins?: unknown;
+      };
+      try {
+        const snapshot = await app.events.reportRoundResult(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          {
+            expectedVersion: parseExpectedVersion(body.expectedVersion),
+            assignmentId,
+            outcome: parseOptionalDuelOutcome(body.outcome),
+            playerAGameWins:
+              typeof body.playerAGameWins === 'number'
+                ? body.playerAGameWins
+                : undefined,
+            playerBGameWins:
+              typeof body.playerBGameWins === 'number'
+                ? body.playerBGameWins
+                : undefined,
+          },
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return snapshot;
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
+  app.post(
+    '/events/:joinCode/rounds/assignments/:assignmentId/correct',
+    async (request, reply) => {
+      const { joinCode, assignmentId } = request.params as {
+        joinCode: string;
+        assignmentId: string;
+      };
+      const body = (request.body ?? {}) as {
+        expectedVersion?: unknown;
+        roundNumber?: unknown;
+        outcome?: unknown;
+        playerAGameWins?: unknown;
+        playerBGameWins?: unknown;
+        reason?: unknown;
+      };
+      try {
+        if (
+          typeof body.roundNumber !== 'number' ||
+          !Number.isInteger(body.roundNumber) ||
+          body.roundNumber < 1
+        ) {
+          throw new InvalidEventInputError('Choose a valid prior roundNumber.');
+        }
+        const snapshot = await app.events.correctPriorRoundResult(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          {
+            expectedVersion: parseExpectedVersion(body.expectedVersion),
+            roundNumber: body.roundNumber,
+            assignmentId,
+            outcome: parseOptionalDuelOutcome(body.outcome),
+            playerAGameWins:
+              typeof body.playerAGameWins === 'number'
+                ? body.playerAGameWins
+                : undefined,
+            playerBGameWins:
+              typeof body.playerBGameWins === 'number'
+                ? body.playerBGameWins
+                : undefined,
+            reason:
+              typeof body.reason === 'string' ? body.reason : undefined,
+          },
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return snapshot;
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
+  app.post(
+    '/events/:joinCode/rounds/participants/:participantId/drop',
+    async (request, reply) => {
+      const { joinCode, participantId } = request.params as {
+        joinCode: string;
+        participantId: string;
+      };
+      const body = (request.body ?? {}) as { expectedVersion?: unknown };
+      try {
+        const snapshot = await app.events.dropRoundParticipant(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          participantId,
+          body.expectedVersion === undefined || body.expectedVersion === null
+            ? undefined
+            : parseExpectedVersion(body.expectedVersion),
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return snapshot;
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
+  app.post(
+    '/events/:joinCode/rounds/participants/:participantId/mark-missing',
+    async (request, reply) => {
+      const { joinCode, participantId } = request.params as {
+        joinCode: string;
+        participantId: string;
+      };
+      const body = (request.body ?? {}) as { expectedVersion?: unknown };
+      try {
+        const snapshot = await app.events.markMissingRoundParticipant(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          participantId,
+          parseExpectedVersion(body.expectedVersion),
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return snapshot;
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
+  app.post(
+    '/events/:joinCode/rounds/participants/:participantId/late-register',
+    async (request, reply) => {
+      const { joinCode, participantId } = request.params as {
+        joinCode: string;
+        participantId: string;
+      };
+      const body = (request.body ?? {}) as { expectedVersion?: unknown };
+      try {
+        const snapshot = await app.events.lateRegisterRoundParticipant(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          participantId,
+          body.expectedVersion === undefined || body.expectedVersion === null
+            ? undefined
+            : parseExpectedVersion(body.expectedVersion),
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return snapshot;
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
+  app.post(
+    '/events/:joinCode/rounds/participants/:participantId/table-lock',
+    async (request, reply) => {
+      const { joinCode, participantId } = request.params as {
+        joinCode: string;
+        participantId: string;
+      };
+      const body = (request.body ?? {}) as {
+        expectedVersion?: unknown;
+        tablePreference?: unknown;
+        tableId?: unknown;
+      };
+      try {
+        if (
+          body.tablePreference !== 'none' &&
+          body.tablePreference !== 'preferred' &&
+          body.tablePreference !== 'locked'
+        ) {
+          throw new InvalidEventInputError('Choose a valid table preference.');
+        }
+        const snapshot = await app.events.setParticipantTableLock(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          {
+            expectedVersion: parseExpectedVersion(body.expectedVersion),
+            participantId,
+            tablePreference: body.tablePreference,
+            tableId:
+              typeof body.tableId === 'string' ? body.tableId : undefined,
+          },
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return snapshot;
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
   app.post('/events/:joinCode/match', async (request, reply) => {
     const { joinCode } = request.params as { joinCode: string };
     try {
@@ -1192,6 +1593,41 @@ function stringArray(value: unknown, field: string): string[] | undefined {
   return value as string[];
 }
 
+function parseStringList(value: unknown, field: string): string[] {
+  return stringArray(value, field) ?? [];
+}
+
+function parseRequiredString(value: unknown, field: string): string {
+  if (typeof value !== 'string' || value.trim().length === 0) {
+    throw new InvalidEventInputError(`${field} is required.`);
+  }
+  return value;
+}
+
+function parseExpectedVersion(value: unknown): number {
+  if (typeof value !== 'number' || !Number.isInteger(value) || value < 1) {
+    throw new InvalidEventInputError('expectedVersion must be a positive integer.');
+  }
+  return value;
+}
+
+function parseOptionalDuelOutcome(
+  value: unknown,
+): 'PLAYER_A_WIN' | 'PLAYER_B_WIN' | 'DRAW' | 'BYE' | undefined {
+  if (value === undefined || value === null || value === '') {
+    return undefined;
+  }
+  if (
+    value === 'PLAYER_A_WIN' ||
+    value === 'PLAYER_B_WIN' ||
+    value === 'DRAW' ||
+    value === 'BYE'
+  ) {
+    return value;
+  }
+  throw new InvalidEventInputError('Choose a valid duel match outcome.');
+}
+
 function parseLimitedSessionStatus(value: unknown): LimitedSessionStatus {
   const allowed: LimitedSessionStatus[] = [
     'DRAFTING',
@@ -1292,7 +1728,10 @@ function sendEventError(
   if (
     error instanceof EventNotJoinableError ||
     error instanceof InvalidParticipantTransitionError ||
-    error instanceof LimitedPersistenceConflictError
+    error instanceof LimitedPersistenceConflictError ||
+    error instanceof RoundVersionConflictError ||
+    error instanceof RoundModeRequiredError ||
+    error instanceof TableConflictError
   ) {
     return reply.code(409).send(errorBody(error.code, error.message));
   }

@@ -182,6 +182,10 @@ export const events = pgTable('events', {
     >()
     .notNull()
     .default([]),
+  /** Orthogonal to game_mode: ROLLING queue vs synchronous ROUNDS. */
+  operationMode: text('operation_mode').notNull().default('ROLLING'),
+  /** Null for ROLLING events; RoundEventState JSON for ROUNDS. */
+  roundState: jsonb('round_state'),
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
   challengePackId: text('challenge_pack_id')
     .notNull()
@@ -203,6 +207,8 @@ export const physicalTables = pgTable('physical_tables', {
   label: text('label').notNull(),
   sortOrder: integer('sort_order').notNull().default(0),
   status: physicalTableStatusEnum('status').notNull().default('free'),
+  /** Optional floor / accessibility zone for round seating. */
+  zone: text('zone'),
   createdAt: timestamp('created_at', { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -223,6 +229,14 @@ export const participants = pgTable('participants', {
   readyAt: timestamp('ready_at', { withTimezone: true }),
   limitedQueueMode: limitedModeEnum('limited_queue_mode'),
   limitedQueuedAt: timestamp('limited_queued_at', { withTimezone: true }),
+  tablePreference: text('table_preference').notNull().default('none'),
+  lockedTableId: uuid('locked_table_id').references(() => physicalTables.id, {
+    onDelete: 'set null',
+  }),
+  preferredTableId: uuid('preferred_table_id').references(
+    () => physicalTables.id,
+    { onDelete: 'set null' },
+  ),
   createdAt: timestamp('created_at', { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -655,7 +669,8 @@ export const tableReservations = pgTable(
       .notNull()
       .references(() => physicalTables.id, { onDelete: 'restrict' }),
     ownerType: text('owner_type').notNull(),
-    ownerId: uuid('owner_id').notNull(),
+    // Text: Limited uses UUIDs; ROUND_ASSIGNMENT uses `${roundId}:${assignmentId}`.
+    ownerId: text('owner_id').notNull(),
     purpose: text('purpose').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()

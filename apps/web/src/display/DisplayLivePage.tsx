@@ -5,6 +5,7 @@ import {
   DISPLAY_ASSIGNMENT_HIGHLIGHT_MS,
   DISPLAY_AUTO_ROTATE_MS,
   type DisplayMode,
+  type PublicDisplayCurrentRound,
   type PublicDisplayEventState,
   type PublicDisplayLimitedSession,
   type PublicDisplayQueue,
@@ -309,6 +310,9 @@ export function DisplayLivePage() {
       ) : null}
 
       <div className={cx(announcementActive || highlightActive ? 'opacity-40' : null)}>
+        {state.currentRound ? (
+          <RoundsPairingsBanner round={state.currentRound} />
+        ) : null}
         {viewMode === 'FLOOR' ? (
           <FloorView
             tables={state.tables}
@@ -327,6 +331,47 @@ export function DisplayLivePage() {
         ) : null}
       </div>
     </div>
+  );
+}
+
+/** Minimal ROUND pairings strip — dedicated display mode polish deferred (docs/ROUND_MODE.md). */
+function RoundsPairingsBanner({ round }: { round: PublicDisplayCurrentRound }) {
+  return (
+    <section className="border-neon/30 bg-neon/5 mb-2 rounded-2xl border p-5">
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="text-muted text-xs tracking-[0.25em] uppercase">
+            Synchronized round
+          </p>
+          <h2 className="font-display text-3xl font-bold sm:text-4xl">
+            Round {round.number}
+          </h2>
+        </div>
+        <Badge tone={round.status === 'ACTIVE' ? 'live' : 'idle'}>
+          {round.status} · {round.complete}/{round.total} done
+        </Badge>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {round.assignments.map((assignment) => (
+          <div
+            key={assignment.id}
+            className="border-muted/20 bg-hull/60 rounded-xl border p-4"
+          >
+            <p className="font-display text-2xl font-bold">
+              {assignment.isBye
+                ? 'Bye'
+                : (assignment.tableLabel ?? `Table ${assignment.position}`)}
+            </p>
+            <p className="text-muted mt-1 text-sm">{assignment.status}</p>
+            {assignment.playerNames.length > 0 ? (
+              <p className="text-ink mt-2 text-lg">
+                {assignment.playerNames.join(' · ')}
+              </p>
+            ) : null}
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 

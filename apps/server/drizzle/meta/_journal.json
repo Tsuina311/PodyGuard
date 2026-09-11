@@ -169,6 +169,20 @@
       "when": 1788339600000,
       "tag": "0023_pod_playing_started_at",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1789156800000,
+      "tag": "0024_round_mode",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1789158600000,
+      "tag": "0025_table_reservation_owner_text",
+      "breakpoints": true
     }
   ]
 }

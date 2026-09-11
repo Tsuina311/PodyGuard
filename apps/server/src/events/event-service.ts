@@ -36,6 +36,7 @@ import {
   validateLimitedCohortSize,
   type ChallengePack,
   type EventMetrics,
+  type EventOperationMode,
   type GameMode,
   type EventSnapshot,
   type LimitedEventModeConfig,
@@ -54,11 +55,14 @@ import {
   type RulesFormat,
   type TreacheryRoleAssignment,
   type SeriesLength,
+  type TablePreferenceKind,
   type TournamentFormat,
   type TournamentOptions,
   type TournamentState,
+  type DuelMatchOutcome,
   normalizeJoinCode,
   typicalGameDurationSeconds,
+  currentEventRound,
 } from '@podyguard/shared';
 import { randomUUID } from 'node:crypto';
 import {
@@ -105,6 +109,31 @@ import {
   type DeckDraft,
 } from './validation.js';
 import { computeEventMetrics } from './metrics.js';
+import {
+  assertRollingMatchAllowed,
+  completeCurrentRound,
+  correctPriorAssignmentResult,
+  dropRoundParticipantMeta,
+  generateNextRound,
+  initializeRoundStateForEvent,
+  lateRegisterRoundParticipantMeta,
+  markMissingRoundParticipantMeta,
+  parseOperationModeInput,
+  parseRoundCountInput,
+  previewRepairRound,
+  publishCurrentRound,
+  repairCurrentRound,
+  reportAssignmentResult,
+  requireRoundState,
+  resolveStalePairingBasis,
+  setRoundParticipantTableLock,
+  startCurrentRound,
+  swapCurrentRoundPlayers,
+  syncRoundParticipants,
+} from './round-orchestration.js';
+import {
+  roundAssignmentOwnerId,
+} from './table-authority.js';
 
 const JOIN_CODE_ATTEMPTS = 8;
 
@@ -136,6 +165,8 @@ export type CreateEventInput = {
   tournamentFormat?: TournamentFormat;
   tournamentOptions?: TournamentOptions;
   limitedModeConfigs?: LimitedEventModeConfig[];
+  operationMode?: EventOperationMode;
+  roundCount?: number | 'AUTO';
 };
 
 export type CreateEventResult = {
@@ -203,6 +234,8 @@ export class EventService {
     const limitedModeConfigs = normalizeLimitedModeConfigs(
       input.limitedModeConfigs,
     );
+    const operationMode = parseOperationModeInput(input.operationMode) ?? 'ROLLING';
+    const roundCount = parseRoundCountInput(input.roundCount);
     const lifetimeHours = assertLifetimeHours(input.lifetimeHours);
     const createdAt = this.now();
     const expiresAt = new Date(
@@ -214,6 +247,10 @@ export class EventService {
         gameMode === 'assassin' ||
         gameMode === 'multiplayer') &&
         preferredPodSize >= 5);
+    const allowThreePods =
+      gameMode === 'assassin' ||
+      gameMode === 'multiplayer' ||
+      gameMode === 'commander';
     const labels = resolveTableLabels({ count: input.tableCount }, 0);
     const hostCredentialHash = await hashHostPin(hostPin);
     let initialTournamentState: TournamentState | undefined;
@@ -230,6 +267,16 @@ export class EventService {
         );
       }
     }
+    const initialRoundState =
+      operationMode === 'ROUNDS'
+        ? initializeRoundStateForEvent({
+            gameMode,
+            preferredPodSize,
+            allowThreePods,
+            allowFivePods,
+            roundCount,
+          })
+        : null;
 
     let stored: StoredEvent | undefined;
     for (let attempt = 0; attempt < JOIN_CODE_ATTEMPTS; attempt += 1) {
@@ -240,15 +287,14 @@ export class EventService {
           hostCredentialHash,
           gameMode,
           rulesFormat,
-          allowThreePods:
-            gameMode === 'assassin' ||
-            gameMode === 'multiplayer' ||
-            gameMode === 'commander',
+          allowThreePods,
           allowFivePods,
           preferredPodSize,
           tournamentFormat,
           tournamentState: initialTournamentState,
           limitedModeConfigs,
+          operationMode,
+          roundState: initialRoundState,
           expiresAt,
           createdAt,
         });
@@ -309,7 +355,7 @@ export class EventService {
     displayName: string,
     decks?: DeckDraft[],
   ): Promise<JoinEventResult> {
-    const stored = await this.requireByJoinCode(joinCode);
+    let stored = await this.requireByJoinCode(joinCode);
     if (
       stored.status !== EventStatus.Open ||
       (stored.tournamentState &&
@@ -337,6 +383,12 @@ export class EventService {
       participantId: participant.id,
     });
     await this.track(stored.id, 'joined_event');
+    if (stored.operationMode === 'ROUNDS' && stored.roundState) {
+      const people = await this.store.listParticipants(stored.id);
+      stored = await this.store.updateEvent(stored.id, {
+        roundState: syncRoundParticipants(stored.roundState, people),
+      });
+    }
     return {
       event: await this.presentEvent(stored),
       participant: toPublicParticipant(participant, undefined, storedDecks),
@@ -1497,6 +1549,12 @@ export class EventService {
         'An occupied table cannot be changed until the pod is finished.',
       );
     }
+    const reservations = await this.store.listActiveTableReservations(stored.id);
+    if (reservations.some((reservation) => reservation.tableId === table.id)) {
+      throw new InvalidParticipantTransitionError(
+        'A reserved table cannot be freed or disabled until the claim is released.',
+      );
+    }
     const next =
       status === 'disabled'
         ? PhysicalTableStatus.Disabled
@@ -2052,6 +2110,7 @@ export class EventService {
 
   async matchNow(joinCode: string, hostToken: string): Promise<MatchResult> {
     const stored = await this.requireHostToken(joinCode, hostToken);
+    assertRollingMatchAllowed(stored);
     if (stored.tournamentState) {
       if (stored.tournamentState.phase === 'registration') {
         throw new InvalidParticipantTransitionError(
@@ -2066,6 +2125,461 @@ export class EventService {
     }
     const pods = await this.runMatch(stored.id);
     return { pods, botsAdded: 0 };
+  }
+
+  async generateRound(
+    joinCode: string,
+    hostToken: string,
+    expectedVersion?: number,
+  ): Promise<EventSnapshot> {
+    const stored = await this.requireHostToken(joinCode, hostToken);
+    const state = requireRoundState(stored);
+    const [people, tables, reservations] = await Promise.all([
+      this.store.listParticipants(stored.id),
+      this.store.listTables(stored.id),
+      this.store.listActiveTableReservations(stored.id),
+    ]);
+    const next = generateNextRound({
+      state,
+      people,
+      tables,
+      reservations,
+      seedKey: stored.id,
+      now: this.now().toISOString(),
+      expectedVersion,
+    });
+    await this.store.updateEvent(stored.id, { roundState: next });
+    await this.track(stored.id, 'round_generated');
+    return this.getSnapshot(joinCode);
+  }
+
+  async publishRound(
+    joinCode: string,
+    hostToken: string,
+    expectedVersion: number,
+  ): Promise<EventSnapshot> {
+    const stored = await this.requireHostToken(joinCode, hostToken);
+    const next = publishCurrentRound(requireRoundState(stored), expectedVersion);
+    const published = currentEventRound(next);
+    if (!published) {
+      throw new InvalidEventInputError('Generate a round first.');
+    }
+    const claimed: Array<{ tableId: string; ownerId: string }> = [];
+    try {
+      for (const assignment of published.assignments) {
+        if (!assignment.tableId || assignment.isBye) continue;
+        const ownerId = roundAssignmentOwnerId(published.id, assignment.id);
+        await this.store.claimTable({
+          eventId: stored.id,
+          tableId: assignment.tableId,
+          ownerType: 'ROUND_ASSIGNMENT',
+          ownerId,
+          purpose: 'ROUND',
+        });
+        claimed.push({ tableId: assignment.tableId, ownerId });
+      }
+      await this.store.updateEvent(stored.id, { roundState: next });
+    } catch (error) {
+      for (const claim of claimed) {
+        await this.store.releaseTableIfOwned({
+          tableId: claim.tableId,
+          ownerType: 'ROUND_ASSIGNMENT',
+          ownerId: claim.ownerId,
+        });
+      }
+      throw error;
+    }
+    await this.track(stored.id, 'round_published');
+    return this.getSnapshot(joinCode);
+  }
+
+  async startRound(
+    joinCode: string,
+    hostToken: string,
+    expectedVersion: number,
+  ): Promise<EventSnapshot> {
+    const stored = await this.requireHostToken(joinCode, hostToken);
+    const next = startCurrentRound(
+      requireRoundState(stored),
+      expectedVersion,
+      this.now().toISOString(),
+    );
+    await this.store.updateEvent(stored.id, { roundState: next });
+    await this.track(stored.id, 'round_started');
+    return this.getSnapshot(joinCode);
+  }
+
+  async completeRound(
+    joinCode: string,
+    hostToken: string,
+    expectedVersion: number,
+    options?: { force?: boolean; forceReason?: string },
+  ): Promise<EventSnapshot> {
+    const stored = await this.requireHostToken(joinCode, hostToken);
+    const prior = requireRoundState(stored);
+    const priorRound = currentEventRound(prior);
+    const next = completeCurrentRound(
+      prior,
+      expectedVersion,
+      this.now().toISOString(),
+      options,
+    );
+    await this.store.updateEvent(stored.id, { roundState: next });
+    if (priorRound) {
+      await this.store.releaseRoundAssignmentClaims(stored.id, priorRound.id);
+    }
+    await this.track(stored.id, 'round_completed');
+    return this.getSnapshot(joinCode);
+  }
+
+  async repairRound(
+    joinCode: string,
+    hostToken: string,
+    input: { expectedVersion: number; unlockedAssignmentIds: string[] },
+  ): Promise<EventSnapshot> {
+    const stored = await this.requireHostToken(joinCode, hostToken);
+    const [people, tables, reservations] = await Promise.all([
+      this.store.listParticipants(stored.id),
+      this.store.listTables(stored.id),
+      this.store.listActiveTableReservations(stored.id),
+    ]);
+    const prior = requireRoundState(stored);
+    const priorRound = currentEventRound(prior);
+    const next = repairCurrentRound({
+      state: prior,
+      expectedVersion: input.expectedVersion,
+      unlockedAssignmentIds: input.unlockedAssignmentIds,
+      people,
+      tables,
+      reservations,
+      seedKey: stored.id,
+    });
+    const repaired = currentEventRound(next);
+    if (priorRound?.status === 'PUBLISHED' && repaired) {
+      await this.syncPublishedRoundClaims(
+        stored.id,
+        priorRound,
+        repaired,
+        input.unlockedAssignmentIds,
+      );
+    }
+    await this.store.updateEvent(stored.id, { roundState: next });
+    await this.track(stored.id, 'round_repaired');
+    return this.getSnapshot(joinCode);
+  }
+
+  async previewRepairRound(
+    joinCode: string,
+    hostToken: string,
+    input: { expectedVersion: number; unlockedAssignmentIds: string[] },
+  ) {
+    const stored = await this.requireHostToken(joinCode, hostToken);
+    const [people, tables, reservations] = await Promise.all([
+      this.store.listParticipants(stored.id),
+      this.store.listTables(stored.id),
+      this.store.listActiveTableReservations(stored.id),
+    ]);
+    return previewRepairRound({
+      state: requireRoundState(stored),
+      expectedVersion: input.expectedVersion,
+      unlockedAssignmentIds: input.unlockedAssignmentIds,
+      people,
+      tables,
+      reservations,
+      seedKey: stored.id,
+    });
+  }
+
+  async resolveRoundStaleBasis(
+    joinCode: string,
+    hostToken: string,
+    input: {
+      expectedVersion: number;
+      decision: 'keep' | 'regenerate';
+    },
+  ): Promise<EventSnapshot> {
+    const stored = await this.requireHostToken(joinCode, hostToken);
+    const [people, tables, reservations] = await Promise.all([
+      this.store.listParticipants(stored.id),
+      this.store.listTables(stored.id),
+      this.store.listActiveTableReservations(stored.id),
+    ]);
+    const prior = requireRoundState(stored);
+    const priorRound = currentEventRound(prior);
+    const next = resolveStalePairingBasis({
+      state: prior,
+      expectedVersion: input.expectedVersion,
+      decision: input.decision,
+      people,
+      tables,
+      reservations,
+      seedKey: stored.id,
+      now: this.now().toISOString(),
+    });
+    if (
+      input.decision === 'regenerate' &&
+      priorRound?.status === 'PUBLISHED'
+    ) {
+      await this.store.releaseRoundAssignmentClaims(stored.id, priorRound.id);
+    }
+    await this.store.updateEvent(stored.id, { roundState: next });
+    await this.track(stored.id, 'round_stale_basis_resolved');
+    return this.getSnapshot(joinCode);
+  }
+
+  async swapRoundPlayers(
+    joinCode: string,
+    hostToken: string,
+    input: {
+      expectedVersion: number;
+      leftAssignmentId: string;
+      leftParticipantId: string;
+      rightAssignmentId: string;
+      rightParticipantId: string;
+    },
+  ): Promise<EventSnapshot> {
+    const stored = await this.requireHostToken(joinCode, hostToken);
+    const prior = requireRoundState(stored);
+    const priorRound = currentEventRound(prior);
+    const next = swapCurrentRoundPlayers({
+      state: prior,
+      ...input,
+    });
+    const swapped = currentEventRound(next);
+    if (priorRound?.status === 'PUBLISHED' && swapped) {
+      await this.syncPublishedRoundClaims(
+        stored.id,
+        priorRound,
+        swapped,
+        [input.leftAssignmentId, input.rightAssignmentId],
+      );
+    }
+    await this.store.updateEvent(stored.id, { roundState: next });
+    await this.track(stored.id, 'round_players_swapped');
+    return this.getSnapshot(joinCode);
+  }
+
+  async reportRoundResult(
+    joinCode: string,
+    actorToken: string,
+    input: {
+      expectedVersion: number;
+      assignmentId: string;
+      outcome?: DuelMatchOutcome;
+      playerAGameWins?: number;
+      playerBGameWins?: number;
+    },
+  ): Promise<EventSnapshot> {
+    const stored = await this.requireByJoinCode(joinCode);
+    requireRoundState(stored);
+    let actor: 'host' | 'participant' = 'participant';
+    try {
+      await this.requireHostToken(joinCode, actorToken);
+      actor = 'host';
+    } catch {
+      await this.requireParticipant(stored.id, actorToken);
+    }
+    const next = reportAssignmentResult({
+      state: requireRoundState(stored),
+      expectedVersion: input.expectedVersion,
+      assignmentId: input.assignmentId,
+      outcome: input.outcome,
+      playerAGameWins: input.playerAGameWins,
+      playerBGameWins: input.playerBGameWins,
+      actor,
+    });
+    await this.store.updateEvent(stored.id, { roundState: next });
+    await this.track(stored.id, 'round_result_reported');
+    return this.getSnapshot(joinCode);
+  }
+
+  async correctPriorRoundResult(
+    joinCode: string,
+    hostToken: string,
+    input: {
+      expectedVersion: number;
+      roundNumber: number;
+      assignmentId: string;
+      outcome?: DuelMatchOutcome;
+      playerAGameWins?: number;
+      playerBGameWins?: number;
+      reason?: string;
+    },
+  ): Promise<EventSnapshot> {
+    const stored = await this.requireHostToken(joinCode, hostToken);
+    const next = correctPriorAssignmentResult({
+      state: requireRoundState(stored),
+      ...input,
+    });
+    await this.store.updateEvent(stored.id, { roundState: next });
+    await this.track(stored.id, 'round_result_corrected');
+    return this.getSnapshot(joinCode);
+  }
+
+  async dropRoundParticipant(
+    joinCode: string,
+    hostToken: string,
+    participantId: string,
+    expectedVersion?: number,
+  ): Promise<EventSnapshot> {
+    const stored = await this.requireHostToken(joinCode, hostToken);
+    const next = dropRoundParticipantMeta(
+      requireRoundState(stored),
+      participantId,
+      this.now().toISOString(),
+      expectedVersion,
+    );
+    await this.store.updateEvent(stored.id, { roundState: next });
+    await this.track(stored.id, 'round_participant_dropped');
+    return this.getSnapshot(joinCode);
+  }
+
+  async markMissingRoundParticipant(
+    joinCode: string,
+    hostToken: string,
+    participantId: string,
+    expectedVersion: number,
+  ): Promise<EventSnapshot> {
+    const stored = await this.requireHostToken(joinCode, hostToken);
+    const next = markMissingRoundParticipantMeta(
+      requireRoundState(stored),
+      participantId,
+      this.now().toISOString(),
+      expectedVersion,
+    );
+    await this.store.updateEvent(stored.id, { roundState: next });
+    await this.track(stored.id, 'round_participant_marked_missing');
+    return this.getSnapshot(joinCode);
+  }
+
+  async lateRegisterRoundParticipant(
+    joinCode: string,
+    hostToken: string,
+    participantId: string,
+    expectedVersion?: number,
+  ): Promise<EventSnapshot> {
+    const stored = await this.requireHostToken(joinCode, hostToken);
+    const person = await this.store.findParticipantById(participantId);
+    if (!person || person.eventId !== stored.id) {
+      throw new ParticipantNotFoundError();
+    }
+    const synced = syncRoundParticipants(
+      requireRoundState(stored),
+      await this.store.listParticipants(stored.id),
+    );
+    const next = lateRegisterRoundParticipantMeta(
+      synced,
+      participantId,
+      this.now().toISOString(),
+      expectedVersion,
+    );
+    await this.store.updateEvent(stored.id, { roundState: next });
+    await this.track(stored.id, 'round_late_registered');
+    return this.getSnapshot(joinCode);
+  }
+
+  async setParticipantTableLock(
+    joinCode: string,
+    hostToken: string,
+    input: {
+      expectedVersion: number;
+      participantId: string;
+      tablePreference: TablePreferenceKind;
+      tableId?: string;
+    },
+  ): Promise<EventSnapshot> {
+    const stored = await this.requireHostToken(joinCode, hostToken);
+    const person = await this.store.findParticipantById(input.participantId);
+    if (!person || person.eventId !== stored.id) {
+      throw new ParticipantNotFoundError();
+    }
+    if (
+      input.tablePreference !== 'none' &&
+      input.tablePreference !== 'preferred' &&
+      input.tablePreference !== 'locked'
+    ) {
+      throw new InvalidEventInputError('Choose a valid table preference.');
+    }
+    let tableId: string | null = null;
+    if (input.tablePreference !== 'none') {
+      if (!input.tableId) {
+        throw new InvalidEventInputError('Choose a table for this preference.');
+      }
+      await this.requireTable(stored.id, input.tableId);
+      tableId = input.tableId;
+    }
+    await this.store.updateParticipant(person.id, {
+      status: person.status,
+      readyAt: person.readyAt,
+      tablePreference: input.tablePreference,
+      lockedTableId: input.tablePreference === 'locked' ? tableId : null,
+      preferredTableId: input.tablePreference === 'preferred' ? tableId : null,
+    });
+    const people = await this.store.listParticipants(stored.id);
+    const synced = syncRoundParticipants(requireRoundState(stored), people);
+    const next = setRoundParticipantTableLock({
+      state: synced,
+      expectedVersion: input.expectedVersion,
+      participantId: input.participantId,
+      tablePreference: input.tablePreference,
+      lockedTableId: input.tablePreference === 'locked' ? tableId : null,
+      preferredTableId: input.tablePreference === 'preferred' ? tableId : null,
+    });
+    await this.store.updateEvent(stored.id, { roundState: next });
+    await this.track(stored.id, 'round_table_lock_set');
+    return this.getSnapshot(joinCode);
+  }
+
+  private async syncPublishedRoundClaims(
+    eventId: string,
+    before: {
+      id: string;
+      assignments: Array<{ id: string; tableId?: string; isBye?: boolean }>;
+    },
+    after: {
+      id: string;
+      assignments: Array<{ id: string; tableId?: string; isBye?: boolean }>;
+    },
+    unlockedAssignmentIds: string[],
+  ): Promise<void> {
+    const unlocked = new Set(unlockedAssignmentIds);
+    const beforeById = new Map(
+      before.assignments.map((assignment) => [assignment.id, assignment]),
+    );
+    const claimed: Array<{ tableId: string; ownerId: string }> = [];
+    try {
+      for (const assignment of after.assignments) {
+        if (!unlocked.has(assignment.id)) continue;
+        const prior = beforeById.get(assignment.id);
+        const priorOwnerId = roundAssignmentOwnerId(before.id, assignment.id);
+        if (prior?.tableId) {
+          await this.store.releaseTableIfOwned({
+            tableId: prior.tableId,
+            ownerType: 'ROUND_ASSIGNMENT',
+            ownerId: priorOwnerId,
+          });
+        }
+        if (!assignment.tableId || assignment.isBye) continue;
+        const ownerId = roundAssignmentOwnerId(after.id, assignment.id);
+        await this.store.claimTable({
+          eventId,
+          tableId: assignment.tableId,
+          ownerType: 'ROUND_ASSIGNMENT',
+          ownerId,
+          purpose: 'ROUND',
+        });
+        claimed.push({ tableId: assignment.tableId, ownerId });
+      }
+    } catch (error) {
+      for (const claim of claimed) {
+        await this.store.releaseTableIfOwned({
+          tableId: claim.tableId,
+          ownerType: 'ROUND_ASSIGNMENT',
+          ownerId: claim.ownerId,
+        });
+      }
+      throw error;
+    }
   }
 
   async fillTablesWithBots(
@@ -2996,6 +3510,8 @@ function toPublicEvent(
     allowThreePods: event.allowThreePods,
     allowFivePods: event.allowFivePods,
     preferredPodSize: event.preferredPodSize,
+    ...(event.operationMode ? { operationMode: event.operationMode } : {}),
+    ...(event.roundState ? { rounds: event.roundState } : {}),
     ...(event.tournamentFormat
       ? {
           tournamentFormat: event.tournamentFormat,

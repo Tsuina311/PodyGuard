@@ -1,6 +1,11 @@
 import type { GameMode } from './treachery';
 import type { LimitedMode, LimitedSessionStatus, LimitedTimer } from './limited';
 import type { PhysicalTableStatus } from './enums';
+import type {
+  RoundActivityKind,
+  RoundAssignmentStatus,
+  RoundStatus,
+} from './rounds';
 
 /** Host-chosen view for one paired public display. */
 export const DISPLAY_MODES = ['FLOOR', 'QUEUES', 'LIMITED', 'AUTO'] as const;
@@ -136,6 +141,25 @@ export type PublicDisplayAnnouncement = {
   createdAt: string;
 };
 
+/** Minimal synchronized-round pairing board for TV (PUBLISHED / ACTIVE only). */
+export type PublicDisplayRoundAssignment = {
+  id: string;
+  position: number;
+  tableLabel?: string;
+  playerNames: string[];
+  status: RoundAssignmentStatus;
+  isBye?: boolean;
+};
+
+export type PublicDisplayCurrentRound = {
+  number: number;
+  status: RoundStatus;
+  activityKind: RoundActivityKind;
+  complete: number;
+  total: number;
+  assignments: PublicDisplayRoundAssignment[];
+};
+
 /**
  * Sanitized, allowlisted state for public TV / projector clients.
  * Built server-side — never a stripped host snapshot.
@@ -148,6 +172,8 @@ export type PublicDisplayEventState = {
   queues: PublicDisplayQueue[];
   recentAssignments: PublicDisplayAssignment[];
   limitedSessions: PublicDisplayLimitedSession[];
+  /** Present when event.rounds current round is PUBLISHED or ACTIVE. */
+  currentRound?: PublicDisplayCurrentRound;
   announcement: PublicDisplayAnnouncement | null;
 };
 

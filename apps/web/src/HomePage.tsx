@@ -7,6 +7,7 @@ import {
   LIMITED_MODES,
   TREACHERY_POD_SIZES,
   type AssassinPodSize,
+  type EventOperationMode,
   type GameMode,
   type LimitedEventModeConfig,
   type RulesFormat,
@@ -97,6 +98,8 @@ export function HomePage() {
   const [lifetimeHours, setLifetimeHours] = useState('24');
   const [tournamentFormat, setTournamentFormat] =
     useState<TournamentFormat | null>(null);
+  const [operationMode, setOperationMode] =
+    useState<EventOperationMode>('ROLLING');
   const [tournamentMatchSize, setTournamentMatchSize] = useState(2);
   const [defaultBestOf, setDefaultBestOf] = useState<SeriesLength>(1);
   const [finalBestOf, setFinalBestOf] = useState<SeriesLength>(3);
@@ -254,12 +257,18 @@ export function HomePage() {
             : undefined,
         preferredPodSize: isLimited ? 4 : eventPodSize,
         lifetimeHours: Number(lifetimeHours),
+        operationMode: isLimited ? 'ROLLING' : operationMode,
         tournamentFormat:
-          !isLimited && tournamentEligible
+          !isLimited &&
+          tournamentEligible &&
+          operationMode === 'ROLLING'
             ? tournamentFormat ?? undefined
             : undefined,
         tournamentOptions:
-          !isLimited && tournamentEligible && tournamentFormat
+          !isLimited &&
+          tournamentEligible &&
+          operationMode === 'ROLLING' &&
+          tournamentFormat
             ? {
                 matchSize: tournamentMatchSize,
                 defaultBestOf,
@@ -567,6 +576,60 @@ export function HomePage() {
               {t('tournament.teamModeUnavailable')}
             </p>
           ) : null}
+          <fieldset className="mb-4">
+            <legend className="text-muted mb-2 text-sm">
+              {t('home.playStyle')}
+            </legend>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <label
+                className={cx(
+                  'cursor-pointer rounded-xl border p-3 transition',
+                  operationMode === 'ROLLING'
+                    ? 'border-neon bg-neon/10'
+                    : 'border-muted/20 hover:border-muted/40',
+                )}
+              >
+                <input
+                  className="sr-only"
+                  type="radio"
+                  name="operationMode"
+                  checked={operationMode === 'ROLLING'}
+                  onChange={() => setOperationMode('ROLLING')}
+                />
+                <span className="block text-sm font-semibold">
+                  {t('home.rollingPlay')}
+                </span>
+                <span className="text-muted mt-1 block text-xs">
+                  {t('home.rollingPlayHint')}
+                </span>
+              </label>
+              <label
+                className={cx(
+                  'cursor-pointer rounded-xl border p-3 transition',
+                  operationMode === 'ROUNDS'
+                    ? 'border-neon bg-neon/10'
+                    : 'border-muted/20 hover:border-muted/40',
+                )}
+              >
+                <input
+                  className="sr-only"
+                  type="radio"
+                  name="operationMode"
+                  checked={operationMode === 'ROUNDS'}
+                  onChange={() => {
+                    setOperationMode('ROUNDS');
+                    setTournamentFormat(null);
+                  }}
+                />
+                <span className="block text-sm font-semibold">
+                  {t('home.synchronizedRounds')}
+                </span>
+                <span className="text-muted mt-1 block text-xs">
+                  {t('home.synchronizedRoundsHint')}
+                </span>
+              </label>
+            </div>
+          </fieldset>
           <Field
             label={t('home.eventName')}
             value={name}
@@ -586,7 +649,8 @@ export function HomePage() {
             max={40}
             required
           />
-          {tournamentEligible ? (            <fieldset className="mb-4">
+          {tournamentEligible && operationMode === 'ROLLING' ? (
+            <fieldset className="mb-4">
               <legend className="text-muted mb-2 text-sm">
                 {t('tournament.eventStructure')}
               </legend>

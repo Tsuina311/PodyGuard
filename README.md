@@ -206,6 +206,11 @@ packages/matching Matchmaking engine + test laboratory
 packages/simulation Seeded event-night simulation, benchmarks, and reports
 ```
 
+See [docs/ROUND_MODE.md](docs/ROUND_MODE.md) for **ROLLING vs synchronized ROUNDS**
+operation mode (host / player / display UX and product boundaries), and
+[docs/ORCHESTRATION_PATHS.md](docs/ORCHESTRATION_PATHS.md) for how ROLLING,
+legacy tournament, Limited, and ROUNDS share the table claim ledger.
+
 Simulation benchmark artifacts are written under the gitignored
 `artifacts/simulation/` directory. See
 [`packages/simulation/README.md`](packages/simulation/README.md) for metrics,

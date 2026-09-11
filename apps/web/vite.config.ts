@@ -38,7 +38,15 @@ function buildRevision(): string {
  */
 function lanHost(): string {
   const candidates: Array<{ address: string; score: number }> = [];
-  for (const [name, infos] of Object.entries(networkInterfaces())) {
+  let interfaces: ReturnType<typeof networkInterfaces>;
+  try {
+    interfaces = networkInterfaces();
+  } catch {
+    // Some CI/sandbox environments deny os.networkInterfaces(); LAN QR hint
+    // is optional for production builds.
+    return '';
+  }
+  for (const [name, infos] of Object.entries(interfaces)) {
     for (const info of infos ?? []) {
       if (info.family !== 'IPv4' || info.internal) {
         continue;

@@ -1,12 +1,16 @@
 import {
   DISPLAY_ASSIGNMENT_HIGHLIGHT_MS,
   LIMITED_MODE_CONFIGS,
+  currentEventRound,
+  parseEventOperationMode,
   poolShortLabel,
+  roundProgress,
   tableAvailabilityHint,
   type DisplayConfig,
   type EventSnapshot,
   type PublicDisplayAnnouncement,
   type PublicDisplayAssignment,
+  type PublicDisplayCurrentRound,
   type PublicDisplayEventState,
   type PublicDisplayLimitedSession,
   type PublicDisplayQueue,
@@ -35,6 +39,7 @@ export function projectPublicDisplayState(input: {
   const now = input.now ?? new Date();
   const { snapshot, config } = input;
   const limitedByTable = limitedTableOwners(snapshot.limitedSessions ?? []);
+  const roundsByTable = roundTableOwners(snapshot);
   const typicalSeconds = snapshot.gameDurationHint?.typicalSeconds ?? 0;
 
   const tables: PublicDisplayTable[] = snapshot.tables
@@ -43,10 +48,16 @@ export function projectPublicDisplayState(input: {
     .map((table) => {
       const pod = input.pods.find((row) => row.tableId === table.id);
       const limited = limitedByTable.get(table.id);
+      const roundSeat = roundsByTable.get(table.id);
       const names = config.showPlayerNames
-        ? (pod?.playerNames ?? table.seatedNames)
+        ? (pod?.playerNames ??
+          roundSeat?.playerNames ??
+          table.seatedNames)
         : [];
-      const playerCount = pod?.playerNames.length ?? table.seatedNames.length;
+      const playerCount =
+        pod?.playerNames.length ??
+        roundSeat?.playerNames.length ??
+        table.seatedNames.length;
 
       let activity: PublicDisplayTableActivity = 'FREE';
       let activityLabel = 'Free';
@@ -107,6 +118,12 @@ export function projectPublicDisplayState(input: {
         } else {
           activityStartedAt = pod.createdAt.toISOString();
         }
+      } else if (roundsByTable.has(table.id)) {
+        // Synchronized round seating claims this table (publish+) even when no
+        // rolling pod row exists — never show FREE on the floor map.
+        const seat = roundsByTable.get(table.id)!;
+        activity = seat.playing ? 'PLAYING' : 'MATCH';
+        activityLabel = `Round ${seat.roundNumber}`;
       } else if (table.status === 'occupied') {
         activity = 'RESERVED';
         activityLabel = 'Reserved';
@@ -150,6 +167,10 @@ export function projectPublicDisplayState(input: {
     .filter((session) => session.status !== 'CANCELLED')
     .map((session) => toPublicDisplayLimitedSession(session, config));
 
+  // Minimal ROUND-mode pairings board. Fuller TV polish (dedicated mode,
+  // timers, bye styling) is deferred — see docs/ROUND_MODE.md.
+  const currentRound = projectCurrentRound(snapshot, config);
+
   return {
     serverNow: now.toISOString(),
     event: {
@@ -164,7 +185,46 @@ export function projectPublicDisplayState(input: {
     queues,
     recentAssignments,
     limitedSessions,
+    ...(currentRound ? { currentRound } : {}),
     announcement: input.announcement,
+  };
+}
+
+function projectCurrentRound(
+  snapshot: EventSnapshot,
+  config: DisplayConfig,
+): PublicDisplayCurrentRound | undefined {
+  if (parseEventOperationMode(snapshot.event.operationMode) !== 'ROUNDS') {
+    return undefined;
+  }
+  const round = snapshot.event.rounds
+    ? currentEventRound(snapshot.event.rounds)
+    : undefined;
+  if (!round || (round.status !== 'PUBLISHED' && round.status !== 'ACTIVE')) {
+    return undefined;
+  }
+  const names = new Map(
+    snapshot.participants.map((row) => [row.id, row.displayName]),
+  );
+  const progress = roundProgress(round);
+  return {
+    number: round.number,
+    status: round.status,
+    activityKind: round.activityKind,
+    complete: progress.complete,
+    total: progress.total,
+    assignments: round.assignments.map((assignment) => ({
+      id: assignment.id,
+      position: assignment.position,
+      tableLabel: assignment.tableLabel,
+      playerNames: config.showPlayerNames
+        ? assignment.participantIds.map(
+            (id) => names.get(id) ?? id.slice(0, 6),
+          )
+        : [],
+      status: assignment.status,
+      ...(assignment.isBye ? { isBye: true } : {}),
+    })),
   };
 }
 
@@ -307,6 +367,39 @@ function buildRecentAssignments(input: {
   return assignments.sort(
     (a, b) => Date.parse(b.assignedAt) - Date.parse(a.assignedAt),
   );
+}
+
+function roundTableOwners(snapshot: EventSnapshot): Map<
+  string,
+  { roundNumber: number; playing: boolean; playerNames: string[] }
+> {
+  const map = new Map<
+    string,
+    { roundNumber: number; playing: boolean; playerNames: string[] }
+  >();
+  if (parseEventOperationMode(snapshot.event.operationMode) !== 'ROUNDS') {
+    return map;
+  }
+  const round = snapshot.event.rounds
+    ? currentEventRound(snapshot.event.rounds)
+    : undefined;
+  if (!round || (round.status !== 'PUBLISHED' && round.status !== 'ACTIVE')) {
+    return map;
+  }
+  const names = new Map(
+    snapshot.participants.map((row) => [row.id, row.displayName]),
+  );
+  for (const assignment of round.assignments) {
+    if (!assignment.tableId || assignment.isBye) continue;
+    map.set(assignment.tableId, {
+      roundNumber: round.number,
+      playing: round.status === 'ACTIVE' || assignment.status === 'PLAYING',
+      playerNames: assignment.participantIds.map(
+        (id) => names.get(id) ?? id.slice(0, 6),
+      ),
+    });
+  }
+  return map;
 }
 
 function limitedTableOwners(

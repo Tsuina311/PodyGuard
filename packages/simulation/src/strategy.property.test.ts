@@ -21,6 +21,9 @@ type GeneratedEventState = {
 
 const configuredRuns = Number.parseInt(process.env.SIMULATION_PROPERTY_RUNS ?? '10000', 10);
 const propertyRuns = Number.isSafeInteger(configuredRuns) && configuredRuns > 0 ? configuredRuns : 10_000;
+/** Keep each sync chunk under Vitest 3's ~60s birpc RPC timeout. */
+const PROPERTY_CHUNK_RUNS = 5_000;
+const propertyTestTimeoutMs = Math.max(120_000, Math.ceil(propertyRuns / 10_000) * 120_000);
 
 const participantShape = fc.record({
   status: fc.constantFrom<EventParticipant['status']>(
@@ -146,65 +149,76 @@ function summary(state: GeneratedEventState): string {
 describe('legacy-v1 adapter properties', () => {
   it(
     `preserves hard invariants, input immutability, termination, and flex validity (${propertyRuns} runs)`,
-    () => {
-      fc.assert(
-        fc.property(eventStateArbitrary, fc.context(), (state, context) => {
-          const generatedContext = summary(state);
-          context.log(generatedContext);
-          const input = adapterInput(state);
-          const before = structuredClone(input);
-          const result = legacyV1Strategy.match(input);
+    async () => {
+      // Chunk + yield so the Vitest worker can answer birpc heartbeats during long heavy runs.
+      let remaining = propertyRuns;
+      while (remaining > 0) {
+        const numRuns = Math.min(PROPERTY_CHUNK_RUNS, remaining);
+        fc.assert(
+          fc.property(eventStateArbitrary, fc.context(), (state, context) => {
+            const generatedContext = summary(state);
+            context.log(generatedContext);
+            const input = adapterInput(state);
+            const before = structuredClone(input);
+            const result = legacyV1Strategy.match(input);
 
-          expect(input, generatedContext).toEqual(before);
-          expect(result.matches.length, generatedContext).toBeLessThanOrEqual(input.tables.length);
+            expect(input, generatedContext).toEqual(before);
+            expect(result.matches.length, generatedContext).toBeLessThanOrEqual(input.tables.length);
 
-          const participantsById = new Map(input.participants.map((entry) => [entry.id, entry]));
-          const availableTables = new Set(input.tables.map((entry) => entry.id));
-          const seated = new Set<string>();
-          const usedTables = new Set<string>();
+            const participantsById = new Map(input.participants.map((entry) => [entry.id, entry]));
+            const availableTables = new Set(input.tables.map((entry) => entry.id));
+            const seated = new Set<string>();
+            const usedTables = new Set<string>();
 
-          for (const pod of result.matches) {
-            expect(availableTables.has(pod.tableId), generatedContext).toBe(true);
-            expect(usedTables.has(pod.tableId), generatedContext).toBe(false);
-            usedTables.add(pod.tableId);
-            expect(input.settings.allowedSizes, generatedContext).toContain(pod.seats.length);
+            for (const pod of result.matches) {
+              expect(availableTables.has(pod.tableId), generatedContext).toBe(true);
+              expect(usedTables.has(pod.tableId), generatedContext).toBe(false);
+              usedTables.add(pod.tableId);
+              expect(input.settings.allowedSizes, generatedContext).toContain(pod.seats.length);
 
-            for (const seat of pod.seats) {
-              const player = participantsById.get(seat.participantId);
-              expect(player, generatedContext).toBeDefined();
-              expect(seated.has(seat.participantId), generatedContext).toBe(false);
-              seated.add(seat.participantId);
-              expect(seat.poolId, generatedContext).toBe(pod.poolId);
-              expect(player?.decks.some(
-                (deck) => deck.id === seat.deckId && deck.poolId === seat.poolId,
-              ), generatedContext).toBe(true);
-              const preferredPool =
-                player?.decks.find((deck) => deck.preference === 'preferred')?.poolId ??
-                player?.decks[0]?.poolId;
-              expect(seat.concession, generatedContext).toBe(seat.poolId !== preferredPool);
-              expect(seat.flexDelta, generatedContext).toBe(
-                computeFlexDelta({
-                  concession: seat.concession,
-                  podSize: pod.seats.length,
-                  flexCredits: player?.flexCredits ?? 0,
-                  preferredSize: input.settings.preferredSize,
-                }),
-              );
+              for (const seat of pod.seats) {
+                const player = participantsById.get(seat.participantId);
+                expect(player, generatedContext).toBeDefined();
+                expect(seated.has(seat.participantId), generatedContext).toBe(false);
+                seated.add(seat.participantId);
+                expect(seat.poolId, generatedContext).toBe(pod.poolId);
+                expect(player?.decks.some(
+                  (deck) => deck.id === seat.deckId && deck.poolId === seat.poolId,
+                ), generatedContext).toBe(true);
+                const preferredPool =
+                  player?.decks.find((deck) => deck.preference === 'preferred')?.poolId ??
+                  player?.decks[0]?.poolId;
+                expect(seat.concession, generatedContext).toBe(seat.poolId !== preferredPool);
+                expect(seat.flexDelta, generatedContext).toBe(
+                  computeFlexDelta({
+                    concession: seat.concession,
+                    podSize: pod.seats.length,
+                    flexCredits: player?.flexCredits ?? 0,
+                    preferredSize: input.settings.preferredSize,
+                  }),
+                );
+              }
             }
-          }
 
-          expect(new Set(result.unmatchedIds).size, generatedContext).toBe(result.unmatchedIds.length);
-          expect([...seated, ...result.unmatchedIds].sort(), generatedContext).toEqual(
-            input.participants.map((entry) => entry.id).sort(),
-          );
-          expect(result.unmatchedIds.every((id) => !seated.has(id)), generatedContext).toBe(true);
-        }),
-        {
-          numRuns: propertyRuns,
-          verbose: true,
-        },
-      );
+            expect(new Set(result.unmatchedIds).size, generatedContext).toBe(result.unmatchedIds.length);
+            expect([...seated, ...result.unmatchedIds].sort(), generatedContext).toEqual(
+              input.participants.map((entry) => entry.id).sort(),
+            );
+            expect(result.unmatchedIds.every((id) => !seated.has(id)), generatedContext).toBe(true);
+          }),
+          {
+            numRuns,
+            verbose: true,
+          },
+        );
+        remaining -= numRuns;
+        if (remaining > 0) {
+          await new Promise<void>((resolve) => {
+            setImmediate(resolve);
+          });
+        }
+      }
     },
-    120_000,
+    propertyTestTimeoutMs,
   );
 });
