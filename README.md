@@ -73,6 +73,28 @@ still open the same join screen.
 If a phone cannot join, open `/#/connectivity` on that phone for a privacy-safe
 layer check (API, realtime polling, websocket, storage).
 
+## App version (phones)
+
+The player-facing release number lives in the repo-root [`VERSION`](VERSION)
+file and is shown next to **PodyGuard** on every screen that uses the brand
+(for example `v1.0.0`).
+
+Convention:
+
+- **Patch** (`1.0.0` → `1.0.1`): every ordinary commit / deploy you want phones
+  to recognize as new.
+- **Minor / major**: only for irreversible global changes.
+
+Before committing a release you care about on phones:
+
+```bash
+yarn bump:patch   # or bump:minor / bump:major
+```
+
+Then confirm on a phone after Pages deploys: the brand line shows the new
+`vX.Y.Z`. Connectivity also lists **App version** and a separate **Build**
+git short SHA for diagnostics.
+
 ### 1. API on Render
 
 The included `render.yaml` is the shortest API path:

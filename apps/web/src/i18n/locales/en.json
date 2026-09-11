@@ -996,6 +996,7 @@
     "aside": "diagnostics",
     "hint": "This page checks whether this phone can reach the app, API, and realtime channel. No event or seat data is sent.",
     "appVersion": "App version",
+    "build": "Build",
     "diagnosticId": "Diagnostic ID",
     "retry": "Retry"
   },

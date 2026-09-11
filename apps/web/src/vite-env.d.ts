@@ -12,5 +12,8 @@ interface ImportMeta {
 /** LAN IPv4 of the dev machine, injected by vite.config.ts. */
 declare const __LAN_HOST__: string;
 
-/** Deployment revision or explicit VITE_APP_VERSION, injected at build time. */
+/** Human-facing semver from repo VERSION (or VITE_APP_VERSION). */
 declare const __APP_VERSION__: string;
+
+/** Short git revision for diagnostics; not shown as the player-facing version. */
+declare const __APP_BUILD__: string;

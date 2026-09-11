@@ -30,6 +30,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
   const technicalContext: FeedbackTechnicalContext | null = details
     ? {
         appVersion: __APP_VERSION__,
+        build: __APP_BUILD__,
         route: feedbackRoute(location.pathname),
         userAgent: navigator.userAgent,
         viewport: {

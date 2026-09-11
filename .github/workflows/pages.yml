@@ -51,6 +51,8 @@ jobs:
           fi
           echo "VITE_PUBLIC_ORIGIN=${VITE_PUBLIC_ORIGIN}"
           echo "VITE_API_URL=${VITE_API_URL}"
+          RELEASE_VERSION="$(tr -d '[:space:]' < VERSION)"
+          echo "RELEASE_VERSION=${RELEASE_VERSION}"
           yarn workspace @podyguard/shared build
           yarn workspace @podyguard/matching build
           yarn workspace @podyguard/web build
@@ -63,7 +65,11 @@ jobs:
             echo "Pages build contains a dangerous join URL pattern"
             exit 1
           fi
-          echo "PAGES BUILD: PASS"
+          if ! grep -R --include='*.js' -F "${RELEASE_VERSION}" apps/web/dist >/dev/null; then
+            echo "Pages build missing release version ${RELEASE_VERSION}"
+            exit 1
+          fi
+          echo "PAGES BUILD: PASS (v${RELEASE_VERSION})"
       - uses: actions/upload-pages-artifact@v3
         with:
           path: apps/web/dist

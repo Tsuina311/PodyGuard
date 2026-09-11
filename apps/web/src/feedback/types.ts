@@ -7,6 +7,7 @@ export type FeedbackContextDetails = {
 
 export type FeedbackTechnicalContext = FeedbackContextDetails & {
   appVersion: string;
+  build?: string;
   route: string;
   userAgent: string;
   viewport: {

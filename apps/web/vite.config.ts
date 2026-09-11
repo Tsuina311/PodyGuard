@@ -1,7 +1,36 @@
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { networkInterfaces } from 'node:os';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
+
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+
+/**
+ * Human-facing release version from the repo-root VERSION file.
+ * Bump patch on ordinary commits; minor/major only for irreversible global changes.
+ */
+function releaseVersion(): string {
+  const fromEnv = process.env.VITE_APP_VERSION?.trim();
+  if (fromEnv) {
+    return fromEnv;
+  }
+  try {
+    return readFileSync(resolve(repoRoot, 'VERSION'), 'utf8').trim();
+  } catch {
+    return '0.0.0-dev';
+  }
+}
+
+function buildRevision(): string {
+  return (
+    process.env.GITHUB_SHA?.trim().slice(0, 7) ||
+    process.env.RENDER_GIT_COMMIT?.trim().slice(0, 7) ||
+    'dev'
+  );
+}
 
 /**
  * The join QR has to point at an address a phone can reach, so we hand the app
@@ -50,12 +79,8 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   define: {
     __LAN_HOST__: JSON.stringify(lanHost()),
-    __APP_VERSION__: JSON.stringify(
-      process.env.VITE_APP_VERSION?.trim() ||
-        process.env.GITHUB_SHA?.slice(0, 7) ||
-        process.env.RENDER_GIT_COMMIT?.slice(0, 7) ||
-        'dev',
-    ),
+    __APP_VERSION__: JSON.stringify(releaseVersion()),
+    __APP_BUILD__: JSON.stringify(buildRevision()),
   },
   server: {
     host: true,

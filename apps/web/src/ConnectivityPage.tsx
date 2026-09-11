@@ -202,7 +202,11 @@ export function ConnectivityPage() {
         <dl className="text-muted mb-5 space-y-1 font-mono text-xs">
           <div className="flex justify-between gap-3">
             <dt>{t('connectivity.appVersion')}</dt>
-            <dd>{__APP_VERSION__}</dd>
+            <dd>v{__APP_VERSION__}</dd>
+          </div>
+          <div className="flex justify-between gap-3">
+            <dt>{t('connectivity.build')}</dt>
+            <dd>{__APP_BUILD__}</dd>
           </div>
           <div className="flex justify-between gap-3">
             <dt>{t('connectivity.diagnosticId')}</dt>
