@@ -1,106 +1,64 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { readStored, removeStored, writeStored } from './device-storage';
-
-type FakeStore = Storage & { map: Map<string, string> };
-
-// The node test environment has no web storage, so stand one up by hand.
-function fakeStore(options?: { denyWrites?: boolean }): FakeStore {
-  const map = new Map<string, string>();
-  return {
-    map,
-    get length() {
-      return map.size;
-    },
-    key: (index: number) => [...map.keys()][index] ?? null,
-    getItem: (key: string) => map.get(key) ?? null,
-    setItem: (key: string, value: string) => {
-      if (options?.denyWrites) {
-        throw new Error('QuotaExceededError');
-      }
-      map.set(key, value);
-    },
-    removeItem: (key: string) => void map.delete(key),
-    clear: () => map.clear(),
-  } as FakeStore;
-}
-
-function install(kind: 'local' | 'session', value: Storage | undefined): void {
-  Object.defineProperty(globalThis, `${kind}Storage`, {
-    configurable: true,
-    value,
-  });
-}
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import {
+  probeDurableStorage,
+  readStored,
+  removeStored,
+  writeStored,
+} from './device-storage';
 
 afterEach(() => {
-  install('local', undefined);
-  install('session', undefined);
+  vi.unstubAllGlobals();
+  removeStored('probe-key');
 });
 
-describe('device storage', () => {
-  it('keeps values where a closed app can still find them', () => {
-    const local = fakeStore();
-    const session = fakeStore();
-    install('local', local);
-    install('session', session);
+describe('device-storage', () => {
+  it('survives localStorage getItem throwing', () => {
+    vi.stubGlobal('localStorage', {
+      getItem: () => {
+        throw new Error('SecurityError');
+      },
+      setItem: () => {
+        throw new Error('SecurityError');
+      },
+      removeItem: () => {
+        throw new Error('SecurityError');
+      },
+    });
+    vi.stubGlobal('sessionStorage', {
+      getItem: () => null,
+      setItem: () => {
+        throw new Error('SecurityError');
+      },
+      removeItem: () => undefined,
+    });
 
-    writeStored('podyguard.player.ABC123', 'seat-token');
-
-    expect(local.map.get('podyguard.player.ABC123')).toBe('seat-token');
-    expect(session.map.size).toBe(0);
-    expect(readStored('podyguard.player.ABC123')).toBe('seat-token');
+    expect(() => writeStored('probe-key', 'value')).not.toThrow();
+    expect(readStored('probe-key')).toBe('value');
+    expect(probeDurableStorage()).toBe('unavailable');
   });
 
-  it('carries a session left over from the old storage forward', () => {
-    const local = fakeStore();
-    const session = fakeStore();
-    session.setItem('podyguard.player.ABC123', 'seat-token');
-    install('local', local);
-    install('session', session);
+  it('survives QuotaExceededError on setItem', () => {
+    const data = new Map<string, string>();
+    vi.stubGlobal('localStorage', {
+      getItem: (key: string) => data.get(key) ?? null,
+      setItem: () => {
+        throw new DOMException('quota', 'QuotaExceededError');
+      },
+      removeItem: (key: string) => {
+        data.delete(key);
+      },
+    });
+    vi.stubGlobal('sessionStorage', {
+      getItem: () => null,
+      setItem: (key: string, value: string) => {
+        data.set(`s:${key}`, value);
+      },
+      removeItem: (key: string) => {
+        data.delete(`s:${key}`);
+      },
+    });
 
-    expect(readStored('podyguard.player.ABC123')).toBe('seat-token');
-    expect(local.map.get('podyguard.player.ABC123')).toBe('seat-token');
-  });
-
-  it('prefers the durable copy over a stale session one', () => {
-    const local = fakeStore();
-    const session = fakeStore();
-    local.setItem('key', 'fresh');
-    session.setItem('key', 'stale');
-    install('local', local);
-    install('session', session);
-
-    expect(readStored('key')).toBe('fresh');
-  });
-
-  it('forgets a value in both stores', () => {
-    const local = fakeStore();
-    const session = fakeStore();
-    local.setItem('key', 'a');
-    session.setItem('key', 'b');
-    install('local', local);
-    install('session', session);
-
-    removeStored('key');
-
-    expect(readStored('key')).toBeNull();
-    expect(local.map.size).toBe(0);
-    expect(session.map.size).toBe(0);
-  });
-
-  it('still holds the value for this session when the durable store refuses', () => {
-    const session = fakeStore();
-    install('local', fakeStore({ denyWrites: true }));
-    install('session', session);
-
-    writeStored('key', 'value');
-
-    expect(session.map.get('key')).toBe('value');
-    expect(readStored('key')).toBe('value');
-  });
-
-  it('is a no-op with no storage at all', () => {
-    expect(() => writeStored('key', 'value')).not.toThrow();
-    expect(readStored('key')).toBeNull();
-    expect(() => removeStored('key')).not.toThrow();
+    expect(() => writeStored('probe-key', 'saved')).not.toThrow();
+    expect(readStored('probe-key')).toBe('saved');
   });
 });

@@ -14,10 +14,21 @@ describe('health endpoint', () => {
       service: string;
       database: string;
       ok: boolean;
+      buildVersion: string;
+      serverStartedAt: string;
+      uptimeSeconds: number;
+      timestamp: string;
     };
     expect(response.statusCode).toBe(body.ok ? 200 : 503);
     expect(body.service).toBe('podyguard-server');
     expect(['up', 'down']).toContain(body.database);
+    expect(body.buildVersion.length).toBeGreaterThan(0);
+    expect(Number.isNaN(Date.parse(body.serverStartedAt))).toBe(false);
+    expect(body.uptimeSeconds).toBeGreaterThanOrEqual(0);
+    expect(Number.isNaN(Date.parse(body.timestamp))).toBe(false);
+    expect(JSON.stringify(body)).not.toMatch(
+      /DATABASE_URL|PARTICIPANT_SESSION|password|secret/i,
+    );
     expect(app.identity.hostAuth).toBeDefined();
     expect(app.identity.participantSessions).toBeDefined();
     expect(app.identity.hostEventSessions).toBeDefined();

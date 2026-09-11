@@ -847,9 +847,13 @@
     "share": "share",
     "noLanAddress": "No LAN address found — this link only works on this computer.",
     "qrUsesLan": "QR code uses {{url}} so phones on your network can open it.",
+    "publicOriginMissing": "Player links are disabled: VITE_PUBLIC_ORIGIN is missing or unsafe in this build. Redeploy with the canonical GitHub Pages URL.",
     "copyPlayerLink": "Copy player link",
     "queue": "Queue",
     "nobodyWaiting": "Nobody waiting.",
+    "likelyFreeSoonCount": "{{count}} table likely free soon",
+    "likelyFreeSoonCount_plural": "{{count}} tables likely free soon",
+    "likelyFreeSoon": "Likely free in ~{{minutes}} min",
     "flex": "flex {{count}}",
     "challengePts": "{{count}} challenge pts",
     "pts": "{{count}} pts",
@@ -941,6 +945,7 @@
     "noLimited": "No limited sessions right now.",
     "playerCount": "{{count}} player",
     "playerCount_plural": "{{count}} players",
+    "likelyFreeSoon": "Likely free in ~{{minutes}} min",
     "ready": "ready",
     "target": "target {{count}}",
     "round": "round {{current}}/{{total}}",
@@ -980,7 +985,19 @@
     "matchingShortly": "Matching will send you to a table shortly.",
     "imTheHost": "I'm the host",
     "offlineSaved": "Saved on this phone. It will send when you are back online.",
-    "stayAtTable": "Stay at the table until the host calls the game."
+    "stayAtTable": "Stay at the table until the host calls the game.",
+    "reference": "Reference: {{id}}",
+    "liveUnavailable": "You're in the event, but live updates are offline. Retry the connection — you do not need to join again.",
+    "liveReconnecting": "Reconnecting to live updates…",
+    "retryLive": "Retry live connection"
+  },
+  "connectivity": {
+    "title": "PodyGuard connectivity",
+    "aside": "diagnostics",
+    "hint": "This page checks whether this phone can reach the app, API, and realtime channel. No event or seat data is sent.",
+    "appVersion": "App version",
+    "diagnosticId": "Diagnostic ID",
+    "retry": "Retry"
   },
   "matchConfig": {
     "title": "Game setup",

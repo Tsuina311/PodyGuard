@@ -385,6 +385,16 @@ function FloorView({
                 {elapsed}
               </p>
             ) : null}
+            {table.likelyFreeSoon ? (
+              <p className="text-neon mt-2 text-sm font-medium sm:text-base">
+                {t('display.likelyFreeSoon', {
+                  minutes: Math.max(
+                    1,
+                    Math.ceil((table.estimatedRemainingSeconds ?? 0) / 60),
+                  ),
+                })}
+              </p>
+            ) : null}
           </div>
         );
       })}

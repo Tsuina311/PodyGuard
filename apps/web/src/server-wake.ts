@@ -1,3 +1,5 @@
+import { readStored, writeStored } from './device-storage';
+
 /** Render free sleeps after ~15 minutes idle; stay under that. */
 export const KEEP_ALIVE_INTERVAL_MS = 10 * 60 * 1000;
 
@@ -24,8 +26,9 @@ export function shouldShowWakeScreen(input: {
 /**
  * True when this tab should hit /health for keepalive.
  *
- * Tabs share a last-ping timestamp in localStorage so fifty open phones still
- * produce about one request per interval, not fifty.
+ * Tabs share a last-ping timestamp in storage so fifty open phones still
+ * produce about one request per interval, not fifty. Storage failures degrade
+ * to "ping now" rather than crashing boot.
  */
 export function shouldSendKeepAlivePing(input: {
   now: number;
@@ -39,10 +42,8 @@ export function shouldSendKeepAlivePing(input: {
   return input.now - input.lastPingAt >= interval;
 }
 
-export function readLastKeepAlivePingAt(
-  storage: Pick<Storage, 'getItem'> = localStorage,
-): number | null {
-  const raw = storage.getItem(KEEP_ALIVE_STORAGE_KEY);
+export function readLastKeepAlivePingAt(): number | null {
+  const raw = readStored(KEEP_ALIVE_STORAGE_KEY);
   if (raw == null || raw === '') {
     return null;
   }
@@ -50,9 +51,6 @@ export function readLastKeepAlivePingAt(
   return Number.isFinite(value) ? value : null;
 }
 
-export function writeLastKeepAlivePingAt(
-  at: number,
-  storage: Pick<Storage, 'setItem'> = localStorage,
-): void {
-  storage.setItem(KEEP_ALIVE_STORAGE_KEY, String(at));
+export function writeLastKeepAlivePingAt(at: number): void {
+  writeStored(KEEP_ALIVE_STORAGE_KEY, String(at));
 }

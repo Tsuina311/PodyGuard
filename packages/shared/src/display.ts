@@ -69,6 +69,10 @@ export type PublicDisplayTable = {
   playerCount: number;
   /** ISO timestamp when the current activity began, if known. */
   activityStartedAt?: string;
+  /** Advice-only: playing table is near its typical game length. */
+  likelyFreeSoon?: boolean;
+  /** Advice-only: estimated seconds until the table is typically free. */
+  estimatedRemainingSeconds?: number;
   /** Limited session label when this table is owned by Limited. */
   limitedSessionLabel?: string;
   limitedRound?: number;

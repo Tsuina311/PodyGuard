@@ -296,7 +296,17 @@ export class MemoryEventStore implements EventStore {
   }
 
   async listAssignments(eventId: string): Promise<StoredAssignment[]> {
-    return [...(this.assignments.get(eventId) ?? [])];
+    const pods = new Map(
+      (this.pods.get(eventId) ?? []).map((pod) => [pod.id, pod]),
+    );
+    return (this.assignments.get(eventId) ?? []).map((assignment) => {
+      const pod = pods.get(assignment.podId);
+      return {
+        ...assignment,
+        podPlayingStartedAt: pod?.playingStartedAt ?? null,
+        podCreatedAt: pod?.createdAt,
+      };
+    });
   }
 
   async findActiveTreacheryAssignment(
@@ -421,6 +431,9 @@ export class MemoryEventStore implements EventStore {
     const pod = this.findPod(podId);
     if (!pod || (pod.status !== 'formed' && pod.status !== 'playing')) {
       throw new PodNotFoundError();
+    }
+    if (pod.status === 'formed') {
+      pod.playingStartedAt = new Date();
     }
     pod.status = 'playing';
     for (const assignment of this.assignments.get(pod.eventId) ?? []) {

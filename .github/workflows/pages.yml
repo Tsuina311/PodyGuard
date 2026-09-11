@@ -49,10 +49,21 @@ jobs:
             OWNER="$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')"
             export VITE_PUBLIC_ORIGIN="https://${OWNER}.github.io/${{ github.event.repository.name }}"
           fi
+          echo "VITE_PUBLIC_ORIGIN=${VITE_PUBLIC_ORIGIN}"
+          echo "VITE_API_URL=${VITE_API_URL}"
           yarn workspace @podyguard/shared build
           yarn workspace @podyguard/matching build
           yarn workspace @podyguard/web build
-
+          # Fail loudly if the bundle would emit a dangerous player origin.
+          if ! grep -R -l --include='*.js' 'github.io' apps/web/dist >/dev/null; then
+            echo "Pages build missing github.io public origin marker"
+            exit 1
+          fi
+          if grep -R --include='*.js' -E 'podyguard\.onrender\.com/#/e/|localhost:5173/\?join=' apps/web/dist; then
+            echo "Pages build contains a dangerous join URL pattern"
+            exit 1
+          fi
+          echo "PAGES BUILD: PASS"
       - uses: actions/upload-pages-artifact@v3
         with:
           path: apps/web/dist

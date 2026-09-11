@@ -150,6 +150,8 @@ export type StoredAssignment = {
   treacheryRole?: TreacheryRole;
   treacheryIdentityId?: number;
   treacheryUnveiledAt?: Date;
+  podPlayingStartedAt?: Date | null;
+  podCreatedAt?: Date;
 };
 
 export type StoredTreacheryAssignment = {
@@ -179,6 +181,7 @@ export type StoredPod = PublicPod & {
   winnerParticipantId?: string | null;
   durationSeconds?: number | null;
   completedAt?: Date | null;
+  playingStartedAt?: Date | null;
   createdAt?: Date;
   rating?: number | null;
   seats?: StoredCompletedSeat[];

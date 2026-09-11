@@ -343,7 +343,8 @@ function AnimatedDie({
     }
     setPhase('pending');
     setDisplay((current) => (current >= 1 && current <= sides ? current : rollDie(sides)));
-    let flicker: ReturnType<typeof window.setInterval> | undefined;
+    // DOM timers are numbers; avoid NodeJS.Timeout from @types/node leaking in.
+    let flicker: number | undefined;
     const start = window.setTimeout(() => {
       setPhase('tumbling');
       flicker = window.setInterval(() => {

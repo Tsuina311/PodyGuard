@@ -58,6 +58,7 @@ import {
   type TournamentOptions,
   type TournamentState,
   normalizeJoinCode,
+  typicalGameDurationSeconds,
 } from '@podyguard/shared';
 import { randomUUID } from 'node:crypto';
 import {
@@ -656,17 +657,20 @@ export class EventService {
 
   async getSnapshot(joinCode: string): Promise<EventSnapshot> {
     const stored = await this.requireByJoinCode(joinCode);
-    const [event, participants, tables, sessions, people] = await Promise.all([
+    const [event, participants, tables, sessions, people, games] =
+      await Promise.all([
       this.presentEvent(stored),
       this.listParticipants(joinCode),
       this.listTablesByEventId(stored.id),
       this.store.listLimitedSessions(stored.id),
       this.store.listParticipants(stored.id),
+      this.store.listCompletedGames(stored.id),
     ]);
     return {
       event,
       participants,
       tables,
+      gameDurationHint: buildGameDurationHint(games, stored.gameMode),
       limitedQueues: limitedQueueSummaries(stored, people),
       limitedSessions: sessions.map((session) =>
         toPublicLimitedSession(session, this.now()),
@@ -689,6 +693,7 @@ export class EventService {
       playerNames: string[];
       poolId?: string;
       createdAt: Date;
+      playingStartedAt?: Date;
     }>;
   }> {
     const stored = await this.requireByJoinCode(joinCode);
@@ -711,6 +716,14 @@ export class EventService {
         playerNames: pod.playerNames,
         ...(pod.poolId ? { poolId: pod.poolId } : {}),
         createdAt: pod.createdAt ?? stored.createdAt,
+        ...(pod.status === 'playing'
+          ? {
+              playingStartedAt:
+                pod.playingStartedAt ??
+                pod.createdAt ??
+                stored.createdAt,
+            }
+          : {}),
       });
     }
     return {
@@ -2558,6 +2571,7 @@ export class EventService {
         podStatusForTable(row.id, assignments),
         poolIdForTable(row.id, assignments),
         trackerUsedForTable(row.id, assignments),
+        playingStartedAtForTable(row.id, assignments),
       ),
     );
   }
@@ -3063,6 +3077,7 @@ function toPublicTable(
   podStatus?: 'formed' | 'playing',
   poolId?: string,
   trackerUsed?: boolean,
+  playingStartedAt?: string,
 ): PublicTable {
   return {
     id: row.id,
@@ -3073,7 +3088,30 @@ function toPublicTable(
     podStatus,
     trackerUsed,
     poolId,
+    ...(playingStartedAt ? { playingStartedAt } : {}),
   };
+}
+
+function playingStartedAtForTable(
+  tableId: string,
+  assignments: StoredAssignment[],
+): string | undefined {
+  const row = assignments.find((assignment) => assignment.tableId === tableId);
+  if (!row || row.podStatus !== 'playing') {
+    return undefined;
+  }
+  const started = row.podPlayingStartedAt ?? row.podCreatedAt;
+  return started?.toISOString();
+}
+
+function buildGameDurationHint(
+  games: StoredCompletedGame[],
+  gameMode: GameMode,
+) {
+  const durations = games
+    .map((game) => game.durationSeconds)
+    .filter((duration): duration is number => duration !== null);
+  return typicalGameDurationSeconds(durations, gameMode);
 }
 
 function podStatusForTable(

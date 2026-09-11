@@ -1,4 +1,5 @@
 import { ApiError } from './api';
+import { readStored, removeStored, writeStored } from './device-storage';
 
 export type PendingOp =
   | {
@@ -26,30 +27,17 @@ function key(joinCode: string): string {
   return `podyguard.pending.${joinCode}`;
 }
 
-const fallback = new Map<string, string>();
-
 function read(joinCode: string): string | null {
-  if (typeof localStorage !== 'undefined') {
-    return localStorage.getItem(key(joinCode));
-  }
-  return fallback.get(key(joinCode)) ?? null;
+  return readStored(key(joinCode));
 }
 
 function write(joinCode: string, value: string | null): void {
   const storeKey = key(joinCode);
-  if (typeof localStorage !== 'undefined') {
-    if (value === null) {
-      localStorage.removeItem(storeKey);
-    } else {
-      localStorage.setItem(storeKey, value);
-    }
+  if (value === null) {
+    removeStored(storeKey);
     return;
   }
-  if (value === null) {
-    fallback.delete(storeKey);
-  } else {
-    fallback.set(storeKey, value);
-  }
+  writeStored(storeKey, value);
 }
 
 export function listPending(joinCode: string): PendingOp[] {

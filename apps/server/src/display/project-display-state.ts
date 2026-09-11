@@ -2,6 +2,7 @@ import {
   DISPLAY_ASSIGNMENT_HIGHLIGHT_MS,
   LIMITED_MODE_CONFIGS,
   poolShortLabel,
+  tableAvailabilityHint,
   type DisplayConfig,
   type EventSnapshot,
   type PublicDisplayAnnouncement,
@@ -21,6 +22,7 @@ export type DisplayActivityPod = {
   playerNames: string[];
   poolId?: string;
   createdAt: Date;
+  playingStartedAt?: Date;
 };
 
 export function projectPublicDisplayState(input: {
@@ -33,6 +35,7 @@ export function projectPublicDisplayState(input: {
   const now = input.now ?? new Date();
   const { snapshot, config } = input;
   const limitedByTable = limitedTableOwners(snapshot.limitedSessions ?? []);
+  const typicalSeconds = snapshot.gameDurationHint?.typicalSeconds ?? 0;
 
   const tables: PublicDisplayTable[] = snapshot.tables
     .slice()
@@ -48,6 +51,8 @@ export function projectPublicDisplayState(input: {
       let activity: PublicDisplayTableActivity = 'FREE';
       let activityLabel = 'Free';
       let activityStartedAt: string | undefined;
+      let likelyFreeSoon: boolean | undefined;
+      let estimatedRemainingSeconds: number | undefined;
       let limitedSessionLabel: string | undefined;
       let limitedRound: number | undefined;
       let limitedResultsReported: number | undefined;
@@ -84,7 +89,24 @@ export function projectPublicDisplayState(input: {
         const pool = pod.poolId ? poolShortLabel(pod.poolId) : null;
         const modeLabel = formatModeLabel(snapshot.event.gameMode);
         activityLabel = pool ? `${modeLabel} · ${pool}` : modeLabel;
-        activityStartedAt = pod.createdAt.toISOString();
+        if (pod.status === 'playing') {
+          const started = pod.playingStartedAt ?? pod.createdAt;
+          activityStartedAt = started.toISOString();
+          if (typicalSeconds > 0) {
+            const hint = tableAvailabilityHint({
+              podStatus: 'playing',
+              playingStartedAt: started,
+              typicalSeconds,
+              now,
+            });
+            if (hint?.likelyFreeSoon) {
+              likelyFreeSoon = true;
+              estimatedRemainingSeconds = hint.estimatedRemainingSeconds;
+            }
+          }
+        } else {
+          activityStartedAt = pod.createdAt.toISOString();
+        }
       } else if (table.status === 'occupied') {
         activity = 'RESERVED';
         activityLabel = 'Reserved';
@@ -100,6 +122,10 @@ export function projectPublicDisplayState(input: {
         playerNames: names,
         playerCount,
         ...(activityStartedAt ? { activityStartedAt } : {}),
+        ...(likelyFreeSoon ? { likelyFreeSoon } : {}),
+        ...(estimatedRemainingSeconds !== undefined
+          ? { estimatedRemainingSeconds }
+          : {}),
         ...(limitedSessionLabel ? { limitedSessionLabel } : {}),
         ...(limitedRound !== undefined ? { limitedRound } : {}),
         ...(limitedResultsReported !== undefined

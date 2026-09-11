@@ -67,6 +67,7 @@ export type {
   CommanderSelection,
   EventMetrics,
   EventSnapshot,
+  GameDurationHint,
   PodRating,
   ProductEventName,
   PublicDeck,
@@ -193,6 +194,19 @@ export type {
   TreacheryIdentityCard,
   PublicTreacheryIdentity,
 } from './treachery';
+
+export {
+  LIKELY_FREE_SOON_ELAPSED_RATIO,
+  LIKELY_FREE_SOON_REMAINING_SECONDS,
+  defaultGameDurationSeconds,
+  median,
+  tableAvailabilityHint,
+  typicalGameDurationSeconds,
+} from './table-availability-hint';
+
+export type {
+  TableAvailabilityHint,
+} from './table-availability-hint';
 
 export {
   DEFAULT_DISPLAY_CONFIG,

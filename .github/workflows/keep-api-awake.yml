@@ -1,10 +1,15 @@
 # Render free instances sleep after ~15 minutes without HTTP traffic.
-# One scheduled ping keeps the API warm without every phone doing it.
+# This workflow is best-effort only: GitHub may delay cron jobs by many minutes
+# when the runner pool is busy. Observed gaps regularly exceed 15 minutes, so
+# this does NOT guarantee the free instance stays awake.
+#
+# For alpha testing, also point an external uptime monitor at /health with an
+# interval comfortably under 15 minutes (for example every 5–10 minutes).
 name: Keep API awake
 
 on:
   schedule:
-    # Every 10 minutes. GitHub may delay cron jobs when the runner pool is busy.
+    # Nominally every 10 minutes. Treat delays as normal, not a bug in this file.
     - cron: '*/10 * * * *'
   workflow_dispatch:
 
@@ -24,5 +29,11 @@ jobs:
             exit 1
           fi
           origin="${API_ORIGIN%/}"
+          started="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo "keep-alive start=${started}"
           echo "GET ${origin}/health"
-          curl -fsS --retry 2 --retry-delay 5 --max-time 90 "${origin}/health"
+          body="$(curl -fsS --retry 2 --retry-delay 5 --max-time 90 "${origin}/health")"
+          finished="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo "keep-alive finish=${finished}"
+          echo "body=${body}"
+          echo "${body}" | grep -q '"ok":true'

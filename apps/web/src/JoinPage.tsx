@@ -51,6 +51,10 @@ import { useEventLive } from './useEventLive';
 import { forgetActiveMatch, rememberActiveMatch } from './active-match';
 import { readStored, removeStored, writeStored } from './device-storage';
 import {
+  getSessionDiagnosticId,
+  recordJoinBreadcrumb,
+} from './join-diagnostics';
+import {
   enqueuePending,
   flushPending,
   isOfflineError,
@@ -135,11 +139,13 @@ export function JoinPage({
     setEvent(null);
     setParticipant(null);
     const existing = loadPlayerSession(joinCode);
+    recordJoinBreadcrumb('EVENT_LOOKUP_STARTED');
     void getEvent(joinCode)
       .then(async (loaded) => {
         if (cancelled) {
           return;
         }
+        recordJoinBreadcrumb('EVENT_LOOKUP_OK');
         setEvent(loaded);
         if (!existing) {
           return;
@@ -199,20 +205,24 @@ export function JoinPage({
         if (cancelled) {
           return;
         }
+        recordJoinBreadcrumb(
+          'EVENT_LOOKUP_FAILED',
+          caught instanceof ApiError ? caught.code : 'unknown',
+        );
         if (caught instanceof ApiError && caught.status === 404) {
           void navigate('/', { replace: true, state: { staleJoin: true } });
           return;
         }
         setError(
           caught instanceof ApiError
-            ? caught.message
-            : t('common.errors.eventNotFound'),
+            ? `${caught.message} (${t('join.reference', { id: getSessionDiagnosticId() })})`
+            : `${t('common.errors.eventNotFound')} (${t('join.reference', { id: getSessionDiagnosticId() })})`,
         );
       });
     return () => {
       cancelled = true;
     };
-  }, [joinCode, navigate]);
+  }, [joinCode, navigate, t]);
 
   const onSnapshot = useCallback((next: EventSnapshot) => {
     setSnapshot(next);
@@ -225,7 +235,13 @@ export function JoinPage({
     });
   }, []);
 
-  useEventLive(event?.joinCode, Boolean(event && token), onSnapshot);
+  const [liveRetryNonce, setLiveRetryNonce] = useState(0);
+  const liveStatus = useEventLive(
+    event?.joinCode,
+    Boolean(event && token),
+    onSnapshot,
+    liveRetryNonce,
+  );
 
   useEffect(() => {
     if (
@@ -347,8 +363,10 @@ export function JoinPage({
     }
     setBusy(true);
     setError(null);
+    recordJoinBreadcrumb('JOIN_STARTED');
     try {
       const result = await joinEvent(event.joinCode, displayName, decks);
+      recordJoinBreadcrumb('JOIN_OK');
       savePlayerSession(event.joinCode, {
         token: result.token,
         displayName: result.participant.displayName,
@@ -367,10 +385,14 @@ export function JoinPage({
         );
       }
     } catch (caught) {
+      recordJoinBreadcrumb(
+        'JOIN_FAILED',
+        caught instanceof ApiError ? caught.code : 'unknown',
+      );
       setError(
         caught instanceof ApiError
-          ? caught.message
-          : t('common.errors.joinEvent'),
+          ? `${caught.message} (${t('join.reference', { id: getSessionDiagnosticId() })})`
+          : `${t('common.errors.joinEvent')} (${t('join.reference', { id: getSessionDiagnosticId() })})`,
       );
     } finally {
       setBusy(false);
@@ -713,6 +735,25 @@ export function JoinPage({
           title={participant.displayName}
           aside={<Badge tone={statusTone(participant.status)}>{participant.status}</Badge>}
         >
+          {liveStatus === 'failed' || liveStatus === 'reconnecting' ? (
+            <div className="border-warning/40 bg-warning/10 mb-4 rounded-xl border px-3 py-2 text-sm">
+              <p className="text-warning mb-2">
+                {liveStatus === 'reconnecting'
+                  ? t('join.liveReconnecting')
+                  : t('join.liveUnavailable')}
+              </p>
+              <p className="text-muted mb-2 text-xs">
+                {t('join.reference', { id: getSessionDiagnosticId() })}
+              </p>
+              <Button
+                variant="glass"
+                size="sm"
+                onClick={() => setLiveRetryNonce((value) => value + 1)}
+              >
+                {t('join.retryLive')}
+              </Button>
+            </div>
+          ) : null}
           {event?.tournament ? (
             <TournamentPlayerStatus
               event={event}

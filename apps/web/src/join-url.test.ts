@@ -1,10 +1,13 @@
+import { isJoinCodeFormat, normalizeJoinCode } from '@podyguard/shared';
 import { describe, expect, it } from 'vitest';
 import {
+  isUnsafePlayerOrigin,
+  joinCodeFromQueryString,
   joinCodeFromScan,
-  joinLinkParts,
-  phoneJoinLinkParts,
   playerJoinUrl,
+  resolvePlayerLinkParts,
   shareableOrigin,
+  stripJoinQueryFromLocation,
 } from './join-url';
 
 describe('joinCodeFromScan', () => {
@@ -12,7 +15,13 @@ describe('joinCodeFromScan', () => {
     expect(joinCodeFromScan('ab23cd')).toBe('AB23CD');
   });
 
-  it('pulls the code from a project-pages join URL', () => {
+  it('pulls the code from a query join URL', () => {
+    expect(
+      joinCodeFromScan('https://tsuina311.github.io/PodyGuard/?join=AB23CD'),
+    ).toBe('AB23CD');
+  });
+
+  it('pulls the code from a legacy hash join URL', () => {
     expect(
       joinCodeFromScan('https://tsuina311.github.io/PodyGuard/#/e/AB23CD'),
     ).toBe('AB23CD');
@@ -28,17 +37,181 @@ describe('joinCodeFromScan', () => {
   });
 });
 
+describe('joinCodeFromQueryString', () => {
+  it('reads ?join=', () => {
+    expect(joinCodeFromQueryString('?join=ab23cd')).toBe('AB23CD');
+  });
+
+  it('rejects invalid join values', () => {
+    expect(joinCodeFromQueryString('?join=NO')).toBeNull();
+    expect(joinCodeFromQueryString('')).toBeNull();
+    expect(joinCodeFromQueryString('?other=AB23CD')).toBeNull();
+  });
+
+  it('normalizes case', () => {
+    expect(isJoinCodeFormat(normalizeJoinCode('ab23cd'))).toBe(true);
+    expect(joinCodeFromQueryString('join=ab23cd')).toBe('AB23CD');
+  });
+});
+
 describe('playerJoinUrl', () => {
-  it('builds a hash-router join link', () => {
+  it('builds a query-string join link', () => {
     expect(playerJoinUrl('http://localhost:5173', '/', 'ab23cd')).toBe(
-      'http://localhost:5173/#/e/AB23CD',
+      'http://localhost:5173/?join=AB23CD',
     );
   });
 
-  it('keeps a GitHub Pages project path in front of the hash', () => {
+  it('keeps a GitHub Pages project path before the query', () => {
     expect(
       playerJoinUrl('https://tsuina311.github.io', '/PodyGuard/', 'ab23cd'),
-    ).toBe('https://tsuina311.github.io/PodyGuard/#/e/AB23CD');
+    ).toBe('https://tsuina311.github.io/PodyGuard/?join=AB23CD');
+  });
+});
+
+describe('resolvePlayerLinkParts', () => {
+  const pages = 'https://tsuina311.github.io/PodyGuard/';
+
+  it('uses the configured public origin in production even on Render', () => {
+    expect(
+      resolvePlayerLinkParts(
+        {
+          protocol: 'https:',
+          hostname: 'podyguard.onrender.com',
+          port: '',
+          origin: 'https://podyguard.onrender.com',
+          pathname: '/',
+        },
+        {
+          lanHost: '',
+          publicSiteUrl: pages,
+          isProduction: true,
+          forPhoneQr: true,
+        },
+      ),
+    ).toEqual({
+      status: 'ok',
+      origin: 'https://tsuina311.github.io',
+      pathname: '/PodyGuard/',
+      source: 'public',
+    });
+  });
+
+  it('refuses to fall back to the tab origin in production without config', () => {
+    expect(
+      resolvePlayerLinkParts(
+        {
+          protocol: 'https:',
+          hostname: 'podyguard.onrender.com',
+          port: '',
+          origin: 'https://podyguard.onrender.com',
+          pathname: '/',
+        },
+        { lanHost: '', isProduction: true, forPhoneQr: true },
+      ),
+    ).toEqual({ status: 'missing_public_origin' });
+  });
+
+  it('rejects an unsafe configured public origin in production', () => {
+    expect(
+      resolvePlayerLinkParts(
+        {
+          protocol: 'https:',
+          hostname: 'podyguard.onrender.com',
+          port: '',
+          origin: 'https://podyguard.onrender.com',
+          pathname: '/',
+        },
+        {
+          lanHost: '',
+          publicSiteUrl: 'https://podyguard.onrender.com',
+          isProduction: true,
+        },
+      ),
+    ).toEqual({ status: 'invalid_public_origin' });
+  });
+
+  it('keeps localhost for development copy/paste', () => {
+    expect(
+      resolvePlayerLinkParts(
+        {
+          protocol: 'http:',
+          hostname: 'localhost',
+          port: '5173',
+          origin: 'http://localhost:5173',
+          pathname: '/',
+        },
+        {
+          lanHost: '192.168.1.101',
+          publicSiteUrl: pages,
+          isProduction: false,
+          forPhoneQr: false,
+        },
+      ),
+    ).toEqual({
+      status: 'ok',
+      origin: 'http://localhost:5173',
+      pathname: '/',
+      source: 'dev-tab',
+    });
+  });
+
+  it('swaps localhost for the LAN address on phone QR in development', () => {
+    expect(
+      resolvePlayerLinkParts(
+        {
+          protocol: 'http:',
+          hostname: 'localhost',
+          port: '5173',
+          origin: 'http://localhost:5173',
+          pathname: '/',
+        },
+        {
+          lanHost: '192.168.1.101',
+          publicSiteUrl: pages,
+          isProduction: false,
+          forPhoneQr: true,
+        },
+      ),
+    ).toEqual({
+      status: 'ok',
+      origin: 'http://192.168.1.101:5173',
+      pathname: '/',
+      source: 'dev-lan',
+    });
+  });
+
+  it('never emits localhost/onrender in a production QR URL', () => {
+    const resolved = resolvePlayerLinkParts(
+      {
+        protocol: 'https:',
+        hostname: 'podyguard.onrender.com',
+        port: '',
+        origin: 'https://podyguard.onrender.com',
+        pathname: '/',
+      },
+      {
+        lanHost: '',
+        publicSiteUrl: pages,
+        isProduction: true,
+        forPhoneQr: true,
+      },
+    );
+    expect(resolved.status).toBe('ok');
+    if (resolved.status !== 'ok') {
+      return;
+    }
+    const url = playerJoinUrl(resolved.origin, resolved.pathname, 'AB23CD');
+    expect(url).toBe('https://tsuina311.github.io/PodyGuard/?join=AB23CD');
+    expect(url).not.toMatch(/localhost|127\.0\.0\.1|onrender\.com/i);
+  });
+});
+
+describe('isUnsafePlayerOrigin', () => {
+  it('flags local and Render hosts', () => {
+    expect(isUnsafePlayerOrigin('localhost')).toBe(true);
+    expect(isUnsafePlayerOrigin('127.0.0.1')).toBe(true);
+    expect(isUnsafePlayerOrigin('podyguard.onrender.com')).toBe(true);
+    expect(isUnsafePlayerOrigin('tsuina311.github.io')).toBe(false);
   });
 });
 
@@ -55,83 +228,28 @@ describe('shareableOrigin', () => {
       'http://192.168.1.101:5173',
     );
   });
-
-  it('keeps the current origin when it is already routable', () => {
-    expect(
-      shareableOrigin(
-        {
-          protocol: 'https:',
-          hostname: 'podyguard.example',
-          port: '',
-          origin: 'https://podyguard.example',
-        },
-        '192.168.1.101',
-      ),
-    ).toBe('https://podyguard.example');
-  });
-
-  it('falls back to the current origin without a LAN address', () => {
-    expect(shareableOrigin(local, '')).toBe('http://localhost:5173');
-  });
 });
 
-describe('joinLinkParts', () => {
-  it('keeps localhost for copy/paste while developing locally', () => {
+describe('stripJoinQueryFromLocation', () => {
+  it('removes join while preserving other query params and the hash', () => {
     expect(
-      joinLinkParts(
-        {
-          protocol: 'http:',
-          hostname: 'localhost',
-          port: '5173',
-          origin: 'http://localhost:5173',
-          pathname: '/',
-        },
-        '192.168.1.101',
-        'https://tsuina311.github.io/PodyGuard',
+      stripJoinQueryFromLocation(
+        'https://tsuina311.github.io/PodyGuard/?join=AB23CD&x=1#/e/AB23CD',
       ),
-    ).toEqual({
-      origin: 'http://localhost:5173',
-      pathname: '/',
-    });
+    ).toBe('/PodyGuard/?x=1#/e/AB23CD');
   });
 
-  it('uses the always-on site when the host opened the API origin', () => {
+  it('returns pathname without join', () => {
     expect(
-      joinLinkParts(
-        {
-          protocol: 'https:',
-          hostname: 'podyguard.onrender.com',
-          port: '',
-          origin: 'https://podyguard.onrender.com',
-          pathname: '/',
-        },
-        '',
-        'https://tsuina311.github.io/PodyGuard/',
+      stripJoinQueryFromLocation(
+        'https://tsuina311.github.io/PodyGuard/?join=AB23CD',
       ),
-    ).toEqual({
-      origin: 'https://tsuina311.github.io',
-      pathname: '/PodyGuard/',
-    });
+    ).toBe('/PodyGuard/');
   });
-});
 
-describe('phoneJoinLinkParts', () => {
-  it('swaps localhost for the LAN address so phone QR codes work', () => {
+  it('returns null when join is absent', () => {
     expect(
-      phoneJoinLinkParts(
-        {
-          protocol: 'http:',
-          hostname: 'localhost',
-          port: '5173',
-          origin: 'http://localhost:5173',
-          pathname: '/',
-        },
-        '192.168.1.101',
-        'https://tsuina311.github.io/PodyGuard',
-      ),
-    ).toEqual({
-      origin: 'http://192.168.1.101:5173',
-      pathname: '/',
-    });
+      stripJoinQueryFromLocation('https://tsuina311.github.io/PodyGuard/'),
+    ).toBeNull();
   });
 });

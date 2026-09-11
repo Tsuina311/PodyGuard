@@ -1,20 +1,54 @@
-import { StrictMode } from 'react';
+import { StrictMode, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
-import { HashRouter } from 'react-router-dom';
+import { HashRouter, useNavigate } from 'react-router-dom';
 import './i18n';
 import { App } from './App';
+import {
+  getSessionDiagnosticId,
+  recordJoinBreadcrumb,
+} from './join-diagnostics';
+import {
+  joinCodeFromQueryString,
+  stripJoinQueryFromLocation,
+} from './join-url';
+import { AppErrorBoundary } from './ui/AppErrorBoundary';
 import './styles.css';
+
+/**
+ * Reads `?join=CODE` from the real location search (outside the hash) and
+ * navigates into the existing HashRouter route. Legacy `#/e/CODE` keeps working.
+ */
+export function JoinQueryBootstrap() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const code = joinCodeFromQueryString(window.location.search);
+    if (!code) {
+      return;
+    }
+    const next = stripJoinQueryFromLocation();
+    if (next) {
+      window.history.replaceState(window.history.state, '', next);
+    }
+    navigate(`/e/${code}`, { replace: true });
+  }, [navigate]);
+  return null;
+}
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
   throw new Error('Root element #root not found');
 }
 
+recordJoinBreadcrumb('PAGE_BOOT', getSessionDiagnosticId());
+
 createRoot(rootElement).render(
   <StrictMode>
-    <HashRouter>
-      <App />
-    </HashRouter>
+    <AppErrorBoundary>
+      <HashRouter>
+        <JoinQueryBootstrap />
+        <App />
+      </HashRouter>
+    </AppErrorBoundary>
   </StrictMode>,
 );
 

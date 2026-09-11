@@ -15,6 +15,17 @@ const resources = Object.fromEntries(
   }),
 );
 
+const storageAvailable = (() => {
+  try {
+    const key = '__podyguard_i18n_probe__';
+    globalThis.localStorage?.setItem(key, '1');
+    globalThis.localStorage?.removeItem(key);
+    return true;
+  } catch {
+    return false;
+  }
+})();
+
 void i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -28,9 +39,10 @@ void i18n
       escapeValue: false,
     },
     detection: {
-      order: ['localStorage', 'navigator'],
+      // Avoid localStorage when the browser denies it — detector can throw.
+      order: storageAvailable ? ['localStorage', 'navigator'] : ['navigator'],
       lookupLocalStorage: 'podyguard-lang',
-      caches: ['localStorage'],
+      caches: storageAvailable ? ['localStorage'] : [],
       convertDetectedLanguage: (lng) => {
         const code = lng.slice(0, 2);
         return isAppLocale(code) ? code : 'en';

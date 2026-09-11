@@ -8,9 +8,11 @@
   localStorage is the only store that survives that, and sessionStorage is still
   read once so a session that was open across the upgrade carries over instead
   of being dropped. Private-mode Safari denies both, and tests run without a DOM,
-  so every access is guarded and the whole module degrades to a no-op rather than
-  taking the page down with it.
+  so every access is guarded and the whole module degrades to an in-memory map
+  rather than taking the page down with it.
 */
+
+const memory = new Map<string, string>();
 
 function store(kind: 'local' | 'session'): Storage | null {
   try {
@@ -44,7 +46,10 @@ export function readStored(key: string): string | null {
       // Reading is what was asked for; an upgrade that cannot be saved is fine.
     }
   }
-  return legacy;
+  if (legacy !== null) {
+    return legacy;
+  }
+  return memory.get(key) ?? null;
 }
 
 export function writeStored(key: string, value: string): void {
@@ -52,25 +57,48 @@ export function writeStored(key: string, value: string): void {
   try {
     if (durable) {
       durable.setItem(key, value);
+      memory.set(key, value);
       return;
     }
   } catch {
-    // Quota or a denied store: fall through and keep the value for this
-    // session at least, which is what the app had before.
+    // Quota or a denied store: fall through.
   }
   try {
-    store('session')?.setItem(key, value);
+    const session = store('session');
+    if (session) {
+      session.setItem(key, value);
+      memory.set(key, value);
+      return;
+    }
   } catch {
-    // Nothing left to write to; callers treat storage as best effort.
+    // Nothing durable left; keep the value for this tab.
   }
+  memory.set(key, value);
 }
 
 export function removeStored(key: string): void {
+  memory.delete(key);
   for (const kind of ['local', 'session'] as const) {
     try {
       store(kind)?.removeItem(key);
     } catch {
       // Ignore: a store we cannot delete from is a store we never wrote to.
     }
+  }
+}
+
+/** True when durable localStorage accepts a round-trip write. */
+export function probeDurableStorage(): 'ok' | 'unavailable' {
+  const probeKey = '__podyguard_storage_probe__';
+  try {
+    const durable = store('local');
+    if (!durable) {
+      return 'unavailable';
+    }
+    durable.setItem(probeKey, '1');
+    durable.removeItem(probeKey);
+    return 'ok';
+  } catch {
+    return 'unavailable';
   }
 }

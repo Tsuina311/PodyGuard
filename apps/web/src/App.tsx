@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react';
 import { Link, Navigate, Route, Routes, useMatch, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { checkHealth } from './api';
+import { ConnectivityPage } from './ConnectivityPage';
 import { FeedbackProvider } from './feedback/FeedbackContext';
+import {
+  getSessionDiagnosticId,
+  recordJoinBreadcrumb,
+} from './join-diagnostics';
 import {
   KEEP_ALIVE_INTERVAL_MS,
   readLastKeepAlivePingAt,
@@ -43,8 +48,11 @@ export function App() {
   const sandbox = useMatch('/match');
   const sandboxConfig = useMatch('/match-config');
   const localLimited = useMatch('/limited');
+  const connectivity = useMatch('/connectivity');
   const home = useMatch({ path: '/', end: true });
-  const localOnly = Boolean(sandbox || sandboxConfig || localLimited);
+  const localOnly = Boolean(
+    sandbox || sandboxConfig || localLimited || connectivity,
+  );
   const waking = useServerWake() && !localOnly;
   return (
     <FeedbackProvider>
@@ -70,6 +78,7 @@ export function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/e/:joinCode" element={<JoinPage />} />
             <Route path="/host/:joinCode" element={<HostPage />} />
+            <Route path="/connectivity" element={<ConnectivityPage />} />
             <Route path="/display" element={<DisplayPairPage />} />
             <Route path="/display/live" element={<DisplayLivePage />} />
             <Route
@@ -149,6 +158,10 @@ function useServerWake(): boolean {
       markWaited();
       setHealthOk(ok);
       waking = !ok;
+      recordJoinBreadcrumb(
+        ok ? 'API_HEALTH_OK' : 'API_HEALTH_FAILED',
+        getSessionDiagnosticId(),
+      );
       if (!ok) {
         retryTimer = window.setTimeout(() => void probe(true), 2500);
       }

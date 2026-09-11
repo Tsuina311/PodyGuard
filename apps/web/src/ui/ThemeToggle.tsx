@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { MessageSquare, Moon, Sun } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { readStored, writeStored } from '../device-storage';
 import { useFeedback } from '../feedback/FeedbackContext';
 import type { FeedbackContextDetails } from '../feedback/types';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -11,11 +12,15 @@ const STORAGE_KEY = 'podyguard-theme';
 const THEME_EVENT = 'podyguard-theme';
 
 function preferredTheme(): Theme {
-  const stored = localStorage.getItem(STORAGE_KEY);
+  const stored = readStored(STORAGE_KEY);
   if (stored === 'light' || stored === 'dark') return stored;
-  return window.matchMedia('(prefers-color-scheme: light)').matches
-    ? 'light'
-    : 'dark';
+  try {
+    return window.matchMedia('(prefers-color-scheme: light)').matches
+      ? 'light'
+      : 'dark';
+  } catch {
+    return 'dark';
+  }
 }
 
 function applyTheme(theme: Theme): void {
@@ -29,7 +34,7 @@ function applyTheme(theme: Theme): void {
 /** Sets light/dark for the whole app and keeps any open ThemeToggle in sync. */
 export function setAppTheme(theme: Theme): void {
   applyTheme(theme);
-  localStorage.setItem(STORAGE_KEY, theme);
+  writeStored(STORAGE_KEY, theme);
   document.dispatchEvent(new CustomEvent(THEME_EVENT, { detail: theme }));
 }
 
@@ -67,7 +72,7 @@ export function ThemeToggle() {
 
   useEffect(() => {
     applyTheme(theme);
-    localStorage.setItem(STORAGE_KEY, theme);
+    writeStored(STORAGE_KEY, theme);
     document
       .querySelector('meta[name="theme-color"]')
       ?.setAttribute('content', theme === 'light' ? '#f7f9fc' : '#03060e');

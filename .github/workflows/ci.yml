@@ -35,3 +35,15 @@ jobs:
 
       - name: Build production artifacts
         run: yarn build
+
+      - name: Pages-shaped web production build
+        env:
+          GITHUB_PAGES: "true"
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          VITE_API_URL: https://podyguard.onrender.com
+          VITE_PUBLIC_ORIGIN: https://tsuina311.github.io/PodyGuard
+        run: |
+          yarn workspace @podyguard/web build
+          test -f apps/web/dist/index.html
+          grep -R -l --include='*.js' 'tsuina311.github.io' apps/web/dist
+          echo "PAGES-SHAPED BUILD: PASS"

@@ -11,7 +11,9 @@ import type {
 } from '@podyguard/shared';
 import {
   ASSASSIN_POD_SIZES,
+  defaultGameDurationSeconds,
   poolShortLabel,
+  tableAvailabilityHint,
   TREACHERY_POD_SIZES,
   usesCommanderRules,
 } from '@podyguard/shared';
@@ -42,10 +44,9 @@ import {
 } from './api';
 import {
   isLocalHostname,
-  joinLinkParts,
   lanHostFromBuild,
-  phoneJoinLinkParts,
   playerJoinUrl,
+  resolvePlayerLinkParts,
 } from './join-url';
 import { Badge, statusTone } from './ui/Badge';
 import { Brand } from './ui/Brand';
@@ -475,33 +476,57 @@ export function HostPage() {
   }
 
   const joinCodeValue = event?.joinCode ?? code;
+  const isProduction = import.meta.env.PROD;
+  const publicOrigin = import.meta.env.VITE_PUBLIC_ORIGIN;
+  const copyLinkParts =
+    typeof window === 'undefined'
+      ? null
+      : resolvePlayerLinkParts(window.location, {
+          lanHost: lanHostFromBuild(),
+          publicSiteUrl: publicOrigin,
+          isProduction,
+          forPhoneQr: false,
+        });
+  const phoneLinkParts =
+    typeof window === 'undefined'
+      ? null
+      : resolvePlayerLinkParts(window.location, {
+          lanHost: lanHostFromBuild(),
+          publicSiteUrl: publicOrigin,
+          isProduction,
+          forPhoneQr: true,
+        });
+  const joinLinkBroken =
+    copyLinkParts?.status !== 'ok' || phoneLinkParts?.status !== 'ok';
   const joinUrl =
-    typeof window === 'undefined'
-      ? ''
-      : (() => {
-          const link = joinLinkParts(
-            window.location,
-            lanHostFromBuild(),
-            import.meta.env.VITE_PUBLIC_ORIGIN,
-          );
-          return playerJoinUrl(link.origin, link.pathname, joinCodeValue);
-        })();
+    copyLinkParts?.status === 'ok'
+      ? playerJoinUrl(
+          copyLinkParts.origin,
+          copyLinkParts.pathname,
+          joinCodeValue,
+        )
+      : '';
   const phoneJoinUrl =
-    typeof window === 'undefined'
-      ? ''
-      : (() => {
-          const link = phoneJoinLinkParts(
-            window.location,
-            lanHostFromBuild(),
-            import.meta.env.VITE_PUBLIC_ORIGIN,
-          );
-          return playerJoinUrl(link.origin, link.pathname, joinCodeValue);
-        })();
+    phoneLinkParts?.status === 'ok'
+      ? playerJoinUrl(
+          phoneLinkParts.origin,
+          phoneLinkParts.pathname,
+          joinCodeValue,
+        )
+      : '';
 
   const unreachableFromPhones =
     typeof window !== 'undefined' &&
     isLocalHostname(window.location.hostname) &&
     !lanHostFromBuild();
+
+  useEffect(() => {
+    if (joinLinkBroken && isProduction) {
+      console.error(
+        '[podyguard] VITE_PUBLIC_ORIGIN is missing or unsafe — refusing to emit a player QR. Set it to the canonical GitHub Pages URL.',
+      );
+    }
+  }, [joinLinkBroken, isProduction]);
 
   async function onCopyLink() {
     try {
@@ -538,6 +563,16 @@ export function HostPage() {
   const pausedPlayers = participants.filter((row) => row.status === 'paused');
   const lobby = participants.filter((row) => row.status === 'joined');
   const readyTables = tables.filter((table) => table.podStatus === 'formed');
+  const typicalGameSeconds =
+    limitedSnapshot?.gameDurationHint?.typicalSeconds ??
+    (event ? defaultGameDurationSeconds(event.gameMode) : 0);
+  const likelyFreeSoonCount = tables.filter((table) =>
+    tableAvailabilityHint({
+      podStatus: table.podStatus,
+      playingStartedAt: table.playingStartedAt,
+      typicalSeconds: typicalGameSeconds,
+    })?.likelyFreeSoon,
+  ).length;
   const showLobbySections =
     !event?.tournament || event.tournament.phase === 'registration';
   const tournamentTableIds = new Set(
@@ -921,22 +956,35 @@ export function HostPage() {
 
       <Panel title={t('host.joinCodeTitle')} aside={t('host.share')}>
         <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
-          <JoinQr value={phoneJoinUrl} />
+          {phoneJoinUrl ? <JoinQr value={phoneJoinUrl} /> : null}
           <div className="min-w-0">
             <p className="font-display text-neon mb-3 text-4xl font-bold tracking-[0.2em] drop-shadow-[0_0_18px_var(--color-neon)]">
               {event.joinCode}
             </p>
-            <p className="text-muted mb-4 font-mono text-xs break-all">{joinUrl}</p>
+            {joinLinkBroken ? (
+              <p className="text-warning mb-4 text-xs">
+                {t('host.publicOriginMissing')}
+              </p>
+            ) : (
+              <p className="text-muted mb-4 font-mono text-xs break-all">
+                {joinUrl}
+              </p>
+            )}
             {unreachableFromPhones ? (
               <p className="text-warning mb-4 text-xs">
                 {t('host.noLanAddress')}
               </p>
-            ) : phoneJoinUrl !== joinUrl ? (
+            ) : phoneJoinUrl && phoneJoinUrl !== joinUrl ? (
               <p className="text-muted mb-4 text-xs">
                 {t('host.qrUsesLan', { url: phoneJoinUrl })}
               </p>
             ) : null}
-            <Button variant="glass" size="sm" onClick={() => void onCopyLink()}>
+            <Button
+              variant="glass"
+              size="sm"
+              disabled={!joinUrl}
+              onClick={() => void onCopyLink()}
+            >
               {copied ? t('common.copied') : t('host.copyPlayerLink')}
             </Button>
           </div>
@@ -964,6 +1012,11 @@ export function HostPage() {
 
       {showLobbySections ? (
       <Panel title={t('host.queue')} aside={t('host.ready', { count: counts.ready })}>
+        {queue.length > 0 && likelyFreeSoonCount > 0 ? (
+          <p className="text-neon mb-3 text-xs">
+            {t('host.likelyFreeSoonCount', { count: likelyFreeSoonCount })}
+          </p>
+        ) : null}
         {queue.length === 0 ? (
           <p className="text-muted text-sm">{t('host.nobodyWaiting')}</p>
         ) : (
@@ -1134,6 +1187,26 @@ export function HostPage() {
                     ? table.seatedNames.join(' · ')
                     : t('common.empty')}
                 </p>
+                {(() => {
+                  const hint = tableAvailabilityHint({
+                    podStatus: table.podStatus,
+                    playingStartedAt: table.playingStartedAt,
+                    typicalSeconds: typicalGameSeconds,
+                  });
+                  if (!hint?.likelyFreeSoon) {
+                    return null;
+                  }
+                  return (
+                    <p className="text-neon mb-3 text-xs">
+                      {t('host.likelyFreeSoon', {
+                        minutes: Math.max(
+                          1,
+                          Math.ceil(hint.estimatedRemainingSeconds / 60),
+                        ),
+                      })}
+                    </p>
+                  );
+                })()}
                 <div className="flex flex-wrap gap-2">
                   {table.podStatus === 'formed' ? (
                     <Button

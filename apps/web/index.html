@@ -28,11 +28,23 @@
     <link rel="icon" href="%BASE_URL%icons/icon.svg" type="image/svg+xml" />
     <script>
       (() => {
-        const saved = localStorage.getItem('podyguard-theme');
+        // Storage can throw in private/restricted browsing — never block boot.
+        let saved = null;
+        try {
+          saved = localStorage.getItem('podyguard-theme');
+        } catch (_) {
+          /* ignore */
+        }
+        let prefersLight = false;
+        try {
+          prefersLight = matchMedia('(prefers-color-scheme: light)').matches;
+        } catch (_) {
+          /* ignore */
+        }
         const theme =
           saved === 'light' || saved === 'dark'
             ? saved
-            : matchMedia('(prefers-color-scheme: light)').matches
+            : prefersLight
               ? 'light'
               : 'dark';
         document.documentElement.dataset.theme = theme;

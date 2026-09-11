@@ -55,13 +55,23 @@ The player-facing site is a static build on **GitHub Pages** (always on). The
 API, database, and live updates stay on **Render** (free instances sleep when
 idle). Phones open Pages immediately and see a wake message while Render boots.
 
-A scheduled GitHub Action (`Keep API awake`) pings `/health` about every ten
-minutes so the free instance stays warm when nobody has the app open. Open
-phones also share one keepalive among themselves (localStorage), so a full
-table does not multiply the traffic.
+A scheduled GitHub Action (`Keep API awake`) pings `/health` on a best-effort
+cron (nominally every ten minutes). **GitHub scheduled workflows are not a
+guarantee** — observed gaps regularly exceed Render’s ~15-minute idle sleep
+window, so cold starts still happen. Open phones also share one keepalive among
+themselves (storage), so a full table does not multiply the traffic.
+
+For alpha testing, configure a true external uptime monitor (UptimeRobot,
+Better Stack, cron-job.org, etc.) against `https://<api-host>/health` with an
+interval comfortably under 15 minutes (for example every 5–10 minutes). Do not
+rely on GitHub Actions alone to keep Render awake.
 
 Share and print the GitHub Pages URL, not the Render URL. Event links look like
-`https://<user>.github.io/PodyGuard/#/e/ABC123`.
+`https://<user>.github.io/PodyGuard/?join=ABC123`. Legacy `#/e/ABC123` links
+still open the same join screen.
+
+If a phone cannot join, open `/#/connectivity` on that phone for a privacy-safe
+layer check (API, realtime polling, websocket, storage).
 
 ### 1. API on Render
 
@@ -109,12 +119,16 @@ Required production variables on the API host:
 ### 2. Always-on site on GitHub Pages
 
 1. In the GitHub repo: **Settings → Pages → Source: GitHub Actions**.
-2. **Settings → Secrets and variables → Actions → Variables**: add `API_ORIGIN`
-   with the Render origin, no trailing slash
-   (`https://podyguard.onrender.com`). Optional: `PUBLIC_SITE_URL` if you later
-   put the UI on a custom domain.
+2. **Settings → Secrets and variables → Actions → Variables**:
+   - `API_ORIGIN` — Render origin, no trailing slash
+     (`https://podyguard.onrender.com`)
+   - `PUBLIC_SITE_URL` — **required for correct player QR codes**, usually
+     `https://tsuina311.github.io/PodyGuard` (or your custom domain). This is
+     baked into the web build as `VITE_PUBLIC_ORIGIN`. Production builds refuse
+     to emit player QR codes without a safe public origin.
 3. Push to `main`. The Pages workflow builds the web app pointed at that API
-   and publishes it.
+   and publishes it. CI also runs a Pages-shaped production web build so a
+   broken Pages typecheck cannot stay invisible.
 
 Until `API_ORIGIN` is set, the Pages workflow fails on purpose so a site is
 never published that cannot reach the API.

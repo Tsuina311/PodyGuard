@@ -21,3 +21,9 @@ services:
         sync: false
       - key: GITHUB_FEEDBACK_REPO
         sync: false
+      # Canonical always-on player site for QR / copy links (never the Render URL).
+      - key: VITE_PUBLIC_ORIGIN
+        value: https://tsuina311.github.io/PodyGuard
+      # Render-hosted UI talks to the same origin; leave empty.
+      - key: VITE_API_URL
+        value: ""

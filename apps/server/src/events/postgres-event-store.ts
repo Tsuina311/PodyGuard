@@ -383,6 +383,8 @@ export class PostgresEventStore implements EventStore {
         treacheryRole: podMembers.treacheryRole,
         treacheryIdentityId: podMembers.treacheryIdentityId,
         treacheryUnveiledAt: podMembers.treacheryUnveiledAt,
+        podPlayingStartedAt: pods.playingStartedAt,
+        podCreatedAt: pods.createdAt,
       })
       .from(podMembers)
       .innerJoin(pods, eq(podMembers.podId, pods.id))
@@ -404,6 +406,8 @@ export class PostgresEventStore implements EventStore {
       treacheryRole: row.treacheryRole ?? undefined,
       treacheryIdentityId: row.treacheryIdentityId ?? undefined,
       treacheryUnveiledAt: row.treacheryUnveiledAt ?? undefined,
+      podPlayingStartedAt: row.podPlayingStartedAt ?? undefined,
+      podCreatedAt: row.podCreatedAt,
     }));
   }
 
@@ -650,10 +654,13 @@ export class PostgresEventStore implements EventStore {
       if (!pod || (pod.status !== 'formed' && pod.status !== 'playing')) {
         throw new PodNotFoundError();
       }
+      const playingStartedAt =
+        pod.status === 'formed' ? new Date() : pod.playingStartedAt ?? new Date();
       const [next] = await tx
         .update(pods)
         .set({
           status: 'playing',
+          playingStartedAt,
           updatedAt: new Date(),
         })
         .where(eq(pods.id, pod.id))
@@ -2395,6 +2402,8 @@ async function loadStoredPod(
     memberIds: members.map((row) => row.id),
     trackerUsed: pod.trackerUsed,
     tournamentMatchId: pod.tournamentMatchId,
+    playingStartedAt: pod.playingStartedAt ?? undefined,
+    createdAt: pod.createdAt,
   };
 }
 

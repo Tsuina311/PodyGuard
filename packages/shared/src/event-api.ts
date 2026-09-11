@@ -12,6 +12,9 @@ import type {
   LimitedQueueSummary,
   PublicLimitedSession,
 } from './limited';
+import type { GameDurationHint } from './table-availability-hint';
+
+export type { GameDurationHint } from './table-availability-hint';
 
 export type PublicEvent = {
   id: string;
@@ -88,12 +91,16 @@ export type PublicTable = {
   podStatus?: 'formed' | 'playing';
   trackerUsed?: boolean;
   poolId?: string;
+  /** When the host started the game at this table, if known. */
+  playingStartedAt?: string;
 };
 
 export type EventSnapshot = {
   event: PublicEvent;
   participants: PublicParticipant[];
   tables: PublicTable[];
+  /** Typical finished-game length for advice-only availability hints. */
+  gameDurationHint?: GameDurationHint;
   limitedQueues?: LimitedQueueSummary[];
   limitedSessions?: PublicLimitedSession[];
 };

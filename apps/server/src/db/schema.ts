@@ -278,6 +278,7 @@ export const pods = pgTable(
     ),
     durationSeconds: integer('duration_seconds'),
     completedAt: timestamp('completed_at', { withTimezone: true }),
+    playingStartedAt: timestamp('playing_started_at', { withTimezone: true }),
     rating: integer('rating'),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
