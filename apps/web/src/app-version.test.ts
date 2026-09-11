@@ -9,6 +9,5 @@ describe('release version', () => {
   it('keeps a valid semver in the repo VERSION file', () => {
     const raw = readFileSync(resolve(repoRoot, 'VERSION'), 'utf8').trim();
     expect(raw).toMatch(/^\d+\.\d+\.\d+$/);
-    expect(raw).toBe('1.0.0');
   });
 });

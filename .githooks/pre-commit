@@ -1,0 +1,42 @@
+#!/bin/sh
+# Auto-bump VERSION on every commit (patch by default).
+# Override: VERSION_BUMP=minor git commit …
+# Skip:     SKIP_VERSION_BUMP=1 git commit …
+set -e
+
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
+if [ "${SKIP_VERSION_BUMP:-}" = "1" ]; then
+  echo "version bump skipped (SKIP_VERSION_BUMP=1)"
+  exit 0
+fi
+
+# Do not bump during rebase / merge / cherry-pick / amend.
+if [ -d "$(git rev-parse --git-path rebase-merge 2>/dev/null)" ] ||
+  [ -d "$(git rev-parse --git-path rebase-apply 2>/dev/null)" ] ||
+  [ -f "$(git rev-parse --git-path MERGE_HEAD 2>/dev/null)" ] ||
+  [ -f "$(git rev-parse --git-path CHERRY_PICK_HEAD 2>/dev/null)" ]; then
+  exit 0
+fi
+
+case "${GIT_REFLOG_ACTION:-}" in
+  *amend*) exit 0 ;;
+esac
+
+# If the commit already stages a VERSION edit, respect it.
+if git diff --cached --name-only | grep -qx VERSION; then
+  echo "VERSION already staged — skipping auto bump"
+  exit 0
+fi
+
+kind="${VERSION_BUMP:-patch}"
+case "$kind" in
+  patch|minor|major) ;;
+  *)
+    echo "VERSION_BUMP must be patch, minor, or major (got: $kind)" >&2
+    exit 1
+    ;;
+esac
+
+node scripts/bump-version.mjs "$kind"
+git add VERSION

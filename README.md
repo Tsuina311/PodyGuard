@@ -79,21 +79,23 @@ The player-facing release number lives in the repo-root [`VERSION`](VERSION)
 file and is shown next to **PodyGuard** on every screen that uses the brand
 (for example `v1.0.0`).
 
-Convention:
+**Automatic bump:** every normal `git commit` runs `.githooks/pre-commit`, which
+bumps the **patch** (`1.0.0` → `1.0.1`) and includes `VERSION` in that commit.
+Hooks are installed on `yarn install` via `prepare` (`core.hooksPath=.githooks`).
 
-- **Patch** (`1.0.0` → `1.0.1`): every ordinary commit / deploy you want phones
-  to recognize as new.
-- **Minor / major**: only for irreversible global changes.
+| Intent | How |
+|--------|-----|
+| Ordinary change | just `git commit` (auto patch) |
+| Irreversible compatible change | `VERSION_BUMP=minor git commit -m "…"` |
+| Irreversible breaking change | `VERSION_BUMP=major git commit -m "…"` |
+| Skip bump (docs-only, etc.) | `SKIP_VERSION_BUMP=1 git commit -m "…"` |
+| Manual bump without committing | `yarn bump:patch` / `bump:minor` / `bump:major` |
 
-Before committing a release you care about on phones:
+Amend / rebase / merge commits do not bump again. If `VERSION` is already
+staged, the hook leaves it alone.
 
-```bash
-yarn bump:patch   # or bump:minor / bump:major
-```
-
-Then confirm on a phone after Pages deploys: the brand line shows the new
-`vX.Y.Z`. Connectivity also lists **App version** and a separate **Build**
-git short SHA for diagnostics.
+After Pages deploys, confirm on a phone: the brand line shows the new `vX.Y.Z`.
+Connectivity also lists **App version** and a separate **Build** git short SHA.
 
 ### 1. API on Render
 
