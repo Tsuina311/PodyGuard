@@ -64,9 +64,15 @@ import { LimitedHostPanel } from './limited/LimitedHostPanel';
 import { HostDisplaysPanel } from './display/HostDisplaysPanel';
 import { JoinPage } from './JoinPage';
 import { cx } from './ui/cx';
+import { LIMITED_MODE_LABELS } from './limited/limited-view';
 
 type HostTab = 'desk' | 'play';
 
+function eventHasLimitedQueues(event: {
+  limitedModeConfigs?: Array<{ enabled: boolean }> | null;
+}): boolean {
+  return event.limitedModeConfigs?.some((config) => config.enabled) === true;
+}
 export function HostPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -655,11 +661,22 @@ export function HostPage() {
                 })}
               </span>
               <Badge tone={event.gameMode === 'treachery' ? 'dev' : 'idle'}>
-                {t(`modes.${event.gameMode}.label`)}
+                {eventHasLimitedQueues(event)
+                  ? t('home.limited')
+                  : t(`modes.${event.gameMode}.label`)}
               </Badge>
-              <Badge tone={event.rulesFormat === 'normal' ? 'live' : 'idle'}>
-                {t(`families.${event.rulesFormat}`)}
-              </Badge>
+              {eventHasLimitedQueues(event) ? (
+                <Badge tone="live">
+                  {event.limitedModeConfigs
+                    ?.filter((config) => config.enabled)
+                    .map((config) => LIMITED_MODE_LABELS[config.mode])
+                    .join(' · ')}
+                </Badge>
+              ) : (
+                <Badge tone={event.rulesFormat === 'normal' ? 'live' : 'idle'}>
+                  {t(`families.${event.rulesFormat}`)}
+                </Badge>
+              )}
             </div>
           </header>
 
@@ -704,6 +721,37 @@ export function HostPage() {
       ) : null}
 
       <div className={cx(tab === 'desk' ? 'contents' : 'hidden')}>
+      {eventHasLimitedQueues(event) ? (
+        <Panel title={t('host.limitedPairing')} aside={t('host.limitedPairingAside')}>
+          <p className="text-muted mb-3 text-sm">
+            {t('host.limitedPairingHint')}
+          </p>
+          <ul className="space-y-2">
+            {event.limitedModeConfigs
+              ?.filter((config) => config.enabled)
+              .map((config) => {
+                const players =
+                  config.preferredCohortSize ?? config.minCohortSize;
+                return (
+                  <li
+                    key={config.mode}
+                    className="border-muted/20 rounded-xl border px-3 py-2 text-sm"
+                  >
+                    <span className="font-semibold">
+                      {LIMITED_MODE_LABELS[config.mode]}
+                    </span>
+                    <span className="text-muted mt-1 block text-xs">
+                      {t('host.limitedPairingSummary', {
+                        count: players,
+                        structure: config.matchStructure,
+                      })}
+                    </span>
+                  </li>
+                );
+              })}
+          </ul>
+        </Panel>
+      ) : (
       <Panel title={t('host.podSizes')} aside={t('host.matching')}>
         {event.gameMode === 'commander' ? (
           <>
@@ -869,6 +917,7 @@ export function HostPage() {
           <p className="text-muted text-sm">{t('host.starMatchmaking')}</p>
         )}
       </Panel>
+      )}
 
       <Panel title={t('host.eventLength')} aside={t('host.joinCodeDies')}>
         <Field
@@ -898,7 +947,9 @@ export function HostPage() {
 
       {metrics ? <HostMetrics metrics={metrics} /> : null}
 
-      {hostToken && usesCommanderRules(event.gameMode, event.rulesFormat) ? (
+      {hostToken &&
+      usesCommanderRules(event.gameMode, event.rulesFormat) &&
+      !eventHasLimitedQueues(event) ? (
         <ChallengePackEditor
           joinCode={code}
           hostToken={hostToken}
