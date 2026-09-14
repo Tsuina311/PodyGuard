@@ -3,7 +3,9 @@ import {
   applyDirectPlayPayload,
   decodeDirectPlayPayload,
   encodeDirectPlayPayload,
+  isDirectPlayQrEncodable,
 } from './direct-play-share';
+import { playerDirectPlayUrl } from './join-url';
 import { defaultMatchConfig, loadMatchConfig } from './match-config';
 import type { CommanderSelection } from './scryfall';
 
@@ -23,10 +25,10 @@ function installStorage(name: 'localStorage' | 'sessionStorage'): void {
 const atraXa: CommanderSelection = {
   oracleId: 'oracle-atraxa',
   cardId: 'card-atraxa',
-  name: 'Atraxa, Praetors\' Voice',
+  name: "Atraxa, Praetors' Voice",
   artCropUri: 'https://example.com/art.jpg',
   typeLine: 'Legendary Creature — Phyrexian Angel Horror',
-  oracleText: 'Flying, vigilance, deathtouch, lifelink',
+  oracleText: 'Flying, vigilance, deathtouch, lifelink. '.repeat(40),
   keywords: ['Flying', 'Vigilance', 'Deathtouch', 'Lifelink'],
 };
 
@@ -36,16 +38,23 @@ describe('direct play share payload', () => {
     installStorage('sessionStorage');
   });
 
-  it('round-trips seat names and commanders without art', () => {
+  it('round-trips seat names and commander names without heavy card text', () => {
     const config = {
       ...defaultMatchConfig(),
       gameMode: 'commander' as const,
       rulesFormat: 'commander' as const,
       seatCount: 4,
       names: ['Alex', 'Blake', 'Casey', 'Drew', 'Extra', 'Extra', 'Extra', 'Extra'],
-      commanders: [[atraXa], [], [], [], [], [], [], []],
+      commanders: [[atraXa], [atraXa], [atraXa], [atraXa], [], [], [], []],
     };
     const token = encodeDirectPlayPayload(config);
+    const url = playerDirectPlayUrl(
+      'https://tsuina311.github.io',
+      '/PodyGuard/',
+      token,
+    );
+    expect(isDirectPlayQrEncodable(url)).toBe(true);
+
     const decoded = decodeDirectPlayPayload(token);
     expect(decoded).not.toBeNull();
     expect(decoded?.gameMode).toBe('commander');
@@ -58,7 +67,7 @@ describe('direct play share payload', () => {
     ]);
     expect(decoded?.commanders[0]?.[0]?.name).toBe(atraXa.name);
     expect(decoded?.commanders[0]?.[0]?.artCropUri).toBe('');
-    expect(decoded?.commanders[0]?.[0]?.keywords).toContain('Flying');
+    expect(decoded?.commanders[0]?.[0]?.oracleText).toBe('');
   });
 
   it('rejects garbage tokens', () => {

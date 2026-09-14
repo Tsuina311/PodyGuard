@@ -51,7 +51,12 @@ export function PlayQueryBootstrap() {
     if (!payload) {
       return;
     }
-    const applied = applyDirectPlayPayload(payload);
+    let applied: ReturnType<typeof applyDirectPlayPayload> = null;
+    try {
+      applied = applyDirectPlayPayload(payload);
+    } catch (error) {
+      console.error('[podyguard-play]', error);
+    }
     const next = stripPlayQueryFromLocation();
     if (next) {
       window.history.replaceState(window.history.state, '', next);

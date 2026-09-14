@@ -316,7 +316,11 @@ function seatGridClass(count: number): string {
     return 'grid-cols-1 landscape:grid-cols-3';
   }
   if (count === 4) {
-    return 'grid-cols-1 landscape:grid-cols-2';
+    // Explicit 2×2 so every seat gets the same fr track on tall phones.
+    return 'grid-cols-1 landscape:grid-cols-2 landscape:grid-rows-2';
+  }
+  if (count === 6) {
+    return 'grid-cols-2 landscape:grid-cols-3 landscape:grid-rows-2';
   }
   return 'grid-cols-2 landscape:grid-cols-3';
 }
@@ -1665,7 +1669,9 @@ export function TrackerView({
             key={player.id}
             data-seat-id={player.id}
             className={cx(
-              'border-muted/20 relative flex h-full min-h-0 flex-col overflow-hidden rounded-xl border p-2 transition-transform duration-200',
+              // Size container so life totals scale to THIS seat, not the phone
+              // viewport (vh broke under CSS force-rotate and on tall Androids).
+              '[container-type:size] border-muted/20 relative flex h-full min-h-0 flex-col overflow-hidden rounded-xl border p-2 transition-transform duration-200',
               player.eliminated ? 'opacity-50' : 'bg-ink/[0.03]',
               archenemyBoard &&
                 player.id === state.archenemyId &&
@@ -1962,7 +1968,7 @@ export function TrackerView({
                 <div
                   key={team.join(':')}
                   className={cx(
-                    'pointer-events-none absolute inset-x-2 z-10 flex h-[min(36%,12rem)] flex-col items-stretch gap-1',
+                    'pointer-events-none absolute inset-x-2 z-10 flex h-[min(36%,12rem)] flex-col items-stretch gap-1 [container-type:size]',
                     // Span the team row (archenemy’s full-width seat included).
                     // Stay clear of the match dial on the seam.
                     index === 0
@@ -3609,7 +3615,7 @@ function SeatPickBoard({
             aria-pressed={selected}
             onClick={() => onSelect(seat.id)}
             className={cx(
-              'relative flex h-full min-h-0 flex-col overflow-hidden rounded-xl border p-2 transition disabled:opacity-40',
+              'relative flex h-full min-h-0 flex-col overflow-hidden rounded-xl border p-2 transition [container-type:size] disabled:opacity-40',
               seat.eliminated ? 'opacity-50' : 'bg-ink/[0.03]',
               archenemyBoard &&
                 seat.id === archenemyId &&
@@ -3679,7 +3685,8 @@ function LifeRow({
   /** Shared-life sides: blend every teammate’s colour across the total. */
   colors?: string[];
 }) {
-  // Size from digit count only — same rules on every board and phone.
+  // Size from digit count + this seat's box (cqh), so every player tile matches
+  // even when the shell is CSS-rotated or the phone is very tall.
   const digits = String(Math.abs(life)).length;
   const palette = colors?.length ? colors : color ? [color] : [];
   const lifeStyle =
@@ -3695,12 +3702,12 @@ function LifeRow({
         : undefined;
   const lifeSize =
     digits >= 5
-      ? 'text-[clamp(1.25rem,5.5vh,2.35rem)] landscape:text-[clamp(1.35rem,8vh,2.5rem)]'
+      ? 'text-[clamp(1.1rem,28cqh,2.35rem)]'
       : digits >= 4
-        ? 'text-[clamp(1.65rem,6.5vh,3.1rem)] landscape:text-[clamp(1.75rem,10vh,3.4rem)]'
+        ? 'text-[clamp(1.35rem,34cqh,3.1rem)]'
         : digits >= 3
-          ? 'text-[clamp(2rem,8vh,3.75rem)] landscape:text-[clamp(2.25rem,12vh,4.25rem)]'
-          : 'text-[clamp(2.5rem,11vh,5rem)] landscape:text-[clamp(2.75rem,16vh,5.5rem)]';
+          ? 'text-[clamp(1.75rem,42cqh,3.75rem)]'
+          : 'text-[clamp(2rem,50cqh,5.5rem)]';
   return (
     <div
       className={cx(

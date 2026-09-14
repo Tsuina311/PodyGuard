@@ -74,7 +74,8 @@
       "apiUnreachable": "Cannot reach the API. Is the server running (yarn dev:server)?"
     },
     "assignedAtTable": "Assigned at the table",
-    "scanToJoin": "Scan to join this event"
+    "scanToJoin": "Scan to join this event",
+    "qrTooLarge": "This setup is too large for a QR code. Copy the link instead, or remove a commander and try again."
   },
   "language": {
     "en": "English",

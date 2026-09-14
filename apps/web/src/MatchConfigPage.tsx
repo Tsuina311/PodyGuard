@@ -6,7 +6,7 @@ import {
   CommanderSeatPickers,
   commandersCompleteForSeats,
 } from './CommanderSeatPickers';
-import { encodeDirectPlayPayload } from './direct-play-share';
+import { encodeDirectPlayPayload, isDirectPlayQrEncodable } from './direct-play-share';
 import {
   isLocalHostname,
   lanHostFromBuild,
@@ -84,6 +84,7 @@ export function MatchConfigPage() {
           encodeDirectPlayPayload(config),
         )
       : '';
+  const phonePlayQrOk = isDirectPlayQrEncodable(phonePlayUrl);
   const unreachableFromPhones =
     typeof window !== 'undefined' &&
     isLocalHostname(window.location.hostname) &&
@@ -336,12 +337,17 @@ export function MatchConfigPage() {
               </p>
             ) : (
               <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-                {phonePlayUrl ? (
+                {phonePlayUrl && phonePlayQrOk ? (
                   <JoinQr
                     value={phonePlayUrl}
                     size={200}
+                    level="L"
                     title={t('matchConfig.scanToOpenTracker')}
                   />
+                ) : phonePlayUrl ? (
+                  <p className="text-warning max-w-xs text-xs">
+                    {t('common.qrTooLarge')}
+                  </p>
                 ) : null}
                 <div className="min-w-0">
                   <p className="text-muted mb-3 font-mono text-[11px] break-all">

@@ -69,21 +69,11 @@ function base64UrlToBytes(token: string): Uint8Array | null {
 }
 
 function slimCommander(commander: CommanderSelection): DirectPlayPayloadV1['c'][number][number] {
-  const row: DirectPlayPayloadV1['c'][number][number] = {
+  return {
     o: commander.oracleId,
     i: commander.cardId,
     n: commander.name,
   };
-  if (commander.typeLine) {
-    row.t = commander.typeLine;
-  }
-  if (commander.oracleText) {
-    row.x = commander.oracleText.slice(0, 400);
-  }
-  if (commander.keywords.length > 0) {
-    row.k = commander.keywords;
-  }
-  return row;
 }
 
 function expandCommander(
@@ -114,6 +104,11 @@ function expandCommander(
 
 export function encodeDirectPlayPayload(config: MatchConfig): string {
   const seatCount = seatCountForMode(config.gameMode, config.seatCount);
+  /*
+    Keep this tiny: phone QR capacity tops out near ~2.3KB at level M, and
+    packing oracle text / art / sandbox chrome blew past that and crashed the
+    QR renderer with "Data too long".
+  */
   const payload: DirectPlayPayloadV1 = {
     v: 1,
     g: config.gameMode,
@@ -124,23 +119,15 @@ export function encodeDirectPlayPayload(config: MatchConfig): string {
       .slice(0, seatCount)
       .map((seat) => seat.map(slimCommander)),
   };
-  if (config.eventName.trim()) {
-    payload.e = config.eventName.trim();
-  }
-  if (config.joinCode.trim()) {
-    payload.j = config.joinCode.trim();
-  }
-  if (config.poolId.trim()) {
-    payload.p = config.poolId.trim();
-  }
-  if (config.tableLabel.trim()) {
-    payload.t = config.tableLabel.trim();
-  }
-  if (config.deckName.trim()) {
-    payload.d = config.deckName.trim();
-  }
   const json = JSON.stringify(payload);
   return bytesToBase64Url(new TextEncoder().encode(json));
+}
+
+/** Soft ceiling for scannable play links (QR level M byte capacity with margin). */
+export const DIRECT_PLAY_QR_MAX_CHARS = 2200;
+
+export function isDirectPlayQrEncodable(url: string): boolean {
+  return url.length > 0 && url.length <= DIRECT_PLAY_QR_MAX_CHARS;
 }
 
 export function decodeDirectPlayPayload(token: string): MatchConfig | null {
