@@ -83,6 +83,38 @@ export function playerJoinUrl(
 }
 
 /**
+ * Direct-play handoff link. The match config token lives in `?play=` so phone
+ * QR scanners cannot drop it with the URL fragment.
+ */
+export function playerDirectPlayUrl(
+  origin: string,
+  pathname: string,
+  payload: string,
+): string {
+  const trimmed = pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
+  return `${origin}${trimmed}/?play=${encodeURIComponent(payload)}`;
+}
+
+/** Reads `?play=` from a query string (`?play=…` or bare `play=…`). */
+export function playPayloadFromQueryString(search: string): string | null {
+  const raw = search.startsWith('?') ? search.slice(1) : search;
+  if (!raw) {
+    return null;
+  }
+  try {
+    const params = new URLSearchParams(raw);
+    const value = params.get('play');
+    if (!value) {
+      return null;
+    }
+    const trimmed = value.trim();
+    return trimmed || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Resolves the public site origin used for copy/QR links.
  *
  * Production never falls back to the host tab origin — a missing
@@ -246,12 +278,29 @@ export function lanHostFromBuild(): string {
 export function stripJoinQueryFromLocation(
   href: string = typeof window !== 'undefined' ? window.location.href : '',
 ): string | null {
+  return stripQueryParamFromLocation('join', href);
+}
+
+/**
+ * Strips `play` from the browser query string without touching the hash route.
+ * Safe to call repeatedly.
+ */
+export function stripPlayQueryFromLocation(
+  href: string = typeof window !== 'undefined' ? window.location.href : '',
+): string | null {
+  return stripQueryParamFromLocation('play', href);
+}
+
+function stripQueryParamFromLocation(
+  key: string,
+  href: string,
+): string | null {
   try {
     const url = new URL(href);
-    if (!url.searchParams.has('join')) {
+    if (!url.searchParams.has(key)) {
       return null;
     }
-    url.searchParams.delete('join');
+    url.searchParams.delete(key);
     const search = url.searchParams.toString();
     return `${url.pathname}${search ? `?${search}` : ''}${url.hash}`;
   } catch {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { COMMANDER_POOLS, usesCommanderRules } from '@podyguard/shared';
 import { useTranslation } from 'react-i18next';
@@ -6,6 +6,13 @@ import {
   CommanderSeatPickers,
   commandersCompleteForSeats,
 } from './CommanderSeatPickers';
+import { encodeDirectPlayPayload } from './direct-play-share';
+import {
+  isLocalHostname,
+  lanHostFromBuild,
+  playerDirectPlayUrl,
+  resolvePlayerLinkParts,
+} from './join-url';
 import {
   CONSTRUCTED_BASE_MODES,
   baseModeFromGameMode,
@@ -27,6 +34,7 @@ import { removeStored } from './device-storage';
 import { Badge } from './ui/Badge';
 import { Brand } from './ui/Brand';
 import { Button } from './ui/Button';
+import { JoinQr } from './ui/JoinQr';
 import { Panel } from './ui/Panel';
 import { ThemeToggleCorner } from './ui/ThemeToggle';
 import { cx } from './ui/cx';
@@ -43,6 +51,7 @@ export function MatchConfigPage() {
   const navigate = useNavigate();
   const [config, setConfig] = useState<MatchConfig>(() => loadMatchConfig());
   const [sandboxOpen, setSandboxOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const players = matchPlayers(config);
   const commanderRules = usesCommanderRules(config.gameMode, config.rulesFormat);
   const commandersReady = commandersCompleteForSeats(
@@ -51,6 +60,35 @@ export function MatchConfigPage() {
   );
   const baseMode = baseModeFromGameMode(config.gameMode);
   const commanderOn = isCommanderEnabled(config.gameMode, config.rulesFormat);
+  const isProduction = import.meta.env.PROD;
+  const publicOrigin = import.meta.env.VITE_PUBLIC_ORIGIN as string | undefined;
+  const phoneLinkParts = useMemo(
+    () =>
+      typeof window === 'undefined'
+        ? null
+        : resolvePlayerLinkParts(window.location, {
+            lanHost: lanHostFromBuild(),
+            publicSiteUrl: publicOrigin,
+            isProduction,
+            forPhoneQr: true,
+          }),
+    [isProduction, publicOrigin],
+  );
+  const shareLinkBroken =
+    phoneLinkParts?.status !== 'ok';
+  const phonePlayUrl =
+    phoneLinkParts?.status === 'ok'
+      ? playerDirectPlayUrl(
+          phoneLinkParts.origin,
+          phoneLinkParts.pathname,
+          encodeDirectPlayPayload(config),
+        )
+      : '';
+  const unreachableFromPhones =
+    typeof window !== 'undefined' &&
+    isLocalHostname(window.location.hostname) &&
+    !lanHostFromBuild();
+  const canStart = !commanderRules || commandersReady;
 
   function update(patch: Partial<MatchConfig>) {
     setConfig((current) => {
@@ -269,15 +307,56 @@ export function MatchConfigPage() {
           <Button
             variant="neon"
             size="lg"
-            disabled={commanderRules && !commandersReady}
+            disabled={!canStart}
             onClick={startGame}
           >
             {t('matchConfig.startGame')}
+          </Button>
+          <Button
+            variant="glass"
+            size="lg"
+            disabled={!canStart}
+            onClick={() => setShareOpen((open) => !open)}
+          >
+            {t('matchConfig.useOtherDevice')}
           </Button>
           <Button variant="glass" size="lg" onClick={resetGame}>
             {t('matchConfig.resetGameState')}
           </Button>
         </div>
+
+        {shareOpen ? (
+          <div className="mt-5 border-t border-muted/15 pt-5">
+            <p className="text-muted mb-4 text-xs">
+              {t('matchConfig.useOtherDeviceHint')}
+            </p>
+            {shareLinkBroken ? (
+              <p className="text-warning text-xs">
+                {t('host.publicOriginMissing')}
+              </p>
+            ) : (
+              <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+                {phonePlayUrl ? (
+                  <JoinQr
+                    value={phonePlayUrl}
+                    size={200}
+                    title={t('matchConfig.scanToOpenTracker')}
+                  />
+                ) : null}
+                <div className="min-w-0">
+                  <p className="text-muted mb-3 font-mono text-[11px] break-all">
+                    {phonePlayUrl}
+                  </p>
+                  {unreachableFromPhones ? (
+                    <p className="text-warning text-xs">
+                      {t('host.noLanAddress')}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : null}
       </Panel>
 
       <Panel

@@ -7,9 +7,12 @@ import {
   getSessionDiagnosticId,
   recordJoinBreadcrumb,
 } from './join-diagnostics';
+import { applyDirectPlayPayload } from './direct-play-share';
 import {
   joinCodeFromQueryString,
+  playPayloadFromQueryString,
   stripJoinQueryFromLocation,
+  stripPlayQueryFromLocation,
 } from './join-url';
 import { AppErrorBoundary } from './ui/AppErrorBoundary';
 import './styles.css';
@@ -34,6 +37,32 @@ export function JoinQueryBootstrap() {
   return null;
 }
 
+/**
+ * Reads `?play=` (direct-play match config) from the real location search and
+ * opens the life tracker with that setup hydrated into local storage.
+ */
+export function PlayQueryBootstrap() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (joinCodeFromQueryString(window.location.search)) {
+      return;
+    }
+    const payload = playPayloadFromQueryString(window.location.search);
+    if (!payload) {
+      return;
+    }
+    const applied = applyDirectPlayPayload(payload);
+    const next = stripPlayQueryFromLocation();
+    if (next) {
+      window.history.replaceState(window.history.state, '', next);
+    }
+    if (applied) {
+      navigate('/match', { replace: true });
+    }
+  }, [navigate]);
+  return null;
+}
+
 const rootElement = document.getElementById('root');
 if (!rootElement) {
   throw new Error('Root element #root not found');
@@ -46,6 +75,7 @@ createRoot(rootElement).render(
     <AppErrorBoundary>
       <HashRouter>
         <JoinQueryBootstrap />
+        <PlayQueryBootstrap />
         <App />
       </HashRouter>
     </AppErrorBoundary>

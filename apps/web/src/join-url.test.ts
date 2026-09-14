@@ -4,10 +4,13 @@ import {
   isUnsafePlayerOrigin,
   joinCodeFromQueryString,
   joinCodeFromScan,
+  playPayloadFromQueryString,
+  playerDirectPlayUrl,
   playerJoinUrl,
   resolvePlayerLinkParts,
   shareableOrigin,
   stripJoinQueryFromLocation,
+  stripPlayQueryFromLocation,
 } from './join-url';
 
 describe('joinCodeFromScan', () => {
@@ -65,6 +68,35 @@ describe('playerJoinUrl', () => {
     expect(
       playerJoinUrl('https://tsuina311.github.io', '/PodyGuard/', 'ab23cd'),
     ).toBe('https://tsuina311.github.io/PodyGuard/?join=AB23CD');
+  });
+});
+
+describe('playerDirectPlayUrl', () => {
+  it('builds a query-string play link', () => {
+    expect(playerDirectPlayUrl('http://localhost:5173', '/', 'abc')).toBe(
+      'http://localhost:5173/?play=abc',
+    );
+  });
+
+  it('keeps a GitHub Pages project path before the query', () => {
+    expect(
+      playerDirectPlayUrl(
+        'https://tsuina311.github.io',
+        '/PodyGuard/',
+        'token',
+      ),
+    ).toBe('https://tsuina311.github.io/PodyGuard/?play=token');
+  });
+});
+
+describe('playPayloadFromQueryString', () => {
+  it('reads ?play=', () => {
+    expect(playPayloadFromQueryString('?play=abc123')).toBe('abc123');
+  });
+
+  it('returns null when play is absent', () => {
+    expect(playPayloadFromQueryString('?join=AB23CD')).toBeNull();
+    expect(playPayloadFromQueryString('')).toBeNull();
   });
 });
 
@@ -250,6 +282,22 @@ describe('stripJoinQueryFromLocation', () => {
   it('returns null when join is absent', () => {
     expect(
       stripJoinQueryFromLocation('https://tsuina311.github.io/PodyGuard/'),
+    ).toBeNull();
+  });
+});
+
+describe('stripPlayQueryFromLocation', () => {
+  it('returns pathname without play', () => {
+    expect(
+      stripPlayQueryFromLocation(
+        'https://tsuina311.github.io/PodyGuard/?play=abc',
+      ),
+    ).toBe('/PodyGuard/');
+  });
+
+  it('returns null when play is absent', () => {
+    expect(
+      stripPlayQueryFromLocation('https://tsuina311.github.io/PodyGuard/'),
     ).toBeNull();
   });
 });

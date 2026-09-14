@@ -19,6 +19,7 @@ import {
   usesCommanderRules,
 } from '@podyguard/shared';
 import { countByStatus, queueByWait } from './match-view';
+import { eventHasLimitedQueues } from './event-mode';
 import {
   ApiError,
   cancelEvent,
@@ -70,11 +71,6 @@ import { LIMITED_MODE_LABELS } from './limited/limited-view';
 
 type HostTab = 'desk' | 'play';
 
-function eventHasLimitedQueues(event: {
-  limitedModeConfigs?: Array<{ enabled: boolean }> | null;
-}): boolean {
-  return event.limitedModeConfigs?.some((config) => config.enabled) === true;
-}
 export function HostPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();

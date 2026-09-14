@@ -48,6 +48,7 @@ import { TrackerView } from './tracker/TrackerView';
 import { TournamentPlayerStatus } from './tournament/TournamentPlayerStatus';
 import { LimitedPlayerPanel } from './limited/LimitedPlayerPanel';
 import { RoundPlayerStatus } from './rounds/RoundPlayerStatus';
+import { eventHasLimitedQueues } from './event-mode';
 import { TreacheryRoleDialog } from './TreacheryRoleDialog';
 import { useEventLive } from './useEventLive';
 import { forgetActiveMatch, rememberActiveMatch } from './active-match';
@@ -359,7 +360,11 @@ export function JoinPage({
     if (!event || !displayName.trim()) {
       return;
     }
-    if (commanderRules && decks.some((deck) => deck.commanders.length === 0)) {
+    if (
+      !limitedQueues &&
+      commanderRules &&
+      decks.some((deck) => deck.commanders.length === 0)
+    ) {
       setError(t('common.errors.chooseCommander'));
       return;
     }
@@ -367,7 +372,11 @@ export function JoinPage({
     setError(null);
     recordJoinBreadcrumb('JOIN_STARTED');
     try {
-      const result = await joinEvent(event.joinCode, displayName, decks);
+      const result = await joinEvent(
+        event.joinCode,
+        displayName,
+        limitedQueues ? undefined : decks,
+      );
       recordJoinBreadcrumb('JOIN_OK');
       savePlayerSession(event.joinCode, {
         token: result.token,
@@ -574,10 +583,10 @@ export function JoinPage({
     forgetActiveMatch(`/e/${event.joinCode}`);
   }
 
-  const commanderRules = usesCommanderRules(
-    event?.gameMode ?? 'commander',
-    event?.rulesFormat,
-  );
+  const limitedQueues = eventHasLimitedQueues(event ?? {});
+  const commanderRules =
+    !limitedQueues &&
+    usesCommanderRules(event?.gameMode ?? 'commander', event?.rulesFormat);
   const isReady = participant?.status === 'ready';
   const isPaused = participant?.status === 'paused';
   const hasLeft = participant?.status === 'left';
@@ -587,8 +596,11 @@ export function JoinPage({
     (commanderRules
       ? decks.every((deck) => deck.commanders.length > 0)
       : decks.every((deck) => deck.poolId.trim().length > 0));
+  // Limited nights only need a display name — Sealed/Draft have no commanders.
   const canJoin =
-    Boolean(event) && displayName.trim().length > 0 && decksComplete;
+    Boolean(event) &&
+    displayName.trim().length > 0 &&
+    (limitedQueues || decksComplete);
   const matchTable = tableForParticipant(snapshot, participant);
   const challengeProgress = Object.fromEntries(
     (snapshot?.participants ?? []).map((row) => [
@@ -774,6 +786,7 @@ export function JoinPage({
           ) : null}
           {(participant.status === 'joined' ||
             participant.status === 'paused') &&
+          !limitedQueues &&
           (!event?.tournament ||
             event.tournament.phase === 'registration') ? (
             <div className="mb-4">
@@ -882,6 +895,18 @@ export function JoinPage({
             <p className="text-muted text-sm">
               You are waiting in a Limited queue. Manage that queue below.
             </p>
+          ) : limitedQueues ? (
+            <>
+              <p className="text-muted mb-4 text-sm">{t('join.limitedJoinHint')}</p>
+              <Button
+                variant="ghost"
+                block
+                disabled={busy}
+                onClick={() => void onLeave()}
+              >
+                {t('join.leaveEvent')}
+              </Button>
+            </>
           ) : isReady ? (
             <>
               {participant.decks.length > 0 ? (
@@ -994,7 +1019,7 @@ export function JoinPage({
                 </Button>
               </div>
             </>
-          ) : isPaused ? (
+          ) : isPaused && !limitedQueues ? (
             <>
               <p className="text-muted mb-4 text-sm">{t('join.pausedMessage')}</p>
               <div className="flex flex-col gap-2">
@@ -1017,7 +1042,7 @@ export function JoinPage({
                 </Button>
               </div>
             </>
-          ) : participant.status === 'joined' ? (
+          ) : participant.status === 'joined' && !limitedQueues ? (
             <>
               <p className="text-muted mb-4 text-sm">{t('join.markReady')}</p>
               <div className="flex flex-col gap-2">
@@ -1071,15 +1096,19 @@ export function JoinPage({
                 autoComplete="nickname"
                 required
               />
-              <DeckEditor
-                decks={decks}
-                onChange={setDeckRows}
-                disabled={busy}
-                requireCommanders={commanderRules}
-                searchProfile={
-                  event ? commanderSearchProfile(event.gameMode) : 'commander'
-                }
-              />
+              {limitedQueues ? (
+                <p className="text-muted mb-4 text-sm">{t('join.limitedNameOnly')}</p>
+              ) : (
+                <DeckEditor
+                  decks={decks}
+                  onChange={setDeckRows}
+                  disabled={busy}
+                  requireCommanders={commanderRules}
+                  searchProfile={
+                    event ? commanderSearchProfile(event.gameMode) : 'commander'
+                  }
+                />
+              )}
               <Button
                 type="submit"
                 size="lg"
@@ -1093,7 +1122,7 @@ export function JoinPage({
         </Panel>
       )}
 
-      {participant && token && snapshot && event?.limitedModeConfigs?.some((config) => config.enabled) ? (
+      {participant && token && snapshot && limitedQueues ? (
         <LimitedPlayerPanel
           snapshot={snapshot}
           participant={participant}
