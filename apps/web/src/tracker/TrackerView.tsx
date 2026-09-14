@@ -886,6 +886,46 @@ export function TrackerView({
   const counterPlayer =
     state.players.find((row) => row.id === counterPlayerId) ?? null;
 
+  /*
+    While the dial menu (or any full-screen sheet) is open, life taps must not
+    land. Also swallow clicks for a beat after close — otherwise the same tap
+    that dismisses the sheet can change a total underneath.
+  */
+  const lifeBlockedByOverlay =
+    menuOpen ||
+    Boolean(diceToolsOpen) ||
+    challengesOpen ||
+    schemeOpen ||
+    rulesOpen ||
+    Boolean(lifeEntry) ||
+    Boolean(dungeonPlayer) ||
+    Boolean(commanderPlayer) ||
+    Boolean(counterPlayer) ||
+    assassinTargetsOpen ||
+    Boolean(assassinVictimId) ||
+    treacheryRolesOpen ||
+    roleCheckOpen;
+  const [lifeClickGuard, setLifeClickGuard] = useState(false);
+  const lifeOverlayWasOpen = useRef(false);
+  useEffect(() => {
+    if (lifeBlockedByOverlay) {
+      lifeOverlayWasOpen.current = true;
+      setLifeClickGuard(false);
+      return;
+    }
+    if (!lifeOverlayWasOpen.current) {
+      return;
+    }
+    lifeOverlayWasOpen.current = false;
+    setLifeClickGuard(true);
+    const timer = window.setTimeout(() => {
+      setLifeClickGuard(false);
+    }, 400);
+    return () => window.clearTimeout(timer);
+  }, [lifeBlockedByOverlay]);
+  const lifeDisabled =
+    Boolean(state.winnerId) || lifeBlockedByOverlay || lifeClickGuard;
+
   useEffect(() => {
     if (
       !dungeonPlayer &&
@@ -1753,7 +1793,7 @@ export function TrackerView({
                   lifeDelta?.playerId === player.id && lifeDeltaFading
                 }
                 color={seatColor(index)}
-                disabled={Boolean(state.winnerId)}
+                disabled={lifeDisabled}
                 onStep={(delta) =>
                   send({
                     type: 'action',
@@ -1990,7 +2030,7 @@ export function TrackerView({
                     colors={team.map((id) =>
                       seatColor(playerSeatIndex(state.players, id)),
                     )}
-                    disabled={Boolean(state.winnerId)}
+                    disabled={lifeDisabled}
                     onStep={(delta) =>
                       send({
                         type: 'action',
