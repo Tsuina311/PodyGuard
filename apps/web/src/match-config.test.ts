@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import {
   defaultMatchConfig,
   loadMatchConfig,
+  replayMatchConfig,
   saveMatchConfig,
   seatColor,
   seatCountForMode,
@@ -76,6 +77,35 @@ describe('standalone match config', () => {
     expect(trackerStorageKey(base)).not.toBe(
       trackerStorageKey({ ...base, gameMode: 'archenemy-commander' }),
     );
+  });
+
+  it('replays seats in the finished order and bumps resetCount', () => {
+    const config = {
+      ...defaultMatchConfig(),
+      seatCount: 4,
+      names: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'],
+      commanders: [
+        [{ oracleId: '1', cardId: '1', name: 'One', artCropUri: '', typeLine: '', oracleText: '', keywords: [] }],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+      ],
+      resetCount: 2,
+    };
+    const next = replayMatchConfig(config, [
+      { name: 'C', commanders: [] },
+      { name: 'A', commanders: config.commanders[0]! },
+      { name: 'D', commanders: [] },
+      { name: 'B', commanders: [] },
+    ]);
+    expect(next.names.slice(0, 4)).toEqual(['C', 'A', 'D', 'B']);
+    expect(next.commanders[1]?.[0]?.name).toBe('One');
+    expect(next.resetCount).toBe(3);
+    expect(trackerStorageKey(next)).not.toBe(trackerStorageKey(config));
   });
 
   it('defaults seats to Player 1, Player 2, …', () => {

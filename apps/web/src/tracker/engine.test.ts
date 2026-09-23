@@ -767,6 +767,12 @@ describe('commander tracker', () => {
     state = applyTrackerAction(state, {
       type: 'counter',
       playerId: 'a',
+      counter: 'gate',
+      delta: 7,
+    });
+    state = applyTrackerAction(state, {
+      type: 'counter',
+      playerId: 'a',
       counter: 'ring',
       delta: 9,
     });
@@ -787,6 +793,7 @@ describe('commander tracker', () => {
       acorn: 0,
       energy: 6,
       experience: 0,
+      gate: 7,
       hit: 0,
       rad: 0,
       ring: 2,
@@ -917,7 +924,19 @@ describe('commander tracker', () => {
       playerId: 'a',
       dungeonId: 'lost-mine',
     });
+    expect(state.dungeons.a).toMatchObject({
+      roomId: '',
+      visitedRoomIds: [],
+    });
+    expect(legalNextRoomIds(state.dungeons.a!)).toEqual(['cave']);
+
+    state = applyTrackerAction(state, {
+      type: 'advanceDungeon',
+      playerId: 'a',
+      roomId: 'cave',
+    });
     expect(state.dungeons.a?.roomId).toBe('cave');
+    expect(state.dungeons.a?.visitedRoomIds).toEqual(['cave']);
 
     const illegal = applyTrackerAction(state, {
       type: 'advanceDungeon',
@@ -940,6 +959,11 @@ describe('commander tracker', () => {
       type: 'enterDungeon',
       playerId: 'a',
       dungeonId: 'mad-mage',
+    });
+    state = applyTrackerAction(state, {
+      type: 'advanceDungeon',
+      playerId: 'a',
+      roomId: 'portal',
     });
     expect(state.dungeons.a?.roomId).toBe('portal');
 
@@ -986,6 +1010,11 @@ describe('commander tracker', () => {
     state = applyTrackerAction(state, {
       type: 'advanceDungeon',
       playerId: 'a',
+      roomId: 'cave',
+    });
+    state = applyTrackerAction(state, {
+      type: 'advanceDungeon',
+      playerId: 'a',
       roomId: 'tunnels',
     });
 
@@ -1015,7 +1044,7 @@ describe('commander tracker', () => {
       playerId: 'a',
       dungeonId: 'tomb',
     });
-    for (const roomId of ['oubliette', 'cradle']) {
+    for (const roomId of ['entry', 'oubliette', 'cradle']) {
       state = applyTrackerAction(state, {
         type: 'advanceDungeon',
         playerId: 'a',
@@ -1040,7 +1069,7 @@ describe('commander tracker', () => {
       playerId: 'a',
       dungeonId: 'tomb',
     });
-    for (const roomId of ['oubliette', 'cradle']) {
+    for (const roomId of ['entry', 'oubliette', 'cradle']) {
       state = applyTrackerAction(state, {
         type: 'advanceDungeon',
         playerId: 'a',
@@ -1052,7 +1081,7 @@ describe('commander tracker', () => {
       playerId: 'a',
       dungeonId: 'tomb',
     });
-    for (const roomId of ['oubliette', 'cradle']) {
+    for (const roomId of ['entry', 'oubliette', 'cradle']) {
       state = applyTrackerAction(state, {
         type: 'advanceDungeon',
         playerId: 'a',
@@ -1067,7 +1096,7 @@ describe('commander tracker', () => {
       playerId: 'a',
       dungeonId: 'lost-mine',
     });
-    for (const roomId of ['goblin', 'store', 'temple']) {
+    for (const roomId of ['cave', 'goblin', 'store', 'temple']) {
       state = applyTrackerAction(state, {
         type: 'advanceDungeon',
         playerId: 'a',
@@ -1087,12 +1116,57 @@ describe('commander tracker', () => {
       playerId: 'a',
       dungeonId: 'tomb',
     });
+    // Preview only — not started until the entrance is visited.
+    const previewSwitch = applyTrackerAction(state, {
+      type: 'enterDungeon',
+      playerId: 'a',
+      dungeonId: 'mad-mage',
+    });
+    expect(previewSwitch.dungeons.a?.dungeonId).toBe('mad-mage');
+    expect(previewSwitch.dungeons.a?.visitedRoomIds).toEqual([]);
+
+    state = applyTrackerAction(state, {
+      type: 'advanceDungeon',
+      playerId: 'a',
+      roomId: 'entry',
+    });
     const switched = applyTrackerAction(state, {
       type: 'enterDungeon',
       playerId: 'a',
       dungeonId: 'mad-mage',
     });
     expect(switched.dungeons.a?.dungeonId).toBe('tomb');
+  });
+
+  it('leaves a dungeon that was never ventured into', () => {
+    let state = createTracker([{ id: 'a', name: 'Ada' }]);
+    state = applyTrackerAction(state, {
+      type: 'enterDungeon',
+      playerId: 'a',
+      dungeonId: 'lost-mine',
+    });
+    state = applyTrackerAction(state, {
+      type: 'leaveDungeon',
+      playerId: 'a',
+    });
+    expect(state.dungeons.a).toBeUndefined();
+
+    state = applyTrackerAction(state, {
+      type: 'enterDungeon',
+      playerId: 'a',
+      dungeonId: 'lost-mine',
+    });
+    state = applyTrackerAction(state, {
+      type: 'advanceDungeon',
+      playerId: 'a',
+      roomId: 'cave',
+    });
+    const stuck = applyTrackerAction(state, {
+      type: 'leaveDungeon',
+      playerId: 'a',
+    });
+    expect(stuck.dungeons.a?.dungeonId).toBe('lost-mine');
+    expect(stuck.dungeons.a?.visitedRoomIds).toEqual(['cave']);
   });
 
   it('Undercity is initiative-only and initiative cannot exit another dungeon', () => {
@@ -1110,6 +1184,11 @@ describe('commander tracker', () => {
       dungeonId: 'lost-mine',
     });
     state = applyTrackerAction(state, {
+      type: 'advanceDungeon',
+      playerId: 'a',
+      roomId: 'cave',
+    });
+    state = applyTrackerAction(state, {
       type: 'initiative',
       playerId: 'a',
     });
@@ -1122,7 +1201,8 @@ describe('commander tracker', () => {
       playerId: 'b',
     });
     expect(initiative.dungeons.b?.dungeonId).toBe('undercity');
-    expect(initiative.dungeons.b?.roomId).toBe('secret');
+    expect(initiative.dungeons.b?.roomId).toBe('');
+    expect(initiative.dungeons.b?.visitedRoomIds).toEqual([]);
   });
 
   it('re-enters Undercity while still holding the initiative after finishing it', () => {
@@ -1154,9 +1234,9 @@ describe('commander tracker', () => {
     });
     expect(state.dungeons.a).toMatchObject({
       dungeonId: 'undercity',
-      roomId: 'secret',
+      roomId: '',
       completed: false,
-      visitedRoomIds: ['secret'],
+      visitedRoomIds: [],
     });
     expect(state.initiativeId).toBe('a');
   });

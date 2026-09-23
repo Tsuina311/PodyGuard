@@ -352,6 +352,34 @@ export function matchPlayers(
   }));
 }
 
+/**
+ * Rebuilds local match config for another game at the same table, keeping mode
+ * and carrying seats in the order the last game ended (after rearranges).
+ */
+export function replayMatchConfig(
+  config: MatchConfig,
+  seats: Array<{ name: string; commanders: CommanderSelection[] }>,
+): MatchConfig {
+  const seatCount = seatCountForMode(config.gameMode, seats.length || config.seatCount);
+  const names = [...config.names];
+  const commanders = config.commanders.map((seat) => [...seat]);
+  for (let index = 0; index < seatCount; index += 1) {
+    const seat = seats[index];
+    names[index] =
+      seat?.name.trim() ||
+      config.names[index] ||
+      `Player ${String(index + 1)}`;
+    commanders[index] = seat?.commanders ?? [];
+  }
+  return {
+    ...config,
+    seatCount,
+    names,
+    commanders,
+    resetCount: config.resetCount + 1,
+  };
+}
+
 export function trackerStorageKey(config: MatchConfig): string {
   return `podyguard.tracker.sandbox.${config.gameMode}.${config.rulesFormat}.${String(config.seatCount)}.${String(config.resetCount)}`;
 }

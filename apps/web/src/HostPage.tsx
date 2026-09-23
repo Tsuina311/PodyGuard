@@ -21,6 +21,10 @@ import {
 import { countByStatus, queueByWait } from './match-view';
 import { eventHasLimitedQueues } from './event-mode';
 import {
+  shouldShowConstructedHostMatching,
+  shouldShowLimitedHostPanel,
+} from './event-screens';
+import {
   ApiError,
   cancelEvent,
   clearHostToken,
@@ -721,7 +725,7 @@ export function HostPage() {
       ) : null}
 
       <div className={cx(tab === 'desk' ? 'contents' : 'hidden')}>
-      {eventHasLimitedQueues(event) ? (
+      {!shouldShowConstructedHostMatching(event) ? (
         <Panel title={t('host.limitedPairing')} aside={t('host.limitedPairingAside')}>
           <p className="text-muted mb-3 text-sm">
             {t('host.limitedPairingHint')}
@@ -985,7 +989,7 @@ export function HostPage() {
         />
       ) : null}
 
-      {hostToken && event.limitedModeConfigs?.some((config) => config.enabled) ? (
+      {shouldShowLimitedHostPanel(event, hostToken) && hostToken ? (
         <LimitedHostPanel
           joinCode={code}
           hostToken={hostToken}
@@ -1389,7 +1393,7 @@ export function HostPage() {
         <Link className="hover:text-ink" to="/display">
           {t('host.displaysPairLink')}
         </Link>
-        {event.limitedModeConfigs?.some((config) => config.enabled) ? (
+        {eventHasLimitedQueues(event) ? (
           <>
             <span className="mx-2">·</span>
             <Link className="hover:text-ink" to={`/display/event/${code}`}>

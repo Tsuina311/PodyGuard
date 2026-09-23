@@ -36,6 +36,20 @@ jobs:
       - name: Build production artifacts
         run: yarn build
 
+      - name: Install Playwright browser
+        run: yarn playwright install --with-deps chromium
+
+      - name: End-to-end (constructed vs Limited screens)
+        run: yarn playwright test
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
       - name: Pages-shaped web production build
         env:
           GITHUB_PAGES: "true"

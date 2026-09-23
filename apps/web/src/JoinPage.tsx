@@ -49,6 +49,7 @@ import { TournamentPlayerStatus } from './tournament/TournamentPlayerStatus';
 import { LimitedPlayerPanel } from './limited/LimitedPlayerPanel';
 import { RoundPlayerStatus } from './rounds/RoundPlayerStatus';
 import { eventHasLimitedQueues } from './event-mode';
+import { shouldShowLimitedPlayerPanel } from './event-screens';
 import { TreacheryRoleDialog } from './TreacheryRoleDialog';
 import { useEventLive } from './useEventLive';
 import { forgetActiveMatch, rememberActiveMatch } from './active-match';
@@ -1122,11 +1123,15 @@ export function JoinPage({
         </Panel>
       )}
 
-      {participant && token && snapshot && limitedQueues ? (
+      {shouldShowLimitedPlayerPanel(event, {
+        participant,
+        token,
+        snapshot,
+      }) ? (
         <LimitedPlayerPanel
-          snapshot={snapshot}
-          participant={participant}
-          token={token}
+          snapshot={snapshot!}
+          participant={participant!}
+          token={token!}
           onSnapshot={onSnapshot}
           onError={setError}
         />

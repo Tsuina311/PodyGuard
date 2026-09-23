@@ -55,6 +55,7 @@ import {
   usesCommanderDamage,
   type ChallengeDetectionMode,
   type ChallengePack,
+  type CommanderSelection,
   type GameMode,
   type PublicTreacheryIdentity,
   type RulesFormat,
@@ -85,7 +86,7 @@ import {
   type TrackerState,
   type SecondaryCounter,
 } from './engine';
-import { DUNGEON_COUNT } from './dungeons';
+import { DUNGEON_COUNT, preloadDungeonArt } from './dungeons';
 import {
   randomPlayerId,
   randomTwoHeadedTeam,
@@ -126,6 +127,7 @@ import { seatColor } from '../match-config';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { DungeonIcon } from '../ui/DungeonIcon';
+import { PortalIcon } from '../ui/PortalIcon';
 import { RingIcon } from '../ui/RingIcon';
 import { ThemeToggle, setAppTheme } from '../ui/ThemeToggle';
 import { LanguageSwitcher } from '../ui/LanguageSwitcher';
@@ -142,6 +144,21 @@ type Props = {
    * no door.
    */
   onFinish: (winnerId: string, durationSeconds: number) => Promise<void>;
+  /**
+   * Direct play: start another game with the same mode using the seats as they
+   * stand now (after any rearrange). Hosted event pods leave this unset.
+   */
+  onReplay?: (seats: Array<{
+    name: string;
+    commanders: CommanderSelection[];
+  }>) => void | Promise<void>;
+  /**
+   * After a replay, confirm the physical table before revealing the first
+   * player — seats often stay put while the phone's order drifted.
+   */
+  promptRearrange?: boolean;
+  /** Opens match setup so commanders can be cleared or swapped before kickoff. */
+  onEditSetup?: () => void;
   /** Leaves the screen without ending or clearing the current game. */
   onQuit: () => void;
   /**
@@ -459,61 +476,6 @@ const starPositionClasses = [
   'top-[30%] left-0',
 ] as const;
 
-/**
- * Clearance for the chrome row that runs into the match clock.
- *
- * Four seats laid flat form a two by two board, so the middle of the screen is
- * the inner corner of every card and the dial covers whatever sits there. Each
- * seat pushes the row that owns that corner clear of it. Five parks the dial in
- * the empty bottom-centre cell; six keeps it on the seam and clears both rows.
- * Held upright the seats stack into one column and the corner is nowhere near
- * the middle, so the clearance is landscape-only.
- */
-function clockClearance(
-  count: number,
-  index: number,
-  row: 'top' | 'bottom',
-  layout: 'default' | 'star' = 'default',
-): string {
-  if (count === 4) {
-    // The two seats along the top of the board meet the dial with their bottom
-    // corners, the two along the bottom with their top ones.
-    const meets = index < 2 ? 'bottom' : 'top';
-    if (row !== meets) {
-      return '';
-    }
-    // Left-hand seats meet it on their right, right-hand seats on their left.
-    return index % 2 === 0 ? 'landscape:pr-7' : 'landscape:pl-7';
-  }
-  if (count === 5) {
-    // Bottom pair flanks the dial: Star uses seats 3 and 2, other modes 3 and 4.
-    const left = 3;
-    const right = layout === 'star' ? 2 : 4;
-    if (row !== 'top' || (index !== left && index !== right)) {
-      return '';
-    }
-    return index === left ? 'landscape:pr-7' : 'landscape:pl-7';
-  }
-  if (count === 6) {
-    // Dial sits on the seam: top seats meet it with their bottom chrome, bottom
-    // seats with their top chrome. The middle column needs the widest shove.
-    const topRow = index < 3;
-    const meets = topRow ? 'bottom' : 'top';
-    if (row !== meets) {
-      return '';
-    }
-    const column = index % 3;
-    if (column === 0) {
-      return 'landscape:pr-0';
-    }
-    if (column === 1) {
-      return 'landscape:px-0';
-    }
-    return 'landscape:pl-0';
-  }
-  return '';
-}
-
 /*
   The skull has no element until a seat is actually knocked out, so it is
   fetched up front and the swap never waits on the network. The reference
@@ -524,6 +486,7 @@ let warmEliminatedArt: HTMLImageElement | null = null;
 
 function usePreloadedEliminatedArt(): void {
   useEffect(() => {
+    preloadDungeonArt();
     if (warmEliminatedArt) {
       return;
     }
@@ -539,6 +502,9 @@ export function TrackerView({
   players,
   persist = true,
   onFinish,
+  onReplay,
+  promptRearrange = false,
+  onEditSetup,
   onQuit,
   onOpenDesk,
   requeueOnFinish = true,
@@ -632,6 +598,9 @@ export function TrackerView({
   const [challengesOpen, setChallengesOpen] = useState(false);
   const [resultHidden, setResultHidden] = useState(false);
   const [finishing, setFinishing] = useState(false);
+  const [replaying, setReplaying] = useState(false);
+  const [needsRearrange, setNeedsRearrange] = useState(promptRearrange);
+  const [pregameSwapId, setPregameSwapId] = useState<string | null>(null);
   const [finishError, setFinishError] = useState<string | null>(null);
   const [challengeNotice, setChallengeNotice] = useState<string | null>(null);
   const [challengeError, setChallengeError] = useState<string | null>(null);
@@ -829,7 +798,7 @@ export function TrackerView({
     controlsHideTimer.current = window.setTimeout(() => {
       setControlsVisible(false);
       controlsHideTimer.current = null;
-    }, 3000);
+    }, 30000);
   }
 
   useEffect(() => () => clearControlsHideTimer(), []);
@@ -840,7 +809,7 @@ export function TrackerView({
     first frame.
   */
   async function finish() {
-    if (!state.winnerId || finishing) {
+    if (!state.winnerId || finishing || replaying) {
       return;
     }
     setFinishing(true);
@@ -853,6 +822,30 @@ export function TrackerView({
         caught instanceof Error ? caught.message : t('common.errors.submitResult'),
       );
       setFinishing(false);
+    }
+  }
+
+  async function replay() {
+    if (!onReplay || replaying || finishing) {
+      return;
+    }
+    setReplaying(true);
+    setFinishError(null);
+    try {
+      await onReplay(
+        state.players.map((player) => ({
+          name: player.name,
+          commanders: player.commanders
+            .map(commanderSelectionFromTracker)
+            .filter((row): row is CommanderSelection => row !== null),
+        })),
+      );
+      removeStored(storageKey);
+    } catch (caught) {
+      setFinishError(
+        caught instanceof Error ? caught.message : t('common.errors.startGame'),
+      );
+      setReplaying(false);
     }
   }
 
@@ -1634,6 +1627,83 @@ export function TrackerView({
   }
 
   if (!state.firstPlayerId) {
+    if (needsRearrange) {
+      return (
+        <>
+          <PreGameScreen
+            contentClassName="max-w-none w-full flex-1"
+            onCancel={leaveSetup}
+            actions={
+              <>
+                {onEditSetup ? (
+                  <Button
+                    variant="glass"
+                    size="lg"
+                    className="h-14 landscape:h-12"
+                    onClick={onEditSetup}
+                  >
+                    {t('tracker.editSetup')}
+                  </Button>
+                ) : null}
+                <Button
+                  variant="neon"
+                  size="lg"
+                  className="h-14 landscape:h-12"
+                  onClick={() => {
+                    setPregameSwapId(null);
+                    setNeedsRearrange(false);
+                  }}
+                >
+                  {t('tracker.seatsLookGood')}
+                </Button>
+              </>
+            }
+          >
+            <div className="mb-3 text-center">
+              <h2 className="font-display mb-1 text-2xl font-bold">
+                {t('tracker.confirmSeatOrder')}
+              </h2>
+              <p className="text-muted text-sm">
+                {t('tracker.confirmSeatOrderHint')}
+              </p>
+            </div>
+            <div className="min-h-[min(52dvh,28rem)] flex-1">
+              <SeatPickBoard
+                players={state.players}
+                seatLayout={seatLayout}
+                archenemyBoard={archenemyBoard}
+                archenemyId={state.archenemyId}
+                forceRotate={false}
+                selectedIds={
+                  pregameSwapId ? new Set([pregameSwapId]) : undefined
+                }
+                onSelect={(seatId) => {
+                  if (!pregameSwapId) {
+                    setPregameSwapId(seatId);
+                    return;
+                  }
+                  if (pregameSwapId === seatId) {
+                    setPregameSwapId(null);
+                    return;
+                  }
+                  const order = swapStarSeats(
+                    state.players.map((player) => player.id),
+                    pregameSwapId,
+                    seatId,
+                  );
+                  send({
+                    type: 'action',
+                    action: { type: 'reorderPlayers', order },
+                  });
+                  setPregameSwapId(null);
+                }}
+              />
+            </div>
+          </PreGameScreen>
+          {rulesSheet}
+        </>
+      );
+    }
     return (
       <>
         <PreGameScreen
@@ -1704,6 +1774,11 @@ export function TrackerView({
               playerId: player.id,
             },
           );
+          // 4-seat: players 2 & 3 swap the pair/quad rails; all four center the pair.
+          // Chrome stays inside the seat flip so far-side players can read it.
+          const fourSeatBoard = state.players.length === 4;
+          const swapSeatChrome =
+            fourSeatBoard && (index === 1 || index === 2);
           return (
           <article
             key={player.id}
@@ -1828,20 +1903,23 @@ export function TrackerView({
                   ) : null}
                 </span>
               </div>
-
               <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 px-1.5 py-0.5">
-                <span className="pointer-events-auto flex w-full min-w-0 items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <span className="flex w-full min-w-0 items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   <CounterBadges
                     player={player}
-                    disabled={Boolean(state.winnerId)}
                     hidePoison={sharedLifeBoard}
                     hideTax={!commanderRules}
-                    onOpen={() => setCounterPlayerId(player.id)}
                   />
                 </span>
               </div>
 
-              <div className="pointer-events-none absolute inset-y-0 left-0 z-20 flex w-9 flex-col items-center gap-1 overflow-y-auto py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div
+                className={cx(
+                  'pointer-events-none absolute inset-y-0 z-20 flex w-9 flex-col items-center gap-1 overflow-y-auto py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+                  swapSeatChrome ? 'right-0' : 'left-0',
+                  fourSeatBoard && 'justify-center',
+                )}
+              >
                 <IconButton
                   title={t('tracker.openCounters', { name: player.name })}
                   disabled={Boolean(state.winnerId)}
@@ -1861,7 +1939,12 @@ export function TrackerView({
                 ) : null}
               </div>
 
-              <div className="pointer-events-none absolute inset-y-0 right-0 z-20 flex w-9 flex-col items-center gap-1 overflow-y-auto py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div
+                className={cx(
+                  'pointer-events-none absolute inset-y-0 z-20 flex w-9 flex-col items-center gap-1 overflow-y-auto py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+                  swapSeatChrome ? 'left-0' : 'right-0',
+                )}
+              >
                 <IconButton
                   title={
                     player.id === state.monarchId
@@ -2054,9 +2137,7 @@ export function TrackerView({
                     <div className="pointer-events-auto flex items-center gap-3">
                       <CounterBadges
                         player={first}
-                        disabled={Boolean(state.winnerId)}
                         onlyPoison
-                        onOpen={() => setCounterPlayerId(first.id)}
                       />
                       {commanderDamageRules ? (
                         <CommanderDamageChip
@@ -2813,10 +2894,22 @@ export function TrackerView({
                   </div>
                 ) : null}
                 <div className="flex flex-wrap items-center justify-center gap-2">
+                  {onReplay ? (
+                    <Button
+                      variant="neon"
+                      size="sm"
+                      disabled={finishing || replaying || challengeSaving > 0}
+                      onClick={() => void replay()}
+                    >
+                      {replaying
+                        ? t('common.loading')
+                        : t('tracker.playAgain')}
+                    </Button>
+                  ) : null}
                   <Button
-                    variant="neon"
+                    variant={onReplay ? 'glass' : 'neon'}
                     size="sm"
-                    disabled={finishing || challengeSaving > 0}
+                    disabled={finishing || replaying || challengeSaving > 0}
                     onClick={() => void finish()}
                   >
                     {finishing
@@ -2847,6 +2940,11 @@ export function TrackerView({
                     {t('tracker.reviewBoard')}
                   </Button>
                 </div>
+                {onReplay ? (
+                  <p className="text-muted mt-2 text-[0.7rem]">
+                    {t('tracker.playAgainHint')}
+                  </p>
+                ) : null}
                 {finishError ? (
                   <p className="text-danger mt-3 text-xs">{finishError}</p>
                 ) : null}
@@ -3581,6 +3679,24 @@ function MatchMenuPane({
   );
 }
 
+/** Rebuild a shareable commander pick from an in-game seat (drops name-only stubs). */
+function commanderSelectionFromTracker(
+  commander: Commander,
+): CommanderSelection | null {
+  if (!commander.oracleId || !commander.cardId) {
+    return null;
+  }
+  return {
+    oracleId: commander.oracleId,
+    cardId: commander.cardId,
+    name: commander.name,
+    artCropUri: commander.artCropUri ?? '',
+    typeLine: commander.typeLine ?? '',
+    oracleText: commander.oracleText ?? '',
+    keywords: commander.keywords ?? [],
+  };
+}
+
 /** Colour bubble + name on setup pickers so the table can claim a seat early. */
 function SeatLabel({
   index,
@@ -3806,6 +3922,9 @@ function LifeRow({
   );
 }
 
+const LIFE_FLOWER_GAIN = assetUrl('/tracker/life-flowers/gain.png');
+const LIFE_FLOWER_LOSS = assetUrl('/tracker/life-flowers/loss.png');
+
 function LifeButton({
   delta,
   disabled,
@@ -3823,6 +3942,7 @@ function LifeButton({
   const timer = useRef<number | null>(null);
   const longPressed = useRef(false);
   const [pressed, setPressed] = useState(false);
+  const flowerSrc = delta > 0 ? LIFE_FLOWER_GAIN : LIFE_FLOWER_LOSS;
 
   function clearTimer() {
     if (timer.current !== null) {
@@ -3873,7 +3993,7 @@ function LifeButton({
       }}
       onContextMenu={(event) => event.preventDefault()}
       className={cx(
-        'font-display text-muted/35 flex justify-center text-2xl font-bold transition-[background-color,color] duration-150 select-none disabled:opacity-40',
+        'font-display text-muted/35 relative flex justify-center overflow-hidden text-2xl font-bold transition-[background-color,color] duration-150 select-none disabled:opacity-40',
         pressed &&
           (delta > 0
             ? 'bg-gain/25 text-gain/80'
@@ -3881,7 +4001,17 @@ function LifeButton({
         className,
       )}
     >
-      <span aria-hidden>{delta > 0 ? '+' : '−'}</span>
+      {pressed ? (
+        <img
+          src={flowerSrc}
+          alt=""
+          draggable={false}
+          className="pointer-events-none absolute inset-0 h-full w-full object-contain object-center opacity-95"
+        />
+      ) : null}
+      <span aria-hidden className="relative z-10">
+        {delta > 0 ? '+' : '−'}
+      </span>
     </button>
   );
 }
@@ -4003,12 +4133,15 @@ function LifeAmountPad({
 function Chip({
   title,
   disabled,
+  interactive = true,
   onClick,
   className,
   children,
 }: {
   title: string;
   disabled: boolean;
+  /** False while the dial has not revealed seat chrome — readout only. */
+  interactive?: boolean;
   onClick: () => void;
   className?: string;
   children: React.ReactNode;
@@ -4018,17 +4151,26 @@ function Chip({
       type="button"
       title={title}
       aria-label={title}
+      tabIndex={interactive ? undefined : -1}
       disabled={disabled}
       onPointerDown={(event) => {
-        event.stopPropagation();
+        if (interactive) {
+          event.stopPropagation();
+        }
       }}
       onClick={(event) => {
+        if (!interactive) {
+          return;
+        }
         event.stopPropagation();
         onClick();
       }}
       className={cx(
         plate,
-        'border-muted/25 hover:border-neon/50 flex shrink-0 items-center gap-1 rounded-lg border px-2 py-1 font-mono text-xs transition disabled:opacity-40',
+        'border-muted/25 flex max-w-full shrink-0 items-center gap-0.5 rounded-lg border px-1 py-1 font-mono text-xs transition disabled:opacity-40',
+        interactive
+          ? 'pointer-events-auto hover:border-neon/50'
+          : 'pointer-events-none',
         className,
       )}
     >
@@ -4142,6 +4284,10 @@ const COUNTER_SPECS: CounterSpec[] = [
     icon: (size) => <Award size={size} aria-hidden />,
   },
   {
+    id: 'gate',
+    icon: (size) => <PortalIcon size={size} />,
+  },
+  {
     id: 'hit',
     maximum: HIT_LIMIT,
     danger: { warn: HIT_LIMIT - 1, alert: HIT_LIMIT },
@@ -4232,20 +4378,16 @@ export function heldCounters(
 /*
   A seat carries badges only for the counters it actually holds, so most games
   show none and the three poison next to the four energy still land in a single
-  glance. Each badge opens the sheet it came from, which is where the counter is
-  adjusted.
+  glance. Badges are readouts only — the counter sheet opens from the seat's
+  counters button.
 */
 function CounterBadges({
   player,
-  disabled,
-  onOpen,
   hidePoison = false,
   hideTax = false,
   onlyPoison = false,
 }: {
   player: TrackerPlayer;
-  disabled: boolean;
-  onOpen: () => void;
   /** Shared-life seats keep poison on the team chrome instead. */
   hidePoison?: boolean;
   /** Normal Magic formats have no commander tax. */
@@ -4269,9 +4411,8 @@ function CounterBadges({
   return (
     <>
       {rows.map(({ definition, value, tone }) => (
-        <button
+        <span
           key={definition.id}
-          type="button"
           title={t('tracker.counterOn', {
             label: definition.label,
             name: player.name,
@@ -4282,27 +4423,19 @@ function CounterBadges({
             name: player.name,
             value,
           })}
-          disabled={disabled}
-          onPointerDown={(event) => {
-            event.stopPropagation();
-          }}
-          onClick={(event) => {
-            event.stopPropagation();
-            onOpen();
-          }}
           /*
-            Readouts rather than controls, so they are pill-shaped and a size
-            down from the buttons along the bottom. They still open the sheet,
-            which is the only place a counter changes.
+            Readouts rather than controls: pill-shaped and a size down from the
+            buttons along the bottom. pointer-events-none so life taps pass
+            through; only the counters button opens the sheet.
           */
           className={cx(
             plate,
-            'border-muted/20 hover:border-neon/50 flex shrink-0 items-center gap-0.5 rounded-full border px-1.5 py-0.5 font-mono text-[0.6rem] leading-none transition disabled:opacity-40',
+            'pointer-events-none flex shrink-0 items-center gap-0.5 rounded-full border border-muted/20 px-1.5 py-0.5 font-mono text-[0.6rem] leading-none',
           )}
         >
           {definition.icon(11)}
           <span className={cx('tabular-nums', tone)}>{value}</span>
-        </button>
+        </span>
       ))}
     </>
   );
@@ -4506,6 +4639,8 @@ function CommanderDamageChip({
   const worst = worstCommanderDamage(state, player);
   const value = worst?.value ?? 0;
   const hidden = !revealed && value <= 0;
+  // Damage can peek before the dial wakes the seat; only then is it a control.
+  const interactive = revealed && !hidden;
   return (
     <Chip
       title={
@@ -4518,12 +4653,9 @@ function CommanderDamageChip({
           : t('tracker.noCommanderDamage', { name: player.name })
       }
       disabled={disabled}
+      interactive={interactive}
       onClick={onOpen}
-      className={
-        hidden
-          ? 'pointer-events-none opacity-0'
-          : 'pointer-events-auto'
-      }
+      className={hidden ? 'opacity-0' : undefined}
     >
       <Shield size={14} aria-hidden />
       <span
@@ -4559,9 +4691,11 @@ function IconButton({
   children: React.ReactNode;
 }) {
   // Active designations stay as a bare gold icon so the table can still see
-  // who holds them without waking every seat control.
+  // who holds them without waking every seat control. Peek is readout only —
+  // the dial must reveal the seat before anything here is tappable.
   const peek = active && !revealed;
   const hidden = !revealed && !active;
+  const interactive = revealed && !hidden;
   return (
     <button
       type="button"
@@ -4569,21 +4703,24 @@ function IconButton({
       aria-label={title}
       aria-pressed={active}
       aria-hidden={hidden || undefined}
+      tabIndex={interactive ? undefined : -1}
       disabled={disabled}
       onPointerDown={(event) => {
-        if (!hidden) {
+        if (interactive) {
           event.stopPropagation();
         }
       }}
       onClick={(event) => {
+        if (!interactive) {
+          return;
+        }
         event.stopPropagation();
         onClick();
       }}
       className={cx(
         'flex size-9 items-center justify-center rounded-lg text-sm transition disabled:opacity-40',
-        hidden
-          ? 'pointer-events-none opacity-0'
-          : 'pointer-events-auto',
+        interactive ? 'pointer-events-auto' : 'pointer-events-none',
+        hidden && 'opacity-0',
         peek &&
           'border-0 bg-transparent text-warning shadow-none [&>svg]:fill-warning/35',
         revealed &&
@@ -4678,9 +4815,11 @@ function DungeonButton({
         total: DUNGEON_COUNT,
       });
   // Progress dots stay on the board whenever any dungeon is done; the active
-  // initiative marker peeks the same way as other designations.
+  // initiative marker peeks the same way as other designations. Peek is
+  // readout only until the dial reveals the seat.
   const peek = !revealed && (active || filled > 0);
   const hidden = !revealed && !active && filled === 0;
+  const interactive = revealed && !hidden;
   return (
     <button
       type="button"
@@ -4688,25 +4827,28 @@ function DungeonButton({
       aria-label={t('tracker.dungeonInitiative', { name, title })}
       aria-pressed={active}
       aria-hidden={hidden || undefined}
+      tabIndex={interactive ? undefined : -1}
       disabled={disabled}
       onPointerDown={(event) => {
-        if (!hidden) {
+        if (interactive) {
           event.stopPropagation();
         }
       }}
       onClick={(event) => {
+        if (!interactive) {
+          return;
+        }
         event.stopPropagation();
         onClick();
       }}
       className={cx(
         'flex min-h-9 w-9 flex-col items-center justify-center gap-0.5 rounded-lg py-0.5 transition disabled:opacity-40',
-        hidden
-          ? 'pointer-events-none opacity-0'
-          : 'pointer-events-auto',
+        interactive ? 'pointer-events-auto' : 'pointer-events-none',
+        hidden && 'opacity-0',
         peek &&
           (active
-            ? 'border-0 bg-transparent text-warning shadow-none [&>svg]:fill-warning/35'
-            : 'border-0 bg-transparent text-neon shadow-none'),
+            ? 'border-0 bg-transparent text-warning shadow-none [&>svg]:fill-warning'
+            : 'border-0 bg-transparent text-neon shadow-none [&>svg]:fill-neon/80'),
         revealed &&
           (active
             ? cx(

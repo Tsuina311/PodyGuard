@@ -45,6 +45,11 @@ yarn dev:server
 
 # Run web app (http://localhost:5173)
 yarn dev:web
+
+# Phone on the same Wi‑Fi: hot-reloads after each save
+yarn dev:phone
+# …with API too:
+yarn dev:phone --with-api
 ```
 
 If `DATABASE_URL` is missing, the server exits with a setup message. It will not try to discover or start a local database.
@@ -180,7 +185,9 @@ manifest's `orientation`, so an iPhone shows a hint to turn the phone instead.
 
 | Script | Description |
 |--------|-------------|
+| `yarn dev:phone` | Vite on LAN with phone HMR; optional `--with-api` |
 | `yarn typecheck` | Typecheck all packages |
+| `yarn test:e2e` | Build web + Playwright e2e (memory API, no DB) |
 | `yarn test` | Run tests in all packages |
 | `yarn test:matching` | Matching engine unit, property, and oracle tests |
 | `yarn simulate:matching` | Seeded snapshot + event-loop simulation report |

@@ -5,6 +5,7 @@ import { networkInterfaces } from 'node:os';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
+import { findFreeDevPort } from '../../scripts/free-dev-port.mjs';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -70,6 +71,8 @@ function lanHost(): string {
   return candidates[0]?.address ?? '';
 }
 
+const lan = lanHost();
+
 function publicBase(): string {
   const fromEnv = process.env.VITE_BASE?.trim();
   if (fromEnv) {
@@ -82,27 +85,51 @@ function publicBase(): string {
   return '/';
 }
 
-export default defineConfig({
-  base: publicBase(),
-  plugins: [react(), tailwindcss()],
-  define: {
-    __LAN_HOST__: JSON.stringify(lanHost()),
-    __APP_VERSION__: JSON.stringify(releaseVersion()),
-    __APP_BUILD__: JSON.stringify(buildRevision()),
-  },
-  server: {
-    host: true,
-    port: 5173,
-    proxy: {
-      '/api': {
-        target: 'http://127.0.0.1:3001',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
-      '/socket.io': {
-        target: 'http://127.0.0.1:3001',
-        ws: true,
+function preferredDevPort(): number {
+  const raw = process.env.PORT?.trim();
+  if (!raw) {
+    return 5173;
+  }
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 5173;
+}
+
+export default defineConfig(async () => {
+  const preferred = preferredDevPort();
+  const port = await findFreeDevPort(preferred);
+  if (port !== preferred) {
+    console.info(`[vite] port ${String(preferred)} is busy — using ${String(port)}`);
+  }
+
+  return {
+    base: publicBase(),
+    plugins: [react(), tailwindcss()],
+    define: {
+      __LAN_HOST__: JSON.stringify(lan),
+      __APP_VERSION__: JSON.stringify(releaseVersion()),
+      __APP_BUILD__: JSON.stringify(buildRevision()),
+    },
+    server: {
+      host: true,
+      port,
+      // We already picked a free localhost port; still allow Vite to bump if a
+      // race steals it between the probe and listen.
+      strictPort: false,
+      // Phones open via the LAN URL; without this, HMR websockets still target
+      // localhost and the handset never sees file changes. Leave port unset so
+      // it tracks the listening port if Vite has to bump again.
+      ...(lan ? { hmr: { host: lan } } : {}),
+      proxy: {
+        '/api': {
+          target: 'http://127.0.0.1:3001',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, ''),
+        },
+        '/socket.io': {
+          target: 'http://127.0.0.1:3001',
+          ws: true,
+        },
       },
     },
-  },
+  };
 });

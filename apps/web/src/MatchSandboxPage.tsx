@@ -6,7 +6,14 @@ import {
   poolLabel,
   type PublicParticipant,
 } from '@podyguard/shared';
-import { loadMatchConfig, matchPlayers, trackerStorageKey } from './match-config';
+import {
+  loadMatchConfig,
+  matchPlayers,
+  replayMatchConfig,
+  saveMatchConfig,
+  trackerStorageKey,
+  type MatchConfig,
+} from './match-config';
 import { assignedDeckLine } from './match-view';
 import { TrackerView } from './tracker/TrackerView';
 import { Badge, statusTone } from './ui/Badge';
@@ -15,6 +22,7 @@ import { Button } from './ui/Button';
 import { Panel } from './ui/Panel';
 import { ThemeToggleCorner } from './ui/ThemeToggle';
 import { forgetActiveMatch, rememberActiveMatch } from './active-match';
+import { removeStored } from './device-storage';
 
 /**
  * The seated-player screen with a fabricated pod behind it, so the real thing
@@ -25,8 +33,10 @@ import { forgetActiveMatch, rememberActiveMatch } from './active-match';
 export function MatchSandboxPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const config = useMemo(() => loadMatchConfig(), []);
-  const players = matchPlayers(config);
+  const [config, setConfig] = useState<MatchConfig>(() => loadMatchConfig());
+  const [gameKey, setGameKey] = useState(0);
+  const [promptRearrange, setPromptRearrange] = useState(false);
+  const players = useMemo(() => matchPlayers(config), [config]);
   const [showTracker, setShowTracker] = useState(true);
   const [challengeProgress, setChallengeProgress] = useState<
     Record<string, { points: number; completedChallengeIds: string[] }>
@@ -57,12 +67,29 @@ export function MatchSandboxPage() {
   if (showTracker) {
     return (
       <TrackerView
+        key={gameKey}
         storageKey={trackerStorageKey(config)}
         gameMode={config.gameMode}
         rulesFormat={config.rulesFormat}
         dealTreachery={config.gameMode === 'treachery'}
         players={players}
         requeueOnFinish={false}
+        promptRearrange={promptRearrange}
+        onEditSetup={() => {
+          forgetActiveMatch('/match');
+          void navigate('/match-config');
+        }}
+        onReplay={async (seats) => {
+          const previousKey = trackerStorageKey(config);
+          const next = replayMatchConfig(config, seats);
+          removeStored(previousKey);
+          removeStored(trackerStorageKey(next));
+          saveMatchConfig(next);
+          setConfig(next);
+          setChallengeProgress({});
+          setPromptRearrange(true);
+          setGameKey((value) => value + 1);
+        }}
         onFinish={async () => {
           forgetActiveMatch('/match');
           void navigate('/');

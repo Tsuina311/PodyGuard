@@ -9,6 +9,7 @@
   "scripts": {
     "dev:web": "yarn workspace @podyguard/web dev",
     "dev:server": "yarn workspace @podyguard/server dev",
+    "dev:phone": "node scripts/dev-phone.mjs",
     "bump:patch": "node scripts/bump-version.mjs patch",
     "bump:minor": "node scripts/bump-version.mjs minor",
     "bump:major": "node scripts/bump-version.mjs major",
@@ -16,6 +17,8 @@
     "build": "yarn workspace @podyguard/shared build && yarn workspace @podyguard/matching build && yarn workspace @podyguard/simulation build && yarn workspace @podyguard/server build && yarn workspace @podyguard/web build",
     "typecheck": "yarn workspace @podyguard/shared typecheck && yarn workspace @podyguard/matching typecheck && yarn workspace @podyguard/simulation typecheck && yarn workspace @podyguard/server typecheck && yarn workspace @podyguard/web typecheck",
     "test": "yarn workspace @podyguard/shared test && yarn workspace @podyguard/matching test && yarn workspace @podyguard/simulation test && yarn workspace @podyguard/server test && yarn workspace @podyguard/web test",
+    "test:e2e": "yarn workspace @podyguard/web build && playwright test",
+    "e2e:serve": "node --import tsx e2e/serve.mjs",
     "test:matching": "yarn workspace @podyguard/matching test",
     "simulate:matching": "yarn workspace @podyguard/matching simulate",
     "benchmark:matching": "yarn workspace @podyguard/matching benchmark",
@@ -35,6 +38,7 @@
     "db:migrate": "yarn workspace @podyguard/server db:migrate"
   },
   "devDependencies": {
+    "@playwright/test": "^1.55.0",
     "tsx": "^4.23.12"
   }
 }

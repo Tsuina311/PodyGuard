@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   ASSASSIN_POD_SIZES,
-  defaultLimitedEventModeConfig,
   LIMITED_MODES,
   TREACHERY_POD_SIZES,
   type AssassinPodSize,
@@ -18,6 +17,10 @@ import {
 import { Play, QrCode, Radio } from 'lucide-react';
 import { ApiError, createEvent, saveHostToken } from './api';
 import { activeMatchPath } from './active-match';
+import {
+  defaultHostLimitedConfigs,
+  limitedConfigsForEventCreate,
+} from './event-mode';
 import {
   baseModeFromGameMode,
   baseModeRequiresCommander,
@@ -58,14 +61,6 @@ import {
 type HomeTab = 'play' | 'host' | 'scan';
 type FormatTab = 'constructed' | 'limited';
 
-function disabledLimitedConfigs(): LimitedEventModeConfig[] {
-  return LIMITED_MODES.map((mode) => ({
-    ...defaultLimitedEventModeConfig(mode),
-    // Match play-mode defaults: one format selected (Booster Draft).
-    enabled: mode === 'BOOSTER_DRAFT',
-  }));
-}
-
 export function HomePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -105,7 +100,7 @@ export function HomePage() {
   const [finalBestOf, setFinalBestOf] = useState<SeriesLength>(3);
   const [swissRounds, setSwissRounds] = useState('3');
   const [limitedConfigs, setLimitedConfigs] = useState<LimitedEventModeConfig[]>(
-    () => disabledLimitedConfigs(),
+    () => defaultHostLimitedConfigs(),
   );
   const [playLimited, setPlayLimited] = useState<LocalLimitedConfig>(() =>
     loadLocalLimitedConfig(),
@@ -282,9 +277,10 @@ export function HomePage() {
                     : undefined,
               }
             : undefined,
-        limitedModeConfigs: isLimited
-          ? limitedConfigs
-          : disabledLimitedConfigs(),
+        limitedModeConfigs: limitedConfigsForEventCreate(
+          isLimited,
+          limitedConfigs,
+        ),
       });
       saveHostToken(result.event.joinCode, result.hostToken);
       void navigate(`/host/${result.event.joinCode}`);

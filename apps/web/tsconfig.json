@@ -7,5 +7,6 @@
     "noEmit": true,
     "rootDir": "src"
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/free-dev-port.test.ts"]
 }

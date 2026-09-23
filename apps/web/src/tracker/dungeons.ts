@@ -1,3 +1,5 @@
+import { assetUrl } from '../asset-url';
+
 export type DungeonId =
   | 'lost-mine'
   | 'mad-mage'
@@ -35,6 +37,7 @@ export type DungeonDefinition = {
 
 export type DungeonProgress = {
   dungeonId: DungeonId;
+  /** Current room; empty until the entrance is chosen. */
   roomId: string;
   visitedRoomIds: string[];
   completed: boolean;
@@ -290,6 +293,22 @@ export const DUNGEONS: DungeonDefinition[] = [
 
 export const DUNGEON_COUNT = DUNGEONS.length;
 
+const warmedDungeonArt = new Map<string, HTMLImageElement>();
+
+/** Decode the four card scans early so the picker is not blank on open. */
+export function preloadDungeonArt(): void {
+  for (const dungeon of DUNGEONS) {
+    const src = assetUrl(dungeon.image);
+    if (warmedDungeonArt.has(src)) {
+      continue;
+    }
+    const image = new Image();
+    image.src = src;
+    warmedDungeonArt.set(src, image);
+    void image.decode().catch(() => undefined);
+  }
+}
+
 export function dungeonById(id: DungeonId): DungeonDefinition {
   const dungeon = DUNGEONS.find((row) => row.id === id);
   if (!dungeon) {
@@ -314,6 +333,12 @@ export function legalNextRoomIds(progress: DungeonProgress): string[] {
     return [];
   }
   const dungeon = dungeonById(progress.dungeonId);
+  // Entering a dungeon does not visit the entrance yet — that first click is
+  // the venture onto the map.
+  if (progress.visitedRoomIds.length === 0) {
+    const entrance = dungeon.rooms.find((room) => room.row === 1);
+    return entrance ? [entrance.id] : [];
+  }
   return roomById(dungeon, progress.roomId).next;
 }
 

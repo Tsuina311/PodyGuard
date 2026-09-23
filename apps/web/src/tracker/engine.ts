@@ -63,6 +63,7 @@ export type SecondaryCounter =
   | 'acorn'
   | 'energy'
   | 'experience'
+  | 'gate'
   | 'hit'
   | 'rad'
   | 'ring'
@@ -214,6 +215,7 @@ export type TrackerAction =
     }
   | { type: 'advanceDungeon'; playerId: string; roomId: string }
   | { type: 'stepBackDungeon'; playerId: string }
+  | { type: 'leaveDungeon'; playerId: string }
   | { type: 'monarch'; playerId: string | null }
   | { type: 'initiative'; playerId: string | null }
   | { type: 'eliminate'; playerId: string }
@@ -543,22 +545,27 @@ export function applyTrackerAction(
       break;
     case 'enterDungeon': {
       const active = next.dungeons[action.playerId];
-      if (active && !active.completed) {
+      // Empty visits means the map was only previewed — not started yet.
+      if (
+        active &&
+        !active.completed &&
+        active.visitedRoomIds.length > 0
+      ) {
         break;
       }
       const dungeon = dungeonById(action.dungeonId);
       if (dungeon.initiativeOnly && !action.viaInitiative) {
         break;
       }
-      const entrance = dungeon.rooms.find((room) => room.row === 1);
-      if (!entrance) {
+      if (!dungeon.rooms.some((room) => room.row === 1)) {
         break;
       }
+      // Map is open; the entrance stays blue until the player taps it.
       next.dungeons[action.playerId] = {
         dungeonId: dungeon.id,
-        roomId: entrance.id,
-        visitedRoomIds: [entrance.id],
-        completed: entrance.next.length === 0,
+        roomId: '',
+        visitedRoomIds: [],
+        completed: false,
       };
       break;
     }
@@ -580,8 +587,8 @@ export function applyTrackerAction(
       }
       break;
     }
-    // Takes back a misclicked room. The entrance stays put, since a player
-    // still cannot abandon a dungeon they have entered.
+    // Takes back a misclicked room. Once the entrance is visited it stays —
+    // a player still cannot abandon a dungeon they have entered.
     case 'stepBackDungeon': {
       const progress = next.dungeons[action.playerId];
       if (!progress || progress.visitedRoomIds.length < 2) {
@@ -600,6 +607,14 @@ export function applyTrackerAction(
       }
       break;
     }
+    case 'leaveDungeon': {
+      const progress = next.dungeons[action.playerId];
+      if (!progress || progress.visitedRoomIds.length > 0) {
+        break;
+      }
+      delete next.dungeons[action.playerId];
+      break;
+    }
     case 'monarch':
       next.monarchId = action.playerId;
       break;
@@ -607,14 +622,17 @@ export function applyTrackerAction(
       next.initiativeId = action.playerId;
       if (action.playerId) {
         const progress = next.dungeons[action.playerId];
-        if (!progress || progress.completed) {
+        if (
+          !progress ||
+          progress.completed ||
+          progress.visitedRoomIds.length === 0
+        ) {
           const undercity = dungeonById('undercity');
-          const entrance = undercity.rooms.find((room) => room.row === 1);
-          if (entrance) {
+          if (undercity.rooms.some((room) => room.row === 1)) {
             next.dungeons[action.playerId] = {
               dungeonId: 'undercity',
-              roomId: entrance.id,
-              visitedRoomIds: [entrance.id],
+              roomId: '',
+              visitedRoomIds: [],
               completed: false,
             };
           }
@@ -966,6 +984,7 @@ export function emptySecondaryCounters(): SecondaryCounters {
     acorn: 0,
     energy: 0,
     experience: 0,
+    gate: 0,
     hit: 0,
     rad: 0,
     ring: 0,

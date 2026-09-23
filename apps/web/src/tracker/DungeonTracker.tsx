@@ -36,10 +36,13 @@ export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
   const { landscape } = useBoardLandscape();
   const progress = state.dungeons[playerId];
   const completedIds = new Set(state.completedDungeons[playerId] ?? []);
+  const dungeonStarted = (progress?.visitedRoomIds.length ?? 0) > 0;
   const canStepBack = (progress?.visitedRoomIds.length ?? 0) > 1;
   const stepBack = canStepBack
     ? () => dispatch({ type: 'stepBackDungeon', playerId })
-    : undefined;
+    : !dungeonStarted && progress
+      ? () => dispatch({ type: 'leaveDungeon', playerId })
+      : undefined;
   const holdsInitiative = state.initiativeId === playerId;
   /*
     Taking the initiative also opens Undercity when this seat is free to enter
@@ -157,7 +160,9 @@ export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
                 <img
                   src={assetUrl(dungeon.image)}
                   alt={dungeon.name}
-                  loading="lazy"
+                  loading="eager"
+                  decoding="async"
+                  fetchPriority="high"
                   className="size-full object-cover"
                 />
                 {completedIds.has(dungeon.id) ? (
@@ -179,7 +184,16 @@ export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
   const visited = new Set(progress.visitedRoomIds);
 
   return (
-    <Shell initiative={initiative} onClose={onClose} onStepBack={stepBack}>
+    <Shell
+      initiative={initiative}
+      onClose={() => {
+        if (progress && progress.visitedRoomIds.length === 0) {
+          dispatch({ type: 'leaveDungeon', playerId });
+        }
+        onClose();
+      }}
+      onStepBack={stepBack}
+    >
       <div className="relative flex min-h-0 min-w-0 flex-1">
         {/*
           Card art and overlay share one viewBox, so the map stays aligned at any
@@ -214,9 +228,9 @@ export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
             />
 
             {dungeon.rooms.map((room) => {
-              const isCurrent = room.id === progress.roomId;
-              const isLegal = legal.has(room.id);
               const wasVisited = visited.has(room.id);
+              const isCurrent = wasVisited && room.id === progress.roomId;
+              const isLegal = legal.has(room.id);
               const box = pixelRect(room);
               return (
                 <rect

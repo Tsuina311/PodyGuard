@@ -153,22 +153,38 @@ export function CommanderPicker({
       </label>
       {value ? (
         <div className="border-muted/20 bg-void/70 flex items-center gap-2 rounded-xl border p-2">
-          <img
-            src={value.artCropUri}
-            alt=""
-            className="h-12 w-16 shrink-0 rounded-lg object-[center_15%] object-cover"
-          />
+          {value.artCropUri ? (
+            <img
+              src={value.artCropUri}
+              alt=""
+              className="h-12 w-16 shrink-0 rounded-lg object-[center_15%] object-cover"
+            />
+          ) : (
+            <span
+              aria-hidden
+              className="bg-muted/15 text-muted flex h-12 w-16 shrink-0 items-center justify-center rounded-lg text-[0.65rem] font-semibold tracking-wide uppercase"
+            >
+              {t('commanderPicker.noArt')}
+            </span>
+          )}
           <span className="min-w-0 flex-1 truncate text-sm font-medium">
             {value.name}
           </span>
           <button
             type="button"
-            aria-label={t('commanderPicker.removeCommander', { name: value.name })}
+            aria-label={t('commanderPicker.changeCommander', { name: value.name })}
             disabled={disabled}
-            onClick={() => onChange(null)}
-            className="text-muted hover:text-ink flex size-8 shrink-0 items-center justify-center disabled:opacity-40"
+            onClick={() => {
+              setArtCard(null);
+              setArtwork([]);
+              setResults([]);
+              setQuery('');
+              onChange(null);
+            }}
+            className="text-muted hover:text-ink flex h-8 shrink-0 items-center gap-1 rounded-lg px-2 text-xs font-semibold disabled:opacity-40"
           >
-            <X size={16} aria-hidden />
+            {t('commanderPicker.change')}
+            <X size={14} aria-hidden />
           </button>
         </div>
       ) : (

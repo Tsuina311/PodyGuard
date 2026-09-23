@@ -12,6 +12,12 @@ coverage
 *.tsbuildinfo
 artifacts/simulation/
 
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
 # Yarn
 .pnp.*
 .yarn/*
