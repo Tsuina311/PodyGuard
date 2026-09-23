@@ -76,7 +76,7 @@ function interpolationForMode(gameMode: GameMode, format: RulesFormat) {
     case 'multiplayer':
       return { ...shared, life: NORMAL_STARTING_LIFE };
     case 'duel-commander':
-      return { ...shared, life: DUEL_COMMANDER_STARTING_LIFE, commanderDamage: 0 };
+      return { ...shared, life: DUEL_COMMANDER_STARTING_LIFE };
     case 'brawl':
       return { ...shared, life: BRAWL_STARTING_LIFE, commanderDamage: 0 };
     case 'archenemy-commander':

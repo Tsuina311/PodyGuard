@@ -74,7 +74,7 @@ export function commanderSearchProfile(mode: GameMode): CommanderSearchProfile {
   return 'commander';
 }
 
-/** Classic Commander and similar formats track 21 commander damage; DC and Brawl do not. */
+/** Classic Commander and Duel Commander track 21 commander damage; Brawl does not. */
 export function usesCommanderDamage(
   mode: GameMode,
   format?: RulesFormat | null,
@@ -82,7 +82,7 @@ export function usesCommanderDamage(
   if (!usesCommanderRules(mode, format)) {
     return false;
   }
-  return mode !== 'duel-commander' && mode !== 'brawl';
+  return mode !== 'brawl';
 }
 
 export const DUEL_COMMANDER_STARTING_LIFE = 20;

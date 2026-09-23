@@ -112,7 +112,19 @@ import { ModeRulesSheet } from './ModeRulesSheet';
 import { SchemeSheet } from './SchemeSheet';
 import { AssassinTargetsSheet } from './AssassinTargetsSheet';
 import { TreacheryRolesSheet } from './TreacheryRolesSheet';
+import {
+  forceRotateFrameClass,
+  inBoardOverlayClass,
+  seatFacingContentClass,
+  trackerOverlayClass,
+} from './board-frame';
+import { commanderDamageChipState } from './commander-damage-chip';
 import { useBoardLandscape, useOrientationLock } from './orientation';
+import {
+  COMMANDER_DAMAGE_IDLE_CLOSE_MS,
+  SEAT_CONTROLS_HIDE_MS,
+  useIdleDismiss,
+} from './use-idle-dismiss';
 import { useWakeLock } from './wake-lock';
 import {
   detectAutomaticChallenges,
@@ -216,9 +228,7 @@ function boardScreenClass(
     bottom === 'roomy'
       ? 'pb-[max(1.25rem,env(safe-area-inset-bottom))]'
       : 'pb-[max(0.5rem,env(safe-area-inset-bottom))]',
-    forceRotate
-      ? 'top-1/2 left-1/2 h-[100dvw] w-[100dvh] -translate-x-1/2 -translate-y-1/2 rotate-90'
-      : 'inset-x-0 top-0 h-[100dvh]',
+    forceRotateFrameClass(forceRotate),
   );
 }
 /**
@@ -443,21 +453,6 @@ function playerSeatFacesAway(
 }
 
 /**
- * Full-screen seat sheets portaled to `document.body` sit outside the board
- * shell. Tag them with `board-landscape` under force-rotate so `landscape:`
- * utilities still fire, and flip 180° when the opening seat faces away.
- */
-function seatFacingPortalClass(
-  facesAway: boolean,
-  forceRotate: boolean,
-): string {
-  return cx(
-    forceRotate && 'board-landscape',
-    facesAway && 'landscape:rotate-180',
-  );
-}
-
-/**
  * Where the dial sits. Even pods: true screen centre. Odd pods (5+) leave an
  * empty cell on the board — park the dial there instead of on a life total.
  */
@@ -649,10 +644,7 @@ export function TrackerView({
     boardLive ? (readingIdentity ? 'portrait' : 'landscape') : null,
   );
   useWakeLock(boardLive && !readingIdentity);
-  const screenClass = cx(
-    boardScreenClass(boardLive && forceRotate),
-    boardLive && forceRotate && 'board-landscape',
-  );
+  const screenClass = boardScreenClass(boardLive && forceRotate);
   usePreloadedEliminatedArt();
   const elapsed = useMatchClock(state);
   const spotlight = useFirstPlayerSpotlight(state, past.length);
@@ -792,13 +784,30 @@ export function TrackerView({
     }
   }
 
+  function hideSeatControls() {
+    clearControlsHideTimer();
+    setControlsVisible(false);
+  }
+
   function revealSeatControls() {
     setControlsVisible(true);
     clearControlsHideTimer();
     controlsHideTimer.current = window.setTimeout(() => {
       setControlsVisible(false);
       controlsHideTimer.current = null;
-    }, 30000);
+    }, SEAT_CONTROLS_HIDE_MS);
+  }
+
+  /** Opens commander damage and freezes dial chrome until the sheet closes. */
+  function openCommanderSheet(playerId: string) {
+    clearControlsHideTimer();
+    setCommanderPlayerId(playerId);
+  }
+
+  /** Closes commander damage and puts the dial chrome away with it. */
+  function closeCommanderSheet() {
+    setCommanderPlayerId(null);
+    hideSeatControls();
   }
 
   useEffect(() => () => clearControlsHideTimer(), []);
@@ -938,7 +947,9 @@ export function TrackerView({
     function onKey(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         setDungeonPlayerId(null);
-        setCommanderPlayerId(null);
+        if (commanderPlayer) {
+          closeCommanderSheet();
+        }
         setCounterPlayerId(null);
         setMenuOpen(false);
         setChallengesOpen(false);
@@ -974,7 +985,10 @@ export function TrackerView({
           role="dialog"
           aria-modal="true"
           aria-label={t('tracker.gameRules')}
-          className="bg-void/70 fixed inset-0 z-[70] flex items-center justify-center p-4 pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] backdrop-blur-md"
+          className={trackerOverlayClass(
+            boardLive && forceRotate,
+            'z-[70] items-center justify-center bg-void/70 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] backdrop-blur-md',
+          )}
           onClick={(event) => {
             if (event.target === event.currentTarget) {
               setRulesOpen(false);
@@ -1934,7 +1948,7 @@ export function TrackerView({
                     player={player}
                     disabled={Boolean(state.winnerId)}
                     revealed={controlsVisible}
-                    onOpen={() => setCommanderPlayerId(player.id)}
+                    onOpen={() => openCommanderSheet(player.id)}
                   />
                 ) : null}
               </div>
@@ -2145,7 +2159,7 @@ export function TrackerView({
                           player={first}
                           disabled={Boolean(state.winnerId)}
                           revealed={controlsVisible}
-                          onOpen={() => setCommanderPlayerId(first.id)}
+                          onOpen={() => openCommanderSheet(first.id)}
                         />
                       ) : null}
                     </div>
@@ -2313,102 +2327,115 @@ export function TrackerView({
         </p>
       )}
       {/*
-        A sheet leaves out the seat it belongs to, so one shared sheet had to
-        drop a column and grow another whenever it changed player, and the art
-        of the column that came back was decoded again. Every seat keeps its
-        own sheet instead: nothing is ever unmounted, and opening one is only a
-        z-index change. Closed sheets sit below the board, which is opaque, so
-        they stay rendered and decoded out of sight. Columns are laid out the
-        same in every sheet, so each crop is decoded once and shared.
+        Commander / counter sheets stay inside the board shell (not portaled).
+        A second force-rotate on document.body made the picker sideways while
+        the board looked correct — absolute inset-0 inherits the shell instead.
       */}
       {commanderDamageRules
         ? state.players.map((seat) => {
-        const open = commanderPlayerId === seat.id;
-        const facesAway = playerSeatFacesAway(
-          state.players,
-          seat.id,
-          seatLayout,
-          {
-            archenemy: archenemyBoard,
-            archenemyId: state.archenemyId,
-          },
-        );
-        return createPortal(
-          <div
-            role="dialog"
-            aria-modal={open}
-            aria-hidden={!open}
-            inert={!open}
-            aria-label={t('tracker.commanderDamageOn', { name: seat.name })}
-            className={cx(
-              'bg-void/95 fixed inset-x-0 top-0 flex h-[100dvh] p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm',
-              open ? 'z-50' : 'pointer-events-none z-30',
-              seatFacingPortalClass(facesAway, forceRotate),
-            )}
-            onClick={(event) => {
-              if (open && event.target === event.currentTarget) {
-                setCommanderPlayerId(null);
-              }
-            }}
-          >
-            <CommanderSheet
-              state={state}
-              player={seat}
-              disabled={Boolean(state.winnerId)}
-              dispatch={(action) => send({ type: 'action', action })}
-              onClose={() => setCommanderPlayerId(null)}
-            />
-          </div>,
-          document.body,
-          seat.id,
-        );
-      })
-        : null}
-      {counterPlayer
-        ? createPortal(
-            <div
-              role="dialog"
-              aria-modal="true"
-              aria-label={t('tracker.countersFor', { name: counterPlayer.name })}
-              className={cx(
-                'bg-void/95 fixed inset-x-0 top-0 z-50 flex h-[100dvh] p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm',
-                seatFacingPortalClass(
-                  playerSeatFacesAway(
-                    state.players,
-                    counterPlayer.id,
-                    seatLayout,
-                    {
-                      archenemy: archenemyBoard,
-                      archenemyId: state.archenemyId,
-                    },
-                  ),
-                  forceRotate,
-                ),
-              )}
-              onClick={(event) => {
-                if (event.target === event.currentTarget) {
-                  setCounterPlayerId(null);
+            const open = commanderPlayerId === seat.id;
+            const facesAway = playerSeatFacesAway(
+              state.players,
+              seat.id,
+              seatLayout,
+              {
+                archenemy: archenemyBoard,
+                archenemyId: state.archenemyId,
+              },
+            );
+            return (
+              <div
+                key={seat.id}
+                role="dialog"
+                aria-modal={open}
+                aria-hidden={!open}
+                inert={!open}
+                aria-label={t('tracker.commanderDamageOn', { name: seat.name })}
+                className={
+                  open
+                    ? inBoardOverlayClass(
+                        'z-50 bg-void/95 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm',
+                      )
+                    : 'hidden'
                 }
-              }}
-            >
-              <CounterSheet
-                player={counterPlayer}
-                disabled={Boolean(state.winnerId)}
-                includeCommanderTax={commanderRules}
-                dispatch={(action) => send({ type: 'action', action })}
-                onClose={() => setCounterPlayerId(null)}
-              />
-            </div>,
-            document.body,
-          )
+                onClick={(event) => {
+                  if (open && event.target === event.currentTarget) {
+                    closeCommanderSheet();
+                  }
+                }}
+              >
+                <div
+                  className={cx(
+                    'flex h-full w-full min-h-0',
+                    seatFacingContentClass(facesAway),
+                  )}
+                >
+                  <CommanderSheet
+                    state={state}
+                    player={seat}
+                    active={open}
+                    disabled={Boolean(state.winnerId)}
+                    dispatch={(action) => send({ type: 'action', action })}
+                    onClose={closeCommanderSheet}
+                  />
+                </div>
+              </div>
+            );
+          })
         : null}
-      {menuOpen
-        ? createPortal(
+      {counterPlayer ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={t('tracker.countersFor', { name: counterPlayer.name })}
+          className={inBoardOverlayClass(
+            'z-50 bg-void/95 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm',
+          )}
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              setCounterPlayerId(null);
+            }
+          }}
+        >
+          <div
+            className={cx(
+              'flex h-full w-full min-h-0',
+              seatFacingContentClass(
+                playerSeatFacesAway(
+                  state.players,
+                  counterPlayer.id,
+                  seatLayout,
+                  {
+                    archenemy: archenemyBoard,
+                    archenemyId: state.archenemyId,
+                  },
+                ),
+              ),
+            )}
+          >
+            <CounterSheet
+              player={counterPlayer}
+              disabled={Boolean(state.winnerId)}
+              includeCommanderTax={commanderRules}
+              dispatch={(action) => send({ type: 'action', action })}
+              onClose={() => setCounterPlayerId(null)}
+            />
+          </div>
+        </div>
+      ) : null}
+      {/*
+        Match menu stays inside the board shell (not portaled) so a portrait
+        phone that CSS-rotates the tracker also rotates every menu pane —
+        Arrange seats included.
+      */}
+      {menuOpen ? (
             <div
               role="dialog"
               aria-modal="true"
               aria-label={t('tracker.matchMenu')}
-              className="bg-void/95 fixed inset-x-0 top-0 z-50 flex h-[100dvh] p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm"
+              className={inBoardOverlayClass(
+                'z-50 bg-void/95 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm',
+              )}
               onClick={(event) => {
                 if (event.target === event.currentTarget) {
                   setMenuOpen(false);
@@ -2478,10 +2505,8 @@ export function TrackerView({
                 }
                 onClose={() => setMenuOpen(false)}
               />
-            </div>,
-            document.body,
-          )
-        : null}
+            </div>
+          ) : null}
       {diceToolsOpen
         ? createPortal(
             <div
@@ -2492,7 +2517,10 @@ export function TrackerView({
                   ? t('tracker.coins')
                   : t('tracker.dice')
               }
-              className="bg-void/95 fixed inset-x-0 top-0 z-50 flex h-[100dvh] p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm"
+              className={trackerOverlayClass(
+                forceRotate,
+                'z-50 bg-void/95 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm',
+              )}
               onClick={(event) => {
                 if (event.target === event.currentTarget) {
                   setDiceToolsOpen(false);
@@ -2514,7 +2542,10 @@ export function TrackerView({
               role="dialog"
               aria-modal="true"
               aria-label={t('tracker.secretContracts')}
-              className="bg-void/95 fixed inset-x-0 top-0 z-[70] flex h-[100dvh] p-2 backdrop-blur-sm"
+              className={trackerOverlayClass(
+                forceRotate,
+                'z-[70] bg-void/95 p-2 backdrop-blur-sm',
+              )}
             >
               <AssassinTargetsSheet
                 players={state.players}
@@ -2560,7 +2591,10 @@ export function TrackerView({
                 n:
                   playerSeatIndex(state.players, assassinVictim.id) + 1,
               })}
-              className="bg-void/95 fixed inset-0 z-[75] flex items-center justify-center p-4 backdrop-blur-sm"
+              className={trackerOverlayClass(
+                forceRotate,
+                'z-[75] items-center justify-center bg-void/95 p-4 backdrop-blur-sm',
+              )}
             >
               <section className="border-muted/25 bg-hull flex h-[min(36rem,90dvh)] w-full max-w-lg flex-col rounded-2xl border p-5 text-center">
                 <Crosshair
@@ -2681,7 +2715,10 @@ export function TrackerView({
               role="dialog"
               aria-modal="true"
               aria-label={t('tracker.commanderChallenges')}
-              className="bg-void/95 fixed inset-x-0 top-0 z-50 flex h-[100dvh] p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm"
+              className={trackerOverlayClass(
+                forceRotate,
+                'z-50 bg-void/95 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm',
+              )}
             >
               <ChallengeSheet
                 pack={challengePack}
@@ -2734,7 +2771,10 @@ export function TrackerView({
                 only a hairline top and bottom. Width it has to spare, so the
                 sides stay clear of a landscape notch.
               */
-              className="bg-void/95 fixed inset-x-0 top-0 z-50 flex h-[100dvh] pt-1 pb-[max(0.25rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm"
+              className={trackerOverlayClass(
+                forceRotate,
+                'z-50 bg-void/95 pt-1 pb-[max(0.25rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm',
+              )}
               onClick={(event) => {
                 if (event.target === event.currentTarget) {
                   setDungeonPlayerId(null);
@@ -2763,7 +2803,10 @@ export function TrackerView({
               role="dialog"
               aria-modal="true"
               aria-label={t('tracker.matchResult')}
-              className="bg-void/70 fixed inset-x-0 top-0 z-[60] flex h-[100dvh] items-center justify-center p-3 backdrop-blur-sm"
+              className={trackerOverlayClass(
+                forceRotate,
+                'z-[60] items-center justify-center bg-void/70 p-3 backdrop-blur-sm',
+              )}
             >
               <section className="border-warning/40 bg-hull/95 w-full max-w-xs rounded-2xl border p-4 text-center shadow-[0_18px_50px_-24px_var(--color-void)]">
                 <Trophy
@@ -3409,15 +3452,21 @@ function MatchMenu({
         </MatchMenuPane>
 
         {/* Top right: clock + rearrange */}
-        <MatchMenuPane title={t('tracker.menuTime')} dense>
-          <p
-            className={cx(
-              'font-display text-center text-[clamp(1.5rem,7vh,2.75rem)] leading-none font-bold tabular-nums',
-              paused ? 'text-warning' : 'text-neon',
-            )}
-          >
-            {formatClock(elapsed)}
-          </p>
+        <MatchMenuPane
+          title={t('tracker.menuTime')}
+          dense
+          align="start"
+          header={
+            <p
+              className={cx(
+                'font-display text-[clamp(1.5rem,7vh,2.75rem)] leading-none font-bold tabular-nums',
+                paused ? 'text-warning' : 'text-neon',
+              )}
+            >
+              {formatClock(elapsed)}
+            </p>
+          }
+        >
           <div className="grid w-full grid-cols-2 gap-1.5">
             <Button
               size="sm"
@@ -3645,15 +3694,21 @@ function MatchMenu({
 /** One quadrant of the match menu: labelled pane with a consistent action stack. */
 function MatchMenuPane({
   title,
+  header,
   footer = false,
   dense = false,
+  align = 'center',
   children,
 }: {
   title: string;
+  /** Sits on the title row — used so the clock can share TIME's height. */
+  header?: ReactNode;
   /** Pin trailing content (e.g. quit) to the bottom of the pane. */
   footer?: boolean;
   /** Tighter padding/gaps for denser panes (Time, Support). */
   dense?: boolean;
+  /** `start` keeps actions under the title instead of centering them in the pane. */
+  align?: 'start' | 'center';
   children: ReactNode;
 }) {
   return (
@@ -3663,14 +3718,17 @@ function MatchMenuPane({
         dense ? 'gap-1.5 p-2.5' : 'gap-2 p-3',
       )}
     >
-      <h5 className="text-muted shrink-0 font-mono text-[0.65rem] font-semibold tracking-[0.18em] uppercase">
-        {title}
-      </h5>
+      <div className="flex shrink-0 items-center justify-between gap-2">
+        <h5 className="text-muted font-mono text-[0.65rem] font-semibold tracking-[0.18em] uppercase">
+          {title}
+        </h5>
+        {header}
+      </div>
       <div
         className={cx(
           'flex min-h-0 flex-1 flex-col overflow-hidden',
           dense ? 'gap-1.5' : 'gap-2',
-          footer ? 'justify-between' : 'justify-center',
+          footer ? 'justify-between' : align === 'start' ? 'justify-start' : 'justify-center',
         )}
       >
         {children}
@@ -4046,9 +4104,9 @@ function LifeAmountPad({
           ? t('tracker.addLifeFor', { name: playerName })
           : t('tracker.removeLifeFor', { name: playerName })
       }
-      className={cx(
-        'bg-void/95 fixed inset-0 z-[80] flex items-center justify-center p-4 backdrop-blur-md',
-        seatFacingPortalClass(facesAway, forceRotate),
+      className={trackerOverlayClass(
+        forceRotate,
+        'z-[80] items-center justify-center bg-void/95 p-4 backdrop-blur-md',
       )}
       onClick={(event) => {
         if (event.target === event.currentTarget) {
@@ -4056,7 +4114,12 @@ function LifeAmountPad({
         }
       }}
     >
-      <section className="border-muted/25 bg-hull w-full max-w-sm rounded-2xl border p-4 shadow-2xl">
+      <section
+        className={cx(
+          'border-muted/25 bg-hull w-full max-w-sm rounded-2xl border p-4 shadow-2xl',
+          seatFacingContentClass(facesAway),
+        )}
+      >
         <header className="mb-3 flex items-start justify-between gap-3">
           <div>
             <p className="text-muted text-xs font-bold tracking-wider uppercase">
@@ -4140,8 +4203,9 @@ function Chip({
 }: {
   title: string;
   disabled: boolean;
-  /** False while the dial has not revealed seat chrome — readout only. */
-  interactive?: boolean;
+      /** False while the dial has not revealed seat chrome — readout only,
+       * except callers that opt into always-tappable chips. */
+      interactive?: boolean;
   onClick: () => void;
   className?: string;
   children: React.ReactNode;
@@ -4167,7 +4231,7 @@ function Chip({
       }}
       className={cx(
         plate,
-        'border-muted/25 flex max-w-full shrink-0 items-center gap-0.5 rounded-lg border px-1 py-1 font-mono text-xs transition disabled:opacity-40',
+        'border-muted/25 flex max-w-full shrink-0 items-center gap-0.5 rounded-lg border px-1.5 py-2 font-mono text-xs transition disabled:opacity-40',
         interactive
           ? 'pointer-events-auto hover:border-neon/50'
           : 'pointer-events-none',
@@ -4638,9 +4702,10 @@ function CommanderDamageChip({
   const { t } = useTranslation();
   const worst = worstCommanderDamage(state, player);
   const value = worst?.value ?? 0;
-  const hidden = !revealed && value <= 0;
-  // Damage can peek before the dial wakes the seat; only then is it a control.
-  const interactive = revealed && !hidden;
+  const { hidden, interactive } = commanderDamageChipState({
+    revealed,
+    damage: value,
+  });
   return (
     <Chip
       title={
@@ -4777,7 +4842,7 @@ function CommanderArt({
             src={entry.artCropUri}
             alt=""
             decoding="sync"
-            className={cx('min-w-0 flex-1 object-cover', entry.focus)}
+            className={cx('size-full min-w-0 flex-1 object-cover', entry.focus)}
           />
         ))}
       </div>
@@ -4963,12 +5028,15 @@ function opponentGridClass(count: number): string {
 function CommanderSheet({
   state,
   player,
+  active,
   disabled,
   dispatch,
   onClose,
 }: {
   state: TrackerState;
   player: TrackerPlayer;
+  /** True while this seat's sheet is the one on top. */
+  active: boolean;
   disabled: boolean;
   dispatch: (action: TrackerAction) => void;
   onClose: () => void;
@@ -4976,6 +5044,11 @@ function CommanderSheet({
   const { t } = useTranslation();
   const opponents = commanderOpponents(state, player.id);
   const shared = teamForPlayer(state, player.id).length > 1;
+  const bumpIdle = useIdleDismiss(
+    active,
+    onClose,
+    COMMANDER_DAMAGE_IDLE_CLOSE_MS,
+  );
   return (
     <section className="flex h-full w-full flex-col">
       <header className="mb-2 flex shrink-0 items-center justify-between gap-3">
@@ -5013,14 +5086,15 @@ function CommanderSheet({
                   artCropUri={commander.artCropUri}
                   value={player.commanderDamage[commander.id] ?? 0}
                   disabled={disabled}
-                  onChange={(delta) =>
+                  onChange={(delta) => {
                     dispatch({
                       type: 'commander',
                       commanderId: commander.id,
                       toId: player.id,
                       delta,
-                    })
-                  }
+                    });
+                    bumpIdle();
+                  }}
                 />
               ))}
             </div>

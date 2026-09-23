@@ -5,7 +5,21 @@ import {
   TREACHERY_IDENTITIES,
   treacheryDistribution,
   treacheryRolesForSize,
+  usesCommanderDamage,
 } from './treachery';
+
+describe('usesCommanderDamage', () => {
+  it('tracks 21 damage in classic and duel commander', () => {
+    expect(usesCommanderDamage('commander')).toBe(true);
+    expect(usesCommanderDamage('duel-commander')).toBe(true);
+  });
+
+  it('skips commander damage in brawl and non-commander formats', () => {
+    expect(usesCommanderDamage('brawl')).toBe(false);
+    expect(usesCommanderDamage('duel')).toBe(false);
+    expect(usesCommanderDamage('multiplayer')).toBe(false);
+  });
+});
 
 describe('Treachery roles', () => {
   it('contains the complete 62-card identity set', () => {

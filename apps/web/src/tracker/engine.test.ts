@@ -559,7 +559,7 @@ describe('commander tracker', () => {
     expect(state.players.map((player) => player.life)).toEqual([life, life]);
   });
 
-  it('does not offer a commander-damage loss in duel commander', () => {
+  it('tracks commander damage in duel commander and prompts at 21', () => {
     let state = createTracker(
       [
         { id: 'a', name: 'Ada' },
@@ -569,13 +569,19 @@ describe('commander tracker', () => {
       { gameMode: 'duel-commander' },
     );
     state = applyTrackerAction(state, {
+      type: 'life',
+      playerId: 'a',
+      delta: 10,
+    });
+    state = applyTrackerAction(state, {
       type: 'commander',
       commanderId: 'b:1',
       toId: 'a',
       delta: 15,
     });
     const tracked = state.players.find((row) => row.id === 'a');
-    expect(tracked?.life).toBe(5);
+    expect(tracked?.life).toBe(15);
+    expect(tracked?.commanderDamage['b:1']).toBe(15);
     expect(tracked?.pendingLoss).toBeNull();
 
     state = applyTrackerAction(state, {
@@ -585,8 +591,30 @@ describe('commander tracker', () => {
       delta: 6,
     });
     const lethal = state.players.find((row) => row.id === 'a');
-    expect(lethal?.pendingLoss).toEqual({ type: 'life' });
-    expect(lethal?.pendingLoss?.type).not.toBe('commander');
+    expect(lethal?.commanderDamage['b:1']).toBe(21);
+    expect(lethal?.pendingLoss).toEqual({
+      type: 'commander',
+      commanderId: 'b:1',
+    });
+  });
+
+  it('does not offer a commander-damage loss in brawl', () => {
+    let state = createTracker(
+      [
+        { id: 'a', name: 'Ada' },
+        { id: 'b', name: 'Bea' },
+      ],
+      Date.now(),
+      { gameMode: 'brawl' },
+    );
+    state = applyTrackerAction(state, {
+      type: 'commander',
+      commanderId: 'b:1',
+      toId: 'a',
+      delta: 21,
+    });
+    const hit = state.players.find((row) => row.id === 'a');
+    expect(hit?.pendingLoss?.type).not.toBe('commander');
   });
 
   it('lowers life by the same amount as commander damage', () => {
