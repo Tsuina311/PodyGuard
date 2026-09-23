@@ -17,10 +17,10 @@ export async function dismissWakeIfPresent(page: Page): Promise<void> {
 export async function openHome(page: Page): Promise<void> {
   await prepareApp(page);
   await page.goto('/');
+  await dismissWakeIfPresent(page);
   await expect(page.getByRole('tab', { name: 'Host event' })).toBeVisible({
     timeout: 30_000,
   });
-  await dismissWakeIfPresent(page);
 }
 
 async function pickConstructedMode(

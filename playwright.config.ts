@@ -33,8 +33,9 @@ export default defineConfig({
   ],
   webServer: {
     command: 'node --import tsx e2e/serve.mjs',
-    // Do not probe `/health` — that checks Postgres, and the e2e stack is
-    // memory-only (CI has no real DATABASE_URL). The static shell is enough.
+    // Prefer `/` over `/health`: production `/health` probes Postgres, while
+    // e2e is memory-only. serve.mjs still fakes a healthy `/health` so the
+    // prod wake screen can dismiss once Playwright starts navigating.
     url: `${baseURL}/`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

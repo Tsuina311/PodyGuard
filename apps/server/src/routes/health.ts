@@ -8,9 +8,21 @@ const buildVersion =
   process.env.npm_package_version?.trim() ||
   'dev';
 
-export const healthRoutes: FastifyPluginAsync = async (app) => {
+export type HealthRoutesOptions = {
+  /**
+   * Override the Postgres probe. Memory-backed stacks (e2e) have no DB and
+   * must still report healthy so the prod wake screen can clear.
+   */
+  checkDatabase?: () => Promise<boolean>;
+};
+
+export const healthRoutes: FastifyPluginAsync<HealthRoutesOptions> = async (
+  app,
+  opts,
+) => {
+  const checkDatabase = opts.checkDatabase ?? checkDatabaseConnection;
   app.get('/health', async (_request, reply) => {
-    const databaseOk = await checkDatabaseConnection();
+    const databaseOk = await checkDatabase();
     const uptimeSeconds = Math.max(
       0,
       Math.floor((Date.now() - serverStartedAt.getTime()) / 1000),

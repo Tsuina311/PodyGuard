@@ -36,4 +36,23 @@ describe('health endpoint', () => {
 
     await app.close();
   });
+
+  it('allows memory stacks to report healthy without Postgres', async () => {
+    const app = await buildApp({
+      logger: false,
+      checkDatabase: async () => true,
+    });
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/health',
+    });
+    const body = response.json() as { ok: boolean; database: string };
+
+    expect(response.statusCode).toBe(200);
+    expect(body.ok).toBe(true);
+    expect(body.database).toBe('up');
+
+    await app.close();
+  });
 });

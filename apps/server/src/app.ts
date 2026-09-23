@@ -35,6 +35,8 @@ export type BuildAppOptions = {
   logger?: boolean;
   serveWeb?: boolean;
   webRoot?: string;
+  /** When set, `/health` uses this instead of probing Postgres. */
+  checkDatabase?: () => Promise<boolean>;
 };
 
 export async function buildApp(options: BuildAppOptions = {}) {
@@ -87,7 +89,9 @@ export async function buildApp(options: BuildAppOptions = {}) {
   });
   await app.register(rateLimit, { global: false });
 
-  await app.register(healthRoutes);
+  await app.register(healthRoutes, {
+    checkDatabase: options.checkDatabase,
+  });
   await app.register(eventRoutes);
   await app.register(displayRoutes);
   await app.register(feedbackRoutes, {

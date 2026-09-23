@@ -40,6 +40,9 @@ const app = await buildApp({
   logger: false,
   serveWeb: true,
   webRoot,
+  // Memory store — no Postgres. Still report healthy so the prod shell's
+  // "Waking the tables" screen (which probes /health) can dismiss.
+  checkDatabase: async () => true,
 });
 
 await app.listen({ port, host });
