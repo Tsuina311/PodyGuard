@@ -126,6 +126,7 @@ export function LimitedPlayerPanel({
     session?.preferredCohortSize ??
     session?.minCohortSize ??
     (session ? limitedModeConfig(session.mode).preferredCohortSize ?? 4 : 4);
+  const format = session?.mode ?? participant.limitedQueueMode ?? null;
   const seatingSession = session?.status === 'SEATING' ? session : undefined;
 
   return (
@@ -146,11 +147,8 @@ export function LimitedPlayerPanel({
       <div className="mb-4">
         <h3 className="font-display text-lg font-semibold">{cue.title}</h3>
         <p className="text-muted mt-1 text-sm">{cue.detail}</p>
-        {session ? (
-          <p className="text-muted mt-2 text-xs">
-            {LIMITED_MODE_LABELS[session.mode]}
-            {session.timer ? '' : ''}
-          </p>
+        {format ? (
+          <p className="text-muted mt-2 text-xs">{LIMITED_MODE_LABELS[format]}</p>
         ) : null}
       </div>
 

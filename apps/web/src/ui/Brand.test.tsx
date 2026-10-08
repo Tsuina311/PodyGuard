@@ -13,7 +13,9 @@ describe('version tip', () => {
   it('toggles developer mode from the same tip as the version', () => {
     render(<Brand />);
     fireEvent.click(screen.getByRole('button', { name: /PodyGuard version/ }));
-    expect(screen.getByTestId('app-version')).toHaveTextContent(/^v/);
+    const tip = screen.getByTestId('app-version');
+    expect(tip).toHaveTextContent(/^v/);
+    expect(tip.parentElement).toHaveClass('top-full');
     fireEvent.click(screen.getByTestId('developer-mode-toggle'));
     expect(screen.getByTestId('developer-mode-toggle')).toHaveTextContent(
       'Developer mode on',

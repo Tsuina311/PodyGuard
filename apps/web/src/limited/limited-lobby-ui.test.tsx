@@ -1,12 +1,13 @@
 /** @vitest-environment jsdom */
 import '@testing-library/jest-dom/vitest';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { EventSnapshot, PublicLimitedSession, PublicParticipant } from '@podyguard/shared';
 import { LimitedHostPanel } from './LimitedHostPanel';
 import { LimitedPlayerPanel } from './LimitedPlayerPanel';
 
 afterEach(() => {
+  localStorage.clear();
   cleanup();
 });
 
@@ -113,6 +114,7 @@ describe('Limited lobby screens', () => {
       />,
     );
     expect(screen.getByRole('button', { name: "I'm ready" })).toBeTruthy();
+    expect(screen.getByText('Pick-Two Draft')).toBeTruthy();
     cleanup();
 
     render(
@@ -142,6 +144,27 @@ describe('Limited lobby screens', () => {
     );
     expect(screen.getByRole('button', { name: 'Add fake players' })).toBeTruthy();
     expect(screen.getByText(/You still use the play tab/)).toBeTruthy();
+  });
+
+  it('lets the fake-player count be cleared while typing', () => {
+    localStorage.setItem('podyguard.developer-mode', 'on');
+    render(
+      <LimitedHostPanel
+        joinCode="DRAFT1"
+        hostToken="host"
+        snapshot={snapshot(participant())}
+        onSession={() => undefined}
+        onError={() => undefined}
+      />,
+    );
+    const input = screen.getByRole('textbox', { name: 'How many' });
+    expect(input).toHaveValue('3');
+    fireEvent.change(input, { target: { value: '' } });
+    expect(input).toHaveValue('');
+    expect(screen.getByRole('button', { name: 'Add fake players' })).toBeDisabled();
+    fireEvent.change(input, { target: { value: '7' } });
+    expect(input).toHaveValue('7');
+    expect(screen.getByRole('button', { name: 'Add fake players' })).toBeEnabled();
   });
 
   it('changes the draft button once someone else is done, then asks for the deck', () => {

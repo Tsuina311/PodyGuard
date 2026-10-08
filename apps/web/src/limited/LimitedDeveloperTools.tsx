@@ -21,11 +21,17 @@ export function LimitedDeveloperTools({
   const [developer] = useDeveloperMode();
   const configs = snapshot.event.limitedModeConfigs?.filter((row) => row.enabled) ?? [];
   const [mode, setMode] = useState<LimitedMode>(configs[0]?.mode ?? 'PICK_TWO_DRAFT');
-  const [count, setCount] = useState(3);
+  const [countText, setCountText] = useState('3');
   const [busy, setBusy] = useState(false);
   if (!developer || configs.length === 0) return null;
 
   const selected = configs.find((row) => row.mode === mode) ?? configs[0]!;
+  const parsedCount = Number(countText);
+  const countReady =
+    /^[0-9]+$/.test(countText) &&
+    Number.isInteger(parsedCount) &&
+    parsedCount >= 1 &&
+    parsedCount <= 8;
   const podSize = selected.preferredCohortSize ?? selected.minCohortSize;
   const lobby = snapshot.participants.filter(
     (person) => person.limitedQueueMode === selected.mode,
@@ -99,22 +105,25 @@ export function LimitedDeveloperTools({
           How many
           <input
             className="border-muted/30 bg-ink ml-2 w-14 rounded-md border px-2 py-1 text-sm"
-            type="number"
-            min={1}
-            max={8}
-            value={count}
-            onChange={(event) => setCount(Number(event.target.value))}
+            inputMode="numeric"
+            value={countText}
+            onChange={(event) => {
+              const next = event.target.value;
+              if (next === '' || /^[0-9]+$/.test(next)) {
+                setCountText(next);
+              }
+            }}
           />
         </label>
         <Button
           size="sm"
           variant="glass"
-          disabled={busy}
+          disabled={busy || !countReady}
           onClick={() =>
             void run(() =>
               addLimitedFakePlayers(joinCode, hostToken, {
                 mode: selected.mode,
-                count,
+                count: parsedCount,
               }),
             )
           }

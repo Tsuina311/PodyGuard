@@ -75,25 +75,27 @@ export function Brand({ className }: { className?: string }) {
           </span>
         </button>
         {showVersion ? (
-          <span
-            id={tipId}
-            role="tooltip"
-            data-testid="app-version"
-            className={cx(
-              'border-muted/25 bg-void/95 text-neon absolute bottom-full left-0 z-20 mb-2',
-              'flex w-44 flex-col gap-2 rounded-md border px-2.5 py-2 font-mono text-[0.7rem]',
-              'font-semibold tracking-normal shadow-lg backdrop-blur-md',
-            )}
-          >
-            <span className="tabular-nums">v{__APP_VERSION__}</span>
-            <button
-              type="button"
-              data-testid="developer-mode-toggle"
-              className="border-neon/40 hover:bg-neon/10 rounded-md border px-2 py-1.5 text-left leading-snug"
-              onClick={() => setDeveloperMode(!developerMode)}
+          <span className="absolute top-full left-0 z-20 pt-2">
+            <span
+              id={tipId}
+              role="tooltip"
+              data-testid="app-version"
+              className={cx(
+                'border-muted/25 bg-void/95 text-neon flex w-44 flex-col gap-2',
+                'rounded-md border px-2.5 py-2 font-mono text-[0.7rem]',
+                'font-semibold tracking-normal shadow-lg backdrop-blur-md',
+              )}
             >
-              {developerMode ? 'Developer mode on' : 'Developer mode off'}
-            </button>
+              <span className="tabular-nums">v{__APP_VERSION__}</span>
+              <button
+                type="button"
+                data-testid="developer-mode-toggle"
+                className="border-neon/40 hover:bg-neon/10 rounded-md border px-2 py-1.5 text-left leading-snug"
+                onClick={() => setDeveloperMode(!developerMode)}
+              >
+                {developerMode ? 'Developer mode on' : 'Developer mode off'}
+              </button>
+            </span>
           </span>
         ) : null}
       </span>
