@@ -6,13 +6,14 @@ import type {
   LimitedMode,
   PublicLimitedSession,
 } from '@podyguard/shared';
+import { limitedHostCue, limitedModeConfig } from '@podyguard/shared';
 import {
   advanceLimitedPhase,
   ApiError,
+  assignLimitedTables,
   cancelLimitedSession,
   completeLimitedSession,
   correctLimitedResult,
-  createLimitedSession,
   dropLimitedParticipant,
   launchLimitedSession,
   replaceLimitedRoster,
@@ -23,6 +24,7 @@ import {
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { Panel } from '../ui/Panel';
+import { LimitedDeveloperTools } from './LimitedDeveloperTools';
 import { LimitedTimerDisplay } from './LimitedTimerDisplay';
 import {
   LIMITED_MODE_LABELS,
@@ -36,16 +38,17 @@ export function LimitedHostPanel({
   hostToken,
   snapshot,
   onSession,
+  onSnapshot = () => undefined,
   onError,
 }: {
   joinCode: string;
   hostToken: string;
   snapshot: EventSnapshot;
   onSession: (session: PublicLimitedSession) => void;
+  onSnapshot?: (snapshot: EventSnapshot) => void;
   onError: (error: string | null) => void;
 }) {
   const [busy, setBusy] = useState(false);
-  const [draftTables, setDraftTables] = useState<Record<string, string[]>>({});
   const configs = snapshot.event.limitedModeConfigs?.filter((row) => row.enabled) ?? [];
 
   async function run(action: () => Promise<{ session: PublicLimitedSession }>) {
@@ -65,86 +68,74 @@ export function LimitedHostPanel({
 
   return (
     <Panel title="Limited event desk" aside={`${snapshot.limitedSessions?.length ?? 0} sessions`}>
+      <LimitedDeveloperTools
+        joinCode={joinCode}
+        hostToken={hostToken}
+        snapshot={snapshot}
+        onSnapshot={onSnapshot}
+        onError={onError}
+      />
       <div className="mb-5 grid gap-3 sm:grid-cols-3">
         {configs.map((config) => {
           const queue = queuedParticipants(snapshot, config.mode);
           const podSize = config.preferredCohortSize ?? config.minCohortSize;
+          const readyCount = queue.filter((person) => person.status === 'ready').length;
+          const cue = limitedHostCue({
+            mode: config.mode,
+            podSize,
+            joined: queue.length,
+            ready: readyCount,
+            draftMinutes: config.draftMinutes,
+            deckMinutes: config.deckbuildingMinutes,
+            roundMinutes: config.roundMinutes,
+            session: null,
+          });
+          const format = limitedModeConfig(config.mode);
           return (
             <div key={config.mode} className="rounded-xl border border-white/10 p-3">
               <div className="mb-2 flex items-center justify-between gap-2">
                 <strong className="text-sm">{LIMITED_MODE_LABELS[config.mode]}</strong>
-                <Badge tone={queue.length >= podSize ? 'ready' : 'idle'}>
-                  {queue.length} queued
+                <Badge tone={readyCount >= podSize ? 'ready' : 'idle'}>
+                  {readyCount}/{podSize} ready
                 </Badge>
               </div>
+              <p className="mb-2 text-sm font-semibold">{cue.title}</p>
+              <p className="text-muted mb-3 text-xs">{cue.detail}</p>
               <p className="text-muted mb-3 text-xs">
-                {config.matchStructure} ·{' '}
-                {config.totalRounds === 'AUTO' ? 'Auto' : config.totalRounds}{' '}
-                rounds · {podSize} players · Swiss 1v1
+                {format.hasDraftPhase
+                  ? format.cardsPerPick === 2
+                    ? 'Four players. Take two cards. Pass left, then right, then left. Diagonals play first.'
+                    : 'Eight players. Take one card. Pass left, then right, then left. Then Swiss.'
+                  : 'No draft. Six packs, then Swiss.'}{' '}
+                {config.matchStructure}.
               </p>
-              {config.mode !== 'SEALED' ? (
-                <fieldset className="mb-3">
-                  <legend className="text-muted mb-1 text-xs">
-                    Draft tables
-                  </legend>
-                  <div className="flex flex-wrap gap-2">
-                    {snapshot.tables.map((table) => {
-                      const selected = (
-                        draftTables[config.mode] ?? []
-                      ).includes(table.id);
-                      return (
-                        <label
-                          key={table.id}
-                          className={`rounded-lg border px-2 py-1 text-xs ${
-                            selected
-                              ? 'border-neon bg-neon/10 text-neon'
-                              : 'border-muted/20 text-muted'
-                          }`}
-                        >
-                          <input
-                            className="mr-1"
-                            type="checkbox"
-                            checked={selected}
-                            disabled={table.status !== 'free'}
-                            onChange={() =>
-                              setDraftTables((current) => ({
-                                ...current,
-                                [config.mode]: selected
-                                  ? (current[config.mode] ?? []).filter(
-                                      (id) => id !== table.id,
-                                    )
-                                  : [
-                                      ...(current[config.mode] ?? []),
-                                      table.id,
-                                    ],
-                              }))
-                            }
-                          />
-                          {table.label}
-                        </label>
-                      );
-                    })}
-                  </div>
-                </fieldset>
-              ) : null}
+              {queue.length === 0 ? (
+                <p className="text-muted mb-3 text-sm">
+                  Nobody has joined yet. They appear here as soon as they scan the QR and enter a name.
+                </p>
+              ) : (
+                <ul className="mb-3 divide-y divide-white/5 text-sm">
+                  {queue.map((person) => (
+                    <li key={person.id} className="flex items-center justify-between gap-2 py-1.5">
+                      <span className="truncate">{person.displayName}</span>
+                      <Badge tone={person.status === 'ready' ? 'ready' : 'idle'}>
+                        {person.status === 'ready' ? 'Ready' : 'Not ready'}
+                      </Badge>
+                    </li>
+                  ))}
+                </ul>
+              )}
               <Button
                 block
                 size="sm"
-                disabled={busy || queue.length < podSize}
+                disabled={busy || cue.action !== 'assign'}
                 onClick={() =>
                   void run(() =>
-                    createLimitedSession(joinCode, hostToken, {
-                      mode: config.mode,
-                      participantCount: podSize,
-                      draftTableIds:
-                        config.mode === 'SEALED'
-                          ? undefined
-                          : draftTables[config.mode],
-                    }),
+                    assignLimitedTables(joinCode, hostToken, { mode: config.mode }),
                   )
                 }
               >
-                Create session
+                {cue.actionLabel ?? 'Assign to tables'}
               </Button>
             </div>
           );
@@ -242,9 +233,17 @@ function LimitedSessionHostCard({
       <ol className="mb-3 divide-y divide-white/5 text-sm">
         {session.participants.map((person, index) => (
           <li key={person.participantId} className="flex flex-wrap items-center gap-2 py-2">
-            <span className="w-6 font-mono text-muted">{person.draftSeat ?? index + 1}</span>
+            <span className="w-6 font-mono text-muted">{person.draftSeat ?? '—'}</span>
             <span className="min-w-0 flex-1 truncate">{person.displayName}</span>
-            <Badge tone={person.status === 'DROPPED' ? 'muted' : 'idle'}>{person.status}</Badge>
+            <Badge tone={person.status === 'DROPPED' ? 'muted' : person.seated ? 'ready' : 'idle'}>
+              {session.status === 'SEATING'
+                ? person.draftSeat
+                  ? person.seated
+                    ? 'Seated'
+                    : `Seat ${person.draftSeat}`
+                  : 'Picking a seat'
+                : person.status}
+            </Badge>
             {session.status === 'FORMING' ? (
               <>
                 <Button size="sm" variant="ghost" disabled={busy || index === 0} onClick={() => move(index, -1)}>↑</Button>
@@ -385,6 +384,14 @@ function LimitedSessionHostCard({
         </div>
       ) : null}
 
+      <SessionStep
+        session={session}
+        tableLabel={
+          snapshot.tables.find((table) => table.id === session.draftTableIds[0])?.label ??
+          null
+        }
+      />
+
       <div className="flex flex-wrap gap-2">
         {session.status === 'FORMING' ? (
           <>
@@ -392,12 +399,18 @@ function LimitedSessionHostCard({
             <Button variant="danger" disabled={busy} onClick={() => void run(() => cancelLimitedSession(joinCode, hostToken, session.id))}>Cancel</Button>
           </>
         ) : session.status === 'SEATING' ? (
-          <Button disabled={busy} onClick={() => void run(() => advanceLimitedPhase(joinCode, hostToken, session.id, session.mode === 'SEALED' ? 'DECKBUILDING' : 'DRAFTING'))}>
+          <Button
+            disabled={
+              busy ||
+              session.participants.some(
+                (person) => person.status !== 'DROPPED' && (!person.draftSeat || !person.seated),
+              )
+            }
+            onClick={() => void run(() => advanceLimitedPhase(joinCode, hostToken, session.id, session.mode === 'SEALED' ? 'DECKBUILDING' : 'DRAFTING'))}
+          >
             {session.mode === 'SEALED' ? 'Start deckbuilding' : 'Start draft'}
           </Button>
-        ) : session.status === 'DRAFTING' ? (
-          <Button disabled={busy} onClick={() => void run(() => advanceLimitedPhase(joinCode, hostToken, session.id, 'DECKBUILDING'))}>Start deckbuilding</Button>
-        ) : session.status === 'DECKBUILDING' || session.status === 'BETWEEN_ROUNDS' ? (
+        ) : session.status === 'BETWEEN_ROUNDS' ? (
           <Button disabled={busy} onClick={() => void run(() => startLimitedRound(joinCode, hostToken, session.id))}>
             Start round {(session.currentRound ?? 0) + 1}
           </Button>
@@ -431,5 +444,39 @@ function LimitedSessionHostCard({
         ) : null}
       </div>
     </section>
+  );
+}
+
+function SessionStep({
+  session,
+  tableLabel,
+}: {
+  session: PublicLimitedSession;
+  tableLabel: string | null;
+}) {
+  if (session.status === 'FORMING') return null;
+  const active = session.participants.filter((person) => person.status !== 'DROPPED');
+  const cue = limitedHostCue({
+    mode: session.mode,
+    podSize: session.preferredCohortSize ?? session.minCohortSize,
+    joined: active.length,
+    ready: active.length,
+    deckMinutes: 0,
+    roundMinutes: 0,
+    session: {
+      status: session.status,
+      seated: active.filter((person) => person.seated).length,
+      active: active.length,
+      phaseAckCount: session.phaseAcks?.length ?? 0,
+      tableLabel,
+      roundNumber: session.currentRound ?? null,
+      totalRounds: session.totalRounds,
+    },
+  });
+  return (
+    <p className="text-muted mb-3 text-sm">
+      <span className="text-ink font-semibold">{cue.title}. </span>
+      {cue.detail}
+    </p>
   );
 }

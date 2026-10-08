@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
+import { useDeveloperMode } from '../developer-mode';
 import { cx } from './cx';
 
 function fineHoverDevice(): boolean {
@@ -14,6 +15,7 @@ export function Brand({ className }: { className?: string }) {
   const tipId = useId();
   const rootRef = useRef<HTMLSpanElement>(null);
   const [showVersion, setShowVersion] = useState(false);
+  const [developerMode, setDeveloperMode] = useDeveloperMode();
 
   useEffect(() => {
     if (!showVersion) {
@@ -40,7 +42,20 @@ export function Brand({ className }: { className?: string }) {
 
   return (
     <div className={cx('flex items-center gap-2.5', className)}>
-      <span ref={rootRef} className="relative inline-flex">
+      <span
+        ref={rootRef}
+        className="relative inline-flex"
+        onMouseEnter={() => {
+          if (fineHoverDevice()) {
+            setShowVersion(true);
+          }
+        }}
+        onMouseLeave={() => {
+          if (fineHoverDevice()) {
+            setShowVersion(false);
+          }
+        }}
+      >
         <button
           type="button"
           className={cx(
@@ -51,28 +66,8 @@ export function Brand({ className }: { className?: string }) {
           aria-label={`PodyGuard version ${__APP_VERSION__}`}
           aria-expanded={showVersion}
           aria-controls={showVersion ? tipId : undefined}
-          onMouseEnter={() => {
-            if (fineHoverDevice()) {
-              setShowVersion(true);
-            }
-          }}
-          onMouseLeave={() => {
-            if (fineHoverDevice()) {
-              setShowVersion(false);
-            }
-          }}
           onFocus={() => setShowVersion(true)}
-          onBlur={() => {
-            if (fineHoverDevice()) {
-              setShowVersion(false);
-            }
-          }}
-          onClick={() => {
-            if (fineHoverDevice()) {
-              return;
-            }
-            setShowVersion((open) => !open);
-          }}
+          onClick={() => setShowVersion((open) => !open)}
         >
           <span aria-hidden className="relative flex size-2.5 items-center justify-center">
             <span className="absolute size-2.5 animate-ping rounded-full bg-neon/60" />
@@ -85,12 +80,20 @@ export function Brand({ className }: { className?: string }) {
             role="tooltip"
             data-testid="app-version"
             className={cx(
-              'border-muted/25 bg-void/95 text-neon absolute bottom-full left-1/2 z-20 mb-2',
-              '-translate-x-1/2 rounded-md border px-2 py-1 font-mono text-[0.7rem]',
-              'font-semibold tracking-normal whitespace-nowrap shadow-lg backdrop-blur-md tabular-nums',
+              'border-muted/25 bg-void/95 text-neon absolute bottom-full left-0 z-20 mb-2',
+              'flex w-44 flex-col gap-2 rounded-md border px-2.5 py-2 font-mono text-[0.7rem]',
+              'font-semibold tracking-normal shadow-lg backdrop-blur-md',
             )}
           >
-            v{__APP_VERSION__}
+            <span className="tabular-nums">v{__APP_VERSION__}</span>
+            <button
+              type="button"
+              data-testid="developer-mode-toggle"
+              className="border-neon/40 hover:bg-neon/10 rounded-md border px-2 py-1.5 text-left leading-snug"
+              onClick={() => setDeveloperMode(!developerMode)}
+            >
+              {developerMode ? 'Developer mode on' : 'Developer mode off'}
+            </button>
           </span>
         ) : null}
       </span>

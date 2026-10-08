@@ -183,6 +183,13 @@
       "when": 1789158600000,
       "tag": "0025_table_reservation_owner_text",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1789245000000,
+      "tag": "0026_limited_table_flow",
+      "breakpoints": true
     }
   ]
 }

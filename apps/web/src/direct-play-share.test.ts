@@ -4,6 +4,7 @@ import {
   decodeDirectPlayPayload,
   encodeDirectPlayPayload,
   isDirectPlayQrEncodable,
+  scryfallArtCropUri,
 } from './direct-play-share';
 import { playerDirectPlayUrl } from './join-url';
 import { defaultMatchConfig, loadMatchConfig } from './match-config';
@@ -68,6 +69,33 @@ describe('direct play share payload', () => {
     expect(decoded?.commanders[0]?.[0]?.name).toBe(atraXa.name);
     expect(decoded?.commanders[0]?.[0]?.artCropUri).toBe('');
     expect(decoded?.commanders[0]?.[0]?.oracleText).toBe('');
+  });
+
+  it('rebuilds commander art from the Scryfall card id', () => {
+    const cardId = 'e7e778ce-3f1e-4626-8f55-bba03970d91a';
+    const config = {
+      ...defaultMatchConfig(),
+      gameMode: 'commander' as const,
+      rulesFormat: 'commander' as const,
+      seatCount: 2,
+      names: ['Alex', 'Blake', 'Casey', 'Drew', 'Extra', 'Extra', 'Extra', 'Extra'],
+      commanders: [
+        [{ ...atraXa, cardId, artCropUri: 'https://cards.example/ignored.jpg' }],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+      ],
+    };
+    const decoded = decodeDirectPlayPayload(encodeDirectPlayPayload(config));
+    expect(decoded?.commanders[0]?.[0]?.artCropUri).toBe(scryfallArtCropUri(cardId));
+    expect(decoded?.commanders[0]?.[0]?.artCropUri).toBe(
+      'https://cards.scryfall.io/art_crop/front/e/7/e7e778ce-3f1e-4626-8f55-bba03970d91a.jpg',
+    );
+    expect(encodeDirectPlayPayload(config)).not.toContain('cards.scryfall.io');
   });
 
   it('rejects garbage tokens', () => {

@@ -5,8 +5,12 @@ import { MemoryEventStore } from './memory-event-store.js';
 import { createIdentityBoundary } from '../identity/index.js';
 
 async function fixture(
-  mode: 'BOOSTER_DRAFT' | 'SEALED' = 'BOOSTER_DRAFT',
-  options: { preferredCohortSize?: number; allowUndersizedLaunch?: boolean } = {},
+  mode: 'BOOSTER_DRAFT' | 'PICK_TWO_DRAFT' | 'SEALED' = 'BOOSTER_DRAFT',
+  options: {
+    preferredCohortSize?: number;
+    allowUndersizedLaunch?: boolean;
+    totalRounds?: number;
+  } = {},
 ) {
   const identity = createIdentityBoundary({
     participantSessionSecret: 'limited-test-secret',
@@ -31,7 +35,7 @@ async function fixture(
           minCohortSize: podSize,
           maxCohortSize: podSize,
           allowUndersizedLaunch: options.allowUndersizedLaunch ?? false,
-          totalRounds: 1,
+          totalRounds: options.totalRounds ?? 1,
           deckbuildingMinutes: 20,
           roundMinutes: 35,
           matchStructure: 'BO1',
@@ -65,6 +69,45 @@ async function fixture(
   };
 }
 
+async function readyAll(
+  app: Awaited<ReturnType<typeof buildApp>>,
+  joinCode: string,
+  players: Array<{ token: string }>,
+) {
+  for (const player of players) {
+    const ready = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/ready`,
+      headers: { authorization: `Bearer ${player.token}` },
+      payload: { ready: true },
+    });
+    expect(ready.statusCode).toBe(200);
+  }
+}
+
+async function claimAndSit(
+  app: Awaited<ReturnType<typeof buildApp>>,
+  joinCode: string,
+  sessionId: string,
+  players: Array<{ token: string }>,
+) {
+  for (const [index, player] of players.entries()) {
+    const claimed = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/limited/sessions/${sessionId}/seat`,
+      headers: { authorization: `Bearer ${player.token}` },
+      payload: { seat: index + 1 },
+    });
+    expect(claimed.statusCode).toBe(200);
+    const sat = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/limited/sessions/${sessionId}/seated`,
+      headers: { authorization: `Bearer ${player.token}` },
+    });
+    expect(sat.statusCode).toBe(200);
+  }
+}
+
 describe('Limited server orchestration', () => {
   it('forms deterministically, seats a draft, runs a round, and restricts corrections', async () => {
     const { app, joinCode, hostToken, players, modeConfigs } = await fixture();
@@ -82,37 +125,48 @@ describe('Limited server orchestration', () => {
       expect(queued.statusCode).toBe(200);
     }
 
-    const snapshot = await app.events.getSnapshot(joinCode);
-    expect(snapshot.limitedQueues).toMatchObject([
-      { mode: 'BOOSTER_DRAFT', waitingCount: 0 },
+    const waiting = await app.events.getSnapshot(joinCode);
+    expect(waiting.limitedSessions ?? []).toHaveLength(0);
+    expect(waiting.limitedQueues).toMatchObject([
+      { mode: 'BOOSTER_DRAFT', waitingCount: 8 },
     ]);
-    const formed = snapshot.limitedSessions?.[0];
-    const deterministicOrder = players
-      .map((player) => player.id)
-      .sort((left, right) => left.localeCompare(right));
-    expect(formed).toMatchObject({
-      mode: 'BOOSTER_DRAFT',
-      status: 'FORMING',
-      participants: deterministicOrder.map((participantId, index) => ({
-        participantId,
-        draftSeat: index + 1,
-      })),
-    });
-    if (!formed) throw new Error('Automatic draft session was not formed.');
-
-    const unauthorizedLaunch = await app.inject({
+    const tooEarly = await app.inject({
       method: 'POST',
-      url: `/events/${joinCode}/limited/sessions/${formed.id}/launch`,
-      headers: { authorization: `Bearer ${players[0]!.token}` },
-    });
-    expect(unauthorizedLaunch.statusCode).toBe(401);
-
-    const launch = await app.inject({
-      method: 'POST',
-      url: `/events/${joinCode}/limited/sessions/${formed.id}/launch`,
+      url: `/events/${joinCode}/limited/assign`,
       headers: { authorization: `Bearer ${hostToken}` },
+      payload: { mode: 'BOOSTER_DRAFT' },
     });
-    expect(launch.json()).toMatchObject({ session: { status: 'SEATING' } });
+    expect(tooEarly.statusCode).toBe(409);
+
+    await readyAll(app, joinCode, players);
+    const assigned = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/limited/assign`,
+      headers: { authorization: `Bearer ${hostToken}` },
+      payload: { mode: 'BOOSTER_DRAFT' },
+    });
+    expect(assigned.statusCode).toBe(200);
+    const formed = (
+      assigned.json() as { session: { id: string; status: string; draftTableIds: string[] } }
+    ).session;
+    expect(formed).toMatchObject({ status: 'SEATING' });
+    expect(formed.draftTableIds).toHaveLength(1);
+
+    const unauthorized = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/limited/sessions/${formed.id}/phase`,
+      headers: { authorization: `Bearer ${players[0]!.token}` },
+      payload: { status: 'DRAFTING' },
+    });
+    expect(unauthorized.statusCode).toBe(401);
+    const beforeSeats = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/limited/sessions/${formed.id}/phase`,
+      headers: { authorization: `Bearer ${hostToken}` },
+      payload: { status: 'DRAFTING' },
+    });
+    expect(beforeSeats.statusCode).toBe(409);
+    await claimAndSit(app, joinCode, formed.id, players);
 
     const drafting = await app.inject({
       method: 'POST',
@@ -256,21 +310,15 @@ describe('Limited server orchestration', () => {
 
   it('sends Sealed directly from seating to timed deckbuilding', async () => {
     const { app, joinCode, hostToken, players } = await fixture('SEALED');
-    for (const player of players) {
-      await app.inject({
-        method: 'PUT',
-        url: `/events/${joinCode}/limited/queue`,
-        headers: { authorization: `Bearer ${player.token}` },
-        payload: { mode: 'SEALED' },
-      });
-    }
-    const session = (await app.events.getSnapshot(joinCode)).limitedSessions?.[0];
-    if (!session) throw new Error('Automatic Sealed session was not formed.');
-    await app.inject({
+    await readyAll(app, joinCode, players);
+    const assigned = await app.inject({
       method: 'POST',
-      url: `/events/${joinCode}/limited/sessions/${session.id}/launch`,
+      url: `/events/${joinCode}/limited/assign`,
       headers: { authorization: `Bearer ${hostToken}` },
+      payload: { mode: 'SEALED' },
     });
+    const session = (assigned.json() as { session: { id: string } }).session;
+    await claimAndSit(app, joinCode, session.id, players);
     const skippedDraft = await app.inject({
       method: 'POST',
       url: `/events/${joinCode}/limited/sessions/${session.id}/phase`,
@@ -286,20 +334,19 @@ describe('Limited server orchestration', () => {
 
   it('keeps Limited-queued players out of Commander matching', async () => {
     const { app, joinCode, hostToken, players } = await fixture();
-    await app.inject({
-      method: 'PUT',
-      url: `/events/${joinCode}/limited/queue`,
-      headers: { authorization: `Bearer ${players[0]!.token}` },
-      payload: { mode: 'BOOSTER_DRAFT' },
-    });
-    const conflictingReady = await app.inject({
+    const lobbyReady = await app.inject({
       method: 'POST',
       url: `/events/${joinCode}/ready`,
       headers: { authorization: `Bearer ${players[0]!.token}` },
       payload: { ready: true },
     });
-    expect(conflictingReady.statusCode).toBe(409);
+    expect(lobbyReady.statusCode).toBe(200);
     for (const player of players.slice(1)) {
+      await app.inject({
+        method: 'DELETE',
+        url: `/events/${joinCode}/limited/queue`,
+        headers: { authorization: `Bearer ${player.token}` },
+      });
       await app.inject({
         method: 'POST',
         url: `/events/${joinCode}/ready`,
@@ -332,8 +379,14 @@ describe('Limited server orchestration', () => {
         payload: { mode: 'BOOSTER_DRAFT' },
       });
     }
-    const formed = (await app.events.getSnapshot(joinCode)).limitedSessions?.[0];
-    if (!formed) throw new Error('Automatic draft session was not formed.');
+    const created = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/limited/sessions`,
+      headers: { authorization: `Bearer ${hostToken}` },
+      payload: { mode: 'BOOSTER_DRAFT', participantCount: 8 },
+    });
+    expect(created.statusCode).toBe(201);
+    const formed = (created.json() as { session: { id: string } }).session;
     const sessionId = formed.id;
     const tables = await app.events.listTables(joinCode);
     await app.inject({
@@ -383,6 +436,14 @@ describe('Limited server orchestration', () => {
         headers: { authorization: `Bearer ${hostToken}` },
       });
     }
+    for (const player of players) {
+      const sat = await app.inject({
+        method: 'POST',
+        url: `/events/${joinCode}/limited/sessions/${sessionId}/seated`,
+        headers: { authorization: `Bearer ${player.token}` },
+      });
+      expect(sat.statusCode).toBe(200);
+    }
     for (const status of ['DRAFTING', 'DECKBUILDING'] as const) {
       await app.inject({
         method: 'POST',
@@ -408,6 +469,154 @@ describe('Limited server orchestration', () => {
     expect(
       new Set(active.rounds[0]?.matches.map((match) => match.tableId)),
     ).toEqual(new Set(tables.map((table) => table.id)));
+    await app.close();
+  });
+
+  it('runs Pick-Two from lobby ready through seat swaps, confirmations, and diagonal matches', async () => {
+    const { app, joinCode, hostToken, players } = await fixture('PICK_TWO_DRAFT', {
+      totalRounds: 3,
+    });
+    const joined = await app.events.getSnapshot(joinCode);
+    expect(joined.limitedQueues?.[0]?.waitingCount).toBe(4);
+    expect(joined.participants.every((person) => person.status === 'joined')).toBe(true);
+    expect(joined.limitedSessions ?? []).toHaveLength(0);
+
+    await readyAll(app, joinCode, players.slice(0, 3));
+    const early = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/limited/assign`,
+      headers: { authorization: `Bearer ${hostToken}` },
+      payload: { mode: 'PICK_TWO_DRAFT' },
+    });
+    expect(early.statusCode).toBe(409);
+
+    await readyAll(app, joinCode, players.slice(3));
+    const assigned = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/limited/assign`,
+      headers: { authorization: `Bearer ${hostToken}` },
+      payload: { mode: 'PICK_TWO_DRAFT' },
+    });
+    expect(assigned.statusCode).toBe(200);
+    const seating = (
+      assigned.json() as {
+        session: {
+          id: string;
+          status: string;
+          participants: Array<{ draftSeat?: number }>;
+          draftTableIds: string[];
+        };
+      }
+    ).session;
+    expect(seating.status).toBe('SEATING');
+    expect(seating.draftTableIds).toHaveLength(1);
+    expect(seating.participants.every((person) => person.draftSeat === undefined)).toBe(
+      true,
+    );
+
+    await claimAndSit(app, joinCode, seating.id, players);
+    const swapped = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/limited/sessions/${seating.id}/seat`,
+      headers: { authorization: `Bearer ${players[1]!.token}` },
+      payload: { seat: 1 },
+    });
+    expect(swapped.statusCode).toBe(200);
+    const afterSwap = (
+      swapped.json() as {
+        session: { participants: Array<{ participantId: string; draftSeat?: number; seated?: boolean }> };
+      }
+    ).session;
+    expect(
+      afterSwap.participants.find((person) => person.participantId === players[1]!.id)
+        ?.draftSeat,
+    ).toBe(1);
+    expect(
+      afterSwap.participants.find((person) => person.participantId === players[0]!.id)
+        ?.draftSeat,
+    ).toBe(2);
+    expect(
+      afterSwap.participants
+        .filter((person) => person.participantId === players[0]!.id || person.participantId === players[1]!.id)
+        .every((person) => person.seated !== true),
+    ).toBe(true);
+    for (const player of [players[0]!, players[1]!]) {
+      const sat = await app.inject({
+        method: 'POST',
+        url: `/events/${joinCode}/limited/sessions/${seating.id}/seated`,
+        headers: { authorization: `Bearer ${player.token}` },
+      });
+      expect(sat.statusCode).toBe(200);
+    }
+
+    const drafting = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/limited/sessions/${seating.id}/phase`,
+      headers: { authorization: `Bearer ${hostToken}` },
+      payload: { status: 'DRAFTING', durationSeconds: 600 },
+    });
+    expect(drafting.json()).toMatchObject({
+      session: { status: 'DRAFTING', timer: { phase: 'DRAFTING' } },
+    });
+    const firstAck = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/limited/sessions/${seating.id}/ack`,
+      headers: { authorization: `Bearer ${players[0]!.token}` },
+    });
+    expect(firstAck.json()).toMatchObject({
+      session: { status: 'DRAFTING', phaseAcks: [players[0]!.id] },
+    });
+    for (const player of players.slice(1)) {
+      const ack = await app.inject({
+        method: 'POST',
+        url: `/events/${joinCode}/limited/sessions/${seating.id}/ack`,
+        headers: { authorization: `Bearer ${player.token}` },
+      });
+      expect(ack.statusCode).toBe(200);
+    }
+    const building = await app.events.getSnapshot(joinCode);
+    expect(building.limitedSessions?.[0]?.status).toBe('DECKBUILDING');
+    for (const player of players) {
+      await app.inject({
+        method: 'POST',
+        url: `/events/${joinCode}/limited/sessions/${seating.id}/ack`,
+        headers: { authorization: `Bearer ${player.token}` },
+      });
+    }
+    const playing = (await app.events.getSnapshot(joinCode)).limitedSessions?.[0];
+    expect(playing?.status).toBe('ROUND_ACTIVE');
+    const bySeat = new Map(
+      playing?.participants.map((person) => [person.draftSeat, person.participantId]),
+    );
+    expect(
+      playing?.rounds[0]?.matches.map((match) => [match.playerAId, match.playerBId]),
+    ).toEqual([
+      [bySeat.get(1), bySeat.get(3)],
+      [bySeat.get(2), bySeat.get(4)],
+    ]);
+
+    for (const match of playing?.rounds[0]?.matches ?? []) {
+      const reporter = players.find((player) => player.id === match.playerAId)!;
+      const reported = await app.inject({
+        method: 'POST',
+        url: `/events/${joinCode}/limited/sessions/${seating.id}/matches/${match.id}/result`,
+        headers: { authorization: `Bearer ${reporter.token}` },
+        payload: {
+          outcome: 'PLAYER_A_WIN',
+          playerAGameWins: 1,
+          playerBGameWins: 0,
+        },
+      });
+      expect(reported.statusCode).toBe(200);
+    }
+    const second = (await app.events.getSnapshot(joinCode)).limitedSessions?.[0];
+    expect(second?.currentRound).toBe(2);
+    expect(
+      second?.rounds[1]?.matches.map((match) => [match.playerAId, match.playerBId]),
+    ).toEqual([
+      [bySeat.get(1), bySeat.get(2)],
+      [bySeat.get(3), bySeat.get(4)],
+    ]);
     await app.close();
   });
 });

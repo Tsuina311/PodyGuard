@@ -16,6 +16,16 @@
   }
 }
 
+/*
+  Tablet, not a phone on its side. A landscape phone is wide but short, so
+  both sides must clear this bar or the phone hit targets would grow.
+*/
+@custom-variant tablet {
+  @media (min-width: 700px) and (min-height: 700px) {
+    @slot;
+  }
+}
+
 @theme {
   --font-display: 'Space Grotesk', 'Avenir Next', 'Segoe UI', sans-serif;
   --font-sans: 'Space Grotesk', 'Avenir Next', 'Segoe UI', sans-serif;

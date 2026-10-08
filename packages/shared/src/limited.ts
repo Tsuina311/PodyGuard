@@ -138,6 +138,8 @@ export type LimitedSessionParticipant = {
   joinedAt: string;
   assignedAt?: string;
   draftSeat?: number;
+  /** True after the player taps I'm seated. */
+  seated?: boolean;
   droppedAt?: string;
 };
 
@@ -219,6 +221,8 @@ export type PublicLimitedSession = {
   currentRound?: number;
   totalRounds: number;
   draftTableIds: string[];
+  /** Players who have confirmed the current draft or deckbuilding phase. */
+  phaseAcks?: string[];
   draftPod?: DraftPod;
   timer?: LimitedTimer;
   createdAt: string;
@@ -262,6 +266,20 @@ export function defaultLimitedEventModeConfig(
     deckbuildingMinutes: config.deckbuildingMinutes,
     roundMinutes: config.roundMinutes,
   };
+}
+
+/**
+ * Rounds a pod plays when the host leaves the count on Auto.
+ * Pick-Two is a fixed three-round seat rotation. Booster Draft and Sealed
+ * use Swiss and at least three rounds, which is the usual store length for
+ * a full pod.
+ */
+export function plannedLimitedRounds(
+  mode: LimitedMode,
+  participantCount: number,
+): number {
+  if (mode === 'PICK_TWO_DRAFT') return 3;
+  return Math.max(3, defaultLimitedRounds(participantCount));
 }
 
 export function defaultLimitedRounds(participantCount: number): number {
@@ -337,7 +355,23 @@ export type LimitedPairingParticipant = {
   participantId: string;
   displayName?: string;
   dropped?: boolean;
+  /** One-based chair around the table. Pick-Two pairings use this. */
+  draftSeat?: number;
 };
+
+/**
+ * Pick-Two seat rotation for chairs 1–4 clockwise.
+ * Round 1 is the diagonals (the player you did not pass packs to).
+ * Rounds 2 and 3 are the two remaining opponents, so everyone plays everyone.
+ */
+export function pickTwoRoundPairs(
+  roundNumber: number,
+): ReadonlyArray<readonly [number, number]> | undefined {
+  if (roundNumber === 1) return [[1, 3], [2, 4]];
+  if (roundNumber === 2) return [[1, 2], [3, 4]];
+  if (roundNumber === 3) return [[1, 4], [2, 3]];
+  return undefined;
+}
 
 export type LimitedPairingInput = {
   sessionId: string;
@@ -362,23 +396,30 @@ export function pairLimitedRound(input: LimitedPairingInput): LimitedRound {
   if (activeIds.length < 2) {
     throw new Error('A Limited round needs at least two active participants.');
   }
-  if (
-    input.mode === 'PICK_TWO_DRAFT' &&
-    activeIds.length === 4 &&
-    input.roundNumber === 1
-  ) {
-    return makeRound(input, [
-      [activeIds[0]!, activeIds[1]!],
-      [activeIds[2]!, activeIds[3]!],
-    ]);
-  }
-  if (
-    input.mode === 'PICK_TWO_DRAFT' &&
-    activeIds.length === 4 &&
-    input.roundNumber === 2
-  ) {
-    const special = pickTwoSecondRound(activeIds, input.previousMatches);
-    if (special) return makeRound(input, special);
+  if (input.mode === 'PICK_TWO_DRAFT' && activeIds.length === 4) {
+    const seated = input.participants.filter(
+      (participant) =>
+        !participant.dropped && participant.draftSeat !== undefined,
+    );
+    const pairs = pickTwoRoundPairs(input.roundNumber);
+    if (!pairs) {
+      throw new Error(
+        'Pick-Two Draft plays three rounds from the seats: diagonals, then each remaining opponent.',
+      );
+    }
+    const bySeat = new Map(
+      seated.map((participant) => [
+        participant.draftSeat!,
+        participant.participantId,
+      ]),
+    );
+    if (![1, 2, 3, 4].every((seat) => bySeat.has(seat))) {
+      throw new Error('Pick-Two Draft pairings need seats 1 through 4.');
+    }
+    return makeRound(
+      input,
+      pairs.map(([left, right]) => [bySeat.get(left)!, bySeat.get(right)!]),
+    );
   }
 
   const standings = calculateLimitedStandings(
@@ -400,40 +441,6 @@ export function pairLimitedRound(input: LimitedPairingInput): LimitedRound {
   const pairs = optimalPairs(pairedIds, standings, input.previousMatches);
   if (byeId) pairs.push([byeId]);
   return makeRound(input, pairs);
-}
-
-function pickTwoSecondRound(
-  activeIds: readonly string[],
-  previousMatches: readonly LimitedMatch[],
-): string[][] | undefined {
-  const firstRound = previousMatches
-    .filter((match) => match.roundNumber === 1 && match.playerBId)
-    .sort((left, right) => left.position - right.position);
-  if (firstRound.length !== 2 || firstRound.some((match) => !match.outcome)) {
-    return undefined;
-  }
-  const winners: string[] = [];
-  const nonWinners: string[] = [];
-  for (const match of firstRound) {
-    const playerBId = match.playerBId!;
-    if (match.outcome === 'PLAYER_A_WIN') {
-      winners.push(match.playerAId);
-      nonWinners.push(playerBId);
-    } else if (match.outcome === 'PLAYER_B_WIN') {
-      winners.push(playerBId);
-      nonWinners.push(match.playerAId);
-    } else {
-      return undefined;
-    }
-  }
-  if (
-    winners.length !== 2 ||
-    nonWinners.length !== 2 ||
-    [...winners, ...nonWinners].some((id) => !activeIds.includes(id))
-  ) {
-    return undefined;
-  }
-  return [winners, nonWinners];
 }
 
 function chooseBye(

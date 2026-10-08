@@ -892,13 +892,11 @@ export function JoinPage({
                 {t('join.joinAgain')}
               </Button>
             </div>
-          ) : parseEventOperationMode(event?.operationMode) === 'ROUNDS' ? null : participant.limitedQueueMode ? (
-            <p className="text-muted text-sm">
-              You are waiting in a Limited queue. Manage that queue below.
-            </p>
-          ) : limitedQueues ? (
+          ) : parseEventOperationMode(event?.operationMode) === 'ROUNDS' ? null : limitedQueues ? (
             <>
-              <p className="text-muted mb-4 text-sm">{t('join.limitedJoinHint')}</p>
+              <p className="text-muted mb-4 text-sm">
+                The Limited panel below is the step you are on. The host sees you as soon as you join.
+              </p>
               <Button
                 variant="ghost"
                 block
@@ -1134,6 +1132,7 @@ export function JoinPage({
           token={token!}
           onSnapshot={onSnapshot}
           onError={setError}
+          onReady={onReady}
         />
       ) : null}
 

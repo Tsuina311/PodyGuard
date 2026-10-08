@@ -17,7 +17,8 @@ import {
 
 /**
  * Compact v1 payload for `?play=` deep links. Omits long sandbox chrome and
- * commander art so phone QR scanners stay under a practical URL size.
+ * commander art URLs so phone QR scanners stay under a practical URL size.
+ * Art is rebuilt from the Scryfall card id on decode.
  */
 type DirectPlayPayloadV1 = {
   v: 1;
@@ -76,6 +77,20 @@ function slimCommander(commander: CommanderSelection): DirectPlayPayloadV1['c'][
   };
 }
 
+/**
+ * Scryfall serves a printing's art crop at a path derived from its card id,
+ * so the share link can omit the URL and the other phone still shows the art.
+ */
+export function scryfallArtCropUri(cardId: string): string {
+  const id = cardId.trim().toLowerCase();
+  if (
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/u.test(id)
+  ) {
+    return '';
+  }
+  return `https://cards.scryfall.io/art_crop/front/${id[0]}/${id[1]}/${id}.jpg`;
+}
+
 function expandCommander(
   raw: DirectPlayPayloadV1['c'][number][number],
 ): CommanderSelection | null {
@@ -93,7 +108,7 @@ function expandCommander(
     oracleId: raw.o,
     cardId: raw.i,
     name: raw.n,
-    artCropUri: '',
+    artCropUri: scryfallArtCropUri(raw.i),
     typeLine: typeof raw.t === 'string' ? raw.t : '',
     oracleText: typeof raw.x === 'string' ? raw.x : '',
     keywords: Array.isArray(raw.k)

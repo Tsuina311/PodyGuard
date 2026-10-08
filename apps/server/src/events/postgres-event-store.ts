@@ -1351,6 +1351,94 @@ export class PostgresEventStore implements EventStore {
     return loadLimitedSessionRequired(id);
   }
 
+  async saveLimitedTableFlow(
+    id: string,
+    input: {
+      seats?: Array<{
+        participantId: string;
+        draftSeat: number | null;
+        seated: boolean;
+      }>;
+      phaseAcks?: string[];
+    },
+  ): Promise<StoredLimitedSession> {
+    try {
+      await getDb().transaction(async (tx) => {
+        const [session] = await tx
+          .select()
+          .from(limitedSessions)
+          .where(eq(limitedSessions.id, id))
+          .limit(1)
+          .for('update');
+        if (!session) throw new Error('Limited session not found.');
+        if (input.seats) {
+          if (session.status !== 'SEATING') {
+            throw new LimitedPersistenceConflictError(
+              'Seats can only change while the pod is seating.',
+            );
+          }
+          assertUniqueLimited(
+            input.seats
+              .map((row) => row.draftSeat)
+              .filter((seat): seat is number => seat !== null),
+            'Limited draft seat',
+          );
+          await tx
+            .update(limitedSessionParticipants)
+            .set({ draftSeat: null, updatedAt: new Date() })
+            .where(eq(limitedSessionParticipants.sessionId, id));
+          await tx.delete(draftSeats).where(eq(draftSeats.sessionId, id));
+          for (const row of input.seats) {
+            const [updated] = await tx
+              .update(limitedSessionParticipants)
+              .set({
+                draftSeat: row.draftSeat,
+                seatedConfirmed: row.seated,
+                updatedAt: new Date(),
+              })
+              .where(
+                and(
+                  eq(limitedSessionParticipants.sessionId, id),
+                  eq(limitedSessionParticipants.participantId, row.participantId),
+                ),
+              )
+              .returning({ id: limitedSessionParticipants.id });
+            if (!updated) {
+              throw new Error('Limited participant is not in this session.');
+            }
+          }
+          const taken = input.seats.filter(
+            (row): row is typeof row & { draftSeat: number } =>
+              row.draftSeat !== null,
+          );
+          if (taken.length) {
+            await tx.insert(draftSeats).values(
+              taken.map((row) => ({
+                sessionId: id,
+                participantId: row.participantId,
+                seat: row.draftSeat,
+              })),
+            );
+          }
+        }
+        if (input.phaseAcks) {
+          await tx
+            .update(limitedSessions)
+            .set({ phaseAcks: [...input.phaseAcks], updatedAt: new Date() })
+            .where(eq(limitedSessions.id, id));
+        }
+      });
+    } catch (error) {
+      if (isUniqueViolation(error)) {
+        throw new LimitedPersistenceConflictError(
+          'Limited draft seat conflicts.',
+        );
+      }
+      throw error;
+    }
+    return loadLimitedSessionRequired(id);
+  }
+
   async replaceLimitedDraftTables(
     id: string,
     tableIds: string[],
@@ -1486,10 +1574,18 @@ export class PostgresEventStore implements EventStore {
   ): Promise<StoredLimitedSession> {
     await getDb().transaction(async (tx) => {
       const timer = patch.timer;
+      const [existing] = await tx
+        .select({ status: limitedSessions.status })
+        .from(limitedSessions)
+        .where(eq(limitedSessions.id, id))
+        .limit(1);
       const [updated] = await tx
         .update(limitedSessions)
         .set({
           status: patch.status,
+          ...(existing && existing.status !== patch.status
+            ? { phaseAcks: [] }
+            : {}),
           ...(!('timer' in patch)
             ? {}
             : timer
@@ -2503,6 +2599,7 @@ async function loadLimitedSession(
     currentRound: row.currentRound,
     totalRounds: row.totalRounds,
     draftTableIds: row.draftTableIds,
+    phaseAcks: row.phaseAcks ?? [],
     timer,
     createdAt: row.createdAt,
     startedAt: row.startedAt,
@@ -2519,6 +2616,7 @@ function mapLimitedParticipant(
     displayName,
     status: row.status,
     draftSeat: row.draftSeat,
+    seatedConfirmed: row.seatedConfirmed,
     joinedAt: row.joinedAt,
     assignedAt: row.assignedAt,
     droppedAt: row.droppedAt,

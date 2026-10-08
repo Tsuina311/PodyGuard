@@ -447,6 +447,7 @@ export const limitedSessions = pgTable(
       .$type<string[]>()
       .notNull()
       .default([]),
+    phaseAcks: jsonb('phase_acks').$type<string[]>().notNull().default([]),
     timerPhase: limitedTimerPhaseEnum('timer_phase'),
     timerStatus: limitedTimerStatusEnum('timer_status'),
     timerDurationSeconds: integer('timer_duration_seconds'),
@@ -491,6 +492,7 @@ export const limitedSessionParticipants = pgTable(
       .notNull()
       .default('ASSIGNED'),
     draftSeat: integer('draft_seat'),
+    seatedConfirmed: boolean('seated_confirmed').notNull().default(false),
     joinedAt: timestamp('joined_at', { withTimezone: true })
       .defaultNow()
       .notNull(),

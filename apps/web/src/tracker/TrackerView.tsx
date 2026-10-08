@@ -119,6 +119,32 @@ import {
   trackerOverlayClass,
 } from './board-frame';
 import { commanderDamageChipState } from './commander-damage-chip';
+import {
+  clearSeatLifeFlash,
+  fadeSeatLifeFlash,
+  noteSeatLifeFlash,
+  type SeatLifeFlash,
+} from './life-flash';
+import { seatFacesAway, seatGridClass } from './seat-layout';
+import {
+  boardGridStackClass,
+  commanderDamageChipPaddingClass,
+  commanderSheetClass,
+  lifeTapGlyph,
+  matchDialStackClass,
+  matchMenuBodyClass,
+  seatSpotlightClass,
+  tabletCounterBadgeClass,
+  tabletDialClass,
+  tabletDungeonButtonClass,
+  tabletLifeGlyphClass,
+  tabletMenuButtonClass,
+  tabletMenuButtonLargeClass,
+  tabletMenuGridClass,
+  tabletMenuStackButtonClass,
+  tabletSeatIconClass,
+  tabletSeatRailClass,
+} from './tracker-layout';
 import { useBoardLandscape, useOrientationLock } from './orientation';
 import {
   COMMANDER_DAMAGE_IDLE_CLOSE_MS,
@@ -308,7 +334,7 @@ const onArt = '[text-shadow:0_2px_14px_var(--color-void)]';
   keeps the glow from being clipped by the card drawn next to it, and the seat
   grows a touch as it settles so the landing is felt as well as seen.
 */
-const spotlightCard = 'z-20 border-neon';
+const spotlightCard = seatSpotlightClass();
 const spotlightSweep = 'shadow-[0_0_0_3px_var(--color-neon),0_0_34px_-2px_var(--color-neon)]';
 const spotlightLanded: Record<'flash' | 'hold', string> = {
   flash: 'first-player-flash scale-[1.02]',
@@ -330,27 +356,6 @@ const spotlightWash =
 */
 const ELIMINATED_ART =
   'https://cards.scryfall.io/art_crop/front/e/7/e7e778ce-3f1e-4626-8f55-bba03970d91a.jpg?1783937590';
-
-/**
- * Held upright the seats stack; laid flat they spread into columns, which keeps
- * every life counter about as tall as it is in portrait.
- */
-function seatGridClass(count: number): string {
-  if (count <= 2) {
-    return 'grid-cols-1 landscape:grid-cols-2';
-  }
-  if (count === 3) {
-    return 'grid-cols-1 landscape:grid-cols-3';
-  }
-  if (count === 4) {
-    // Explicit 2×2 so every seat gets the same fr track on tall phones.
-    return 'grid-cols-1 landscape:grid-cols-2 landscape:grid-rows-2';
-  }
-  if (count === 6) {
-    return 'grid-cols-2 landscape:grid-cols-3 landscape:grid-rows-2';
-  }
-  return 'grid-cols-2 landscape:grid-cols-3';
-}
 
 /**
  * Bottom seats slide toward the empty centre cell. The nudge is a share of the
@@ -406,34 +411,6 @@ function seatPlacementClass(
     return cx('landscape:col-start-3', bottomSeatNudgeLeft);
   }
   return '';
-}
-
-/**
- * Seats on the far side of the phone (top of a landscape board) are rotated
- * so the player across the table can read their life total upright.
- */
-function seatFacesAway(
-  count: number,
-  index: number,
-  layout: 'default' | 'star' = 'default',
-  options: { archenemy?: boolean; archenemyId?: string | null; playerId?: string } = {},
-): boolean {
-  if (options.archenemy) {
-    return options.playerId === options.archenemyId;
-  }
-  if (count <= 3) {
-    return false;
-  }
-  if (layout === 'star' && count === 5) {
-    return index === 0 || index === 1 || index === 4;
-  }
-  if (count === 4) {
-    return index < 2;
-  }
-  if (count === 5) {
-    return index < 3;
-  }
-  return index < Math.ceil(count / 2);
 }
 
 function playerSeatFacesAway(
@@ -535,50 +512,56 @@ export function TrackerView({
     initial,
   );
   /*
-    Consecutive life taps accumulate into a single flash under the total. Any
-    other tracker action clears it, so the figure always describes the burst
-    that just happened and not the whole game. After 5s it fades out.
+    Consecutive life taps on one seat accumulate into a single flash under
+    that total. Another seat's taps do not clear it. Any other tracker action
+    clears every flash. After 5s of quiet on that seat it fades out.
   */
-  const lifeDeltaTimer = useRef<number | null>(null);
-  function clearLifeDeltaTimer() {
-    if (lifeDeltaTimer.current !== null) {
-      window.clearTimeout(lifeDeltaTimer.current);
-      lifeDeltaTimer.current = null;
+  const lifeDeltaTimers = useRef<Map<string, number>>(new Map());
+  function clearLifeDeltaTimer(playerId: string) {
+    const timer = lifeDeltaTimers.current.get(playerId);
+    if (timer !== undefined) {
+      window.clearTimeout(timer);
+      lifeDeltaTimers.current.delete(playerId);
     }
   }
-  function dismissLifeDelta(immediate = false) {
-    clearLifeDeltaTimer();
+  function clearAllLifeDeltaTimers() {
+    for (const timer of lifeDeltaTimers.current.values()) {
+      window.clearTimeout(timer);
+    }
+    lifeDeltaTimers.current.clear();
+  }
+  function dismissLifeDelta(playerId: string, immediate = false) {
+    clearLifeDeltaTimer(playerId);
     if (immediate) {
-      setLifeDeltaFading(false);
-      setLifeDelta(null);
+      setLifeDeltas((current) => clearSeatLifeFlash(current, playerId));
       return;
     }
-    setLifeDeltaFading(true);
-    lifeDeltaTimer.current = window.setTimeout(() => {
-      setLifeDelta(null);
-      setLifeDeltaFading(false);
-      lifeDeltaTimer.current = null;
+    setLifeDeltas((current) => fadeSeatLifeFlash(current, playerId));
+    const timer = window.setTimeout(() => {
+      lifeDeltaTimers.current.delete(playerId);
+      setLifeDeltas((current) => clearSeatLifeFlash(current, playerId));
     }, 300);
+    lifeDeltaTimers.current.set(playerId, timer);
+  }
+  function dismissAllLifeDeltas() {
+    clearAllLifeDeltaTimers();
+    setLifeDeltas({});
   }
   function send(message: Msg) {
     if (message.type === 'action' && message.action.type === 'life') {
       const { playerId, delta } = message.action;
-      setLifeDeltaFading(false);
-      setLifeDelta((current) =>
-        current?.playerId === playerId
-          ? { playerId, amount: current.amount + delta }
-          : { playerId, amount: delta },
-      );
-      clearLifeDeltaTimer();
-      lifeDeltaTimer.current = window.setTimeout(() => {
-        dismissLifeDelta();
+      setLifeDeltas((current) => noteSeatLifeFlash(current, playerId, delta));
+      clearLifeDeltaTimer(playerId);
+      const timer = window.setTimeout(() => {
+        dismissLifeDelta(playerId);
       }, 5000);
+      lifeDeltaTimers.current.set(playerId, timer);
     } else {
-      dismissLifeDelta(true);
+      dismissAllLifeDeltas();
     }
     dispatch(message);
   }
-  useEffect(() => () => clearLifeDeltaTimer(), []);
+  useEffect(() => () => clearAllLifeDeltaTimers(), []);
   const [dungeonPlayerId, setDungeonPlayerId] = useState<string | null>(null);
   const [commanderPlayerId, setCommanderPlayerId] = useState<string | null>(
     null,
@@ -623,11 +606,9 @@ export function TrackerView({
   const [treacheryRolesOpen, setTreacheryRolesOpen] = useState(false);
   const [schemeOpen, setSchemeOpen] = useState(false);
   const [rulesOpen, setRulesOpen] = useState(false);
-  const [lifeDelta, setLifeDelta] = useState<{
-    playerId: string;
-    amount: number;
-  } | null>(null);
-  const [lifeDeltaFading, setLifeDeltaFading] = useState(false);
+  const [lifeDeltas, setLifeDeltas] = useState<Record<string, SeatLifeFlash>>(
+    {},
+  );
   const [lifeEntry, setLifeEntry] = useState<{
     playerId: string;
     sign: 1 | -1;
@@ -1771,7 +1752,8 @@ export function TrackerView({
       <div
         ref={boardRef}
         className={cx(
-          'relative grid min-h-0 flex-1 auto-rows-fr gap-2',
+          boardGridStackClass(),
+          'grid min-h-0 flex-1 auto-rows-fr gap-2',
           archenemyBoard
             ? 'grid-cols-1 landscape:grid-cols-3'
             : seatGridClass(state.players.length),
@@ -1873,14 +1855,8 @@ export function TrackerView({
             {!sharedLifeBoard ? (
               <LifeRow
                 life={player.life}
-                flash={
-                  lifeDelta?.playerId === player.id
-                    ? lifeDelta.amount
-                    : null
-                }
-                flashFading={
-                  lifeDelta?.playerId === player.id && lifeDeltaFading
-                }
+                flash={lifeDeltas[player.id]?.amount ?? null}
+                flashFading={lifeDeltas[player.id]?.fading ?? false}
                 color={seatColor(index)}
                 disabled={lifeDisabled}
                 onStep={(delta) =>
@@ -1895,7 +1871,7 @@ export function TrackerView({
               />
             ) : null}
 
-              <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-end gap-2 px-9 py-0.5">
+              <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-end gap-2 px-9 py-0.5 tablet:px-20">
                 <span className="pointer-events-auto flex shrink-0 flex-wrap justify-end gap-1">
                   {emperorBoard && !state.emperorIds.includes(player.id) ? (
                     <Badge tone="idle" title={t('tracker.generalRange')}>
@@ -1917,7 +1893,7 @@ export function TrackerView({
                   ) : null}
                 </span>
               </div>
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 px-1.5 py-0.5">
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 px-1.5 py-0.5 tablet:px-20 tablet:py-2">
                 <span className="flex w-full min-w-0 items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   <CounterBadges
                     player={player}
@@ -1930,6 +1906,7 @@ export function TrackerView({
               <div
                 className={cx(
                   'pointer-events-none absolute inset-y-0 z-20 flex w-9 flex-col items-center gap-1 overflow-y-auto py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+                  tabletSeatRailClass(),
                   swapSeatChrome ? 'right-0' : 'left-0',
                   fourSeatBoard && 'justify-center',
                 )}
@@ -1956,6 +1933,7 @@ export function TrackerView({
               <div
                 className={cx(
                   'pointer-events-none absolute inset-y-0 z-20 flex w-9 flex-col items-center gap-1 overflow-y-auto py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+                  tabletSeatRailClass(),
                   swapSeatChrome ? 'left-0' : 'right-0',
                 )}
               >
@@ -2115,14 +2093,8 @@ export function TrackerView({
                 >
                   <LifeRow
                     life={first.life}
-                    flash={
-                      lifeDelta?.playerId === first.id
-                        ? lifeDelta.amount
-                        : null
-                    }
-                    flashFading={
-                      lifeDelta?.playerId === first.id && lifeDeltaFading
-                    }
+                    flash={lifeDeltas[first.id]?.amount ?? null}
+                    flashFading={lifeDeltas[first.id]?.fading ?? false}
                     compact
                     colors={team.map((id) =>
                       seatColor(playerSeatIndex(state.players, id)),
@@ -2182,7 +2154,8 @@ export function TrackerView({
             send({ type: 'action', action: { type: 'begin' } })
           }
           className={cx(
-            'bg-neon text-void hover:bg-neon/90 absolute z-30 flex min-h-16 min-w-28 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full px-6 font-display text-lg font-bold shadow-[0_10px_30px_-8px_var(--color-void)] transition',
+            'bg-neon text-void hover:bg-neon/90 z-30 flex min-h-16 min-w-28 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full px-6 font-display text-lg font-bold shadow-[0_10px_30px_-8px_var(--color-void)] transition tablet:min-h-20 tablet:min-w-36 tablet:text-2xl',
+            matchDialStackClass(),
             clockPositionClass(state.players.length),
           )}
         >
@@ -2211,7 +2184,9 @@ export function TrackerView({
         }}
         className={cx(
           plate,
-          'hover:border-neon/50 absolute z-20 flex size-16 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-full border font-mono shadow-[0_10px_30px_-8px_var(--color-void)] transition',
+          'hover:border-neon/50 z-30 flex size-16 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-full border font-mono shadow-[0_10px_30px_-8px_var(--color-void)] transition',
+          tabletDialClass(),
+          matchDialStackClass(),
           clockPositionClass(state.players.length),
           state.pausedAt ? 'text-warning border-warning/50' : 'text-ink',
           state.pausedAt ? '' : dayNightRing(state.dayNight),
@@ -2244,7 +2219,7 @@ export function TrackerView({
             )}
           </span>
         ) : null}
-        <span className="text-sm leading-none font-bold tabular-nums">
+        <span className="text-sm leading-none font-bold tabular-nums tablet:text-2xl">
           {formatClock(elapsed)}
         </span>
         {state.pausedAt ? (
@@ -2351,13 +2326,12 @@ export function TrackerView({
                 aria-hidden={!open}
                 inert={!open}
                 aria-label={t('tracker.commanderDamageOn', { name: seat.name })}
-                className={
-                  open
-                    ? inBoardOverlayClass(
-                        'z-50 bg-void/95 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm',
-                      )
-                    : 'hidden'
-                }
+                className={commanderSheetClass(
+                  open,
+                  inBoardOverlayClass(
+                    'z-50 bg-void/95 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm',
+                  ),
+                )}
                 onClick={(event) => {
                   if (open && event.target === event.currentTarget) {
                     closeCommanderSheet();
@@ -3172,6 +3146,19 @@ function useMatchClock(state: TrackerState): number {
   belongs to one player stays on that player's card, within their reach, which
   is why no counter or designation appears in here.
 */
+function menuControlClass(
+  className: string,
+  kind: 'grid' | 'stack' | 'large' = 'grid',
+): string {
+  const tablet =
+    kind === 'large'
+      ? tabletMenuButtonLargeClass()
+      : kind === 'stack'
+        ? tabletMenuStackButtonClass()
+        : tabletMenuButtonClass();
+  return cx(className, tablet);
+}
+
 function MatchMenu({
   state,
   elapsed,
@@ -3271,7 +3258,7 @@ function MatchMenu({
             type="button"
             aria-label={t('common.close')}
             onClick={onClose}
-            className="border-muted/25 text-muted hover:text-ink hover:border-muted/50 flex size-8 shrink-0 items-center justify-center rounded-full border transition"
+            className="border-muted/25 text-muted hover:text-ink hover:border-muted/50 flex size-8 shrink-0 items-center justify-center rounded-full border transition tablet:size-12"
           >
             <X size={18} aria-hidden />
           </button>
@@ -3396,7 +3383,7 @@ function MatchMenu({
             type="button"
             aria-label={t('tracker.closeMatchMenu')}
             onClick={onClose}
-            className="border-muted/25 text-muted hover:text-ink hover:border-muted/50 flex size-8 shrink-0 items-center justify-center rounded-full border transition"
+            className="border-muted/25 text-muted hover:text-ink hover:border-muted/50 flex size-8 shrink-0 items-center justify-center rounded-full border transition tablet:size-12"
           >
             <X size={18} aria-hidden />
           </button>
@@ -3405,11 +3392,11 @@ function MatchMenu({
       <div className="grid min-h-0 flex-1 grid-cols-2 grid-rows-2 gap-2">
         {/* Top left: dice, coins, day/night */}
         <MatchMenuPane title={t('tracker.menuTable')} dense>
-          <div className="grid w-full grid-cols-2 gap-1.5">
+          <div className={cx('grid w-full grid-cols-2 gap-1.5', tabletMenuGridClass())}>
             <Button
               size="sm"
               variant="glass"
-              className="h-9 w-full justify-start px-2.5"
+              className={menuControlClass('h-9 w-full justify-start px-2.5')}
               onClick={() => onDiceTools('dice')}
             >
               <Dices size={14} aria-hidden />
@@ -3418,7 +3405,7 @@ function MatchMenu({
             <Button
               size="sm"
               variant="glass"
-              className="h-9 w-full justify-start px-2.5"
+              className={menuControlClass('h-9 w-full justify-start px-2.5')}
               onClick={() => onDiceTools('coin')}
             >
               <Coins size={14} aria-hidden />
@@ -3427,7 +3414,7 @@ function MatchMenu({
             <Button
               size="sm"
               variant={state.dayNight === 'day' ? 'neon' : 'glass'}
-              className="h-9 w-full justify-start px-2.5"
+              className={menuControlClass('h-9 w-full justify-start px-2.5')}
               disabled={decided}
               onClick={() => {
                 dispatch({ type: 'dayNight', value: 'day' });
@@ -3439,7 +3426,7 @@ function MatchMenu({
             <Button
               size="sm"
               variant={state.dayNight === 'night' ? 'neon' : 'glass'}
-              className="h-9 w-full justify-start px-2.5"
+              className={menuControlClass('h-9 w-full justify-start px-2.5')}
               disabled={decided}
               onClick={() => {
                 dispatch({ type: 'dayNight', value: 'night' });
@@ -3459,7 +3446,7 @@ function MatchMenu({
           header={
             <p
               className={cx(
-                'font-display text-[clamp(1.5rem,7vh,2.75rem)] leading-none font-bold tabular-nums',
+                'font-display text-[clamp(1.5rem,7vh,2.75rem)] leading-none font-bold tabular-nums tablet:text-[clamp(2.75rem,6vh,4.25rem)]',
                 paused ? 'text-warning' : 'text-neon',
               )}
             >
@@ -3467,11 +3454,11 @@ function MatchMenu({
             </p>
           }
         >
-          <div className="grid w-full grid-cols-2 gap-1.5">
+          <div className={cx('grid w-full grid-cols-2 gap-1.5', tabletMenuGridClass())}>
             <Button
               size="sm"
               variant={paused ? 'neon' : 'glass'}
-              className="h-9 w-full"
+              className={menuControlClass('h-9 w-full')}
               onClick={() => {
                 dispatch({ type: 'pause' });
               }}
@@ -3486,7 +3473,7 @@ function MatchMenu({
             <Button
               size="sm"
               variant="glass"
-              className="h-9 w-full"
+              className={menuControlClass('h-9 w-full')}
               disabled={!canUndo}
               onClick={onUndo}
             >
@@ -3498,7 +3485,7 @@ function MatchMenu({
             <Button
               size="sm"
               variant="neon"
-              className="h-9 w-full justify-start"
+              className={menuControlClass('h-9 w-full justify-start', 'stack')}
               disabled={decided || state.schemeOrder.length === 0}
               onClick={onScheme}
             >
@@ -3511,7 +3498,7 @@ function MatchMenu({
           <Button
             size="sm"
             variant="glass"
-            className="h-9 w-full justify-start"
+            className={menuControlClass('h-9 w-full justify-start', 'stack')}
             disabled={decided || state.players.length < 2}
             onClick={() => {
               setSelectedSeatId(null);
@@ -3532,7 +3519,7 @@ function MatchMenu({
           <Button
             size="md"
             variant="glass"
-            className="h-11 w-full justify-start"
+            className={menuControlClass('h-11 w-full justify-start', 'large')}
             disabled={decided}
             onClick={() => {
               setSelectedSeatId(null);
@@ -3549,7 +3536,7 @@ function MatchMenu({
           <Button
             size="md"
             variant={decided ? 'neon' : 'glass'}
-            className="h-11 w-full justify-start"
+            className={menuControlClass('h-11 w-full justify-start', 'large')}
             disabled={decided}
             onClick={() => {
               setSelectedSeatId(null);
@@ -3587,7 +3574,7 @@ function MatchMenu({
               <Button
                 size="md"
                 variant="neon"
-                className="h-11 w-full"
+                className={menuControlClass('h-11 w-full', 'large')}
                 onClick={() => void onFinish()}
               >
                 {requeueOnFinish
@@ -3600,11 +3587,11 @@ function MatchMenu({
 
         {/* Bottom right: help + quit */}
         <MatchMenuPane title={t('tracker.menuSupport')} dense>
-          <div className="grid w-full grid-cols-2 gap-1.5">
+          <div className={cx('grid w-full grid-cols-2 gap-1.5', tabletMenuGridClass())}>
             <Button
               size="sm"
               variant="glass"
-              className="h-9 w-full justify-start px-2.5"
+              className={menuControlClass('h-9 w-full justify-start px-2.5')}
               onClick={onRules}
             >
               <BookOpen size={14} aria-hidden />
@@ -3613,7 +3600,7 @@ function MatchMenu({
             <Button
               size="sm"
               variant="glass"
-              className="h-9 w-full justify-start px-2.5"
+              className={menuControlClass('h-9 w-full justify-start px-2.5')}
               onClick={() =>
                 openFeedback({
                   participantStatus: 'playing',
@@ -3628,7 +3615,7 @@ function MatchMenu({
               <Button
                 size="sm"
                 variant="glass"
-                className="h-9 w-full justify-start px-2.5"
+                className={menuControlClass('h-9 w-full justify-start px-2.5')}
                 onClick={onChallenges}
               >
                 <Sparkles size={14} aria-hidden />
@@ -3639,7 +3626,7 @@ function MatchMenu({
               <Button
                 size="sm"
                 variant="glass"
-                className="h-9 w-full justify-start px-2.5"
+                className={menuControlClass('h-9 w-full justify-start px-2.5')}
                 onClick={onTargets}
               >
                 <Crosshair size={14} aria-hidden />
@@ -3650,7 +3637,7 @@ function MatchMenu({
               <Button
                 size="sm"
                 variant="glass"
-                className="h-9 w-full justify-start px-2.5"
+                className={menuControlClass('h-9 w-full justify-start px-2.5')}
                 onClick={() => {
                   onClose();
                   onCheckRole();
@@ -3664,7 +3651,7 @@ function MatchMenu({
               <Button
                 size="sm"
                 variant="glass"
-                className="h-9 w-full justify-start px-2.5"
+                className={menuControlClass('h-9 w-full justify-start px-2.5')}
                 onClick={() => {
                   onClose();
                   onOpenDesk();
@@ -3677,7 +3664,7 @@ function MatchMenu({
             <Button
               size="sm"
               variant="danger"
-              className="h-9 w-full justify-start px-2.5"
+              className={menuControlClass('h-9 w-full justify-start px-2.5')}
               title={t('tracker.quitHint')}
               onClick={onQuit}
             >
@@ -3715,11 +3702,11 @@ function MatchMenuPane({
     <section
       className={cx(
         'border-muted/20 bg-hull/40 flex min-h-0 flex-col overflow-hidden rounded-2xl border backdrop-blur-sm',
-        dense ? 'gap-1.5 p-2.5' : 'gap-2 p-3',
+        dense ? 'gap-1.5 p-2.5 tablet:gap-3 tablet:p-4' : 'gap-2 p-3 tablet:gap-3 tablet:p-5',
       )}
     >
       <div className="flex shrink-0 items-center justify-between gap-2">
-        <h5 className="text-muted font-mono text-[0.65rem] font-semibold tracking-[0.18em] uppercase">
+        <h5 className="text-muted font-mono text-[0.65rem] font-semibold tracking-[0.18em] uppercase tablet:text-sm">
           {title}
         </h5>
         {header}
@@ -3727,8 +3714,8 @@ function MatchMenuPane({
       <div
         className={cx(
           'flex min-h-0 flex-1 flex-col overflow-hidden',
-          dense ? 'gap-1.5' : 'gap-2',
-          footer ? 'justify-between' : align === 'start' ? 'justify-start' : 'justify-center',
+          dense ? 'gap-1.5 tablet:gap-3' : 'gap-2 tablet:gap-3',
+          footer ? 'justify-between' : matchMenuBodyClass(align, false),
         )}
       >
         {children}
@@ -3980,9 +3967,6 @@ function LifeRow({
   );
 }
 
-const LIFE_FLOWER_GAIN = assetUrl('/tracker/life-flowers/gain.png');
-const LIFE_FLOWER_LOSS = assetUrl('/tracker/life-flowers/loss.png');
-
 function LifeButton({
   delta,
   disabled,
@@ -4000,7 +3984,6 @@ function LifeButton({
   const timer = useRef<number | null>(null);
   const longPressed = useRef(false);
   const [pressed, setPressed] = useState(false);
-  const flowerSrc = delta > 0 ? LIFE_FLOWER_GAIN : LIFE_FLOWER_LOSS;
 
   function clearTimer() {
     if (timer.current !== null) {
@@ -4052,23 +4035,16 @@ function LifeButton({
       onContextMenu={(event) => event.preventDefault()}
       className={cx(
         'font-display text-muted/35 relative flex justify-center overflow-hidden text-2xl font-bold transition-[background-color,color] duration-150 select-none disabled:opacity-40',
+        tabletLifeGlyphClass(),
         pressed &&
           (delta > 0
             ? 'bg-gain/25 text-gain/80'
             : 'bg-danger/25 text-danger/80'),
-        className,
-      )}
+      className,
+    )}
     >
-      {pressed ? (
-        <img
-          src={flowerSrc}
-          alt=""
-          draggable={false}
-          className="pointer-events-none absolute inset-0 h-full w-full object-contain object-center opacity-95"
-        />
-      ) : null}
       <span aria-hidden className="relative z-10">
-        {delta > 0 ? '+' : '−'}
+        {lifeTapGlyph(delta)}
       </span>
     </button>
   );
@@ -4133,7 +4109,7 @@ function LifeAmountPad({
                 sign > 0 ? 'text-gain' : 'text-danger',
               )}
             >
-              {sign > 0 ? '+' : '−'}
+              {sign > 0 ? '+' : '-'}
               {digits || '0'}
             </p>
           </div>
@@ -4141,7 +4117,7 @@ function LifeAmountPad({
             type="button"
             aria-label={t('common.close')}
             onClick={onClose}
-            className="border-muted/25 text-muted flex size-8 items-center justify-center rounded-full border"
+            className="border-muted/25 text-muted flex size-8 items-center justify-center rounded-full border tablet:size-12"
           >
             <X size={16} aria-hidden />
           </button>
@@ -4231,7 +4207,8 @@ function Chip({
       }}
       className={cx(
         plate,
-        'border-muted/25 flex max-w-full shrink-0 items-center gap-0.5 rounded-lg border px-1.5 py-2 font-mono text-xs transition disabled:opacity-40',
+        'border-muted/25 flex max-w-full shrink-0 items-center gap-0.5 rounded-lg border font-mono text-xs transition disabled:opacity-40',
+        commanderDamageChipPaddingClass(),
         interactive
           ? 'pointer-events-auto hover:border-neon/50'
           : 'pointer-events-none',
@@ -4495,6 +4472,7 @@ function CounterBadges({
           className={cx(
             plate,
             'pointer-events-none flex shrink-0 items-center gap-0.5 rounded-full border border-muted/20 px-1.5 py-0.5 font-mono text-[0.6rem] leading-none',
+            tabletCounterBadgeClass(),
           )}
         >
           {definition.icon(11)}
@@ -4537,7 +4515,7 @@ function ChallengeSheet({
           type="button"
           aria-label={t('tracker.closeChallenges')}
           onClick={onClose}
-          className="border-muted/25 text-muted hover:text-ink flex size-8 shrink-0 items-center justify-center rounded-full border"
+          className="border-muted/25 text-muted hover:text-ink flex size-8 shrink-0 items-center justify-center rounded-full border tablet:size-12"
         >
           <X size={18} aria-hidden />
         </button>
@@ -4633,7 +4611,7 @@ function CounterSheet({
           type="button"
           aria-label={t('tracker.closeCounters')}
           onClick={onClose}
-          className="border-muted/25 text-muted hover:text-ink hover:border-muted/50 flex size-8 shrink-0 items-center justify-center rounded-full border transition"
+          className="border-muted/25 text-muted hover:text-ink hover:border-muted/50 flex size-8 shrink-0 items-center justify-center rounded-full border transition tablet:size-12"
         >
           <X size={18} aria-hidden />
         </button>
@@ -4784,6 +4762,7 @@ function IconButton({
       }}
       className={cx(
         'flex size-9 items-center justify-center rounded-lg text-sm transition disabled:opacity-40',
+        tabletSeatIconClass(),
         interactive ? 'pointer-events-auto' : 'pointer-events-none',
         hidden && 'opacity-0',
         peek &&
@@ -4908,6 +4887,7 @@ function DungeonButton({
       }}
       className={cx(
         'flex min-h-9 w-9 flex-col items-center justify-center gap-0.5 rounded-lg py-0.5 transition disabled:opacity-40',
+        tabletDungeonButtonClass(),
         interactive ? 'pointer-events-auto' : 'pointer-events-none',
         hidden && 'opacity-0',
         peek &&
@@ -5061,7 +5041,7 @@ function CommanderSheet({
           type="button"
           aria-label={t('tracker.closeCommanderDamage')}
           onClick={onClose}
-          className="border-muted/25 text-muted hover:text-ink hover:border-muted/50 flex size-8 shrink-0 items-center justify-center rounded-full border transition"
+          className="border-muted/25 text-muted hover:text-ink hover:border-muted/50 flex size-8 shrink-0 items-center justify-center rounded-full border transition tablet:size-12"
         >
           <X size={18} aria-hidden />
         </button>

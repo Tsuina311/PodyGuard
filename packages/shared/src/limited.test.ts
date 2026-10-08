@@ -97,38 +97,35 @@ describe('Limited pairings', () => {
     expect(() => assertLimitedRoundInvariant(round)).not.toThrow();
   });
 
-  it('uses the official optimized Pick-Two four-player Round 1', () => {
-    const round = pairLimitedRound({
+  it('pairs Pick-Two from seats: diagonals, then the other two opponents', () => {
+    const seated = people(4).map((person, index) => ({
+      ...person,
+      draftSeat: index + 1,
+    }));
+    const first = pairLimitedRound({
       sessionId: 'pick-two',
       mode: 'PICK_TWO_DRAFT',
       roundNumber: 1,
-      participants: people(4),
+      participants: seated,
       previousMatches: [],
       bestOf: 1,
     });
     expect(
-      round.matches.map((match) => [match.playerAId, match.playerBId]),
+      first.matches.map((match) => [match.playerAId, match.playerBId]),
     ).toEqual([
-      ['p1', 'p2'],
-      ['p3', 'p4'],
+      ['p1', 'p3'],
+      ['p2', 'p4'],
     ]);
-  });
-
-  it('pairs Round-1 winners and non-winners in Pick-Two Round 2', () => {
-    const previous = [
-      completed('m1', 1, 1, 'p1', 'p2', 'PLAYER_A_WIN'),
-      completed('m2', 1, 2, 'p3', 'p4', 'PLAYER_B_WIN'),
-    ];
-    const round = pairLimitedRound({
+    const third = pairLimitedRound({
       sessionId: 'pick-two',
       mode: 'PICK_TWO_DRAFT',
-      roundNumber: 2,
-      participants: people(4),
-      previousMatches: previous,
+      roundNumber: 3,
+      participants: seated,
+      previousMatches: [],
       bestOf: 1,
     });
     expect(
-      round.matches.map((match) => [match.playerAId, match.playerBId]),
+      third.matches.map((match) => [match.playerAId, match.playerBId]),
     ).toEqual([
       ['p1', 'p4'],
       ['p2', 'p3'],

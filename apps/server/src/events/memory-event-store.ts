@@ -749,6 +749,7 @@ export class MemoryEventStore implements EventStore {
           displayName: participant.displayName,
           status: row.status ?? 'ASSIGNED',
           draftSeat: row.draftSeat ?? null,
+          seatedConfirmed: false,
           joinedAt: row.queuedAt ?? createdAt,
           assignedAt: createdAt,
           droppedAt: null,
@@ -764,6 +765,7 @@ export class MemoryEventStore implements EventStore {
       currentRound: null,
       totalRounds: input.totalRounds,
       draftTableIds: [...draftTableIds],
+      phaseAcks: [],
       timer: null,
       createdAt,
       startedAt: null,
@@ -880,6 +882,7 @@ export class MemoryEventStore implements EventStore {
         displayName: person.displayName,
         status: 'ASSIGNED',
         draftSeat: row.draftSeat ?? null,
+        seatedConfirmed: false,
         joinedAt: existing?.joinedAt ?? now,
         assignedAt: now,
         droppedAt: null,
@@ -939,11 +942,53 @@ export class MemoryEventStore implements EventStore {
     return session;
   }
 
+  async saveLimitedTableFlow(
+    id: string,
+    input: {
+      seats?: Array<{
+        participantId: string;
+        draftSeat: number | null;
+        seated: boolean;
+      }>;
+      phaseAcks?: string[];
+    },
+  ): Promise<StoredLimitedSession> {
+    const session = this.requireLimitedSession(id);
+    if (input.seats) {
+      if (session.status !== 'SEATING') {
+        throw new LimitedPersistenceConflictError(
+          'Seats can only change while the pod is seating.',
+        );
+      }
+      const seats = input.seats
+        .map((row) => row.draftSeat)
+        .filter((seat): seat is number => seat !== null);
+      assertUnique(seats, 'Limited draft seat');
+      for (const row of input.seats) {
+        const participant = session.participants.find(
+          (person) => person.participantId === row.participantId,
+        );
+        if (!participant) {
+          throw new Error('Limited participant is not in this session.');
+        }
+        participant.draftSeat = row.draftSeat;
+        participant.seatedConfirmed = row.seated;
+      }
+    }
+    if (input.phaseAcks) {
+      session.phaseAcks = [...input.phaseAcks];
+    }
+    return session;
+  }
+
   async updateLimitedSessionPhase(
     id: string,
     patch: LimitedSessionPhasePatch,
   ): Promise<StoredLimitedSession> {
     const session = this.requireLimitedSession(id);
+    if (session.status !== patch.status) {
+      session.phaseAcks = [];
+    }
     session.status = patch.status;
     if ('timer' in patch) session.timer = patch.timer ?? null;
     if ('currentRound' in patch) session.currentRound = patch.currentRound ?? null;

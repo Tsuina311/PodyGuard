@@ -726,9 +726,9 @@ export function HostPage() {
 
       <div className={cx(tab === 'desk' ? 'contents' : 'hidden')}>
       {!shouldShowConstructedHostMatching(event) ? (
-        <Panel title={t('host.limitedPairing')} aside={t('host.limitedPairingAside')}>
+        <Panel title={t('host.limitedPairing')} aside="1v1">
           <p className="text-muted mb-3 text-sm">
-            {t('host.limitedPairingHint')}
+            Players join the lobby from the QR, tap Ready, then you assign them to a table. Seats are chosen on their phones.
           </p>
           <ul className="space-y-2">
             {event.limitedModeConfigs
@@ -736,6 +736,10 @@ export function HostPage() {
               .map((config) => {
                 const players =
                   config.preferredCohortSize ?? config.minCohortSize;
+                const pairing =
+                  config.mode === 'PICK_TWO_DRAFT'
+                    ? 'diagonals first, then each remaining opponent'
+                    : 'Swiss 1v1';
                 return (
                   <li
                     key={config.mode}
@@ -745,10 +749,7 @@ export function HostPage() {
                       {LIMITED_MODE_LABELS[config.mode]}
                     </span>
                     <span className="text-muted mt-1 block text-xs">
-                      {t('host.limitedPairingSummary', {
-                        count: players,
-                        structure: config.matchStructure,
-                      })}
+                      {players} players · {config.matchStructure} · {pairing}
                     </span>
                   </li>
                 );
@@ -1004,6 +1005,7 @@ export function HostPage() {
               ? { limitedSessions: limitedSnapshot.limitedSessions }
               : {}),
           }}
+          onSnapshot={onSnapshot}
           onSession={(session) =>
             setLimitedSnapshot((current) => ({
               event,
@@ -1076,7 +1078,7 @@ export function HostPage() {
         />
       ) : null}
 
-      {showLobbySections && !isRoundsMode ? (
+      {showLobbySections && !isRoundsMode && !eventHasLimitedQueues(event) ? (
       <Panel title={t('host.queue')} aside={t('host.ready', { count: counts.ready })}>
         {queue.length > 0 && likelyFreeSoonCount > 0 ? (
           <p className="text-neon mb-3 text-xs">
@@ -1127,7 +1129,7 @@ export function HostPage() {
       </Panel>
       ) : null}
 
-      {showLobbySections && !isRoundsMode && lobby.length > 0 ? (
+      {showLobbySections && !isRoundsMode && !eventHasLimitedQueues(event) && lobby.length > 0 ? (
         <Panel title={t('host.notReady')} aside={String(lobby.length)}>
           <ul className="divide-y divide-white/5">
             {lobby.map((row) => (
@@ -1148,7 +1150,7 @@ export function HostPage() {
         </Panel>
       ) : null}
 
-      {showLobbySections && pausedPlayers.length > 0 ? (
+      {showLobbySections && !eventHasLimitedQueues(event) && pausedPlayers.length > 0 ? (
         <Panel title={t('host.pausedTitle')} aside={String(pausedPlayers.length)}>
           <ul className="divide-y divide-white/5">
             {pausedPlayers.map((row) => (

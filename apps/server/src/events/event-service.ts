@@ -25,11 +25,15 @@ import {
   PhysicalTableStatus,
   addLimitedTimerSeconds,
   calculateLimitedStandings,
-  defaultLimitedRounds,
   deterministicDraftSeats,
+  everyoneSeated,
+  applyLimitedSeatChoice,
+  confirmLimitedSeat,
+  recordLimitedPhaseAck,
   isLimitedMode,
   limitedModeConfig,
   pairLimitedRound,
+  plannedLimitedRounds,
   pauseLimitedTimer,
   resumeLimitedTimer,
   startLimitedTimer,
@@ -40,6 +44,7 @@ import {
   type GameMode,
   type EventSnapshot,
   type LimitedEventModeConfig,
+  type LimitedSeatState,
   type LimitedMatchOutcome,
   type LimitedMode,
   type LimitedSessionStatus,
@@ -90,6 +95,7 @@ import {
   type StoredDeck,
   type StoredEvent,
   type StoredLimitedMatch,
+  type StoredLimitedParticipant,
   type StoredLimitedSession,
   type StoredParticipant,
   type StoredTable,
@@ -383,6 +389,17 @@ export class EventService {
       participantId: participant.id,
     });
     await this.track(stored.id, 'joined_event');
+    const enabledLimited = stored.limitedModeConfigs.filter((row) => row.enabled);
+    let joinedParticipant = participant;
+    if (enabledLimited.length === 1) {
+      joinedParticipant = await this.store.updateParticipant(participant.id, {
+        status: participant.status,
+        readyAt: participant.readyAt,
+        limitedQueueMode: enabledLimited[0]!.mode,
+        limitedQueuedAt: this.now(),
+      });
+      await this.track(stored.id, 'limited_queued');
+    }
     if (stored.operationMode === 'ROUNDS' && stored.roundState) {
       const people = await this.store.listParticipants(stored.id);
       stored = await this.store.updateEvent(stored.id, {
@@ -391,7 +408,7 @@ export class EventService {
     }
     return {
       event: await this.presentEvent(stored),
-      participant: toPublicParticipant(participant, undefined, storedDecks),
+      participant: toPublicParticipant(joinedParticipant, undefined, storedDecks),
       token: session.token,
     };
   }
@@ -542,9 +559,24 @@ export class EventService {
 
     if (ready) {
       if (participant.limitedQueueMode) {
-        throw new InvalidParticipantTransitionError(
-          'Leave the Limited queue before joining normal matchmaking.',
-        );
+        if (
+          participant.status !== ParticipantStatus.Joined &&
+          participant.status !== ParticipantStatus.Paused &&
+          participant.status !== ParticipantStatus.Ready
+        ) {
+          throw new InvalidParticipantTransitionError(
+            'Only a player in the lobby can mark themselves ready.',
+          );
+        }
+        if (participant.status === ParticipantStatus.Ready) {
+          return this.present(participant);
+        }
+        const updated = await this.store.updateParticipant(participant.id, {
+          status: ParticipantStatus.Ready,
+          readyAt: this.now(),
+        });
+        await this.track(stored.id, 'became_ready');
+        return this.present(updated);
       }
       if (
         participant.status !== ParticipantStatus.Joined &&
@@ -804,7 +836,7 @@ export class EventService {
     mode: LimitedMode,
   ): Promise<EventSnapshot> {
     const stored = await this.requireByJoinCode(joinCode);
-    const config = requireEnabledLimitedConfig(stored, mode);
+    requireEnabledLimitedConfig(stored, mode);
     const participant = await this.requireParticipant(
       stored.id,
       participantToken,
@@ -825,18 +857,6 @@ export class EventService {
       limitedQueuedAt: this.now(),
     });
     await this.track(stored.id, 'limited_queued');
-    const target = config.preferredCohortSize ?? config.minCohortSize;
-    const queue = await this.limitedQueue(stored.id, mode);
-    if (queue.length >= target) {
-      try {
-        await this.createLimitedSessionFromQueue(stored, config, {
-          participantCount: target,
-          automatic: true,
-        });
-      } catch (error) {
-        if (!(error instanceof LimitedPersistenceConflictError)) throw error;
-      }
-    }
     return this.getSnapshot(joinCode);
   }
 
@@ -884,6 +904,357 @@ export class EventService {
         draftTableIds: input.draftTableIds,
         automatic: false,
       }),
+    );
+  }
+
+  async assignLimitedTables(
+    joinCode: string,
+    hostToken: string,
+    input: { mode: LimitedMode; draftTableIds?: string[] },
+  ): Promise<PublicLimitedSession> {
+    const event = await this.requireHostToken(joinCode, hostToken);
+    const config = requireEnabledLimitedConfig(event, input.mode);
+    const target = config.preferredCohortSize ?? config.minCohortSize;
+    let draftTableIds = input.draftTableIds?.filter((id) => id.length > 0);
+    if (!draftTableIds?.length) {
+      const tables = (await this.store.listTables(event.id))
+        .filter((table) => table.status === PhysicalTableStatus.Free)
+        .sort(
+          (left, right) =>
+            left.sortOrder - right.sortOrder || left.id.localeCompare(right.id),
+        );
+      const table = tables[0];
+      if (!table) {
+        throw new InvalidParticipantTransitionError(
+          'There is no free table to assign. Free a table, then try again.',
+        );
+      }
+      draftTableIds = [table.id];
+    }
+    const created = await this.createLimitedSessionFromQueue(event, config, {
+      participantCount: target,
+      draftTableIds,
+      automatic: false,
+      readyOnly: true,
+      leaveSeatsOpen: true,
+    });
+    const updated = await this.store.updateLimitedSessionPhase(created.id, {
+      status: 'SEATING',
+      startedAt: this.now(),
+    });
+    await this.track(event.id, 'limited_phase_changed');
+    return toPublicLimitedSession(updated);
+  }
+
+  /**
+   * Temporary host-only stand-ins for an empty draft table.
+   * Not gated on the dev server flag so a phone build can use it.
+   * Remove this before a public launch.
+   */
+  async addLimitedFakePlayers(
+    joinCode: string,
+    hostToken: string,
+    input: { mode: LimitedMode; count: number },
+  ): Promise<EventSnapshot> {
+    const event = await this.requireHostToken(joinCode, hostToken);
+    requireEnabledLimitedConfig(event, input.mode);
+    if (!Number.isInteger(input.count) || input.count < 1 || input.count > 8) {
+      throw new InvalidEventInputError('Add between 1 and 8 fake players.');
+    }
+    const people = await this.store.listParticipants(event.id);
+    const taken = new Set(people.map((person) => person.displayName.toLowerCase()));
+    const now = this.now();
+    for (let index = 0; index < input.count; index += 1) {
+      const bot = await this.store.insertParticipant({
+        eventId: event.id,
+        displayName: nextBotName(taken),
+        isBot: true,
+        status: ParticipantStatus.Joined,
+      });
+      await this.store.updateParticipant(bot.id, {
+        status: ParticipantStatus.Joined,
+        readyAt: null,
+        limitedQueueMode: input.mode,
+        limitedQueuedAt: now,
+      });
+    }
+    await this.track(event.id, 'limited_queued');
+    return this.getSnapshot(joinCode);
+  }
+
+  /**
+   * Moves only fake players through the current Limited gate.
+   * The human still has to tap their own Ready, seat, and confirmations.
+   */
+  async advanceLimitedFakes(
+    joinCode: string,
+    hostToken: string,
+    input: {
+      action: 'ready' | 'seat' | 'seated' | 'ack' | 'report';
+      mode?: LimitedMode;
+      sessionId?: string;
+    },
+  ): Promise<EventSnapshot> {
+    const event = await this.requireHostToken(joinCode, hostToken);
+    const people = await this.store.listParticipants(event.id);
+    const bots = new Set(
+      people.filter((person) => person.isBot).map((person) => person.id),
+    );
+    if (input.action === 'ready') {
+      if (!input.mode || !isLimitedMode(input.mode)) {
+        throw new InvalidEventInputError('Choose the Limited lobby to ready.');
+      }
+      const now = this.now();
+      for (const person of people) {
+        if (
+          !person.isBot ||
+          person.limitedQueueMode !== input.mode ||
+          person.status === ParticipantStatus.Ready
+        ) {
+          continue;
+        }
+        if (
+          person.status !== ParticipantStatus.Joined &&
+          person.status !== ParticipantStatus.Paused
+        ) {
+          continue;
+        }
+        await this.store.updateParticipant(person.id, {
+          status: ParticipantStatus.Ready,
+          readyAt: now,
+          limitedQueueMode: person.limitedQueueMode,
+          limitedQueuedAt: person.limitedQueuedAt,
+        });
+      }
+      return this.getSnapshot(joinCode);
+    }
+
+    const session = input.sessionId
+      ? await this.requireLimitedSession(event.id, input.sessionId)
+      : (await this.store.listLimitedSessions(event.id)).find(
+          (candidate) => !['COMPLETED', 'CANCELLED'].includes(candidate.status),
+        );
+    if (!session) {
+      throw new InvalidParticipantTransitionError(
+        'There is no Limited pod for the fake players to move.',
+      );
+    }
+    if (input.action === 'seat' || input.action === 'seated') {
+      if (session.status !== 'SEATING') {
+        throw new InvalidParticipantTransitionError(
+          'Fake players can only take seats while the pod is choosing chairs.',
+        );
+      }
+      let seats: LimitedSeatState[] = session.participants.map(toSeatState);
+      const seatCount = session.preferredCohortSize ?? session.minCohortSize;
+      if (input.action === 'seat') {
+        for (const row of seats) {
+          if (!bots.has(row.participantId) || row.dropped || row.seat != null) {
+            continue;
+          }
+          const taken = new Set(
+            seats
+              .filter((seat) => !seat.dropped && seat.seat != null)
+              .map((seat) => seat.seat),
+          );
+          let open = 0;
+          for (let seat = 1; seat <= seatCount; seat += 1) {
+            if (!taken.has(seat)) {
+              open = seat;
+              break;
+            }
+          }
+          if (!open) break;
+          seats = applyLimitedSeatChoice(seats, row.participantId, open, seatCount);
+        }
+      } else {
+        for (const row of [...seats]) {
+          if (
+            !bots.has(row.participantId) ||
+            row.dropped ||
+            row.seat == null ||
+            row.seated
+          ) {
+            continue;
+          }
+          seats = confirmLimitedSeat(seats, row.participantId);
+        }
+      }
+      await this.store.saveLimitedTableFlow(session.id, {
+        seats: seats.map((row) => ({
+          participantId: row.participantId,
+          draftSeat: row.seat,
+          seated: row.seated,
+        })),
+      });
+      return this.getSnapshot(joinCode);
+    }
+    if (input.action === 'ack') {
+      if (session.status !== 'DRAFTING' && session.status !== 'DECKBUILDING') {
+        throw new InvalidParticipantTransitionError(
+          'Fake players can only confirm a draft or a deck that is already running.',
+        );
+      }
+      const activeIds = session.participants
+        .filter((row) => row.status !== 'DROPPED')
+        .map((row) => row.participantId);
+      let acked = [...session.phaseAcks];
+      for (const id of activeIds) {
+        if (!bots.has(id) || acked.includes(id)) continue;
+        acked = recordLimitedPhaseAck(acked, id, activeIds).acked;
+      }
+      await this.store.saveLimitedTableFlow(session.id, { phaseAcks: acked });
+      const complete = activeIds.every((id) => acked.includes(id));
+      if (complete && session.status === 'DRAFTING') {
+        await this.moveLimitedPhase(event, session.id, 'DECKBUILDING');
+      } else if (complete && session.status === 'DECKBUILDING') {
+        await this.beginLimitedRound(
+          event,
+          (await this.store.findLimitedSessionById(session.id))!,
+        );
+      }
+      return this.getSnapshot(joinCode);
+    }
+    if (session.status !== 'ROUND_ACTIVE') {
+      throw new InvalidParticipantTransitionError(
+        'Fake matches can only be finished during a round.',
+      );
+    }
+    const round = session.rounds.find(
+      (candidate) => candidate.number === session.currentRound,
+    );
+    const wins = session.matchStructure === 'BO1' ? 1 : 2;
+    for (const match of round?.matches ?? []) {
+      if (match.outcome || !match.playerBId) continue;
+      if (!bots.has(match.playerAId) || !bots.has(match.playerBId)) continue;
+      await this.store.finalizeLimitedMatchResult({
+        matchId: match.id,
+        outcome: 'PLAYER_A_WIN',
+        playerAGameWins: wins,
+        playerBGameWins: 0,
+        reportedAt: this.now(),
+        correctedByParticipantId: match.playerAId,
+      });
+      await this.track(event.id, 'limited_result_reported');
+    }
+    await this.progressLimitedRound(event.id, session.id);
+    return this.getSnapshot(joinCode);
+  }
+
+  async claimLimitedSeat(
+    joinCode: string,
+    participantToken: string,
+    sessionId: string,
+    seat: number,
+  ): Promise<PublicLimitedSession> {
+    const event = await this.requireByJoinCode(joinCode);
+    const participant = await this.requireParticipant(event.id, participantToken);
+    const session = await this.requireLimitedSession(event.id, sessionId);
+    if (session.status !== 'SEATING') {
+      throw new InvalidParticipantTransitionError(
+        'Seats can only change while everyone is choosing chairs.',
+      );
+    }
+    const seatCount = session.preferredCohortSize ?? session.minCohortSize;
+    let next;
+    try {
+      next = applyLimitedSeatChoice(
+        session.participants.map(toSeatState),
+        participant.id,
+        seat,
+        seatCount,
+      );
+    } catch (error) {
+      throw new InvalidEventInputError(
+        error instanceof Error ? error.message : 'That seat is not available.',
+      );
+    }
+    const updated = await this.store.saveLimitedTableFlow(session.id, {
+      seats: next.map((row) => ({
+        participantId: row.participantId,
+        draftSeat: row.seat,
+        seated: row.seated,
+      })),
+    });
+    return toPublicLimitedSession(updated);
+  }
+
+  async confirmLimitedSeated(
+    joinCode: string,
+    participantToken: string,
+    sessionId: string,
+  ): Promise<PublicLimitedSession> {
+    const event = await this.requireByJoinCode(joinCode);
+    const participant = await this.requireParticipant(event.id, participantToken);
+    const session = await this.requireLimitedSession(event.id, sessionId);
+    if (session.status !== 'SEATING') {
+      throw new InvalidParticipantTransitionError(
+        "I'm seated is only used while the pod is choosing chairs.",
+      );
+    }
+    let next;
+    try {
+      next = confirmLimitedSeat(
+        session.participants.map(toSeatState),
+        participant.id,
+      );
+    } catch (error) {
+      throw new InvalidEventInputError(
+        error instanceof Error ? error.message : 'Choose a seat first.',
+      );
+    }
+    const updated = await this.store.saveLimitedTableFlow(session.id, {
+      seats: next.map((row) => ({
+        participantId: row.participantId,
+        draftSeat: row.seat,
+        seated: row.seated,
+      })),
+    });
+    return toPublicLimitedSession(updated);
+  }
+
+  async acknowledgeLimitedPhase(
+    joinCode: string,
+    participantToken: string,
+    sessionId: string,
+  ): Promise<PublicLimitedSession> {
+    const event = await this.requireByJoinCode(joinCode);
+    const participant = await this.requireParticipant(event.id, participantToken);
+    const session = await this.requireLimitedSession(event.id, sessionId);
+    if (session.status !== 'DRAFTING' && session.status !== 'DECKBUILDING') {
+      throw new InvalidParticipantTransitionError(
+        'That confirmation is not open right now.',
+      );
+    }
+    const activeIds = session.participants
+      .filter((row) => row.status !== 'DROPPED')
+      .map((row) => row.participantId);
+    let recorded;
+    try {
+      recorded = recordLimitedPhaseAck(
+        session.phaseAcks,
+        participant.id,
+        activeIds,
+      );
+    } catch (error) {
+      throw new InvalidParticipantTransitionError(
+        error instanceof Error ? error.message : 'You are not in this pod.',
+      );
+    }
+    await this.store.saveLimitedTableFlow(session.id, {
+      phaseAcks: recorded.acked,
+    });
+    if (!recorded.complete) {
+      return toPublicLimitedSession(
+        (await this.store.findLimitedSessionById(session.id))!,
+      );
+    }
+    if (session.status === 'DRAFTING') {
+      return this.moveLimitedPhase(event, session.id, 'DECKBUILDING');
+    }
+    return this.beginLimitedRound(
+      event,
+      (await this.store.findLimitedSessionById(session.id))!,
     );
   }
 
@@ -1026,6 +1397,25 @@ export class EventService {
   ): Promise<PublicLimitedSession> {
     const event = await this.requireHostToken(joinCode, hostToken);
     const session = await this.requireLimitedSession(event.id, sessionId);
+    if (
+      session.status === 'SEATING' &&
+      (status === 'DRAFTING' || status === 'DECKBUILDING') &&
+      !everyoneSeated(session.participants.map(toSeatState))
+    ) {
+      throw new InvalidParticipantTransitionError(
+        "Every player has to choose a seat and tap I'm seated before this can start.",
+      );
+    }
+    return this.moveLimitedPhase(event, session.id, status, durationSeconds);
+  }
+
+  private async moveLimitedPhase(
+    event: StoredEvent,
+    sessionId: string,
+    status: LimitedSessionStatus,
+    durationSeconds?: number,
+  ): Promise<PublicLimitedSession> {
+    const session = await this.requireLimitedSession(event.id, sessionId);
     const allowed = nextLimitedPhases(session);
     if (!allowed.includes(status)) {
       throw new InvalidParticipantTransitionError(
@@ -1108,6 +1498,13 @@ export class EventService {
   ): Promise<PublicLimitedSession> {
     const event = await this.requireHostToken(joinCode, hostToken);
     const session = await this.requireLimitedSession(event.id, sessionId);
+    return this.beginLimitedRound(event, session);
+  }
+
+  private async beginLimitedRound(
+    event: StoredEvent,
+    session: StoredLimitedSession,
+  ): Promise<PublicLimitedSession> {
     if (
       session.status !== 'BETWEEN_ROUNDS' &&
       session.status !== 'DECKBUILDING'
@@ -1139,6 +1536,9 @@ export class EventService {
         participantId: participant.participantId,
         displayName: participant.displayName,
         dropped: participant.status === 'DROPPED',
+        ...(participant.draftSeat != null
+          ? { draftSeat: participant.draftSeat }
+          : {}),
       })),
       previousMatches: session.rounds.flatMap((round) =>
         round.matches.map(toLimitedMatch),
@@ -1156,12 +1556,6 @@ export class EventService {
         (left, right) =>
           left.sortOrder - right.sortOrder || left.id.localeCompare(right.id),
       );
-    const tableMatches = paired.matches.filter((match) => match.playerBId);
-    if (tables.length < tableMatches.length) {
-      throw new InvalidParticipantTransitionError(
-        `Starting this round needs ${tableMatches.length} free tables.`,
-      );
-    }
     let tableIndex = 0;
     const now = this.now();
     await this.store.createLimitedRound({
@@ -1170,7 +1564,10 @@ export class EventService {
       status: 'ACTIVE',
       startedAt: now,
       matches: paired.matches.map((match) => {
-        const table = match.playerBId ? tables[tableIndex++] : undefined;
+        const table =
+          match.playerBId && tableIndex < tables.length
+            ? tables[tableIndex++]
+            : undefined;
         return {
           position: match.position,
           playerAId: match.playerAId,
@@ -2686,6 +3083,8 @@ export class EventService {
       label?: string;
       draftTableIds?: string[];
       automatic: boolean;
+      readyOnly?: boolean;
+      leaveSeatsOpen?: boolean;
     },
   ): Promise<StoredLimitedSession> {
     const queue = await this.limitedQueue(event.id, config.mode);
@@ -2693,9 +3092,14 @@ export class EventService {
       options.participantCount ??
       config.preferredCohortSize ??
       config.minCohortSize;
-    if (!Number.isInteger(target) || target < 1 || queue.length < target) {
+    const pool = options.readyOnly
+      ? queue.filter((person) => person.status === ParticipantStatus.Ready)
+      : queue;
+    if (!Number.isInteger(target) || target < 1 || pool.length < target) {
       throw new InvalidParticipantTransitionError(
-        `The ${config.mode} queue does not have ${target} waiting players.`,
+        options.readyOnly
+          ? `${pool.length} of ${target} players are ready. Assign tables once everyone you need has tapped Ready.`
+          : `The ${config.mode} queue does not have ${target} waiting players.`,
       );
     }
     const allowUndersizedLaunch =
@@ -2714,17 +3118,18 @@ export class EventService {
         error instanceof Error ? error.message : 'Invalid Limited cohort.',
       );
     }
-    const selected = queue.slice(0, target);
-    const seats = config.mode === 'SEALED'
-      ? new Map<string, number>()
-      : new Map(
-          deterministicDraftSeats(selected.map((person) => person.id)).map(
-            (seat) => [seat.participantId, seat.seat],
-          ),
-        );
+    const selected = pool.slice(0, target);
+    const seats =
+      options.leaveSeatsOpen || config.mode === 'SEALED'
+        ? new Map<string, number>()
+        : new Map(
+            deterministicDraftSeats(selected.map((person) => person.id)).map(
+              (seat) => [seat.participantId, seat.seat],
+            ),
+          );
     const totalRounds =
       config.totalRounds === 'AUTO'
-        ? defaultLimitedRounds(selected.length)
+        ? plannedLimitedRounds(config.mode, selected.length)
         : config.totalRounds;
     const sequence = (await this.store.listLimitedSessions(event.id)).filter(
       (session) => session.mode === config.mode,
@@ -2799,8 +3204,23 @@ export class EventService {
         timer: null,
       });
       await this.track(eventId, 'limited_phase_changed');
+      const event = await this.store.findEventById(eventId);
+      if (event) {
+        try {
+          return await this.beginLimitedRound(
+            event,
+            await this.requireLimitedSession(eventId, session.id),
+          );
+        } catch (error) {
+          if (!(error instanceof InvalidParticipantTransitionError)) {
+            throw error;
+          }
+        }
+      }
     }
-    return toPublicLimitedSession(session);
+    return toPublicLimitedSession(
+      await this.requireLimitedSession(eventId, session.id),
+    );
   }
 
   private async scheduleTournamentMatches(
@@ -3313,6 +3733,15 @@ function toLimitedMatch(match: StoredLimitedMatch) {
   };
 }
 
+function toSeatState(participant: StoredLimitedParticipant) {
+  return {
+    participantId: participant.participantId,
+    seat: participant.draftSeat,
+    seated: participant.seatedConfirmed,
+    dropped: participant.status === 'DROPPED',
+  };
+}
+
 function toPublicLimitedSession(
   session: StoredLimitedSession,
   now?: Date,
@@ -3338,6 +3767,7 @@ function toPublicLimitedSession(
       joinedAt: participant.joinedAt.toISOString(),
       assignedAt: participant.assignedAt?.toISOString(),
       draftSeat: participant.draftSeat ?? undefined,
+      seated: participant.seatedConfirmed,
       droppedAt: participant.droppedAt?.toISOString(),
     })),
     rounds,
@@ -3358,25 +3788,23 @@ function toPublicLimitedSession(
     currentRound: session.currentRound ?? undefined,
     totalRounds: session.totalRounds,
     draftTableIds: session.draftTableIds,
-    draftPod:
-      session.mode === 'SEALED'
-        ? undefined
-        : {
-            id: session.id,
-            sessionId: session.id,
-            tableIds: session.draftTableIds,
-            seats: session.participants
-              .filter(
-                (participant) =>
-                  participant.draftSeat !== null &&
-                  participant.status !== 'DROPPED',
-              )
-              .map((participant) => ({
-                participantId: participant.participantId,
-                seat: participant.draftSeat!,
-              }))
-              .sort((left, right) => left.seat - right.seat),
-          },
+    phaseAcks: session.phaseAcks ?? [],
+    draftPod: {
+      id: session.id,
+      sessionId: session.id,
+      tableIds: session.draftTableIds,
+      seats: session.participants
+        .filter(
+          (participant) =>
+            participant.draftSeat !== null &&
+            participant.status !== 'DROPPED',
+        )
+        .map((participant) => ({
+          participantId: participant.participantId,
+          seat: participant.draftSeat!,
+        }))
+        .sort((left, right) => left.seat - right.seat),
+    },
     timer:
       session.timer &&
       now &&

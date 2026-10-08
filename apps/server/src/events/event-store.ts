@@ -306,6 +306,7 @@ export type StoredLimitedParticipant = {
   displayName: string;
   status: LimitedParticipantStatus;
   draftSeat: number | null;
+  seatedConfirmed: boolean;
   joinedAt: Date;
   assignedAt: Date | null;
   droppedAt: Date | null;
@@ -356,6 +357,7 @@ export type StoredLimitedSession = {
   currentRound: number | null;
   totalRounds: number;
   draftTableIds: string[];
+  phaseAcks: string[];
   timer: LimitedTimer | null;
   createdAt: Date;
   startedAt: Date | null;
@@ -560,6 +562,17 @@ export interface EventStore {
   replaceLimitedDraftTables(
     id: string,
     tableIds: string[],
+  ): Promise<StoredLimitedSession>;
+  saveLimitedTableFlow(
+    id: string,
+    input: {
+      seats?: Array<{
+        participantId: string;
+        draftSeat: number | null;
+        seated: boolean;
+      }>;
+      phaseAcks?: string[];
+    },
   ): Promise<StoredLimitedSession>;
   updateLimitedSessionPhase(
     id: string,

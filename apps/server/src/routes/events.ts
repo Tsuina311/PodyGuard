@@ -343,6 +343,31 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
     }
   });
 
+  app.post('/events/:joinCode/limited/assign', async (request, reply) => {
+    const { joinCode } = request.params as { joinCode: string };
+    const body = (request.body ?? {}) as {
+      mode?: unknown;
+      draftTableIds?: unknown;
+    };
+    try {
+      if (!isLimitedMode(body.mode)) {
+        throw new InvalidEventInputError('Choose a valid Limited mode.');
+      }
+      const session = await app.events.assignLimitedTables(
+        normalizeJoinCode(joinCode),
+        bearerToken(request.headers.authorization),
+        {
+          mode: body.mode,
+          draftTableIds: stringArray(body.draftTableIds, 'draftTableIds'),
+        },
+      );
+      await app.live.publish(normalizeJoinCode(joinCode));
+      return { session };
+    } catch (error) {
+      return sendEventError(reply, error);
+    }
+  });
+
   app.post('/events/:joinCode/limited/sessions', async (request, reply) => {
     const { joinCode } = request.params as { joinCode: string };
     const body = (request.body ?? {}) as {
@@ -376,6 +401,74 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
       return sendEventError(reply, error);
     }
   });
+
+  app.post(
+    '/events/:joinCode/limited/sessions/:sessionId/seat',
+    async (request, reply) => {
+      const { joinCode, sessionId } = request.params as {
+        joinCode: string;
+        sessionId: string;
+      };
+      const body = (request.body ?? {}) as { seat?: unknown };
+      try {
+        if (typeof body.seat !== 'number' || !Number.isInteger(body.seat)) {
+          throw new InvalidEventInputError('Choose a seat number.');
+        }
+        const session = await app.events.claimLimitedSeat(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          sessionId,
+          body.seat,
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return { session };
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
+  app.post(
+    '/events/:joinCode/limited/sessions/:sessionId/seated',
+    async (request, reply) => {
+      const { joinCode, sessionId } = request.params as {
+        joinCode: string;
+        sessionId: string;
+      };
+      try {
+        const session = await app.events.confirmLimitedSeated(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          sessionId,
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return { session };
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
+  app.post(
+    '/events/:joinCode/limited/sessions/:sessionId/ack',
+    async (request, reply) => {
+      const { joinCode, sessionId } = request.params as {
+        joinCode: string;
+        sessionId: string;
+      };
+      try {
+        const session = await app.events.acknowledgeLimitedPhase(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          sessionId,
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return { session };
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
 
   app.post(
     '/events/:joinCode/limited/sessions/:sessionId/launch',
@@ -1356,6 +1449,63 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
       );
       await app.live.publish(normalizeJoinCode(joinCode));
       return result;
+    } catch (error) {
+      return sendEventError(reply, error);
+    }
+  });
+
+  app.post('/events/:joinCode/dev/limited-players', async (request, reply) => {
+    const { joinCode } = request.params as { joinCode: string };
+    const body = (request.body ?? {}) as { mode?: unknown; count?: unknown };
+    try {
+      if (!isLimitedMode(body.mode)) {
+        throw new InvalidEventInputError('Choose a valid Limited mode.');
+      }
+      if (typeof body.count !== 'number') {
+        throw new InvalidEventInputError('Say how many fake players to add.');
+      }
+      const snapshot = await app.events.addLimitedFakePlayers(
+        normalizeJoinCode(joinCode),
+        bearerToken(request.headers.authorization),
+        { mode: body.mode, count: body.count },
+      );
+      await app.live.publish(normalizeJoinCode(joinCode));
+      return { snapshot };
+    } catch (error) {
+      return sendEventError(reply, error);
+    }
+  });
+
+  app.post('/events/:joinCode/dev/limited-fakes', async (request, reply) => {
+    const { joinCode } = request.params as { joinCode: string };
+    const body = (request.body ?? {}) as {
+      action?: unknown;
+      mode?: unknown;
+      sessionId?: unknown;
+    };
+    try {
+      const action =
+        body.action === 'ready' ||
+        body.action === 'seat' ||
+        body.action === 'seated' ||
+        body.action === 'ack' ||
+        body.action === 'report'
+          ? body.action
+          : undefined;
+      if (!action) {
+        throw new InvalidEventInputError('Choose what the fake players should do.');
+      }
+      const snapshot = await app.events.advanceLimitedFakes(
+        normalizeJoinCode(joinCode),
+        bearerToken(request.headers.authorization),
+        {
+          action,
+          ...(isLimitedMode(body.mode) ? { mode: body.mode } : {}),
+          ...(typeof body.sessionId === 'string' ? { sessionId: body.sessionId } : {}),
+        },
+      );
+      await app.live.publish(normalizeJoinCode(joinCode));
+      return { snapshot };
     } catch (error) {
       return sendEventError(reply, error);
     }

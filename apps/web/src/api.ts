@@ -312,6 +312,53 @@ export function leaveLimitedQueue(joinCode: string, token: string) {
   );
 }
 
+export function assignLimitedTables(
+  joinCode: string,
+  token: string,
+  input: { mode: LimitedMode; draftTableIds?: string[] },
+) {
+  return request<{ session: import('@podyguard/shared').PublicLimitedSession }>(
+    `/events/${joinCode}/limited/assign`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(input),
+    },
+  );
+}
+
+export function claimLimitedSeat(
+  joinCode: string,
+  token: string,
+  sessionId: string,
+  seat: number,
+) {
+  return limitedSessionRequest(joinCode, token, sessionId, '/seat', {
+    method: 'POST',
+    body: JSON.stringify({ seat }),
+  });
+}
+
+export function confirmLimitedSeated(
+  joinCode: string,
+  token: string,
+  sessionId: string,
+) {
+  return limitedSessionRequest(joinCode, token, sessionId, '/seated', {
+    method: 'POST',
+  });
+}
+
+export function acknowledgeLimitedPhase(
+  joinCode: string,
+  token: string,
+  sessionId: string,
+) {
+  return limitedSessionRequest(joinCode, token, sessionId, '/ack', {
+    method: 'POST',
+  });
+}
+
 export function createLimitedSession(
   joinCode: string,
   token: string,
@@ -781,6 +828,40 @@ export function setTournamentMatchBestOf(
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
       body: JSON.stringify({ bestOf }),
+    },
+  );
+}
+
+export function addLimitedFakePlayers(
+  joinCode: string,
+  token: string,
+  input: { mode: LimitedMode; count: number },
+) {
+  return request<{ snapshot: EventSnapshot }>(
+    `/events/${joinCode}/dev/limited-players`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(input),
+    },
+  );
+}
+
+export function advanceLimitedFakes(
+  joinCode: string,
+  token: string,
+  input: {
+    action: 'ready' | 'seat' | 'seated' | 'ack' | 'report';
+    mode?: LimitedMode;
+    sessionId?: string;
+  },
+) {
+  return request<{ snapshot: EventSnapshot }>(
+    `/events/${joinCode}/dev/limited-fakes`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(input),
     },
   );
 }
