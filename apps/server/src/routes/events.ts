@@ -353,7 +353,7 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
       if (!isLimitedMode(body.mode)) {
         throw new InvalidEventInputError('Choose a valid Limited mode.');
       }
-      const session = await app.events.assignLimitedTables(
+      const assigned = await app.events.assignLimitedTables(
         normalizeJoinCode(joinCode),
         bearerToken(request.headers.authorization),
         {
@@ -362,7 +362,7 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
         },
       );
       await app.live.publish(normalizeJoinCode(joinCode));
-      return { session };
+      return assigned;
     } catch (error) {
       return sendEventError(reply, error);
     }
@@ -403,6 +403,32 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
   });
 
   app.post(
+    '/events/:joinCode/limited/sessions/:sessionId/layout',
+    async (request, reply) => {
+      const { joinCode, sessionId } = request.params as {
+        joinCode: string;
+        sessionId: string;
+      };
+      const body = (request.body ?? {}) as { layout?: unknown };
+      try {
+        if (body.layout !== 'square' && body.layout !== 'long') {
+          throw new InvalidEventInputError('Choose a square or a long table.');
+        }
+        const session = await app.events.setLimitedSeatLayout(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          sessionId,
+          body.layout,
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return { session };
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
+  app.post(
     '/events/:joinCode/limited/sessions/:sessionId/seat',
     async (request, reply) => {
       const { joinCode, sessionId } = request.params as {
@@ -437,6 +463,27 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
       };
       try {
         const session = await app.events.confirmLimitedSeated(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          sessionId,
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return { session };
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
+  app.post(
+    '/events/:joinCode/limited/sessions/:sessionId/play',
+    async (request, reply) => {
+      const { joinCode, sessionId } = request.params as {
+        joinCode: string;
+        sessionId: string;
+      };
+      try {
+        const session = await app.events.confirmLimitedPlay(
           normalizeJoinCode(joinCode),
           bearerToken(request.headers.authorization),
           sessionId,

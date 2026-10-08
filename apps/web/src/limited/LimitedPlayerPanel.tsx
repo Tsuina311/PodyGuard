@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import type {
   EventSnapshot,
   LimitedMatchOutcome,
@@ -11,7 +11,9 @@ import {
   acknowledgeLimitedPhase,
   ApiError,
   claimLimitedSeat,
+  confirmLimitedPlay,
   confirmLimitedSeated,
+  setLimitedSeatLayout,
   dropLimitedParticipant,
   joinLimitedQueue,
   leaveLimitedQueue,
@@ -30,6 +32,12 @@ import {
   participantName,
   scoreForOutcome,
 } from './limited-view';
+
+const TrackerView = lazy(() =>
+  import('../tracker/TrackerView').then((module) => ({
+    default: module.TrackerView,
+  })),
+);
 
 export function LimitedPlayerPanel({
   snapshot,
@@ -52,6 +60,7 @@ export function LimitedPlayerPanel({
     participant.limitedQueueMode ?? enabled[0]?.mode ?? 'BOOSTER_DRAFT',
   );
   const [busy, setBusy] = useState(false);
+  const [showTracker, setShowTracker] = useState(false);
   const session = activeLimitedSession(snapshot, participant.id);
   const match = currentLimitedMatch(session, participant.id);
   const self = session?.participants.find(
@@ -104,6 +113,7 @@ export function LimitedPlayerPanel({
             : null,
           roundNumber: session.currentRound ?? null,
           totalRounds: session.totalRounds,
+          playStarted: Boolean(session.timer),
         }
       : null,
   });
@@ -128,6 +138,60 @@ export function LimitedPlayerPanel({
     (session ? limitedModeConfig(session.mode).preferredCohortSize ?? 4 : 4);
   const format = session?.mode ?? participant.limitedQueueMode ?? null;
   const seatingSession = session?.status === 'SEATING' ? session : undefined;
+
+  function beginPlay(tracker: boolean) {
+    if (!session) return;
+    if (session.timer) {
+      if (tracker) setShowTracker(true);
+      return;
+    }
+    void act(async () => {
+      const result = await confirmLimitedPlay(
+        snapshot.event.joinCode,
+        token,
+        session.id,
+      );
+      remember(result.session);
+      if (tracker) setShowTracker(true);
+    });
+  }
+
+  if (
+    showTracker &&
+    session &&
+    match?.playerBId &&
+    !match.outcome
+  ) {
+    const opponentId =
+      match.playerAId === participant.id ? match.playerBId : match.playerAId;
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col bg-void">
+        {session.timer ? (
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-[70] px-3 pt-2">
+            <LimitedTimerDisplay timer={session.timer} compact />
+          </div>
+        ) : null}
+        <Suspense fallback={null}>
+          <TrackerView
+            storageKey={`podyguard.tracker.limited.${snapshot.event.joinCode}.${match.id}`}
+            players={[
+              { id: participant.id, name: participant.displayName, commanders: [] },
+              {
+                id: opponentId,
+                name: participantName(session, opponentId),
+                commanders: [],
+              },
+            ]}
+            gameMode="duel"
+            rulesFormat="normal"
+            requeueOnFinish={false}
+            onFinish={async () => setShowTracker(false)}
+            onQuit={() => setShowTracker(false)}
+          />
+        </Suspense>
+      </div>
+    );
+  }
 
   return (
     <Panel
@@ -241,6 +305,22 @@ export function LimitedPlayerPanel({
             seatCount={seatCount}
             selfId={participant.id}
             disabled={busy}
+            layout={seatingSession.seatLayout === 'long' ? 'long' : 'square'}
+            onLayout={
+              seatCount === 4
+                ? (layout) => {
+                    void act(async () => {
+                      const result = await setLimitedSeatLayout(
+                        snapshot.event.joinCode,
+                        token,
+                        seatingSession.id,
+                        layout,
+                      );
+                      remember(result.session);
+                    });
+                  }
+                : undefined
+            }
             occupants={seatingSession.participants
               .filter((row) => row.draftSeat && row.status !== 'DROPPED')
               .map((row) => ({
@@ -309,6 +389,28 @@ export function LimitedPlayerPanel({
               ? `Result: ${match.outcome.replaceAll('_', ' ')}`
               : `Best of ${match.bestOf}`}
           </p>
+          {!match.outcome && match.playerBId ? (
+            <div className="mb-3 flex flex-col gap-2">
+              <Button
+                variant="neon"
+                block
+                disabled={busy}
+                onClick={() => beginPlay(true)}
+              >
+                Use life tracker
+              </Button>
+              {session.timer ? null : (
+                <Button
+                  variant="glass"
+                  block
+                  disabled={busy}
+                  onClick={() => beginPlay(false)}
+                >
+                  Start without life tracker
+                </Button>
+              )}
+            </div>
+          ) : null}
           {!match.outcome && match.playerBId ? (
             <div className="grid grid-cols-2 gap-2">
               {(['PLAYER_A_WIN', 'PLAYER_B_WIN', 'DRAW', 'DOUBLE_LOSS'] as const).map(

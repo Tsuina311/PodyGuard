@@ -11,6 +11,7 @@ import {
   limitedDeckbuildingTitle,
   limitedDraftInstructions,
   limitedHostCue,
+  limitedTablesNeeded,
   limitedPlayerCue,
   recordLimitedPhaseAck,
   type LimitedSeatState,
@@ -63,6 +64,36 @@ describe('Limited flow copy', () => {
       action: 'assign',
       actionLabel: 'Assign to tables',
     });
+    expect(limitedTablesNeeded(4, 3)).toBe(12);
+    expect(
+      limitedHostCue({
+        mode: 'PICK_TWO_DRAFT',
+        podSize: 4,
+        tableCount: 3,
+        joined: 9,
+        ready: 9,
+        deckMinutes: 30,
+        roundMinutes: 50,
+        draftMinutes: 50,
+        session: null,
+      }),
+    ).toMatchObject({
+      action: 'none',
+      detail: expect.stringContaining('9 of 12 ready for 3 tables'),
+    });
+    expect(
+      limitedHostCue({
+        mode: 'PICK_TWO_DRAFT',
+        podSize: 4,
+        tableCount: 3,
+        joined: 12,
+        ready: 12,
+        deckMinutes: 30,
+        roundMinutes: 50,
+        draftMinutes: 50,
+        session: null,
+      }).action,
+    ).toBe('assign');
   });
 
   it('walks seating, draft confirmation, and deckbuilding for Pick-Two', () => {
@@ -167,6 +198,47 @@ describe('Limited flow copy', () => {
     expect(deck.title).toBe(limitedDeckbuildingTitle());
     expect(deck.title).toBe('Time to make the best deck!');
     expect(deck.actionLabel).toBe('Deck is ready');
+
+    const waiting = limitedPlayerCue({
+      mode: 'PICK_TWO_DRAFT',
+      inLobby: true,
+      ready: true,
+      session: {
+        status: 'ROUND_ACTIVE',
+        mode: 'PICK_TWO_DRAFT',
+        tableLabel: 'Table 1',
+        seat: 1,
+        seated: true,
+        phaseAckCount: 0,
+        selfAcked: false,
+        opponentName: 'Bea',
+        roundNumber: 1,
+        totalRounds: 3,
+        playStarted: false,
+      },
+    });
+    expect(waiting.action).toBe('start-play');
+    expect(waiting.detail).toContain('Use the life tracker');
+    expect(
+      limitedHostCue({
+        mode: 'PICK_TWO_DRAFT',
+        podSize: 4,
+        joined: 4,
+        ready: 4,
+        deckMinutes: 25,
+        roundMinutes: 40,
+        session: {
+          status: 'ROUND_ACTIVE',
+          seated: 4,
+          active: 4,
+          phaseAckCount: 0,
+          tableLabel: 'Table 1',
+          roundNumber: 1,
+          totalRounds: 3,
+          playStarted: false,
+        },
+      }).detail,
+    ).toContain('pause that clock for this table');
   });
 
   it('uses one-card packs for Booster Draft and skips the draft for Sealed', () => {

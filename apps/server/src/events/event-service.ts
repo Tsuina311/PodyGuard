@@ -28,6 +28,7 @@ import {
   deterministicDraftSeats,
   everyoneSeated,
   applyLimitedSeatChoice,
+  limitedTablesNeeded,
   confirmLimitedSeat,
   recordLimitedPhaseAck,
   isLimitedMode,
@@ -911,39 +912,60 @@ export class EventService {
     joinCode: string,
     hostToken: string,
     input: { mode: LimitedMode; draftTableIds?: string[] },
-  ): Promise<PublicLimitedSession> {
+  ): Promise<{ session: PublicLimitedSession; snapshot: EventSnapshot }> {
     const event = await this.requireHostToken(joinCode, hostToken);
     const config = requireEnabledLimitedConfig(event, input.mode);
-    const target = config.preferredCohortSize ?? config.minCohortSize;
-    let draftTableIds = input.draftTableIds?.filter((id) => id.length > 0);
-    if (!draftTableIds?.length) {
-      const tables = (await this.store.listTables(event.id))
-        .filter((table) => table.status === PhysicalTableStatus.Free)
-        .sort(
-          (left, right) =>
-            left.sortOrder - right.sortOrder || left.id.localeCompare(right.id),
-        );
-      const table = tables[0];
-      if (!table) {
-        throw new InvalidParticipantTransitionError(
-          'There is no free table to assign. Free a table, then try again.',
-        );
-      }
-      draftTableIds = [table.id];
+    const podSize = config.preferredCohortSize ?? config.minCohortSize;
+    let tables = (await this.store.listTables(event.id))
+      .filter((table) => table.status === PhysicalTableStatus.Free)
+      .sort(
+        (left, right) =>
+          left.sortOrder - right.sortOrder || left.id.localeCompare(right.id),
+      );
+    const requested = input.draftTableIds?.filter((id) => id.length > 0);
+    if (requested?.length) {
+      const allowed = new Set(tables.map((table) => table.id));
+      tables = requested
+        .filter((id) => allowed.has(id))
+        .map((id) => tables.find((table) => table.id === id)!)
+        .filter(Boolean);
     }
-    const created = await this.createLimitedSessionFromQueue(event, config, {
-      participantCount: target,
-      draftTableIds,
-      automatic: false,
-      readyOnly: true,
-      leaveSeatsOpen: true,
-    });
-    const updated = await this.store.updateLimitedSessionPhase(created.id, {
-      status: 'SEATING',
-      startedAt: this.now(),
-    });
-    await this.track(event.id, 'limited_phase_changed');
-    return toPublicLimitedSession(updated);
+    if (tables.length === 0) {
+      throw new InvalidParticipantTransitionError(
+        'There is no free table to assign. Free a table, then try again.',
+      );
+    }
+    const needed = limitedTablesNeeded(podSize, tables.length);
+    const ready = (await this.limitedQueue(event.id, config.mode)).filter(
+      (person) => person.status === ParticipantStatus.Ready,
+    ).length;
+    if (ready < needed) {
+      throw new InvalidParticipantTransitionError(
+        `${ready} of ${needed} players are ready. ${tables.length} ${
+          tables.length === 1 ? 'table needs' : 'tables each need'
+        } ${podSize}.`,
+      );
+    }
+    let first: PublicLimitedSession | undefined;
+    for (const table of tables) {
+      const created = await this.createLimitedSessionFromQueue(event, config, {
+        participantCount: podSize,
+        draftTableIds: [table.id],
+        automatic: false,
+        readyOnly: true,
+        leaveSeatsOpen: true,
+      });
+      const updated = await this.store.updateLimitedSessionPhase(created.id, {
+        status: 'SEATING',
+        startedAt: this.now(),
+      });
+      await this.track(event.id, 'limited_phase_changed');
+      first ??= toPublicLimitedSession(updated);
+    }
+    return {
+      session: first!,
+      snapshot: await this.getSnapshot(joinCode),
+    };
   }
 
   /**
@@ -1139,6 +1161,32 @@ export class EventService {
     }
     await this.progressLimitedRound(event.id, session.id);
     return this.getSnapshot(joinCode);
+  }
+
+  async setLimitedSeatLayout(
+    joinCode: string,
+    participantToken: string,
+    sessionId: string,
+    layout: 'square' | 'long',
+  ): Promise<PublicLimitedSession> {
+    const event = await this.requireByJoinCode(joinCode);
+    await this.requireParticipant(event.id, participantToken);
+    const session = await this.requireLimitedSession(event.id, sessionId);
+    if (session.status !== 'SEATING') {
+      throw new InvalidParticipantTransitionError(
+        'The table layout can only change while everyone is choosing chairs.',
+      );
+    }
+    const seatCount = session.preferredCohortSize ?? session.minCohortSize;
+    if (seatCount !== 4) {
+      throw new InvalidParticipantTransitionError(
+        'A long table is only for a pod of four.',
+      );
+    }
+    const updated = await this.store.saveLimitedTableFlow(session.id, {
+      seatLayout: layout,
+    });
+    return toPublicLimitedSession(updated);
   }
 
   async claimLimitedSeat(
@@ -1491,6 +1539,48 @@ export class EventService {
     return toPublicLimitedSession(updated);
   }
 
+  async confirmLimitedPlay(
+    joinCode: string,
+    participantToken: string,
+    sessionId: string,
+  ): Promise<PublicLimitedSession> {
+    const event = await this.requireByJoinCode(joinCode);
+    const participant = await this.requireParticipant(event.id, participantToken);
+    const session = await this.requireLimitedSession(event.id, sessionId);
+    if (session.status !== 'ROUND_ACTIVE') {
+      throw new InvalidParticipantTransitionError(
+        'The table can start playing once the pairings are up.',
+      );
+    }
+    const round = session.rounds.find(
+      (candidate) => candidate.number === session.currentRound,
+    );
+    const match = round?.matches.find(
+      (candidate) =>
+        candidate.playerAId === participant.id ||
+        candidate.playerBId === participant.id,
+    );
+    if (!match?.playerBId) {
+      throw new InvalidParticipantTransitionError(
+        'Start play from a match that has an opponent.',
+      );
+    }
+    if (session.timer) {
+      return toPublicLimitedSession(session);
+    }
+    const config = requireLimitedConfig(event, session.mode);
+    const updated = await this.store.updateLimitedSessionPhase(session.id, {
+      status: session.status,
+      timer: startLimitedTimer(
+        'ROUND',
+        config.roundMinutes * 60,
+        this.now().toISOString(),
+      ),
+    });
+    await this.track(event.id, 'limited_phase_changed');
+    return toPublicLimitedSession(updated);
+  }
+
   async startLimitedRound(
     joinCode: string,
     hostToken: string,
@@ -1582,15 +1672,10 @@ export class EventService {
         };
       }),
     });
-    const config = requireLimitedConfig(event, session.mode);
     await this.store.updateLimitedSessionPhase(session.id, {
       status: 'ROUND_ACTIVE',
       currentRound: roundNumber,
-      timer: startLimitedTimer(
-        'ROUND',
-        config.roundMinutes * 60,
-        now.toISOString(),
-      ),
+      timer: null,
     });
     await this.track(event.id, 'limited_round_created');
     await this.track(event.id, 'limited_phase_changed');
@@ -3789,6 +3874,7 @@ function toPublicLimitedSession(
     totalRounds: session.totalRounds,
     draftTableIds: session.draftTableIds,
     phaseAcks: session.phaseAcks ?? [],
+    seatLayout: session.seatLayout === 'long' ? 'long' : 'square',
     draftPod: {
       id: session.id,
       sessionId: session.id,

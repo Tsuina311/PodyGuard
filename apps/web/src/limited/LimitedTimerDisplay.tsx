@@ -21,7 +21,8 @@ export function LimitedTimerDisplay({
   return (
     <div className={compact ? 'text-right' : 'text-center'}>
       <p className="text-muted text-xs tracking-[0.18em] uppercase">
-        {timer.phase.replace('_', ' ')} · {timer.status}
+        {timer.phase === 'ROUND' ? 'Best of' : timer.phase === 'DECKBUILDING' ? 'Deckbuilding' : 'Draft'}{' '}
+        · {timer.status === 'RUNNING' ? 'Running' : timer.status === 'PAUSED' ? 'Paused' : "Time's up"}
       </p>
       <p
         className={`font-mono font-bold tabular-nums ${

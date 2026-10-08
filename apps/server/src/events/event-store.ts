@@ -358,6 +358,7 @@ export type StoredLimitedSession = {
   totalRounds: number;
   draftTableIds: string[];
   phaseAcks: string[];
+  seatLayout: 'square' | 'long';
   timer: LimitedTimer | null;
   createdAt: Date;
   startedAt: Date | null;
@@ -572,6 +573,7 @@ export interface EventStore {
         seated: boolean;
       }>;
       phaseAcks?: string[];
+      seatLayout?: 'square' | 'long';
     },
   ): Promise<StoredLimitedSession>;
   updateLimitedSessionPhase(

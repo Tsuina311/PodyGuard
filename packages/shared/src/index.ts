@@ -136,6 +136,7 @@ export {
   limitedDeckbuildingTitle,
   limitedDraftInstructions,
   limitedHostCue,
+  limitedTablesNeeded,
   limitedPlayerCue,
   recordLimitedPhaseAck,
 } from './limited-flow';

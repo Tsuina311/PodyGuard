@@ -1,4 +1,6 @@
-const LAYOUTS: Record<number, number[][]> = {
+export type LimitedSeatLayout = 'square' | 'long';
+
+const SQUARE: Record<number, number[][]> = {
   4: [
     [0, 1, 0],
     [4, 0, 2],
@@ -16,19 +18,21 @@ export function LimitedSeatMap({
   occupants,
   selfId,
   disabled,
+  layout = 'square',
+  onLayout,
   onPick,
 }: {
   seatCount: number;
   occupants: Array<{ participantId: string; displayName: string; seat: number }>;
   selfId: string;
   disabled?: boolean;
+  layout?: LimitedSeatLayout;
+  onLayout?: (layout: LimitedSeatLayout) => void;
   onPick: (seat: number) => void;
 }) {
-  const layout = LAYOUTS[seatCount];
   const bySeat = new Map(occupants.map((row) => [row.seat, row]));
-  const seats = layout
-    ? null
-    : Array.from({ length: seatCount }, (_, index) => index + 1);
+  const square = SQUARE[seatCount];
+  const long = seatCount === 4 && layout === 'long';
 
   function chair(seat: number) {
     const person = bySeat.get(seat);
@@ -57,39 +61,97 @@ export function LimitedSeatMap({
     );
   }
 
-  if (!layout) {
-    return (
-      <div className="flex flex-wrap justify-center gap-2">
-        {seats?.map((seat) => chair(seat))}
-      </div>
-    );
-  }
-
   return (
-    <div className="mx-auto grid w-full max-w-sm gap-2">
-      {layout.map((row, rowIndex) => (
-        <div
-          key={rowIndex}
-          className="grid grid-cols-3 items-center justify-items-center gap-2"
-        >
-          {row.map((seat, column) =>
-            seat === 0 ? (
-              <div
-                key={`${rowIndex}-${column}`}
-                className={
-                  rowIndex === 1 && column === 1
-                    ? 'border-muted/30 text-muted flex size-16 items-center justify-center rounded-full border text-[0.65rem] uppercase tracking-widest'
-                    : 'size-16'
-                }
-              >
-                {rowIndex === 1 && column === 1 ? 'Table' : null}
-              </div>
-            ) : (
-              chair(seat)
-            ),
-          )}
+    <div>
+      {seatCount === 4 && onLayout ? (
+        <div className="mb-3 flex justify-center gap-2">
+          <LayoutButton
+            selected={layout !== 'long'}
+            disabled={disabled}
+            onClick={() => onLayout('square')}
+          >
+            Square
+          </LayoutButton>
+          <LayoutButton
+            selected={layout === 'long'}
+            disabled={disabled}
+            onClick={() => onLayout('long')}
+          >
+            Long table
+          </LayoutButton>
         </div>
-      ))}
+      ) : null}
+      <p className="text-muted mb-3 text-center text-xs">
+        {long
+          ? 'Two players sit across from two. You play the person in front of you first.'
+          : seatCount === 4
+            ? 'One player on each side. You play the person opposite you first.'
+            : 'Tap a seat. You can swap once you have a chair.'}
+      </p>
+      {long ? (
+        <div className="mx-auto flex w-full max-w-xs flex-col gap-2">
+          <div className="grid grid-cols-2 gap-2">{chair(1)}{chair(2)}</div>
+          <div className="border-muted/30 text-muted mx-4 flex h-8 items-center justify-center rounded-full border text-[0.65rem] uppercase tracking-widest">
+            Table
+          </div>
+          <div className="grid grid-cols-2 gap-2">{chair(3)}{chair(4)}</div>
+        </div>
+      ) : square ? (
+        <div className="mx-auto grid w-full max-w-sm gap-2">
+          {square.map((row, rowIndex) => (
+            <div
+              key={rowIndex}
+              className="grid grid-cols-3 items-center justify-items-center gap-2"
+            >
+              {row.map((seat, column) =>
+                seat === 0 ? (
+                  <div
+                    key={`${rowIndex}-${column}`}
+                    className={
+                      rowIndex === 1 && column === 1
+                        ? 'border-muted/30 text-muted flex size-16 items-center justify-center rounded-full border text-[0.65rem] uppercase tracking-widest'
+                        : 'size-16'
+                    }
+                  >
+                    {rowIndex === 1 && column === 1 ? 'Table' : null}
+                  </div>
+                ) : (
+                  chair(seat)
+                ),
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-wrap justify-center gap-2">
+          {Array.from({ length: seatCount }, (_, index) => chair(index + 1))}
+        </div>
+      )}
     </div>
+  );
+}
+
+function LayoutButton({
+  selected,
+  disabled,
+  onClick,
+  children,
+}: {
+  selected: boolean;
+  disabled?: boolean;
+  onClick: () => void;
+  children: string;
+}) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      className={`rounded-lg border px-3 py-1.5 text-xs font-semibold ${
+        selected ? 'border-neon text-neon' : 'border-muted/20 text-muted'
+      }`}
+    >
+      {children}
+    </button>
   );
 }

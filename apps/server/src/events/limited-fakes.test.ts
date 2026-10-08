@@ -19,7 +19,7 @@ describe('Limited fake players', () => {
       payload: {
         name: 'Solo draft',
         hostPin: '2468',
-        tableCount: 2,
+        tableCount: 1,
         limitedModeConfigs: [
           {
             mode: 'PICK_TWO_DRAFT',

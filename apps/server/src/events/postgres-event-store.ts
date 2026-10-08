@@ -1360,6 +1360,7 @@ export class PostgresEventStore implements EventStore {
         seated: boolean;
       }>;
       phaseAcks?: string[];
+      seatLayout?: 'square' | 'long';
     },
   ): Promise<StoredLimitedSession> {
     try {
@@ -1421,10 +1422,14 @@ export class PostgresEventStore implements EventStore {
             );
           }
         }
-        if (input.phaseAcks) {
+        if (input.phaseAcks || input.seatLayout) {
           await tx
             .update(limitedSessions)
-            .set({ phaseAcks: [...input.phaseAcks], updatedAt: new Date() })
+            .set({
+              ...(input.phaseAcks ? { phaseAcks: [...input.phaseAcks] } : {}),
+              ...(input.seatLayout ? { seatLayout: input.seatLayout } : {}),
+              updatedAt: new Date(),
+            })
             .where(eq(limitedSessions.id, id));
         }
       });
@@ -2600,6 +2605,7 @@ async function loadLimitedSession(
     totalRounds: row.totalRounds,
     draftTableIds: row.draftTableIds,
     phaseAcks: row.phaseAcks ?? [],
+    seatLayout: row.seatLayout === 'long' ? 'long' : 'square',
     timer,
     createdAt: row.createdAt,
     startedAt: row.startedAt,

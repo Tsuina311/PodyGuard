@@ -448,6 +448,7 @@ export const limitedSessions = pgTable(
       .notNull()
       .default([]),
     phaseAcks: jsonb('phase_acks').$type<string[]>().notNull().default([]),
+    seatLayout: text('seat_layout').notNull().default('square'),
     timerPhase: limitedTimerPhaseEnum('timer_phase'),
     timerStatus: limitedTimerStatusEnum('timer_status'),
     timerDurationSeconds: integer('timer_duration_seconds'),

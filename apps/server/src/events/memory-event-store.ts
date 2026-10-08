@@ -766,6 +766,7 @@ export class MemoryEventStore implements EventStore {
       totalRounds: input.totalRounds,
       draftTableIds: [...draftTableIds],
       phaseAcks: [],
+      seatLayout: 'square',
       timer: null,
       createdAt,
       startedAt: null,
@@ -951,6 +952,7 @@ export class MemoryEventStore implements EventStore {
         seated: boolean;
       }>;
       phaseAcks?: string[];
+      seatLayout?: 'square' | 'long';
     },
   ): Promise<StoredLimitedSession> {
     const session = this.requireLimitedSession(id);
@@ -977,6 +979,9 @@ export class MemoryEventStore implements EventStore {
     }
     if (input.phaseAcks) {
       session.phaseAcks = [...input.phaseAcks];
+    }
+    if (input.seatLayout) {
+      session.seatLayout = input.seatLayout;
     }
     return session;
   }

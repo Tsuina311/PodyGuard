@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { EventSnapshot, LimitedMode, PublicLimitedSession } from '@podyguard/shared';
+import { limitedTablesNeeded } from '@podyguard/shared';
 import { addLimitedFakePlayers, advanceLimitedFakes, ApiError } from '../api';
 import { useDeveloperMode } from '../developer-mode';
 import { Button } from '../ui/Button';
@@ -33,6 +34,8 @@ export function LimitedDeveloperTools({
     parsedCount >= 1 &&
     parsedCount <= 8;
   const podSize = selected.preferredCohortSize ?? selected.minCohortSize;
+  const freeTables = snapshot.tables.filter((table) => table.status === 'free').length;
+  const seatsNeeded = limitedTablesNeeded(podSize, freeTables);
   const lobby = snapshot.participants.filter(
     (person) => person.limitedQueueMode === selected.mode,
   );
@@ -80,7 +83,9 @@ export function LimitedDeveloperTools({
       <p className="text-muted mb-3 text-xs">
         Fake players join the lobby and stop at every button a friend would tap.
         You still use the play tab for your own Ready, seat, and confirmations.
-        Add them before you assign tables. This pod wants {podSize}; the lobby has {lobby.length}.
+        Add them before you assign tables. Each table wants {podSize}.{' '}
+        {freeTables} {freeTables === 1 ? 'table wants' : 'tables want'} {seatsNeeded}; the lobby has{' '}
+        {lobby.length}.
       </p>
       {configs.length > 1 ? (
         <div className="mb-3 flex flex-wrap gap-2">

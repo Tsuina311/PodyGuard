@@ -317,7 +317,10 @@ export function assignLimitedTables(
   token: string,
   input: { mode: LimitedMode; draftTableIds?: string[] },
 ) {
-  return request<{ session: import('@podyguard/shared').PublicLimitedSession }>(
+  return request<{
+    session: import('@podyguard/shared').PublicLimitedSession;
+    snapshot: import('@podyguard/shared').EventSnapshot;
+  }>(
     `/events/${joinCode}/limited/assign`,
     {
       method: 'POST',
@@ -325,6 +328,18 @@ export function assignLimitedTables(
       body: JSON.stringify(input),
     },
   );
+}
+
+export function setLimitedSeatLayout(
+  joinCode: string,
+  token: string,
+  sessionId: string,
+  layout: 'square' | 'long',
+) {
+  return limitedSessionRequest(joinCode, token, sessionId, '/layout', {
+    method: 'POST',
+    body: JSON.stringify({ layout }),
+  });
 }
 
 export function claimLimitedSeat(
@@ -345,6 +360,16 @@ export function confirmLimitedSeated(
   sessionId: string,
 ) {
   return limitedSessionRequest(joinCode, token, sessionId, '/seated', {
+    method: 'POST',
+  });
+}
+
+export function confirmLimitedPlay(
+  joinCode: string,
+  token: string,
+  sessionId: string,
+) {
+  return limitedSessionRequest(joinCode, token, sessionId, '/play', {
     method: 'POST',
   });
 }

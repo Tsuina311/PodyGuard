@@ -223,6 +223,8 @@ export type PublicLimitedSession = {
   draftTableIds: string[];
   /** Players who have confirmed the current draft or deckbuilding phase. */
   phaseAcks?: string[];
+  /** How the four chairs are drawn while the pod is sitting down. */
+  seatLayout?: 'square' | 'long';
   draftPod?: DraftPod;
   timer?: LimitedTimer;
   createdAt: string;

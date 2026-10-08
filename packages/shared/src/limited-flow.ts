@@ -19,6 +19,7 @@ export type LimitedPlayerAction =
   | 'seated'
   | 'ack-draft'
   | 'ack-deck'
+  | 'start-play'
   | 'none';
 
 export type LimitedHostAction =
@@ -140,6 +141,8 @@ export function limitedPlayerCue(input: {
     opponentName: string | null;
     roundNumber: number | null;
     totalRounds: number | null;
+    /** False while the table has pairings but nobody has started the best-of clock. */
+    playStarted?: boolean;
   } | null;
 }): LimitedCue {
   if (!input.session) {
@@ -234,7 +237,8 @@ export function limitedPlayerCue(input: {
     if (session.selfAcked) {
       return {
         title: 'Deck received',
-        detail: 'Matches start automatically once every deck is ready.',
+        detail:
+          'Pairings appear once every deck is ready. The best-of clock starts when this table begins play.',
         action: 'none',
         actionLabel: null,
       };
@@ -252,11 +256,22 @@ export function limitedPlayerCue(input: {
   }
 
   if (session.status === 'ROUND_ACTIVE') {
+    const roundLabel = `Round ${session.roundNumber ?? 1} of ${session.totalRounds ?? 1}.`;
+    if (session.opponentName && session.playStarted === false) {
+      return {
+        title: `You play ${session.opponentName}`,
+        detail: `${roundLabel} The best-of clock for this table starts when you begin. Use the life tracker, or start without it. Once it is running it stays running in the tracker and on this screen until the host pauses this table.`,
+        action: 'start-play',
+        actionLabel: null,
+      };
+    }
     return {
       title: session.opponentName
         ? `You play ${session.opponentName}`
         : 'You have a bye this round',
-      detail: `Round ${session.roundNumber ?? 1} of ${session.totalRounds ?? 1}. Play the match, then report the result here.`,
+      detail: session.opponentName
+        ? `${roundLabel} The best-of clock keeps running while you use the life tracker and while you do not. Report the result here.`
+        : `${roundLabel} You sit this one out.`,
       action: 'none',
       actionLabel: null,
     };
@@ -297,9 +312,16 @@ export function limitedPlayerCue(input: {
   };
 }
 
+/** Ready players required before every free table can start a pod. */
+export function limitedTablesNeeded(podSize: number, tableCount: number): number {
+  if (tableCount < 1 || podSize < 1) return 0;
+  return podSize * tableCount;
+}
+
 export function limitedHostCue(input: {
   mode: LimitedMode;
   podSize: number;
+  tableCount?: number;
   joined: number;
   ready: number;
   draftMinutes?: number;
@@ -313,6 +335,7 @@ export function limitedHostCue(input: {
     tableLabel: string | null;
     roundNumber: number | null;
     totalRounds: number;
+    playStarted?: boolean;
   } | null;
 }): LimitedCue {
   const clocks =
@@ -321,10 +344,24 @@ export function limitedHostCue(input: {
       : `Draft ${input.draftMinutes ?? 50} min · deckbuilding ${input.deckMinutes} min · rounds ${input.roundMinutes} min.`;
 
   if (!input.session || input.session.status === 'FORMING') {
-    const readyToAssign = input.ready >= input.podSize;
+    const tables = input.tableCount ?? 1;
+    const seats = limitedTablesNeeded(input.podSize, tables);
+    if (tables < 1) {
+      return {
+        title: 'Lobby',
+        detail: `No free table is left for another pod. ${clocks}`,
+        action: 'none',
+        actionLabel: null,
+      };
+    }
+    const readyToAssign = input.ready >= seats;
+    const across =
+      tables === 1
+        ? `${input.ready} of ${seats} ready.`
+        : `${input.ready} of ${seats} ready for ${tables} tables.`;
     return {
       title: 'Lobby',
-      detail: `${input.joined} in the lobby, ${input.ready} of ${input.podSize} ready. Players show up here as soon as they join. ${clocks}`,
+      detail: `${input.joined} in the lobby, ${across} Players show up here as soon as they join. ${clocks}`,
       action: readyToAssign ? 'assign' : 'none',
       actionLabel: readyToAssign ? 'Assign to tables' : null,
     };
@@ -370,7 +407,16 @@ export function limitedHostCue(input: {
   if (session.status === 'DECKBUILDING') {
     return {
       title: limitedDeckbuildingTitle(),
-      detail: `${session.phaseAckCount} of ${session.active} have a deck ready. Matches start on their own when everyone is ready.`,
+      detail: `${session.phaseAckCount} of ${session.active} have a deck ready. Pairings appear when everyone is ready, and the best-of clock waits until the table starts playing.`,
+      action: 'none',
+      actionLabel: null,
+    };
+  }
+
+  if (session.status === 'ROUND_ACTIVE' && session.playStarted === false) {
+    return {
+      title: `Round ${session.roundNumber ?? 1} of ${session.totalRounds}`,
+      detail: `Pairings are up at ${table}. The best-of clock starts when someone there uses the life tracker or starts without it. You can pause that clock for this table, for example while everyone eats.`,
       action: 'none',
       actionLabel: null,
     };
@@ -381,8 +427,8 @@ export function limitedHostCue(input: {
       title: `Round ${session.roundNumber ?? 1} of ${session.totalRounds}`,
       detail:
         input.mode === 'PICK_TWO_DRAFT'
-          ? 'Pick-Two plays the diagonals first, then each remaining opponent at the table.'
-          : 'Pairings are Swiss: similar records play, and the same two players are not rematched while another pairing exists.',
+          ? 'Pick-Two plays the diagonals first, then each remaining opponent at the table. The best-of clock keeps running until you pause this table.'
+          : 'Pairings are Swiss: similar records play, and the same two players are not rematched while another pairing exists. The best-of clock keeps running until you pause this table.',
       action: 'none',
       actionLabel: null,
     };

@@ -6,7 +6,7 @@ import type {
   LimitedMode,
   PublicLimitedSession,
 } from '@podyguard/shared';
-import { limitedHostCue, limitedModeConfig } from '@podyguard/shared';
+import { limitedHostCue, limitedModeConfig, limitedTablesNeeded } from '@podyguard/shared';
 import {
   advanceLimitedPhase,
   ApiError,
@@ -79,10 +79,13 @@ export function LimitedHostPanel({
         {configs.map((config) => {
           const queue = queuedParticipants(snapshot, config.mode);
           const podSize = config.preferredCohortSize ?? config.minCohortSize;
+          const freeTables = snapshot.tables.filter((table) => table.status === 'free').length;
+          const seatsNeeded = limitedTablesNeeded(podSize, freeTables);
           const readyCount = queue.filter((person) => person.status === 'ready').length;
           const cue = limitedHostCue({
             mode: config.mode,
             podSize,
+            tableCount: freeTables,
             joined: queue.length,
             ready: readyCount,
             draftMinutes: config.draftMinutes,
@@ -95,8 +98,8 @@ export function LimitedHostPanel({
             <div key={config.mode} className="rounded-xl border border-white/10 p-3">
               <div className="mb-2 flex items-center justify-between gap-2">
                 <strong className="text-sm">{LIMITED_MODE_LABELS[config.mode]}</strong>
-                <Badge tone={readyCount >= podSize ? 'ready' : 'idle'}>
-                  {readyCount}/{podSize} ready
+                <Badge tone={freeTables > 0 && readyCount >= seatsNeeded ? 'ready' : 'idle'}>
+                  {freeTables > 0 ? `${readyCount}/${seatsNeeded} ready` : `${readyCount} ready`}
                 </Badge>
               </div>
               <p className="mb-2 text-sm font-semibold">{cue.title}</p>
@@ -104,9 +107,9 @@ export function LimitedHostPanel({
               <p className="text-muted mb-3 text-xs">
                 {format.hasDraftPhase
                   ? format.cardsPerPick === 2
-                    ? 'Four players. Take two cards. Pass left, then right, then left. Diagonals play first.'
-                    : 'Eight players. Take one card. Pass left, then right, then left. Then Swiss.'
-                  : 'No draft. Six packs, then Swiss.'}{' '}
+                    ? `Each table seats four. ${freeTables} ${freeTables === 1 ? 'table needs' : 'tables need'} ${seatsNeeded} ready players. Take two cards. Pass left, then right, then left. Diagonals play first.`
+                    : `Each table seats eight. ${freeTables} ${freeTables === 1 ? 'table needs' : 'tables need'} ${seatsNeeded} ready players. Take one card. Pass left, then right, then left. Then Swiss.`
+                  : `Each table seats four. ${freeTables} ${freeTables === 1 ? 'table needs' : 'tables need'} ${seatsNeeded} ready players. No draft. Six packs, then Swiss.`}{' '}
                 {config.matchStructure}.
               </p>
               {queue.length === 0 ? (
@@ -129,11 +132,20 @@ export function LimitedHostPanel({
                 block
                 size="sm"
                 disabled={busy || cue.action !== 'assign'}
-                onClick={() =>
-                  void run(() =>
-                    assignLimitedTables(joinCode, hostToken, { mode: config.mode }),
-                  )
-                }
+                onClick={() => {
+                  setBusy(true);
+                  onError(null);
+                  void assignLimitedTables(joinCode, hostToken, { mode: config.mode })
+                    .then((result) => onSnapshot(result.snapshot))
+                    .catch((caught: unknown) => {
+                      onError(
+                        caught instanceof ApiError
+                          ? caught.message
+                          : 'Limited action failed.',
+                      );
+                    })
+                    .finally(() => setBusy(false));
+                }}
               >
                 {cue.actionLabel ?? 'Assign to tables'}
               </Button>
@@ -231,19 +243,13 @@ function LimitedSessionHostCard({
       </div>
 
       <ol className="mb-3 divide-y divide-white/5 text-sm">
-        {session.participants.map((person, index) => (
+        {session.participants.map((person, index) => {
+          const mark = rosterMark(session, person);
+          return (
           <li key={person.participantId} className="flex flex-wrap items-center gap-2 py-2">
             <span className="w-6 font-mono text-muted">{person.draftSeat ?? '—'}</span>
             <span className="min-w-0 flex-1 truncate">{person.displayName}</span>
-            <Badge tone={person.status === 'DROPPED' ? 'muted' : person.seated ? 'ready' : 'idle'}>
-              {session.status === 'SEATING'
-                ? person.draftSeat
-                  ? person.seated
-                    ? 'Seated'
-                    : `Seat ${person.draftSeat}`
-                  : 'Picking a seat'
-                : person.status}
-            </Badge>
+            <Badge tone={mark.tone}>{mark.label}</Badge>
             {session.status === 'FORMING' ? (
               <>
                 <Button size="sm" variant="ghost" disabled={busy || index === 0} onClick={() => move(index, -1)}>↑</Button>
@@ -268,7 +274,8 @@ function LimitedSessionHostCard({
               </Button>
             ) : null}
           </li>
-        ))}
+          );
+        })}
       </ol>
 
       {session.status === 'FORMING' && queued.length > 0 ? (
@@ -416,9 +423,13 @@ function LimitedSessionHostCard({
           </Button>
         ) : null}
         {session.timer?.status === 'RUNNING' ? (
-          <Button variant="glass" disabled={busy} onClick={() => void run(() => updateLimitedTimer(joinCode, hostToken, session.id, 'PAUSE'))}>Pause timer</Button>
+          <Button variant="glass" disabled={busy} onClick={() => void run(() => updateLimitedTimer(joinCode, hostToken, session.id, 'PAUSE'))}>
+            {session.timer.phase === 'ROUND' ? 'Pause this table' : 'Pause timer'}
+          </Button>
         ) : session.timer?.status === 'PAUSED' ? (
-          <Button variant="glass" disabled={busy} onClick={() => void run(() => updateLimitedTimer(joinCode, hostToken, session.id, 'RESUME'))}>Resume timer</Button>
+          <Button variant="glass" disabled={busy} onClick={() => void run(() => updateLimitedTimer(joinCode, hostToken, session.id, 'RESUME'))}>
+            {session.timer.phase === 'ROUND' ? 'Resume this table' : 'Resume timer'}
+          </Button>
         ) : null}
         {session.timer ? (
           <Button variant="glass" disabled={busy} onClick={() => void run(() => updateLimitedTimer(joinCode, hostToken, session.id, 'ADD', { seconds: 300 }))}>+5 minutes</Button>
@@ -447,6 +458,31 @@ function LimitedSessionHostCard({
   );
 }
 
+function rosterMark(
+  session: PublicLimitedSession,
+  person: PublicLimitedSession['participants'][number],
+): { label: string; tone: 'muted' | 'ready' | 'idle' } {
+  if (person.status === 'DROPPED') return { label: 'Dropped', tone: 'muted' };
+  const confirmed = session.phaseAcks?.includes(person.participantId) ?? false;
+  if (session.status === 'SEATING') {
+    if (!person.draftSeat) return { label: 'Picking a seat', tone: 'idle' };
+    return person.seated
+      ? { label: 'Seated', tone: 'ready' }
+      : { label: `Seat ${person.draftSeat}`, tone: 'idle' };
+  }
+  if (session.status === 'DRAFTING') {
+    return confirmed
+      ? { label: 'Draft done', tone: 'ready' }
+      : { label: 'Drafting', tone: 'idle' };
+  }
+  if (session.status === 'DECKBUILDING') {
+    return confirmed
+      ? { label: 'Deck received', tone: 'ready' }
+      : { label: 'Building', tone: 'idle' };
+  }
+  return { label: person.status.replaceAll('_', ' '), tone: 'idle' };
+}
+
 function SessionStep({
   session,
   tableLabel,
@@ -468,6 +504,7 @@ function SessionStep({
       seated: active.filter((person) => person.seated).length,
       active: active.length,
       phaseAckCount: session.phaseAcks?.length ?? 0,
+      playStarted: Boolean(session.timer),
       tableLabel,
       roundNumber: session.currentRound ?? null,
       totalRounds: session.totalRounds,

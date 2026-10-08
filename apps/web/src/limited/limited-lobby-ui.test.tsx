@@ -129,6 +129,36 @@ describe('Limited lobby screens', () => {
     expect(screen.getByText('Ada')).toBeTruthy();
     expect(screen.getByText('Not ready')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Assign to tables' })).toBeDisabled();
+    cleanup();
+
+    const readyNine = Array.from({ length: 9 }, (_, index) =>
+      participant({
+        id: `p${index + 1}`,
+        displayName: `Player ${index + 1}`,
+        status: 'ready',
+      }),
+    );
+    render(
+      <LimitedHostPanel
+        joinCode="DRAFT1"
+        hostToken="host"
+        snapshot={{
+          ...snapshot(readyNine[0]!),
+          participants: readyNine,
+          tables: [1, 2, 3].map((number) => ({
+            id: `t${number}`,
+            label: `Table ${number}`,
+            sortOrder: number,
+            status: 'free' as const,
+            seatedNames: [],
+          })),
+        }}
+        onSession={() => undefined}
+        onError={() => undefined}
+      />,
+    );
+    expect(screen.getByText('9/12 ready')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Assign to tables' })).toBeDisabled();
     expect(screen.queryByRole('button', { name: 'Add fake players' })).toBeNull();
     cleanup();
 
@@ -203,5 +233,121 @@ describe('Limited lobby screens', () => {
     );
     expect(screen.getByText('Time to make the best deck!')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Deck is ready' })).toBeTruthy();
+  });
+
+  it('shows Deck received on the host desk for the player who tapped it', () => {
+    render(
+      <LimitedHostPanel
+        joinCode="DRAFT1"
+        hostToken="host"
+        snapshot={snapshot(
+          participant({ status: 'matched' }),
+          session({
+            status: 'DECKBUILDING',
+            phaseAcks: ['p1'],
+            participants: [
+              {
+                participantId: 'p1',
+                displayName: 'Ada',
+                status: 'DECKBUILDING',
+                joinedAt: '2026-01-01T00:00:00.000Z',
+                draftSeat: 1,
+                seated: true,
+              },
+              {
+                participantId: 'p2',
+                displayName: 'Bea',
+                status: 'DECKBUILDING',
+                joinedAt: '2026-01-01T00:00:00.000Z',
+                draftSeat: 2,
+                seated: true,
+              },
+            ],
+          }),
+        )}
+        onSession={() => undefined}
+        onError={() => undefined}
+      />,
+    );
+    expect(screen.getByText('Deck received')).toBeTruthy();
+    expect(screen.getByText('Building')).toBeTruthy();
+    expect(screen.getByText(/1 of 2 have a deck ready/)).toBeTruthy();
+  });
+
+  it('waits for the table to start the best-of clock, then lets the host pause that table', () => {
+    const me = participant({ status: 'matched' });
+    const round = session({
+      status: 'ROUND_ACTIVE',
+      currentRound: 1,
+      participants: [
+        {
+          participantId: 'p1',
+          displayName: 'Ada',
+          status: 'PLAYING',
+          joinedAt: '2026-01-01T00:00:00.000Z',
+          draftSeat: 1,
+          seated: true,
+        },
+        {
+          participantId: 'p2',
+          displayName: 'Bea',
+          status: 'PLAYING',
+          joinedAt: '2026-01-01T00:00:00.000Z',
+          draftSeat: 3,
+          seated: true,
+        },
+      ],
+      rounds: [
+        {
+          id: 'r1',
+          number: 1,
+          status: 'ACTIVE',
+          matches: [
+            {
+              id: 'm1',
+              roundNumber: 1,
+              position: 1,
+              playerAId: 'p1',
+              playerBId: 'p2',
+              status: 'PLAYING',
+              bestOf: 3,
+            },
+          ],
+          createdAt: '2026-01-01T00:00:00.000Z',
+        },
+      ],
+    });
+    render(
+      <LimitedPlayerPanel
+        snapshot={snapshot(me, round)}
+        participant={me}
+        token="player"
+        onSnapshot={() => undefined}
+        onError={() => undefined}
+      />,
+    );
+    expect(screen.getByRole('button', { name: 'Use life tracker' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Start without life tracker' })).toBeTruthy();
+    cleanup();
+
+    render(
+      <LimitedHostPanel
+        joinCode="DRAFT1"
+        hostToken="host"
+        snapshot={snapshot(me, {
+          ...round,
+          timer: {
+            phase: 'ROUND',
+            status: 'RUNNING',
+            durationSeconds: 2400,
+            startedAt: '2026-01-01T00:00:00.000Z',
+            targetAt: '2099-01-01T00:00:00.000Z',
+          },
+        })}
+        onSession={() => undefined}
+        onError={() => undefined}
+      />,
+    );
+    expect(screen.getByRole('button', { name: 'Pause this table' })).toBeTruthy();
   });
 });

@@ -10,6 +10,7 @@ async function fixture(
     preferredCohortSize?: number;
     allowUndersizedLaunch?: boolean;
     totalRounds?: number;
+    tableCount?: number;
   } = {},
 ) {
   const identity = createIdentityBoundary({
@@ -26,7 +27,7 @@ async function fixture(
     payload: {
       name: 'Limited Night',
       hostPin: '2468',
-      tableCount: 4,
+      tableCount: options.tableCount ?? 1,
       limitedModeConfigs: [
         {
           mode,
@@ -231,8 +232,12 @@ describe('Limited server orchestration', () => {
     expect(active.status).toBe('ROUND_ACTIVE');
     expect(active.rounds[0]?.matches).toHaveLength(4);
     expect(
-      new Set(active.rounds[0]?.matches.map((match) => match.tableId)).size,
-    ).toBe(4);
+      new Set(
+        active.rounds[0]?.matches
+          .map((match) => match.tableId)
+          .filter((tableId) => tableId),
+      ).size,
+    ).toBe(1);
 
     const first = active.rounds[0]!.matches[0]!;
     const firstReporter = players.find((player) => player.id === first.playerAId)!;
@@ -370,7 +375,9 @@ describe('Limited server orchestration', () => {
   });
 
   it('lets the host reorder a draft and reuse draft tables for play', async () => {
-    const { app, joinCode, hostToken, players } = await fixture('BOOSTER_DRAFT');
+    const { app, joinCode, hostToken, players } = await fixture('BOOSTER_DRAFT', {
+      tableCount: 4,
+    });
     for (const player of players) {
       await app.inject({
         method: 'PUT',
@@ -594,6 +601,26 @@ describe('Limited server orchestration', () => {
       [bySeat.get(1), bySeat.get(3)],
       [bySeat.get(2), bySeat.get(4)],
     ]);
+    expect(playing?.timer).toBeUndefined();
+    const started = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/limited/sessions/${seating.id}/play`,
+      headers: { authorization: `Bearer ${players[0]!.token}` },
+    });
+    expect(started.statusCode).toBe(200);
+    const startedTimer = (
+      started.json() as { session: { timer?: { phase: string; startedAt: string } } }
+    ).session.timer;
+    expect(startedTimer?.phase).toBe('ROUND');
+    const again = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/limited/sessions/${seating.id}/play`,
+      headers: { authorization: `Bearer ${players[1]!.token}` },
+    });
+    expect(
+      (again.json() as { session: { timer?: { startedAt: string } } }).session.timer
+        ?.startedAt,
+    ).toBe(startedTimer?.startedAt);
 
     for (const match of playing?.rounds[0]?.matches ?? []) {
       const reporter = players.find((player) => player.id === match.playerAId)!;
@@ -617,6 +644,67 @@ describe('Limited server orchestration', () => {
       [bySeat.get(1), bySeat.get(2)],
       [bySeat.get(3), bySeat.get(4)],
     ]);
+    await app.close();
+  });
+
+  it('waits for every Pick-Two table before assigning pods', async () => {
+    const { app, joinCode, hostToken, players } = await fixture('PICK_TWO_DRAFT', {
+      tableCount: 3,
+    });
+    const extra: Array<{ token: string }> = [];
+    for (let index = 0; index < 8; index += 1) {
+      const joined = await app.inject({
+        method: 'POST',
+        url: `/events/${joinCode}/join`,
+        payload: { displayName: `Extra ${index + 1}` },
+      });
+      extra.push(joined.json() as { token: string });
+    }
+    const all = [...players, ...extra];
+    expect(all).toHaveLength(12);
+    await readyAll(app, joinCode, all.slice(0, 9));
+    const short = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/limited/assign`,
+      headers: { authorization: `Bearer ${hostToken}` },
+      payload: { mode: 'PICK_TWO_DRAFT' },
+    });
+    expect(short.statusCode).toBe(409);
+    expect((short.json() as { error: { message: string } }).error.message).toContain(
+      '9 of 12',
+    );
+    await readyAll(app, joinCode, all.slice(9));
+    const assigned = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/limited/assign`,
+      headers: { authorization: `Bearer ${hostToken}` },
+      payload: { mode: 'PICK_TWO_DRAFT' },
+    });
+    expect(assigned.statusCode).toBe(200);
+    const sessions = (
+      assigned.json() as {
+        snapshot: {
+          limitedSessions?: Array<{
+            id: string;
+            status: string;
+            draftTableIds: string[];
+          }>;
+        };
+      }
+    ).snapshot.limitedSessions ?? [];
+    expect(sessions).toHaveLength(3);
+    expect(sessions.every((session) => session.status === 'SEATING')).toBe(true);
+    expect(new Set(sessions.flatMap((session) => session.draftTableIds)).size).toBe(3);
+    const layout = await app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/limited/sessions/${sessions[0]!.id}/layout`,
+      headers: { authorization: `Bearer ${players[0]!.token}` },
+      payload: { layout: 'long' },
+    });
+    expect(layout.statusCode).toBe(200);
+    expect((layout.json() as { session: { seatLayout?: string } }).session.seatLayout).toBe(
+      'long',
+    );
     await app.close();
   });
 });
