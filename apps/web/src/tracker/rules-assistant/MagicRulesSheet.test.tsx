@@ -25,6 +25,13 @@ describe('Magic Rules sheet', () => {
 
     expect(screen.getByRole('heading', { name: 'Trample' })).toBeTruthy();
     expect(screen.getByText('Rule 702.19')).toBeTruthy();
+    expect(
+      screen.getByText(/assign combat damage beyond what is needed/),
+    ).toBeTruthy();
+    expect(screen.queryByText(/Voice input is not available/)).toBeNull();
+    expect(screen.queryByText(/Official wording is not copied/)).toBeNull();
+    expect(screen.queryByText(/Dictation uses your browser/)).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Flying' })).toBeNull();
     expect(screen.getByRole('link', { name: 'Official rules' })).toHaveAttribute(
       'href',
       'https://magic.wizards.com/en/rules',

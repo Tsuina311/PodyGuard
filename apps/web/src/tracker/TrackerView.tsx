@@ -620,14 +620,16 @@ export function TrackerView({
   const { landscape, forceRotate } = useBoardLandscape();
   const boardLive = Boolean(state.firstPlayerId);
   /*
-    An identity is a portrait card scan held close to one player's face, so the
-    phone comes back upright to read it and returns to the table on the way out.
+    Reading a card identity or a rules answer is a portrait page. The phone
+    comes back upright for that, then returns to the landscape table on the
+    way out.
   */
-  const readingIdentity = treacheryRolesOpen || roleCheckOpen;
+  const readingUpright =
+    treacheryRolesOpen || roleCheckOpen || magicRulesOpen;
   useOrientationLock(
-    boardLive ? (readingIdentity ? 'portrait' : 'landscape') : null,
+    boardLive ? (readingUpright ? 'portrait' : 'landscape') : null,
   );
-  useWakeLock(boardLive && !readingIdentity);
+  useWakeLock(boardLive && !treacheryRolesOpen && !roleCheckOpen);
   const screenClass = boardScreenClass(boardLive && forceRotate);
   usePreloadedEliminatedArt();
   const elapsed = useMatchClock(state);
@@ -2527,8 +2529,8 @@ export function TrackerView({
               aria-modal="true"
               aria-label={t('tracker.magicRules.title')}
               className={trackerOverlayClass(
-                boardLive && forceRotate,
-                'z-[70] items-center justify-center bg-void/70 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] backdrop-blur-md',
+                false,
+                'z-[70] bg-void pb-[max(0px,env(safe-area-inset-bottom))] pl-[max(0px,env(safe-area-inset-left))] pr-[max(0px,env(safe-area-inset-right))] pt-[max(0px,env(safe-area-inset-top))]',
               )}
               onClick={(event) => {
                 if (event.target === event.currentTarget) {

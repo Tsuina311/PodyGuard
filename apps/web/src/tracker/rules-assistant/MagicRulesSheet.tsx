@@ -3,12 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Mic, Square, X } from 'lucide-react';
 import { Button } from '../../ui/Button';
 import { cx } from '../../ui/cx';
-import {
-  HEADING_COUNT,
-  INDEXED_RULE_COUNT,
-  RULES_EFFECTIVE_DATE,
-} from './catalog';
-import { CURATED_BY_ID, CURATED_RULES, POPULAR_RULE_IDS } from './curated';
+import { CURATED_BY_ID, POPULAR_RULE_IDS } from './curated';
 import { searchRules } from './search';
 import { speechLanguageOptions, speechLanguageTag } from './speech-languages';
 import type { RulesSearchHit } from './types';
@@ -43,9 +38,10 @@ export function MagicRulesSheet({ onClose }: { onClose: () => void }) {
   const speechError = speech.error
     ? t(speechErrorKey(speech.error))
     : null;
+  const showingResult = result !== null;
 
   return (
-    <section className="border-muted/25 bg-hull flex max-h-[min(88dvh,42rem)] w-full max-w-md flex-col overflow-hidden rounded-2xl border shadow-[0_18px_50px_-24px_var(--color-void)]">
+    <section className="bg-hull flex h-full min-h-0 w-full flex-col">
       <header className="border-muted/15 flex shrink-0 items-center justify-between gap-3 border-b px-4 py-3">
         <h4 className="font-display truncate text-sm leading-tight font-bold">
           {t('tracker.magicRules.title')}
@@ -127,65 +123,74 @@ export function MagicRulesSheet({ onClose }: { onClose: () => void }) {
             )}
           </button>
         </div>
-        <div className="mt-2 flex items-center justify-between gap-2">
-          <label
-            htmlFor="magic-rules-speech-language"
-            className="text-muted shrink-0 text-xs"
-          >
-            {t('tracker.magicRules.speechLanguage')}
-          </label>
-          <select
-            id="magic-rules-speech-language"
-            value={speechLocale}
-            onChange={(event) => setSpeechLocale(event.target.value)}
-            className="border-muted/25 bg-hull text-ink h-9 max-w-[14rem] rounded-lg border px-2 text-sm"
-          >
-            {speechLanguageOptions().map((option) => (
-              <option key={option.locale} value={option.locale}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        {showingResult ? null : (
+          <div className="mt-2 flex items-center justify-between gap-2">
+            <label
+              htmlFor="magic-rules-speech-language"
+              className="text-muted shrink-0 text-xs"
+            >
+              {t('tracker.magicRules.speechLanguage')}
+            </label>
+            <select
+              id="magic-rules-speech-language"
+              value={speechLocale}
+              onChange={(event) => setSpeechLocale(event.target.value)}
+              className="border-muted/25 bg-hull text-ink h-9 max-w-[14rem] rounded-lg border px-2 text-sm"
+            >
+              {speechLanguageOptions().map((option) => (
+                <option key={option.locale} value={option.locale}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </form>
 
       <div
         className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3"
         aria-live="polite"
       >
-        <p className="text-muted mb-3 text-xs leading-relaxed">
-          {speech.listening
-            ? t('tracker.magicRules.listening')
-            : speechError ??
-              (!speech.supported
-                ? t('tracker.magicRules.speechUnsupported')
-                : t('tracker.magicRules.speechPrivacy'))}
-        </p>
+        {speech.listening ? (
+          <p className="text-muted mb-3 text-sm">{t('tracker.magicRules.listening')}</p>
+        ) : null}
+        {speechError ? (
+          <p className="text-muted mb-3 text-sm">{speechError}</p>
+        ) : null}
+        {!showingResult && !speech.supported && !speech.listening ? (
+          <p className="text-muted mb-3 text-sm">
+            {t('tracker.magicRules.speechUnsupported')}
+          </p>
+        ) : null}
 
-        <p className="text-muted mb-2 font-mono text-[0.68rem] tracking-wide uppercase">
-          {t('tracker.magicRules.popular')}
-        </p>
-        <div className="mb-4 flex flex-wrap gap-2">
-          {POPULAR_RULE_IDS.map((id) => {
-            const entry = CURATED_BY_ID.get(id);
-            const label = entry
-              ? uiLocale === 'fr'
-                ? entry.labelFr
-                : entry.title
-              : id;
-            return (
-              <Button
-                key={id}
-                size="sm"
-                variant="glass"
-                className="h-10"
-                onClick={() => runSearch(label)}
-              >
-                {label}
-              </Button>
-            );
-          })}
-        </div>
+        {showingResult ? null : (
+          <>
+            <p className="text-muted mb-2 font-mono text-[0.68rem] tracking-wide uppercase">
+              {t('tracker.magicRules.popular')}
+            </p>
+            <div className="mb-4 flex flex-wrap gap-2">
+              {POPULAR_RULE_IDS.map((id) => {
+                const entry = CURATED_BY_ID.get(id);
+                const label = entry
+                  ? uiLocale === 'fr'
+                    ? entry.labelFr
+                    : entry.title
+                  : id;
+                return (
+                  <Button
+                    key={id}
+                    size="sm"
+                    variant="glass"
+                    className="h-10"
+                    onClick={() => runSearch(label)}
+                  >
+                    {label}
+                  </Button>
+                );
+              })}
+            </div>
+          </>
+        )}
 
         {result?.status === 'none' ? (
           <p className="text-sm leading-relaxed">{t('tracker.magicRules.noResult')}</p>
@@ -227,17 +232,6 @@ export function MagicRulesSheet({ onClose }: { onClose: () => void }) {
           </div>
         ) : null}
       </div>
-
-      <footer className="border-muted/15 text-muted shrink-0 space-y-1 border-t px-4 py-3 text-[0.7rem] leading-relaxed">
-        <p>
-          {t('tracker.magicRules.stats', {
-            rules: INDEXED_RULE_COUNT,
-            headings: HEADING_COUNT,
-            explanations: CURATED_RULES.length,
-          })}
-        </p>
-        <p>{t('tracker.magicRules.coverage', { date: RULES_EFFECTIVE_DATE })}</p>
-      </footer>
     </section>
   );
 }
@@ -301,7 +295,7 @@ function RuleCard({
           <h6 className="mt-3 mb-1 font-mono text-[0.68rem] tracking-wide uppercase">
             {t('tracker.magicRules.explanation')}
           </h6>
-          <p className="text-sm leading-relaxed">{hit.explanation}</p>
+          <p className="text-base leading-relaxed">{hit.explanation}</p>
         </>
       ) : (
         <p className="mt-3 text-sm leading-relaxed">
@@ -313,7 +307,7 @@ function RuleCard({
           <h6 className="mt-3 mb-1 font-mono text-[0.68rem] tracking-wide uppercase">
             {t('tracker.magicRules.example')}
           </h6>
-          <p className="text-sm leading-relaxed">{hit.example}</p>
+          <p className="text-base leading-relaxed">{hit.example}</p>
         </>
       ) : null}
       {related.length > 0 ? (
