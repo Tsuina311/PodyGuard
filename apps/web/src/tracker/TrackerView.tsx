@@ -13,6 +13,7 @@ import {
   Award,
   ArrowUpDown,
   BookOpen,
+  CircleHelp,
   Building2,
   Coins,
   Crosshair,
@@ -109,6 +110,7 @@ import { planFirstPlayerReveal, type RevealHop } from './first-player-reveal';
 import { DungeonTracker } from './DungeonTracker';
 import { DiceToolsSheet } from './DiceToolsSheet';
 import { ModeRulesSheet } from './ModeRulesSheet';
+import { MagicRulesPanel } from './rules-assistant/RulesAssistantFrame';
 import { SchemeSheet } from './SchemeSheet';
 import { AssassinTargetsSheet } from './AssassinTargetsSheet';
 import { TreacheryRolesSheet } from './TreacheryRolesSheet';
@@ -606,6 +608,7 @@ export function TrackerView({
   const [treacheryRolesOpen, setTreacheryRolesOpen] = useState(false);
   const [schemeOpen, setSchemeOpen] = useState(false);
   const [rulesOpen, setRulesOpen] = useState(false);
+  const [magicRulesOpen, setMagicRulesOpen] = useState(false);
   const [lifeDeltas, setLifeDeltas] = useState<Record<string, SeatLifeFlash>>(
     {},
   );
@@ -877,6 +880,7 @@ export function TrackerView({
   const lifeBlockedByOverlay =
     menuOpen ||
     Boolean(diceToolsOpen) ||
+    magicRulesOpen ||
     challengesOpen ||
     schemeOpen ||
     rulesOpen ||
@@ -918,6 +922,7 @@ export function TrackerView({
       !challengesOpen &&
       !schemeOpen &&
       !rulesOpen &&
+      !magicRulesOpen &&
       !assassinTargetsOpen &&
       !assassinVictimId &&
       !treacheryRolesOpen &&
@@ -936,6 +941,7 @@ export function TrackerView({
         setChallengesOpen(false);
         setSchemeOpen(false);
         setRulesOpen(false);
+        setMagicRulesOpen(false);
         setAssassinTargetsOpen(false);
         setAssassinVictimId(null);
         setTreacheryRolesOpen(false);
@@ -955,6 +961,7 @@ export function TrackerView({
     dungeonPlayer,
     menuOpen,
     rulesOpen,
+    magicRulesOpen,
     schemeOpen,
     treacheryRolesOpen,
     lifeEntry,
@@ -2448,6 +2455,10 @@ export function TrackerView({
                   setMenuOpen(false);
                   setRulesOpen(true);
                 }}
+                onMagicRules={() => {
+                  setMenuOpen(false);
+                  setMagicRulesOpen(true);
+                }}
                 onDiceTools={(tool) => {
                   setMenuOpen(false);
                   setDiceToolsOpen(tool);
@@ -2504,6 +2515,32 @@ export function TrackerView({
               <DiceToolsSheet
                 focus={diceToolsOpen}
                 onClose={() => setDiceToolsOpen(false)}
+              />
+            </div>,
+            document.body,
+          )
+        : null}
+      {magicRulesOpen
+        ? createPortal(
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label={t('tracker.magicRules.title')}
+              className={trackerOverlayClass(
+                boardLive && forceRotate,
+                'z-[70] items-center justify-center bg-void/70 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] backdrop-blur-md',
+              )}
+              onClick={(event) => {
+                if (event.target === event.currentTarget) {
+                  setMagicRulesOpen(false);
+                }
+              }}
+            >
+              <MagicRulesPanel
+                onClose={() => setMagicRulesOpen(false)}
+                loadingLabel={t('tracker.magicRules.loading')}
+                failedMessage={t('tracker.magicRules.failed')}
+                closeLabel={t('tracker.magicRules.close')}
               />
             </div>,
             document.body,
@@ -3175,6 +3212,7 @@ function MatchMenu({
   onCheckRole,
   onChallenges,
   onRules,
+  onMagicRules,
   onDiceTools,
   onScheme,
   onTargets,
@@ -3196,6 +3234,7 @@ function MatchMenu({
   onCheckRole?: () => void;
   onChallenges?: () => void;
   onRules: () => void;
+  onMagicRules: () => void;
   onDiceTools: (tool: 'coin' | 'dice') => void;
   onScheme?: () => void;
   onTargets?: () => void;
@@ -3588,6 +3627,15 @@ function MatchMenu({
         {/* Bottom right: help + quit */}
         <MatchMenuPane title={t('tracker.menuSupport')} dense>
           <div className={cx('grid w-full grid-cols-2 gap-1.5', tabletMenuGridClass())}>
+            <Button
+              size="sm"
+              variant="glass"
+              className={menuControlClass('h-9 w-full justify-start px-2.5')}
+              onClick={onMagicRules}
+            >
+              <CircleHelp size={14} aria-hidden />
+              {t('tracker.magicRules.open')}
+            </Button>
             <Button
               size="sm"
               variant="glass"
