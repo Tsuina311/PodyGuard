@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Mic, Square, X } from 'lucide-react';
+import { resolveAppLocale } from '../../i18n/locales';
 import { Button } from '../../ui/Button';
 import { cx } from '../../ui/cx';
 import { CURATED_BY_ID, POPULAR_RULE_IDS } from './curated';
-import { searchRules } from './search';
+import { answerLocale, searchRules } from './search';
 import { speechLanguageOptions, speechLanguageTag } from './speech-languages';
 import type { RulesSearchHit } from './types';
 import {
@@ -14,24 +15,34 @@ import {
 
 export function MagicRulesSheet({ onClose }: { onClose: () => void }) {
   const { t, i18n } = useTranslation();
-  const uiLocale = (i18n.resolvedLanguage ?? i18n.language).slice(0, 2);
+  const uiLocale = resolveAppLocale(i18n.language);
   const [query, setQuery] = useState('');
   const [submitted, setSubmitted] = useState('');
+  const [localeOverride, setLocaleOverride] = useState<string | null>(null);
   const [speechLocale, setSpeechLocale] = useState(uiLocale);
+  const resultLocale = answerLocale(submitted, localeOverride ?? uiLocale);
   const result = useMemo(
-    () => (submitted.trim() ? searchRules(submitted, uiLocale) : null),
-    [submitted, uiLocale],
+    () => (submitted.trim() ? searchRules(submitted, resultLocale) : null),
+    [submitted, resultLocale],
   );
 
-  function runSearch(value: string) {
+  useEffect(() => {
+    if (!result?.completion) {
+      return;
+    }
+    setQuery(result.completion);
+  }, [result]);
+
+  function runSearch(value: string, override?: string | null) {
     setQuery(value);
     setSubmitted(value);
+    setLocaleOverride(override ?? null);
   }
 
   const speech = useSpeechRecognition({
     lang: speechLanguageTag(speechLocale),
     onFinal: (transcript) => {
-      runSearch(transcript);
+      runSearch(transcript, speechLocale);
     },
   });
 
@@ -60,7 +71,7 @@ export function MagicRulesSheet({ onClose }: { onClose: () => void }) {
         className="shrink-0 px-4 pt-3"
         onSubmit={(event) => {
           event.preventDefault();
-          setSubmitted(query);
+          runSearch(query);
         }}
       >
         <div className="flex items-center gap-2">
@@ -81,7 +92,7 @@ export function MagicRulesSheet({ onClose }: { onClose: () => void }) {
                 return;
               }
               event.preventDefault();
-              setSubmitted(query);
+              runSearch(query);
             }}
             className="border-muted/25 bg-black/20 text-ink placeholder:text-muted focus-visible:ring-neon/70 h-12 min-w-0 flex-1 rounded-xl border px-3 text-base outline-none focus-visible:ring-2"
           />

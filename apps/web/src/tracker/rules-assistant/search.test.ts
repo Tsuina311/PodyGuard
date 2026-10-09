@@ -7,7 +7,7 @@ import {
   RULES_EFFECTIVE_DATE,
 } from './catalog';
 import { CURATED_RULES } from './curated';
-import { searchRules } from './search';
+import { answerLocale, searchRules } from './search';
 
 describe('rules search', () => {
   it('recognizes an exact keyword', () => {
@@ -52,6 +52,32 @@ describe('rules search', () => {
     expect(searchRules('trampl', 'en').primary?.id).toBe('trample');
     expect(searchRules('hexprof', 'en').primary?.id).toBe('hexproof');
     expect(searchRules('dubble strike', 'en').primary?.id).toBe('double-strike');
+  });
+
+  it('completes a clipped keyword and suggests when more than one rule fits', () => {
+    const initiative = searchRules('initiat', 'en');
+    expect(initiative.status).toBe('ambiguous');
+    expect(initiative.completion).toBe('initiative');
+    expect(initiative.alternatives.map((hit) => hit.id).sort()).toEqual([
+      'first-strike',
+      'the-initiative',
+    ]);
+
+    const trample = searchRules('pietinem', 'fr');
+    expect(trample.primary?.id).toBe('trample');
+    expect(trample.primary?.title).toBe('Piétinement');
+    expect(trample.completion).toBe('Piétinement');
+    expect(trample.primary?.explanation ?? '').toMatch(/Le piétinement permet/);
+  });
+
+  it('answers a French question in French even when the app language is English', () => {
+    expect(answerLocale('Piétinement', 'en')).toBe('fr');
+    expect(answerLocale('trample', 'en')).toBe('en');
+    expect(answerLocale('trample', 'fr')).toBe('fr');
+    const result = searchRules('Piétinement', answerLocale('Piétinement', 'en'));
+    expect(result.primary?.title).toBe('Piétinement');
+    expect(result.primary?.explanation ?? '').toMatch(/Le piétinement permet/);
+    expect(result.primary?.explanationFallback).toBe(false);
   });
 
   it('does not guess an ambiguous word', () => {

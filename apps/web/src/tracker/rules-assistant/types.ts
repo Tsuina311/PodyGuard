@@ -51,4 +51,6 @@ export interface RulesSearchResult {
   companions: RulesSearchHit[];
   related: RulesSearchHit[];
   alternatives: RulesSearchHit[];
+  /** Canonical spelling when the query was a clipped or partial keyword. */
+  completion: string | null;
 }

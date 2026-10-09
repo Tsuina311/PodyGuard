@@ -117,17 +117,46 @@ const AMBIGUOUS = new Map<string, readonly string[]>(
 
 const PHRASES = new Map<string, string>();
 const HEADINGS = new Map<string, string[]>();
+const FRENCH_MARKERS = new Set<string>();
+const ENGLISH_MARKERS = new Set<string>();
 
 for (const rule of CURATED_RULES) {
+  const frenchLabel = normalizeQuery(rule.labelFr);
+  const englishTitle = normalizeQuery(rule.title);
+  if (frenchLabel) {
+    FRENCH_MARKERS.add(frenchLabel);
+  }
+  if (englishTitle) {
+    ENGLISH_MARKERS.add(englishTitle);
+  }
+  for (const keyword of rule.keywords) {
+    const key = normalizeQuery(keyword);
+    if (!key) {
+      continue;
+    }
+    if (key === frenchLabel) {
+      FRENCH_MARKERS.add(key);
+    } else {
+      ENGLISH_MARKERS.add(key);
+    }
+  }
   if (rule.interactionOf) {
     continue;
   }
-  registerPhrase(normalizeQuery(rule.title), rule.id);
+  registerPhrase(englishTitle, rule.id);
   registerPhrase(normalizeQuery(rule.id.replace(/-/g, ' ')), rule.id);
-  registerPhrase(normalizeQuery(rule.labelFr), rule.id);
+  registerPhrase(frenchLabel, rule.id);
   for (const keyword of rule.keywords) {
     registerPhrase(normalizeQuery(keyword), rule.id);
   }
+}
+
+for (const [phrase] of AMBIGUOUS) {
+  ENGLISH_MARKERS.add(phrase);
+  FRENCH_MARKERS.delete(phrase);
+}
+for (const rule of CURATED_RULES) {
+  FRENCH_MARKERS.delete(normalizeQuery(rule.title));
 }
 
 for (const [id, rule] of RULES_BY_ID) {
@@ -174,7 +203,63 @@ function emptyResult(normalizedQuery: string): RulesSearchResult {
     companions: [],
     related: [],
     alternatives: [],
+    completion: null,
   };
+}
+
+function longestMarker(
+  words: string[],
+  start: number,
+  table: ReadonlySet<string>,
+): number {
+  const max = Math.min(6, words.length - start);
+  for (let length = max; length >= 1; length -= 1) {
+    if (table.has(words.slice(start, start + length).join(' '))) {
+      return length;
+    }
+  }
+  return 0;
+}
+
+/** French questions stay in French even when the rest of the app is not. */
+export function answerLocale(raw: string, uiLocale: string): string {
+  const ui = uiLocale.toLowerCase().slice(0, 2) || 'en';
+  if (ui === 'fr' || queryUsesFrench(raw)) {
+    return 'fr';
+  }
+  const words = stripQuestion(normalizeQuery(raw)).split(' ').filter(Boolean);
+  const prefix = words.length > 0 ? prefixAt(words, 0, ui) : null;
+  if (prefix?.french && prefix.length === words.length) {
+    return 'fr';
+  }
+  return ui;
+}
+
+function queryUsesFrench(raw: string): boolean {
+  const query = stripQuestion(normalizeQuery(raw));
+  if (!query) {
+    return false;
+  }
+  const words = query.split(' ');
+  let french = 0;
+  let english = 0;
+  let index = 0;
+  while (index < words.length) {
+    const frenchLength = longestMarker(words, index, FRENCH_MARKERS);
+    const englishLength = longestMarker(words, index, ENGLISH_MARKERS);
+    if (frenchLength > 0 && frenchLength >= englishLength) {
+      french += frenchLength;
+      index += frenchLength;
+      continue;
+    }
+    if (englishLength > 0) {
+      english += englishLength;
+      index += englishLength;
+      continue;
+    }
+    index += 1;
+  }
+  return french > english;
 }
 
 function bump(scores: Map<string, number>, id: string, score: number) {
@@ -258,6 +343,102 @@ function fuzzyAt(
     }
   }
   return null;
+}
+
+/**
+ * Speech often stops early ("initiat"). A token that is the start of one
+ * keyword completes to that keyword; several keywords become suggestions.
+ */
+function prefixAt(
+  words: string[],
+  start: number,
+  locale: string,
+): { ids: string[]; length: number; phrase: string; french: boolean } | null {
+  const max = Math.min(4, words.length - start);
+  for (let length = max; length >= 1; length -= 1) {
+    const window = words.slice(start, start + length);
+    if (window.some((word) => word.length < 5) || window.every((word) => GLUE.has(word))) {
+      continue;
+    }
+    const entries: Array<{ ids: string[]; phrase: string; extra: number }> = [];
+    const consider = (phrase: string, ids: readonly string[]) => {
+      const phraseWords = phrase.split(' ');
+      if (phraseWords.length !== length) {
+        return;
+      }
+      let extra = 0;
+      let prefixed = false;
+      for (let index = 0; index < length; index += 1) {
+        const left = window[index] ?? '';
+        const right = phraseWords[index] ?? '';
+        if (left === right) {
+          continue;
+        }
+        if (
+          right.startsWith(left) &&
+          right.length - left.length <= 4 &&
+          left[0] === right[0]
+        ) {
+          prefixed = true;
+          extra += right.length - left.length;
+          continue;
+        }
+        return;
+      }
+      if (!prefixed) {
+        return;
+      }
+      entries.push({ ids: [...ids], phrase, extra });
+    };
+    for (const [phrase, id] of PHRASES) {
+      consider(phrase, [id]);
+    }
+    for (const [phrase, ids] of AMBIGUOUS) {
+      consider(phrase, ids);
+    }
+    if (entries.length === 0) {
+      continue;
+    }
+    entries.sort((left, right) => left.extra - right.extra);
+    const extra = entries[0]?.extra ?? 0;
+    const closest = entries.filter((entry) => entry.extra === extra);
+    const ids = [...new Set(closest.flatMap((entry) => entry.ids))];
+    if (ids.length === 0 || ids.length > 4) {
+      continue;
+    }
+    return {
+      ids,
+      length,
+      french: closest.every(
+        (entry) =>
+          FRENCH_MARKERS.has(entry.phrase) && !ENGLISH_MARKERS.has(entry.phrase),
+      ),
+      phrase: completionLabel(
+        closest.map((entry) => entry.phrase),
+        ids,
+        locale,
+      ),
+    };
+  }
+  return null;
+}
+
+function completionLabel(
+  phrases: string[],
+  ids: string[],
+  locale: string,
+): string {
+  if (ids.length === 1) {
+    const rule = CURATED_BY_ID.get(ids[0] ?? '');
+    if (rule) {
+      return displayTitle(rule, locale);
+    }
+  }
+  const wantFrench = locale.toLowerCase().startsWith('fr');
+  const preferred = phrases.find((phrase) =>
+    wantFrench ? FRENCH_MARKERS.has(phrase) : ENGLISH_MARKERS.has(phrase),
+  );
+  return preferred ?? phrases[0] ?? '';
 }
 
 function sameMembers(left: readonly string[], right: readonly string[]): boolean {
@@ -399,6 +580,7 @@ export function searchRules(raw: string, locale: string): RulesSearchResult {
   const words = normalizedQuery.split(' ').filter((word) => !numberWords.has(word));
   const scores = new Map<string, number>();
   const ambiguousGroups: string[][] = [];
+  let completedPhrase: string | null = null;
 
   for (const number of numbers) {
     const curated = CURATED_BY_NUMBER.get(number);
@@ -420,6 +602,20 @@ export function searchRules(raw: string, locale: string): RulesSearchResult {
         bump(scores, id, 70);
       }
       index += ambiguous.length;
+      continue;
+    }
+    const prefix = prefixAt(words, index, locale);
+    if (prefix) {
+      if (prefix.ids.length > 1) {
+        ambiguousGroups.push(prefix.ids);
+      }
+      for (const id of prefix.ids) {
+        bump(scores, id, 85);
+      }
+      if (index === 0 && numbers.length === 0 && index + prefix.length === words.length) {
+        completedPhrase = prefix.phrase;
+      }
+      index += prefix.length;
       continue;
     }
     const fuzzy = fuzzyAt(words, index);
@@ -467,6 +663,7 @@ export function searchRules(raw: string, locale: string): RulesSearchResult {
       companions: [],
       related: [],
       alternatives,
+      completion: completedPhrase,
     };
   }
 
@@ -490,6 +687,7 @@ export function searchRules(raw: string, locale: string): RulesSearchResult {
       companions: [],
       related: relatedHits(interaction.related, locale, exclude),
       alternatives: [],
+      completion: completedPhrase,
     };
   }
 
@@ -529,6 +727,7 @@ export function searchRules(raw: string, locale: string): RulesSearchResult {
     companions,
     related,
     alternatives: [],
+    completion: completedPhrase,
   };
 }
 
