@@ -19,12 +19,9 @@ describe('Magic Rules sheet', () => {
     ).toBeDisabled();
     expect(screen.getByText(/Voice input is not available/)).toBeTruthy();
 
-    fireEvent.change(screen.getByLabelText('Rules question'), {
-      target: { value: 'trample' },
-    });
-    const form = screen.getByLabelText('Rules question').closest('form');
-    expect(form).toBeTruthy();
-    fireEvent.submit(form as HTMLFormElement);
+    const field = screen.getByLabelText('Rules question');
+    fireEvent.change(field, { target: { value: 'trample' } });
+    fireEvent.keyDown(field, { key: 'Enter', code: 'Enter' });
 
     expect(screen.getByRole('heading', { name: 'Trample' })).toBeTruthy();
     expect(screen.getByText('Rule 702.19')).toBeTruthy();
@@ -34,6 +31,16 @@ describe('Magic Rules sheet', () => {
     );
     expect(fetchSpy).not.toHaveBeenCalled();
     fetchSpy.mockRestore();
+  });
+
+  it('searches when the Search button is used', () => {
+    render(<MagicRulesSheet onClose={() => undefined} />);
+    fireEvent.change(screen.getByLabelText('Rules question'), {
+      target: { value: 'haste' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Search' }));
+    expect(screen.getByRole('heading', { name: 'Haste' })).toBeTruthy();
+    expect(screen.getByText('Rule 702.10')).toBeTruthy();
   });
 
   it('opens a popular rule and then a related rule', () => {

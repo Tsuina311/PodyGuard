@@ -19,7 +19,9 @@ export interface SpeechRecognitionLike {
   abort: () => void;
   onresult:
     | ((event: {
-        results: ArrayLike<ArrayLike<{ transcript: string }>>;
+        results: ArrayLike<
+          ArrayLike<{ transcript: string }> & { isFinal?: boolean }
+        >;
       }) => void)
     | null;
   onerror: ((event: { error: string }) => void) | null;
@@ -68,9 +70,21 @@ function errorCode(reason: string): SpeechErrorCode {
 function transcriptFrom(event: {
   results: ArrayLike<ArrayLike<{ transcript: string }>>;
 }): string {
+  const parts: string[] = [];
+  for (let index = 0; index < event.results.length; index += 1) {
+    const alternative = event.results[index]?.[0];
+    if (alternative?.transcript) {
+      parts.push(alternative.transcript);
+    }
+  }
+  return parts.join(' ').replace(/\s+/g, ' ').trim().slice(0, MAX_TRANSCRIPT);
+}
+
+function resultIsFinal(event: {
+  results: ArrayLike<{ isFinal?: boolean }>;
+}): boolean {
   const last = event.results[event.results.length - 1];
-  const alternative = last?.[0];
-  return (alternative?.transcript ?? '').replace(/\s+/g, ' ').trim().slice(0, MAX_TRANSCRIPT);
+  return last?.isFinal !== false;
 }
 
 /**
@@ -107,6 +121,16 @@ export function useSpeechRecognition({
   const mounted = useRef(true);
   const timeoutRef = useRef<number | null>(null);
   const userStop = useRef(false);
+  const heardRef = useRef('');
+  const deliveredRef = useRef('');
+
+  function deliver(transcript: string) {
+    if (!mounted.current || !transcript || transcript === deliveredRef.current) {
+      return;
+    }
+    deliveredRef.current = transcript;
+    onFinalRef.current(transcript);
+  }
 
   function clearTimer() {
     if (timeoutRef.current !== null) {
@@ -146,13 +170,19 @@ export function useSpeechRecognition({
       return;
     }
     userStop.current = true;
-    generation.current += 1;
     activeRef.current = false;
     clearTimer();
-    const recognition = recognitionRef.current;
-    recognitionRef.current = null;
     setListening(false);
-    release(recognition);
+    deliver(heardRef.current);
+    const recognition = recognitionRef.current;
+    try {
+      recognition?.stop();
+    } catch {
+      release(recognition);
+      if (recognitionRef.current === recognition) {
+        recognitionRef.current = null;
+      }
+    }
   }
 
   function start() {
@@ -180,6 +210,8 @@ export function useSpeechRecognition({
     }
 
     userStop.current = false;
+    heardRef.current = '';
+    deliveredRef.current = '';
     generation.current += 1;
     const token = generation.current;
     activeRef.current = true;
@@ -187,7 +219,7 @@ export function useSpeechRecognition({
     recognitionRef.current = recognition;
     recognition.lang = lang;
     recognition.continuous = false;
-    recognition.interimResults = false;
+    recognition.interimResults = true;
     setError(null);
     setListening(true);
 
@@ -199,14 +231,17 @@ export function useSpeechRecognition({
       if (!transcript) {
         return;
       }
-      onFinalRef.current(transcript);
+      heardRef.current = transcript;
+      if (resultIsFinal(event) || userStop.current) {
+        deliver(transcript);
+      }
     };
     recognition.onerror = (event) => {
       if (!mounted.current || token !== generation.current) {
         return;
       }
       const code = errorCode(event.error);
-      if (code === 'aborted' && userStop.current) {
+      if (userStop.current && (code === 'aborted' || code === 'no-speech')) {
         return;
       }
       activeRef.current = false;
@@ -243,7 +278,11 @@ export function useSpeechRecognition({
       generation.current += 1;
       activeRef.current = false;
       setListening(false);
-      setError('timeout');
+      if (heardRef.current) {
+        deliver(heardRef.current);
+      } else {
+        setError('timeout');
+      }
       release(recognition);
       if (recognitionRef.current === recognition) {
         recognitionRef.current = null;

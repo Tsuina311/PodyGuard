@@ -63,7 +63,7 @@ describe('speech recognition', () => {
     ).toBe(Supported);
   });
 
-  it('starts one session from the click, with final results only', () => {
+  it('starts one session from the click and keeps partial speech', () => {
     const { result, created } = harness();
     act(() => {
       result.current.start();
@@ -72,7 +72,7 @@ describe('speech recognition', () => {
     expect(recognition).toBeDefined();
     expect(recognition?.start).toHaveBeenCalledTimes(1);
     expect(recognition?.continuous).toBe(false);
-    expect(recognition?.interimResults).toBe(false);
+    expect(recognition?.interimResults).toBe(true);
     expect(recognition?.lang).toBe('fr-FR');
     expect(result.current.listening).toBe(true);
 
@@ -118,7 +118,51 @@ describe('speech recognition', () => {
     }
   });
 
-  it('cancels and can start again, ignoring the cancelled transcript', () => {
+  it('searches speech already heard when the user presses stop', () => {
+    const { result, created, onFinal } = harness();
+    act(() => {
+      result.current.start();
+    });
+    const recognition = created[0];
+    const interim = Object.assign([{ transcript: 'trample' }], {
+      isFinal: false,
+    });
+    act(() => {
+      recognition?.onresult?.({ results: [interim] });
+    });
+    expect(onFinal).not.toHaveBeenCalled();
+
+    act(() => {
+      result.current.stop();
+    });
+    expect(recognition?.stop).toHaveBeenCalled();
+    expect(recognition?.abort).not.toHaveBeenCalled();
+    expect(onFinal).toHaveBeenCalledWith('trample');
+    expect(result.current.listening).toBe(false);
+    expect(result.current.error).toBeNull();
+  });
+
+  it('uses the final transcript when stop ends the session', () => {
+    const { result, created, onFinal } = harness();
+    act(() => {
+      result.current.start();
+    });
+    const recognition = created[0];
+    act(() => {
+      result.current.stop();
+    });
+    expect(onFinal).not.toHaveBeenCalled();
+    act(() => {
+      recognition?.onresult?.({
+        results: [Object.assign([{ transcript: 'haste' }], { isFinal: true })],
+      });
+      recognition?.onend?.();
+    });
+    expect(onFinal).toHaveBeenCalledWith('haste');
+    expect(result.current.error).toBeNull();
+  });
+
+  it('ignores a transcript from a session that was replaced', () => {
     const { result, created, onFinal } = harness();
     act(() => {
       result.current.start();
@@ -127,17 +171,13 @@ describe('speech recognition', () => {
     act(() => {
       result.current.stop();
     });
-    expect(first?.abort).toHaveBeenCalled();
-    expect(result.current.listening).toBe(false);
-
+    act(() => {
+      result.current.start();
+    });
     act(() => {
       first?.onresult?.({ results: [[{ transcript: 'stale' }]] });
     });
     expect(onFinal).not.toHaveBeenCalled();
-
-    act(() => {
-      result.current.start();
-    });
     expect(created).toHaveLength(2);
     expect(result.current.listening).toBe(true);
   });

@@ -1202,6 +1202,7 @@
       "close": "Close Magic Rules",
       "askLabel": "Rules question",
       "askPlaceholder": "Ask a rules question",
+      "search": "Search",
       "listen": "Dictate a question",
       "stopListening": "Stop dictation",
       "listening": "Listening…",

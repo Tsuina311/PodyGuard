@@ -80,8 +80,23 @@ export function MagicRulesSheet({ onClose }: { onClose: () => void }) {
             value={query}
             placeholder={t('tracker.magicRules.askPlaceholder')}
             onChange={(event) => setQuery(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key !== 'Enter' || event.nativeEvent.isComposing) {
+                return;
+              }
+              event.preventDefault();
+              setSubmitted(query);
+            }}
             className="border-muted/25 bg-black/20 text-ink placeholder:text-muted focus-visible:ring-neon/70 h-12 min-w-0 flex-1 rounded-xl border px-3 text-base outline-none focus-visible:ring-2"
           />
+          <Button
+            type="submit"
+            size="md"
+            variant="neon"
+            className="h-12 shrink-0 px-3"
+          >
+            {t('tracker.magicRules.search')}
+          </Button>
           <button
             type="button"
             aria-label={
