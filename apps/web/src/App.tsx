@@ -49,9 +49,11 @@ export function App() {
   const sandboxConfig = useMatch('/match-config');
   const localLimited = useMatch('/limited');
   const connectivity = useMatch('/connectivity');
+  const wakeDemo = useMatch('/wake');
   const home = useMatch({ path: '/', end: true });
+  // /wake is the same screen with no health timer, so the timed cover stays off.
   const localOnly = Boolean(
-    sandbox || sandboxConfig || localLimited || connectivity,
+    sandbox || sandboxConfig || localLimited || connectivity || wakeDemo,
   );
   const waking = useServerWake() && !localOnly;
   return (
@@ -79,6 +81,7 @@ export function App() {
             <Route path="/e/:joinCode" element={<JoinPage />} />
             <Route path="/host/:joinCode" element={<HostPage />} />
             <Route path="/connectivity" element={<ConnectivityPage />} />
+            <Route path="/wake" element={<ServerWakeScreen />} />
             <Route path="/display" element={<DisplayPairPage />} />
             <Route path="/display/live" element={<DisplayLivePage />} />
             <Route

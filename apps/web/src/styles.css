@@ -149,6 +149,38 @@
   }
 }
 
+/*
+  A tapped letter on the wake screen bursts out of the line, then the button
+  hides itself. 280ms matches LETTER_BURST_MS.
+*/
+@keyframes letter-explode {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+    opacity: 1;
+    text-shadow: 0 0 0 transparent;
+  }
+  40% {
+    transform: translate3d(calc(var(--letter-burst-x, 0px) * 0.45), -0.45em, 0)
+      scale(1.55) rotate(calc(var(--letter-burst-rot, 0deg) * 0.5));
+    opacity: 1;
+    text-shadow: 0 0 10px var(--color-neon);
+  }
+  100% {
+    transform: translate3d(var(--letter-burst-x, 12px), -1.1em, 0) scale(0.35)
+      rotate(var(--letter-burst-rot, 16deg));
+    opacity: 0;
+    text-shadow: 0 0 16px var(--color-neon);
+  }
+}
+
+@utility letter-explode {
+  animation: letter-explode 280ms ease-out forwards;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation-duration: 1ms;
+  }
+}
+
 @utility bg-grid {
   background-image:
     linear-gradient(

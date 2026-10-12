@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useDeveloperMode } from '../developer-mode';
 import { cx } from './cx';
 
@@ -16,6 +17,9 @@ export function Brand({ className }: { className?: string }) {
   const rootRef = useRef<HTMLSpanElement>(null);
   const [showVersion, setShowVersion] = useState(false);
   const [developerMode, setDeveloperMode] = useDeveloperMode();
+  // A tap focuses the dot before click. Focus opens the tip; without this, the
+  // click that follows would toggle it straight back shut.
+  const suppressToggle = useRef(false);
 
   useEffect(() => {
     if (!showVersion) {
@@ -66,8 +70,20 @@ export function Brand({ className }: { className?: string }) {
           aria-label={`PodyGuard version ${__APP_VERSION__}`}
           aria-expanded={showVersion}
           aria-controls={showVersion ? tipId : undefined}
-          onFocus={() => setShowVersion(true)}
-          onClick={() => setShowVersion((open) => !open)}
+          onFocus={() => {
+            suppressToggle.current = true;
+            setShowVersion(true);
+            window.setTimeout(() => {
+              suppressToggle.current = false;
+            }, 0);
+          }}
+          onClick={() => {
+            if (suppressToggle.current) {
+              suppressToggle.current = false;
+              return;
+            }
+            setShowVersion((open) => !open);
+          }}
         >
           <span aria-hidden className="relative flex size-2.5 items-center justify-center">
             <span className="absolute size-2.5 animate-ping rounded-full bg-neon/60" />
@@ -95,6 +111,13 @@ export function Brand({ className }: { className?: string }) {
               >
                 {developerMode ? 'Developer mode on' : 'Developer mode off'}
               </button>
+              <Link
+                to="/wake"
+                data-testid="wake-demo-link"
+                className="border-neon/40 hover:bg-neon/10 rounded-md border px-2 py-1.5 text-left leading-snug"
+              >
+                Wake demo
+              </Link>
             </span>
           </span>
         ) : null}

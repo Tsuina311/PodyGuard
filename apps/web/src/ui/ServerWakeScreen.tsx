@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Brand } from './Brand';
+import { ExplodingSentence } from './ExplodingSentence';
 
 export function ServerWakeScreen() {
   const { t } = useTranslation();
@@ -10,8 +11,8 @@ export function ServerWakeScreen() {
       <h1 className="font-display mb-3 text-3xl font-bold tracking-tight">
         {t('wake.title')}
       </h1>
-      <p className="text-muted max-w-sm text-sm leading-relaxed">
-        {t('wake.message')}
+      <p className="text-muted max-w-sm text-sm leading-relaxed select-none">
+        <ExplodingSentence text={t('wake.message')} />
       </p>
     </section>
   );
