@@ -296,10 +296,133 @@ function longestPhrase(
   return null;
 }
 
+/**
+ * Consonants only, with sounds a recognizer confuses folded together.
+ * "temple" and "trample" land one consonant apart.
+ */
+function soundKey(word: string): string {
+  const prepared = word.replace(/ph/g, 'f').replace(/ck/g, 'k').replace(/qu/g, 'k');
+  let key = '';
+  for (const char of prepared) {
+    if ('aeiouy'.includes(char)) {
+      continue;
+    }
+    const mapped =
+      char === 'b'
+        ? 'p'
+        : char === 'd'
+          ? 't'
+          : char === 'g' || char === 'c' || char === 'q'
+            ? 'k'
+            : char === 'v'
+              ? 'f'
+              : char === 'z'
+                ? 's'
+                : char === 'x'
+                  ? 'ks'
+                  : char;
+    for (const piece of mapped) {
+      if (key.at(-1) !== piece) {
+        key += piece;
+      }
+    }
+  }
+  return key;
+}
+
+/**
+ * Spoken text is already a dictionary word. Match it to a rule name that
+ * sounds alike, not one that shares a spelling. Short names are left alone.
+ */
+function soundAt(
+  words: string[],
+  start: number,
+  locale: string,
+): { ids: string[]; length: number; phrase: string } | null {
+  const max = Math.min(4, words.length - start);
+  for (let length = max; length >= 1; length -= 1) {
+    const window = words.slice(start, start + length);
+    if (window.some((word) => word.length < 4) || window.every((word) => GLUE.has(word))) {
+      continue;
+    }
+    let bestDistance = 2;
+    const entries: Array<{ ids: string[]; phrase: string }> = [];
+    const consider = (phrase: string, ids: readonly string[], distance: number) => {
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        entries.length = 0;
+        entries.push({ ids: [...ids], phrase });
+        return;
+      }
+      if (distance === bestDistance && !entries.some((entry) => entry.phrase === phrase)) {
+        entries.push({ ids: [...ids], phrase });
+      }
+    };
+    const visit = (phrase: string, ids: readonly string[]) => {
+      const phraseWords = phrase.split(' ');
+      if (phraseWords.length !== length || phrase.replace(/ /g, '').length < 6) {
+        return;
+      }
+      let distance = 0;
+      for (let index = 0; index < length; index += 1) {
+        const left = window[index] ?? '';
+        const right = phraseWords[index] ?? '';
+        if (left[0] !== right[0]) {
+          return;
+        }
+        const leftKey = soundKey(left);
+        const rightKey = soundKey(right);
+        if (leftKey.length < 3 || rightKey.length < 3) {
+          return;
+        }
+        const step = editDistance(leftKey, rightKey);
+        if (step > 1) {
+          return;
+        }
+        distance += step;
+      }
+      if (distance > 1) {
+        return;
+      }
+      consider(phrase, ids, distance);
+    };
+    for (const [phrase, id] of PHRASES) {
+      visit(phrase, [id]);
+    }
+    for (const [phrase, ids] of AMBIGUOUS) {
+      visit(phrase, ids);
+    }
+    if (entries.length === 0) {
+      continue;
+    }
+    const ids = [...new Set(entries.flatMap((entry) => entry.ids))];
+    if (ids.length === 0 || ids.length > 4) {
+      continue;
+    }
+    return {
+      ids,
+      length,
+      phrase: completionLabel(
+        entries.map((entry) => entry.phrase),
+        ids,
+        locale,
+      ),
+    };
+  }
+  return null;
+}
+
+/**
+ * A typed misspelling. Speech recognition emits a real word, which
+ * {@link soundAt} handles. Words under six letters are skipped: one edit
+ * turns "stack" into "stick". Six or seven letters allow one edit, longer
+ * names allow two. The first letter has to match.
+ */
 function fuzzyAt(
   words: string[],
   start: number,
-): { ids: string[]; length: number; distance: number } | null {
+  locale: string,
+): { ids: string[]; length: number; distance: number; phrase: string } | null {
   const max = Math.min(4, words.length - start);
   for (let length = max; length >= 1; length -= 1) {
     const window = words.slice(start, start + length);
@@ -307,40 +430,63 @@ function fuzzyAt(
       continue;
     }
     let bestDistance = 3;
-    const ids: string[] = [];
-    for (const [phrase, id] of PHRASES) {
+    const entries: Array<{ ids: string[]; phrase: string }> = [];
+    const consider = (phrase: string, ids: readonly string[], distance: number) => {
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        entries.length = 0;
+        entries.push({ ids: [...ids], phrase });
+        return;
+      }
+      if (distance === bestDistance && !entries.some((entry) => entry.phrase === phrase)) {
+        entries.push({ ids: [...ids], phrase });
+      }
+    };
+    const visit = (phrase: string, ids: readonly string[]) => {
       const phraseWords = phrase.split(' ');
       if (phraseWords.length !== length) {
-        continue;
+        return;
       }
       let distance = 0;
-      let ok = true;
       for (let index = 0; index < length; index += 1) {
         const left = window[index] ?? '';
         const right = phraseWords[index] ?? '';
         const step = editDistance(left, right);
         const size = Math.max(left.length, right.length);
         const limit = size >= 8 ? 2 : 1;
-        if (size < 5 || left[0] !== right[0] || step > limit) {
-          ok = false;
-          break;
+        if (size < 6 || left[0] !== right[0] || step > limit) {
+          return;
         }
         distance += step;
       }
-      if (!ok || distance === 0 || distance > 2) {
-        continue;
+      if (distance === 0 || distance > 2) {
+        return;
       }
-      if (distance < bestDistance) {
-        bestDistance = distance;
-        ids.length = 0;
-        ids.push(id);
-      } else if (distance === bestDistance && !ids.includes(id)) {
-        ids.push(id);
-      }
+      consider(phrase, ids, distance);
+    };
+    for (const [phrase, id] of PHRASES) {
+      visit(phrase, [id]);
     }
-    if (ids.length > 0) {
-      return { ids, length, distance: bestDistance };
+    for (const [phrase, ids] of AMBIGUOUS) {
+      visit(phrase, ids);
     }
+    if (entries.length === 0) {
+      continue;
+    }
+    const ids = [...new Set(entries.flatMap((entry) => entry.ids))];
+    if (ids.length === 0 || ids.length > 4) {
+      continue;
+    }
+    return {
+      ids,
+      length,
+      distance: bestDistance,
+      phrase: completionLabel(
+        entries.map((entry) => entry.phrase),
+        ids,
+        locale,
+      ),
+    };
   }
   return null;
 }
@@ -569,7 +715,12 @@ function ranked(scores: Map<string, number>): Array<{ id: string; score: number 
  * Deterministic local search. It never invents a combined ruling: a pair of
  * mechanics is explained together only when a curated interaction exists.
  */
-export function searchRules(raw: string, locale: string): RulesSearchResult {
+export function searchRules(
+  raw: string,
+  locale: string,
+  options?: { spoken?: boolean },
+): RulesSearchResult {
+  const spoken = options?.spoken === true;
   const normalizedQuery = stripQuestion(normalizeQuery(raw)).slice(0, 500);
   if (!normalizedQuery) {
     return emptyResult(normalizedQuery);
@@ -618,13 +769,30 @@ export function searchRules(raw: string, locale: string): RulesSearchResult {
       index += prefix.length;
       continue;
     }
-    const fuzzy = fuzzyAt(words, index);
+    const sound = spoken ? soundAt(words, index, locale) : null;
+    if (sound) {
+      if (sound.ids.length > 1) {
+        ambiguousGroups.push(sound.ids);
+      }
+      for (const id of sound.ids) {
+        bump(scores, id, 75);
+      }
+      if (index === 0 && numbers.length === 0 && index + sound.length === words.length) {
+        completedPhrase = sound.phrase;
+      }
+      index += sound.length;
+      continue;
+    }
+    const fuzzy = fuzzyAt(words, index, locale);
     if (fuzzy) {
       if (fuzzy.ids.length > 1) {
         ambiguousGroups.push(fuzzy.ids);
       }
       for (const id of fuzzy.ids) {
         bump(scores, id, 80 - fuzzy.distance * 10);
+      }
+      if (index === 0 && numbers.length === 0 && index + fuzzy.length === words.length) {
+        completedPhrase = fuzzy.phrase;
       }
       index += fuzzy.length;
       continue;

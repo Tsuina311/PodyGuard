@@ -54,6 +54,47 @@ describe('rules search', () => {
     expect(searchRules('dubble strike', 'en').primary?.id).toBe('double-strike');
   });
 
+  it('matches a close misspelling to the nearest rule name', () => {
+    const trample = searchRules('tremple', 'en');
+    expect(trample.primary?.id).toBe('trample');
+    expect(trample.completion).toBe('Trample');
+
+    const flying = searchRules('fliyng', 'en');
+    expect(flying.primary?.id).toBe('flying');
+    expect(flying.completion).toBe('Flying');
+
+    const haste = searchRules('celirite', 'fr');
+    expect(haste.primary?.id).toBe('haste');
+    expect(haste.primary?.title).toBe('Célérité');
+    expect(haste.completion).toBe('Célérité');
+
+    const initiative = searchRules('initative', 'en');
+    expect(initiative.status).toBe('ambiguous');
+    expect(initiative.completion).toBe('initiative');
+    expect(initiative.alternatives.map((hit) => hit.id).sort()).toEqual([
+      'first-strike',
+      'the-initiative',
+    ]);
+
+    expect(searchRules('stick', 'en').status).toBe('none');
+  });
+
+  it('matches a spoken dictionary word by sound and does not do that for typing', () => {
+    const spoken = searchRules('temple', 'en', { spoken: true });
+    expect(spoken.primary?.id).toBe('trample');
+    expect(spoken.completion).toBe('Trample');
+
+    expect(searchRules('temple', 'en').status).toBe('none');
+
+    const strike = searchRules('stick', 'en', { spoken: true });
+    expect(strike.status).toBe('ambiguous');
+    expect(strike.alternatives.map((hit) => hit.id).sort()).toEqual([
+      'double-strike',
+      'first-strike',
+    ]);
+    expect(searchRules('stick', 'en').status).toBe('none');
+  });
+
   it('completes a clipped keyword and suggests when more than one rule fits', () => {
     const initiative = searchRules('initiat', 'en');
     expect(initiative.status).toBe('ambiguous');

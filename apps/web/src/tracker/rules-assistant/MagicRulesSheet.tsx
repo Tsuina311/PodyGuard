@@ -19,11 +19,15 @@ export function MagicRulesSheet({ onClose }: { onClose: () => void }) {
   const [query, setQuery] = useState('');
   const [submitted, setSubmitted] = useState('');
   const [localeOverride, setLocaleOverride] = useState<string | null>(null);
+  const [spoken, setSpoken] = useState(false);
   const [speechLocale, setSpeechLocale] = useState(uiLocale);
   const resultLocale = answerLocale(submitted, localeOverride ?? uiLocale);
   const result = useMemo(
-    () => (submitted.trim() ? searchRules(submitted, resultLocale) : null),
-    [submitted, resultLocale],
+    () =>
+      submitted.trim()
+        ? searchRules(submitted, resultLocale, { spoken })
+        : null,
+    [submitted, resultLocale, spoken],
   );
 
   useEffect(() => {
@@ -33,16 +37,21 @@ export function MagicRulesSheet({ onClose }: { onClose: () => void }) {
     setQuery(result.completion);
   }, [result]);
 
-  function runSearch(value: string, override?: string | null) {
+  function runSearch(
+    value: string,
+    override?: string | null,
+    fromSpeech = false,
+  ) {
     setQuery(value);
     setSubmitted(value);
     setLocaleOverride(override ?? null);
+    setSpoken(fromSpeech);
   }
 
   const speech = useSpeechRecognition({
     lang: speechLanguageTag(speechLocale),
     onFinal: (transcript) => {
-      runSearch(transcript, speechLocale);
+      runSearch(transcript, speechLocale, true);
     },
   });
 
@@ -145,7 +154,9 @@ export function MagicRulesSheet({ onClose }: { onClose: () => void }) {
             <select
               id="magic-rules-speech-language"
               value={speechLocale}
-              onChange={(event) => setSpeechLocale(event.target.value)}
+              onChange={(event) =>
+                setSpeechLocale(resolveAppLocale(event.target.value))
+              }
               className="border-muted/25 bg-hull text-ink h-9 max-w-[14rem] rounded-lg border px-2 text-sm"
             >
               {speechLanguageOptions().map((option) => (

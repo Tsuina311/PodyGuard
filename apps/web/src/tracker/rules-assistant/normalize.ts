@@ -76,30 +76,54 @@ export function stripQuestion(query: string): string {
   return current;
 }
 
+/**
+ * Edits needed to turn one word into another. A swapped pair of letters counts
+ * as one edit. Anything further than two edits is reported as 3.
+ */
 export function editDistance(left: string, right: string): number {
   if (left === right) {
     return 0;
   }
+  const height = left.length;
   const width = right.length;
-  if (Math.abs(left.length - width) > 2) {
+  if (Math.abs(height - width) > 2) {
     return 3;
   }
-  const prev = new Array<number>(width + 1);
-  const next = new Array<number>(width + 1);
+  const rows: number[][] = Array.from({ length: height + 1 }, () =>
+    Array.from({ length: width + 1 }, () => 0),
+  );
   for (let column = 0; column <= width; column += 1) {
-    prev[column] = column;
+    const header = rows[0];
+    if (header) {
+      header[column] = column;
+    }
   }
-  for (let row = 1; row <= left.length; row += 1) {
-    next[0] = row;
+  for (let row = 1; row <= height; row += 1) {
+    const current = rows[row];
+    const previous = rows[row - 1];
+    const before = rows[row - 2];
+    if (!current || !previous) {
+      continue;
+    }
+    current[0] = row;
     let rowMin = row;
     for (let column = 1; column <= width; column += 1) {
       const cost = left[row - 1] === right[column - 1] ? 0 : 1;
-      const value = Math.min(
-        (prev[column] ?? 0) + 1,
-        (next[column - 1] ?? 0) + 1,
-        (prev[column - 1] ?? 0) + cost,
+      let value = Math.min(
+        (previous[column] ?? 0) + 1,
+        (current[column - 1] ?? 0) + 1,
+        (previous[column - 1] ?? 0) + cost,
       );
-      next[column] = value;
+      if (
+        before &&
+        row > 1 &&
+        column > 1 &&
+        left[row - 1] === right[column - 2] &&
+        left[row - 2] === right[column - 1]
+      ) {
+        value = Math.min(value, (before[column - 2] ?? 0) + 1);
+      }
+      current[column] = value;
       if (value < rowMin) {
         rowMin = value;
       }
@@ -107,9 +131,6 @@ export function editDistance(left: string, right: string): number {
     if (rowMin > 2) {
       return 3;
     }
-    for (let column = 0; column <= width; column += 1) {
-      prev[column] = next[column] ?? 0;
-    }
   }
-  return prev[width] ?? 3;
+  return rows[height]?.[width] ?? 3;
 }
