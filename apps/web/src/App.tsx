@@ -81,7 +81,7 @@ export function App() {
             <Route path="/e/:joinCode" element={<JoinPage />} />
             <Route path="/host/:joinCode" element={<HostPage />} />
             <Route path="/connectivity" element={<ConnectivityPage />} />
-            <Route path="/wake" element={<ServerWakeScreen />} />
+            <Route path="/wake" element={<ServerWakeScreen switchable />} />
             <Route path="/display" element={<DisplayPairPage />} />
             <Route path="/display/live" element={<DisplayLivePage />} />
             <Route

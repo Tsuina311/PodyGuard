@@ -181,6 +181,65 @@
   }
 }
 
+/*
+  A hovered letter drops past the bottom of the viewport. 900ms matches
+  LETTER_FALL_MS. The burst above is unchanged.
+*/
+@keyframes letter-fall {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(var(--letter-burst-x, 16px), 120vh, 0)
+      rotate(var(--letter-burst-rot, 28deg));
+    opacity: 1;
+  }
+}
+
+@utility letter-fall {
+  animation: letter-fall 900ms cubic-bezier(0.4, 0, 1, 1) forwards;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation-duration: 1ms;
+  }
+}
+
+/*
+  The glyph spins around its own center while its center travels in a straight
+  line. Rotate is the rightmost function so it happens before the translation.
+  1100ms matches LETTER_FLY_MS. Burst and the straight fall above are unchanged.
+*/
+@keyframes letter-fly {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(var(--letter-fly-x, 70vw), var(--letter-fly-y, -70vh), 0)
+      rotate(var(--letter-burst-rot, 720deg));
+    opacity: 1;
+  }
+}
+
+@utility letter-fly {
+  transform-origin: center;
+  animation: letter-fly 1100ms linear forwards;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation-duration: 1ms;
+  }
+}
+
+/* Fade a burst letter back into the line once it is allowed to return. */
+@utility letter-return {
+  transition: opacity 280ms ease-out;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
 @utility bg-grid {
   background-image:
     linear-gradient(
