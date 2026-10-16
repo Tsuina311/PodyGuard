@@ -1,17 +1,11 @@
 @import 'tailwindcss';
 
 /*
-  Board landscape matches a sideways phone, or a phone shell that CSS-rotated
-  itself when the OS would not lock orientation (every iPhone).
+  Wider than tall. Used so a seat grid fills the rectangle it has. It is not
+  a signal to rotate the board.
 */
 @custom-variant landscape {
   @media (orientation: landscape) {
-    @slot;
-  }
-  &.board-landscape {
-    @slot;
-  }
-  .board-landscape & {
     @slot;
   }
 }

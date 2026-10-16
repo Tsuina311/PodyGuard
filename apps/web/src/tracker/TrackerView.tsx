@@ -28,13 +28,13 @@ import {
   Moon,
   MoreHorizontal,
   LayoutDashboard,
+  LayoutGrid,
   Nut,
   LogOut,
   Pause,
   Play,
   Plus,
   Radiation,
-  RotateCw,
   Shield,
   Shuffle,
   Sparkles,
@@ -115,9 +115,8 @@ import { SchemeSheet } from './SchemeSheet';
 import { AssassinTargetsSheet } from './AssassinTargetsSheet';
 import { TreacheryRolesSheet } from './TreacheryRolesSheet';
 import {
-  forceRotateFrameClass,
+  boardFrameClass,
   inBoardOverlayClass,
-  seatFacingContentClass,
   trackerOverlayClass,
 } from './board-frame';
 import { commanderDamageChipState } from './commander-damage-chip';
@@ -127,7 +126,17 @@ import {
   noteSeatLifeFlash,
   type SeatLifeFlash,
 } from './life-flash';
-import { seatFacesAway, seatGridClass } from './seat-layout';
+import {
+  duelBoardFrameClass,
+  duelBoardLayouts,
+  duelClockFaceClass,
+  duelPlayerSheetTurnClass,
+  duelSeatClass,
+  duelSeatFaceClass,
+  duelSeatPlaceClass,
+  seatGridClass,
+  type DuelBoardLayout,
+} from './seat-layout';
 import {
   boardGridStackClass,
   commanderDamageChipPaddingClass,
@@ -147,7 +156,7 @@ import {
   tabletSeatIconClass,
   tabletSeatRailClass,
 } from './tracker-layout';
-import { useBoardLandscape, useOrientationLock } from './orientation';
+import { useLandscape } from './orientation';
 import {
   COMMANDER_DAMAGE_IDLE_CLOSE_MS,
   SEAT_CONTROLS_HIDE_MS,
@@ -242,21 +251,23 @@ type Props = {
 
 /*
   Fixed to the dynamic viewport so mobile browser chrome cannot push the last
-  card out of reach. The side padding honours landscape notch insets, which is
-  the orientation a phone sits in on the table. When the OS will not lock
-  landscape (every iPhone), the shell is rotated instead so the board still
-  reads as a table layout.
+  card out of reach. A two-player board is flush to the safe area so the two
+  halves meet. Larger pods keep a gutter. The shell is not rotated.
 */
-function boardScreenClass(
-  forceRotate: boolean,
-  bottom: 'tight' | 'roomy' = 'tight',
-): string {
+function boardScreenClass(bottom: 'tight' | 'roomy' | 'flush' = 'tight'): string {
+  const inset =
+    bottom === 'flush'
+      ? 'pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]'
+      : cx(
+          'pt-2 pl-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))]',
+          bottom === 'roomy'
+            ? 'pb-[max(1.25rem,env(safe-area-inset-bottom))]'
+            : 'pb-[max(0.5rem,env(safe-area-inset-bottom))]',
+        );
   return cx(
-    'bg-deep-space fixed z-40 flex touch-manipulation flex-col overflow-hidden pt-2 pl-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))]',
-    bottom === 'roomy'
-      ? 'pb-[max(1.25rem,env(safe-area-inset-bottom))]'
-      : 'pb-[max(0.5rem,env(safe-area-inset-bottom))]',
-    forceRotateFrameClass(forceRotate),
+    'bg-deep-space fixed z-40 flex touch-manipulation flex-col overflow-hidden',
+    inset,
+    boardFrameClass(),
   );
 }
 /**
@@ -276,12 +287,8 @@ function PreGameScreen({
   onCancel?: () => void;
 }) {
   const { t } = useTranslation();
-  /*
-    Setup stays in the phone's natural orientation. Only the running life
-    tracker locks or CSS-rotates into landscape.
-  */
   return (
-    <section className={boardScreenClass(false, 'roomy')}>
+    <section className={boardScreenClass('roomy')}>
       <div className="flex min-h-0 flex-1 flex-col gap-3 landscape:flex-row landscape:items-center landscape:justify-center landscape:gap-6 landscape:px-4">
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain landscape:flex-none landscape:max-h-full">
           <div
@@ -413,22 +420,6 @@ function seatPlacementClass(
     return cx('landscape:col-start-3', bottomSeatNudgeLeft);
   }
   return '';
-}
-
-function playerSeatFacesAway(
-  players: Array<{ id: string }>,
-  playerId: string,
-  layout: 'default' | 'star',
-  options: { archenemy?: boolean; archenemyId?: string | null } = {},
-): boolean {
-  const index = players.findIndex((player) => player.id === playerId);
-  if (index < 0) {
-    return false;
-  }
-  return seatFacesAway(players.length, index, layout, {
-    ...options,
-    playerId,
-  });
 }
 
 /**
@@ -580,6 +571,20 @@ export function TrackerView({
   const [finishing, setFinishing] = useState(false);
   const [replaying, setReplaying] = useState(false);
   const [needsRearrange, setNeedsRearrange] = useState(promptRearrange);
+  const [boardLayout, setBoardLayout] = useState<DuelBoardLayout>(() => {
+    if (!persist) {
+      return 'wide';
+    }
+    return readStored(`${storageKey}:board-layout`) === 'portrait'
+      ? 'portrait'
+      : 'wide';
+  });
+  useEffect(() => {
+    if (!persist) {
+      return;
+    }
+    writeStored(`${storageKey}:board-layout`, boardLayout);
+  }, [boardLayout, persist, storageKey]);
   const [pregameSwapId, setPregameSwapId] = useState<string | null>(null);
   const [finishError, setFinishError] = useState<string | null>(null);
   const [challengeNotice, setChallengeNotice] = useState<string | null>(null);
@@ -617,20 +622,11 @@ export function TrackerView({
     sign: 1 | -1;
   } | null>(null);
   const attemptedChallenges = useRef(new Set<string>());
-  const { landscape, forceRotate } = useBoardLandscape();
+  const landscape = useLandscape();
   const boardLive = Boolean(state.firstPlayerId);
-  /*
-    Reading a card identity or a rules answer is a portrait page. The phone
-    comes back upright for that, then returns to the landscape table on the
-    way out.
-  */
-  const readingUpright =
-    treacheryRolesOpen || roleCheckOpen || magicRulesOpen;
-  useOrientationLock(
-    boardLive ? (readingUpright ? 'portrait' : 'landscape') : null,
-  );
   useWakeLock(boardLive && !treacheryRolesOpen && !roleCheckOpen);
-  const screenClass = boardScreenClass(boardLive && forceRotate);
+  const duelBoard = state.players.length === 2;
+  const screenClass = boardScreenClass(duelBoard ? 'flush' : 'tight');
   usePreloadedEliminatedArt();
   const elapsed = useMatchClock(state);
   const spotlight = useFirstPlayerSpotlight(state, past.length);
@@ -976,7 +972,6 @@ export function TrackerView({
           aria-modal="true"
           aria-label={t('tracker.gameRules')}
           className={trackerOverlayClass(
-            boardLive && forceRotate,
             'z-[70] items-center justify-center bg-void/70 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] backdrop-blur-md',
           )}
           onClick={(event) => {
@@ -994,6 +989,10 @@ export function TrackerView({
         document.body,
       )
     : null;
+  const layoutChoices = duelBoardLayouts(state.players.length);
+  const activeBoardLayout = layoutChoices.includes(boardLayout)
+    ? boardLayout
+    : 'wide';
 
   if (
     gameMode === 'assassin' &&
@@ -1678,8 +1677,8 @@ export function TrackerView({
                 seatLayout={seatLayout}
                 archenemyBoard={archenemyBoard}
                 archenemyId={state.archenemyId}
+                boardLayout={activeBoardLayout}
                 showNames
-                forceRotate={false}
                 selectedIds={
                   pregameSwapId ? new Set([pregameSwapId]) : undefined
                 }
@@ -1762,25 +1761,18 @@ export function TrackerView({
       {/* auto-rows-fr splits the leftover height evenly between the seats. */}
       <div
         ref={boardRef}
+        data-board-layout={activeBoardLayout}
         className={cx(
           boardGridStackClass(),
-          'grid min-h-0 flex-1 auto-rows-fr gap-2',
+          'grid min-h-0 flex-1 auto-rows-fr',
+          duelBoard ? 'gap-0' : 'gap-2',
+          duelBoardFrameClass(activeBoardLayout),
           archenemyBoard
             ? 'grid-cols-1 landscape:grid-cols-3'
-            : seatGridClass(state.players.length),
+            : seatGridClass(state.players.length, activeBoardLayout),
         )}
       >
         {state.players.map((player, index) => {
-          const facesAway = seatFacesAway(
-            state.players.length,
-            index,
-            seatLayout,
-            {
-              archenemy: archenemyBoard,
-              archenemyId: state.archenemyId,
-              playerId: player.id,
-            },
-          );
           // 4-seat: players 2 & 3 swap the pair/quad rails; all four center the pair.
           // Chrome stays inside the seat flip so far-side players can read it.
           const fourSeatBoard = state.players.length === 4;
@@ -1793,7 +1785,12 @@ export function TrackerView({
             className={cx(
               // Size container so life totals scale to THIS seat, not the phone
               // viewport (vh broke under CSS force-rotate and on tall Androids).
-              '[container-type:size] border-muted/20 relative flex h-full min-h-0 flex-col overflow-hidden rounded-xl border p-2 transition-transform duration-200',
+              'relative flex h-full min-h-0 flex-col overflow-hidden transition-transform duration-200 [container-type:size]',
+              duelSeatPlaceClass(activeBoardLayout, index),
+              duelBoard
+                ? 'rounded-none border-0 p-0'
+                : 'border-muted/20 rounded-xl border p-2',
+              duelSeatClass(activeBoardLayout),
               player.eliminated ? 'opacity-50' : 'bg-ink/[0.03]',
               archenemyBoard &&
                 player.id === state.archenemyId &&
@@ -1811,8 +1808,12 @@ export function TrackerView({
           >
             <div
               className={cx(
-                'absolute inset-0',
-                facesAway && 'landscape:rotate-180',
+                '[container-type:size]',
+                duelSeatFaceClass(
+                  activeBoardLayout,
+                  index,
+                  duelBoard && !landscape,
+                ),
               )}
             >
             <CommanderArt
@@ -2074,7 +2075,7 @@ export function TrackerView({
         <AllyArrows
           pairs={allyPairs}
           containerRef={boardRef}
-          layoutKey={`${landscape ? 'l' : 'p'}:${forceRotate ? 'r' : 'n'}:${String(state.players.length)}`}
+          layoutKey={`${landscape ? 'l' : 'p'}:${String(state.players.length)}`}
         />
         {/*
           A team's life reads like a single seat's: + above the total and −
@@ -2168,6 +2169,7 @@ export function TrackerView({
             'bg-neon text-void hover:bg-neon/90 z-30 flex min-h-16 min-w-28 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full px-6 font-display text-lg font-bold shadow-[0_10px_30px_-8px_var(--color-void)] transition tablet:min-h-20 tablet:min-w-36 tablet:text-2xl',
             matchDialStackClass(),
             clockPositionClass(state.players.length),
+            duelClockFaceClass(duelBoard && activeBoardLayout === 'wide' && !landscape),
           )}
         >
           {t('tracker.start')}
@@ -2199,6 +2201,7 @@ export function TrackerView({
           tabletDialClass(),
           matchDialStackClass(),
           clockPositionClass(state.players.length),
+          duelClockFaceClass(duelBoard && activeBoardLayout === 'wide' && !landscape),
           state.pausedAt ? 'text-warning border-warning/50' : 'text-ink',
           state.pausedAt ? '' : dayNightRing(state.dayNight),
         )}
@@ -2274,16 +2277,6 @@ export function TrackerView({
                 state.players.find((player) => player.id === lifeEntry.playerId)
                   ?.name ?? 'player'
               }
-              facesAway={playerSeatFacesAway(
-                state.players,
-                lifeEntry.playerId,
-                seatLayout,
-                {
-                  archenemy: archenemyBoard,
-                  archenemyId: state.archenemyId,
-                },
-              )}
-              forceRotate={forceRotate}
               onConfirm={(amount) => {
                 send({
                   type: 'action',
@@ -2301,34 +2294,12 @@ export function TrackerView({
           )
         : null}
       {/*
-        Where the browser lets go of the orientation the board turns itself, so
-        this only ever shows on a phone that refused — every iPhone, which has
-        neither the lock nor the manifest's orientation. It cannot be tapped, so
-        it never costs a life total, and it leaves the moment the phone turns.
-      */}
-      {landscape ? null : (
-        <p className="text-muted bg-void/70 pointer-events-none absolute inset-x-0 bottom-1 z-30 mx-auto flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.65rem]">
-          <RotateCw size={12} aria-hidden />
-          {t('tracker.turnPhone')}
-        </p>
-      )}
-      {/*
-        Commander / counter sheets stay inside the board shell (not portaled).
-        A second force-rotate on document.body made the picker sideways while
-        the board looked correct — absolute inset-0 inherits the shell instead.
+        Commander / counter sheets stay inside the board shell (not portaled)
+        so they share the board's rectangle.
       */}
       {commanderDamageRules
         ? state.players.map((seat) => {
             const open = commanderPlayerId === seat.id;
-            const facesAway = playerSeatFacesAway(
-              state.players,
-              seat.id,
-              seatLayout,
-              {
-                archenemy: archenemyBoard,
-                archenemyId: state.archenemyId,
-              },
-            );
             return (
               <div
                 key={seat.id}
@@ -2349,12 +2320,7 @@ export function TrackerView({
                   }
                 }}
               >
-                <div
-                  className={cx(
-                    'flex h-full w-full min-h-0',
-                    seatFacingContentClass(facesAway),
-                  )}
-                >
+                <div className="flex h-full w-full min-h-0">
                   <CommanderSheet
                     state={state}
                     player={seat}
@@ -2373,35 +2339,41 @@ export function TrackerView({
           role="dialog"
           aria-modal="true"
           aria-label={t('tracker.countersFor', { name: counterPlayer.name })}
-          className={inBoardOverlayClass(
-            'z-50 bg-void/95 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm',
-          )}
+          className={(() => {
+            const counterIndex = Math.max(
+              0,
+              state.players.findIndex((row) => row.id === counterPlayer.id),
+            );
+            const counterTurn = duelBoard
+              ? duelPlayerSheetTurnClass(
+                  activeBoardLayout,
+                  counterIndex,
+                  !landscape,
+                )
+              : '';
+            const counterSideways = counterTurn.includes('h-[100dvw]');
+            return counterSideways
+              ? cx(
+                  'bg-void/95 z-50 flex p-2 backdrop-blur-sm',
+                  counterTurn,
+                )
+              : inBoardOverlayClass(
+                  'z-50 bg-void/95 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm',
+                  counterTurn,
+                );
+          })()}
           onClick={(event) => {
             if (event.target === event.currentTarget) {
               setCounterPlayerId(null);
             }
           }}
         >
-          <div
-            className={cx(
-              'flex h-full w-full min-h-0',
-              seatFacingContentClass(
-                playerSeatFacesAway(
-                  state.players,
-                  counterPlayer.id,
-                  seatLayout,
-                  {
-                    archenemy: archenemyBoard,
-                    archenemyId: state.archenemyId,
-                  },
-                ),
-              ),
-            )}
-          >
+          <div className="flex h-full w-full min-h-0">
             <CounterSheet
               player={counterPlayer}
               disabled={Boolean(state.winnerId)}
               includeCommanderTax={commanderRules}
+              turned={duelBoard && activeBoardLayout === 'wide' && !landscape}
               dispatch={(action) => send({ type: 'action', action })}
               onClose={() => setCounterPlayerId(null)}
             />
@@ -2409,18 +2381,21 @@ export function TrackerView({
         </div>
       ) : null}
       {/*
-        Match menu stays inside the board shell (not portaled) so a portrait
-        phone that CSS-rotates the tracker also rotates every menu pane —
-        Arrange seats included.
+        On a wide board the menu turns with the totals. On a portrait board it
+        stays upright, with full-width rows so the labels fit.
       */}
       {menuOpen ? (
             <div
               role="dialog"
               aria-modal="true"
               aria-label={t('tracker.matchMenu')}
-              className={inBoardOverlayClass(
-                'z-50 bg-void/95 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm',
-              )}
+              className={
+                duelBoard && activeBoardLayout === 'wide' && !landscape
+                  ? 'bg-void/95 absolute top-1/2 left-1/2 z-50 flex h-[100dvw] w-[100dvh] -translate-x-1/2 -translate-y-1/2 rotate-90 p-2 backdrop-blur-sm'
+                  : inBoardOverlayClass(
+                      'z-50 bg-void/95 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm',
+                    )
+              }
               onClick={(event) => {
                 if (event.target === event.currentTarget) {
                   setMenuOpen(false);
@@ -2428,12 +2403,14 @@ export function TrackerView({
               }}
             >
               <MatchMenu
+                sideways={duelBoard && activeBoardLayout === 'wide' && !landscape}
                 state={state}
                 elapsed={elapsed}
                 canUndo={past.length > 0}
                 seatLayout={seatLayout}
                 archenemyBoard={archenemyBoard}
-                forceRotate={forceRotate}
+                boardLayout={activeBoardLayout}
+                onBoardLayout={setBoardLayout}
                 requeueOnFinish={requeueOnFinish}
                 dispatch={(action) => send({ type: 'action', action })}
                 onUndo={() => {
@@ -2507,7 +2484,6 @@ export function TrackerView({
                   : t('tracker.dice')
               }
               className={trackerOverlayClass(
-                forceRotate,
                 'z-50 bg-void/95 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm',
               )}
               onClick={(event) => {
@@ -2531,7 +2507,6 @@ export function TrackerView({
               aria-modal="true"
               aria-label={t('tracker.magicRules.title')}
               className={trackerOverlayClass(
-                false,
                 'z-[70] bg-void pb-[max(0px,env(safe-area-inset-bottom))] pl-[max(0px,env(safe-area-inset-left))] pr-[max(0px,env(safe-area-inset-right))] pt-[max(0px,env(safe-area-inset-top))]',
               )}
               onClick={(event) => {
@@ -2558,7 +2533,6 @@ export function TrackerView({
               aria-modal="true"
               aria-label={t('tracker.secretContracts')}
               className={trackerOverlayClass(
-                forceRotate,
                 'z-[70] bg-void/95 p-2 backdrop-blur-sm',
               )}
             >
@@ -2607,7 +2581,6 @@ export function TrackerView({
                   playerSeatIndex(state.players, assassinVictim.id) + 1,
               })}
               className={trackerOverlayClass(
-                forceRotate,
                 'z-[75] items-center justify-center bg-void/95 p-4 backdrop-blur-sm',
               )}
             >
@@ -2649,7 +2622,7 @@ export function TrackerView({
                   seatLayout={seatLayout}
                   archenemyBoard={archenemyBoard}
                   archenemyId={state.archenemyId}
-                  forceRotate={forceRotate}
+                  boardLayout={activeBoardLayout}
                   selectedIds={new Set([assassinVictim.id])}
                   disabledIds={
                     new Set([
@@ -2732,7 +2705,6 @@ export function TrackerView({
               aria-modal="true"
               aria-label={t('tracker.commanderChallenges')}
               className={trackerOverlayClass(
-                forceRotate,
                 'z-50 bg-void/95 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm',
               )}
             >
@@ -2788,7 +2760,6 @@ export function TrackerView({
                 sides stay clear of a landscape notch.
               */
               className={trackerOverlayClass(
-                forceRotate,
                 'z-50 bg-void/95 pt-1 pb-[max(0.25rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm',
               )}
               onClick={(event) => {
@@ -2820,7 +2791,6 @@ export function TrackerView({
               aria-modal="true"
               aria-label={t('tracker.matchResult')}
               className={trackerOverlayClass(
-                forceRotate,
                 'z-[60] items-center justify-center bg-void/70 p-3 backdrop-blur-sm',
               )}
             >
@@ -3207,7 +3177,8 @@ function MatchMenu({
   canUndo,
   seatLayout,
   archenemyBoard,
-  forceRotate,
+  boardLayout,
+  onBoardLayout,
   requeueOnFinish,
   dispatch,
   onUndo,
@@ -3223,13 +3194,15 @@ function MatchMenu({
   onTargets,
   onPlayerLost,
   onClose,
+  sideways = false,
 }: {
   state: TrackerState;
   elapsed: number;
   canUndo: boolean;
   seatLayout: 'default' | 'star';
   archenemyBoard: boolean;
-  forceRotate: boolean;
+  boardLayout: DuelBoardLayout;
+  onBoardLayout: (layout: DuelBoardLayout) => void;
   requeueOnFinish: boolean;
   dispatch: (action: TrackerAction) => void;
   onUndo: () => void;
@@ -3245,10 +3218,14 @@ function MatchMenu({
   onTargets?: () => void;
   onPlayerLost?: (playerId: string) => void;
   onClose: () => void;
+  /** Wide board on a tall phone: the menu itself is turned, so use the square. */
+  sideways?: boolean;
 }) {
   const { t } = useTranslation();
   const { openFeedback } = useFeedback();
+  const landscape = useLandscape();
   const [arrangeSeats, setArrangeSeats] = useState(false);
+  const [pickLayout, setPickLayout] = useState(false);
   const [pickLoser, setPickLoser] = useState(false);
   const [pickWinner, setPickWinner] = useState(false);
   const [selectedSeatId, setSelectedSeatId] = useState<string | null>(null);
@@ -3261,11 +3238,56 @@ function MatchMenu({
 
   function closeSeatPick() {
     setArrangeSeats(false);
+    setPickLayout(false);
     setPickLoser(false);
     setPickWinner(false);
     setSelectedSeatId(null);
     setConfirmLoserId(null);
     setConfirmWinnerId(null);
+  }
+
+  const layoutChoices = duelBoardLayouts(state.players.length);
+
+  if (pickLayout) {
+    return (
+      <section className="flex h-full w-full flex-col">
+        <header className="mb-1 flex shrink-0 items-center justify-between gap-3">
+          <h4 className="font-display truncate text-sm leading-tight font-bold">
+            {t('tracker.changeLayout')}
+          </h4>
+          <button
+            type="button"
+            aria-label={t('common.close')}
+            onClick={onClose}
+            className="border-muted/25 text-muted hover:text-ink hover:border-muted/50 flex size-8 shrink-0 items-center justify-center rounded-full border transition tablet:size-12"
+          >
+            <X size={18} aria-hidden />
+          </button>
+        </header>
+        <p className="text-muted mb-3 shrink-0 text-center text-xs">
+          {t('tracker.changeLayoutHint')}
+        </p>
+        <div
+          className={cx(
+            'grid min-h-0 flex-1 gap-3',
+            // Wide turns the menu, and a row of choices lands as a column on
+            // the phone. Portrait keeps the menu upright, so stack the choices
+            // here too. Wide stays the top tap either way.
+            sideways ? 'grid-cols-2' : 'grid-cols-1 grid-rows-2',
+          )}
+        >
+          {layoutChoices.map((layout) => (
+            <LayoutChoice
+              key={layout}
+              layout={layout}
+              sideways={sideways}
+              selected={layout === boardLayout}
+              onSelect={() => onBoardLayout(layout)}
+            />
+          ))}
+        </div>
+      </section>
+    );
   }
 
   if (arrangeSeats || pickLoser || pickWinner) {
@@ -3313,7 +3335,7 @@ function MatchMenu({
           seatLayout={seatLayout}
           archenemyBoard={archenemyBoard}
           archenemyId={state.archenemyId}
-          forceRotate={forceRotate}
+          boardLayout={boardLayout}
           selectedIds={
             new Set(
               [
@@ -3434,7 +3456,17 @@ function MatchMenu({
           </button>
         </div>
       </header>
-      <div className="grid min-h-0 flex-1 grid-cols-2 grid-rows-2 gap-2">
+      <div
+        className={cx(
+          'grid min-h-0 flex-1 gap-2',
+          // A wide screen keeps the four panes in a square. A tall screen
+          // gives each pane the full width, so a pair of options sits on one
+          // row the way it did when the menu was horizontal.
+          sideways || landscape
+            ? 'grid-cols-2 grid-rows-2'
+            : 'grid-cols-1 overflow-y-auto [grid-auto-rows:minmax(min-content,1fr)]',
+        )}
+      >
         {/* Top left: dice, coins, day/night */}
         <MatchMenuPane title={t('tracker.menuTable')} dense>
           <div className={cx('grid w-full grid-cols-2 gap-1.5', tabletMenuGridClass())}>
@@ -3540,23 +3572,57 @@ function MatchMenu({
                 : t('tracker.firstScheme')}
             </Button>
           ) : null}
-          <Button
-            size="sm"
-            variant="glass"
-            className={menuControlClass('h-9 w-full justify-start', 'stack')}
-            disabled={decided || state.players.length < 2}
-            onClick={() => {
-              setSelectedSeatId(null);
-              setConfirmLoserId(null);
-              setConfirmWinnerId(null);
-              setPickLoser(false);
-              setPickWinner(false);
-              setArrangeSeats(true);
-            }}
+          <div
+            className={cx(
+              'grid w-full gap-1.5',
+              layoutChoices.length > 1 ? 'grid-cols-2' : 'grid-cols-1',
+            )}
           >
-            <ArrowUpDown size={14} aria-hidden />
-            {t('tracker.rearrangeSeats')}
-          </Button>
+            <Button
+              size="sm"
+              variant="glass"
+              className={menuControlClass(
+                'h-auto min-h-9 w-full justify-start !whitespace-normal px-2 text-left leading-tight',
+                'stack',
+              )}
+              disabled={decided || state.players.length < 2}
+              onClick={() => {
+                setSelectedSeatId(null);
+                setConfirmLoserId(null);
+                setConfirmWinnerId(null);
+                setPickLoser(false);
+                setPickWinner(false);
+                setPickLayout(false);
+                setArrangeSeats(true);
+              }}
+            >
+              <ArrowUpDown size={14} className="shrink-0" aria-hidden />
+              {t('tracker.rearrangeSeats')}
+            </Button>
+            {layoutChoices.length > 1 ? (
+              <Button
+                size="sm"
+                variant="glass"
+                className={menuControlClass(
+                  'h-auto min-h-9 w-full justify-start !whitespace-normal px-2 text-left leading-tight',
+                  'stack',
+                )}
+                disabled={decided}
+                onClick={() => {
+                  setSelectedSeatId(null);
+                  setConfirmLoserId(null);
+                  setConfirmWinnerId(null);
+                  setPickLoser(false);
+                  setPickWinner(false);
+                  setArrangeSeats(false);
+                  setPickLayout(true);
+                }}
+              >
+                <LayoutGrid size={14} className="shrink-0" aria-hidden />
+                {t('tracker.changeLayout')}
+              </Button>
+            ) : null}
+          </div>
         </MatchMenuPane>
 
         {/* Bottom left: result */}
@@ -3572,6 +3638,7 @@ function MatchMenu({
               setConfirmWinnerId(null);
               setPickWinner(false);
               setArrangeSeats(false);
+              setPickLayout(false);
               setPickLoser(true);
             }}
           >
@@ -3589,6 +3656,7 @@ function MatchMenu({
               setConfirmWinnerId(null);
               setPickLoser(false);
               setArrangeSeats(false);
+              setPickLayout(false);
               setPickWinner(true);
             }}
           >
@@ -3825,7 +3893,7 @@ function SeatPickBoard({
   seatLayout,
   archenemyBoard,
   archenemyId,
-  forceRotate,
+  boardLayout = 'wide',
   showNames = false,
   selectedIds,
   disabledIds,
@@ -3835,7 +3903,7 @@ function SeatPickBoard({
   seatLayout: 'default' | 'star';
   archenemyBoard: boolean;
   archenemyId?: string | null;
-  forceRotate: boolean;
+  boardLayout?: DuelBoardLayout;
   /** Names stand in for commander art on a non-commander rearrange. */
   showNames?: boolean;
   selectedIds?: ReadonlySet<string>;
@@ -3843,25 +3911,22 @@ function SeatPickBoard({
   onSelect: (playerId: string) => void;
 }) {
   const { t } = useTranslation();
+  const sideways = boardLayout === 'wide' && players.length === 2 && !useLandscape();
   return (
     <div
+      data-board-layout={boardLayout}
       className={cx(
         'relative grid min-h-0 flex-1 auto-rows-fr gap-2',
-        forceRotate && 'board-landscape',
+        duelBoardFrameClass(boardLayout),
         archenemyBoard
           ? 'grid-cols-1 landscape:grid-cols-3'
-          : seatGridClass(players.length),
+          : seatGridClass(players.length, boardLayout),
       )}
     >
       {players.map((seat, index) => {
         const color = seatColor(seat.colorIndex);
         const selected = selectedIds?.has(seat.id) ?? false;
         const disabled = disabledIds?.has(seat.id) ?? false;
-        const facesAway = seatFacesAway(players.length, index, seatLayout, {
-          archenemy: archenemyBoard,
-          archenemyId,
-          playerId: seat.id,
-        });
         const seatLabel = t('tracker.seatN', { n: index + 1 });
         return (
           <button
@@ -3873,6 +3938,8 @@ function SeatPickBoard({
             onClick={() => onSelect(seat.id)}
             className={cx(
               'relative flex h-full min-h-0 flex-col overflow-hidden rounded-xl border p-2 transition [container-type:size] disabled:opacity-40',
+              duelSeatPlaceClass(boardLayout, index),
+              duelSeatClass(boardLayout),
               seat.eliminated ? 'opacity-50' : 'bg-ink/[0.03]',
               archenemyBoard &&
                 seat.id === archenemyId &&
@@ -3885,8 +3952,8 @@ function SeatPickBoard({
           >
             <span
               className={cx(
-                'absolute inset-0',
-                facesAway && 'landscape:rotate-180',
+                '[container-type:size]',
+                duelSeatFaceClass(boardLayout, index, sideways),
               )}
             >
               <CommanderArt
@@ -3911,6 +3978,93 @@ function SeatPickBoard({
         );
       })}
     </div>
+  );
+}
+
+function LayoutChoice({
+  layout,
+  sideways,
+  selected,
+  onSelect,
+}: {
+  layout: DuelBoardLayout;
+  /** The menu is turned with a wide board, so the thumbnail has to be drawn
+   *  in that turned space to land side by side on the phone. */
+  sideways: boolean;
+  selected: boolean;
+  onSelect: () => void;
+}) {
+  const { t } = useTranslation();
+  const title =
+    layout === 'wide' ? t('tracker.layoutWide') : t('tracker.layoutPortrait');
+  const hint =
+    layout === 'wide'
+      ? t('tracker.layoutWideHint')
+      : t('tracker.layoutPortraitHint');
+  return (
+    <button
+      type="button"
+      aria-pressed={selected}
+      onClick={onSelect}
+      className={cx(
+        'flex h-full min-h-0 flex-col gap-2 rounded-2xl border p-3 text-left transition',
+        selected
+          ? 'border-neon bg-neon/10 ring-neon/50 ring-2'
+          : 'border-muted/25 bg-hull/40 hover:border-muted/50',
+      )}
+    >
+      <span
+        className={cx(
+          'bg-void/70 mx-auto flex min-h-0 items-center justify-center rounded-lg p-1.5',
+          // Upright menu: portrait stays a tall stack. Wide is that same pair
+          // turned onto its side, so the bars run across the card. A turned
+          // menu keeps the wide frame, which stands up into tall columns.
+          sideways
+            ? 'aspect-[2/1] w-full shrink-0'
+            : layout === 'wide'
+              ? 'aspect-[2/1] w-44 shrink-0'
+              : 'aspect-[1/2] h-44 w-auto shrink-0',
+        )}
+      >
+        <span
+          className={cx(
+            'grid h-full w-full gap-1',
+            layout === 'wide'
+              ? 'grid-rows-2'
+              : sideways
+                ? 'grid-cols-2'
+                : 'grid-rows-2',
+          )}
+        >
+          <span
+            className={cx(
+              'rounded-sm',
+              layout === 'wide' && !sideways && 'row-start-2',
+            )}
+            style={{ backgroundColor: seatColor(0) }}
+          />
+          <span
+            className={cx(
+              'rounded-sm',
+              layout === 'wide' && !sideways && 'row-start-1',
+            )}
+            style={{ backgroundColor: seatColor(1) }}
+          />
+        </span>
+      </span>
+      <span className="font-display text-sm font-bold">{title}</span>
+      <span className="text-muted text-xs leading-snug">{hint}</span>
+      <span
+        aria-hidden={!selected}
+        className={cx(
+          'mt-auto inline-flex items-center gap-1 text-xs font-semibold',
+          selected ? 'text-neon' : 'invisible',
+        )}
+      >
+        <Check size={14} aria-hidden />
+        {t('tracker.layoutSelected')}
+      </span>
+    </button>
   );
 }
 
@@ -3957,8 +4111,8 @@ function LifeRow({
   /** Shared-life sides: blend every teammate’s colour across the total. */
   colors?: string[];
 }) {
-  // Size from digit count + this seat's box (cqh), so every player tile matches
-  // even when the shell is CSS-rotated or the phone is very tall.
+  // Size from digit count and this seat's box. The shorter side wins so a
+  // wide seat and a tall seat both fill without the total leaving the card.
   const digits = String(Math.abs(life)).length;
   const palette = colors?.length ? colors : color ? [color] : [];
   const lifeStyle =
@@ -3974,12 +4128,12 @@ function LifeRow({
         : undefined;
   const lifeSize =
     digits >= 5
-      ? 'text-[clamp(1.1rem,28cqh,2.35rem)]'
+      ? 'text-[clamp(1.25rem,min(22cqw,28cqh),6rem)]'
       : digits >= 4
-        ? 'text-[clamp(1.35rem,34cqh,3.1rem)]'
+        ? 'text-[clamp(1.5rem,min(28cqw,36cqh),8rem)]'
         : digits >= 3
-          ? 'text-[clamp(1.75rem,42cqh,3.75rem)]'
-          : 'text-[clamp(2rem,50cqh,5.5rem)]';
+          ? 'text-[clamp(1.75rem,min(34cqw,44cqh),11rem)]'
+          : 'text-[clamp(2.5rem,min(48cqw,56cqh),16rem)]';
   return (
     <div
       className={cx(
@@ -4011,7 +4165,7 @@ function LifeRow({
         <div className="relative flex flex-col items-center">
           <p
             className={cx(
-              'font-display w-full max-w-[12rem] shrink-0 text-center leading-none font-bold tabular-nums',
+              'font-display w-full max-w-full shrink-0 text-center leading-none font-bold tabular-nums',
               !lifeStyle && 'text-neon',
               lifeSize,
               onArt,
@@ -4124,15 +4278,11 @@ function LifeButton({
 function LifeAmountPad({
   sign,
   playerName,
-  facesAway = false,
-  forceRotate = false,
   onConfirm,
   onClose,
 }: {
   sign: 1 | -1;
   playerName: string;
-  facesAway?: boolean;
-  forceRotate?: boolean;
   onConfirm: (amount: number) => void;
   onClose: () => void;
 }) {
@@ -4152,7 +4302,6 @@ function LifeAmountPad({
           : t('tracker.removeLifeFor', { name: playerName })
       }
       className={trackerOverlayClass(
-        forceRotate,
         'z-[80] items-center justify-center bg-void/95 p-4 backdrop-blur-md',
       )}
       onClick={(event) => {
@@ -4161,12 +4310,7 @@ function LifeAmountPad({
         }
       }}
     >
-      <section
-        className={cx(
-          'border-muted/25 bg-hull w-full max-w-sm rounded-2xl border p-4 shadow-2xl',
-          seatFacingContentClass(facesAway),
-        )}
-      >
+      <section className="border-muted/25 bg-hull w-full max-w-sm rounded-2xl border p-4 shadow-2xl">
         <header className="mb-3 flex items-start justify-between gap-3">
           <div>
             <p className="text-muted text-xs font-bold tracking-wider uppercase">
@@ -4661,12 +4805,15 @@ function CounterSheet({
   dispatch,
   onClose,
   includeCommanderTax = true,
+  turned = false,
 }: {
   player: TrackerPlayer;
   disabled: boolean;
   dispatch: (action: TrackerAction) => void;
   onClose: () => void;
   includeCommanderTax?: boolean;
+  /** Wide board: the sheet is turned, so it has the wide side to lay cards on. */
+  turned?: boolean;
 }) {
   const { t } = useTranslation();
   const counters = counterDefinitions(t).filter(
@@ -4687,7 +4834,12 @@ function CounterSheet({
           <X size={18} aria-hidden />
         </button>
       </header>
-      <div className="grid min-h-0 flex-1 grid-cols-2 content-center gap-2 overflow-y-auto landscape:grid-cols-4">
+      <div
+        className={cx(
+          'grid min-h-0 flex-1 content-center gap-2 overflow-y-auto',
+          turned ? 'grid-cols-4' : 'grid-cols-2 landscape:grid-cols-4',
+        )}
+      >
         {counters.map((counter) => (
           <CounterCard key={counter.id} label={counter.label}>
             <Counter

@@ -78,7 +78,7 @@ export function matchMenuBodyClass(
 
 /**
  * Commander-damage sheet while it is not the one on top. `hidden` so the
- * columns do not show through the seat gaps. Never a second `rotate-90`.
+ * columns do not show through the seat gaps. The sheet is not rotated.
  */
 export function commanderSheetClass(open: boolean, openClass: string): string {
   return open ? openClass : 'hidden';

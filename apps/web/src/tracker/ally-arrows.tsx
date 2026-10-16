@@ -50,9 +50,8 @@ function elementTranslate(el: HTMLElement): { x: number; y: number } {
 }
 
 /**
- * Seat centre in the board's local layout space. Prefer offset* over
- * getBoundingClientRect so an ancestor rotate (iPhone force-landscape shell)
- * cannot map screen AABB deltas into wrong left/top coordinates.
+ * Seat centre in the board's local layout space. offset* follows the grid
+ * even when a seat is nudged with a translate.
  */
 function seatCenter(seat: HTMLElement): { x: number; y: number } {
   const { x: tx, y: ty } = elementTranslate(seat);

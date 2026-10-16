@@ -8,7 +8,6 @@ import {
   type DungeonRoom,
 } from './dungeons';
 import type { TrackerAction, TrackerState } from './engine';
-import { useBoardLandscape } from './orientation';
 import { assetUrl } from '../asset-url';
 import { Button } from '../ui/Button';
 import { cx } from '../ui/cx';
@@ -25,15 +24,10 @@ const CARD_W = 488;
 const CARD_H = 680;
 
 /*
-  A phone on the table never faces everyone, so it gets turned constantly and
-  the width is the space actually worth spending. A portrait card in a landscape
-  viewport can only be as wide as the viewport is tall, which on a phone leaves
-  the map about half the size it could be. Turning the card on its side trades
-  the wasted margins for roughly double the map.
+  The card stays upright and letterboxes into whatever rectangle it is given.
 */
 export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
   const { t } = useTranslation();
-  const { landscape } = useBoardLandscape();
   const progress = state.dungeons[playerId];
   const completedIds = new Set(state.completedDungeons[playerId] ?? []);
   const dungeonStarted = (progress?.visitedRoomIds.length ?? 0) > 0;
@@ -201,24 +195,10 @@ export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
         */}
         <svg
           className="min-h-0 w-full min-w-0 flex-1"
-          viewBox={
-            landscape
-              ? `0 0 ${String(CARD_H)} ${String(CARD_W)}`
-              : `0 0 ${String(CARD_W)} ${String(CARD_H)}`
-          }
+          viewBox={`0 0 ${String(CARD_W)} ${String(CARD_H)}`}
           preserveAspectRatio="xMidYMid meet"
         >
-          {/*
-            Turned anticlockwise so the rooms still run in reading order: the top
-            of the card becomes the left edge, and the dungeon flows rightwards.
-          */}
-          <g
-            transform={
-              landscape
-                ? `translate(0 ${String(CARD_W)}) rotate(-90)`
-                : undefined
-            }
-          >
+          <g>
             <image
               href={assetUrl(dungeon.image)}
               x="0"

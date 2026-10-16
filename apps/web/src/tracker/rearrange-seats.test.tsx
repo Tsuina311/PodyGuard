@@ -34,6 +34,44 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
+async function startMatch(
+  players: Array<{ id: string; name: string }>,
+  storageKey: string,
+) {
+  render(
+    <MemoryRouter>
+      <FeedbackProvider>
+        <TrackerView
+          storageKey={storageKey}
+          persist={false}
+          gameMode={players.length === 2 ? 'duel' : 'commander'}
+          rulesFormat={players.length === 2 ? 'normal' : 'commander'}
+          players={players}
+          onFinish={async () => undefined}
+          onQuit={() => undefined}
+        />
+      </FeedbackProvider>
+    </MemoryRouter>,
+  );
+  vi.useFakeTimers();
+  fireEvent.click(
+    screen.getByRole('button', { name: 'Reveal starting player' }),
+  );
+  for (
+    let step = 0;
+    step < 80 && !screen.queryByRole('button', { name: 'Start' });
+    step += 1
+  ) {
+    await act(async () => {
+      vi.advanceTimersByTime(500);
+    });
+  }
+  fireEvent.click(screen.getByRole('button', { name: 'Start' }));
+  vi.useRealTimers();
+  fireEvent.click(screen.getByRole('button', { name: /Show seat controls/ }));
+  fireEvent.click(screen.getByRole('button', { name: /Match menu/ }));
+}
+
 function lifeColor(label: HTMLElement): string {
   return label.querySelector('p')?.style.color ?? '';
 }
@@ -108,5 +146,46 @@ describe('rearranging duel seats', () => {
     const beaSeat = document.querySelector('[data-seat-id="bea"]');
     expect(adaSeat?.querySelector('p')?.style.color).toBe(asRgb(SEAT_COLORS[0]));
     expect(beaSeat?.querySelector('p')?.style.color).toBe(asRgb(SEAT_COLORS[1]));
+  });
+});
+
+describe('duel board layout', () => {
+  it('shows the wide layout as selected and stacks the seats in portrait', async () => {
+    await startMatch(
+      [
+        { id: 'ada', name: 'Ada' },
+        { id: 'bea', name: 'Bea' },
+      ],
+      'layout-test',
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Change layout' }));
+    const wide = screen.getByRole('button', { name: /Wide/ });
+    const portrait = screen.getByRole('button', { name: /Portrait/ });
+    expect(wide).toHaveAttribute('aria-pressed', 'true');
+    expect(portrait).toHaveAttribute('aria-pressed', 'false');
+    expect(document.querySelector('[data-board-layout="wide"]')).toBeTruthy();
+
+    fireEvent.click(portrait);
+    expect(portrait).toHaveAttribute('aria-pressed', 'true');
+    expect(wide).toHaveAttribute('aria-pressed', 'false');
+    const board = document.querySelector('[data-board-layout="portrait"]');
+    expect(board).toBeTruthy();
+    expect(board?.className).toContain('grid-rows-2');
+    expect(board?.className).not.toContain('grid-cols-2');
+  });
+
+  it('keeps a single full-width layout when there are more than two seats', async () => {
+    await startMatch(
+      [
+        { id: 'ada', name: 'Ada' },
+        { id: 'bea', name: 'Bea' },
+        { id: 'cam', name: 'Cam' },
+        { id: 'dee', name: 'Dee' },
+      ],
+      'layout-pod-test',
+    );
+    expect(screen.queryByRole('button', { name: 'Change layout' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Rearrange seats' })).toBeTruthy();
   });
 });
