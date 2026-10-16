@@ -108,6 +108,8 @@ export type TrackerSeed = {
 export type TrackerPlayer = {
   id: string;
   name: string;
+  /** Colour assigned when the table sits down, kept when this player changes seats. */
+  colorIndex: number;
   life: number;
   /** Lowest life observed this game, used by threshold-then-win challenges. */
   minimumLife: number;
@@ -240,9 +242,10 @@ export function createTracker(
   return {
     gameMode,
     rulesFormat,
-    players: names.map((row) => ({
+    players: names.map((row, index) => ({
       id: row.id,
       name: row.name,
+      colorIndex: index,
       life: startingLife,
       minimumLife: startingLife,
       poison: 0,

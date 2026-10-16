@@ -1,4 +1,14 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent as ReactPointerEvent,
+  type ReactNode,
+} from 'react';
 import { cx } from './cx';
 
 /** Matches the `letter-explode` animation length in styles.css. */
@@ -146,7 +156,7 @@ function glyphStyle(burst: Burst): CSSProperties {
 }
 
 const textButtonClass =
-  'cursor-pointer border-0 bg-transparent p-0 text-inherit align-baseline touch-manipulation focus-visible:ring-neon/50 rounded-sm focus-visible:ring-2 focus-visible:outline-none';
+  'cursor-pointer border-0 bg-transparent p-0 text-inherit align-baseline touch-none focus-visible:ring-neon/50 rounded-sm focus-visible:ring-2 focus-visible:outline-none';
 
 function fineHoverDevice(): boolean {
   try {
@@ -154,6 +164,32 @@ function fineHoverDevice(): boolean {
   } catch {
     return false;
   }
+}
+
+type LetterLaunch = () => void;
+
+type LetterTouchApi = {
+  register: (node: HTMLButtonElement, launch: LetterLaunch) => () => void;
+};
+
+const LetterTouchContext = createContext<LetterTouchApi | null>(null);
+
+function buttonOf(node: EventTarget | Node | null): HTMLButtonElement | null {
+  if (!(node instanceof Element)) {
+    return null;
+  }
+  const button = node instanceof HTMLButtonElement ? node : node.closest('button');
+  return button instanceof HTMLButtonElement ? button : null;
+}
+
+function isFinger(event: ReactPointerEvent<HTMLElement>): boolean {
+  if (event.pointerType === 'touch' || event.pointerType === 'pen') {
+    return true;
+  }
+  if (event.pointerType === 'mouse') {
+    return false;
+  }
+  return !fineHoverDevice();
 }
 
 export function ExplodingLetter({
@@ -165,13 +201,29 @@ export function ExplodingLetter({
 }) {
   const { phase, play } = useLetterPlayback(motionDuration(motion));
   const [burst, setBurst] = useState(restingBurst);
+  const nodeRef = useRef<HTMLButtonElement | null>(null);
+  const touch = useContext(LetterTouchContext);
+  const launchRef = useRef<LetterLaunch>(() => {});
 
   function burstLetter() {
     play(() => setBurst(launchOffset(motion)));
   }
 
+  launchRef.current = burstLetter;
+
+  useEffect(() => {
+    const node = nodeRef.current;
+    if (!node || !touch) {
+      return;
+    }
+    return touch.register(node, () => {
+      launchRef.current();
+    });
+  }, [touch]);
+
   return (
     <button
+      ref={nodeRef}
       type="button"
       className={cx(textButtonClass, glyphClass(phase, motion))}
       style={glyphStyle(burst)}
@@ -188,6 +240,106 @@ export function ExplodingLetter({
   );
 }
 
+function FingerTrail({ children }: { children: ReactNode }) {
+  const launches = useRef(new Map<HTMLButtonElement, LetterLaunch>());
+  const fingers = useRef(new Set<number>());
+  const api = useMemo<LetterTouchApi>(
+    () => ({
+      register(node, launch) {
+        launches.current.set(node, launch);
+        return () => {
+          if (launches.current.get(node) === launch) {
+            launches.current.delete(node);
+          }
+        };
+      },
+    }),
+    [],
+  );
+
+  function launchHit(x: number, y: number): boolean {
+    const seen = new Set<Element>();
+    const candidates: Array<Element | null> = [];
+    if (typeof document.elementsFromPoint === 'function') {
+      candidates.push(...document.elementsFromPoint(x, y));
+    }
+    if (typeof document.elementFromPoint === 'function') {
+      candidates.push(document.elementFromPoint(x, y));
+    }
+    for (const node of candidates) {
+      if (!node || seen.has(node)) {
+        continue;
+      }
+      seen.add(node);
+      const button = buttonOf(node);
+      const launch = button ? launches.current.get(button) : undefined;
+      if (launch) {
+        launch();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function launchUnder(x: number, y: number, fallback: EventTarget | null) {
+    // A fingertip is wider than a letter, so look a few pixels off the contact point.
+    const samples = [
+      [0, 0],
+      [0, -12],
+      [0, 12],
+      [-10, 0],
+      [10, 0],
+    ];
+    for (const [dx, dy] of samples) {
+      if (launchHit(x + (dx ?? 0), y + (dy ?? 0))) {
+        return;
+      }
+    }
+    const button = buttonOf(fallback);
+    const launch = button ? launches.current.get(button) : undefined;
+    launch?.();
+  }
+
+  function onPointerDown(event: ReactPointerEvent<HTMLSpanElement>) {
+    if (!isFinger(event)) {
+      return;
+    }
+    fingers.current.add(event.pointerId);
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    } catch {
+      // Some test environments have no pointer capture.
+    }
+    launchUnder(event.clientX, event.clientY, event.target);
+  }
+
+  function onPointerMove(event: ReactPointerEvent<HTMLSpanElement>) {
+    if (!fingers.current.has(event.pointerId)) {
+      return;
+    }
+    // Touch moves stay on the first contact. Ask the screen which letter is under the finger.
+    launchUnder(event.clientX, event.clientY, null);
+  }
+
+  function endFinger(event: ReactPointerEvent<HTMLSpanElement>) {
+    fingers.current.delete(event.pointerId);
+  }
+
+  return (
+    <LetterTouchContext.Provider value={api}>
+      <span
+        className="touch-none"
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={endFinger}
+        onPointerCancel={endFinger}
+      >
+        {children}
+      </span>
+    </LetterTouchContext.Provider>
+  );
+}
+
 export function ExplodingSentence({
   text,
   motion = 'burst',
@@ -197,7 +349,7 @@ export function ExplodingSentence({
 }) {
   const parts = text.split(/(\s+)/);
   return (
-    <>
+    <FingerTrail>
       {parts.map((part, index) => {
         if (/^\s+$/.test(part)) {
           return <span key={index}>{part}</span>;
@@ -218,6 +370,6 @@ export function ExplodingSentence({
           </span>
         );
       })}
-    </>
+    </FingerTrail>
   );
 }

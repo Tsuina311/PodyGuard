@@ -92,6 +92,51 @@ describe('wake sentence letters', () => {
     expect(titleLetter).toHaveClass('letter-explode');
   });
 
+  it('bursts a letter when a finger touches it, before the tap ends', () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: false }));
+    render(<ExplodingSentence text="Waking" motion="burst" />);
+    const touched = screen.getByRole('button', { name: 'W' });
+    fireEvent.pointerEnter(touched);
+    expect(touched).not.toHaveClass('letter-explode');
+    fireEvent.pointerDown(touched, {
+      pointerType: 'touch',
+      pointerId: 1,
+      clientX: 4,
+      clientY: 8,
+      buttons: 1,
+    });
+    expect(touched).toHaveClass('letter-explode');
+  });
+
+  it('bursts each letter a finger slides across', () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: false }));
+    render(<ExplodingSentence text="Waking" motion="burst" />);
+    const first = screen.getByRole('button', { name: 'W' });
+    const next = screen.getByRole('button', { name: 'a' });
+    const at = (x: number) => (x < 10 ? first : next);
+    document.elementFromPoint = (x: number) => at(x);
+    document.elementsFromPoint = (x: number) => [at(x)];
+
+    fireEvent.pointerDown(first, {
+      pointerType: 'touch',
+      pointerId: 1,
+      clientX: 0,
+      clientY: 8,
+      buttons: 1,
+    });
+    expect(first).toHaveClass('letter-explode');
+    expect(next).not.toHaveClass('letter-explode');
+
+    fireEvent.pointerMove(first, {
+      pointerType: 'touch',
+      pointerId: 1,
+      clientX: 20,
+      clientY: 8,
+      buttons: 1,
+    });
+    expect(next).toHaveClass('letter-explode');
+  });
+
   it('picks one motion for the waiting screen and hides the switch', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
     render(<ServerWakeScreen />);

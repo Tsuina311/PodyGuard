@@ -1223,9 +1223,7 @@ export function TrackerView({
                   <span
                     className="size-5 shrink-0 rounded-full shadow-[0_0_0_1px_rgba(0,0,0,0.35)]"
                     style={{
-                      backgroundColor: seatColor(
-                        playerSeatIndex(state.players, playerId),
-                      ),
+                      backgroundColor: playerColor(state.players, playerId),
                     }}
                     aria-label={t('tracker.seatN', {
                       n: playerSeatIndex(state.players, playerId) + 1,
@@ -1351,7 +1349,7 @@ export function TrackerView({
                         : 'border-muted/25 bg-void/70 text-ink',
                   )}
                 >
-                  <SeatLabel index={index} name={player.name} />
+                  <SeatLabel index={player.colorIndex} name={player.name} />
                 </button>
               );
             })}
@@ -1415,7 +1413,10 @@ export function TrackerView({
                           )}
                         >
                           <SeatLabel
-                            index={playerSeatIndex(state.players, playerId)}
+                            index={
+                              seat?.colorIndex ??
+                              playerSeatIndex(state.players, playerId)
+                            }
                             name={seat?.name ?? playerId}
                           />
                         </button>
@@ -1506,7 +1507,7 @@ export function TrackerView({
                     : 'border-muted/25 bg-void/70 text-ink',
                 )}
               >
-                <SeatLabel index={index} name={player.name} />
+                <SeatLabel index={player.colorIndex} name={player.name} />
               </button>
             ))}
           </div>
@@ -1606,7 +1607,7 @@ export function TrackerView({
                         : 'border-muted/25 bg-void/70 text-ink',
                   )}
                 >
-                  <SeatLabel index={index} name={player.name} />
+                  <SeatLabel index={player.colorIndex} name={player.name} />
                 </button>
               );
             })}
@@ -1677,6 +1678,7 @@ export function TrackerView({
                 seatLayout={seatLayout}
                 archenemyBoard={archenemyBoard}
                 archenemyId={state.archenemyId}
+                showNames
                 forceRotate={false}
                 selectedIds={
                   pregameSwapId ? new Set([pregameSwapId]) : undefined
@@ -1866,7 +1868,7 @@ export function TrackerView({
                 life={player.life}
                 flash={lifeDeltas[player.id]?.amount ?? null}
                 flashFading={lifeDeltas[player.id]?.fading ?? false}
-                color={seatColor(index)}
+                color={seatColor(player.colorIndex)}
                 disabled={lifeDisabled}
                 onStep={(delta) =>
                   send({
@@ -2106,7 +2108,7 @@ export function TrackerView({
                     flashFading={lifeDeltas[first.id]?.fading ?? false}
                     compact
                     colors={team.map((id) =>
-                      seatColor(playerSeatIndex(state.players, id)),
+                      playerColor(state.players, id),
                     )}
                     disabled={lifeDisabled}
                     onStep={(delta) =>
@@ -2620,8 +2622,9 @@ export function TrackerView({
                   <span
                     className="size-4 rounded-full shadow-[0_0_0_1px_rgba(0,0,0,0.35)]"
                     style={{
-                      backgroundColor: seatColor(
-                        playerSeatIndex(state.players, assassinVictim.id),
+                      backgroundColor: playerColor(
+                        state.players,
+                        assassinVictim.id,
                       ),
                     }}
                     aria-label={t('tracker.seatN', {
@@ -2833,9 +2836,7 @@ export function TrackerView({
                       key={seat.id}
                       className="size-4 rounded-full shadow-[0_0_0_1px_rgba(0,0,0,0.35)]"
                       style={{
-                        backgroundColor: seatColor(
-                          playerSeatIndex(state.players, seat.id),
-                        ),
+                        backgroundColor: seatColor(seat.colorIndex),
                       }}
                       aria-label={t('tracker.seatN', {
                         n: playerSeatIndex(state.players, seat.id) + 1,
@@ -2865,7 +2866,9 @@ export function TrackerView({
                           <span className="flex min-w-0 items-center gap-2">
                             <span
                               className="size-3 shrink-0 rounded-full shadow-[0_0_0_1px_rgba(0,0,0,0.35)]"
-                              style={{ backgroundColor: seatColor(index) }}
+                              style={{
+                                backgroundColor: seatColor(player.colorIndex),
+                              }}
                               aria-hidden
                             />
                             <span className="text-muted truncate">
@@ -3322,6 +3325,7 @@ function MatchMenu({
           disabledIds={
             arrangeSeats ? undefined : disabledIds
           }
+          showNames={arrangeSeats}
           onSelect={(seatId) => {
             if (arrangeSeats) {
               if (!selectedSeatId) {
@@ -3361,7 +3365,7 @@ function MatchMenu({
           >
             <span
               className="size-8 rounded-full shadow-[0_0_0_1px_rgba(0,0,0,0.35)]"
-              style={{ backgroundColor: seatColor(confirmSeatIndex) }}
+              style={{ backgroundColor: seatColor(confirmSeat.colorIndex) }}
               aria-label={t('tracker.seatN', { n: confirmSeatIndex + 1 })}
             />
             <p className="font-display text-base font-semibold">
@@ -3599,9 +3603,7 @@ function MatchMenu({
                     key={seat.id}
                     className="size-3.5 rounded-full shadow-[0_0_0_1px_rgba(0,0,0,0.35)]"
                     style={{
-                      backgroundColor: seatColor(
-                        playerSeatIndex(state.players, seat.id),
-                      ),
+                      backgroundColor: seatColor(seat.colorIndex),
                     }}
                     aria-label={t('tracker.seatN', {
                       n: playerSeatIndex(state.players, seat.id) + 1,
@@ -3824,6 +3826,7 @@ function SeatPickBoard({
   archenemyBoard,
   archenemyId,
   forceRotate,
+  showNames = false,
   selectedIds,
   disabledIds,
   onSelect,
@@ -3833,6 +3836,8 @@ function SeatPickBoard({
   archenemyBoard: boolean;
   archenemyId?: string | null;
   forceRotate: boolean;
+  /** Names stand in for commander art on a non-commander rearrange. */
+  showNames?: boolean;
   selectedIds?: ReadonlySet<string>;
   disabledIds?: ReadonlySet<string>;
   onSelect: (playerId: string) => void;
@@ -3849,7 +3854,7 @@ function SeatPickBoard({
       )}
     >
       {players.map((seat, index) => {
-        const color = seatColor(index);
+        const color = seatColor(seat.colorIndex);
         const selected = selectedIds?.has(seat.id) ?? false;
         const disabled = disabledIds?.has(seat.id) ?? false;
         const facesAway = seatFacesAway(players.length, index, seatLayout, {
@@ -3857,12 +3862,13 @@ function SeatPickBoard({
           archenemyId,
           playerId: seat.id,
         });
+        const seatLabel = t('tracker.seatN', { n: index + 1 });
         return (
           <button
             key={seat.id}
             type="button"
             disabled={disabled}
-            aria-label={t('tracker.seatN', { n: index + 1 })}
+            aria-label={showNames ? `${seat.name}, ${seatLabel}` : seatLabel}
             aria-pressed={selected}
             onClick={() => onSelect(seat.id)}
             className={cx(
@@ -3893,6 +3899,13 @@ function SeatPickBoard({
                 color={color}
                 interactive={false}
               />
+              {showNames ? (
+                <span className="pointer-events-none absolute inset-x-1 bottom-1.5 z-20 flex justify-center">
+                  <span className="bg-void/80 text-ink max-w-full truncate rounded-full px-2 py-0.5 text-sm font-semibold shadow-sm">
+                    {seat.name}
+                  </span>
+                </span>
+              ) : null}
             </span>
           </button>
         );
@@ -3901,8 +3914,16 @@ function SeatPickBoard({
   );
 }
 
+function playerColor(
+  players: ReadonlyArray<{ id: string; colorIndex: number }>,
+  playerId: string,
+): string {
+  const player = players.find((row) => row.id === playerId);
+  return seatColor(player?.colorIndex ?? playerSeatIndex(players, playerId));
+}
+
 function playerSeatIndex(
-  players: Array<{ id: string }>,
+  players: ReadonlyArray<{ id: string }>,
   playerId: string,
 ): number {
   const index = players.findIndex((player) => player.id === playerId);
@@ -5337,8 +5358,13 @@ function normalizePlayer(
       commanderDamage[primaryCommanderId(key)] = value;
     }
   }
+  const rosterIndex = roster.findIndex((row) => row.id === player.id);
   return {
     ...player,
+    colorIndex:
+      typeof player.colorIndex === 'number'
+        ? player.colorIndex
+        : Math.max(0, rosterIndex),
     minimumLife: player.minimumLife ?? player.life,
     poison: player.poison ?? 0,
     commanderTax: player.commanderTax ?? 0,

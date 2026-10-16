@@ -1285,6 +1285,7 @@ describe('commander tracker', () => {
       order: ['c', 'a', 'b'],
     });
     expect(state.players.map((player) => player.id)).toEqual(['c', 'a', 'b']);
+    expect(state.players.map((player) => player.colorIndex)).toEqual([2, 0, 1]);
     expect(state.players.find((player) => player.id === 'a')?.life).toBe(
       STARTING_LIFE - 7,
     );
