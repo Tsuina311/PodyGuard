@@ -280,20 +280,36 @@ function PreGameScreen({
   actions,
   contentClassName = 'max-w-lg',
   onCancel,
+  fill = false,
 }: {
   children: ReactNode;
   actions?: ReactNode;
   contentClassName?: string;
   onCancel?: () => void;
+  /** The body is a board that must fill the space above the actions. */
+  fill?: boolean;
 }) {
   const { t } = useTranslation();
   return (
     <section className={boardScreenClass('roomy')}>
-      <div className="flex min-h-0 flex-1 flex-col gap-3 landscape:flex-row landscape:items-center landscape:justify-center landscape:gap-6 landscape:px-4">
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain landscape:flex-none landscape:max-h-full">
+      <div
+        className={cx(
+          'flex min-h-0 flex-1 flex-col gap-3 landscape:flex-row landscape:justify-center landscape:gap-6 landscape:px-4',
+          fill ? 'landscape:items-stretch' : 'landscape:items-center',
+        )}
+      >
+        <div
+          className={cx(
+            'min-h-0 flex-1 overflow-y-auto overscroll-contain',
+            fill
+              ? 'flex flex-col'
+              : 'landscape:flex-none landscape:max-h-full',
+          )}
+        >
           <div
             className={cx(
-              'mx-auto flex min-h-full w-full flex-col justify-center py-1',
+              'mx-auto flex w-full flex-col py-1',
+              fill ? 'h-full min-h-0 flex-1' : 'min-h-full justify-center',
               contentClassName,
             )}
           >
@@ -1635,7 +1651,8 @@ export function TrackerView({
       return (
         <>
           <PreGameScreen
-            contentClassName="max-w-none w-full flex-1"
+            fill
+            contentClassName="max-w-none w-full"
             onCancel={leaveSetup}
             actions={
               <>
@@ -1663,7 +1680,7 @@ export function TrackerView({
               </>
             }
           >
-            <div className="mb-3 text-center">
+            <div className="mb-3 shrink-0 text-center">
               <h2 className="font-display mb-1 text-2xl font-bold">
                 {t('tracker.confirmSeatOrder')}
               </h2>
@@ -1671,7 +1688,7 @@ export function TrackerView({
                 {t('tracker.confirmSeatOrderHint')}
               </p>
             </div>
-            <div className="min-h-[min(52dvh,28rem)] flex-1">
+            <div className="flex min-h-0 w-full flex-1 flex-col">
               <SeatPickBoard
                 players={state.players}
                 seatLayout={seatLayout}
@@ -1786,7 +1803,7 @@ export function TrackerView({
               // Size container so life totals scale to THIS seat, not the phone
               // viewport (vh broke under CSS force-rotate and on tall Androids).
               'relative flex h-full min-h-0 flex-col overflow-hidden transition-transform duration-200 [container-type:size]',
-              duelSeatPlaceClass(activeBoardLayout, index),
+              duelBoard ? duelSeatPlaceClass(activeBoardLayout, index) : '',
               duelBoard
                 ? 'rounded-none border-0 p-0'
                 : 'border-muted/20 rounded-xl border p-2',
@@ -2026,7 +2043,6 @@ export function TrackerView({
                   <Building2 size={18} aria-hidden />
                 </IconButton>
               </div>
-            </div>
             {player.pendingLoss ? (
               <div
                 role="dialog"
@@ -2069,9 +2085,22 @@ export function TrackerView({
                 </div>
               </div>
             ) : null}
+            </div>
           </article>
           );
         })}
+        {duelBoard && !commanderRules ? (
+          <div
+            aria-hidden
+            className={cx(
+              'pointer-events-none absolute z-10',
+              activeBoardLayout === 'portrait'
+                ? 'inset-x-0 top-1/2 h-0 -translate-y-1/2'
+                : 'inset-y-0 left-1/2 w-0 -translate-x-1/2',
+              'shadow-[0_0_0_1px_color-mix(in_oklab,var(--color-ink)_32%,transparent),0_0_22px_3px_color-mix(in_oklab,var(--color-ink)_22%,transparent)]',
+            )}
+          />
+        ) : null}
         <AllyArrows
           pairs={allyPairs}
           containerRef={boardRef}
@@ -3336,6 +3365,7 @@ function MatchMenu({
           archenemyBoard={archenemyBoard}
           archenemyId={state.archenemyId}
           boardLayout={boardLayout}
+          turnedMenu={sideways}
           selectedIds={
             new Set(
               [
@@ -3894,6 +3924,7 @@ function SeatPickBoard({
   archenemyBoard,
   archenemyId,
   boardLayout = 'wide',
+  turnedMenu = false,
   showNames = false,
   selectedIds,
   disabledIds,
@@ -3904,6 +3935,9 @@ function SeatPickBoard({
   archenemyBoard: boolean;
   archenemyId?: string | null;
   boardLayout?: DuelBoardLayout;
+  /** The match menu is already turned for a wide board, so the seats are
+   * drawn stacked and the menu turn stands them up side by side. */
+  turnedMenu?: boolean;
   /** Names stand in for commander art on a non-commander rearrange. */
   showNames?: boolean;
   selectedIds?: ReadonlySet<string>;
@@ -3911,16 +3945,24 @@ function SeatPickBoard({
   onSelect: (playerId: string) => void;
 }) {
   const { t } = useTranslation();
-  const sideways = boardLayout === 'wide' && players.length === 2 && !useLandscape();
+  // Inside the turned wide menu, portrait geometry plus that turn is the wide
+  // board. Applying wide again would stack the seats.
+  const facingLayout: DuelBoardLayout =
+    turnedMenu && boardLayout === 'wide' ? 'portrait' : boardLayout;
+  const sideways =
+    !turnedMenu &&
+    facingLayout === 'wide' &&
+    players.length === 2 &&
+    !useLandscape();
   return (
     <div
       data-board-layout={boardLayout}
       className={cx(
         'relative grid min-h-0 flex-1 auto-rows-fr gap-2',
-        duelBoardFrameClass(boardLayout),
+        duelBoardFrameClass(facingLayout),
         archenemyBoard
           ? 'grid-cols-1 landscape:grid-cols-3'
-          : seatGridClass(players.length, boardLayout),
+          : seatGridClass(players.length, facingLayout),
       )}
     >
       {players.map((seat, index) => {
@@ -3938,8 +3980,10 @@ function SeatPickBoard({
             onClick={() => onSelect(seat.id)}
             className={cx(
               'relative flex h-full min-h-0 flex-col overflow-hidden rounded-xl border p-2 transition [container-type:size] disabled:opacity-40',
-              duelSeatPlaceClass(boardLayout, index),
-              duelSeatClass(boardLayout),
+              players.length === 2
+                ? duelSeatPlaceClass(facingLayout, index)
+                : '',
+              duelSeatClass(facingLayout),
               seat.eliminated ? 'opacity-50' : 'bg-ink/[0.03]',
               archenemyBoard &&
                 seat.id === archenemyId &&
@@ -3953,7 +3997,7 @@ function SeatPickBoard({
             <span
               className={cx(
                 '[container-type:size]',
-                duelSeatFaceClass(boardLayout, index, sideways),
+                duelSeatFaceClass(facingLayout, index, sideways),
               )}
             >
               <CommanderArt

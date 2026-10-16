@@ -24,26 +24,39 @@ describe('duel seat layout', () => {
     expect(duelBoardLayouts(4)).toEqual(['wide']);
     expect(duelBoardFrameClass('wide')).toBe('');
     expect(duelSeatClass('portrait')).toBe('');
-    expect(duelSeatPlaceClass('wide', 0)).toContain('col-start-2');
-    expect(duelSeatPlaceClass('wide', 1)).toContain('col-start-1');
+    expect(duelSeatPlaceClass('wide', 0)).toBe('col-start-2 row-start-1');
+    expect(duelSeatPlaceClass('wide', 1)).toBe('col-start-1 row-start-1');
     expect(duelSeatPlaceClass('portrait', 0)).toBe('');
-    expect(duelSeatFaceClass('wide', 0, true)).toContain('-rotate-90');
-    expect(duelSeatFaceClass('wide', 1, true)).toMatch(/(?:^|\s)rotate-90$/);
-    expect(duelSeatFaceClass('wide', 0, true)).not.toContain('inset-0');
+    expect(duelSeatPlaceClass('portrait', 1)).toBe('');
+    // Tall phone: swap the seat box, then turn each total toward that side.
+    expect(duelSeatFaceClass('wide', 0, true)).toBe(
+      'absolute top-1/2 left-1/2 h-[100cqw] w-[100cqh] -translate-x-1/2 -translate-y-1/2 -rotate-90',
+    );
+    expect(duelSeatFaceClass('wide', 1, true)).toBe(
+      'absolute top-1/2 left-1/2 h-[100cqw] w-[100cqh] -translate-x-1/2 -translate-y-1/2 rotate-90',
+    );
     expect(duelSeatFaceClass('portrait', 0, true)).toBe(
       'absolute inset-0 rotate-180',
     );
     expect(duelSeatFaceClass('portrait', 1, true)).toBe('absolute inset-0');
+    expect(duelSeatFaceClass('portrait', 1, false)).toBe('absolute inset-0');
+    // A phone that is already wide does not turn the totals again.
     expect(duelSeatFaceClass('wide', 0, false)).toBe('absolute inset-0');
+    expect(duelSeatFaceClass('wide', 1, false)).toBe('absolute inset-0');
     expect(duelClockFaceClass(true)).toBe('rotate-90');
     expect(duelClockFaceClass(false)).toBe('');
-    expect(duelPlayerSheetTurnClass('wide', 0, true)).toContain('-rotate-90');
-    expect(duelPlayerSheetTurnClass('wide', 1, true)).toMatch(
-      /(?:^|\s)rotate-90$/,
+    expect(duelPlayerSheetTurnClass('wide', 0, true)).toBe(
+      'absolute top-1/2 left-1/2 h-[100dvw] w-[100dvh] -translate-x-1/2 -translate-y-1/2 -rotate-90',
+    );
+    expect(duelPlayerSheetTurnClass('wide', 1, true)).toBe(
+      'absolute top-1/2 left-1/2 h-[100dvw] w-[100dvh] -translate-x-1/2 -translate-y-1/2 rotate-90',
     );
     expect(duelPlayerSheetTurnClass('wide', 0, false)).toBe('');
+    expect(duelPlayerSheetTurnClass('wide', 1, false)).toBe('');
     expect(duelPlayerSheetTurnClass('portrait', 0, false)).toBe('rotate-180');
+    expect(duelPlayerSheetTurnClass('portrait', 0, true)).toBe('rotate-180');
     expect(duelPlayerSheetTurnClass('portrait', 1, false)).toBe('');
+    expect(duelPlayerSheetTurnClass('portrait', 1, true)).toBe('');
   });
 });
 
