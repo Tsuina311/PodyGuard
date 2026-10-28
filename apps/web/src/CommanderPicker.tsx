@@ -8,7 +8,6 @@ import type {
   CommanderCandidate,
   CommanderSelection,
 } from './scryfall';
-import { cardImageSrc } from './card-image';
 import { Button } from './ui/Button';
 
 type Props = {
@@ -156,7 +155,7 @@ export function CommanderPicker({
         <div className="border-muted/20 bg-void/70 flex items-center gap-2 rounded-xl border p-2">
           {value.artCropUri ? (
             <img
-              src={cardImageSrc(value.artCropUri)}
+              src={value.artCropUri}
               alt=""
               className="h-12 w-16 shrink-0 rounded-lg object-[center_15%] object-cover"
             />
@@ -228,7 +227,7 @@ export function CommanderPicker({
                   onClick={() => void chooseCard(card)}
                 >
                   <img
-                    src={cardImageSrc(card.artCropUri)}
+                    src={card.artCropUri}
                     alt=""
                     className="h-10 w-14 shrink-0 rounded object-[center_15%] object-cover"
                   />
@@ -280,7 +279,7 @@ export function CommanderPicker({
                   onClick={() => chooseArt(artCard, art)}
                 >
                   <img
-                    src={cardImageSrc(art.artCropUri)}
+                    src={art.artCropUri}
                     alt={`${artCard.name}${art.setName ? ` — ${art.setName}` : ''}`}
                     className="size-full object-[center_15%] object-cover"
                   />

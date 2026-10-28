@@ -8,30 +8,7 @@ import {
 
 type ScryfallRoutesOptions = {
   client?: ScryfallClient;
-  fetchImage?: typeof fetch;
 };
-
-const IMAGE_HOSTS = new Set(['cards.scryfall.io', 'api.scryfall.com']);
-const IMAGE_CACHE_LIMIT = 80;
-
-const imageCache = new Map<string, { type: string; body: Buffer }>();
-
-/** Only Scryfall's own image hosts. Anything else must not be fetched. */
-export function scryfallImageUrl(value: unknown): URL | null {
-  if (typeof value !== 'string' || value.length === 0 || value.length > 2_000) {
-    return null;
-  }
-  let url: URL;
-  try {
-    url = new URL(value);
-  } catch {
-    return null;
-  }
-  if (url.protocol !== 'https:' || !IMAGE_HOSTS.has(url.hostname)) {
-    return null;
-  }
-  return url;
-}
 
 type ErrorBody = {
   error: {
@@ -45,82 +22,6 @@ export const scryfallRoutes: FastifyPluginAsync<ScryfallRoutesOptions> = async (
   options,
 ) => {
   const client = options.client ?? new ScryfallClient();
-  const fetchImage = options.fetchImage ?? fetch;
-
-  app.get('/scryfall/image', async (request, reply) => {
-    const src = scryfallImageUrl(
-      (request.query as Record<string, unknown>).src,
-    );
-    if (!src) {
-      return reply.code(400).send(
-        errorBody(
-          'INVALID_SCRYFALL_IMAGE',
-          'Card images have to come from Scryfall.',
-        ),
-      );
-    }
-
-    const cached = imageCache.get(src.href);
-    if (cached) {
-      return reply
-        .header('Cache-Control', 'public, max-age=86400')
-        .type(cached.type)
-        .send(cached.body);
-    }
-
-    let upstream: Response;
-    try {
-      upstream = await fetchImage(src, {
-        redirect: 'follow',
-        headers: {
-          Accept: 'image/avif,image/webp,image/apng,image/*,*/*',
-          'User-Agent': 'PodyGuard/1.0',
-        },
-      });
-    } catch {
-      return reply.code(502).send(
-        errorBody(
-          'SCRYFALL_UNAVAILABLE',
-          'Scryfall could not be reached. Please try again.',
-        ),
-      );
-    }
-
-    let finalHost = src.hostname;
-    if (upstream.url) {
-      try {
-        finalHost = new URL(upstream.url).hostname;
-      } catch {
-        finalHost = '';
-      }
-    }
-    const type = upstream.headers.get('content-type') ?? '';
-    if (
-      !upstream.ok ||
-      !IMAGE_HOSTS.has(finalHost) ||
-      !type.startsWith('image/')
-    ) {
-      return reply.code(502).send(
-        errorBody(
-          'SCRYFALL_UNAVAILABLE',
-          'Scryfall could not be reached. Please try again.',
-        ),
-      );
-    }
-
-    const body = Buffer.from(await upstream.arrayBuffer());
-    if (imageCache.size >= IMAGE_CACHE_LIMIT) {
-      const oldest = imageCache.keys().next().value;
-      if (oldest) {
-        imageCache.delete(oldest);
-      }
-    }
-    imageCache.set(src.href, { type, body });
-    return reply
-      .header('Cache-Control', 'public, max-age=86400')
-      .type(type)
-      .send(body);
-  });
 
   app.get('/scryfall/commanders', async (request, reply) => {
     const query = request.query as Record<string, unknown>;

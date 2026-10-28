@@ -169,7 +169,6 @@ import {
 } from './challenges';
 import i18n from '../i18n';
 import { assetUrl } from '../asset-url';
-import { cardImageSrc } from '../card-image';
 import { forgetActiveMatch } from '../active-match';
 import { readStored, removeStored, writeStored } from '../device-storage';
 import { useFeedback } from '../feedback/FeedbackContext';
@@ -5086,7 +5085,7 @@ function CommanderArt({
         {art.map((entry) => (
           <img
             key={entry.id}
-            src={cardImageSrc(entry.artCropUri)}
+            src={entry.artCropUri}
             alt=""
             decoding="sync"
             className={cx('size-full min-w-0 flex-1 object-cover', entry.focus)}
@@ -5378,7 +5377,7 @@ function CommanderTile({
     <div className="border-muted/20 bg-void/60 relative min-h-16 flex-1 overflow-hidden rounded-xl border">
       {artCropUri ? (
         <img
-          src={cardImageSrc(artCropUri)}
+          src={artCropUri}
           alt=""
           loading="eager"
           fetchPriority="high"

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Skull, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { cardImageSrc } from '../card-image';
 import { schemeById, type SchemeCard } from './archenemy';
 import { Button } from '../ui/Button';
 import { cx } from '../ui/cx';
@@ -70,7 +69,7 @@ export function SchemeSheet({
   return (
     <div className="flex max-h-full w-full max-w-4xl flex-col items-center gap-3 landscape:flex-row landscape:items-stretch">
       <img
-        src={cardImageSrc(shown.imageUrl)}
+        src={shown.imageUrl}
         alt={shown.name}
         className="max-h-[52dvh] min-h-0 rounded-xl object-contain shadow-2xl landscape:max-h-[94dvh] landscape:max-w-[62%]"
       />
@@ -175,7 +174,7 @@ function SchemeStrip({
           )}
         >
           <img
-            src={cardImageSrc(scheme.thumbnailUrl)}
+            src={scheme.thumbnailUrl}
             alt=""
             loading="lazy"
             className="h-20 w-auto"

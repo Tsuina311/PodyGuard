@@ -1,7 +1,5 @@
-import Fastify from 'fastify';
 import { describe, expect, it, vi } from 'vitest';
 import { buildApp } from '../app.js';
-import { scryfallImageUrl, scryfallRoutes } from '../routes/scryfall.js';
 import { ScryfallClient } from './scryfall-client.js';
 
 function jsonResponse(
@@ -308,57 +306,6 @@ describe('Scryfall routes', () => {
         message: 'Scryfall could not be reached. Please try again.',
       },
     });
-    await app.close();
-  });
-});
-
-describe('Scryfall image proxy', () => {
-  it('accepts only Scryfall image hosts', () => {
-    expect(
-      scryfallImageUrl(
-        'https://cards.scryfall.io/small/front/a/b/ab.jpg',
-      )?.hostname,
-    ).toBe('cards.scryfall.io');
-    expect(
-      scryfallImageUrl('https://api.scryfall.com/cards/dsc/364?format=image'),
-    ).not.toBeNull();
-    expect(scryfallImageUrl('https://example.com/card.jpg')).toBeNull();
-    expect(scryfallImageUrl('http://cards.scryfall.io/a.jpg')).toBeNull();
-    expect(scryfallImageUrl('javascript:alert(1)')).toBeNull();
-  });
-
-  it('returns the image bytes for a list to show', async () => {
-    const bytes = Buffer.from('jpeg-bytes');
-    const fetchImage = vi.fn<typeof fetch>().mockResolvedValue(
-      new Response(bytes, {
-        status: 200,
-        headers: { 'content-type': 'image/jpeg' },
-      }),
-    );
-    const app = Fastify({ logger: false });
-    await app.register(scryfallRoutes, { fetchImage });
-    const src = 'https://cards.scryfall.io/small/front/a/b/ab.jpg';
-    const response = await app.inject({
-      method: 'GET',
-      url: `/scryfall/image?src=${encodeURIComponent(src)}`,
-    });
-    expect(response.statusCode).toBe(200);
-    expect(response.headers['content-type']).toContain('image/jpeg');
-    expect(response.rawPayload.equals(bytes)).toBe(true);
-    expect(fetchImage).toHaveBeenCalledOnce();
-    await app.close();
-  });
-
-  it('refuses to fetch a non-Scryfall address', async () => {
-    const fetchImage = vi.fn<typeof fetch>();
-    const app = Fastify({ logger: false });
-    await app.register(scryfallRoutes, { fetchImage });
-    const response = await app.inject({
-      method: 'GET',
-      url: '/scryfall/image?src=https%3A%2F%2Fexample.com%2Fcard.jpg',
-    });
-    expect(response.statusCode).toBe(400);
-    expect(fetchImage).not.toHaveBeenCalled();
     await app.close();
   });
 });
