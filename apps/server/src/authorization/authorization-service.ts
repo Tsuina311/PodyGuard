@@ -3,7 +3,7 @@ import type {
   HostIdentity,
   OrganiserRole,
 } from '@podyguard/shared';
-import { ungatedEntitlements } from '@podyguard/shared';
+import { OrganiserRole as OrganiserRoleEnum, ungatedEntitlements } from '@podyguard/shared';
 
 /**
  * Application authorization. Inputs are HostIdentity (our type), never Neon Auth SDK types.
@@ -34,16 +34,25 @@ export class EventManagementForbiddenError extends Error {
   }
 }
 
-/**
- * Phase 0 stub: persistent host accounts do not exist yet, so no organiser
- * is bound to events. Entitlements stay commercially ungated until billing.
- */
 export class BackendAuthorizationService implements AuthorizationService {
-  getOrganiserRole(
-    _host: HostIdentity,
-    _eventId: string,
+  constructor(
+    private readonly resolveEventOwnerUserId?: (
+      eventId: string,
+    ) => Promise<string | null>,
+  ) {}
+
+  async getOrganiserRole(
+    host: HostIdentity,
+    eventId: string,
   ): Promise<OrganiserRole | null> {
-    return Promise.resolve(null);
+    if (!this.resolveEventOwnerUserId) {
+      return null;
+    }
+    const ownerId = await this.resolveEventOwnerUserId(eventId);
+    if (ownerId && ownerId === host.accountId) {
+      return OrganiserRoleEnum.Owner;
+    }
+    return null;
   }
 
   async assertCanManageEvent(

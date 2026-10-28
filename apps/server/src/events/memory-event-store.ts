@@ -1,9 +1,16 @@
 import { randomUUID } from 'node:crypto';
-import type { ChallengePack, ProductEventName } from '@podyguard/shared';
+import type {
+  ChallengePack,
+  GuestIdentityVerification,
+  ProductEventName,
+} from '@podyguard/shared';
 import {
+  GuestProfileNotFoundError,
   JoinCodeConflictError,
   LimitedPersistenceConflictError,
+  PlaygroupNotFoundError,
   PodNotFoundError,
+  SavedDeckNotFoundError,
   TableNotFoundError,
   type EventStore,
   type CompletePodInput,
@@ -15,16 +22,22 @@ import {
   type NewStoredTable,
   type NewStoredLimitedSession,
   type NewStoredLimitedRound,
+  type NewStoredSavedDeckProfile,
   type LimitedRoundPatch,
   type LimitedSessionPhasePatch,
   type FinalizeLimitedMatchResultInput,
   type StoredAssignment,
+  type StoredAuthChallenge,
   type StoredCompletedGame,
   type StoredDeck,
   type StoredChallengeCompletion,
   type StoredEvent,
+  type StoredGameRecord,
+  type StoredGuestProfile,
   type StoredParticipant,
+  type StoredPlaygroup,
   type StoredPod,
+  type StoredSavedDeckProfile,
   type StoredTable,
   type StoredTableReservation,
   type StoredTreacheryAssignment,
@@ -33,6 +46,8 @@ import {
   type StoredLimitedMatch,
   type StoredLimitedParticipant,
   type StoredLimitedResultAudit,
+  type StoredUserAccount,
+  type UpsertStoredGameRecordInput,
 } from './event-store.js';
 import {
   TableConflictError,
@@ -63,6 +78,12 @@ export class MemoryEventStore implements EventStore {
     StoredLimitedResultAudit[]
   >();
   private readonly tableReservations = new Map<string, StoredTableReservation>();
+  private readonly userAccounts = new Map<string, StoredUserAccount>();
+  private readonly authChallenges = new Map<string, StoredAuthChallenge>();
+  private readonly playgroups = new Map<string, StoredPlaygroup>();
+  private readonly guestProfiles = new Map<string, StoredGuestProfile>();
+  private readonly savedDeckProfiles = new Map<string, StoredSavedDeckProfile>();
+  private readonly gameRecords = new Map<string, StoredGameRecord>();
 
   async insertEvent(input: NewStoredEvent): Promise<StoredEvent> {
     if (this.byJoinCode.has(input.joinCode)) {
@@ -87,6 +108,11 @@ export class MemoryEventStore implements EventStore {
       expiresAt: input.expiresAt ?? new Date(Date.now() + 24 * 60 * 60 * 1000),
       challengePackId: 'classic-commander-v1',
       challengePackVersion: 1,
+      ownerUserId: input.ownerUserId ?? null,
+      playgroupId: input.playgroupId ?? null,
+      showReturningPlayerSuggestions:
+        input.showReturningPlayerSuggestions !== false,
+      guestIdentityVerification: input.guestIdentityVerification ?? 'NONE',
       createdAt: input.createdAt ?? new Date(),
     };
     this.events.set(event.id, event);
@@ -126,6 +152,9 @@ export class MemoryEventStore implements EventStore {
       tablePreference: 'none',
       lockedTableId: null,
       preferredTableId: null,
+      userAccountId: input.userAccountId ?? null,
+      guestProfileId: input.guestProfileId ?? null,
+      savedDeckProfileId: input.savedDeckProfileId ?? null,
       flexCredits: 0,
       createdAt: new Date(),
     };
@@ -160,6 +189,9 @@ export class MemoryEventStore implements EventStore {
       tablePreference?: StoredParticipant['tablePreference'];
       lockedTableId?: string | null;
       preferredTableId?: string | null;
+      userAccountId?: string | null;
+      guestProfileId?: string | null;
+      savedDeckProfileId?: string | null;
     },
   ): Promise<StoredParticipant> {
     const existing = await this.findParticipantById(id);
@@ -185,6 +217,15 @@ export class MemoryEventStore implements EventStore {
     }
     if (patch.preferredTableId !== undefined) {
       existing.preferredTableId = patch.preferredTableId;
+    }
+    if (patch.userAccountId !== undefined) {
+      existing.userAccountId = patch.userAccountId;
+    }
+    if (patch.guestProfileId !== undefined) {
+      existing.guestProfileId = patch.guestProfileId;
+    }
+    if (patch.savedDeckProfileId !== undefined) {
+      existing.savedDeckProfileId = patch.savedDeckProfileId;
     }
     return existing;
   }
@@ -642,6 +683,9 @@ export class MemoryEventStore implements EventStore {
       tournamentState?: StoredEvent['tournamentState'];
       operationMode?: StoredEvent['operationMode'];
       roundState?: StoredEvent['roundState'];
+      playgroupId?: string | null;
+      showReturningPlayerSuggestions?: boolean;
+      guestIdentityVerification?: GuestIdentityVerification;
     },
   ): Promise<StoredEvent> {
     const event = this.events.get(id);
@@ -677,6 +721,16 @@ export class MemoryEventStore implements EventStore {
     }
     if (patch.roundState !== undefined) {
       event.roundState = patch.roundState;
+    }
+    if (patch.playgroupId !== undefined) {
+      event.playgroupId = patch.playgroupId;
+    }
+    if (patch.showReturningPlayerSuggestions !== undefined) {
+      event.showReturningPlayerSuggestions =
+        patch.showReturningPlayerSuggestions;
+    }
+    if (patch.guestIdentityVerification !== undefined) {
+      event.guestIdentityVerification = patch.guestIdentityVerification;
     }
     return event;
   }
@@ -1443,6 +1497,606 @@ export class MemoryEventStore implements EventStore {
     return released;
   }
 
+  async upsertUserAccount(input: {
+    authUserId: string;
+    email?: string | null;
+    displayName: string;
+  }): Promise<StoredUserAccount> {
+    const email = input.email?.trim().toLowerCase() ?? null;
+    const existing =
+      (await this.findUserAccountByAuthUserId(input.authUserId)) ??
+      (email ? await this.findUserAccountByEmail(email) : undefined);
+    const now = new Date();
+    if (existing) {
+      existing.authUserId = input.authUserId;
+      if (email) {
+        existing.email = email;
+      }
+      if (input.displayName.trim()) {
+        existing.displayName = input.displayName.trim();
+      }
+      existing.updatedAt = now;
+      return existing;
+    }
+    const created: StoredUserAccount = {
+      id: randomUUID(),
+      authUserId: input.authUserId,
+      email,
+      displayName: input.displayName.trim(),
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.userAccounts.set(created.id, created);
+    return created;
+  }
+
+  async findUserAccountById(
+    id: string,
+  ): Promise<StoredUserAccount | undefined> {
+    return this.userAccounts.get(id);
+  }
+
+  async findUserAccountByAuthUserId(
+    authUserId: string,
+  ): Promise<StoredUserAccount | undefined> {
+    for (const user of this.userAccounts.values()) {
+      if (user.authUserId === authUserId) {
+        return user;
+      }
+    }
+    return undefined;
+  }
+
+  async findUserAccountByEmail(
+    email: string,
+  ): Promise<StoredUserAccount | undefined> {
+    const normalized = email.trim().toLowerCase();
+    for (const user of this.userAccounts.values()) {
+      if (user.email?.toLowerCase() === normalized) {
+        return user;
+      }
+    }
+    return undefined;
+  }
+
+  async updateUserAccount(
+    id: string,
+    patch: { displayName?: string },
+  ): Promise<StoredUserAccount> {
+    const user = this.userAccounts.get(id);
+    if (!user) {
+      throw new Error('User account not found.');
+    }
+    if (patch.displayName !== undefined) {
+      user.displayName = patch.displayName.trim();
+    }
+    user.updatedAt = new Date();
+    return user;
+  }
+
+  async deleteUserAccount(id: string): Promise<void> {
+    this.userAccounts.delete(id);
+    for (const event of this.events.values()) {
+      if (event.ownerUserId === id) {
+        event.ownerUserId = null;
+      }
+    }
+    for (const list of this.participants.values()) {
+      for (const participant of list) {
+        if (participant.userAccountId === id) {
+          participant.userAccountId = null;
+        }
+      }
+    }
+    for (const guest of this.guestProfiles.values()) {
+      if (guest.linkedUserAccountId === id) {
+        guest.linkedUserAccountId = null;
+      }
+    }
+    for (const record of this.gameRecords.values()) {
+      for (const participant of record.participants) {
+        if (participant.userAccountId === id) {
+          participant.userAccountId = null;
+        }
+      }
+    }
+    for (const [playgroupId, playgroup] of [...this.playgroups]) {
+      if (playgroup.ownerUserId === id) {
+        await this.deletePlaygroup(playgroupId);
+      }
+    }
+  }
+
+  async insertAuthChallenge(input: {
+    email: string;
+    displayName?: string | null;
+    codeHash: string;
+    expiresAt: Date;
+  }): Promise<StoredAuthChallenge> {
+    const row: StoredAuthChallenge = {
+      id: randomUUID(),
+      email: input.email.trim().toLowerCase(),
+      displayName: input.displayName?.trim() || null,
+      codeHash: input.codeHash,
+      attempts: 0,
+      expiresAt: input.expiresAt,
+      consumedAt: null,
+      createdAt: new Date(),
+    };
+    this.authChallenges.set(row.id, row);
+    return row;
+  }
+
+  async findLatestAuthChallengeByEmail(
+    email: string,
+  ): Promise<StoredAuthChallenge | undefined> {
+    const normalized = email.trim().toLowerCase();
+    const candidates = [...this.authChallenges.values()]
+      .filter((row) => row.email === normalized && row.consumedAt === null)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    return candidates[0];
+  }
+
+  async incrementAuthChallengeAttempts(id: string): Promise<void> {
+    const challenge = this.authChallenges.get(id);
+    if (challenge) {
+      challenge.attempts += 1;
+    }
+  }
+
+  async consumeAuthChallenge(id: string, consumedAt: Date): Promise<void> {
+    const challenge = this.authChallenges.get(id);
+    if (challenge) {
+      challenge.consumedAt = consumedAt;
+    }
+  }
+
+  async insertPlaygroup(input: {
+    ownerUserId: string;
+    name: string;
+    guestIdentityVerification?: GuestIdentityVerification;
+  }): Promise<StoredPlaygroup> {
+    const now = new Date();
+    const row: StoredPlaygroup = {
+      id: randomUUID(),
+      ownerUserId: input.ownerUserId,
+      name: input.name,
+      guestIdentityVerification: input.guestIdentityVerification ?? 'NONE',
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.playgroups.set(row.id, row);
+    return row;
+  }
+
+  async findPlaygroupById(id: string): Promise<StoredPlaygroup | undefined> {
+    return this.playgroups.get(id);
+  }
+
+  async listPlaygroupsByOwner(ownerUserId: string): Promise<StoredPlaygroup[]> {
+    return [...this.playgroups.values()]
+      .filter((row) => row.ownerUserId === ownerUserId)
+      .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+  }
+
+  async updatePlaygroup(
+    id: string,
+    patch: {
+      name?: string;
+      guestIdentityVerification?: GuestIdentityVerification;
+    },
+  ): Promise<StoredPlaygroup> {
+    const row = this.playgroups.get(id);
+    if (!row) {
+      throw new PlaygroupNotFoundError();
+    }
+    if (patch.name !== undefined) {
+      row.name = patch.name;
+    }
+    if (patch.guestIdentityVerification !== undefined) {
+      row.guestIdentityVerification = patch.guestIdentityVerification;
+    }
+    row.updatedAt = new Date();
+    return row;
+  }
+
+  async deletePlaygroup(id: string): Promise<void> {
+    this.playgroups.delete(id);
+    for (const [guestId, guest] of [...this.guestProfiles]) {
+      if (guest.playgroupId === id) {
+        await this.deleteGuestProfile(guestId);
+      }
+    }
+    for (const [deckId, deck] of [...this.savedDeckProfiles]) {
+      if (deck.playgroupId === id) {
+        this.savedDeckProfiles.delete(deckId);
+      }
+    }
+    for (const event of this.events.values()) {
+      if (event.playgroupId === id) {
+        event.playgroupId = null;
+      }
+    }
+    for (const record of this.gameRecords.values()) {
+      if (record.playgroupId === id) {
+        record.playgroupId = null;
+      }
+    }
+  }
+
+  async listEventsByPlaygroup(playgroupId: string): Promise<StoredEvent[]> {
+    return [...this.events.values()]
+      .filter((event) => event.playgroupId === playgroupId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async insertGuestProfile(input: {
+    playgroupId: string;
+    displayName: string;
+    linkedUserAccountId?: string | null;
+    lastSeenAt?: Date | null;
+  }): Promise<StoredGuestProfile> {
+    const now = new Date();
+    const row: StoredGuestProfile = {
+      id: randomUUID(),
+      playgroupId: input.playgroupId,
+      displayName: input.displayName,
+      linkedUserAccountId: input.linkedUserAccountId ?? null,
+      archivedAt: null,
+      lastSeenAt: input.lastSeenAt ?? null,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.guestProfiles.set(row.id, row);
+    const playgroup = this.playgroups.get(input.playgroupId);
+    if (playgroup) {
+      playgroup.updatedAt = now;
+    }
+    return row;
+  }
+
+  async findGuestProfileById(
+    id: string,
+  ): Promise<StoredGuestProfile | undefined> {
+    return this.guestProfiles.get(id);
+  }
+
+  async listGuestProfilesByPlaygroup(
+    playgroupId: string,
+    options?: { includeArchived?: boolean },
+  ): Promise<StoredGuestProfile[]> {
+    return [...this.guestProfiles.values()]
+      .filter(
+        (row) =>
+          row.playgroupId === playgroupId &&
+          (options?.includeArchived || row.archivedAt === null),
+      )
+      .sort((a, b) => {
+        const aSeen = a.lastSeenAt?.getTime() ?? 0;
+        const bSeen = b.lastSeenAt?.getTime() ?? 0;
+        if (bSeen !== aSeen) return bSeen - aSeen;
+        return a.displayName.localeCompare(b.displayName);
+      });
+  }
+
+  async listGuestProfilesByLinkedUser(
+    userAccountId: string,
+  ): Promise<StoredGuestProfile[]> {
+    return [...this.guestProfiles.values()].filter(
+      (row) => row.linkedUserAccountId === userAccountId && row.archivedAt === null,
+    );
+  }
+
+  async updateGuestProfile(
+    id: string,
+    patch: {
+      displayName?: string;
+      linkedUserAccountId?: string | null;
+      archivedAt?: Date | null;
+      lastSeenAt?: Date | null;
+    },
+  ): Promise<StoredGuestProfile> {
+    const row = this.guestProfiles.get(id);
+    if (!row) {
+      throw new GuestProfileNotFoundError();
+    }
+    if (patch.displayName !== undefined) {
+      row.displayName = patch.displayName;
+    }
+    if (patch.linkedUserAccountId !== undefined) {
+      row.linkedUserAccountId = patch.linkedUserAccountId;
+    }
+    if (patch.archivedAt !== undefined) {
+      row.archivedAt = patch.archivedAt;
+    }
+    if (patch.lastSeenAt !== undefined) {
+      row.lastSeenAt = patch.lastSeenAt;
+    }
+    row.updatedAt = new Date();
+    return row;
+  }
+
+  async deleteGuestProfile(id: string): Promise<void> {
+    this.guestProfiles.delete(id);
+    for (const [deckId, deck] of [...this.savedDeckProfiles]) {
+      if (deck.guestProfileId === id) {
+        await this.deleteSavedDeckProfile(deckId);
+      }
+    }
+    for (const list of this.participants.values()) {
+      for (const participant of list) {
+        if (participant.guestProfileId === id) {
+          participant.guestProfileId = null;
+        }
+      }
+    }
+    for (const record of this.gameRecords.values()) {
+      for (const participant of record.participants) {
+        if (participant.guestProfileId === id) {
+          participant.guestProfileId = null;
+        }
+      }
+    }
+  }
+
+  async mergeGuestProfiles(input: {
+    playgroupId: string;
+    sourceGuestId: string;
+    targetGuestId: string;
+  }): Promise<StoredGuestProfile> {
+    const source = this.guestProfiles.get(input.sourceGuestId);
+    const target = this.guestProfiles.get(input.targetGuestId);
+    if (
+      !source ||
+      !target ||
+      source.playgroupId !== input.playgroupId ||
+      target.playgroupId !== input.playgroupId
+    ) {
+      throw new GuestProfileNotFoundError();
+    }
+    for (const deck of this.savedDeckProfiles.values()) {
+      if (deck.guestProfileId === source.id) {
+        deck.guestProfileId = target.id;
+        deck.preferred = false;
+      }
+    }
+    for (const list of this.participants.values()) {
+      for (const participant of list) {
+        if (participant.guestProfileId === source.id) {
+          participant.guestProfileId = target.id;
+        }
+      }
+    }
+    for (const record of this.gameRecords.values()) {
+      for (const participant of record.participants) {
+        if (participant.guestProfileId === source.id) {
+          participant.guestProfileId = target.id;
+        }
+      }
+    }
+    if (!target.linkedUserAccountId && source.linkedUserAccountId) {
+      target.linkedUserAccountId = source.linkedUserAccountId;
+    }
+    if (
+      source.lastSeenAt &&
+      (!target.lastSeenAt ||
+        source.lastSeenAt.getTime() > target.lastSeenAt.getTime())
+    ) {
+      target.lastSeenAt = source.lastSeenAt;
+    }
+    target.updatedAt = new Date();
+    this.guestProfiles.delete(source.id);
+    return target;
+  }
+
+  async insertSavedDeckProfile(
+    input: NewStoredSavedDeckProfile,
+  ): Promise<StoredSavedDeckProfile> {
+    const now = new Date();
+    if (input.preferred) {
+      for (const deck of this.savedDeckProfiles.values()) {
+        if (deck.guestProfileId === input.guestProfileId) {
+          deck.preferred = false;
+        }
+      }
+    }
+    const row: StoredSavedDeckProfile = {
+      id: randomUUID(),
+      playgroupId: input.playgroupId,
+      guestProfileId: input.guestProfileId,
+      format: input.format,
+      deckName: input.deckName ?? null,
+      commanderName: input.commanderName ?? null,
+      commanderScryfallId: input.commanderScryfallId ?? null,
+      commanders: input.commanders ? [...input.commanders] : [],
+      bracket: input.bracket ?? null,
+      poolId: input.poolId,
+      preferred: input.preferred ?? false,
+      timesUsed: input.timesUsed ?? 0,
+      lastUsedAt: input.lastUsedAt ?? null,
+      archivedAt: null,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.savedDeckProfiles.set(row.id, row);
+    return row;
+  }
+
+  async findSavedDeckProfileById(
+    id: string,
+  ): Promise<StoredSavedDeckProfile | undefined> {
+    return this.savedDeckProfiles.get(id);
+  }
+
+  async listSavedDeckProfilesByPlaygroup(
+    playgroupId: string,
+    options?: { includeArchived?: boolean },
+  ): Promise<StoredSavedDeckProfile[]> {
+    return [...this.savedDeckProfiles.values()]
+      .filter(
+        (row) =>
+          row.playgroupId === playgroupId &&
+          (options?.includeArchived || row.archivedAt === null),
+      )
+      .sort(compareSavedDeckOrder);
+  }
+
+  async listSavedDeckProfilesByGuest(
+    guestProfileId: string,
+    options?: { includeArchived?: boolean },
+  ): Promise<StoredSavedDeckProfile[]> {
+    return [...this.savedDeckProfiles.values()]
+      .filter(
+        (row) =>
+          row.guestProfileId === guestProfileId &&
+          (options?.includeArchived || row.archivedAt === null),
+      )
+      .sort(compareSavedDeckOrder);
+  }
+
+  async updateSavedDeckProfile(
+    id: string,
+    patch: Partial<
+      Omit<NewStoredSavedDeckProfile, 'playgroupId' | 'guestProfileId'>
+    > & {
+      archivedAt?: Date | null;
+      timesUsed?: number;
+      lastUsedAt?: Date | null;
+    },
+  ): Promise<StoredSavedDeckProfile> {
+    const row = this.savedDeckProfiles.get(id);
+    if (!row) {
+      throw new SavedDeckNotFoundError();
+    }
+    if (patch.preferred === true) {
+      for (const other of this.savedDeckProfiles.values()) {
+        if (other.guestProfileId === row.guestProfileId && other.id !== row.id) {
+          other.preferred = false;
+        }
+      }
+    }
+    if (patch.format !== undefined) row.format = patch.format;
+    if (patch.deckName !== undefined) row.deckName = patch.deckName ?? null;
+    if (patch.commanderName !== undefined) {
+      row.commanderName = patch.commanderName ?? null;
+    }
+    if (patch.commanderScryfallId !== undefined) {
+      row.commanderScryfallId = patch.commanderScryfallId ?? null;
+    }
+    if (patch.commanders !== undefined) {
+      row.commanders = [...patch.commanders];
+    }
+    if (patch.bracket !== undefined) row.bracket = patch.bracket ?? null;
+    if (patch.poolId !== undefined) row.poolId = patch.poolId;
+    if (patch.preferred !== undefined) row.preferred = patch.preferred;
+    if (patch.timesUsed !== undefined) row.timesUsed = patch.timesUsed;
+    if (patch.lastUsedAt !== undefined) row.lastUsedAt = patch.lastUsedAt;
+    if (patch.archivedAt !== undefined) row.archivedAt = patch.archivedAt;
+    row.updatedAt = new Date();
+    return row;
+  }
+
+  async deleteSavedDeckProfile(id: string): Promise<void> {
+    this.savedDeckProfiles.delete(id);
+    for (const list of this.participants.values()) {
+      for (const participant of list) {
+        if (participant.savedDeckProfileId === id) {
+          participant.savedDeckProfileId = null;
+        }
+      }
+    }
+    for (const record of this.gameRecords.values()) {
+      for (const participant of record.participants) {
+        if (participant.savedDeckProfileId === id) {
+          participant.savedDeckProfileId = null;
+        }
+      }
+    }
+  }
+
+  async upsertGameRecord(
+    input: UpsertStoredGameRecordInput,
+  ): Promise<StoredGameRecord> {
+    const existing = [...this.gameRecords.values()].find(
+      (row) =>
+        row.source === input.source &&
+        row.sourceType === input.sourceType &&
+        row.sourceId === input.sourceId,
+    );
+    const now = new Date();
+    const recordId = existing?.id ?? randomUUID();
+    const participants = input.participants.map((p) => ({
+      id: randomUUID(),
+      gameRecordId: recordId,
+      eventParticipantId: p.eventParticipantId ?? null,
+      userAccountId: p.userAccountId ?? null,
+      guestProfileId: p.guestProfileId ?? null,
+      displayNameSnapshot: p.displayNameSnapshot,
+      savedDeckProfileId: p.savedDeckProfileId ?? null,
+      deckNameSnapshot: p.deckNameSnapshot ?? null,
+      commanderNameSnapshot: p.commanderNameSnapshot ?? null,
+      commanderScryfallIdSnapshot: p.commanderScryfallIdSnapshot ?? null,
+      bracketSnapshot: p.bracketSnapshot ?? null,
+      resultType: p.resultType ?? null,
+      placement: p.placement ?? null,
+      teamId: p.teamId ?? null,
+      createdAt: now,
+    }));
+    const record: StoredGameRecord = {
+      id: recordId,
+      source: input.source,
+      sourceType: input.sourceType,
+      sourceId: input.sourceId,
+      eventId: input.eventId ?? null,
+      playgroupId: input.playgroupId ?? null,
+      gameMode: input.gameMode,
+      format: input.format ?? null,
+      poolId: input.poolId ?? null,
+      durationSeconds: input.durationSeconds ?? null,
+      startedAt: input.startedAt ?? null,
+      endedAt: input.endedAt,
+      createdAt: existing?.createdAt ?? now,
+      updatedAt: now,
+      participants,
+    };
+    this.gameRecords.set(recordId, record);
+    return record;
+  }
+
+  async listGameRecordsByPlaygroup(
+    playgroupId: string,
+  ): Promise<StoredGameRecord[]> {
+    return [...this.gameRecords.values()]
+      .filter((row) => row.playgroupId === playgroupId)
+      .sort((a, b) => b.endedAt.getTime() - a.endedAt.getTime());
+  }
+
+  async listGameRecordsByEvent(eventId: string): Promise<StoredGameRecord[]> {
+    return [...this.gameRecords.values()]
+      .filter((row) => row.eventId === eventId)
+      .sort((a, b) => b.endedAt.getTime() - a.endedAt.getTime());
+  }
+
+  async listGameRecordsForIdentity(input: {
+    guestProfileIds?: string[];
+    userAccountIds?: string[];
+  }): Promise<StoredGameRecord[]> {
+    const guestSet = new Set(input.guestProfileIds ?? []);
+    const userSet = new Set(input.userAccountIds ?? []);
+    if (guestSet.size === 0 && userSet.size === 0) {
+      return [];
+    }
+    return [...this.gameRecords.values()]
+      .filter((record) =>
+        record.participants.some(
+          (p) =>
+            (p.guestProfileId && guestSet.has(p.guestProfileId)) ||
+            (p.userAccountId && userSet.has(p.userAccountId)),
+        ),
+      )
+      .sort((a, b) => b.endedAt.getTime() - a.endedAt.getTime());
+  }
+
   private findPod(podId: string): StoredPod | undefined {
     for (const list of this.pods.values()) {
       const found = list.find((row) => row.id === podId);
@@ -1489,3 +2143,22 @@ function toCompletedGame(pod: StoredPod): StoredCompletedGame {
     })),
   };
 }
+
+function compareSavedDeckOrder(
+  a: StoredSavedDeckProfile,
+  b: StoredSavedDeckProfile,
+): number {
+  if (a.preferred !== b.preferred) {
+    return a.preferred ? -1 : 1;
+  }
+  const aUsed = a.lastUsedAt?.getTime() ?? 0;
+  const bUsed = b.lastUsedAt?.getTime() ?? 0;
+  if (bUsed !== aUsed) {
+    return bUsed - aUsed;
+  }
+  if (b.timesUsed !== a.timesUsed) {
+    return b.timesUsed - a.timesUsed;
+  }
+  return a.createdAt.getTime() - b.createdAt.getTime();
+}
+

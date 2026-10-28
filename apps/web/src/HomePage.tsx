@@ -1,21 +1,34 @@
-import { useState, type FormEvent } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useState, type FormEvent } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   ASSASSIN_POD_SIZES,
   LIMITED_MODES,
   TREACHERY_POD_SIZES,
+  buildFallbackCommanderSelection,
   type AssassinPodSize,
   type EventOperationMode,
   type GameMode,
   type LimitedEventModeConfig,
+  type Playgroup,
+  type PlaygroupOverview,
   type RulesFormat,
   type SeriesLength,
   type TournamentFormat,
   type TreacheryPodSize,
 } from '@podyguard/shared';
-import { Play, QrCode, Radio } from 'lucide-react';
-import { ApiError, createEvent, saveHostToken } from './api';
+import { Play, QrCode, Radio, Users } from 'lucide-react';
+import {
+  ApiError,
+  createEvent,
+  getPlaygroupOverview,
+  listMyPlaygroups,
+  loadAccountSession,
+  loadPreferredPlaygroupId,
+  saveHostToken,
+  savePreferredPlaygroupId,
+} from './api';
+import { emptySeatCommanders } from './CommanderSeatPickers';
 import { activeMatchPath } from './active-match';
 import {
   defaultHostLimitedConfigs,
@@ -109,6 +122,96 @@ export function HomePage() {
   const [joinCode, setJoinCode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  // Account & Playgroup state for authenticated hosts
+  const [accountSession] = useState(() => loadAccountSession());
+  const [playgroups, setPlaygroups] = useState<Playgroup[]>([]);
+  const [selectedPlaygroupId, setSelectedPlaygroupId] = useState<string | null>(
+    () => loadPreferredPlaygroupId(),
+  );
+  const [playgroupOverview, setPlaygroupOverview] =
+    useState<PlaygroupOverview | null>(null);
+  const [showReturningSuggestions, setShowReturningSuggestions] =
+    useState(true);
+  const [selectedLocalGuestIds, setSelectedLocalGuestIds] = useState<string[]>(
+    [],
+  );
+
+  useEffect(() => {
+    if (!accountSession?.token) return;
+    let cancelled = false;
+    void listMyPlaygroups(accountSession.token)
+      .then(async ({ playgroups: list }) => {
+        if (cancelled) return;
+        setPlaygroups(list);
+        const preferred = loadPreferredPlaygroupId();
+        const chosen =
+          (preferred && list.some((pg) => pg.id === preferred)
+            ? preferred
+            : null) ??
+          list[0]?.id ??
+          null;
+        setSelectedPlaygroupId(chosen);
+        if (chosen) {
+          const ov = await getPlaygroupOverview(accountSession.token, chosen);
+          if (!cancelled) {
+            setPlaygroupOverview(ov.overview);
+          }
+        }
+      })
+      .catch(() => {
+        /* ignore offline or expired token on home screen */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [accountSession?.token]);
+
+  async function onChoosePlaygroup(pgId: string | null) {
+    setSelectedPlaygroupId(pgId);
+    savePreferredPlaygroupId(pgId);
+    if (!pgId || !accountSession?.token) {
+      setPlaygroupOverview(null);
+      return;
+    }
+    try {
+      const ov = await getPlaygroupOverview(accountSession.token, pgId);
+      setPlaygroupOverview(ov.overview);
+    } catch {
+      setPlaygroupOverview(null);
+    }
+  }
+
+  function applyLastPlaygroupEventSetup() {
+    const last = playgroupOverview?.lastEventConfig;
+    if (!last) return;
+    setName(last.name);
+    setTableCount(String(last.tableCount));
+    setLifetimeHours(String(last.lifetimeHours));
+    setOperationMode(last.operationMode);
+    setShowReturningSuggestions(last.showReturningPlayerSuggestions);
+    const base = baseModeFromGameMode(last.gameMode);
+    const cmdOn = isCommanderEnabled(last.gameMode, last.rulesFormat);
+    setHostCommander(cmdOn);
+    setHostBaseMode(base);
+    if (last.gameMode === 'commander') {
+      setCommanderPodSize(last.preferredPodSize);
+    } else if (last.gameMode === 'multiplayer') {
+      setMultiplayerPodSize(last.preferredPodSize);
+    }
+  }
+
+  function toggleLocalGuestSelection(guestId: string) {
+    setSelectedLocalGuestIds((current) => {
+      const next = current.includes(guestId)
+        ? current.filter((id) => id !== guestId)
+        : [...current, guestId];
+      if (next.length >= 2) {
+        setTrackerSeats(seatCountForMode(playResolved.gameMode, next.length));
+      }
+      return next;
+    });
+  }
   const [trackerSeats, setTrackerSeats] = useState(() => {
     const saved = loadMatchConfig();
     return seatCountForMode(
@@ -186,13 +289,66 @@ export function HomePage() {
   function startTracker() {
     setError(null);
     const config = loadMatchConfig();
-    const seatCount = trackerSeats;
+    const chosenGuests = (playgroupOverview?.guests ?? []).filter((g) =>
+      selectedLocalGuestIds.includes(g.guest.id),
+    );
+    const seatCount =
+      chosenGuests.length >= 2
+        ? seatCountForMode(playResolved.gameMode, chosenGuests.length)
+        : trackerSeats;
+    const names = defaultSeatNames(Math.max(seatCount, 8));
+    const commanders = emptySeatCommanders(Math.max(seatCount, 8));
+    const seatIdentities: Array<{
+      guestProfileId?: string;
+      savedDeckProfileId?: string;
+      bracket?: number;
+    } | null> = Array.from({ length: Math.max(seatCount, 8) }, () => null);
+    let resolvedPoolId = config.poolId;
+
+    for (let i = 0; i < Math.min(chosenGuests.length, seatCount); i += 1) {
+      const entry = chosenGuests[i]!;
+      names[i] = entry.guest.displayName;
+      const preferredDeck =
+        entry.savedDecks.find((d) => d.preferred) ?? entry.savedDecks[0];
+      if (preferredDeck) {
+        const deckCommanders =
+          preferredDeck.commanders.length > 0
+            ? preferredDeck.commanders
+            : preferredDeck.commanderName
+              ? [
+                  buildFallbackCommanderSelection({
+                    commanderName: preferredDeck.commanderName,
+                    commanderScryfallId: preferredDeck.commanderScryfallId,
+                  }),
+                ]
+              : [];
+        commanders[i] = deckCommanders;
+        if (i === 0 && preferredDeck.poolId) {
+          resolvedPoolId = preferredDeck.poolId;
+        }
+        seatIdentities[i] = {
+          guestProfileId: entry.guest.id,
+          savedDeckProfileId: preferredDeck.id,
+          bracket: preferredDeck.bracket,
+        };
+      } else {
+        seatIdentities[i] = {
+          guestProfileId: entry.guest.id,
+        };
+      }
+    }
+
     saveMatchConfig({
       ...config,
       gameMode: playResolved.gameMode,
       rulesFormat: playResolved.rulesFormat,
       seatCount,
-      names: defaultSeatNames(Math.max(seatCount, 8)),
+      poolId: resolvedPoolId,
+      names,
+      commanders,
+      playgroupId:
+        chosenGuests.length > 0 ? (selectedPlaygroupId ?? undefined) : undefined,
+      seatIdentities: chosenGuests.length > 0 ? seatIdentities : undefined,
     });
     void navigate('/match-config');
   }
@@ -281,6 +437,8 @@ export function HomePage() {
           isLimited,
           limitedConfigs,
         ),
+        playgroupId: selectedPlaygroupId ?? undefined,
+        showReturningPlayerSuggestions: showReturningSuggestions,
       });
       saveHostToken(result.event.joinCode, result.hostToken);
       void navigate(`/host/${result.event.joinCode}`);
@@ -309,7 +467,18 @@ export function HomePage() {
     <>
       <ThemeToggleCorner />
       <header className="mb-1">
-        <Brand className="mb-3" />
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <Brand />
+          <Link
+            to="/account"
+            className="border-muted/25 bg-hull/60 text-muted hover:border-neon/50 hover:text-neon inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold transition"
+          >
+            <Users size={14} aria-hidden />
+            {accountSession
+              ? `${accountSession.account.displayName} · Playgroups`
+              : 'Host Account & Playgroups'}
+          </Link>
+        </div>
         <h1 className="font-display text-3xl leading-[1.05] font-bold tracking-tight text-balance sm:text-4xl">
           {t('home.taglineBefore')}{' '}
           <span className="from-beam via-neon to-plasma bg-gradient-to-r bg-clip-text text-transparent">
@@ -444,6 +613,52 @@ export function HomePage() {
               })}
             </p>
           )}
+          {playgroupOverview && playgroupOverview.guests.length > 0 ? (
+            <div className="border-muted/20 bg-void/40 mb-4 rounded-xl border p-3">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <p className="text-muted text-xs font-medium tracking-wider uppercase">
+                  Recent players · {playgroupOverview.playgroup.name}
+                </p>
+                <Link
+                  to="/account"
+                  className="text-neon text-xs hover:underline"
+                >
+                  Manage
+                </Link>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {playgroupOverview.guests.map(({ guest, savedDecks }) => {
+                  const checked = selectedLocalGuestIds.includes(guest.id);
+                  const pref =
+                    savedDecks.find((d) => d.preferred) ?? savedDecks[0];
+                  return (
+                    <button
+                      key={guest.id}
+                      type="button"
+                      onClick={() => toggleLocalGuestSelection(guest.id)}
+                      className={cx(
+                        'rounded-xl border px-2.5 py-1.5 text-left text-xs transition',
+                        checked
+                          ? 'border-neon bg-neon/15 text-neon font-semibold'
+                          : 'border-muted/20 text-muted hover:border-muted/40 hover:text-ink',
+                      )}
+                    >
+                      <span className="block">
+                        {checked ? '☑ ' : '☐ '}
+                        {guest.displayName}
+                      </span>
+                      {pref?.commanderName ? (
+                        <span className="text-muted/80 block text-[10px]">
+                          {pref.commanderName}
+                          {pref.bracket ? ` · B${pref.bracket}` : ''}
+                        </span>
+                      ) : null}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
           {ongoingMatch ? (
             <>
               <Button
@@ -634,6 +849,80 @@ export function HomePage() {
             autoComplete="off"
             required
           />
+          <div className="border-muted/20 bg-void/40 mb-4 rounded-xl border p-3">
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <span className="text-muted text-xs font-medium tracking-wider uppercase">
+                Playgroup
+              </span>
+              <Link to="/account" className="text-neon text-xs hover:underline">
+                {accountSession ? 'Manage playgroups' : 'Sign in for playgroups'}
+              </Link>
+            </div>
+            {playgroups.length > 0 ? (
+              <div className="space-y-2.5">
+                <div className="flex flex-wrap gap-1.5">
+                  {playgroups.map((pg) => (
+                    <button
+                      key={pg.id}
+                      type="button"
+                      onClick={() => void onChoosePlaygroup(pg.id)}
+                      className={cx(
+                        'rounded-xl border px-3 py-1.5 text-xs font-semibold transition',
+                        selectedPlaygroupId === pg.id
+                          ? 'border-neon bg-neon/15 text-neon'
+                          : 'border-muted/20 text-muted hover:border-muted/40',
+                      )}
+                    >
+                      {pg.name}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => void onChoosePlaygroup(null)}
+                    className={cx(
+                      'rounded-xl border px-3 py-1.5 text-xs font-semibold transition',
+                      selectedPlaygroupId === null
+                        ? 'border-neon bg-neon/15 text-neon'
+                        : 'border-muted/20 text-muted hover:border-muted/40',
+                    )}
+                  >
+                    No playgroup
+                  </button>
+                </div>
+                {selectedPlaygroupId ? (
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+                    <label className="text-muted flex cursor-pointer items-center gap-2 text-xs">
+                      <input
+                        type="checkbox"
+                        className="accent-neon"
+                        checked={showReturningSuggestions}
+                        onChange={(e) =>
+                          setShowReturningSuggestions(e.target.checked)
+                        }
+                      />
+                      Show returning-player suggestions on join
+                    </label>
+                    {playgroupOverview?.lastEventConfig ? (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        onClick={applyLastPlaygroupEventSetup}
+                      >
+                        Reuse last event setup
+                      </Button>
+                    ) : null}
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              <p className="text-muted text-xs">
+                {accountSession
+                  ? 'No playgroup created yet. Create one in Playgroups to pre-seed friends and their Commanders.'
+                  : 'Optional: sign in to associate this event with a recurring playgroup.'}
+              </p>
+            )}
+          </div>
           <Field
             label={t('home.tables')}
             hint={t('home.tablesHint')}

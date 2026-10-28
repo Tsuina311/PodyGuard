@@ -1,10 +1,14 @@
 import { and, asc, desc, eq, inArray, isNull, like, or } from 'drizzle-orm';
 import { getDb } from '../db/client.js';
 import {
+  authChallenges,
   events,
   deckOptions,
   challengeCompletions,
   challengePackVersions,
+  gameRecords,
+  gameRecordParticipants,
+  guestProfiles,
   matchHistory,
   matchHistoryMembers,
   limitedSessions,
@@ -14,20 +18,30 @@ import {
   limitedMatches,
   limitedMatchParticipants,
   limitedResultAudits,
+  playgroups,
+  savedDeckProfiles,
   tableReservations,
   participants,
   physicalTables,
   podMembers,
   pods,
   productEvents,
+  userAccounts,
 } from '../db/schema.js';
-import type { ChallengePack, ProductEventName } from '@podyguard/shared';
+import type {
+  ChallengePack,
+  GuestIdentityVerification,
+  ProductEventName,
+} from '@podyguard/shared';
 import { parseChallengePack } from '@podyguard/shared';
 import {
   EventNotFoundError,
+  GuestProfileNotFoundError,
   JoinCodeConflictError,
   LimitedPersistenceConflictError,
+  PlaygroupNotFoundError,
   PodNotFoundError,
+  SavedDeckNotFoundError,
   TableNotFoundError,
   type EventStore,
   type CompletePodInput,
@@ -39,16 +53,22 @@ import {
   type NewStoredTable,
   type NewStoredLimitedSession,
   type NewStoredLimitedRound,
+  type NewStoredSavedDeckProfile,
   type LimitedRoundPatch,
   type LimitedSessionPhasePatch,
   type FinalizeLimitedMatchResultInput,
   type StoredAssignment,
+  type StoredAuthChallenge,
   type StoredCompletedGame,
   type StoredDeck,
   type StoredChallengeCompletion,
   type StoredEvent,
+  type StoredGameRecord,
+  type StoredGuestProfile,
   type StoredParticipant,
+  type StoredPlaygroup,
   type StoredPod,
+  type StoredSavedDeckProfile,
   type StoredTable,
   type StoredTableReservation,
   type StoredTreacheryAssignment,
@@ -57,6 +77,8 @@ import {
   type StoredLimitedMatch,
   type StoredLimitedParticipant,
   type StoredLimitedResultAudit,
+  type StoredUserAccount,
+  type UpsertStoredGameRecordInput,
 } from './event-store.js';
 import {
   TableConflictError,
@@ -91,6 +113,11 @@ export class PostgresEventStore implements EventStore {
           limitedModeConfigs: input.limitedModeConfigs ?? [],
           operationMode: input.operationMode ?? 'ROLLING',
           roundState: input.roundState ?? null,
+          ownerUserId: input.ownerUserId ?? null,
+          playgroupId: input.playgroupId ?? null,
+          showReturningPlayerSuggestions:
+            input.showReturningPlayerSuggestions !== false,
+          guestIdentityVerification: input.guestIdentityVerification ?? 'NONE',
           expiresAt:
             input.expiresAt ?? new Date(Date.now() + 24 * 60 * 60 * 1000),
           ...(input.createdAt ? { createdAt: input.createdAt } : {}),
@@ -137,6 +164,9 @@ export class PostgresEventStore implements EventStore {
         isBot: input.isBot ?? false,
         status: input.status ?? 'joined',
         readyAt: input.readyAt ?? null,
+        userAccountId: input.userAccountId ?? null,
+        guestProfileId: input.guestProfileId ?? null,
+        savedDeckProfileId: input.savedDeckProfileId ?? null,
       })
       .returning();
     if (!row) {
@@ -174,6 +204,9 @@ export class PostgresEventStore implements EventStore {
       tablePreference?: StoredParticipant['tablePreference'];
       lockedTableId?: string | null;
       preferredTableId?: string | null;
+      userAccountId?: string | null;
+      guestProfileId?: string | null;
+      savedDeckProfileId?: string | null;
     },
   ): Promise<StoredParticipant> {
     const [row] = await getDb()
@@ -199,6 +232,15 @@ export class PostgresEventStore implements EventStore {
         ...(patch.preferredTableId === undefined
           ? {}
           : { preferredTableId: patch.preferredTableId }),
+        ...(patch.userAccountId === undefined
+          ? {}
+          : { userAccountId: patch.userAccountId }),
+        ...(patch.guestProfileId === undefined
+          ? {}
+          : { guestProfileId: patch.guestProfileId }),
+        ...(patch.savedDeckProfileId === undefined
+          ? {}
+          : { savedDeckProfileId: patch.savedDeckProfileId }),
         updatedAt: new Date(),
       })
       .where(eq(participants.id, id))
@@ -1034,6 +1076,9 @@ export class PostgresEventStore implements EventStore {
       tournamentState?: StoredEvent['tournamentState'];
       operationMode?: StoredEvent['operationMode'];
       roundState?: StoredEvent['roundState'];
+      playgroupId?: string | null;
+      showReturningPlayerSuggestions?: boolean;
+      guestIdentityVerification?: GuestIdentityVerification;
     },
   ): Promise<StoredEvent> {
     const [row] = await getDb()
@@ -1067,6 +1112,18 @@ export class PostgresEventStore implements EventStore {
         ...(patch.roundState === undefined
           ? {}
           : { roundState: patch.roundState }),
+        ...(patch.playgroupId === undefined
+          ? {}
+          : { playgroupId: patch.playgroupId }),
+        ...(patch.showReturningPlayerSuggestions === undefined
+          ? {}
+          : {
+              showReturningPlayerSuggestions:
+                patch.showReturningPlayerSuggestions,
+            }),
+        ...(patch.guestIdentityVerification === undefined
+          ? {}
+          : { guestIdentityVerification: patch.guestIdentityVerification }),
         updatedAt: new Date(),
       })
       .where(eq(events.id, id))
@@ -2518,6 +2575,680 @@ export class PostgresEventStore implements EventStore {
       return tableIds;
     });
   }
+
+  async upsertUserAccount(input: {
+    authUserId: string;
+    email?: string | null;
+    displayName: string;
+  }): Promise<StoredUserAccount> {
+    const email = input.email?.trim().toLowerCase() ?? null;
+    const existing =
+      (await this.findUserAccountByAuthUserId(input.authUserId)) ??
+      (email ? await this.findUserAccountByEmail(email) : undefined);
+    const now = new Date();
+    if (existing) {
+      const [updated] = await getDb()
+        .update(userAccounts)
+        .set({
+          authUserId: input.authUserId,
+          ...(email ? { email } : {}),
+          ...(input.displayName.trim()
+            ? { displayName: input.displayName.trim() }
+            : {}),
+          updatedAt: now,
+        })
+        .where(eq(userAccounts.id, existing.id))
+        .returning();
+      if (!updated) throw new Error('User account update failed.');
+      return mapUserAccount(updated);
+    }
+    const [created] = await getDb()
+      .insert(userAccounts)
+      .values({
+        authUserId: input.authUserId,
+        email,
+        displayName: input.displayName.trim(),
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
+    if (!created) throw new Error('User account insert failed.');
+    return mapUserAccount(created);
+  }
+
+  async findUserAccountById(
+    id: string,
+  ): Promise<StoredUserAccount | undefined> {
+    if (!isUuid(id)) return undefined;
+    const [row] = await getDb()
+      .select()
+      .from(userAccounts)
+      .where(eq(userAccounts.id, id))
+      .limit(1);
+    return row ? mapUserAccount(row) : undefined;
+  }
+
+  async findUserAccountByAuthUserId(
+    authUserId: string,
+  ): Promise<StoredUserAccount | undefined> {
+    const [row] = await getDb()
+      .select()
+      .from(userAccounts)
+      .where(eq(userAccounts.authUserId, authUserId))
+      .limit(1);
+    return row ? mapUserAccount(row) : undefined;
+  }
+
+  async findUserAccountByEmail(
+    email: string,
+  ): Promise<StoredUserAccount | undefined> {
+    const normalized = email.trim().toLowerCase();
+    const [row] = await getDb()
+      .select()
+      .from(userAccounts)
+      .where(eq(userAccounts.email, normalized))
+      .limit(1);
+    return row ? mapUserAccount(row) : undefined;
+  }
+
+  async updateUserAccount(
+    id: string,
+    patch: { displayName?: string },
+  ): Promise<StoredUserAccount> {
+    const [row] = await getDb()
+      .update(userAccounts)
+      .set({
+        ...(patch.displayName === undefined
+          ? {}
+          : { displayName: patch.displayName.trim() }),
+        updatedAt: new Date(),
+      })
+      .where(eq(userAccounts.id, id))
+      .returning();
+    if (!row) throw new Error('User account not found.');
+    return mapUserAccount(row);
+  }
+
+  async deleteUserAccount(id: string): Promise<void> {
+    await getDb().delete(userAccounts).where(eq(userAccounts.id, id));
+  }
+
+  async insertAuthChallenge(input: {
+    email: string;
+    displayName?: string | null;
+    codeHash: string;
+    expiresAt: Date;
+  }): Promise<StoredAuthChallenge> {
+    const [row] = await getDb()
+      .insert(authChallenges)
+      .values({
+        email: input.email.trim().toLowerCase(),
+        displayName: input.displayName?.trim() || null,
+        codeHash: input.codeHash,
+        expiresAt: input.expiresAt,
+      })
+      .returning();
+    if (!row) throw new Error('Auth challenge insert failed.');
+    return mapAuthChallenge(row);
+  }
+
+  async findLatestAuthChallengeByEmail(
+    email: string,
+  ): Promise<StoredAuthChallenge | undefined> {
+    const normalized = email.trim().toLowerCase();
+    const [row] = await getDb()
+      .select()
+      .from(authChallenges)
+      .where(
+        and(
+          eq(authChallenges.email, normalized),
+          isNull(authChallenges.consumedAt),
+        ),
+      )
+      .orderBy(desc(authChallenges.createdAt))
+      .limit(1);
+    return row ? mapAuthChallenge(row) : undefined;
+  }
+
+  async incrementAuthChallengeAttempts(id: string): Promise<void> {
+    const [current] = await getDb()
+      .select({ attempts: authChallenges.attempts })
+      .from(authChallenges)
+      .where(eq(authChallenges.id, id))
+      .limit(1);
+    if (!current) return;
+    await getDb()
+      .update(authChallenges)
+      .set({ attempts: current.attempts + 1 })
+      .where(eq(authChallenges.id, id));
+  }
+
+  async consumeAuthChallenge(id: string, consumedAt: Date): Promise<void> {
+    await getDb()
+      .update(authChallenges)
+      .set({ consumedAt })
+      .where(eq(authChallenges.id, id));
+  }
+
+  async insertPlaygroup(input: {
+    ownerUserId: string;
+    name: string;
+    guestIdentityVerification?: GuestIdentityVerification;
+  }): Promise<StoredPlaygroup> {
+    const now = new Date();
+    const [row] = await getDb()
+      .insert(playgroups)
+      .values({
+        ownerUserId: input.ownerUserId,
+        name: input.name,
+        guestIdentityVerification: input.guestIdentityVerification ?? 'NONE',
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
+    if (!row) throw new Error('Playgroup insert failed.');
+    return mapPlaygroup(row);
+  }
+
+  async findPlaygroupById(id: string): Promise<StoredPlaygroup | undefined> {
+    if (!isUuid(id)) return undefined;
+    const [row] = await getDb()
+      .select()
+      .from(playgroups)
+      .where(eq(playgroups.id, id))
+      .limit(1);
+    return row ? mapPlaygroup(row) : undefined;
+  }
+
+  async listPlaygroupsByOwner(ownerUserId: string): Promise<StoredPlaygroup[]> {
+    const rows = await getDb()
+      .select()
+      .from(playgroups)
+      .where(eq(playgroups.ownerUserId, ownerUserId))
+      .orderBy(desc(playgroups.updatedAt));
+    return rows.map(mapPlaygroup);
+  }
+
+  async updatePlaygroup(
+    id: string,
+    patch: {
+      name?: string;
+      guestIdentityVerification?: GuestIdentityVerification;
+    },
+  ): Promise<StoredPlaygroup> {
+    const [row] = await getDb()
+      .update(playgroups)
+      .set({
+        ...(patch.name === undefined ? {} : { name: patch.name }),
+        ...(patch.guestIdentityVerification === undefined
+          ? {}
+          : { guestIdentityVerification: patch.guestIdentityVerification }),
+        updatedAt: new Date(),
+      })
+      .where(eq(playgroups.id, id))
+      .returning();
+    if (!row) throw new PlaygroupNotFoundError();
+    return mapPlaygroup(row);
+  }
+
+  async deletePlaygroup(id: string): Promise<void> {
+    await getDb().delete(playgroups).where(eq(playgroups.id, id));
+  }
+
+  async listEventsByPlaygroup(playgroupId: string): Promise<StoredEvent[]> {
+    const rows = await getDb()
+      .select()
+      .from(events)
+      .where(eq(events.playgroupId, playgroupId))
+      .orderBy(desc(events.createdAt));
+    return rows.map(mapEvent);
+  }
+
+  async insertGuestProfile(input: {
+    playgroupId: string;
+    displayName: string;
+    linkedUserAccountId?: string | null;
+    lastSeenAt?: Date | null;
+  }): Promise<StoredGuestProfile> {
+    const now = new Date();
+    const [row] = await getDb()
+      .insert(guestProfiles)
+      .values({
+        playgroupId: input.playgroupId,
+        displayName: input.displayName,
+        linkedUserAccountId: input.linkedUserAccountId ?? null,
+        lastSeenAt: input.lastSeenAt ?? null,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
+    if (!row) throw new Error('Guest profile insert failed.');
+    await getDb()
+      .update(playgroups)
+      .set({ updatedAt: now })
+      .where(eq(playgroups.id, input.playgroupId));
+    return mapGuestProfile(row);
+  }
+
+  async findGuestProfileById(
+    id: string,
+  ): Promise<StoredGuestProfile | undefined> {
+    if (!isUuid(id)) return undefined;
+    const [row] = await getDb()
+      .select()
+      .from(guestProfiles)
+      .where(eq(guestProfiles.id, id))
+      .limit(1);
+    return row ? mapGuestProfile(row) : undefined;
+  }
+
+  async listGuestProfilesByPlaygroup(
+    playgroupId: string,
+    options?: { includeArchived?: boolean },
+  ): Promise<StoredGuestProfile[]> {
+    const rows = await getDb()
+      .select()
+      .from(guestProfiles)
+      .where(
+        options?.includeArchived
+          ? eq(guestProfiles.playgroupId, playgroupId)
+          : and(
+              eq(guestProfiles.playgroupId, playgroupId),
+              isNull(guestProfiles.archivedAt),
+            ),
+      );
+    return rows
+      .map(mapGuestProfile)
+      .sort((a, b) => {
+        const aSeen = a.lastSeenAt?.getTime() ?? 0;
+        const bSeen = b.lastSeenAt?.getTime() ?? 0;
+        if (bSeen !== aSeen) return bSeen - aSeen;
+        return a.displayName.localeCompare(b.displayName);
+      });
+  }
+
+  async listGuestProfilesByLinkedUser(
+    userAccountId: string,
+  ): Promise<StoredGuestProfile[]> {
+    const rows = await getDb()
+      .select()
+      .from(guestProfiles)
+      .where(
+        and(
+          eq(guestProfiles.linkedUserAccountId, userAccountId),
+          isNull(guestProfiles.archivedAt),
+        ),
+      );
+    return rows.map(mapGuestProfile);
+  }
+
+  async updateGuestProfile(
+    id: string,
+    patch: {
+      displayName?: string;
+      linkedUserAccountId?: string | null;
+      archivedAt?: Date | null;
+      lastSeenAt?: Date | null;
+    },
+  ): Promise<StoredGuestProfile> {
+    const [row] = await getDb()
+      .update(guestProfiles)
+      .set({
+        ...(patch.displayName === undefined
+          ? {}
+          : { displayName: patch.displayName }),
+        ...(patch.linkedUserAccountId === undefined
+          ? {}
+          : { linkedUserAccountId: patch.linkedUserAccountId }),
+        ...(patch.archivedAt === undefined
+          ? {}
+          : { archivedAt: patch.archivedAt }),
+        ...(patch.lastSeenAt === undefined
+          ? {}
+          : { lastSeenAt: patch.lastSeenAt }),
+        updatedAt: new Date(),
+      })
+      .where(eq(guestProfiles.id, id))
+      .returning();
+    if (!row) throw new GuestProfileNotFoundError();
+    return mapGuestProfile(row);
+  }
+
+  async deleteGuestProfile(id: string): Promise<void> {
+    await getDb().delete(guestProfiles).where(eq(guestProfiles.id, id));
+  }
+
+  async mergeGuestProfiles(input: {
+    playgroupId: string;
+    sourceGuestId: string;
+    targetGuestId: string;
+  }): Promise<StoredGuestProfile> {
+    const source = await this.findGuestProfileById(input.sourceGuestId);
+    const target = await this.findGuestProfileById(input.targetGuestId);
+    if (
+      !source ||
+      !target ||
+      source.playgroupId !== input.playgroupId ||
+      target.playgroupId !== input.playgroupId
+    ) {
+      throw new GuestProfileNotFoundError();
+    }
+    return getDb().transaction(async (tx) => {
+      await tx
+        .update(savedDeckProfiles)
+        .set({ guestProfileId: target.id, preferred: false, updatedAt: new Date() })
+        .where(eq(savedDeckProfiles.guestProfileId, source.id));
+      await tx
+        .update(participants)
+        .set({ guestProfileId: target.id, updatedAt: new Date() })
+        .where(eq(participants.guestProfileId, source.id));
+      await tx
+        .update(gameRecordParticipants)
+        .set({ guestProfileId: target.id })
+        .where(eq(gameRecordParticipants.guestProfileId, source.id));
+      const [updated] = await tx
+        .update(guestProfiles)
+        .set({
+          linkedUserAccountId:
+            target.linkedUserAccountId ?? source.linkedUserAccountId,
+          lastSeenAt:
+            source.lastSeenAt &&
+            (!target.lastSeenAt ||
+              source.lastSeenAt.getTime() > target.lastSeenAt.getTime())
+              ? source.lastSeenAt
+              : target.lastSeenAt,
+          updatedAt: new Date(),
+        })
+        .where(eq(guestProfiles.id, target.id))
+        .returning();
+      await tx.delete(guestProfiles).where(eq(guestProfiles.id, source.id));
+      if (!updated) throw new GuestProfileNotFoundError();
+      return mapGuestProfile(updated);
+    });
+  }
+
+  async insertSavedDeckProfile(
+    input: NewStoredSavedDeckProfile,
+  ): Promise<StoredSavedDeckProfile> {
+    const now = new Date();
+    if (input.preferred) {
+      await getDb()
+        .update(savedDeckProfiles)
+        .set({ preferred: false, updatedAt: now })
+        .where(eq(savedDeckProfiles.guestProfileId, input.guestProfileId));
+    }
+    const [row] = await getDb()
+      .insert(savedDeckProfiles)
+      .values({
+        playgroupId: input.playgroupId,
+        guestProfileId: input.guestProfileId,
+        format: input.format,
+        deckName: input.deckName ?? null,
+        commanderName: input.commanderName ?? null,
+        commanderScryfallId: input.commanderScryfallId ?? null,
+        commanders: input.commanders ?? [],
+        bracket: input.bracket ?? null,
+        poolId: input.poolId,
+        preferred: input.preferred ?? false,
+        timesUsed: input.timesUsed ?? 0,
+        lastUsedAt: input.lastUsedAt ?? null,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
+    if (!row) throw new Error('Saved deck profile insert failed.');
+    return mapSavedDeckProfile(row);
+  }
+
+  async findSavedDeckProfileById(
+    id: string,
+  ): Promise<StoredSavedDeckProfile | undefined> {
+    if (!isUuid(id)) return undefined;
+    const [row] = await getDb()
+      .select()
+      .from(savedDeckProfiles)
+      .where(eq(savedDeckProfiles.id, id))
+      .limit(1);
+    return row ? mapSavedDeckProfile(row) : undefined;
+  }
+
+  async listSavedDeckProfilesByPlaygroup(
+    playgroupId: string,
+    options?: { includeArchived?: boolean },
+  ): Promise<StoredSavedDeckProfile[]> {
+    const rows = await getDb()
+      .select()
+      .from(savedDeckProfiles)
+      .where(
+        options?.includeArchived
+          ? eq(savedDeckProfiles.playgroupId, playgroupId)
+          : and(
+              eq(savedDeckProfiles.playgroupId, playgroupId),
+              isNull(savedDeckProfiles.archivedAt),
+            ),
+      );
+    return rows.map(mapSavedDeckProfile).sort(compareSavedDeckOrderPg);
+  }
+
+  async listSavedDeckProfilesByGuest(
+    guestProfileId: string,
+    options?: { includeArchived?: boolean },
+  ): Promise<StoredSavedDeckProfile[]> {
+    const rows = await getDb()
+      .select()
+      .from(savedDeckProfiles)
+      .where(
+        options?.includeArchived
+          ? eq(savedDeckProfiles.guestProfileId, guestProfileId)
+          : and(
+              eq(savedDeckProfiles.guestProfileId, guestProfileId),
+              isNull(savedDeckProfiles.archivedAt),
+            ),
+      );
+    return rows.map(mapSavedDeckProfile).sort(compareSavedDeckOrderPg);
+  }
+
+  async updateSavedDeckProfile(
+    id: string,
+    patch: Partial<
+      Omit<NewStoredSavedDeckProfile, 'playgroupId' | 'guestProfileId'>
+    > & {
+      archivedAt?: Date | null;
+      timesUsed?: number;
+      lastUsedAt?: Date | null;
+    },
+  ): Promise<StoredSavedDeckProfile> {
+    const existing = await this.findSavedDeckProfileById(id);
+    if (!existing) throw new SavedDeckNotFoundError();
+    const now = new Date();
+    if (patch.preferred === true) {
+      await getDb()
+        .update(savedDeckProfiles)
+        .set({ preferred: false, updatedAt: now })
+        .where(eq(savedDeckProfiles.guestProfileId, existing.guestProfileId));
+    }
+    const [row] = await getDb()
+      .update(savedDeckProfiles)
+      .set({
+        ...(patch.format === undefined ? {} : { format: patch.format }),
+        ...(patch.deckName === undefined ? {} : { deckName: patch.deckName }),
+        ...(patch.commanderName === undefined
+          ? {}
+          : { commanderName: patch.commanderName }),
+        ...(patch.commanderScryfallId === undefined
+          ? {}
+          : { commanderScryfallId: patch.commanderScryfallId }),
+        ...(patch.commanders === undefined
+          ? {}
+          : { commanders: patch.commanders }),
+        ...(patch.bracket === undefined ? {} : { bracket: patch.bracket }),
+        ...(patch.poolId === undefined ? {} : { poolId: patch.poolId }),
+        ...(patch.preferred === undefined
+          ? {}
+          : { preferred: patch.preferred }),
+        ...(patch.timesUsed === undefined
+          ? {}
+          : { timesUsed: patch.timesUsed }),
+        ...(patch.lastUsedAt === undefined
+          ? {}
+          : { lastUsedAt: patch.lastUsedAt }),
+        ...(patch.archivedAt === undefined
+          ? {}
+          : { archivedAt: patch.archivedAt }),
+        updatedAt: now,
+      })
+      .where(eq(savedDeckProfiles.id, id))
+      .returning();
+    if (!row) throw new SavedDeckNotFoundError();
+    return mapSavedDeckProfile(row);
+  }
+
+  async deleteSavedDeckProfile(id: string): Promise<void> {
+    await getDb().delete(savedDeckProfiles).where(eq(savedDeckProfiles.id, id));
+  }
+
+  async upsertGameRecord(
+    input: UpsertStoredGameRecordInput,
+  ): Promise<StoredGameRecord> {
+    return getDb().transaction(async (tx) => {
+      const [existing] = await tx
+        .select()
+        .from(gameRecords)
+        .where(
+          and(
+            eq(gameRecords.source, input.source),
+            eq(gameRecords.sourceType, input.sourceType),
+            eq(gameRecords.sourceId, input.sourceId),
+          ),
+        )
+        .limit(1);
+      const now = new Date();
+      let recordRow: typeof gameRecords.$inferSelect;
+      if (existing) {
+        const [updated] = await tx
+          .update(gameRecords)
+          .set({
+            eventId: input.eventId ?? null,
+            playgroupId: input.playgroupId ?? null,
+            gameMode: input.gameMode,
+            format: input.format ?? null,
+            poolId: input.poolId ?? null,
+            durationSeconds: input.durationSeconds ?? null,
+            startedAt: input.startedAt ?? null,
+            endedAt: input.endedAt,
+            updatedAt: now,
+          })
+          .where(eq(gameRecords.id, existing.id))
+          .returning();
+        if (!updated) throw new Error('Game record update failed.');
+        recordRow = updated;
+        await tx
+          .delete(gameRecordParticipants)
+          .where(eq(gameRecordParticipants.gameRecordId, existing.id));
+      } else {
+        const [inserted] = await tx
+          .insert(gameRecords)
+          .values({
+            source: input.source,
+            sourceType: input.sourceType,
+            sourceId: input.sourceId,
+            eventId: input.eventId ?? null,
+            playgroupId: input.playgroupId ?? null,
+            gameMode: input.gameMode,
+            format: input.format ?? null,
+            poolId: input.poolId ?? null,
+            durationSeconds: input.durationSeconds ?? null,
+            startedAt: input.startedAt ?? null,
+            endedAt: input.endedAt,
+            createdAt: now,
+            updatedAt: now,
+          })
+          .returning();
+        if (!inserted) throw new Error('Game record insert failed.');
+        recordRow = inserted;
+      }
+
+      const participantRows =
+        input.participants.length > 0
+          ? await tx
+              .insert(gameRecordParticipants)
+              .values(
+                input.participants.map((p) => ({
+                  gameRecordId: recordRow.id,
+                  eventParticipantId: p.eventParticipantId ?? null,
+                  userAccountId: p.userAccountId ?? null,
+                  guestProfileId: p.guestProfileId ?? null,
+                  displayNameSnapshot: p.displayNameSnapshot,
+                  savedDeckProfileId: p.savedDeckProfileId ?? null,
+                  deckNameSnapshot: p.deckNameSnapshot ?? null,
+                  commanderNameSnapshot: p.commanderNameSnapshot ?? null,
+                  commanderScryfallIdSnapshot:
+                    p.commanderScryfallIdSnapshot ?? null,
+                  bracketSnapshot: p.bracketSnapshot ?? null,
+                  resultType: p.resultType ?? null,
+                  placement: p.placement ?? null,
+                  teamId: p.teamId ?? null,
+                  createdAt: now,
+                })),
+              )
+              .returning()
+          : [];
+
+      return mapGameRecord(recordRow, participantRows);
+    });
+  }
+
+  async listGameRecordsByPlaygroup(
+    playgroupId: string,
+  ): Promise<StoredGameRecord[]> {
+    const rows = await getDb()
+      .select()
+      .from(gameRecords)
+      .where(eq(gameRecords.playgroupId, playgroupId))
+      .orderBy(desc(gameRecords.endedAt));
+    return loadGameRecordsWithParticipants(rows);
+  }
+
+  async listGameRecordsByEvent(eventId: string): Promise<StoredGameRecord[]> {
+    const rows = await getDb()
+      .select()
+      .from(gameRecords)
+      .where(eq(gameRecords.eventId, eventId))
+      .orderBy(desc(gameRecords.endedAt));
+    return loadGameRecordsWithParticipants(rows);
+  }
+
+  async listGameRecordsForIdentity(input: {
+    guestProfileIds?: string[];
+    userAccountIds?: string[];
+  }): Promise<StoredGameRecord[]> {
+    const guestIds = (input.guestProfileIds ?? []).filter(isUuid);
+    const userIds = (input.userAccountIds ?? []).filter(isUuid);
+    if (guestIds.length === 0 && userIds.length === 0) {
+      return [];
+    }
+    const conditions = [];
+    if (guestIds.length > 0) {
+      conditions.push(inArray(gameRecordParticipants.guestProfileId, guestIds));
+    }
+    if (userIds.length > 0) {
+      conditions.push(inArray(gameRecordParticipants.userAccountId, userIds));
+    }
+    const matchingRows = await getDb()
+      .select({ gameRecordId: gameRecordParticipants.gameRecordId })
+      .from(gameRecordParticipants)
+      .where(conditions.length === 1 ? conditions[0]! : or(...conditions));
+    const recordIds = [...new Set(matchingRows.map((row) => row.gameRecordId))];
+    if (recordIds.length === 0) {
+      return [];
+    }
+    const rows = await getDb()
+      .select()
+      .from(gameRecords)
+      .where(inArray(gameRecords.id, recordIds))
+      .orderBy(desc(gameRecords.endedAt));
+    return loadGameRecordsWithParticipants(rows);
+  }
 }
 
 async function loadLimitedSessionRequired(
@@ -2798,6 +3529,14 @@ function mapEvent(row: typeof events.$inferSelect): StoredEvent {
     expiresAt: row.expiresAt,
     challengePackId: row.challengePackId,
     challengePackVersion: row.challengePackVersion,
+    ownerUserId: row.ownerUserId ?? null,
+    playgroupId: row.playgroupId ?? null,
+    showReturningPlayerSuggestions:
+      row.showReturningPlayerSuggestions !== false,
+    guestIdentityVerification:
+      row.guestIdentityVerification === 'HOST_CONFIRM'
+        ? 'HOST_CONFIRM'
+        : 'NONE',
     createdAt: row.createdAt,
   };
 }
@@ -2819,6 +3558,9 @@ function mapParticipant(
       preference === 'preferred' || preference === 'locked' ? preference : 'none',
     lockedTableId: row.lockedTableId ?? null,
     preferredTableId: row.preferredTableId ?? null,
+    userAccountId: row.userAccountId ?? null,
+    guestProfileId: row.guestProfileId ?? null,
+    savedDeckProfileId: row.savedDeckProfileId ?? null,
     flexCredits: row.flexCredits,
     createdAt: row.createdAt,
   };
@@ -2864,3 +3606,163 @@ function mapTableReservation(
     createdAt: row.createdAt,
   };
 }
+
+function mapUserAccount(
+  row: typeof userAccounts.$inferSelect,
+): StoredUserAccount {
+  return {
+    id: row.id,
+    authUserId: row.authUserId,
+    email: row.email ?? null,
+    displayName: row.displayName,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  };
+}
+
+function mapAuthChallenge(
+  row: typeof authChallenges.$inferSelect,
+): StoredAuthChallenge {
+  return {
+    id: row.id,
+    email: row.email,
+    displayName: row.displayName ?? null,
+    codeHash: row.codeHash,
+    attempts: row.attempts,
+    expiresAt: row.expiresAt,
+    consumedAt: row.consumedAt ?? null,
+    createdAt: row.createdAt,
+  };
+}
+
+function mapPlaygroup(row: typeof playgroups.$inferSelect): StoredPlaygroup {
+  return {
+    id: row.id,
+    ownerUserId: row.ownerUserId,
+    name: row.name,
+    guestIdentityVerification:
+      row.guestIdentityVerification === 'HOST_CONFIRM'
+        ? 'HOST_CONFIRM'
+        : 'NONE',
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  };
+}
+
+function mapGuestProfile(
+  row: typeof guestProfiles.$inferSelect,
+): StoredGuestProfile {
+  return {
+    id: row.id,
+    playgroupId: row.playgroupId,
+    displayName: row.displayName,
+    linkedUserAccountId: row.linkedUserAccountId ?? null,
+    archivedAt: row.archivedAt ?? null,
+    lastSeenAt: row.lastSeenAt ?? null,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  };
+}
+
+function mapSavedDeckProfile(
+  row: typeof savedDeckProfiles.$inferSelect,
+): StoredSavedDeckProfile {
+  return {
+    id: row.id,
+    playgroupId: row.playgroupId,
+    guestProfileId: row.guestProfileId,
+    format: row.format,
+    deckName: row.deckName ?? null,
+    commanderName: row.commanderName ?? null,
+    commanderScryfallId: row.commanderScryfallId ?? null,
+    commanders: row.commanders ?? [],
+    bracket: row.bracket ?? null,
+    poolId: row.poolId,
+    preferred: row.preferred,
+    timesUsed: row.timesUsed,
+    lastUsedAt: row.lastUsedAt ?? null,
+    archivedAt: row.archivedAt ?? null,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  };
+}
+
+function compareSavedDeckOrderPg(
+  a: StoredSavedDeckProfile,
+  b: StoredSavedDeckProfile,
+): number {
+  if (a.preferred !== b.preferred) {
+    return a.preferred ? -1 : 1;
+  }
+  const aUsed = a.lastUsedAt?.getTime() ?? 0;
+  const bUsed = b.lastUsedAt?.getTime() ?? 0;
+  if (bUsed !== aUsed) {
+    return bUsed - aUsed;
+  }
+  if (b.timesUsed !== a.timesUsed) {
+    return b.timesUsed - a.timesUsed;
+  }
+  return a.createdAt.getTime() - b.createdAt.getTime();
+}
+
+async function loadGameRecordsWithParticipants(
+  rows: Array<typeof gameRecords.$inferSelect>,
+): Promise<StoredGameRecord[]> {
+  if (rows.length === 0) return [];
+  const recordIds = rows.map((row) => row.id);
+  const participantRows = await getDb()
+    .select()
+    .from(gameRecordParticipants)
+    .where(inArray(gameRecordParticipants.gameRecordId, recordIds))
+    .orderBy(asc(gameRecordParticipants.createdAt));
+  const byRecord = new Map<
+    string,
+    Array<typeof gameRecordParticipants.$inferSelect>
+  >();
+  for (const p of participantRows) {
+    const list = byRecord.get(p.gameRecordId) ?? [];
+    list.push(p);
+    byRecord.set(p.gameRecordId, list);
+  }
+  return rows.map((row) => mapGameRecord(row, byRecord.get(row.id) ?? []));
+}
+
+function mapGameRecord(
+  row: typeof gameRecords.$inferSelect,
+  participantRows: Array<typeof gameRecordParticipants.$inferSelect>,
+): StoredGameRecord {
+  return {
+    id: row.id,
+    source: (row.source as StoredGameRecord['source']) ?? 'PODYGUARD',
+    sourceType: row.sourceType as StoredGameRecord['sourceType'],
+    sourceId: row.sourceId,
+    eventId: row.eventId ?? null,
+    playgroupId: row.playgroupId ?? null,
+    gameMode: row.gameMode,
+    format: row.format ?? null,
+    poolId: row.poolId ?? null,
+    durationSeconds: row.durationSeconds ?? null,
+    startedAt: row.startedAt ?? null,
+    endedAt: row.endedAt,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+    participants: participantRows.map((p) => ({
+      id: p.id,
+      gameRecordId: p.gameRecordId,
+      eventParticipantId: p.eventParticipantId ?? null,
+      userAccountId: p.userAccountId ?? null,
+      guestProfileId: p.guestProfileId ?? null,
+      displayNameSnapshot: p.displayNameSnapshot,
+      savedDeckProfileId: p.savedDeckProfileId ?? null,
+      deckNameSnapshot: p.deckNameSnapshot ?? null,
+      commanderNameSnapshot: p.commanderNameSnapshot ?? null,
+      commanderScryfallIdSnapshot: p.commanderScryfallIdSnapshot ?? null,
+      bracketSnapshot: p.bracketSnapshot ?? null,
+      resultType: (p.resultType as StoredGameRecord['participants'][number]['resultType']) ?? null,
+      placement: p.placement ?? null,
+      teamId: p.teamId ?? null,
+      createdAt: p.createdAt,
+    })),
+  };
+}
+

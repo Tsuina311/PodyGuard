@@ -21,8 +21,18 @@ import {
   DevToolsDisabledError,
   LimitedPersistenceConflictError,
   PodNotFoundError,
+  PlaygroupNotFoundError,
+  PlaygroupForbiddenError,
+  GuestProfileNotFoundError,
+  SavedDeckNotFoundError,
+  DuplicateGuestNameError,
 } from '../events/event-store.js';
 import { LimitedSessionNotFoundError } from '../events/event-service.js';
+import {
+  AuthChallengeInvalidError,
+  AuthChallengeRateLimitedError,
+} from '../events/playgroup-domain.js';
+import { EventManagementForbiddenError } from '../authorization/index.js';
 import {
   parseOperationModeInput,
   parseRoundCountInput,
@@ -32,6 +42,7 @@ import {
 import { TableConflictError } from '../events/table-authority.js';
 import { InvalidEventInputError } from '../events/validation.js';
 import {
+  InvalidAccountSessionError,
   InvalidHostEventSessionError,
   InvalidParticipantSessionError,
   ParticipantSessionSecretMissingError,
@@ -72,38 +83,69 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
       limitedModeConfigs?: unknown;
       operationMode?: unknown;
       roundCount?: unknown;
+      playgroupId?: unknown;
+      showReturningPlayerSuggestions?: unknown;
+      guestIdentityVerification?: unknown;
     };
     try {
-      const result = await app.events.createEvent({
-        name: typeof body.name === 'string' ? body.name : '',
-        hostPin: typeof body.hostPin === 'string' ? body.hostPin : '',
-        tableCount: parseTableCount(body.tableCount),
-        gameMode: parseGameMode(body.gameMode),
-        rulesFormat: parseRulesFormat(body.rulesFormat),
-        allowThreePods: body.allowThreePods === undefined ? undefined : Boolean(body.allowThreePods),
-        allowFivePods: body.allowFivePods === undefined ? undefined : Boolean(body.allowFivePods),
-        preferredPodSize:
-          typeof body.preferredPodSize === 'number' ? body.preferredPodSize : undefined,
-        lifetimeHours:
-          typeof body.lifetimeHours === 'number' ? body.lifetimeHours : undefined,
-        tournamentFormat:
-          body.tournamentFormat === 'single-elimination' ||
-          body.tournamentFormat === 'swiss'
-            ? body.tournamentFormat
-            : undefined,
-        tournamentOptions:
-          body.tournamentOptions && typeof body.tournamentOptions === 'object'
-            ? (body.tournamentOptions as {
-                matchSize?: number;
-                defaultBestOf?: 1 | 3 | 5;
-                finalBestOf?: 1 | 3 | 5;
-                swissRounds?: number;
-              })
-            : undefined,
-        limitedModeConfigs: parseLimitedModeConfigs(body.limitedModeConfigs),
-        operationMode: parseOperationModeInput(body.operationMode),
-        roundCount: parseRoundCountInput(body.roundCount),
-      });
+      const result = await app.events.createEvent(
+        {
+          name: typeof body.name === 'string' ? body.name : '',
+          hostPin: typeof body.hostPin === 'string' ? body.hostPin : '',
+          tableCount: parseTableCount(body.tableCount),
+          gameMode: parseGameMode(body.gameMode),
+          rulesFormat: parseRulesFormat(body.rulesFormat),
+          allowThreePods:
+            body.allowThreePods === undefined
+              ? undefined
+              : Boolean(body.allowThreePods),
+          allowFivePods:
+            body.allowFivePods === undefined
+              ? undefined
+              : Boolean(body.allowFivePods),
+          preferredPodSize:
+            typeof body.preferredPodSize === 'number'
+              ? body.preferredPodSize
+              : undefined,
+          lifetimeHours:
+            typeof body.lifetimeHours === 'number'
+              ? body.lifetimeHours
+              : undefined,
+          tournamentFormat:
+            body.tournamentFormat === 'single-elimination' ||
+            body.tournamentFormat === 'swiss'
+              ? body.tournamentFormat
+              : undefined,
+          tournamentOptions:
+            body.tournamentOptions && typeof body.tournamentOptions === 'object'
+              ? (body.tournamentOptions as {
+                  matchSize?: number;
+                  defaultBestOf?: 1 | 3 | 5;
+                  finalBestOf?: 1 | 3 | 5;
+                  swissRounds?: number;
+                })
+              : undefined,
+          limitedModeConfigs: parseLimitedModeConfigs(body.limitedModeConfigs),
+          operationMode: parseOperationModeInput(body.operationMode),
+          roundCount: parseRoundCountInput(body.roundCount),
+          playgroupId:
+            typeof body.playgroupId === 'string' &&
+            body.playgroupId.trim().length > 0
+              ? body.playgroupId.trim()
+              : undefined,
+          showReturningPlayerSuggestions:
+            typeof body.showReturningPlayerSuggestions === 'boolean'
+              ? body.showReturningPlayerSuggestions
+              : undefined,
+          guestIdentityVerification:
+            body.guestIdentityVerification === 'HOST_CONFIRM'
+              ? 'HOST_CONFIRM'
+              : body.guestIdentityVerification === 'NONE'
+                ? 'NONE'
+                : undefined,
+        },
+        bearerToken(request.headers.authorization),
+      );
       return reply.code(201).send(result);
     } catch (error) {
       return sendEventError(reply, error);
@@ -200,17 +242,66 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
     },
   );
 
+  app.get('/events/:joinCode/join-suggestions', async (request, reply) => {
+    const { joinCode } = request.params as { joinCode: string };
+    const query = (request.query ?? {}) as { q?: unknown };
+    try {
+      return await app.events.getJoinSuggestions(
+        normalizeJoinCode(joinCode),
+        typeof query.q === 'string' ? query.q : undefined,
+      );
+    } catch (error) {
+      return sendEventError(reply, error);
+    }
+  });
+
+  app.get(
+    '/events/:joinCode/join-suggestions/:guestProfileId/decks',
+    async (request, reply) => {
+      const { joinCode, guestProfileId } = request.params as {
+        joinCode: string;
+        guestProfileId: string;
+      };
+      try {
+        return await app.events.getJoinGuestDecks(
+          normalizeJoinCode(joinCode),
+          guestProfileId,
+        );
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
   app.post('/events/:joinCode/join', async (request, reply) => {
     const { joinCode } = request.params as { joinCode: string };
     const body = (request.body ?? {}) as {
       displayName?: unknown;
       decks?: unknown;
+      guestProfileId?: unknown;
+      savedDeckProfileId?: unknown;
+      rememberMe?: unknown;
     };
     try {
       const result = await app.events.joinEvent(
         normalizeJoinCode(joinCode),
         typeof body.displayName === 'string' ? body.displayName : '',
         parseDeckDrafts(body.decks),
+        {
+          guestProfileId:
+            typeof body.guestProfileId === 'string' &&
+            body.guestProfileId.trim().length > 0
+              ? body.guestProfileId.trim()
+              : undefined,
+          savedDeckProfileId:
+            typeof body.savedDeckProfileId === 'string' &&
+            body.savedDeckProfileId.trim().length > 0
+              ? body.savedDeckProfileId.trim()
+              : undefined,
+          rememberMe:
+            typeof body.rememberMe === 'boolean' ? body.rememberMe : undefined,
+          accountToken: bearerToken(request.headers.authorization) || undefined,
+        },
       );
       await app.live.publish(normalizeJoinCode(joinCode));
       return reply.code(201).send(result);
@@ -1074,6 +1165,7 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
       allowFivePods?: unknown;
       preferredPodSize?: unknown;
       lifetimeHours?: unknown;
+      showReturningPlayerSuggestions?: unknown;
     };
     try {
       const event = await app.events.updateMatchSettings(
@@ -1088,6 +1180,10 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
             typeof body.preferredPodSize === 'number' ? body.preferredPodSize : undefined,
           lifetimeHours:
             typeof body.lifetimeHours === 'number' ? body.lifetimeHours : undefined,
+          showReturningPlayerSuggestions:
+            typeof body.showReturningPlayerSuggestions === 'boolean'
+              ? body.showReturningPlayerSuggestions
+              : undefined,
         },
       );
       await app.live.publish(normalizeJoinCode(joinCode));
@@ -1906,7 +2002,7 @@ function parseCommanderKeywords(value: unknown): string[] {
   return value;
 }
 
-function sendEventError(
+export function sendEventError(
   reply: { code: (status: number) => { send: (payload: ErrorBody) => unknown } },
   error: unknown,
 ) {
@@ -1918,7 +2014,10 @@ function sendEventError(
     error instanceof TableNotFoundError ||
     error instanceof PodNotFoundError ||
     error instanceof ParticipantNotFoundError ||
-    error instanceof LimitedSessionNotFoundError
+    error instanceof LimitedSessionNotFoundError ||
+    error instanceof PlaygroupNotFoundError ||
+    error instanceof GuestProfileNotFoundError ||
+    error instanceof SavedDeckNotFoundError
   ) {
     return reply.code(404).send(errorBody(error.code, error.message));
   }
@@ -1928,18 +2027,28 @@ function sendEventError(
     error instanceof LimitedPersistenceConflictError ||
     error instanceof RoundVersionConflictError ||
     error instanceof RoundModeRequiredError ||
-    error instanceof TableConflictError
+    error instanceof TableConflictError ||
+    error instanceof DuplicateGuestNameError
   ) {
     return reply.code(409).send(errorBody(error.code, error.message));
   }
   if (
     error instanceof InvalidHostPinError ||
     error instanceof InvalidHostEventSessionError ||
-    error instanceof InvalidParticipantSessionError
+    error instanceof InvalidParticipantSessionError ||
+    error instanceof InvalidAccountSessionError ||
+    error instanceof AuthChallengeInvalidError
   ) {
     return reply.code(401).send(errorBody(error.code, error.message));
   }
-  if (error instanceof DevToolsDisabledError) {
+  if (error instanceof AuthChallengeRateLimitedError) {
+    return reply.code(429).send(errorBody(error.code, error.message));
+  }
+  if (
+    error instanceof DevToolsDisabledError ||
+    error instanceof PlaygroupForbiddenError ||
+    error instanceof EventManagementForbiddenError
+  ) {
     return reply.code(403).send(errorBody(error.code, error.message));
   }
   if (error instanceof ParticipantSessionSecretMissingError) {

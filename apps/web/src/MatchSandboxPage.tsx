@@ -2,10 +2,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
+  bracketFromPoolId,
   challengeById,
   poolLabel,
   type PublicParticipant,
 } from '@podyguard/shared';
+import {
+  loadAccountToken,
+  recordLocalPlaygroupGame,
+} from './api';
 import {
   loadMatchConfig,
   matchPlayers,
@@ -90,7 +95,43 @@ export function MatchSandboxPage() {
           setPromptRearrange(true);
           setGameKey((value) => value + 1);
         }}
-        onFinish={async () => {
+        onFinish={async (winnerId, durationSeconds) => {
+          const accountToken = loadAccountToken();
+          if (config.playgroupId && accountToken) {
+            try {
+              await recordLocalPlaygroupGame(accountToken, config.playgroupId, {
+                clientGameId: `${trackerStorageKey(config)}:${String(gameKey)}`,
+                gameMode: config.gameMode,
+                rulesFormat: config.rulesFormat,
+                poolId: config.poolId,
+                durationSeconds,
+                seats: players.map((player, index) => {
+                  const identity = config.seatIdentities?.[index] ?? undefined;
+                  const primaryCommander = player.commanders[0];
+                  const isWinner = Boolean(winnerId && player.id === winnerId);
+                  return {
+                    guestProfileId: identity?.guestProfileId,
+                    userAccountId: identity?.userAccountId,
+                    savedDeckProfileId: identity?.savedDeckProfileId,
+                    displayName: player.name,
+                    commanderName: primaryCommander?.name,
+                    commanderScryfallId:
+                      primaryCommander?.oracleId || primaryCommander?.cardId,
+                    bracket:
+                      identity?.bracket ?? bracketFromPoolId(config.poolId),
+                    resultType: winnerId
+                      ? isWinner
+                        ? 'WIN'
+                        : 'LOSS'
+                      : 'COMPLETED_NO_WINNER',
+                    placement: isWinner ? 1 : undefined,
+                  };
+                }),
+              });
+            } catch {
+              /* Do not block leaving the local tracker if offline */
+            }
+          }
           forgetActiveMatch('/match');
           void navigate('/');
         }}

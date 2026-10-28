@@ -2,6 +2,7 @@ export type { AuthProvider, HostAuthCredentials } from './auth-provider.js';
 export { DeferredHostAuthProvider } from './deferred-host-auth-provider.js';
 export {
   HostAuthDeferredError,
+  InvalidAccountSessionError,
   InvalidHostEventSessionError,
   InvalidParticipantSessionError,
   ParticipantSessionSecretMissingError,
@@ -11,6 +12,13 @@ export type {
   IdentityBoundary,
   IdentityBoundaryOptions,
 } from './create-identity-boundary.js';
+export {
+  HmacAccountSessionService,
+} from './account-session-service.js';
+export type {
+  AccountSession,
+  AccountSessionService,
+} from './account-session-service.js';
 export {
   bindingFromNeonAuthAccount,
   toHostIdentity,

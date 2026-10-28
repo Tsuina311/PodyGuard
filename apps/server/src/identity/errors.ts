@@ -37,3 +37,13 @@ export class InvalidHostEventSessionError extends Error {
     this.name = 'InvalidHostEventSessionError';
   }
 }
+
+export class InvalidAccountSessionError extends Error {
+  readonly code = 'INVALID_ACCOUNT_SESSION';
+
+  constructor(message = 'Account session is invalid or expired.') {
+    super(message);
+    this.name = 'InvalidAccountSessionError';
+  }
+}
+

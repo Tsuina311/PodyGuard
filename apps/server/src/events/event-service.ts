@@ -66,12 +66,28 @@ import {
   type TournamentOptions,
   type TournamentState,
   type DuelMatchOutcome,
+  type CommanderSelection,
+  type DerivedStats,
+  type GameRecord,
+  type GameResultType,
+  type GuestIdentityVerification,
+  type GuestProfile,
+  type JoinGuestSuggestion,
+  type JoinGuestSuggestionsResponse,
+  type JoinSavedDeckSuggestion,
+  type Playgroup,
+  type PlaygroupOverview,
+  type SavedDeckProfile,
+  type UserAccount,
+  isSavedDeckCompatibleWithEvent,
   normalizeJoinCode,
   typicalGameDurationSeconds,
   currentEventRound,
 } from '@podyguard/shared';
 import { randomUUID } from 'node:crypto';
+import { EventManagementForbiddenError } from '../authorization/index.js';
 import {
+  InvalidAccountSessionError,
   InvalidParticipantSessionError,
   type IdentityBoundary,
 } from '../identity/index.js';
@@ -81,13 +97,18 @@ import { nextBotName } from './bot-names.js';
 import { SEATS_PER_TABLE } from './plan-pods.js';
 import {
   DevToolsDisabledError,
+  DuplicateGuestNameError,
   EventNotFoundError,
   EventNotJoinableError,
+  GuestProfileNotFoundError,
   InvalidHostPinError,
   InvalidParticipantTransitionError,
   JoinCodeConflictError,
   LimitedPersistenceConflictError,
   ParticipantNotFoundError,
+  PlaygroupForbiddenError,
+  PlaygroupNotFoundError,
+  SavedDeckNotFoundError,
   TableNotFoundError,
   PodNotFoundError,
   type EventStore,
@@ -101,6 +122,31 @@ import {
   type StoredParticipant,
   type StoredTable,
 } from './event-store.js';
+import {
+  assertPlaygroupName,
+  AuthChallengeInvalidError,
+  AuthChallengeRateLimitedError,
+  buildAccountDashboard,
+  buildPlaygroupOverview,
+  getJoinGuestDecksForEvent,
+  getJoinSuggestionsForEvent,
+  loginWithNeonAuthFlow,
+  normalizeSavedDeckInput,
+  recordLimitedMatchToHistory,
+  recordPodCompletionToHistory,
+  recordRoundAssignmentToHistory,
+  requireAuthenticatedAccount,
+  requireOwnedPlaygroup,
+  startEmailAuthFlow,
+  syncGuestDecksOnJoinOrUpdate,
+  toPublicGameRecord,
+  toPublicGuestProfile,
+  toPublicPlaygroup,
+  toPublicSavedDeckProfile,
+  toPublicUserAccount,
+  tryResolveAuthenticatedAccount,
+  verifyEmailAuthFlow,
+} from './playgroup-domain.js';
 import {
   assertDecks,
   assertDisplayName,
@@ -174,6 +220,16 @@ export type CreateEventInput = {
   limitedModeConfigs?: LimitedEventModeConfig[];
   operationMode?: EventOperationMode;
   roundCount?: number | 'AUTO';
+  playgroupId?: string | null;
+  showReturningPlayerSuggestions?: boolean;
+  guestIdentityVerification?: GuestIdentityVerification;
+};
+
+export type JoinEventOptions = {
+  guestProfileId?: string;
+  savedDeckProfileId?: string;
+  rememberMe?: boolean;
+  accountToken?: string;
 };
 
 export type CreateEventResult = {
@@ -214,9 +270,43 @@ export class EventService {
     private readonly options: EventServiceOptions = {},
   ) {}
 
-  async createEvent(input: CreateEventInput): Promise<CreateEventResult> {
+  async createEvent(
+    input: CreateEventInput,
+    accountToken?: string,
+  ): Promise<CreateEventResult> {
     const name = assertEventName(input.name);
     const hostPin = assertHostPin(input.hostPin);
+    let ownerUserId: string | null = null;
+    let playgroupId: string | null = null;
+    let guestIdentityVerification: GuestIdentityVerification =
+      input.guestIdentityVerification === 'HOST_CONFIRM'
+        ? 'HOST_CONFIRM'
+        : 'NONE';
+
+    if (input.playgroupId) {
+      const { account, playgroup } = await requireOwnedPlaygroup(
+        this.store,
+        this.identity,
+        accountToken ?? '',
+        input.playgroupId,
+      );
+      ownerUserId = account.id;
+      playgroupId = playgroup.id;
+      if (!input.guestIdentityVerification) {
+        guestIdentityVerification = playgroup.guestIdentityVerification;
+      }
+    } else if (accountToken) {
+      const account = await tryResolveAuthenticatedAccount(
+        this.store,
+        this.identity,
+        accountToken,
+      );
+      if (account) {
+        ownerUserId = account.id;
+      }
+    }
+    const showReturningPlayerSuggestions =
+      input.showReturningPlayerSuggestions !== false;
     const gameMode: GameMode = parseGameMode(input.gameMode);
     const rulesFormat = resolveRulesFormat(
       gameMode,
@@ -302,6 +392,10 @@ export class EventService {
           limitedModeConfigs,
           operationMode,
           roundState: initialRoundState,
+          ownerUserId,
+          playgroupId,
+          showReturningPlayerSuggestions,
+          guestIdentityVerification,
           expiresAt,
           createdAt,
         });
@@ -357,10 +451,36 @@ export class EventService {
     );
   }
 
+  async getJoinSuggestions(
+    joinCode: string,
+    query?: string,
+  ): Promise<JoinGuestSuggestionsResponse> {
+    const stored = await this.requireByJoinCode(joinCode);
+    return getJoinSuggestionsForEvent(this.store, stored, query);
+  }
+
+  async getJoinGuestDecks(
+    joinCode: string,
+    guestProfileId: string,
+  ): Promise<{
+    guest: JoinGuestSuggestion;
+    decks: JoinSavedDeckSuggestion[];
+  }> {
+    const stored = await this.requireByJoinCode(joinCode);
+    const publicEvent = await this.presentEvent(stored);
+    return getJoinGuestDecksForEvent(
+      this.store,
+      stored,
+      publicEvent,
+      guestProfileId,
+    );
+  }
+
   async joinEvent(
     joinCode: string,
     displayName: string,
     decks?: DeckDraft[],
+    options?: JoinEventOptions,
   ): Promise<JoinEventResult> {
     let stored = await this.requireByJoinCode(joinCode);
     if (
@@ -370,16 +490,143 @@ export class EventService {
     ) {
       throw new EventNotJoinableError();
     }
-    const name = assertDisplayName(displayName);
+    const publicEvent = await this.presentEvent(stored);
+    const authenticatedAccount = await tryResolveAuthenticatedAccount(
+      this.store,
+      this.identity,
+      options?.accountToken,
+    );
+
+    let guestProfileId: string | null = null;
+    let userAccountId: string | null = authenticatedAccount?.id ?? null;
+    let savedDeckProfileId: string | null = null;
+    let resolvedDisplayName = displayName;
+    let resolvedDecks = decks;
+
+    if (options?.guestProfileId) {
+      if (!stored.playgroupId) {
+        throw new GuestProfileNotFoundError();
+      }
+      const guest = await this.store.findGuestProfileById(
+        options.guestProfileId,
+      );
+      if (
+        !guest ||
+        guest.playgroupId !== stored.playgroupId ||
+        guest.archivedAt !== null
+      ) {
+        throw new GuestProfileNotFoundError();
+      }
+      guestProfileId = guest.id;
+      if (!userAccountId && guest.linkedUserAccountId) {
+        userAccountId = guest.linkedUserAccountId;
+      }
+      if (!resolvedDisplayName.trim()) {
+        resolvedDisplayName = guest.displayName;
+      }
+      if (options.savedDeckProfileId) {
+        const savedDeck = await this.store.findSavedDeckProfileById(
+          options.savedDeckProfileId,
+        );
+        if (
+          !savedDeck ||
+          savedDeck.guestProfileId !== guest.id ||
+          savedDeck.archivedAt !== null ||
+          !isSavedDeckCompatibleWithEvent(
+            toPublicSavedDeckProfile(savedDeck),
+            publicEvent,
+          )
+        ) {
+          throw new InvalidEventInputError(
+            'That saved deck configuration is not valid for this event.',
+          );
+        }
+        savedDeckProfileId = savedDeck.id;
+        if (!resolvedDecks || resolvedDecks.length === 0) {
+          const deckSuggestion = toPublicSavedDeckProfile(savedDeck);
+          resolvedDecks = [
+            {
+              name: deckSuggestion.deckName ?? deckSuggestion.commanderName,
+              poolId: deckSuggestion.poolId,
+              preference: 'preferred',
+              commanders:
+                deckSuggestion.commanders.length > 0
+                  ? deckSuggestion.commanders
+                  : [],
+            },
+          ];
+        }
+      }
+      await this.store.updateGuestProfile(guest.id, {
+        lastSeenAt: this.now(),
+      });
+    }
+
+    const name = assertDisplayName(resolvedDisplayName);
+
+    if (
+      !guestProfileId &&
+      stored.playgroupId &&
+      options?.rememberMe === true
+    ) {
+      const existingGuests = await this.store.listGuestProfilesByPlaygroup(
+        stored.playgroupId,
+      );
+      const exactMatch = existingGuests.find(
+        (g) => g.displayName.toLowerCase() === name.toLowerCase(),
+      );
+      if (exactMatch) {
+        guestProfileId = exactMatch.id;
+        await this.store.updateGuestProfile(exactMatch.id, {
+          lastSeenAt: this.now(),
+        });
+      } else {
+        const createdGuest = await this.store.insertGuestProfile({
+          playgroupId: stored.playgroupId,
+          displayName: name,
+          linkedUserAccountId: userAccountId,
+          lastSeenAt: this.now(),
+        });
+        guestProfileId = createdGuest.id;
+      }
+    }
+
+    const validatedDecks =
+      resolvedDecks && resolvedDecks.length > 0
+        ? assertDecks(resolvedDecks)
+        : [];
+
+    if (
+      stored.playgroupId &&
+      guestProfileId &&
+      validatedDecks.length > 0 &&
+      options?.rememberMe !== false
+    ) {
+      const syncedDeckId = await syncGuestDecksOnJoinOrUpdate(this.store, {
+        playgroupId: stored.playgroupId,
+        guestProfileId,
+        event: stored,
+        decks: validatedDecks,
+        explicitSavedDeckProfileId: savedDeckProfileId ?? undefined,
+        now: this.now(),
+      });
+      if (syncedDeckId) {
+        savedDeckProfileId = syncedDeckId;
+      }
+    }
+
     const participant = await this.store.insertParticipant({
       eventId: stored.id,
       displayName: name,
+      userAccountId,
+      guestProfileId,
+      savedDeckProfileId,
     });
     const storedDecks =
-      decks && decks.length > 0
+      validatedDecks.length > 0
         ? await this.store.replaceDecks(
             participant.id,
-            assertDecks(decks).map((row) => ({
+            validatedDecks.map((row) => ({
               participantId: participant.id,
               ...row,
             })),
@@ -433,13 +680,30 @@ export class EventService {
         'Deck lists can only change while waiting, ready, or paused.',
       );
     }
+    const validatedDecks = assertDecks(decks);
     const storedDecks = await this.store.replaceDecks(
       participant.id,
-      assertDecks(decks).map((row) => ({
+      validatedDecks.map((row) => ({
         participantId: participant.id,
         ...row,
       })),
     );
+    if (stored.playgroupId && participant.guestProfileId) {
+      const syncedId = await syncGuestDecksOnJoinOrUpdate(this.store, {
+        playgroupId: stored.playgroupId,
+        guestProfileId: participant.guestProfileId,
+        event: stored,
+        decks: validatedDecks,
+        now: this.now(),
+      });
+      if (syncedId && syncedId !== participant.savedDeckProfileId) {
+        await this.store.updateParticipant(participant.id, {
+          status: participant.status,
+          readyAt: participant.readyAt,
+          savedDeckProfileId: syncedId,
+        });
+      }
+    }
     const assignments = await this.store.listAssignments(stored.id);
     const seat = assignments.find((row) => row.participantId === participant.id);
     return toPublicParticipant(participant, seat, storedDecks);
@@ -1717,11 +1981,17 @@ export class EventService {
       );
     }
     validateLimitedResult(match, result);
-    await this.store.finalizeLimitedMatchResult({
+    const finalized = await this.store.finalizeLimitedMatchResult({
       matchId,
       ...result,
       reportedAt: this.now(),
       correctedByParticipantId: reporter.id,
+    });
+    await recordLimitedMatchToHistory(this.store, {
+      event,
+      session,
+      match: finalized.match,
+      endedAt: this.now(),
     });
     await this.track(event.id, 'limited_result_reported');
     return this.progressLimitedRound(event.id, session.id);
@@ -1743,11 +2013,17 @@ export class EventService {
       );
     }
     validateLimitedResult(match, result);
-    await this.store.finalizeLimitedMatchResult({
+    const finalized = await this.store.finalizeLimitedMatchResult({
       matchId,
       ...result,
       correctionReason: result.correctionReason.trim(),
       reportedAt: this.now(),
+    });
+    await recordLimitedMatchToHistory(this.store, {
+      event,
+      session,
+      match: finalized.match,
+      endedAt: this.now(),
     });
     await this.track(event.id, 'limited_result_corrected');
     return this.progressLimitedRound(event.id, session.id);
@@ -1942,9 +2218,32 @@ export class EventService {
     const winsNeeded = Math.ceil(match.bestOf / 2);
     const seriesComplete =
       (match.seriesWins?.[winnerParticipantId] ?? 0) + 1 >= winsNeeded;
+    const assignments = await this.store.listAssignments(stored.id);
+    const seatDecks = new Map(
+      assignments
+        .filter((a) => a.podId === pod.id)
+        .map((a) => [
+          a.participantId,
+          {
+            deckName: a.deckName,
+            poolId: a.poolId,
+            commanders: a.commanders,
+          },
+        ]),
+    );
     await this.store.completePod(pod.id, {
       winnerParticipantId,
       requeue: !seriesComplete,
+    });
+    await recordPodCompletionToHistory(this.store, {
+      event: stored,
+      podId: pod.id,
+      memberIds: pod.memberIds,
+      poolId: pod.poolId,
+      winnerParticipantId,
+      startedAt: pod.playingStartedAt ?? pod.createdAt ?? null,
+      endedAt: this.now(),
+      seatDecks,
     });
     const recorded = recordTournamentGame(
       tournamentState,
@@ -2220,6 +2519,18 @@ export class EventService {
       input.durationSeconds === undefined
         ? undefined
         : Math.max(0, Math.min(24 * 60 * 60, Math.round(input.durationSeconds)));
+    const seatDecks = new Map(
+      assignments
+        .filter((a) => a.podId === pod.id)
+        .map((a) => [
+          a.participantId,
+          {
+            deckName: a.deckName,
+            poolId: a.poolId,
+            commanders: a.commanders,
+          },
+        ]),
+    );
     if (pod.tournamentMatchId) {
       const tournamentState = this.requireTournament(stored);
       const match = tournamentState.rounds
@@ -2233,6 +2544,17 @@ export class EventService {
         winnerParticipantId: input.winnerParticipantId,
         durationSeconds,
         requeue: !seriesComplete,
+      });
+      await recordPodCompletionToHistory(this.store, {
+        event: stored,
+        podId: pod.id,
+        memberIds: pod.memberIds,
+        poolId: pod.poolId,
+        winnerParticipantId: input.winnerParticipantId,
+        durationSeconds,
+        startedAt: pod.playingStartedAt ?? pod.createdAt ?? null,
+        endedAt: this.now(),
+        seatDecks,
       });
       const recorded = recordTournamentGame(
         tournamentState,
@@ -2250,6 +2572,17 @@ export class EventService {
           winnerParticipantId: input.winnerParticipantId,
           durationSeconds,
           requeue: true,
+        });
+        await recordPodCompletionToHistory(this.store, {
+          event: stored,
+          podId: pod.id,
+          memberIds: pod.memberIds,
+          poolId: pod.poolId,
+          winnerParticipantId: input.winnerParticipantId,
+          durationSeconds,
+          startedAt: pod.playingStartedAt ?? pod.createdAt ?? null,
+          endedAt: this.now(),
+          seatDecks,
         });
       } catch (error) {
         if (!(error instanceof PodNotFoundError)) {
@@ -2284,7 +2617,29 @@ export class EventService {
         'Choose a winner for this tournament match instead of finishing it.',
       );
     }
+    const assignments = await this.store.listAssignments(stored.id);
+    const seatDecks = new Map(
+      assignments
+        .filter((a) => a.podId === pod.id)
+        .map((a) => [
+          a.participantId,
+          {
+            deckName: a.deckName,
+            poolId: a.poolId,
+            commanders: a.commanders,
+          },
+        ]),
+    );
     await this.store.completePod(pod.id);
+    await recordPodCompletionToHistory(this.store, {
+      event: stored,
+      podId: pod.id,
+      memberIds: pod.memberIds,
+      poolId: pod.poolId,
+      startedAt: pod.playingStartedAt ?? pod.createdAt ?? null,
+      endedAt: this.now(),
+      seatDecks,
+    });
     await this.track(stored.id, 'game_finished');
     await this.track(stored.id, 'requeued');
     return this.snapshotTable(stored.id, tableId);
@@ -2321,6 +2676,7 @@ export class EventService {
       allowFivePods?: boolean;
       preferredPodSize?: number;
       lifetimeHours?: number;
+      showReturningPlayerSuggestions?: boolean;
     },
   ): Promise<PublicEvent> {
     const stored = await this.requireHostToken(joinCode, hostToken);
@@ -2354,6 +2710,13 @@ export class EventService {
       allowFivePods,
       preferredPodSize,
       expiresAt,
+      ...(patch.showReturningPlayerSuggestions === undefined
+        ? {}
+        : {
+            showReturningPlayerSuggestions: Boolean(
+              patch.showReturningPlayerSuggestions,
+            ),
+          }),
     });
     return this.presentEvent(updated);
   }
@@ -2707,6 +3070,24 @@ export class EventService {
       options,
     );
     await this.store.updateEvent(stored.id, { roundState: next });
+    const completedRound = next.rounds.find(
+      (r) => r.number === priorRound?.number,
+    );
+    if (completedRound) {
+      for (const assignment of completedRound.assignments) {
+        if (assignment.isBye) continue;
+        await recordRoundAssignmentToHistory(this.store, {
+          event: stored,
+          roundNumber: completedRound.number,
+          assignmentId: assignment.id,
+          activityKind: completedRound.activityKind,
+          participantIds: assignment.participantIds,
+          outcome: assignment.outcome,
+          startedAt: completedRound.startedAt,
+          endedAt: this.now(),
+        });
+      }
+    }
     if (priorRound) {
       await this.store.releaseRoundAssignmentClaims(stored.id, priorRound.id);
     }
@@ -2871,6 +3252,27 @@ export class EventService {
       actor,
     });
     await this.store.updateEvent(stored.id, { roundState: next });
+    const current = currentEventRound(next);
+    const updatedAssignment = current?.assignments.find(
+      (a) => a.id === input.assignmentId,
+    );
+    if (
+      current &&
+      updatedAssignment &&
+      updatedAssignment.status === 'COMPLETED' &&
+      !updatedAssignment.isBye
+    ) {
+      await recordRoundAssignmentToHistory(this.store, {
+        event: stored,
+        roundNumber: current.number,
+        assignmentId: updatedAssignment.id,
+        activityKind: current.activityKind,
+        participantIds: updatedAssignment.participantIds,
+        outcome: updatedAssignment.outcome,
+        startedAt: current.startedAt,
+        endedAt: this.now(),
+      });
+    }
     await this.track(stored.id, 'round_result_reported');
     return this.getSnapshot(joinCode);
   }
@@ -2894,6 +3296,28 @@ export class EventService {
       ...input,
     });
     await this.store.updateEvent(stored.id, { roundState: next });
+    const targetRound = next.rounds.find(
+      (r) => r.number === input.roundNumber,
+    );
+    const correctedAssignment = targetRound?.assignments.find(
+      (a) => a.id === input.assignmentId,
+    );
+    if (
+      targetRound &&
+      correctedAssignment &&
+      !correctedAssignment.isBye
+    ) {
+      await recordRoundAssignmentToHistory(this.store, {
+        event: stored,
+        roundNumber: targetRound.number,
+        assignmentId: correctedAssignment.id,
+        activityKind: targetRound.activityKind,
+        participantIds: correctedAssignment.participantIds,
+        outcome: correctedAssignment.outcome,
+        startedAt: targetRound.startedAt,
+        endedAt: this.now(),
+      });
+    }
     await this.track(stored.id, 'round_result_corrected');
     return this.getSnapshot(joinCode);
   }
@@ -3489,7 +3913,21 @@ export class EventService {
   }
 
   private async presentEvent(event: StoredEvent): Promise<PublicEvent> {
-    return toPublicEvent(event, await this.resolvePack(event));
+    let playgroupName: string | undefined;
+    let hasPlaygroupSuggestions = false;
+    if (event.playgroupId) {
+      const [playgroup, guests] = await Promise.all([
+        this.store.findPlaygroupById(event.playgroupId),
+        this.store.listGuestProfilesByPlaygroup(event.playgroupId),
+      ]);
+      playgroupName = playgroup?.name;
+      hasPlaygroupSuggestions =
+        event.showReturningPlayerSuggestions && guests.length > 0;
+    }
+    return toPublicEvent(event, await this.resolvePack(event), {
+      playgroupName,
+      hasPlaygroupSuggestions,
+    });
   }
 
   private async resolvePack(event: StoredEvent): Promise<ChallengePack> {
@@ -3525,11 +3963,524 @@ export class EventService {
     token: string,
   ): Promise<StoredEvent> {
     const stored = await this.requireByJoinCode(joinCode);
+    if (token.startsWith('as1.')) {
+      const account = await requireAuthenticatedAccount(
+        this.store,
+        this.identity,
+        token,
+      );
+      if (!stored.ownerUserId || stored.ownerUserId !== account.id) {
+        throw new EventManagementForbiddenError();
+      }
+      return stored;
+    }
     const session = this.identity.hostEventSessions.verify(token);
     if (session.eventId !== stored.id) {
       throw new InvalidHostPinError();
     }
     return stored;
+  }
+
+  async startEmailAuth(input: {
+    email: string;
+    displayName?: string;
+  }): Promise<{
+    challengeId: string;
+    email: string;
+    expiresAt: string;
+    devCode?: string;
+  }> {
+    return startEmailAuthFlow(
+      this.store,
+      {
+        now: this.now(),
+        exposeDevCode: true,
+      },
+      input,
+    );
+  }
+
+  async verifyEmailAuth(input: {
+    email: string;
+    code: string;
+    displayName?: string;
+  }): Promise<{
+    account: UserAccount;
+    token: string;
+    playgroups: Playgroup[];
+  }> {
+    return verifyEmailAuthFlow(
+      this.store,
+      this.identity,
+      { now: this.now() },
+      input,
+    );
+  }
+
+  async loginWithNeonAuth(input: {
+    neonUserId: string;
+    email?: string | null;
+    displayName?: string;
+  }): Promise<{
+    account: UserAccount;
+    token: string;
+    playgroups: Playgroup[];
+  }> {
+    return loginWithNeonAuthFlow(this.store, this.identity, input);
+  }
+
+  async getMyAccount(accountToken: string): Promise<{
+    account: UserAccount;
+    playgroups: Playgroup[];
+    stats: DerivedStats;
+    recentGames: GameRecord[];
+    linkedGuests: GuestProfile[];
+    claimableGuests: Array<{ guest: GuestProfile; playgroupName: string }>;
+  }> {
+    const account = await requireAuthenticatedAccount(
+      this.store,
+      this.identity,
+      accountToken,
+    );
+    return buildAccountDashboard(this.store, account);
+  }
+
+  async updateMyAccount(
+    accountToken: string,
+    input: { displayName: string },
+  ): Promise<{ account: UserAccount }> {
+    const account = await requireAuthenticatedAccount(
+      this.store,
+      this.identity,
+      accountToken,
+    );
+    const displayName = assertDisplayName(input.displayName);
+    const updated = await this.store.updateUserAccount(account.id, {
+      displayName,
+    });
+    return { account: toPublicUserAccount(updated) };
+  }
+
+  async deleteMyAccount(accountToken: string): Promise<void> {
+    const account = await requireAuthenticatedAccount(
+      this.store,
+      this.identity,
+      accountToken,
+    );
+    await this.store.deleteUserAccount(account.id);
+  }
+
+  async linkGuestToAccount(
+    accountToken: string,
+    guestProfileId: string,
+  ): Promise<{ guest: GuestProfile }> {
+    const account = await requireAuthenticatedAccount(
+      this.store,
+      this.identity,
+      accountToken,
+    );
+    const guest = await this.store.findGuestProfileById(guestProfileId);
+    if (!guest || guest.archivedAt !== null) {
+      throw new GuestProfileNotFoundError();
+    }
+    const updated = await this.store.updateGuestProfile(guest.id, {
+      linkedUserAccountId: account.id,
+    });
+    return { guest: toPublicGuestProfile(updated) };
+  }
+
+  async createPlaygroup(
+    accountToken: string,
+    input: {
+      name: string;
+      guestIdentityVerification?: GuestIdentityVerification;
+    },
+  ): Promise<Playgroup> {
+    const account = await requireAuthenticatedAccount(
+      this.store,
+      this.identity,
+      accountToken,
+    );
+    const name = assertPlaygroupName(input.name);
+    const created = await this.store.insertPlaygroup({
+      ownerUserId: account.id,
+      name,
+      guestIdentityVerification: input.guestIdentityVerification,
+    });
+    return toPublicPlaygroup(created);
+  }
+
+  async listMyPlaygroups(accountToken: string): Promise<Playgroup[]> {
+    const account = await requireAuthenticatedAccount(
+      this.store,
+      this.identity,
+      accountToken,
+    );
+    const rows = await this.store.listPlaygroupsByOwner(account.id);
+    return rows.map(toPublicPlaygroup);
+  }
+
+  async getPlaygroupOverview(
+    accountToken: string,
+    playgroupId: string,
+  ): Promise<PlaygroupOverview> {
+    const { playgroup } = await requireOwnedPlaygroup(
+      this.store,
+      this.identity,
+      accountToken,
+      playgroupId,
+    );
+    return buildPlaygroupOverview(this.store, playgroup);
+  }
+
+  async updatePlaygroup(
+    accountToken: string,
+    playgroupId: string,
+    patch: {
+      name?: string;
+      guestIdentityVerification?: GuestIdentityVerification;
+    },
+  ): Promise<Playgroup> {
+    const { playgroup } = await requireOwnedPlaygroup(
+      this.store,
+      this.identity,
+      accountToken,
+      playgroupId,
+    );
+    const updated = await this.store.updatePlaygroup(playgroup.id, {
+      ...(patch.name !== undefined
+        ? { name: assertPlaygroupName(patch.name) }
+        : {}),
+      ...(patch.guestIdentityVerification !== undefined
+        ? { guestIdentityVerification: patch.guestIdentityVerification }
+        : {}),
+    });
+    return toPublicPlaygroup(updated);
+  }
+
+  async deletePlaygroup(
+    accountToken: string,
+    playgroupId: string,
+  ): Promise<void> {
+    const { playgroup } = await requireOwnedPlaygroup(
+      this.store,
+      this.identity,
+      accountToken,
+      playgroupId,
+    );
+    await this.store.deletePlaygroup(playgroup.id);
+  }
+
+  async createGuestProfile(
+    accountToken: string,
+    playgroupId: string,
+    input: { displayName: string; allowDuplicate?: boolean },
+  ): Promise<GuestProfile> {
+    const { playgroup } = await requireOwnedPlaygroup(
+      this.store,
+      this.identity,
+      accountToken,
+      playgroupId,
+    );
+    const displayName = assertDisplayName(input.displayName);
+    const existing = await this.store.listGuestProfilesByPlaygroup(
+      playgroup.id,
+    );
+    if (
+      !input.allowDuplicate &&
+      existing.some(
+        (g) => g.displayName.toLowerCase() === displayName.toLowerCase(),
+      )
+    ) {
+      throw new DuplicateGuestNameError(displayName);
+    }
+    const created = await this.store.insertGuestProfile({
+      playgroupId: playgroup.id,
+      displayName,
+    });
+    return toPublicGuestProfile(created);
+  }
+
+  async updateGuestProfile(
+    accountToken: string,
+    playgroupId: string,
+    guestId: string,
+    patch: { displayName?: string; archived?: boolean },
+  ): Promise<GuestProfile> {
+    const { playgroup } = await requireOwnedPlaygroup(
+      this.store,
+      this.identity,
+      accountToken,
+      playgroupId,
+    );
+    const guest = await this.store.findGuestProfileById(guestId);
+    if (!guest || guest.playgroupId !== playgroup.id) {
+      throw new GuestProfileNotFoundError();
+    }
+    const updated = await this.store.updateGuestProfile(guest.id, {
+      ...(patch.displayName !== undefined
+        ? { displayName: assertDisplayName(patch.displayName) }
+        : {}),
+      ...(patch.archived !== undefined
+        ? { archivedAt: patch.archived ? this.now() : null }
+        : {}),
+    });
+    return toPublicGuestProfile(updated);
+  }
+
+  async deleteGuestProfile(
+    accountToken: string,
+    playgroupId: string,
+    guestId: string,
+  ): Promise<void> {
+    const { playgroup } = await requireOwnedPlaygroup(
+      this.store,
+      this.identity,
+      accountToken,
+      playgroupId,
+    );
+    const guest = await this.store.findGuestProfileById(guestId);
+    if (!guest || guest.playgroupId !== playgroup.id) {
+      throw new GuestProfileNotFoundError();
+    }
+    await this.store.deleteGuestProfile(guest.id);
+  }
+
+  async mergeGuestProfiles(
+    accountToken: string,
+    playgroupId: string,
+    sourceGuestId: string,
+    targetGuestId: string,
+  ): Promise<GuestProfile> {
+    const { playgroup } = await requireOwnedPlaygroup(
+      this.store,
+      this.identity,
+      accountToken,
+      playgroupId,
+    );
+    if (sourceGuestId === targetGuestId) {
+      throw new InvalidEventInputError(
+        'Choose two different guest profiles to merge.',
+      );
+    }
+    const merged = await this.store.mergeGuestProfiles({
+      playgroupId: playgroup.id,
+      sourceGuestId,
+      targetGuestId,
+    });
+    return toPublicGuestProfile(merged);
+  }
+
+  async createSavedDeckProfile(
+    accountToken: string,
+    playgroupId: string,
+    guestId: string,
+    input: {
+      format?: string;
+      deckName?: string;
+      commanderName?: string;
+      commanderScryfallId?: string;
+      commanders?: CommanderSelection[];
+      bracket?: number;
+      poolId?: string;
+      preferred?: boolean;
+    },
+  ): Promise<SavedDeckProfile> {
+    const { playgroup } = await requireOwnedPlaygroup(
+      this.store,
+      this.identity,
+      accountToken,
+      playgroupId,
+    );
+    const guest = await this.store.findGuestProfileById(guestId);
+    if (!guest || guest.playgroupId !== playgroup.id) {
+      throw new GuestProfileNotFoundError();
+    }
+    const normalized = normalizeSavedDeckInput(input);
+    const existing = await this.store.listSavedDeckProfilesByGuest(guest.id);
+    const created = await this.store.insertSavedDeckProfile({
+      playgroupId: playgroup.id,
+      guestProfileId: guest.id,
+      ...normalized,
+      preferred: normalized.preferred || existing.length === 0,
+    });
+    return toPublicSavedDeckProfile(created);
+  }
+
+  async updateSavedDeckProfile(
+    accountToken: string,
+    playgroupId: string,
+    guestId: string,
+    deckId: string,
+    patch: {
+      format?: string;
+      deckName?: string;
+      commanderName?: string;
+      commanderScryfallId?: string;
+      commanders?: CommanderSelection[];
+      bracket?: number;
+      poolId?: string;
+      preferred?: boolean;
+      archived?: boolean;
+    },
+  ): Promise<SavedDeckProfile> {
+    const { playgroup } = await requireOwnedPlaygroup(
+      this.store,
+      this.identity,
+      accountToken,
+      playgroupId,
+    );
+    const guest = await this.store.findGuestProfileById(guestId);
+    if (!guest || guest.playgroupId !== playgroup.id) {
+      throw new GuestProfileNotFoundError();
+    }
+    const existing = await this.store.findSavedDeckProfileById(deckId);
+    if (!existing || existing.guestProfileId !== guest.id) {
+      throw new SavedDeckNotFoundError();
+    }
+    const merged = normalizeSavedDeckInput({
+      format: patch.format ?? existing.format,
+      deckName:
+        patch.deckName !== undefined
+          ? patch.deckName
+          : (existing.deckName ?? undefined),
+      commanderName:
+        patch.commanderName !== undefined
+          ? patch.commanderName
+          : (existing.commanderName ?? undefined),
+      commanderScryfallId:
+        patch.commanderScryfallId !== undefined
+          ? patch.commanderScryfallId
+          : (existing.commanderScryfallId ?? undefined),
+      commanders:
+        patch.commanders !== undefined ? patch.commanders : existing.commanders,
+      bracket:
+        patch.bracket !== undefined
+          ? patch.bracket
+          : (existing.bracket ?? undefined),
+      poolId: patch.poolId ?? existing.poolId,
+      preferred:
+        patch.preferred !== undefined ? patch.preferred : existing.preferred,
+    });
+    const updated = await this.store.updateSavedDeckProfile(existing.id, {
+      ...merged,
+      ...(patch.archived !== undefined
+        ? { archivedAt: patch.archived ? this.now() : null }
+        : {}),
+    });
+    return toPublicSavedDeckProfile(updated);
+  }
+
+  async deleteSavedDeckProfile(
+    accountToken: string,
+    playgroupId: string,
+    guestId: string,
+    deckId: string,
+  ): Promise<void> {
+    const { playgroup } = await requireOwnedPlaygroup(
+      this.store,
+      this.identity,
+      accountToken,
+      playgroupId,
+    );
+    const guest = await this.store.findGuestProfileById(guestId);
+    if (!guest || guest.playgroupId !== playgroup.id) {
+      throw new GuestProfileNotFoundError();
+    }
+    const existing = await this.store.findSavedDeckProfileById(deckId);
+    if (!existing || existing.guestProfileId !== guest.id) {
+      throw new SavedDeckNotFoundError();
+    }
+    await this.store.deleteSavedDeckProfile(existing.id);
+  }
+
+  async recordLocalPlaygroupGame(
+    accountToken: string,
+    playgroupId: string,
+    input: {
+      clientGameId: string;
+      gameMode: GameMode;
+      rulesFormat?: RulesFormat;
+      poolId?: string;
+      durationSeconds?: number;
+      startedAt?: string;
+      endedAt?: string;
+      seats: Array<{
+        guestProfileId?: string;
+        userAccountId?: string;
+        displayName: string;
+        savedDeckProfileId?: string;
+        deckName?: string;
+        commanderName?: string;
+        commanderScryfallId?: string;
+        bracket?: number;
+        resultType?: GameResultType;
+        placement?: number;
+        teamId?: string;
+      }>;
+    },
+  ): Promise<GameRecord> {
+    const { playgroup } = await requireOwnedPlaygroup(
+      this.store,
+      this.identity,
+      accountToken,
+      playgroupId,
+    );
+    const sourceId = input.clientGameId.trim();
+    if (!sourceId || sourceId.length > 120) {
+      throw new InvalidEventInputError('clientGameId is required.');
+    }
+    if (!Array.isArray(input.seats) || input.seats.length < 2) {
+      throw new InvalidEventInputError(
+        'A recorded game requires at least 2 participants.',
+      );
+    }
+    const now = this.now();
+    for (const seat of input.seats) {
+      if (seat.guestProfileId) {
+        const guest = await this.store.findGuestProfileById(seat.guestProfileId);
+        if (guest && guest.playgroupId === playgroup.id) {
+          await this.store.updateGuestProfile(guest.id, { lastSeenAt: now });
+        }
+      }
+      if (seat.savedDeckProfileId) {
+        const deck = await this.store.findSavedDeckProfileById(
+          seat.savedDeckProfileId,
+        );
+        if (deck && deck.playgroupId === playgroup.id) {
+          await this.store.updateSavedDeckProfile(deck.id, {
+            timesUsed: deck.timesUsed + 1,
+            lastUsedAt: now,
+          });
+        }
+      }
+    }
+    const stored = await this.store.upsertGameRecord({
+      source: 'PODYGUARD',
+      sourceType: 'LOCAL_PLAY',
+      sourceId: `${playgroup.id}:${sourceId}`,
+      playgroupId: playgroup.id,
+      gameMode: parseGameMode(input.gameMode),
+      format: input.rulesFormat ?? 'commander',
+      poolId: input.poolId ?? null,
+      durationSeconds: input.durationSeconds ?? null,
+      startedAt: input.startedAt ? new Date(input.startedAt) : null,
+      endedAt: input.endedAt ? new Date(input.endedAt) : now,
+      participants: input.seats.map((seat) => ({
+        userAccountId: seat.userAccountId ?? null,
+        guestProfileId: seat.guestProfileId ?? null,
+        displayNameSnapshot: assertDisplayName(seat.displayName),
+        savedDeckProfileId: seat.savedDeckProfileId ?? null,
+        deckNameSnapshot: seat.deckName?.trim() || null,
+        commanderNameSnapshot: seat.commanderName?.trim() || null,
+        commanderScryfallIdSnapshot: seat.commanderScryfallId?.trim() || null,
+        bracketSnapshot: seat.bracket ?? null,
+        resultType: seat.resultType ?? 'COMPLETED_NO_WINNER',
+        placement: seat.placement ?? null,
+        teamId: seat.teamId ?? null,
+      })),
+    });
+    return toPublicGameRecord(stored);
   }
 
   private async requireParticipant(
@@ -4013,6 +4964,10 @@ function summarizeLimitedMetric(
 function toPublicEvent(
   event: StoredEvent,
   pack: ChallengePack = OFFICIAL_COMMANDER_CHALLENGES,
+  playgroupMeta?: {
+    playgroupName?: string;
+    hasPlaygroupSuggestions?: boolean;
+  },
 ): PublicEvent {
   return {
     id: event.id,
@@ -4045,6 +5000,14 @@ function toPublicEvent(
     challengePackId: event.challengePackId,
     challengePackVersion: event.challengePackVersion,
     challengePack: pack,
+    ...(event.playgroupId ? { playgroupId: event.playgroupId } : {}),
+    ...(playgroupMeta?.playgroupName
+      ? { playgroupName: playgroupMeta.playgroupName }
+      : {}),
+    showReturningPlayerSuggestions: event.showReturningPlayerSuggestions,
+    ...(playgroupMeta?.hasPlaygroupSuggestions !== undefined
+      ? { hasPlaygroupSuggestions: playgroupMeta.hasPlaygroupSuggestions }
+      : {}),
   };
 }
 

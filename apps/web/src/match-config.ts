@@ -13,6 +13,13 @@ import type { CommanderSelection } from './scryfall';
 import { emptySeatCommanders } from './CommanderSeatPickers';
 import { readStored, writeStored } from './device-storage';
 
+export type MatchSeatIdentity = {
+  guestProfileId?: string;
+  userAccountId?: string;
+  savedDeckProfileId?: string;
+  bracket?: number;
+};
+
 /**
  * Shared state for the two local match routes. `/match-config` writes it and
  * `/match` reads it, which keeps every knob off the battle screen so it can be
@@ -29,6 +36,9 @@ export type MatchConfig = {
   deckName: string;
   names: string[];
   commanders: CommanderSelection[][];
+  /** Optional playgroup & seat identity references for recording local games. */
+  playgroupId?: string;
+  seatIdentities?: Array<MatchSeatIdentity | null>;
   /** Bumped by "Reset game state" to abandon the stored tracker snapshot. */
   resetCount: number;
 };

@@ -9,6 +9,8 @@ import {
   commanderSearchProfile,
   type ChallengeDetectionMode,
   type EventSnapshot,
+  type JoinGuestSuggestion,
+  type JoinSavedDeckSuggestion,
   type PodRating,
   type PublicEvent,
   type PublicParticipant,
@@ -20,12 +22,16 @@ import {
   clearPlayerSession,
   completeChallenge,
   getEvent,
+  getJoinGuestDecks,
+  getJoinSuggestions,
   getMyTreacheryRole,
   getMe,
   joinEvent,
   listParticipants,
   listTables,
   leaveEvent,
+  loadAccountSession,
+  loadAccountToken,
   loadPlayerSession,
   ratePod,
   reportGameResult,
@@ -43,6 +49,7 @@ import { Field } from './ui/Field';
 import { Panel } from './ui/Panel';
 import { ThemeToggleCorner } from './ui/ThemeToggle';
 import { WaitTime } from './ui/WaitTime';
+import { cx } from './ui/cx';
 import { assignedDeckLine, tableForParticipant } from './match-view';
 import { TrackerView } from './tracker/TrackerView';
 import { TournamentPlayerStatus } from './tournament/TournamentPlayerStatus';
@@ -130,6 +137,25 @@ export function JoinPage({
   const rolePod = useRef<string | null>(null);
   const joinDraftKey = joinDraftStorageKey(joinCode);
 
+  // Returning-player / playgroup identity state
+  const [accountSession] = useState(() => loadAccountSession());
+  const [suggestions, setSuggestions] = useState<JoinGuestSuggestion[]>([]);
+  const [suggestionMode, setSuggestionMode] = useState<
+    'none' | 'list' | 'search'
+  >('none');
+  const [suggestionSearch, setSuggestionSearch] = useState('');
+  const [joinStep, setJoinStep] = useState<
+    'choose-identity' | 'returning-decks' | 'new-player'
+  >('new-player');
+  const [selectedGuest, setSelectedGuest] =
+    useState<JoinGuestSuggestion | null>(null);
+  const [savedDecks, setSavedDecks] = useState<JoinSavedDeckSuggestion[]>([]);
+  const [selectedSavedDeckId, setSelectedSavedDeckId] = useState<string | null>(
+    null,
+  );
+  const [useDifferentDeck, setUseDifferentDeck] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
+
   useEffect(() => {
     if (!joinCode || participant) {
       return;
@@ -152,6 +178,18 @@ export function JoinPage({
         recordJoinBreadcrumb('EVENT_LOOKUP_OK');
         setEvent(loaded);
         if (!existing) {
+          if (loaded.playgroupId && loaded.showReturningPlayerSuggestions !== false) {
+            try {
+              const sug = await getJoinSuggestions(loaded.joinCode);
+              if (!cancelled && (sug.suggestions.length > 0 || sug.mode === 'search')) {
+                setSuggestions(sug.suggestions);
+                setSuggestionMode(sug.mode);
+                setJoinStep('choose-identity');
+              }
+            } catch {
+              /* fall back to standard join form if suggestions fail */
+            }
+          }
           return;
         }
         // Ready for the form in case the seat has gone, so a player who has to
@@ -356,6 +394,85 @@ export function JoinPage({
     return () => window.removeEventListener('online', onOnline);
   }, [event, token]);
 
+  useEffect(() => {
+    if (
+      !event?.joinCode ||
+      suggestionMode !== 'search' ||
+      joinStep !== 'choose-identity'
+    ) {
+      return;
+    }
+    let cancelled = false;
+    const timer = window.setTimeout(() => {
+      void getJoinSuggestions(event.joinCode, suggestionSearch)
+        .then((res) => {
+          if (!cancelled) {
+            setSuggestions(res.suggestions);
+          }
+        })
+        .catch(() => {
+          /* ignore search error */
+        });
+    }, 220);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [event?.joinCode, joinStep, suggestionMode, suggestionSearch]);
+
+  async function onPickGuestIdentity(guest: JoinGuestSuggestion) {
+    if (!event) return;
+    setError(null);
+    setSelectedGuest(guest);
+    setDisplayName(guest.displayName);
+    setSelectedSavedDeckId(null);
+    setUseDifferentDeck(false);
+    try {
+      const res = await getJoinGuestDecks(event.joinCode, guest.id);
+      setSavedDecks(res.decks);
+      const preferred =
+        res.decks.find((d) => d.preferred) ?? res.decks[0] ?? null;
+      if (preferred) {
+        applySavedDeckSelection(preferred);
+      } else {
+        setUseDifferentDeck(true);
+      }
+      setJoinStep('returning-decks');
+    } catch {
+      setSavedDecks([]);
+      setUseDifferentDeck(true);
+      setJoinStep('returning-decks');
+    }
+  }
+
+  function applySavedDeckSelection(deck: JoinSavedDeckSuggestion) {
+    setSelectedSavedDeckId(deck.id);
+    setUseDifferentDeck(false);
+    setDeckRows([
+      {
+        name: deck.deckName ?? deck.commanderName ?? '',
+        poolId: deck.poolId,
+        preference: 'preferred',
+        commanders: deck.commanders,
+      },
+    ]);
+  }
+
+  function onChooseDifferentDeck() {
+    setSelectedSavedDeckId(null);
+    setUseDifferentDeck(true);
+    setDeckRows(defaultDeckRows());
+  }
+
+  function onChooseNewPlayer() {
+    setSelectedGuest(null);
+    setSelectedSavedDeckId(null);
+    setUseDifferentDeck(false);
+    setDisplayName('');
+    setDeckRows(defaultDeckRows());
+    setJoinStep('new-player');
+  }
+
   async function onJoin(submit: FormEvent) {
     submit.preventDefault();
     if (!event || !displayName.trim()) {
@@ -364,6 +481,7 @@ export function JoinPage({
     if (
       !limitedQueues &&
       commanderRules &&
+      !selectedSavedDeckId &&
       decks.some((deck) => deck.commanders.length === 0)
     ) {
       setError(t('common.errors.chooseCommander'));
@@ -377,6 +495,12 @@ export function JoinPage({
         event.joinCode,
         displayName,
         limitedQueues ? undefined : decks,
+        {
+          guestProfileId: selectedGuest?.id,
+          savedDeckProfileId: selectedSavedDeckId ?? undefined,
+          rememberMe: event.playgroupId ? rememberMe : undefined,
+          accountToken: loadAccountToken() ?? undefined,
+        },
       );
       recordJoinBreadcrumb('JOIN_OK');
       savePlayerSession(event.joinCode, {
@@ -1078,6 +1202,176 @@ export function JoinPage({
             <p className="text-muted text-sm">{t('join.matchingShortly')}</p>
           )}
         </Panel>
+      ) : joinStep === 'choose-identity' &&
+        (suggestions.length > 0 || suggestionMode === 'search') ? (
+        <Panel
+          title={`Welcome to ${event?.name ?? t('join.joinEvent')}`}
+          aside={event?.playgroupName ?? 'Played here before?'}
+        >
+          <p className="text-muted mb-3 text-sm font-medium">
+            Played here before? Who are you?
+          </p>
+          {suggestionMode === 'search' ? (
+            <Field
+              label="Search your name"
+              value={suggestionSearch}
+              onChange={(e) => setSuggestionSearch(e.target.value)}
+              placeholder="Start typing your name..."
+              autoComplete="off"
+            />
+          ) : null}
+          <div className="mb-4 grid gap-2 sm:grid-cols-2">
+            {suggestions.map((guest) => (
+              <button
+                key={guest.id}
+                type="button"
+                onClick={() => void onPickGuestIdentity(guest)}
+                className="border-muted/25 bg-void/60 hover:border-neon hover:bg-neon/10 flex items-center justify-between rounded-xl border px-4 py-3 text-left text-base font-semibold transition"
+              >
+                <span>{guest.displayName}</span>
+                <span className="text-neon text-xs">Select →</span>
+              </button>
+            ))}
+          </div>
+          {accountSession ? (
+            <Button
+              type="button"
+              variant="glass"
+              block
+              className="mb-2"
+              onClick={() => {
+                setSelectedGuest(null);
+                setSelectedSavedDeckId(null);
+                setDisplayName(accountSession.account.displayName);
+                setJoinStep('new-player');
+              }}
+            >
+              Join as {accountSession.account.displayName} (Host / Account)
+            </Button>
+          ) : null}
+          <Button
+            type="button"
+            variant="outline"
+            size="lg"
+            block
+            onClick={onChooseNewPlayer}
+          >
+            I&apos;m new here
+          </Button>
+        </Panel>
+      ) : joinStep === 'returning-decks' && selectedGuest ? (
+        <Panel
+          title={`Welcome back, ${selectedGuest.displayName}`}
+          aside="Returning player"
+          onSubmit={onJoin}
+        >
+          {!limitedQueues && savedDecks.length > 0 && !useDifferentDeck ? (
+            <div className="mb-4 space-y-2.5">
+              <p className="text-muted text-sm">What are you playing tonight?</p>
+              <div className="grid gap-2">
+                {savedDecks.map((deck) => {
+                  const active = selectedSavedDeckId === deck.id;
+                  return (
+                    <button
+                      key={deck.id}
+                      type="button"
+                      onClick={() => applySavedDeckSelection(deck)}
+                      className={cx(
+                        'flex items-center justify-between gap-3 rounded-xl border p-3.5 text-left transition',
+                        active
+                          ? 'border-neon bg-neon/15 shadow-[0_0_24px_-12px_var(--color-neon)]'
+                          : 'border-muted/20 bg-void/60 hover:border-muted/40',
+                      )}
+                    >
+                      <div className="min-w-0">
+                        <p className="font-display truncate text-base font-bold">
+                          {deck.commanderName || deck.deckName || 'Saved Deck'}
+                        </p>
+                        <p className="text-muted text-xs">
+                          {deck.bracket
+                            ? `Bracket ${deck.bracket}`
+                            : poolLabel(deck.poolId)}
+                          {deck.deckName && deck.commanderName
+                            ? ` · ${deck.deckName}`
+                            : ''}
+                          {deck.lastUsedAt
+                            ? ` · Last used ${new Date(
+                                deck.lastUsedAt,
+                              ).toLocaleDateString()}`
+                            : ''}
+                        </p>
+                      </div>
+                      <Badge tone={active ? 'live' : 'idle'}>
+                        {deck.bracket
+                          ? `B${deck.bracket}`
+                          : poolLabel(deck.poolId)}
+                      </Badge>
+                    </button>
+                  );
+                })}
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={onChooseDifferentDeck}
+              >
+                Different deck
+              </Button>
+            </div>
+          ) : !limitedQueues ? (
+            <div className="mb-4">
+              {savedDecks.length > 0 ? (
+                <div className="mb-3 flex items-center justify-between">
+                  <p className="text-muted text-xs">
+                    Registering a new deck for {selectedGuest.displayName}
+                  </p>
+                  <button
+                    type="button"
+                    className="text-neon text-xs hover:underline"
+                    onClick={() => {
+                      const first = savedDecks[0];
+                      if (first) applySavedDeckSelection(first);
+                    }}
+                  >
+                    ← Use saved deck
+                  </button>
+                </div>
+              ) : null}
+              <DeckEditor
+                decks={decks}
+                onChange={setDeckRows}
+                disabled={busy}
+                requireCommanders={commanderRules}
+                searchProfile={
+                  event ? commanderSearchProfile(event.gameMode) : 'commander'
+                }
+              />
+            </div>
+          ) : (
+            <p className="text-muted mb-4 text-sm">{t('join.limitedNameOnly')}</p>
+          )}
+
+          <div className="flex flex-col gap-2">
+            <Button
+              type="submit"
+              variant="neon"
+              size="lg"
+              block
+              disabled={busy || (!selectedSavedDeckId && !canJoin)}
+            >
+              {busy ? t('common.joining') : t('join.joinEventButton')}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setJoinStep('choose-identity')}
+            >
+              Not {selectedGuest.displayName}? Switch player
+            </Button>
+          </div>
+        </Panel>
       ) : (
         <Panel title={t('join.takeSeat')} onSubmit={onJoin}>
           {event?.tournament &&
@@ -1087,6 +1381,32 @@ export function JoinPage({
             </p>
           ) : (
             <>
+              {suggestions.length > 0 || suggestionMode === 'search' ? (
+                <div className="mb-3 flex items-center justify-between text-xs">
+                  <span className="text-muted">Joining as a new player</span>
+                  <button
+                    type="button"
+                    className="text-neon font-semibold hover:underline"
+                    onClick={() => setJoinStep('choose-identity')}
+                  >
+                    ← Played here before?
+                  </button>
+                </div>
+              ) : null}
+              {accountSession && !displayName ? (
+                <div className="mb-3">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="glass"
+                    onClick={() =>
+                      setDisplayName(accountSession.account.displayName)
+                    }
+                  >
+                    Use my account name ({accountSession.account.displayName})
+                  </Button>
+                </div>
+              ) : null}
               <Field
                 label={t('join.displayName')}
                 value={displayName}
@@ -1108,6 +1428,17 @@ export function JoinPage({
                   }
                 />
               )}
+              {event?.playgroupId ? (
+                <label className="text-muted mb-4 flex cursor-pointer items-center gap-2 text-xs">
+                  <input
+                    type="checkbox"
+                    className="accent-neon"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                  />
+                  Remember me for future games with this group
+                </label>
+              ) : null}
               <Button
                 type="submit"
                 size="lg"

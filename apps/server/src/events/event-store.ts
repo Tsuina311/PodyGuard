@@ -3,6 +3,10 @@ import type {
   CommanderSelection,
   EventOperationMode,
   GameMode,
+  GameResultType,
+  GameSource,
+  GameSourceType,
+  GuestIdentityVerification,
   ProductEventName,
   PublicEvent,
   PublicParticipant,
@@ -107,6 +111,191 @@ export class ParticipantNotFoundError extends Error {
   }
 }
 
+export class PlaygroupNotFoundError extends Error {
+  readonly code = 'PLAYGROUP_NOT_FOUND';
+
+  constructor() {
+    super('Playgroup not found.');
+    this.name = 'PlaygroupNotFoundError';
+  }
+}
+
+export class PlaygroupForbiddenError extends Error {
+  readonly code = 'PLAYGROUP_FORBIDDEN';
+
+  constructor() {
+    super('You do not have permission to access this playgroup.');
+    this.name = 'PlaygroupForbiddenError';
+  }
+}
+
+export class GuestProfileNotFoundError extends Error {
+  readonly code = 'GUEST_PROFILE_NOT_FOUND';
+
+  constructor() {
+    super('Saved player not found.');
+    this.name = 'GuestProfileNotFoundError';
+  }
+}
+
+export class DuplicateGuestNameError extends Error {
+  readonly code = 'DUPLICATE_GUEST_NAME';
+
+  constructor(displayName: string) {
+    super(
+      `A saved player named "${displayName}" already exists in this playgroup. Use a distinguisher or confirm adding a duplicate.`,
+    );
+    this.name = 'DuplicateGuestNameError';
+  }
+}
+
+export class SavedDeckNotFoundError extends Error {
+  readonly code = 'SAVED_DECK_NOT_FOUND';
+
+  constructor() {
+    super('Saved deck configuration not found.');
+    this.name = 'SavedDeckNotFoundError';
+  }
+}
+
+export type StoredUserAccount = {
+  id: string;
+  authUserId: string;
+  email: string | null;
+  displayName: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type StoredAuthChallenge = {
+  id: string;
+  email: string;
+  displayName: string | null;
+  codeHash: string;
+  attempts: number;
+  expiresAt: Date;
+  consumedAt: Date | null;
+  createdAt: Date;
+};
+
+export type StoredPlaygroup = {
+  id: string;
+  ownerUserId: string;
+  name: string;
+  guestIdentityVerification: GuestIdentityVerification;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type StoredGuestProfile = {
+  id: string;
+  playgroupId: string;
+  displayName: string;
+  linkedUserAccountId: string | null;
+  archivedAt: Date | null;
+  lastSeenAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type StoredSavedDeckProfile = {
+  id: string;
+  playgroupId: string;
+  guestProfileId: string;
+  format: string;
+  deckName: string | null;
+  commanderName: string | null;
+  commanderScryfallId: string | null;
+  commanders: CommanderSelection[];
+  bracket: number | null;
+  poolId: string;
+  preferred: boolean;
+  timesUsed: number;
+  lastUsedAt: Date | null;
+  archivedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type NewStoredSavedDeckProfile = {
+  playgroupId: string;
+  guestProfileId: string;
+  format: string;
+  deckName?: string | null;
+  commanderName?: string | null;
+  commanderScryfallId?: string | null;
+  commanders?: CommanderSelection[];
+  bracket?: number | null;
+  poolId: string;
+  preferred?: boolean;
+  timesUsed?: number;
+  lastUsedAt?: Date | null;
+};
+
+export type StoredGameRecordParticipant = {
+  id: string;
+  gameRecordId: string;
+  eventParticipantId: string | null;
+  userAccountId: string | null;
+  guestProfileId: string | null;
+  displayNameSnapshot: string;
+  savedDeckProfileId: string | null;
+  deckNameSnapshot: string | null;
+  commanderNameSnapshot: string | null;
+  commanderScryfallIdSnapshot: string | null;
+  bracketSnapshot: number | null;
+  resultType: GameResultType | null;
+  placement: number | null;
+  teamId: string | null;
+  createdAt: Date;
+};
+
+export type StoredGameRecord = {
+  id: string;
+  source: GameSource;
+  sourceType: GameSourceType;
+  sourceId: string;
+  eventId: string | null;
+  playgroupId: string | null;
+  gameMode: string;
+  format: string | null;
+  poolId: string | null;
+  durationSeconds: number | null;
+  startedAt: Date | null;
+  endedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  participants: StoredGameRecordParticipant[];
+};
+
+export type UpsertStoredGameRecordInput = {
+  source: GameSource;
+  sourceType: GameSourceType;
+  sourceId: string;
+  eventId?: string | null;
+  playgroupId?: string | null;
+  gameMode: string;
+  format?: string | null;
+  poolId?: string | null;
+  durationSeconds?: number | null;
+  startedAt?: Date | null;
+  endedAt: Date;
+  participants: Array<{
+    eventParticipantId?: string | null;
+    userAccountId?: string | null;
+    guestProfileId?: string | null;
+    displayNameSnapshot: string;
+    savedDeckProfileId?: string | null;
+    deckNameSnapshot?: string | null;
+    commanderNameSnapshot?: string | null;
+    commanderScryfallIdSnapshot?: string | null;
+    bracketSnapshot?: number | null;
+    resultType?: GameResultType | null;
+    placement?: number | null;
+    teamId?: string | null;
+  }>;
+};
+
 export type StoredEvent = {
   id: string;
   name: string;
@@ -126,6 +315,10 @@ export type StoredEvent = {
   expiresAt: Date;
   challengePackId: string;
   challengePackVersion: number;
+  ownerUserId: string | null;
+  playgroupId: string | null;
+  showReturningPlayerSuggestions: boolean;
+  guestIdentityVerification: GuestIdentityVerification;
   createdAt: Date;
 };
 
@@ -141,6 +334,9 @@ export type StoredParticipant = {
   tablePreference: TablePreferenceKind;
   lockedTableId: string | null;
   preferredTableId: string | null;
+  userAccountId: string | null;
+  guestProfileId: string | null;
+  savedDeckProfileId: string | null;
   flexCredits: number;
   createdAt: Date;
 };
@@ -269,6 +465,10 @@ export type NewStoredEvent = {
   limitedModeConfigs?: LimitedEventModeConfig[];
   operationMode?: EventOperationMode;
   roundState?: RoundEventState | null;
+  ownerUserId?: string | null;
+  playgroupId?: string | null;
+  showReturningPlayerSuggestions?: boolean;
+  guestIdentityVerification?: GuestIdentityVerification;
   expiresAt?: Date;
   createdAt?: Date;
 };
@@ -279,6 +479,9 @@ export type NewStoredParticipant = {
   isBot?: boolean;
   status?: StoredParticipant['status'];
   readyAt?: Date | null;
+  userAccountId?: string | null;
+  guestProfileId?: string | null;
+  savedDeckProfileId?: string | null;
 };
 
 export type NewStoredPod = {
@@ -480,6 +683,9 @@ export interface EventStore {
       tablePreference?: TablePreferenceKind;
       lockedTableId?: string | null;
       preferredTableId?: string | null;
+      userAccountId?: string | null;
+      guestProfileId?: string | null;
+      savedDeckProfileId?: string | null;
     },
   ): Promise<StoredParticipant>;
   insertTable(input: NewStoredTable): Promise<StoredTable>;
@@ -547,6 +753,9 @@ export interface EventStore {
       tournamentState?: TournamentState | null;
       operationMode?: EventOperationMode;
       roundState?: RoundEventState | null;
+      playgroupId?: string | null;
+      showReturningPlayerSuggestions?: boolean;
+      guestIdentityVerification?: GuestIdentityVerification;
     },
   ): Promise<StoredEvent>;
   createLimitedSession(
@@ -633,4 +842,115 @@ export interface EventStore {
     eventId: string,
     roundId: string,
   ): Promise<string[]>;
+
+  upsertUserAccount(input: {
+    authUserId: string;
+    email?: string | null;
+    displayName: string;
+  }): Promise<StoredUserAccount>;
+  findUserAccountById(id: string): Promise<StoredUserAccount | undefined>;
+  findUserAccountByAuthUserId(
+    authUserId: string,
+  ): Promise<StoredUserAccount | undefined>;
+  findUserAccountByEmail(email: string): Promise<StoredUserAccount | undefined>;
+  updateUserAccount(
+    id: string,
+    patch: { displayName?: string },
+  ): Promise<StoredUserAccount>;
+  deleteUserAccount(id: string): Promise<void>;
+
+  insertAuthChallenge(input: {
+    email: string;
+    displayName?: string | null;
+    codeHash: string;
+    expiresAt: Date;
+  }): Promise<StoredAuthChallenge>;
+  findLatestAuthChallengeByEmail(
+    email: string,
+  ): Promise<StoredAuthChallenge | undefined>;
+  incrementAuthChallengeAttempts(id: string): Promise<void>;
+  consumeAuthChallenge(id: string, consumedAt: Date): Promise<void>;
+
+  insertPlaygroup(input: {
+    ownerUserId: string;
+    name: string;
+    guestIdentityVerification?: GuestIdentityVerification;
+  }): Promise<StoredPlaygroup>;
+  findPlaygroupById(id: string): Promise<StoredPlaygroup | undefined>;
+  listPlaygroupsByOwner(ownerUserId: string): Promise<StoredPlaygroup[]>;
+  updatePlaygroup(
+    id: string,
+    patch: {
+      name?: string;
+      guestIdentityVerification?: GuestIdentityVerification;
+    },
+  ): Promise<StoredPlaygroup>;
+  deletePlaygroup(id: string): Promise<void>;
+  listEventsByPlaygroup(playgroupId: string): Promise<StoredEvent[]>;
+
+  insertGuestProfile(input: {
+    playgroupId: string;
+    displayName: string;
+    linkedUserAccountId?: string | null;
+    lastSeenAt?: Date | null;
+  }): Promise<StoredGuestProfile>;
+  findGuestProfileById(id: string): Promise<StoredGuestProfile | undefined>;
+  listGuestProfilesByPlaygroup(
+    playgroupId: string,
+    options?: { includeArchived?: boolean },
+  ): Promise<StoredGuestProfile[]>;
+  listGuestProfilesByLinkedUser(
+    userAccountId: string,
+  ): Promise<StoredGuestProfile[]>;
+  updateGuestProfile(
+    id: string,
+    patch: {
+      displayName?: string;
+      linkedUserAccountId?: string | null;
+      archivedAt?: Date | null;
+      lastSeenAt?: Date | null;
+    },
+  ): Promise<StoredGuestProfile>;
+  deleteGuestProfile(id: string): Promise<void>;
+  mergeGuestProfiles(input: {
+    playgroupId: string;
+    sourceGuestId: string;
+    targetGuestId: string;
+  }): Promise<StoredGuestProfile>;
+
+  insertSavedDeckProfile(
+    input: NewStoredSavedDeckProfile,
+  ): Promise<StoredSavedDeckProfile>;
+  findSavedDeckProfileById(
+    id: string,
+  ): Promise<StoredSavedDeckProfile | undefined>;
+  listSavedDeckProfilesByPlaygroup(
+    playgroupId: string,
+    options?: { includeArchived?: boolean },
+  ): Promise<StoredSavedDeckProfile[]>;
+  listSavedDeckProfilesByGuest(
+    guestProfileId: string,
+    options?: { includeArchived?: boolean },
+  ): Promise<StoredSavedDeckProfile[]>;
+  updateSavedDeckProfile(
+    id: string,
+    patch: Partial<
+      Omit<NewStoredSavedDeckProfile, 'playgroupId' | 'guestProfileId'>
+    > & {
+      archivedAt?: Date | null;
+      timesUsed?: number;
+      lastUsedAt?: Date | null;
+    },
+  ): Promise<StoredSavedDeckProfile>;
+  deleteSavedDeckProfile(id: string): Promise<void>;
+
+  upsertGameRecord(
+    input: UpsertStoredGameRecordInput,
+  ): Promise<StoredGameRecord>;
+  listGameRecordsByPlaygroup(playgroupId: string): Promise<StoredGameRecord[]>;
+  listGameRecordsByEvent(eventId: string): Promise<StoredGameRecord[]>;
+  listGameRecordsForIdentity(input: {
+    guestProfileIds?: string[];
+    userAccountIds?: string[];
+  }): Promise<StoredGameRecord[]>;
 }

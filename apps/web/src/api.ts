@@ -24,6 +24,18 @@ import {
   type TournamentFormat,
   type TournamentOptions,
   type SeriesLength,
+  type DerivedStats,
+  type GameRecord,
+  type GameResultType,
+  type GuestIdentityVerification,
+  type GuestProfile,
+  type JoinGuestSuggestion,
+  type JoinGuestSuggestionsResponse,
+  type JoinSavedDeckSuggestion,
+  type Playgroup,
+  type PlaygroupOverview,
+  type SavedDeckProfile,
+  type UserAccount,
 } from '@podyguard/shared';
 import { resolveApiUrl } from './api-base';
 import { readStored, removeStored, writeStored } from './device-storage';
@@ -140,11 +152,17 @@ export function createEvent(
     tournamentFormat?: TournamentFormat;
     tournamentOptions?: TournamentOptions;
     limitedModeConfigs?: LimitedEventModeConfig[];
+    playgroupId?: string | null;
+    showReturningPlayerSuggestions?: boolean;
+    accountToken?: string;
   },
 ) {
+  const { accountToken, ...rest } = options ?? {};
+  const token = accountToken ?? loadAccountToken();
   return request<{ event: PublicEvent; hostToken: string }>('/events', {
     method: 'POST',
-    body: JSON.stringify({ name, hostPin, tableCount, ...options }),
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: JSON.stringify({ name, hostPin, tableCount, ...rest }),
   });
 }
 
@@ -175,18 +193,44 @@ export function listParticipants(joinCode: string) {
   );
 }
 
+export function getJoinSuggestions(joinCode: string, query?: string) {
+  const params = new URLSearchParams();
+  if (query && query.trim().length > 0) {
+    params.set('q', query.trim());
+  }
+  const suffix = params.toString() ? `?${params.toString()}` : '';
+  return request<JoinGuestSuggestionsResponse>(
+    `/events/${joinCode}/join-suggestions${suffix}`,
+  );
+}
+
+export function getJoinGuestDecks(joinCode: string, guestProfileId: string) {
+  return request<{
+    guest: JoinGuestSuggestion;
+    decks: JoinSavedDeckSuggestion[];
+  }>(`/events/${joinCode}/join-suggestions/${guestProfileId}/decks`);
+}
+
 export function joinEvent(
   joinCode: string,
   displayName: string,
   decks?: DeckDraft[],
+  options?: {
+    guestProfileId?: string;
+    savedDeckProfileId?: string;
+    rememberMe?: boolean;
+    accountToken?: string;
+  },
 ) {
+  const { accountToken, ...rest } = options ?? {};
   return request<{
     event: PublicEvent;
     participant: PublicParticipant;
     token: string;
   }>(`/events/${joinCode}/join`, {
     method: 'POST',
-    body: JSON.stringify({ displayName, decks }),
+    headers: accountToken ? { Authorization: `Bearer ${accountToken}` } : {},
+    body: JSON.stringify({ displayName, decks, ...rest }),
   });
 }
 
@@ -939,6 +983,7 @@ export function updateMatchSettings(
     allowFivePods?: boolean;
     preferredPodSize?: number;
     lifetimeHours?: number;
+    showReturningPlayerSuggestions?: boolean;
   },
 ) {
   return request<{ event: PublicEvent }>(`/events/${joinCode}/settings`, {
@@ -1168,3 +1213,323 @@ export function cancelDisplayAnnouncement(
     },
   );
 }
+
+const ACCOUNT_SESSION_KEY = 'podyguard.account.session';
+const PREFERRED_PLAYGROUP_KEY = 'podyguard.account.preferredPlaygroupId';
+
+export type StoredAccountSession = {
+  token: string;
+  account: UserAccount;
+};
+
+export function saveAccountSession(session: StoredAccountSession) {
+  writeStored(ACCOUNT_SESSION_KEY, JSON.stringify(session));
+}
+
+export function loadAccountSession(): StoredAccountSession | null {
+  const raw = readStored(ACCOUNT_SESSION_KEY);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw) as StoredAccountSession;
+    if (
+      typeof parsed?.token === 'string' &&
+      parsed.token.length > 0 &&
+      parsed.account &&
+      typeof parsed.account.id === 'string'
+    ) {
+      return parsed;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export function loadAccountToken(): string | null {
+  return loadAccountSession()?.token ?? null;
+}
+
+export function clearAccountSession() {
+  removeStored(ACCOUNT_SESSION_KEY);
+}
+
+export function savePreferredPlaygroupId(playgroupId: string | null) {
+  if (!playgroupId) {
+    removeStored(PREFERRED_PLAYGROUP_KEY);
+    return;
+  }
+  writeStored(PREFERRED_PLAYGROUP_KEY, playgroupId);
+}
+
+export function loadPreferredPlaygroupId(): string | null {
+  return readStored(PREFERRED_PLAYGROUP_KEY);
+}
+
+export function startEmailAuth(email: string, displayName?: string) {
+  return request<{
+    challengeId: string;
+    email: string;
+    expiresAt: string;
+    devCode?: string;
+  }>('/auth/email/start', {
+    method: 'POST',
+    body: JSON.stringify({ email, displayName }),
+  });
+}
+
+export function verifyEmailAuth(
+  email: string,
+  code: string,
+  displayName?: string,
+) {
+  return request<{
+    account: UserAccount;
+    token: string;
+    playgroups: Playgroup[];
+  }>('/auth/email/verify', {
+    method: 'POST',
+    body: JSON.stringify({ email, code, displayName }),
+  });
+}
+
+export function getMyAccount(token: string) {
+  return request<{
+    account: UserAccount;
+    playgroups: Playgroup[];
+    stats: DerivedStats;
+    recentGames: GameRecord[];
+    linkedGuests: GuestProfile[];
+    claimableGuests: Array<{ guest: GuestProfile; playgroupName: string }>;
+  }>('/account/me', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export function updateMyAccount(token: string, displayName: string) {
+  return request<{ account: UserAccount }>('/account/me', {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ displayName }),
+  });
+}
+
+export function deleteMyAccount(token: string) {
+  return request<{ ok: true }>('/account/me', {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export function claimGuestHistory(token: string, guestProfileId: string) {
+  return request<{ guest: GuestProfile }>('/account/claim-guest', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ guestProfileId }),
+  });
+}
+
+export function listMyPlaygroups(token: string) {
+  return request<{ playgroups: Playgroup[] }>('/playgroups', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export function createPlaygroup(
+  token: string,
+  name: string,
+  guestIdentityVerification?: GuestIdentityVerification,
+) {
+  return request<{ playgroup: Playgroup }>('/playgroups', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ name, guestIdentityVerification }),
+  });
+}
+
+export function getPlaygroupOverview(token: string, playgroupId: string) {
+  return request<{ overview: PlaygroupOverview }>(`/playgroups/${playgroupId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export function updatePlaygroup(
+  token: string,
+  playgroupId: string,
+  patch: {
+    name?: string;
+    guestIdentityVerification?: GuestIdentityVerification;
+  },
+) {
+  return request<{ playgroup: Playgroup }>(`/playgroups/${playgroupId}`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify(patch),
+  });
+}
+
+export function deletePlaygroup(token: string, playgroupId: string) {
+  return request<{ ok: true }>(`/playgroups/${playgroupId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export function createGuestProfile(
+  token: string,
+  playgroupId: string,
+  displayName: string,
+  allowDuplicate?: boolean,
+) {
+  return request<{ guest: GuestProfile }>(`/playgroups/${playgroupId}/guests`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ displayName, allowDuplicate }),
+  });
+}
+
+export function updateGuestProfile(
+  token: string,
+  playgroupId: string,
+  guestId: string,
+  patch: { displayName?: string; archived?: boolean },
+) {
+  return request<{ guest: GuestProfile }>(
+    `/playgroups/${playgroupId}/guests/${guestId}`,
+    {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(patch),
+    },
+  );
+}
+
+export function deleteGuestProfile(
+  token: string,
+  playgroupId: string,
+  guestId: string,
+) {
+  return request<{ ok: true }>(`/playgroups/${playgroupId}/guests/${guestId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export function mergeGuestProfiles(
+  token: string,
+  playgroupId: string,
+  sourceGuestId: string,
+  targetGuestId: string,
+) {
+  return request<{ guest: GuestProfile }>(
+    `/playgroups/${playgroupId}/guests/${sourceGuestId}/merge`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ targetGuestId }),
+    },
+  );
+}
+
+export function createSavedDeckProfile(
+  token: string,
+  playgroupId: string,
+  guestId: string,
+  input: {
+    format?: string;
+    deckName?: string;
+    commanderName?: string;
+    commanderScryfallId?: string;
+    commanders?: CommanderSelection[];
+    bracket?: number;
+    poolId?: string;
+    preferred?: boolean;
+  },
+) {
+  return request<{ deck: SavedDeckProfile }>(
+    `/playgroups/${playgroupId}/guests/${guestId}/decks`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(input),
+    },
+  );
+}
+
+export function updateSavedDeckProfile(
+  token: string,
+  playgroupId: string,
+  guestId: string,
+  deckId: string,
+  patch: {
+    format?: string;
+    deckName?: string;
+    commanderName?: string;
+    commanderScryfallId?: string;
+    commanders?: CommanderSelection[];
+    bracket?: number;
+    poolId?: string;
+    preferred?: boolean;
+    archived?: boolean;
+  },
+) {
+  return request<{ deck: SavedDeckProfile }>(
+    `/playgroups/${playgroupId}/guests/${guestId}/decks/${deckId}`,
+    {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(patch),
+    },
+  );
+}
+
+export function deleteSavedDeckProfile(
+  token: string,
+  playgroupId: string,
+  guestId: string,
+  deckId: string,
+) {
+  return request<{ ok: true }>(
+    `/playgroups/${playgroupId}/guests/${guestId}/decks/${deckId}`,
+    {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
+}
+
+export function recordLocalPlaygroupGame(
+  token: string,
+  playgroupId: string,
+  input: {
+    clientGameId: string;
+    gameMode: GameMode;
+    rulesFormat?: 'normal' | 'commander';
+    poolId?: string;
+    durationSeconds?: number;
+    startedAt?: string;
+    endedAt?: string;
+    seats: Array<{
+      guestProfileId?: string;
+      userAccountId?: string;
+      displayName: string;
+      savedDeckProfileId?: string;
+      deckName?: string;
+      commanderName?: string;
+      commanderScryfallId?: string;
+      bracket?: number;
+      resultType?: GameResultType;
+      placement?: number;
+      teamId?: string;
+    }>;
+  },
+) {
+  return request<{ gameRecord: GameRecord }>(
+    `/playgroups/${playgroupId}/games`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(input),
+    },
+  );
+}
+

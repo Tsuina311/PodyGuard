@@ -317,3 +317,40 @@ export type {
   RoundTableInput,
   TablePreferenceKind,
 } from './rounds';
+
+export {
+  GAME_RESULT_TYPES,
+  GAME_SOURCES,
+  GAME_SOURCE_TYPES,
+  GUEST_IDENTITY_VERIFICATION_MODES,
+  LARGE_PLAYGROUP_SEARCH_LIMIT,
+  SMALL_PLAYGROUP_SUGGESTION_LIMIT,
+  bracketFromPoolId,
+  buildFallbackCommanderSelection,
+  deriveStatsForIdentity,
+  isSavedDeckCompatibleWithEvent,
+  poolIdFromBracket,
+} from './playgroups';
+
+export type {
+  CommanderUsageStat,
+  DerivedStats,
+  GameRecord,
+  GameRecordParticipant,
+  GameResultType,
+  GameSource,
+  GameSourceType,
+  GuestIdentityVerification,
+  GuestProfile,
+  JoinGuestSuggestion,
+  JoinGuestSuggestionsResponse,
+  JoinSavedDeckSuggestion,
+  PlayedWithStat,
+  Playgroup,
+  PlaygroupGuestOverview,
+  PlaygroupOverview,
+  RecentPlaygroupEventConfig,
+  SavedDeckProfile,
+  UserAccount,
+} from './playgroups';
+

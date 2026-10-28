@@ -49,6 +49,12 @@ export type PublicEvent = {
   challengePackId?: string;
   challengePackVersion?: number;
   challengePack?: ChallengePack;
+  /** Associated playgroup when created by an authenticated organizer. */
+  playgroupId?: string;
+  playgroupName?: string;
+  /** Whether returning-player suggestions are enabled on the join screen. */
+  showReturningPlayerSuggestions?: boolean;
+  hasPlaygroupSuggestions?: boolean;
 };
 
 export type CommanderSelection = {

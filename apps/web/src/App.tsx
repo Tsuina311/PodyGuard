@@ -18,6 +18,7 @@ import {
 import { HomePage } from './HomePage';
 import { HostPage } from './HostPage';
 import { JoinPage } from './JoinPage';
+import { AccountPage } from './AccountPage';
 import { MatchConfigPage } from './MatchConfigPage';
 import { MatchSandboxPage } from './MatchSandboxPage';
 import { DisplayLivePage } from './display/DisplayLivePage';
@@ -78,6 +79,8 @@ export function App() {
         >
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/account" element={<AccountPage />} />
+            <Route path="/playgroups/:playgroupId" element={<AccountPage />} />
             <Route path="/e/:joinCode" element={<JoinPage />} />
             <Route path="/host/:joinCode" element={<HostPage />} />
             <Route path="/connectivity" element={<ConnectivityPage />} />

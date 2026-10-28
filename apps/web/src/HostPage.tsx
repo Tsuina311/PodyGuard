@@ -32,6 +32,7 @@ import {
   getEventMetrics,
   listParticipants,
   listTables,
+  loadAccountToken,
   loadHostToken,
   loadPlayerSession,
   matchNow,
@@ -138,7 +139,7 @@ export function HostPage() {
   useEventLive(code, Boolean(event), onSnapshot);
 
   useEffect(() => {
-    const token = loadHostToken(code);
+    const token = loadHostToken(code) ?? loadAccountToken();
     if (!token) {
       return;
     }
@@ -156,7 +157,9 @@ export function HostPage() {
       .catch(() => {
         // The PIN form is the way back in, so drop the key the server refused
         // rather than retrying it on every visit.
-        clearHostToken(code);
+        if (loadHostToken(code) === token) {
+          clearHostToken(code);
+        }
       });
     return () => {
       cancelled = true;
@@ -348,6 +351,7 @@ export function HostPage() {
       allowFivePods?: boolean;
       preferredPodSize?: number;
       lifetimeHours?: number;
+      showReturningPlayerSuggestions?: boolean;
     },
   ) {
     if (!hostToken) {
@@ -681,6 +685,11 @@ export function HostPage() {
                   {t(`families.${event.rulesFormat}`)}
                 </Badge>
               )}
+              {event.playgroupName && event.playgroupId ? (
+                <Link to={`/playgroups/${event.playgroupId}`}>
+                  <Badge tone="live">{event.playgroupName}</Badge>
+                </Link>
+              ) : null}
             </div>
           </header>
 
@@ -1055,6 +1064,21 @@ export function HostPage() {
             >
               {copied ? t('common.copied') : t('host.copyPlayerLink')}
             </Button>
+            {event.playgroupId ? (
+              <label className="text-muted mt-3 flex cursor-pointer items-center gap-2 text-xs">
+                <input
+                  type="checkbox"
+                  className="accent-neon"
+                  checked={event.showReturningPlayerSuggestions !== false}
+                  onChange={(e) =>
+                    void onToggleSetting({
+                      showReturningPlayerSuggestions: e.target.checked,
+                    })
+                  }
+                />
+                Show returning-player suggestions on join
+              </label>
+            ) : null}
           </div>
         </div>
       </Panel>

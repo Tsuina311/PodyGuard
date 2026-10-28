@@ -22,6 +22,7 @@ import { displayRoutes } from './routes/displays.js';
 import { eventRoutes } from './routes/events.js';
 import { feedbackRoutes } from './routes/feedback.js';
 import { healthRoutes } from './routes/health.js';
+import { playgroupRoutes } from './routes/playgroups.js';
 import { scryfallRoutes } from './routes/scryfall.js';
 import type { ScryfallClient } from './scryfall/scryfall-client.js';
 
@@ -93,6 +94,7 @@ export async function buildApp(options: BuildAppOptions = {}) {
     checkDatabase: options.checkDatabase,
   });
   await app.register(eventRoutes);
+  await app.register(playgroupRoutes);
   await app.register(displayRoutes);
   await app.register(feedbackRoutes, {
     service: new FeedbackService(feedbackTransport),

@@ -145,6 +145,143 @@ export const schemaMeta = pgTable('schema_meta', {
     .notNull(),
 });
 
+export const userAccounts = pgTable(
+  'user_accounts',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    authUserId: text('auth_user_id').notNull().unique(),
+    email: text('email'),
+    displayName: text('display_name').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex('user_accounts_email_unique')
+      .on(table.email)
+      .where(sql`${table.email} is not null`),
+  ],
+);
+
+export const authChallenges = pgTable(
+  'auth_challenges',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    email: text('email').notNull(),
+    displayName: text('display_name'),
+    codeHash: text('code_hash').notNull(),
+    attempts: integer('attempts').notNull().default(0),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    consumedAt: timestamp('consumed_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [index('auth_challenges_email_idx').on(table.email)],
+);
+
+export const playgroups = pgTable(
+  'playgroups',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    ownerUserId: uuid('owner_user_id')
+      .notNull()
+      .references(() => userAccounts.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    guestIdentityVerification: text('guest_identity_verification')
+      .notNull()
+      .default('NONE'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [index('playgroups_owner_user_id_idx').on(table.ownerUserId)],
+);
+
+export const guestProfiles = pgTable(
+  'guest_profiles',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    playgroupId: uuid('playgroup_id')
+      .notNull()
+      .references(() => playgroups.id, { onDelete: 'cascade' }),
+    displayName: text('display_name').notNull(),
+    linkedUserAccountId: uuid('linked_user_account_id').references(
+      () => userAccounts.id,
+      { onDelete: 'set null' },
+    ),
+    archivedAt: timestamp('archived_at', { withTimezone: true }),
+    lastSeenAt: timestamp('last_seen_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index('guest_profiles_playgroup_id_idx').on(table.playgroupId),
+    index('guest_profiles_playgroup_name_idx').on(
+      table.playgroupId,
+      table.displayName,
+    ),
+    index('guest_profiles_linked_user_idx').on(table.linkedUserAccountId),
+  ],
+);
+
+export const savedDeckProfiles = pgTable(
+  'saved_deck_profiles',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    playgroupId: uuid('playgroup_id')
+      .notNull()
+      .references(() => playgroups.id, { onDelete: 'cascade' }),
+    guestProfileId: uuid('guest_profile_id')
+      .notNull()
+      .references(() => guestProfiles.id, { onDelete: 'cascade' }),
+    format: text('format').notNull().default('commander'),
+    deckName: text('deck_name'),
+    commanderName: text('commander_name'),
+    commanderScryfallId: text('commander_scryfall_id'),
+    commanders: jsonb('commanders')
+      .$type<
+        Array<{
+          oracleId: string;
+          cardId: string;
+          name: string;
+          artCropUri: string;
+          typeLine: string;
+          oracleText: string;
+          keywords: string[];
+        }>
+      >()
+      .notNull()
+      .default([]),
+    bracket: integer('bracket'),
+    poolId: text('pool_id').notNull().default('b3'),
+    preferred: boolean('preferred').notNull().default(false),
+    timesUsed: integer('times_used').notNull().default(0),
+    lastUsedAt: timestamp('last_used_at', { withTimezone: true }),
+    archivedAt: timestamp('archived_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index('saved_deck_profiles_playgroup_id_idx').on(table.playgroupId),
+    index('saved_deck_profiles_guest_profile_id_idx').on(table.guestProfileId),
+  ],
+);
+
 export const events = pgTable('events', {
   id: uuid('id').defaultRandom().primaryKey(),
   publicJoinCode: text('public_join_code').notNull().unique(),
@@ -191,6 +328,18 @@ export const events = pgTable('events', {
     .notNull()
     .default('classic-commander-v1'),
   challengePackVersion: integer('challenge_pack_version').notNull().default(1),
+  ownerUserId: uuid('owner_user_id').references(() => userAccounts.id, {
+    onDelete: 'set null',
+  }),
+  playgroupId: uuid('playgroup_id').references(() => playgroups.id, {
+    onDelete: 'set null',
+  }),
+  showReturningPlayerSuggestions: boolean('show_returning_player_suggestions')
+    .notNull()
+    .default(true),
+  guestIdentityVerification: text('guest_identity_verification')
+    .notNull()
+    .default('NONE'),
   createdAt: timestamp('created_at', { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -235,6 +384,16 @@ export const participants = pgTable('participants', {
   }),
   preferredTableId: uuid('preferred_table_id').references(
     () => physicalTables.id,
+    { onDelete: 'set null' },
+  ),
+  userAccountId: uuid('user_account_id').references(() => userAccounts.id, {
+    onDelete: 'set null',
+  }),
+  guestProfileId: uuid('guest_profile_id').references(() => guestProfiles.id, {
+    onDelete: 'set null',
+  }),
+  savedDeckProfileId: uuid('saved_deck_profile_id').references(
+    () => savedDeckProfiles.id,
     { onDelete: 'set null' },
   ),
   createdAt: timestamp('created_at', { withTimezone: true })
@@ -757,4 +916,84 @@ export const displayAnnouncements = pgTable(
   },
   (table) => [index('display_announcements_event_id_idx').on(table.eventId)],
 );
+
+export const gameRecords = pgTable(
+  'game_records',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    source: text('source').notNull().default('PODYGUARD'),
+    sourceType: text('source_type').notNull(),
+    sourceId: text('source_id').notNull(),
+    eventId: uuid('event_id').references(() => events.id, {
+      onDelete: 'set null',
+    }),
+    playgroupId: uuid('playgroup_id').references(() => playgroups.id, {
+      onDelete: 'set null',
+    }),
+    gameMode: text('game_mode').notNull(),
+    format: text('format'),
+    poolId: text('pool_id'),
+    durationSeconds: integer('duration_seconds'),
+    startedAt: timestamp('started_at', { withTimezone: true }),
+    endedAt: timestamp('ended_at', { withTimezone: true }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex('game_records_source_unique').on(
+      table.source,
+      table.sourceType,
+      table.sourceId,
+    ),
+    index('game_records_event_id_idx').on(table.eventId),
+    index('game_records_playgroup_id_idx').on(table.playgroupId),
+  ],
+);
+
+export const gameRecordParticipants = pgTable(
+  'game_record_participants',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    gameRecordId: uuid('game_record_id')
+      .notNull()
+      .references(() => gameRecords.id, { onDelete: 'cascade' }),
+    eventParticipantId: uuid('event_participant_id').references(
+      () => participants.id,
+      { onDelete: 'set null' },
+    ),
+    userAccountId: uuid('user_account_id').references(() => userAccounts.id, {
+      onDelete: 'set null',
+    }),
+    guestProfileId: uuid('guest_profile_id').references(
+      () => guestProfiles.id,
+      { onDelete: 'set null' },
+    ),
+    displayNameSnapshot: text('display_name_snapshot').notNull(),
+    savedDeckProfileId: uuid('saved_deck_profile_id').references(
+      () => savedDeckProfiles.id,
+      { onDelete: 'set null' },
+    ),
+    deckNameSnapshot: text('deck_name_snapshot'),
+    commanderNameSnapshot: text('commander_name_snapshot'),
+    commanderScryfallIdSnapshot: text('commander_scryfall_id_snapshot'),
+    bracketSnapshot: integer('bracket_snapshot'),
+    resultType: text('result_type'),
+    placement: integer('placement'),
+    teamId: text('team_id'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index('game_record_participants_record_id_idx').on(table.gameRecordId),
+    index('game_record_participants_user_id_idx').on(table.userAccountId),
+    index('game_record_participants_guest_id_idx').on(table.guestProfileId),
+    index('game_record_participants_deck_id_idx').on(table.savedDeckProfileId),
+  ],
+);
+
 
