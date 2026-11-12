@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Points this clone at .githooks so VERSION auto-bumps on commit.
+ * Compatibility entrypoint: installs Husky checks and VERSION bump hooks.
  * Safe to run repeatedly; fails soft when git is unavailable.
  */
 import { spawnSync } from 'node:child_process';
@@ -9,7 +9,7 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const hooksPath = resolve(root, '.githooks');
+const hooksPath = resolve(root, '.husky/_');
 
 if (!existsSync(resolve(root, '.git'))) {
   process.exit(0);
@@ -20,18 +20,18 @@ const current = spawnSync('git', ['config', '--get', 'core.hooksPath'], {
   encoding: 'utf8',
 });
 const value = (current.stdout || '').trim();
-if (value === '.githooks' || value === hooksPath) {
+if (value === '.husky/_' || value === hooksPath) {
   process.exit(0);
 }
 
-const result = spawnSync('git', ['config', 'core.hooksPath', '.githooks'], {
+const result = spawnSync(process.execPath, [resolve(root, 'node_modules/husky/bin.js')], {
   cwd: root,
   encoding: 'utf8',
 });
 if (result.status !== 0) {
   console.warn(
-    'Could not set core.hooksPath=.githooks — run: git config core.hooksPath .githooks',
+    'Could not install Husky — run yarn prepare in the repository root.',
   );
   process.exit(0);
 }
-console.log('Configured git hooks path: .githooks (auto version bump on commit)');
+console.log('Installed Husky checks and automatic version bump.');

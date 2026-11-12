@@ -71,6 +71,8 @@ export async function createConstructedEvent(
     baseModeLabel: string;
     commanderRules: boolean;
     pin?: string;
+    tableCount?: number;
+    playgroupName?: string;
   },
 ): Promise<string> {
   const pin = options.pin ?? '2468';
@@ -78,8 +80,10 @@ export async function createConstructedEvent(
   await page.getByRole('tab', { name: 'Host event' }).click();
   await page.getByRole('tab', { name: 'Constructed' }).click();
   await pickConstructedMode(page, options);
+  if (options.playgroupName) await page.getByRole('button', { name: options.playgroupName, exact: true }).click();
   await page.getByLabel('Event name').fill(options.name);
   await page.getByLabel('Host PIN').fill(pin);
+  await page.getByRole('spinbutton', { name: /^Tables\b/ }).fill(String(options.tableCount ?? 1));
 
   const createResponse = page.waitForResponse(
     (response) =>
@@ -116,6 +120,8 @@ export async function createLimitedEvent(
     .click();
   await page.getByLabel('Event name').fill(options.name);
   await page.getByLabel('Host PIN').fill(pin);
+
+  await page.getByRole('spinbutton', { name: /^Tables\b/ }).fill('1');
 
   const createResponse = page.waitForResponse(
     (response) =>

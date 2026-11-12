@@ -466,6 +466,7 @@ export function AccountPage() {
             ) : null}
           </div>
           <div className="flex items-center gap-2">
+            <Link to="/admin" className="text-muted text-xs underline">Administration</Link>
             <Button
               size="sm"
               variant="glass"

@@ -147,6 +147,7 @@ import {
   tryResolveAuthenticatedAccount,
   verifyEmailAuthFlow,
 } from './playgroup-domain.js';
+import { deliverEmailCode, requireEmailDelivery } from '../identity/email-delivery.js';
 import {
   assertDecks,
   assertDisplayName,
@@ -3990,7 +3991,8 @@ export class EventService {
     expiresAt: string;
     devCode?: string;
   }> {
-    return startEmailAuthFlow(
+    if (!this.options.isDev) requireEmailDelivery();
+    const result = await startEmailAuthFlow(
       this.store,
       {
         now: this.now(),
@@ -3998,6 +4000,10 @@ export class EventService {
       },
       input,
     );
+    if (this.options.isDev) return result;
+    await deliverEmailCode(result.email, result.devCode!, result.challengeId);
+    const { devCode: _code, ...publicResult } = result;
+    return publicResult;
   }
 
   async verifyEmailAuth(input: {
@@ -4026,6 +4032,9 @@ export class EventService {
     token: string;
     playgroups: Playgroup[];
   }> {
+    // A client-supplied subject is not a verified provider identity. This
+    // compatibility shortcut is exclusive to development until JWT verification exists.
+    if (!this.options.isDev) throw new InvalidAccountSessionError();
     return loginWithNeonAuthFlow(this.store, this.identity, input);
   }
 
@@ -4118,6 +4127,15 @@ export class EventService {
     );
     const rows = await this.store.listPlaygroupsByOwner(account.id);
     return rows.map(toPublicPlaygroup);
+  }
+
+  async listAdminPlaygroups(offset: number, limit: number): Promise<Playgroup[]> {
+    return (await this.store.listPlaygroupsForAdmin(offset, limit)).map(toPublicPlaygroup);
+  }
+
+  async getAdminPlaygroupOverview(playgroupId: string): Promise<PlaygroupOverview | null> {
+    const playgroup = await this.store.findPlaygroupById(playgroupId);
+    return playgroup ? buildPlaygroupOverview(this.store, playgroup) : null;
   }
 
   async getPlaygroupOverview(

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 import { openQuickPlaySetup } from './helpers';
 
 test.describe('quick play', () => {

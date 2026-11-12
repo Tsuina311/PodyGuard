@@ -1673,6 +1673,12 @@ export class MemoryEventStore implements EventStore {
     return this.playgroups.get(id);
   }
 
+  async listPlaygroupsForAdmin(offset: number, limit: number): Promise<StoredPlaygroup[]> {
+    return [...this.playgroups.values()]
+      .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime() || a.id.localeCompare(b.id))
+      .slice(offset, offset + limit);
+  }
+
   async listPlaygroupsByOwner(ownerUserId: string): Promise<StoredPlaygroup[]> {
     return [...this.playgroups.values()]
       .filter((row) => row.ownerUserId === ownerUserId)

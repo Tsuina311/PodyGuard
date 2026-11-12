@@ -1215,6 +1215,17 @@ export function cancelDisplayAnnouncement(
 }
 
 const ACCOUNT_SESSION_KEY = 'podyguard.account.session';
+export function getAdminPlaygroups(token: string, offset = 0) {
+  return request<{ playgroups: Playgroup[]; nextOffset: number | null }>(`/admin/playgroups?offset=${offset}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export function getAdminPlaygroup(token: string, id: string) {
+  return request<{ overview: PlaygroupOverview }>(`/admin/playgroups/${encodeURIComponent(id)}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
 const PREFERRED_PLAYGROUP_KEY = 'podyguard.account.preferredPlaygroupId';
 
 export type StoredAccountSession = {

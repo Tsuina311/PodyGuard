@@ -13,9 +13,9 @@
     "bump:patch": "node scripts/bump-version.mjs patch",
     "bump:minor": "node scripts/bump-version.mjs minor",
     "bump:major": "node scripts/bump-version.mjs major",
-    "prepare": "node scripts/install-git-hooks.mjs",
+    "prepare": "husky",
     "build": "yarn workspace @podyguard/shared build && yarn workspace @podyguard/matching build && yarn workspace @podyguard/simulation build && yarn workspace @podyguard/server build && yarn workspace @podyguard/web build",
-    "typecheck": "yarn workspace @podyguard/shared typecheck && yarn workspace @podyguard/matching typecheck && yarn workspace @podyguard/simulation typecheck && yarn workspace @podyguard/server typecheck && yarn workspace @podyguard/web typecheck",
+    "typecheck": "yarn workspace @podyguard/shared typecheck && yarn workspace @podyguard/matching typecheck && yarn workspace @podyguard/simulation typecheck && yarn workspace @podyguard/server typecheck && yarn workspace @podyguard/web typecheck && tsc -p tsconfig.e2e.json",
     "test": "yarn workspace @podyguard/shared test && yarn workspace @podyguard/matching test && yarn workspace @podyguard/simulation test && yarn workspace @podyguard/server test && yarn workspace @podyguard/web test",
     "test:e2e": "yarn workspace @podyguard/web build && playwright test",
     "e2e:serve": "node --import tsx e2e/serve.mjs",
@@ -35,10 +35,25 @@
     "simulation:sweep-wait-cause": "tsx packages/simulation/src/cli.ts sweep-wait-cause",
     "simulation:compare": "tsx packages/simulation/src/cli.ts compare",
     "db:generate": "yarn workspace @podyguard/server db:generate",
-    "db:migrate": "yarn workspace @podyguard/server db:migrate"
+    "db:migrate": "yarn workspace @podyguard/server db:migrate",
+    "check:quick": "yarn typecheck && yarn test:fast",
+    "check:push": "yarn typecheck && yarn test && yarn test:e2e",
+    "check:release": "yarn check:push && yarn build && yarn test:persistence",
+    "test:e2e:smoke": "yarn workspace @podyguard/web build && playwright test commander-lobby playgroup-admin",
+    "test:e2e:ui": "yarn workspace @podyguard/web build && playwright test --ui",
+    "test:e2e:report": "playwright show-report",
+    "demo": "yarn workspace @podyguard/web build && node --import tsx e2e/serve.mjs",
+    "test:fast": "yarn workspace @podyguard/shared test --exclude src/rounds.property.test.ts && yarn workspace @podyguard/matching test && yarn workspace @podyguard/server test && yarn workspace @podyguard/web test",
+    "test:persistence": "node --import tsx scripts/check-persistence.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.55.0",
-    "tsx": "^4.23.12"
+    "@types/node": "^22.13.10",
+    "husky": "^9.1.7",
+    "tsx": "^4.23.12",
+    "typescript": "^5.8.2"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

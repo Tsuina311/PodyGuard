@@ -2760,6 +2760,12 @@ export class PostgresEventStore implements EventStore {
     return row ? mapPlaygroup(row) : undefined;
   }
 
+  async listPlaygroupsForAdmin(offset: number, limit: number): Promise<StoredPlaygroup[]> {
+    const rows = await getDb().select().from(playgroups)
+      .orderBy(desc(playgroups.updatedAt), asc(playgroups.id)).offset(offset).limit(limit);
+    return rows.map(mapPlaygroup);
+  }
+
   async listPlaygroupsByOwner(ownerUserId: string): Promise<StoredPlaygroup[]> {
     const rows = await getDb()
       .select()

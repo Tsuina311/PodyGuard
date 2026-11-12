@@ -878,6 +878,7 @@ export interface EventStore {
   }): Promise<StoredPlaygroup>;
   findPlaygroupById(id: string): Promise<StoredPlaygroup | undefined>;
   listPlaygroupsByOwner(ownerUserId: string): Promise<StoredPlaygroup[]>;
+  listPlaygroupsForAdmin(offset: number, limit: number): Promise<StoredPlaygroup[]>;
   updatePlaygroup(
     id: string,
     patch: {

@@ -8,15 +8,18 @@ export default defineConfig({
   testDir: './e2e',
   fullyParallel: false,
   forbidOnly: Boolean(process.env.CI),
+  failOnFlakyTests: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   workers: 1,
   timeout: 60_000,
   expect: { timeout: 15_000 },
-  reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
+  reporter: [['list'], ['html', { open: 'never' }], ['junit', { outputFile: 'reports/e2e.xml' }]],
   use: {
     baseURL,
     locale: 'en-US',
-    trace: 'on-first-retry',
+    actionTimeout: 15_000,
+    trace: 'retain-on-failure',
+    video: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
   projects: [
@@ -25,9 +28,9 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         locale: 'en-US',
-        // Prefer bundled Chromium in CI; fall back to the system Chrome locally
-        // when playwright CDN downloads are blocked or slow.
-        ...(process.env.CI ? {} : { channel: 'chrome' as const }),
+        // Use the same bundled browser locally and in CI. Opt into system Chrome
+        // explicitly with E2E_CHANNEL=chrome when diagnosing browser differences.
+        ...(process.env.E2E_CHANNEL ? { channel: process.env.E2E_CHANNEL as 'chrome' } : {}),
       },
     },
   ],
@@ -37,7 +40,7 @@ export default defineConfig({
     // e2e is memory-only. serve.mjs still fakes a healthy `/health` so the
     // prod wake screen can dismiss once Playwright starts navigating.
     url: `${baseURL}/`,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: process.env.E2E_REUSE_SERVER === '1',
     timeout: 120_000,
     stdout: 'pipe',
     stderr: 'pipe',

@@ -7,6 +7,8 @@ export default defineConfig({
     __APP_BUILD__: JSON.stringify('test'),
   },
   test: {
+    reporters: ['default', 'junit'],
+    outputFile: { junit: '../../reports/web.xml' },
     environment: 'node',
   },
 });
