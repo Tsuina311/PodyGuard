@@ -30,7 +30,7 @@ separate from real accounts. JUnit results live in `reports/e2e.xml`.
 
 CI uploads HTML reports, traces and screenshots for 14 days, including failed
 runs. Configure GitHub Actions failure notifications in your GitHub notification
-settings. CI retries once; a retry pass is flaky and must be investigated.
+settings. CI retries once; a retry pass is flagged as flaky and fails the gate.
 The local server is fresh by default. `E2E_REUSE_SERVER=1` deliberately reuses
 one when debugging; it can contain previous test state.
 
@@ -87,11 +87,13 @@ Task branches do not publish Pages. Review and merge the PR to release.
 
 - Commander: four-player joining, bracket changes, readiness, matching, starting,
   tracker life changes, undo, refresh recovery, result recording and playgroup
-  history; failed deck-save protection and empty-queue feedback.
+  history, then a second event with the same saved players and Commanders;
+  failed deck-save protection and empty-queue feedback.
 - Playgroups: independent returning browser sessions and saved commanders,
   results/opponents checked against API; admin access, data display and locking.
 - Limited: Booster Draft (8), Pick-Two Draft (4), Sealed (4), real UI joining,
-  readiness, seating, phases, results, standings and table release.
+  readiness, seating, phases, timer pause/resume, refresh, result corrections,
+  standings and table release.
 - Existing quick play, setup transfer, invite links and constructed/Limited
   screen regressions remain covered.
 

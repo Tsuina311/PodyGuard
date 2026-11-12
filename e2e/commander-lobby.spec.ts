@@ -4,6 +4,11 @@ import { createConstructedEvent, prepareApp } from './helpers';
 // Only the external card catalogue is stubbed. Joining, decks, readiness,
 // matching, starting and live updates use the real application server.
 async function stubCommanderCatalogue(page: Page) {
+  // Artwork is external and irrelevant to queue/tracker correctness. Keep this
+  // journey independent of CDN availability and invalid fixture card IDs.
+  const artwork = (route: import('@playwright/test').Route) => route.fulfill({ contentType: 'image/svg+xml', body: '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="#123"/></svg>' });
+  await page.route('https://cards.scryfall.io/**', artwork);
+  await page.route('https://example.com/commander.jpg', artwork);
   const commander = {
     oracleId: 'test-oracle', cardId: 'test-card', name: 'Test Commander',
     artCropUri: 'https://example.com/commander.jpg',
@@ -40,7 +45,7 @@ for (const changeBracket of [false, true]) {
   test(`one-table Commander: three friends + host${changeBracket ? ' changing B2 to B3 before ready' : ''} can match and start`, async ({ page, browser, baseURL }) => {
     test.setTimeout(120_000);
     const demo = await (await page.request.get('/test/demo')).json();
-    const groupName = `Commander history ${changeBracket ? 'changed' : 'standard'}`;
+    const groupName = `Commander history ${changeBracket ? 'changed' : 'standard'} ${test.info().repeatEachIndex}-${test.info().retry}`;
     const groupResponse = await page.request.post('/api/playgroups', {
       headers: { Authorization: `Bearer ${demo.token}` }, data: { name: groupName },
     });
@@ -68,9 +73,10 @@ for (const changeBracket of [false, true]) {
     const friends: Page[] = [];
     try {
       for (const name of ['Ada', 'Bea', 'Cal']) {
-        const friend = await browser.newPage({
+        const context = await browser.newContext({
           viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true,
         });
+        const friend = await context.newPage();
         friends.push(friend);
         await prepareApp(friend);
         await stubCommanderCatalogue(friend);
@@ -174,7 +180,7 @@ for (const changeBracket of [false, true]) {
         expect((await overview.json()).overview.recordedGamesCount).toBe(1);
       });
     } finally {
-      await Promise.all(friends.map((friend) => friend.close()));
+      await Promise.all(friends.map((friend) => friend.context().close()));
     }
   });
 }
