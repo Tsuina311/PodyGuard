@@ -2616,6 +2616,26 @@ export class PostgresEventStore implements EventStore {
     return mapUserAccount(created);
   }
 
+  async upsertGoogleUserAccount(input: {
+    authUserId: string; email: string; displayName: string; allowLegacyEmailLink: boolean;
+  }): Promise<StoredUserAccount | undefined> {
+    const bound = await this.findUserAccountByAuthUserId(input.authUserId);
+    if (bound) return bound;
+    // Unique subject/email constraints arbitrate simultaneous first sign-ins.
+    const [created] = await getDb().insert(userAccounts).values({
+      authUserId: input.authUserId, email: input.email, displayName: input.displayName,
+    }).onConflictDoNothing().returning();
+    if (created) return mapUserAccount(created);
+    const concurrent = await this.findUserAccountByAuthUserId(input.authUserId);
+    if (concurrent) return concurrent;
+    const legacy = await this.findUserAccountByEmail(input.email);
+    if (!legacy || !input.allowLegacyEmailLink || legacy.authUserId.startsWith('google:')) return undefined;
+    const [linked] = await getDb().update(userAccounts).set({
+      authUserId: input.authUserId, updatedAt: new Date(),
+    }).where(and(eq(userAccounts.id, legacy.id), eq(userAccounts.authUserId, legacy.authUserId))).returning();
+    return linked ? mapUserAccount(linked) : await this.findUserAccountByAuthUserId(input.authUserId);
+  }
+
   async findUserAccountById(
     id: string,
   ): Promise<StoredUserAccount | undefined> {
@@ -2758,6 +2778,12 @@ export class PostgresEventStore implements EventStore {
       .where(eq(playgroups.id, id))
       .limit(1);
     return row ? mapPlaygroup(row) : undefined;
+  }
+
+  async listPlaygroupsForAdmin(offset: number, limit: number): Promise<StoredPlaygroup[]> {
+    const rows = await getDb().select().from(playgroups)
+      .orderBy(desc(playgroups.updatedAt), asc(playgroups.id)).offset(offset).limit(limit);
+    return rows.map(mapPlaygroup);
   }
 
   async listPlaygroupsByOwner(ownerUserId: string): Promise<StoredPlaygroup[]> {

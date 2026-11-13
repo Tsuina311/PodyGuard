@@ -16,7 +16,7 @@ function bearerToken(header: string | undefined): string {
 }
 
 export const playgroupRoutes: FastifyPluginAsync = async (app) => {
-  app.post('/auth/email/start', async (request, reply) => {
+  app.post('/auth/email/start', { config: { rateLimit: { max: 5, timeWindow: '15 minutes' } } }, async (request, reply) => {
     const body = (request.body ?? {}) as {
       email?: unknown;
       displayName?: unknown;
@@ -33,7 +33,7 @@ export const playgroupRoutes: FastifyPluginAsync = async (app) => {
     }
   });
 
-  app.post('/auth/email/verify', async (request, reply) => {
+  app.post('/auth/email/verify', { config: { rateLimit: { max: 20, timeWindow: '15 minutes' } } }, async (request, reply) => {
     const body = (request.body ?? {}) as {
       email?: unknown;
       code?: unknown;

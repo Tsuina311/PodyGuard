@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 import { encodePlayPayloadFromStoredConfig } from './encode-play';
 import { dismissWakeIfPresent, openQuickPlaySetup, prepareApp } from './helpers';
 

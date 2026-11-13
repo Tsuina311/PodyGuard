@@ -88,6 +88,7 @@ export function HostPage() {
   const [limitedSnapshot, setLimitedSnapshot] = useState<EventSnapshot | null>(null);
   const [hostPin, setHostPin] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [matchNotice, setMatchNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
   const [metrics, setMetrics] = useState<EventMetrics | null>(null);
@@ -376,8 +377,12 @@ export function HostPage() {
     }
     setBusy(true);
     setError(null);
+    setMatchNotice(null);
     try {
-      await matchNow(code, hostToken);
+      const result = await matchNow(code, hostToken);
+      setMatchNotice(result.pods.length === 0
+        ? t('host.noMatches', { defaultValue: 'No tables could be formed. Check that enough compatible players are ready and a table is free.' })
+        : t('host.matchesFormed', { count: result.pods.length, defaultValue: '{{count}} table(s) formed. Start a game when everyone is seated.' }));
       await refresh();
       await refreshMetrics(hostToken);
     } catch (caught) {
@@ -1385,6 +1390,7 @@ export function HostPage() {
         </div>
       </Panel>
 
+      {matchNotice ? <p role="status" className="text-sm">{matchNotice}</p> : null}
       {error ? <p className="text-danger text-sm">{error}</p> : null}
 
       <Panel title={t('host.dangerZone')} aside={t('host.irreversible')}>

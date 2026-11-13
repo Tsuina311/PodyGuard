@@ -1215,6 +1215,17 @@ export function cancelDisplayAnnouncement(
 }
 
 const ACCOUNT_SESSION_KEY = 'podyguard.account.session';
+export function getAdminPlaygroups(token: string, offset = 0) {
+  return request<{ playgroups: Playgroup[]; nextOffset: number | null }>(`/admin/playgroups?offset=${offset}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export function getAdminPlaygroup(token: string, id: string) {
+  return request<{ overview: PlaygroupOverview }>(`/admin/playgroups/${encodeURIComponent(id)}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
 const PREFERRED_PLAYGROUP_KEY = 'podyguard.account.preferredPlaygroupId';
 
 export type StoredAccountSession = {
@@ -1263,6 +1274,18 @@ export function savePreferredPlaygroupId(playgroupId: string | null) {
 
 export function loadPreferredPlaygroupId(): string | null {
   return readStored(PREFERRED_PLAYGROUP_KEY);
+}
+
+export function getGoogleSignInConfiguration() {
+  return request<{ enabled: false } | { enabled: true; clientId: string; nonce: string }>('/auth/google/config', {
+    method: 'POST', body: '{}',
+  });
+}
+
+export function signInWithGoogle(credential: string, nonce: string) {
+  return request<{ account: UserAccount; token: string; playgroups: Playgroup[] }>('/auth/google', {
+    method: 'POST', body: JSON.stringify({ credential, nonce }),
+  });
 }
 
 export function startEmailAuth(email: string, displayName?: string) {

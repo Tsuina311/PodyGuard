@@ -176,7 +176,7 @@ export function JoinPage({
           return;
         }
         recordJoinBreadcrumb('EVENT_LOOKUP_OK');
-        setEvent(loaded);
+        if (existing) setEvent(loaded);
         if (!existing) {
           if (loaded.playgroupId && loaded.showReturningPlayerSuggestions !== false) {
             try {
@@ -190,6 +190,9 @@ export function JoinPage({
               /* fall back to standard join form if suggestions fail */
             }
           }
+          // Do not flash the new-player form while returning-player suggestions
+          // load: a late response used to replace a form someone was filling.
+          if (!cancelled) setEvent(loaded);
           return;
         }
         // Ready for the form in case the seat has gone, so a player who has to
@@ -566,6 +569,16 @@ export function JoinPage({
     setBusy(true);
     setError(null);
     try {
+      // Readiness must refer to the deck currently shown in the form. Saving is
+      // deliberately awaited: a failed bracket/Commander update must not queue
+      // the participant using their previous deck.
+      if (ready && !limitedQueues) {
+        if (commanderRules && decks.some(deck => deck.commanders.length === 0)) {
+          setError(t('common.errors.chooseCommander'));
+          return;
+        }
+        await setDecks(event.joinCode, token, decks);
+      }
       const result = await setReady(event.joinCode, token, ready);
       setParticipant(result.participant);
     } catch (caught) {

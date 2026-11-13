@@ -1,6 +1,6 @@
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -45,7 +45,7 @@ describe('simulation artifacts', () => {
     expect(normalizeBaselineId('queue-v2-alpha')).toBe('queue-v2-alpha');
     expect(normalizeBaselineId('matcher-queue-v2-alpha')).toBe('queue-v2-alpha');
     expect(committedBaselinePath('queue-v2-alpha', '/tmp/baselines')).toBe(
-      '/tmp/baselines/matcher-queue-v2-alpha.json',
+      resolve('/tmp/baselines', 'matcher-queue-v2-alpha.json'),
     );
     expect(() => normalizeBaselineId('queue v2')).toThrow(/slug/);
   });

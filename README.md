@@ -29,6 +29,11 @@ Use **separate** development and production databases.
 
 ## Quick start
 
+For commit/push checks, browser failure reports, the isolated demo account and
+the read-only admin console, see [Developer testing](docs/DEVELOPER_TESTING.md).
+On Windows PowerShell this clone also supports `./yarn.cmd` when Yarn is not
+installed globally (for example `./yarn.cmd test:e2e:ui`).
+
 ```bash
 # Install dependencies
 yarn install
@@ -86,7 +91,8 @@ file and is shown next to **PodyGuard** on every screen that uses the brand
 
 **Automatic bump:** every normal `git commit` runs `.githooks/pre-commit`, which
 bumps the **patch** (`1.0.0` → `1.0.1`) and includes `VERSION` in that commit.
-Hooks are installed on `yarn install` via `prepare` (`core.hooksPath=.githooks`).
+Husky hooks are installed on `yarn install` via `prepare`. Commits run fast
+checks before the version bump; pushes run the full unit and browser suites.
 
 | Intent | How |
 |--------|-----|

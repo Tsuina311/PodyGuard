@@ -7,6 +7,8 @@ const testTimeout = Math.max(120_000, Math.ceil(propertyRuns / 400) * 120_000);
 
 export default defineConfig({
   test: {
+    reporters: ['default', 'junit'],
+    outputFile: { junit: '../../reports/shared.xml' },
     environment: 'node',
     hookTimeout: testTimeout,
     testTimeout,
