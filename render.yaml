@@ -20,10 +20,8 @@ services:
       # Optional read-only admin console; configure a random 32+ character token.
       - key: ADMIN_ACCESS_TOKEN
         sync: false
-      # Required before using production email accounts (not guest event joins).
-      - key: RESEND_API_KEY
-        sync: false
-      - key: AUTH_EMAIL_FROM
+      # Public Google OAuth web client ID; no email provider or client secret.
+      - key: GOOGLE_CLIENT_ID
         sync: false
       - key: GITHUB_FEEDBACK_TOKEN
         sync: false

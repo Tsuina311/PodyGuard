@@ -7,7 +7,6 @@ import {
 } from '@podyguard/shared';
 import { InvalidEventInputError } from '../events/validation.js';
 import { sendEventError } from './events.js';
-import { EmailDeliveryUnavailableError } from '../identity/email-delivery.js';
 
 function bearerToken(header: string | undefined): string {
   if (!header?.startsWith('Bearer ')) {
@@ -30,7 +29,6 @@ export const playgroupRoutes: FastifyPluginAsync = async (app) => {
       });
       return reply.code(200).send(result);
     } catch (error) {
-      if (error instanceof EmailDeliveryUnavailableError) return reply.code(503).send({ error: { code: error.code, message: error.message } });
       return sendEventError(reply, error);
     }
   });

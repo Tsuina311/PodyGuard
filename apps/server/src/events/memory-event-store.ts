@@ -1530,6 +1530,28 @@ export class MemoryEventStore implements EventStore {
     return created;
   }
 
+  async upsertGoogleUserAccount(input: {
+    authUserId: string; email: string; displayName: string; allowLegacyEmailLink: boolean;
+  }): Promise<StoredUserAccount | undefined> {
+    // No await between the identity checks and write: concurrent attempts cannot
+    // reassign a legacy account after its first Google binding.
+    const accounts = [...this.userAccounts.values()];
+    const bound = accounts.find(user => user.authUserId === input.authUserId);
+    if (bound) return bound;
+    const existing = accounts.find(user => user.email?.toLowerCase() === input.email);
+    if (existing) {
+      if (!input.allowLegacyEmailLink || existing.authUserId.startsWith('google:')) return undefined;
+      existing.authUserId = input.authUserId;
+      existing.updatedAt = new Date();
+      return existing;
+    }
+    const now = new Date();
+    const created = { id: randomUUID(), authUserId: input.authUserId, email: input.email,
+      displayName: input.displayName, createdAt: now, updatedAt: now };
+    this.userAccounts.set(created.id, created);
+    return created;
+  }
+
   async findUserAccountById(
     id: string,
   ): Promise<StoredUserAccount | undefined> {

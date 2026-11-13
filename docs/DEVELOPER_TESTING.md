@@ -58,12 +58,12 @@ responses. No admin mutations are provided.
 
 For local demo admin, use `local-demo-admin-token-not-for-production`.
 
-Production account login requires `RESEND_API_KEY` and `AUTH_EMAIL_FROM` on the
-API server. Verify the sender domain with Resend first. Without delivery
-configuration, sign-in returns a clear unavailable error; it never reveals a
-verification code. Development/demo retains on-screen codes. The unverified
-Neon subject compatibility endpoint is development-only.
-See https://resend.com/docs/api-reference/emails/send-email for sender/API setup.
+Production accounts use **Continue with Google**. Configure `GOOGLE_CLIENT_ID`
+on the API server; there is no email provider, client secret, or separate Vite
+setting. Follow [Google sign-in setup](GOOGLE_SIGN_IN.md) for the free development
+setup, authorized origins, test users, existing-account linking, and rehearsal.
+Production email-code and unverified Neon shortcuts are disabled. Domain tests
+and the isolated demo retain fixture helpers; the public UI offers only Google.
 
 ## Database verification
 

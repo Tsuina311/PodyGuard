@@ -147,7 +147,7 @@ import {
   tryResolveAuthenticatedAccount,
   verifyEmailAuthFlow,
 } from './playgroup-domain.js';
-import { deliverEmailCode, requireEmailDelivery } from '../identity/email-delivery.js';
+import { GoogleSignInError, type VerifiedGoogleAccount } from '../identity/google-sign-in.js';
 import {
   assertDecks,
   assertDisplayName,
@@ -3991,8 +3991,8 @@ export class EventService {
     expiresAt: string;
     devCode?: string;
   }> {
-    if (!this.options.isDev) requireEmailDelivery();
-    const result = await startEmailAuthFlow(
+    if (!this.options.isDev) throw new InvalidAccountSessionError('Use Google to sign in.');
+    return startEmailAuthFlow(
       this.store,
       {
         now: this.now(),
@@ -4000,10 +4000,6 @@ export class EventService {
       },
       input,
     );
-    if (this.options.isDev) return result;
-    await deliverEmailCode(result.email, result.devCode!, result.challengeId);
-    const { devCode: _code, ...publicResult } = result;
-    return publicResult;
   }
 
   async verifyEmailAuth(input: {
@@ -4015,12 +4011,33 @@ export class EventService {
     token: string;
     playgroups: Playgroup[];
   }> {
+    if (!this.options.isDev) throw new InvalidAccountSessionError('Use Google to sign in.');
     return verifyEmailAuthFlow(
       this.store,
       this.identity,
       { now: this.now() },
       input,
     );
+  }
+
+  async loginWithGoogleAuth(google: VerifiedGoogleAccount): Promise<{
+    account: UserAccount; token: string; playgroups: Playgroup[];
+  }> {
+    const stored = await this.store.upsertGoogleUserAccount({
+      authUserId: `google:${google.subject}`,
+      email: google.email,
+      displayName: google.name.trim().slice(0, 24) || 'Host',
+      allowLegacyEmailLink: google.authoritativeEmail,
+    });
+    if (!stored) {
+      throw new GoogleSignInError('GOOGLE_ACCOUNT_LINK_REQUIRED',
+        'This email belongs to an existing account that cannot be linked automatically. Use its original Google account or contact the host.', 409);
+    }
+    return {
+      account: toPublicUserAccount(stored),
+      token: this.identity.accountSessions.issue(stored.id).token,
+      playgroups: (await this.store.listPlaygroupsByOwner(stored.id)).map(toPublicPlaygroup),
+    };
   }
 
   async loginWithNeonAuth(input: {

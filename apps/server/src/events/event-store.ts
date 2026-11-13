@@ -849,6 +849,13 @@ export interface EventStore {
     displayName: string;
   }): Promise<StoredUserAccount>;
   findUserAccountById(id: string): Promise<StoredUserAccount | undefined>;
+  /** Bind a verified Google subject without replacing a different Google identity. */
+  upsertGoogleUserAccount(input: {
+    authUserId: string;
+    email: string;
+    displayName: string;
+    allowLegacyEmailLink: boolean;
+  }): Promise<StoredUserAccount | undefined>;
   findUserAccountByAuthUserId(
     authUserId: string,
   ): Promise<StoredUserAccount | undefined>;

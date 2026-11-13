@@ -40,12 +40,10 @@ import {
   mergeGuestProfiles,
   saveAccountSession,
   savePreferredPlaygroupId,
-  startEmailAuth,
   updateGuestProfile,
   updateMyAccount,
   updatePlaygroup,
   updateSavedDeckProfile,
-  verifyEmailAuth,
 } from './api';
 import { CommanderPicker } from './CommanderPicker';
 import type { CommanderSelection } from './scryfall';
@@ -56,6 +54,7 @@ import { Field } from './ui/Field';
 import { Panel } from './ui/Panel';
 import { ThemeToggleCorner } from './ui/ThemeToggle';
 import { cx } from './ui/cx';
+import { GoogleSignInButton } from './GoogleSignInButton';
 
 const inputClass =
   'h-10 w-full rounded-lg border border-muted/20 bg-void/70 px-3 text-sm outline-none placeholder:text-muted/50 focus:border-neon/70';
@@ -77,13 +76,6 @@ export function AccountPage() {
   const [claimableGuests, setClaimableGuests] = useState<
     Array<{ guest: GuestProfile; playgroupName: string }>
   >([]);
-
-  // Auth form state
-  const [authEmail, setAuthEmail] = useState('');
-  const [authDisplayName, setAuthDisplayName] = useState('');
-  const [authStep, setAuthStep] = useState<'email' | 'code'>('email');
-  const [authCode, setAuthCode] = useState('');
-  const [devCode, setDevCode] = useState<string | null>(null);
 
   // Playgroup & guest form state
   const [newPlaygroupName, setNewPlaygroupName] = useState('');
@@ -169,51 +161,6 @@ export function AccountPage() {
       routePlaygroupId ?? loadPreferredPlaygroupId(),
     );
   }, [refreshDashboard, routePlaygroupId, session?.token]);
-
-  async function onStartAuth(submit: FormEvent) {
-    submit.preventDefault();
-    setBusy(true);
-    setError(null);
-    try {
-      const res = await startEmailAuth(authEmail, authDisplayName);
-      setAuthStep('code');
-      if (res.devCode) {
-        setDevCode(res.devCode);
-        setAuthCode(res.devCode);
-      }
-    } catch (caught) {
-      setError(
-        caught instanceof ApiError
-          ? caught.message
-          : 'Could not start sign-in.',
-      );
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function onVerifyAuth(submit: FormEvent) {
-    submit.preventDefault();
-    setBusy(true);
-    setError(null);
-    try {
-      const res = await verifyEmailAuth(authEmail, authCode, authDisplayName);
-      const nextSession = { token: res.token, account: res.account };
-      saveAccountSession(nextSession);
-      setSession(nextSession);
-      setAccount(res.account);
-      setAuthStep('email');
-      setAuthCode('');
-      setDevCode(null);
-      await refreshDashboard(res.token);
-    } catch (caught) {
-      setError(
-        caught instanceof ApiError ? caught.message : 'Could not verify code.',
-      );
-    } finally {
-      setBusy(false);
-    }
-  }
 
   function onSignOut() {
     clearAccountSession();
@@ -363,82 +310,16 @@ export function AccountPage() {
           </p>
         </header>
 
-        {authStep === 'email' ? (
-          <Panel
-            title="Sign in or create account"
-            aside="Low-friction email code"
-            onSubmit={onStartAuth}
-          >
-            <Field
-              label="Email"
-              type="email"
-              value={authEmail}
-              onChange={(e) => setAuthEmail(e.target.value)}
-              placeholder="you@example.com"
-              autoComplete="email"
-              required
-            />
-            <Field
-              label="Display name"
-              hint="Shown when you host or play in events"
-              value={authDisplayName}
-              onChange={(e) => setAuthDisplayName(e.target.value)}
-              placeholder="Alex"
-              autoComplete="nickname"
-            />
-            <Button type="submit" variant="neon" size="lg" block disabled={busy}>
-              {busy ? 'Sending code...' : 'Continue with email'}
-            </Button>
-          </Panel>
-        ) : (
-          <Panel
-            title="Enter verification code"
-            aside={authEmail}
-            onSubmit={onVerifyAuth}
-          >
-            {devCode ? (
-              <div className="border-neon/40 bg-neon/10 mb-4 rounded-xl border p-3 text-xs">
-                <p className="text-neon font-semibold">
-                  Verification code ready: <span className="font-mono">{devCode}</span>
-                </p>
-                <p className="text-muted mt-1">
-                  Code pre-filled below for instant sign-in.
-                </p>
-              </div>
-            ) : null}
-            <Field
-              label="6-digit code"
-              value={authCode}
-              onChange={(e) => setAuthCode(e.target.value)}
-              placeholder="123456"
-              inputMode="numeric"
-              className="font-mono tracking-[0.3em]"
-              required
-            />
-            <div className="flex flex-col gap-2">
-              <Button
-                type="submit"
-                variant="neon"
-                size="lg"
-                block
-                disabled={busy}
-              >
-                {busy ? 'Signing in...' : 'Verify & sign in'}
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                block
-                onClick={() => {
-                  setAuthStep('email');
-                  setError(null);
-                }}
-              >
-                Use a different email
-              </Button>
-            </div>
-          </Panel>
-        )}
+        <Panel title="Sign in or create account">
+          <p className="text-muted mb-4 text-sm">Continue with Google to create your account or return to your saved playgroups. You can change your display name afterwards.</p>
+          <GoogleSignInButton onSignedIn={res => {
+            const nextSession = { token: res.token, account: res.account };
+            saveAccountSession(nextSession);
+            setSession(nextSession);
+            setAccount(res.account);
+            setError(null);
+          }} />
+        </Panel>
 
         {error ? <p className="text-danger text-sm">{error}</p> : null}
 
