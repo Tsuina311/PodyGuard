@@ -5,6 +5,7 @@ import { resolveAppLocale } from '../../i18n/locales';
 import { Button } from '../../ui/Button';
 import { cx } from '../../ui/cx';
 import { CURATED_BY_ID, POPULAR_RULE_IDS } from './curated';
+import { CardTextSearch } from './CardTextSearch';
 import { answerLocale, searchRules } from './search';
 import { speechLanguageOptions, speechLanguageTag } from './speech-languages';
 import type { RulesSearchHit } from './types';
@@ -17,6 +18,7 @@ export function MagicRulesSheet({ onClose }: { onClose: () => void }) {
   const { t, i18n } = useTranslation();
   const uiLocale = resolveAppLocale(i18n.language);
   const [query, setQuery] = useState('');
+  const [tab, setTab] = useState<'rules' | 'cards'>('rules');
   const [submitted, setSubmitted] = useState('');
   const [localeOverride, setLocaleOverride] = useState<string | null>(null);
   const [spoken, setSpoken] = useState(false);
@@ -75,6 +77,16 @@ export function MagicRulesSheet({ onClose }: { onClose: () => void }) {
           <X size={18} aria-hidden />
         </button>
       </header>
+
+      <div role="tablist" aria-label={t('tracker.magicRules.title')} className="flex shrink-0 gap-2 px-4 pt-3">
+        {(['rules', 'cards'] as const).map(value => <button key={value} type="button" role="tab"
+          aria-selected={tab === value} onClick={() => { speech.stop(); setTab(value); }}
+          className={cx('min-h-11 rounded-xl border px-4', tab === value ? 'border-neon text-neon' : 'border-muted/25 text-muted')}>
+          {t(`tracker.magicRules.${value}Tab`)}
+        </button>)}
+      </div>
+
+      {tab === 'cards' ? <CardTextSearch /> : <>
 
       <form
         className="shrink-0 px-4 pt-3"
@@ -254,6 +266,7 @@ export function MagicRulesSheet({ onClose }: { onClose: () => void }) {
           </div>
         ) : null}
       </div>
+      </>}
     </section>
   );
 }

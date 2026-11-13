@@ -92,6 +92,21 @@ Task branches do not publish Pages. Review and merge the PR to release.
   failed deck-save protection and empty-queue feedback.
 - Playgroups: independent returning browser sessions and saved commanders,
   results/opponents checked against API; admin access, data display and locking.
+  Saved Commander pairs cover Partner, named Partner, Friends forever,
+  Backgrounds and Doctor pairings, manual names, editing without replacing the
+  saved deck, and reuse in an actual four-player tracker.
+- Landscape tracker: a running four-player phone game checks actual seat
+  rotations, life controls, player counter sheets, portrait/landscape changes,
+  and retained life values. Screenshots are attached to the browser report.
+- Magic Rules: the Cards tab accepts names in any Scryfall-supported language
+  and displays English Oracle text (including every face). Exact names take
+  priority; partial names show up to 20 matches. No artwork is downloaded.
+  At app startup, the dedicated text cache is validated and stripped of extra
+  fields; invalid records and records older than 24 hours are discarded.
+  Up to 40 searches are retained locally for offline reuse. Existing saved
+  Commander artwork is unaffected. Adapter tests cover all 11 traditional
+  Magic print languages; the browser test covers French lookup, startup
+  cleanup, reload recovery, offline cached lookup, and retaining the game.
 - Limited: Booster Draft (8), Pick-Two Draft (4), Sealed (4), real UI joining,
   readiness, seating, phases, timer pause/resume, refresh, result corrections,
   standings and table release.

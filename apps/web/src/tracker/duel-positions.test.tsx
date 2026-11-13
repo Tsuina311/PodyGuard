@@ -409,6 +409,23 @@ describe('duel menu positions', () => {
 });
 
 describe('four-player positions stay off the duel path', () => {
+  it('faces the top two players across a landscape table and turns their counter sheets', async () => {
+    setOrientation(true);
+    renderTracker({ players: POD, storageKey: 'landscape-pod-positions', gameMode: 'commander', rulesFormat: 'commander' });
+    await revealAndStart();
+    expect(has(face('ada'), 'rotate-180')).toBe(true);
+    expect(has(face('bea'), 'rotate-180')).toBe(true);
+    expect(has(face('cam'), 'rotate-180')).toBe(false);
+    expect(has(face('dee'), 'rotate-180')).toBe(false);
+    expect(has(clock(), 'rotate-180')).toBe(false);
+    fireEvent.click(clock());
+    fireEvent.click(screen.getByRole('button', { name: 'Open counters for Ada' }));
+    expect(has(screen.getByRole('dialog', { name: 'Counters for Ada' }), 'rotate-180')).toBe(true);
+    fireEvent.click(screen.getByRole('button', { name: 'Close counters' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Open counters for Cam' }));
+    expect(has(screen.getByRole('dialog', { name: 'Counters for Cam' }), 'rotate-180')).toBe(false);
+  });
+
   it('keeps the pod grid and does not borrow duel turns, the seam, or the wide menu', async () => {
     renderTracker({
       players: POD,

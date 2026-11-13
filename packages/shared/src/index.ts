@@ -1,3 +1,6 @@
+export { parseCardText } from './card-text';
+export type { CardText, CardTextFace } from './card-text';
+
 export {
   EventStatus,
   ParticipantStatus,

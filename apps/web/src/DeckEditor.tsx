@@ -1,11 +1,8 @@
 import { COMMANDER_POOLS } from '@podyguard/shared';
 import type { CommanderSearchProfile } from '@podyguard/shared';
 import { useTranslation } from 'react-i18next';
-import { CommanderPicker } from './CommanderPicker';
-import {
-  canHaveSecondCommander,
-  type CommanderSelection,
-} from './scryfall';
+import { CommanderPairPicker } from './CommanderPairPicker';
+import type { CommanderSelection } from './scryfall';
 import { Button } from './ui/Button';
 import { cx } from './ui/cx';
 
@@ -82,35 +79,8 @@ export function DeckEditor({
           />
           {requireCommanders ? (
             <div className="mb-2 space-y-2">
-              <CommanderPicker
-                label={t('deckEditor.commander')}
-                value={row.commanders[0] ?? null}
-                disabled={disabled}
-                searchProfile={searchProfile}
-                onChange={(commander) =>
-                  update(index, {
-                    commanders: commander ? [commander] : [],
-                  })
-                }
-              />
-              {row.commanders[0] &&
-              (row.commanders[1] ||
-                canHaveSecondCommander(row.commanders[0])) ? (
-                <CommanderPicker
-                  label={t('deckEditor.secondCommander')}
-                  value={row.commanders[1] ?? null}
-                  partnerFor={row.commanders[0]}
-                  disabled={disabled}
-                  searchProfile={searchProfile}
-                  onChange={(commander) =>
-                    update(index, {
-                      commanders: commander
-                        ? [row.commanders[0]!, commander]
-                        : [row.commanders[0]!],
-                    })
-                  }
-                />
-              ) : null}
+              <CommanderPairPicker value={row.commanders} disabled={disabled} searchProfile={searchProfile}
+                onChange={commanders => update(index, { commanders })} />
             </div>
           ) : null}
           <div className="flex items-center justify-between gap-2">

@@ -45,8 +45,8 @@ import {
   updatePlaygroup,
   updateSavedDeckProfile,
 } from './api';
-import { CommanderPicker } from './CommanderPicker';
-import type { CommanderSelection } from './scryfall';
+import { CommanderPairPicker } from './CommanderPairPicker';
+import { commanderNames, type CommanderSelection } from './scryfall';
 import { Badge } from './ui/Badge';
 import { Brand } from './ui/Brand';
 import { Button } from './ui/Button';
@@ -790,9 +790,7 @@ function PlaygroupGuestCard({
 }) {
   const { guest, savedDecks, stats } = item;
   const [addingDeck, setAddingDeck] = useState(false);
-  const [pickedCommander, setPickedCommander] =
-    useState<CommanderSelection | null>(null);
-  const [manualCommanderName, setManualCommanderName] = useState('');
+  const [pickedCommanders, setPickedCommanders] = useState<CommanderSelection[]>([]);
   const [deckName, setDeckName] = useState('');
   const [bracket, setBracket] = useState<number>(3);
   const [preferred, setPreferred] = useState(false);
@@ -805,9 +803,13 @@ function PlaygroupGuestCard({
 
   async function onSaveNewCommander(e: FormEvent) {
     e.preventDefault();
-    const cmdName = pickedCommander?.name || manualCommanderName.trim();
+    const cmdName = pickedCommanders[0]?.name.trim();
     if (!cmdName) {
       onError('Choose or enter a Commander name.');
+      return;
+    }
+    if (pickedCommanders[1] && !pickedCommanders[1].name.trim()) {
+      onError('Choose or enter the second Commander name.');
       return;
     }
     setSavingDeck(true);
@@ -817,15 +819,14 @@ function PlaygroupGuestCard({
         format: 'commander',
         commanderName: cmdName,
         commanderScryfallId:
-          pickedCommander?.oracleId || pickedCommander?.cardId,
-        commanders: pickedCommander ? [pickedCommander] : undefined,
+          pickedCommanders[0]?.oracleId || pickedCommanders[0]?.cardId,
+        commanders: pickedCommanders,
         deckName: deckName.trim() || undefined,
         bracket,
         poolId: `b${bracket}`,
         preferred: preferred || savedDecks.length === 0,
       });
-      setPickedCommander(null);
-      setManualCommanderName('');
+      setPickedCommanders([]);
       setDeckName('');
       setBracket(3);
       setPreferred(false);
@@ -973,7 +974,7 @@ function PlaygroupGuestCard({
                   )}
                 >
                   <span>
-                    {deck.commanderName || deck.deckName || 'Deck'}
+                    {commanderNames(deck.commanders, deck.commanderName || deck.deckName || 'Deck')}
                   </span>
                   <span>·</span>
                   <span className="font-mono">
@@ -1058,27 +1059,8 @@ function PlaygroupGuestCard({
                 <p className="text-xs font-semibold">
                   Add Commander for {guest.displayName}
                 </p>
-                <CommanderPicker
-                  label="Search Scryfall Commander"
-                  value={pickedCommander}
-                  onChange={(cmd) => {
-                    setPickedCommander(cmd);
-                    if (cmd) setManualCommanderName(cmd.name);
-                  }}
-                />
-                {!pickedCommander ? (
-                  <div>
-                    <label className="text-muted mb-1 block text-xs">
-                      Or type Commander name directly
-                    </label>
-                    <input
-                      className={inputClass}
-                      value={manualCommanderName}
-                      onChange={(e) => setManualCommanderName(e.target.value)}
-                      placeholder="e.g. Muldrotha, the Gravetide"
-                    />
-                  </div>
-                ) : null}
+                <CommanderPairPicker primaryLabel="Search Scryfall Commander" value={pickedCommanders}
+                  onChange={setPickedCommanders} disabled={savingDeck} allowManual />
                 <div>
                   <label className="text-muted mb-1 block text-xs">
                     Deck nickname (optional)
@@ -1242,6 +1224,30 @@ function SavedDeckRowEditor({
 }) {
   const [editingDeckName, setEditingDeckName] = useState(false);
   const [deckNameDraft, setDeckNameDraft] = useState(deck.deckName ?? '');
+  const [editingCommanders, setEditingCommanders] = useState(false);
+  const [commanderDraft, setCommanderDraft] = useState<CommanderSelection[]>(deck.commanders ?? []);
+  const [savingCommanders, setSavingCommanders] = useState(false);
+
+  async function onSaveCommanders(e: FormEvent) {
+    e.preventDefault();
+    if (!commanderDraft[0]?.name.trim() || (commanderDraft[1] && !commanderDraft[1].name.trim())) {
+      onError('Choose or enter the Commander names.');
+      return;
+    }
+    onError(null);
+    setSavingCommanders(true);
+    try {
+      await updateSavedDeckProfile(token, playgroupId, guestId, deck.id, {
+        commanderName: commanderDraft[0].name.trim(),
+        commanderScryfallId: commanderDraft[0].oracleId || commanderDraft[0].cardId,
+        commanders: commanderDraft,
+      });
+      await onRefresh();
+      setEditingCommanders(false);
+    } catch (caught) {
+      onError(caught instanceof ApiError ? caught.message : 'Could not update Commanders.');
+    } finally { setSavingCommanders(false); }
+  }
 
   async function onSaveDeckName(e: FormEvent) {
     e.preventDefault();
@@ -1266,7 +1272,7 @@ function SavedDeckRowEditor({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="min-w-0">
           <p className="truncate font-semibold">
-            {deck.commanderName || deck.deckName || 'Saved Deck'}
+            {commanderNames(deck.commanders, deck.commanderName || deck.deckName || 'Saved Deck')}
           </p>
           {deck.deckName && deck.commanderName ? (
             <p className="text-muted truncate text-xs">{deck.deckName}</p>
@@ -1314,6 +1320,13 @@ function SavedDeckRowEditor({
           </button>
           <button
             type="button"
+            onClick={() => { setCommanderDraft(deck.commanders ?? []); setEditingCommanders(current => !current); }}
+            className="text-muted hover:text-ink px-1.5 text-xs"
+          >
+            Edit commanders
+          </button>
+          <button
+            type="button"
             onClick={() => {
               setDeckNameDraft(deck.deckName ?? '');
               setEditingDeckName((v) => !v);
@@ -1332,6 +1345,19 @@ function SavedDeckRowEditor({
           </button>
         </div>
       </div>
+
+      {editingCommanders ? (
+        <form onSubmit={event => void onSaveCommanders(event)} className="space-y-3">
+          <CommanderPairPicker value={commanderDraft} onChange={setCommanderDraft}
+            primaryLabel="Commander" disabled={savingCommanders} allowManual />
+          <div className="flex gap-2">
+            <Button type="submit" size="sm" variant="neon" disabled={savingCommanders}>
+              {savingCommanders ? 'Saving...' : 'Save commanders'}
+            </Button>
+            <Button type="button" size="sm" variant="ghost" disabled={savingCommanders} onClick={() => setEditingCommanders(false)}>Cancel</Button>
+          </div>
+        </form>
+      ) : null}
 
       {editingDeckName ? (
         <form onSubmit={(e) => void onSaveDeckName(e)} className="flex gap-2">
