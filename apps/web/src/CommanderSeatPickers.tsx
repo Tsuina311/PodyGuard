@@ -1,8 +1,8 @@
 import type { CommanderSearchProfile } from '@podyguard/shared';
 import { useTranslation } from 'react-i18next';
-import { CommanderPicker } from './CommanderPicker';
+import { CommanderPairPicker } from './CommanderPairPicker';
 import { cx } from './ui/cx';
-import { canHaveSecondCommander, type CommanderSelection } from './scryfall';
+import type { CommanderSelection } from './scryfall';
 
 export function emptySeatCommanders(length = 8): CommanderSelection[][] {
   return Array.from({ length }, () => []);
@@ -79,31 +79,8 @@ export function CommanderSeatPickers({
             ) : (
               <p className="text-sm font-medium">{playerLabel}</p>
             )}
-            <CommanderPicker
-              label={t('deckEditor.commander')}
-              value={seat[0] ?? null}
-              disabled={disabled}
-              searchProfile={searchProfile}
-              onChange={(commander) =>
-                setSeatCommanders(index, commander ? [commander] : [])
-              }
-            />
-            {seat[0] &&
-            (seat[1] || canHaveSecondCommander(seat[0])) ? (
-              <CommanderPicker
-                label={t('deckEditor.secondCommander')}
-                value={seat[1] ?? null}
-                partnerFor={seat[0]}
-                disabled={disabled}
-                searchProfile={searchProfile}
-                onChange={(commander) =>
-                  setSeatCommanders(
-                    index,
-                    commander ? [seat[0]!, commander] : [seat[0]!],
-                  )
-                }
-              />
-            ) : null}
+            <CommanderPairPicker value={seat} disabled={disabled} searchProfile={searchProfile}
+              onChange={value => setSeatCommanders(index, value)} />
           </div>
         );
       })}

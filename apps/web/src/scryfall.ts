@@ -11,6 +11,10 @@ export type CommanderArtwork = {
   artist?: string;
 };
 
+export function commanderNames(commanders: readonly Pick<CommanderSelection, 'name'>[] = [], fallback = ''): string {
+  return commanders.map(card => card.name.trim()).filter(Boolean).join(' + ') || fallback;
+}
+
 export function canHaveSecondCommander(
   commander: Pick<CommanderSelection, 'typeLine' | 'oracleText' | 'keywords'>,
 ): boolean {

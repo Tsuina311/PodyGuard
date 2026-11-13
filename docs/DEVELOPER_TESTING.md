@@ -92,6 +92,12 @@ Task branches do not publish Pages. Review and merge the PR to release.
   failed deck-save protection and empty-queue feedback.
 - Playgroups: independent returning browser sessions and saved commanders,
   results/opponents checked against API; admin access, data display and locking.
+  Saved Commander pairs cover Partner, named Partner, Friends forever,
+  Backgrounds and Doctor pairings, manual names, editing without replacing the
+  saved deck, and reuse in an actual four-player tracker.
+- Landscape tracker: a running four-player phone game checks actual seat
+  rotations, life controls, player counter sheets, portrait/landscape changes,
+  and retained life values. Screenshots are attached to the browser report.
 - Limited: Booster Draft (8), Pick-Two Draft (4), Sealed (4), real UI joining,
   readiness, seating, phases, timer pause/resume, refresh, result corrections,
   standings and table release.

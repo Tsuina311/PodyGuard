@@ -52,6 +52,7 @@ import { WaitTime } from './ui/WaitTime';
 import { cx } from './ui/cx';
 import { assignedDeckLine, tableForParticipant } from './match-view';
 import { TrackerView } from './tracker/TrackerView';
+import { commanderNames } from './scryfall';
 import { TournamentPlayerStatus } from './tournament/TournamentPlayerStatus';
 import { LimitedPlayerPanel } from './limited/LimitedPlayerPanel';
 import { RoundPlayerStatus } from './rounds/RoundPlayerStatus';
@@ -1307,7 +1308,7 @@ export function JoinPage({
                     >
                       <div className="min-w-0">
                         <p className="font-display truncate text-base font-bold">
-                          {deck.commanderName || deck.deckName || 'Saved Deck'}
+                          {commanderNames(deck.commanders, deck.commanderName || deck.deckName || 'Saved Deck')}
                         </p>
                         <p className="text-muted text-xs">
                           {deck.bracket

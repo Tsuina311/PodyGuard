@@ -136,6 +136,7 @@ import {
   duelSeatFaceClass,
   duelSeatPlaceClass,
   seatGridClass,
+  seatFacesAway,
   type DuelBoardLayout,
 } from './seat-layout';
 import {
@@ -1014,6 +1015,14 @@ export function TrackerView({
     ? boardLayout
     : 'wide';
 
+  function podPlayerTurnClass(playerId: string): string {
+    const index = state.players.findIndex(player => player.id === playerId);
+    return !duelBoard && landscape && index >= 0 && seatFacesAway(
+      state.players.length, index, seatLayout,
+      { archenemy: archenemyBoard, archenemyId: state.archenemyId, playerId },
+    ) ? 'rotate-180' : '';
+  }
+
   if (
     gameMode === 'assassin' &&
     Object.keys(state.assassinTargets).length === 0
@@ -1835,6 +1844,7 @@ export function TrackerView({
                   index,
                   duelBoard && !landscape,
                 ),
+                podPlayerTurnClass(player.id),
               )}
             >
             <CommanderArt
@@ -2306,6 +2316,7 @@ export function TrackerView({
         ? createPortal(
             <LifeAmountPad
               sign={lifeEntry.sign}
+              turnClass={podPlayerTurnClass(lifeEntry.playerId)}
               playerName={
                 state.players.find((player) => player.id === lifeEntry.playerId)
                   ?.name ?? 'player'
@@ -2345,6 +2356,7 @@ export function TrackerView({
                   open,
                   inBoardOverlayClass(
                     'z-50 bg-void/95 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] backdrop-blur-sm',
+                    podPlayerTurnClass(seat.id),
                   ),
                 )}
                 onClick={(event) => {
@@ -2383,7 +2395,7 @@ export function TrackerView({
                   counterIndex,
                   !landscape,
                 )
-              : '';
+              : podPlayerTurnClass(counterPlayer.id);
             const counterSideways = counterTurn.includes('h-[100dvw]');
             return counterSideways
               ? cx(
@@ -4326,11 +4338,13 @@ function LifeButton({
 function LifeAmountPad({
   sign,
   playerName,
+  turnClass = '',
   onConfirm,
   onClose,
 }: {
   sign: 1 | -1;
   playerName: string;
+  turnClass?: string;
   onConfirm: (amount: number) => void;
   onClose: () => void;
 }) {
@@ -4351,6 +4365,7 @@ function LifeAmountPad({
       }
       className={trackerOverlayClass(
         'z-[80] items-center justify-center bg-void/95 p-4 backdrop-blur-md',
+        turnClass,
       )}
       onClick={(event) => {
         if (event.target === event.currentTarget) {

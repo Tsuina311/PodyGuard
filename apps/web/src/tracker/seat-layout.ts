@@ -112,8 +112,8 @@ export function seatGridClass(
 }
 
 /**
- * Which seats sit across the table in a wide pod. The board no longer rotates
- * those seats; the flag remains for placement tests.
+ * Which seats sit across the table in a landscape pod. Their inner face and
+ * player sheets turn 180 degrees while the grid and center clock stay fixed.
  */
 export function seatFacesAway(
   count: number,
