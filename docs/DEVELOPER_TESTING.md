@@ -87,7 +87,8 @@ Task branches do not publish Pages. Review and merge the PR to release.
 
 - Commander: four-player joining, bracket changes, readiness, matching, starting,
   tracker life changes, undo, refresh recovery, result recording and playgroup
-  history, then a second event with the same saved players and Commanders;
+  history, two complete games at the same physical table with fresh trackers
+  for all four players, then another event with the saved players and Commanders;
   failed deck-save protection and empty-queue feedback.
 - Playgroups: independent returning browser sessions and saved commanders,
   results/opponents checked against API; admin access, data display and locking.

@@ -42,6 +42,34 @@ function waitForSnapshot(
 }
 
 describe('event live snapshots', () => {
+  it('returns success when cancelling a live event and notifies connected watchers', async () => {
+    const app = await buildTestApp();
+    await app.listen({ host: '127.0.0.1', port: 0 });
+    const address = app.server.address();
+    const port = typeof address === 'object' && address ? address.port : 0;
+    const created = await app.inject({ method: 'POST', url: '/events',
+      payload: { name: 'Cancellation rehearsal', hostPin: '2468', tableCount: 1 } });
+    const { event, hostToken } = created.json();
+    const socket = ioClient(`http://127.0.0.1:${port}`, { transports: ['websocket'] });
+    try {
+      await new Promise<void>((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error('watcher did not connect')), 4000);
+        socket.on('connect', () => socket.emit('watch', event.joinCode));
+        socket.once('snapshot', () => { clearTimeout(timer); resolve(); });
+      });
+      const missing = new Promise<void>((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error('closed event was not announced')), 4000);
+        socket.once('event-missing', () => { clearTimeout(timer); resolve(); });
+      });
+      const cancelled = await app.inject({ method: 'POST', url: `/events/${event.joinCode}/host/cancel`,
+        headers: { authorization: `Bearer ${hostToken}` } });
+      await missing;
+      expect(cancelled.statusCode).toBe(200);
+      expect(cancelled.json().event.status).toBe('closed');
+      expect((await app.inject({ method: 'GET', url: `/events/${event.joinCode}` })).statusCode).toBe(404);
+    } finally { socket.close(); await app.close(); }
+  });
+
   it('pushes a snapshot to watchers when a player joins', async () => {
     const app = await buildTestApp();
     await app.listen({ host: '127.0.0.1', port: 0 });

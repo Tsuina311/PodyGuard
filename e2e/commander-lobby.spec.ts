@@ -108,6 +108,8 @@ for (const changeBracket of [false, true]) {
         { status: 'occupied', seatedNames: expect.arrayContaining(['Ada', 'Bea', 'Cal', 'Host']) },
       ]);
       await page.getByRole('button', { name: 'Start game', exact: true }).click();
+      const playingTable = (await (await page.request.get(`/api/events/${code}/tables`)).json()).tables[0];
+      expect(playingTable.playingStartedAt).toBeTruthy();
       await page.getByRole('tab', { name: 'Play', exact: true }).click();
       for (const player of [...friends, page]) {
         await expect(player.getByText('Match found', { exact: true })).toBeVisible();
@@ -137,10 +139,15 @@ for (const changeBracket of [false, true]) {
         await expect.poll(() => page.evaluate(({ key, seatId }) => {
           const saved = JSON.parse(localStorage.getItem(key) ?? 'null');
           return saved?.players?.find((player: { id: string; life: number }) => player.id === seatId)?.life;
-        }, { key: `podyguard.tracker.${code}.${eventTables[0].id}`, seatId })).toBe(39);
+        }, { key: `podyguard.tracker.${code}.${eventTables[0].id}.${playingTable.playingStartedAt}`, seatId })).toBe(39);
         await page.reload();
         await page.getByRole('tab', { name: 'Play', exact: true }).click();
         await expect(page.locator('article[data-seat-id]').first().getByText('39', { exact: true })).toBeVisible();
+      });
+      await test.step('Other players retain a changed tracker until the first game finishes', async () => {
+        const friendSeat = friends[0]!.locator('article[data-seat-id]').first();
+        await friendSeat.getByRole('button', { name: /^Remove 1 life/ }).click();
+        await expect(friendSeat.getByText('39', { exact: true })).toBeVisible();
       });
       await test.step('Finish a game and verify playgroup history exactly once', async () => {
         const reveal = page.getByRole('button', { name: /^Show seat controls/ });
@@ -165,6 +172,31 @@ for (const changeBracket of [false, true]) {
         const tables = await page.request.get(`/api/events/${code}/tables`);
         expect((await tables.json()).tables[0].status).toBe('free');
       });
+      await test.step('A second game at the same table starts fresh for every player', async () => {
+        await page.getByRole('tab', { name: 'Desk', exact: true }).click();
+        await expect(page.getByText('4 ready', { exact: true }).first()).toBeVisible();
+        await page.getByRole('button', { name: 'Match now', exact: true }).click();
+        await page.getByRole('button', { name: 'Start game', exact: true }).click();
+        await page.getByRole('tab', { name: 'Play', exact: true }).click();
+        for (const player of [...friends, page]) {
+          await expect(player.getByText('Match found', { exact: true })).toBeVisible();
+          await player.getByRole('button', { name: 'Use game tracker', exact: true }).click();
+          await expect(player.getByRole('heading', { name: 'Ready to begin' })).toBeVisible();
+          await player.getByRole('button', { name: 'Reveal starting player', exact: true }).click();
+          await expect(player.getByText('40', { exact: true })).toHaveCount(4);
+          await player.getByRole('button', { name: 'Start', exact: true }).click();
+          await expect(player.getByRole('button', { name: 'Start', exact: true })).toHaveCount(0);
+        }
+        const controls = page.getByRole('button', { name: /^Show seat controls/ });
+        if (await controls.isVisible()) await controls.click();
+        await page.getByRole('button', { name: /^Match menu\./ }).click();
+        await page.getByRole('button', { name: 'Game won by', exact: true }).click();
+        await page.getByRole('button', { name: 'Seat 1', exact: true }).click();
+        await page.getByRole('button', { name: 'Yes, they won', exact: true }).click();
+        await page.getByRole('button', { name: 'Done & requeue', exact: true }).click();
+        const overview = await page.request.get(`/api/playgroups/${groupId}`, { headers: { Authorization: `Bearer ${demo.token}` } });
+        expect((await overview.json()).overview.recordedGamesCount).toBe(2);
+      });
       await test.step('The same playgroup returns for another event with its saved Commanders', async () => {
         const nextCode = await createConstructedEvent(page, {
           name: 'Next Commander night', baseModeLabel: 'Multiplayer', commanderRules: true,
@@ -186,7 +218,7 @@ for (const changeBracket of [false, true]) {
         const roster = await page.request.get(`/api/events/${nextCode}/participants`);
         expect((await roster.json()).participants).toHaveLength(4);
         const overview = await page.request.get(`/api/playgroups/${groupId}`, { headers: { Authorization: `Bearer ${demo.token}` } });
-        expect((await overview.json()).overview.recordedGamesCount).toBe(1);
+        expect((await overview.json()).overview.recordedGamesCount).toBe(2);
       });
     } finally {
       await Promise.all(friends.map((friend) => friend.context().close()));
