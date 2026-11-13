@@ -207,11 +207,13 @@ export const gameNightRoutes: FastifyPluginAsync<{
           if (!night) return reply.code(404).send();
           const token = bearer(req.headers.authorization);
           await host(token, night.playgroupId);
-          if (night.eventJoinCode)
+          if (night.eventJoinCode) {
+            const event = await app.events.getEvent(night.eventJoinCode);
             return {
-              event: await app.events.getEvent(night.eventJoinCode),
-              hostToken: token,
+              event,
+              hostToken: app.identity.hostEventSessions.issue(event.id).token,
             };
+          }
           const recovered = await app.events.findGameNightEvent(
             night.playgroupId,
             night.id,
@@ -219,7 +221,11 @@ export const gameNightRoutes: FastifyPluginAsync<{
           );
           if (recovered) {
             await store.update(night.id, { eventJoinCode: recovered.joinCode });
-            return { event: recovered, hostToken: token };
+            return {
+              event: recovered,
+              hostToken: app.identity.hostEventSessions.issue(recovered.id)
+                .token,
+            };
           }
           if (!fresh(night))
             return reply.code(409).send({

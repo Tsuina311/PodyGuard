@@ -170,6 +170,10 @@ describe('game nights', () => {
       ),
     );
     expect(results.map((r) => r.statusCode)).toEqual([200, 200]);
+    for (const response of results) {
+      expect(response.json().hostToken).toMatch(/^hs1\./);
+      expect(response.json().hostToken).not.toBe(token);
+    }
     const event = results[0]!.json().event;
     expect(results[1]!.json().event.id).toBe(event.id);
     expect(event.pregameAgreement).toEqual(input().agreement);
@@ -208,6 +212,7 @@ describe('game nights', () => {
       payload: { hostPin: '2468' },
     });
     expect(retry.statusCode).toBe(200);
+    expect(retry.json().hostToken).toMatch(/^hs1\./);
     expect(retry.json().event.id).toBe(recovered!.id);
   });
   it('rejects another owner starting a night and malformed responses', async () => {
