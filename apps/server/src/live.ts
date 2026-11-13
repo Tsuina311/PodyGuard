@@ -6,6 +6,7 @@ import {
   type EventSnapshot,
   type PublicDisplayEventState,
 } from '@podyguard/shared';
+import { EventNotFoundError } from './events/event-store.js';
 
 export type EventLive = {
   publish(joinCode: string): Promise<void>;
@@ -28,7 +29,16 @@ export function attachLive(app: FastifyInstance): EventLive {
         return;
       }
       const code = normalizeJoinCode(joinCode);
-      const snapshot = await app.events.getSnapshot(code);
+      let snapshot: EventSnapshot;
+      try {
+        snapshot = await app.events.getSnapshot(code);
+      } catch (error) {
+        // Cancellation expires the join code before publishing. Notify watchers
+        // instead of turning a successful cancellation into an HTTP 404.
+        if (!(error instanceof EventNotFoundError)) throw error;
+        io.to(roomName(code)).emit('event-missing');
+        return;
+      }
       io.to(roomName(code)).emit('snapshot', snapshot satisfies EventSnapshot);
 
       try {

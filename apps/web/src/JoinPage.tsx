@@ -281,6 +281,11 @@ export function JoinPage({
   }, []);
 
   const [liveRetryNonce, setLiveRetryNonce] = useState(0);
+
+  // Tracker choice belongs to this game, not every future game at the table.
+  useEffect(() => {
+    if (participant?.status !== 'playing') setShowTracker(false);
+  }, [participant?.status]);
   const liveStatus = useEventLive(
     event?.joinCode,
     Boolean(event && token),
@@ -740,6 +745,9 @@ export function JoinPage({
     displayName.trim().length > 0 &&
     (limitedQueues || decksComplete);
   const matchTable = tableForParticipant(snapshot, participant);
+  // A physical table is reused throughout the evening. Each started game needs
+  // its own saved tracker, while refreshes during that game keep the same key.
+  const trackerKey = `podyguard.tracker.${event?.joinCode ?? ''}.${matchTable?.id ?? participant?.id ?? ''}.${matchTable?.playingStartedAt ?? 'pending'}`;
   const challengeProgress = Object.fromEntries(
     (snapshot?.participants ?? []).map((row) => [
       row.id,
@@ -792,7 +800,8 @@ export function JoinPage({
     return (
       <>
         <TrackerView
-          storageKey={`podyguard.tracker.${event?.joinCode ?? ''}.${matchTable?.id ?? participant.id}`}
+          key={trackerKey}
+          storageKey={trackerKey}
           players={(snapshot?.participants ?? [])
             .filter((row) => row.tableLabel === participant.tableLabel)
             .map((row) => ({
