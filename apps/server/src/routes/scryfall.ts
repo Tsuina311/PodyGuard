@@ -23,6 +23,18 @@ export const scryfallRoutes: FastifyPluginAsync<ScryfallRoutesOptions> = async (
 ) => {
   const client = options.client ?? new ScryfallClient();
 
+  app.get('/scryfall/card-text', async (request, reply) => {
+    const search = stringQuery((request.query as Record<string, unknown>).q) ?? '';
+    if (!search || search.length > 200) {
+      return reply.code(400).send(errorBody('INVALID_SCRYFALL_QUERY', 'Enter a card name (up to 200 characters).'));
+    }
+    try {
+      return { cards: await client.searchCardText(search) };
+    } catch (error) {
+      return sendScryfallError(reply, error);
+    }
+  });
+
   app.get('/scryfall/commanders', async (request, reply) => {
     const query = request.query as Record<string, unknown>;
     const search = stringQuery(query.q) ?? stringQuery(query.query) ?? '';

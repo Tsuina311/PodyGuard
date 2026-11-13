@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { HashRouter, useNavigate } from 'react-router-dom';
 import './i18n';
 import { App } from './App';
+import { verifyCardTextCache } from './card-text-cache';
 import {
   getSessionDiagnosticId,
   recordJoinBreadcrumb,
@@ -73,6 +74,7 @@ if (!rootElement) {
   throw new Error('Root element #root not found');
 }
 
+verifyCardTextCache();
 recordJoinBreadcrumb('PAGE_BOOT', getSessionDiagnosticId());
 
 createRoot(rootElement).render(

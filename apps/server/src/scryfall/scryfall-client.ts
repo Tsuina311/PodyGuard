@@ -1,4 +1,4 @@
-import type { CommanderSearchProfile, CommanderSelection } from '@podyguard/shared';
+import type { CardText, CardTextFace, CommanderSearchProfile, CommanderSelection } from '@podyguard/shared';
 
 const DEFAULT_BASE_URL = 'https://api.scryfall.com';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1_000;
@@ -17,6 +17,11 @@ type ScryfallImageUris = {
 };
 
 type ScryfallCardFace = {
+  mana_cost?: string;
+  power?: string;
+  toughness?: string;
+  loyalty?: string;
+  defense?: string;
   name?: string;
   oracle_id?: string;
   oracle_text?: string;
@@ -24,7 +29,7 @@ type ScryfallCardFace = {
   image_uris?: ScryfallImageUris;
 };
 
-type ScryfallCard = {
+type ScryfallCard = ScryfallCardFace & {
   id: string;
   oracle_id?: string;
   name: string;
@@ -133,6 +138,52 @@ export class ScryfallClient {
       .filter((card): card is CommanderSelection => card !== null);
     this.setCached(cacheKey, result);
     return result;
+  }
+
+  async searchCardText(query: string): Promise<CardText[]> {
+    const cacheKey = `text:${query.trim().toLowerCase()}`;
+    const cached = this.getCached<CardText[]>(cacheKey);
+    if (cached) return cached;
+    const url = new URL('/cards/search', this.baseUrl);
+    // Quoting prevents a card name from being interpreted as search operators.
+    url.searchParams.set('q', `!"${escapeSearchValue(query.trim())}" lang:any`);
+    url.searchParams.set('include_multilingual', 'true');
+    url.searchParams.set('unique', 'cards');
+    url.searchParams.set('order', 'name');
+    let response: ScryfallList;
+    try {
+      response = await this.requestJson<ScryfallList>(url.toString());
+    } catch (error) {
+      if (!(error instanceof ScryfallNotFoundError)) throw error;
+      url.searchParams.set('q', `name:"${escapeSearchValue(query.trim())}" lang:any`);
+      try {
+        response = await this.requestJson<ScryfallList>(url.toString());
+      } catch (fallbackError) {
+        if (fallbackError instanceof ScryfallNotFoundError) return [];
+        throw fallbackError;
+      }
+    }
+    const seen = new Set<string>();
+    const cards: CardText[] = [];
+    for (const card of response.data) {
+      const oracleId = requireOracleId(card, card.card_faces?.[0]);
+      if (seen.has(oracleId)) continue;
+      seen.add(oracleId);
+      const faces = (card.card_faces?.length ? card.card_faces : [card]).map((face): CardTextFace => ({
+        name: face.name ?? card.name,
+        manaCost: face.mana_cost ?? '',
+        typeLine: face.type_line ?? '',
+        // oracle_text is English even when the matching printed_name isn't.
+        oracleText: face.oracle_text ?? '',
+        power: face.power ?? '', toughness: face.toughness ?? '',
+        loyalty: face.loyalty ?? '', defense: face.defense ?? '',
+      }));
+      cards.push({ oracleId, name: card.name, faces });
+      if (cards.length === 20) break;
+    }
+    // Never retain the full upstream objects (or their image URLs) here.
+    this.setCached(cacheKey, cards);
+    return cards;
   }
 
   async artworkVariants(input: {

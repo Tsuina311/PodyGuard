@@ -249,6 +249,12 @@ export function setDecks(
   );
 }
 
+export function searchCardText(query: string) {
+  return request<{ cards: import('@podyguard/shared').CardText[] }>(
+    `/scryfall/card-text?${new URLSearchParams({ q: query })}`,
+  );
+}
+
 export function searchCommanders(
   query: string,
   partnerFor?: string,
