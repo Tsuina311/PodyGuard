@@ -103,7 +103,8 @@ for (const changeBracket of [false, true]) {
       await page.getByRole('button', { name: 'Match now', exact: true }).click();
       await expect(page.getByRole('button', { name: 'Start game', exact: true })).toHaveCount(1);
       const tables = await page.request.get(`/api/events/${code}/tables`);
-      expect((await tables.json()).tables).toMatchObject([
+      const eventTables = (await tables.json()).tables;
+      expect(eventTables).toMatchObject([
         { status: 'occupied', seatedNames: expect.arrayContaining(['Ada', 'Bea', 'Cal', 'Host']) },
       ]);
       await page.getByRole('button', { name: 'Start game', exact: true }).click();
@@ -128,7 +129,15 @@ for (const changeBracket of [false, true]) {
         await page.getByRole('button', { name: 'Undo', exact: true }).click();
         await page.getByRole('button', { name: 'Close match menu', exact: true }).click();
         await expect(page.getByText('40', { exact: true })).toHaveCount(4);
-        await seat.getByRole('button', { name: /^Remove 1 life/ }).click();
+        const removeLife = seat.getByRole('button', { name: /^Remove 1 life/ });
+        await expect(removeLife).toBeEnabled();
+        await removeLife.click();
+        await expect(seat.getByText('39', { exact: true })).toBeVisible();
+        const seatId = await seat.getAttribute('data-seat-id');
+        await expect.poll(() => page.evaluate(({ key, seatId }) => {
+          const saved = JSON.parse(localStorage.getItem(key) ?? 'null');
+          return saved?.players?.find((player: { id: string; life: number }) => player.id === seatId)?.life;
+        }, { key: `podyguard.tracker.${code}.${eventTables[0].id}`, seatId })).toBe(39);
         await page.reload();
         await page.getByRole('tab', { name: 'Play', exact: true }).click();
         await expect(page.locator('article[data-seat-id]').first().getByText('39', { exact: true })).toBeVisible();

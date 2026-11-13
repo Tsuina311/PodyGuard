@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useLayoutEffect,
   useMemo,
   useReducer,
   useRef,
@@ -908,7 +909,10 @@ export function TrackerView({
     roleCheckOpen;
   const [lifeClickGuard, setLifeClickGuard] = useState(false);
   const lifeOverlayWasOpen = useRef(false);
-  useEffect(() => {
+  // Close the overlay -> tap-guard transition before paint. A passive effect
+  // briefly enabled the buttons before disabling them again, so a fast tap
+  // could begin on an enabled button and be discarded on pointer-up.
+  useLayoutEffect(() => {
     if (lifeBlockedByOverlay) {
       lifeOverlayWasOpen.current = true;
       setLifeClickGuard(false);
