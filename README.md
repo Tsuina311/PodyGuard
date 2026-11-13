@@ -2,6 +2,11 @@
 
 Live matchmaking for casual multiplayer tabletop events (first game: Magic: The Gathering Commander).
 
+Plan a game night with your playgroup, share guest RSVP links and calendar
+downloads, and carry an optional pregame agreement into your event. Hosts can
+preview pods and see compatibility, repeat opponents and waiting explanations.
+See [Game-night planning and reliability checks](docs/GAME_NIGHTS.md).
+
 ## Stack
 
 - **Web:** React, TypeScript, Vite (local)

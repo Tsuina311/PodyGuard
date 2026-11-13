@@ -1,4 +1,5 @@
 import {
+  parsePregameAgreement,
   challengeInPack,
   cloneOfficialPack,
   emptyPrivatePack,
@@ -207,6 +208,8 @@ export type LimitedResultInput = {
 };
 
 export type CreateEventInput = {
+  gameNightId?: string | null;
+  pregameAgreement?: import('@podyguard/shared').PregameAgreement;
   name: string;
   hostPin: string;
   tableCount: number;
@@ -271,10 +274,33 @@ export class EventService {
     private readonly options: EventServiceOptions = {},
   ) {}
 
+  async findGameNightEvent(
+    playgroupId: string,
+    gameNightId: string,
+    accountToken: string,
+  ) {
+    await requireOwnedPlaygroup(
+      this.store,
+      this.identity,
+      accountToken,
+      playgroupId,
+    );
+    const event = (await this.store.listEventsByPlaygroup(playgroupId)).find(
+      (e) => e.gameNightId === gameNightId,
+    );
+    return event ? this.presentEvent(event) : undefined;
+  }
+
   async createEvent(
     input: CreateEventInput,
     accountToken?: string,
   ): Promise<CreateEventResult> {
+    let pregameAgreement;
+    try {
+      pregameAgreement = parsePregameAgreement(input.pregameAgreement);
+    } catch (error) {
+      throw new InvalidEventInputError((error as Error).message);
+    }
     const name = assertEventName(input.name);
     const hostPin = assertHostPin(input.hostPin);
     let ownerUserId: string | null = null;
@@ -383,6 +409,8 @@ export class EventService {
           name,
           joinCode: generateJoinCode(),
           hostCredentialHash,
+          pregameAgreement,
+          gameNightId: input.gameNightId,
           gameMode,
           rulesFormat,
           allowThreePods,
@@ -3812,7 +3840,7 @@ export class EventService {
     return created;
   }
 
-  private async runMatch(eventId: string): Promise<PublicPod[]> {
+  private async buildMatchPlan(eventId: string) {
     const [tables, people, decks, history, event] = await Promise.all([
       this.store.listTables(eventId),
       this.store.listParticipants(eventId),
@@ -3849,6 +3877,67 @@ export class EventService {
       { groups: history },
       matchOptions,
     );
+    return { result, ready, people, event, history, freeTables };
+  }
+
+  async previewMatches(joinCode: string, hostToken: string) {
+    const event = await this.requireHostToken(joinCode, hostToken);
+    assertRollingMatchAllowed(event);
+    if (event.tournamentState)
+      throw new InvalidEventInputError(
+        'Use the tournament schedule for tournament pairings.',
+      );
+    const { result, ready, people, history, freeTables } =
+      await this.buildMatchPlan(event.id);
+    const pods = result.matches.map((match) => {
+      const ids = match.seats.map((seat) => seat.participantId);
+      let repeatPairs = 0;
+      for (let a = 0; a < ids.length; a += 1)
+        for (let b = a + 1; b < ids.length; b += 1) {
+          if (
+            history.some(
+              (group) => group.includes(ids[a]!) && group.includes(ids[b]!),
+            )
+          )
+            repeatPairs += 1;
+        }
+      return {
+        tableLabel: freeTables.find((t) => t.id === match.tableId)?.label ?? '',
+        poolId: match.poolId,
+        playerNames: ids.map(
+          (id) => people.find((p) => p.id === id)!.displayName,
+        ),
+        repeatPairs,
+        longestWaitSeconds: Math.max(
+          0,
+          ...ready
+            .filter((p) => ids.includes(p.id))
+            .map((p) =>
+              Math.floor(
+                (this.now().getTime() - (p.readyAt ?? p.createdAt).getTime()) /
+                  1000,
+              ),
+            ),
+        ),
+      };
+    });
+    const waiting = result.unmatchedIds.map((id) => ({
+      displayName: people.find((p) => p.id === id)!.displayName,
+      reason:
+        freeTables.length <= result.matches.length
+          ? ('NO_FREE_TABLE' as const)
+          : ('NO_COMPATIBLE_POD' as const),
+    }));
+    return {
+      pods,
+      waiting,
+      readyCount: ready.length,
+      freeTableCount: freeTables.length,
+    };
+  }
+
+  private async runMatch(eventId: string): Promise<PublicPod[]> {
+    const { result, people, event } = await this.buildMatchPlan(eventId);
     const created: PublicPod[] = [];
     for (const match of result.matches) {
       const treacheryRoles =
@@ -5007,6 +5096,7 @@ function toPublicEvent(
   return {
     id: event.id,
     name: event.name,
+    pregameAgreement: event.pregameAgreement ?? {},
     joinCode: event.joinCode,
     status: event.status,
     gameMode: event.gameMode,

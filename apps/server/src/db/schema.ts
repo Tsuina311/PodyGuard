@@ -283,6 +283,8 @@ export const savedDeckProfiles = pgTable(
 );
 
 export const events = pgTable('events', {
+  gameNightId: uuid('game_night_id').unique(),
+  pregameAgreement: jsonb('pregame_agreement').$type<{ pace?: 'relaxed' | 'focused'; durationMinutes?: number; notes?: string }>().notNull().default({}),
   id: uuid('id').defaultRandom().primaryKey(),
   publicJoinCode: text('public_join_code').notNull().unique(),
   name: text('name').notNull(),
@@ -997,3 +999,23 @@ export const gameRecordParticipants = pgTable(
 );
 
 
+
+export const gameNights = pgTable('game_nights', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  playgroupId: uuid('playgroup_id').notNull().references(() => playgroups.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
+  timeZone: text('time_zone').notNull(),
+  location: text('location').notNull(),
+  seatTarget: integer('seat_target').notNull(),
+  agreement: jsonb('agreement').$type<{ pace?: 'relaxed' | 'focused'; durationMinutes?: number; notes?: string }>().notNull().default({}),
+  cancelled: boolean('cancelled').notNull().default(false),
+  eventJoinCode: text('event_join_code'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, table => [index('game_nights_playgroup_idx').on(table.playgroupId)]);
+export const gameNightRsvps = pgTable('game_night_rsvps', {
+  nightId: uuid('night_id').notNull().references(() => gameNights.id, { onDelete: 'cascade' }),
+  tokenHash: text('token_hash').notNull(),
+  displayName: text('display_name').notNull(),
+  response: text('response').$type<'yes' | 'maybe' | 'no'>().notNull(),
+}, table => [uniqueIndex('game_night_rsvp_unique').on(table.nightId, table.tokenHash)]);

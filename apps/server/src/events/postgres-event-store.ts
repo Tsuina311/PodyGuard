@@ -112,6 +112,8 @@ export class PostgresEventStore implements EventStore {
           tournamentState: input.tournamentState ?? null,
           limitedModeConfigs: input.limitedModeConfigs ?? [],
           operationMode: input.operationMode ?? 'ROLLING',
+          gameNightId: input.gameNightId ?? null,
+          pregameAgreement: input.pregameAgreement ?? {},
           roundState: input.roundState ?? null,
           ownerUserId: input.ownerUserId ?? null,
           playgroupId: input.playgroupId ?? null,
@@ -793,7 +795,8 @@ export class PostgresEventStore implements EventStore {
         .select()
         .from(pods)
         .where(eq(pods.id, podId))
-        .limit(1);
+        .limit(1)
+        .for('update');
       if (!pod || (pod.status !== 'formed' && pod.status !== 'playing')) {
         throw new PodNotFoundError();
       }
@@ -3539,6 +3542,8 @@ function mapEvent(row: typeof events.$inferSelect): StoredEvent {
   return {
     id: row.id,
     name: row.name,
+    gameNightId: row.gameNightId,
+    pregameAgreement: row.pregameAgreement,
     joinCode: row.publicJoinCode,
     status: row.status,
     gameMode: row.gameMode,

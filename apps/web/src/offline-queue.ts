@@ -65,29 +65,44 @@ export function isOfflineError(error: unknown): boolean {
   return error instanceof ApiError && error.status === 0;
 }
 
-export async function flushPending(
+const flushing = new Map<string, Promise<void>>();
+
+export function flushPending(
   joinCode: string,
   send: (op: PendingOp) => Promise<void>,
 ): Promise<void> {
-  const queue = listPending(joinCode);
-  if (queue.length === 0) {
-    return;
-  }
-  const remaining: PendingOp[] = [];
-  for (const op of queue) {
-    try {
-      await send(op);
-    } catch (error) {
-      remaining.push(op);
-      if (isOfflineError(error)) {
-        remaining.push(...queue.slice(queue.indexOf(op) + 1));
-        break;
+  // An online event and a React refresh can arrive together. Only one replay
+  // may consume a queue in this tab. Persist each acknowledgement immediately.
+  const active = flushing.get(joinCode);
+  if (active) return active;
+  const replay = async () => {
+    const queue = listPending(joinCode);
+    let removed = 0;
+    for (let index = 0; index < queue.length; index += 1) {
+      try {
+        await send(queue[index]!);
+      } catch {
+        // Keep this operation and everything after it, preserving dependencies.
+        return;
       }
+      const current = listPending(joinCode);
+      const position = index - removed;
+      // Keep operations appended while the request was in flight. If the
+      // queue was explicitly cleared/replaced, do not remove a different op.
+      if (JSON.stringify(current[position]) !== JSON.stringify(queue[index]))
+        return;
+      current.splice(position, 1);
+      removed += 1;
+      write(joinCode, current.length ? JSON.stringify(current) : null);
     }
-  }
-  if (remaining.length === 0) {
-    clearPending(joinCode);
-  } else {
-    write(joinCode, JSON.stringify(remaining));
-  }
+  };
+  const task = Promise.resolve()
+    .then(async () => {
+      if (typeof navigator !== 'undefined' && navigator.locks)
+        await navigator.locks.request(`podyguard.pending.${joinCode}`, replay);
+      else await replay();
+    })
+    .finally(() => flushing.delete(joinCode));
+  flushing.set(joinCode, task);
+  return task;
 }

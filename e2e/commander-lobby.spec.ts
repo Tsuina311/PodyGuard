@@ -100,6 +100,9 @@ for (const changeBracket of [false, true]) {
 
       await page.getByRole('tab', { name: 'Desk', exact: true }).click();
       await expect(page.getByText('4 ready', { exact: true }).first()).toBeVisible();
+      await page.getByRole('button', { name: 'Preview pods', exact: true }).click();
+      await expect(page.getByRole('heading', { name: 'Proposed pods', exact: true })).toBeVisible();
+      await expect(page.getByText(/0 repeat opponent pair/)).toBeVisible();
       await page.getByRole('button', { name: 'Match now', exact: true }).click();
       await expect(page.getByRole('button', { name: 'Start game', exact: true })).toHaveCount(1);
       const tables = await page.request.get(`/api/events/${code}/tables`);

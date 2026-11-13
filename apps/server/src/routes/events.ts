@@ -1583,6 +1583,13 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
     },
   );
 
+  app.get('/events/:joinCode/match-preview', async (request, reply) => {
+    const { joinCode } = request.params as { joinCode: string };
+    reply.header('Cache-Control', 'no-store');
+    try { return await app.events.previewMatches(joinCode, bearerToken(request.headers.authorization)); }
+    catch (error) { return sendEventError(reply, error); }
+  });
+
   app.post('/events/:joinCode/match', async (request, reply) => {
     const { joinCode } = request.params as { joinCode: string };
     try {

@@ -55,6 +55,7 @@ import {
 } from './table-authority.js';
 
 export class MemoryEventStore implements EventStore {
+  private completingPods = new Set<string>();
   private readonly events = new Map<string, StoredEvent>();
   private readonly byJoinCode = new Map<string, string>();
   private readonly participants = new Map<string, StoredParticipant[]>();
@@ -102,6 +103,8 @@ export class MemoryEventStore implements EventStore {
       preferredPodSize: input.preferredPodSize ?? 4,
       tournamentFormat: input.tournamentFormat ?? null,
       tournamentState: input.tournamentState ?? null,
+      gameNightId: input.gameNightId ?? null,
+      pregameAgreement: input.pregameAgreement ?? {},
       limitedModeConfigs: input.limitedModeConfigs ?? [],
       operationMode: input.operationMode ?? 'ROLLING',
       roundState: input.roundState ?? null,
@@ -539,46 +542,52 @@ export class MemoryEventStore implements EventStore {
     podId: string,
     result: CompletePodInput = {},
   ): Promise<StoredPod> {
-    const pod = this.findPod(podId);
-    if (!pod || (pod.status !== 'formed' && pod.status !== 'playing')) {
-      throw new PodNotFoundError();
-    }
-    const assignments = this.assignments.get(pod.eventId) ?? [];
-    const memberIds = assignments
-      .filter((row) => row.podId === pod.id)
-      .map((row) => row.participantId);
-    const groups = this.history.get(pod.eventId) ?? [];
-    groups.push(memberIds);
-    this.history.set(pod.eventId, groups);
-    for (const assignment of assignments.filter((row) => row.podId === pod.id)) {
-      const participant = await this.findParticipantById(assignment.participantId);
-      if (!participant) {
-        continue;
+    if (this.completingPods.has(podId)) throw new PodNotFoundError();
+    this.completingPods.add(podId);
+    try {
+      const pod = this.findPod(podId);
+      if (!pod || (pod.status !== 'formed' && pod.status !== 'playing')) {
+        throw new PodNotFoundError();
       }
-      participant.status = result.requeue === false ? 'joined' : 'ready';
-      participant.readyAt = result.requeue === false ? null : new Date();
-    }
-    this.assignments.set(
-      pod.eventId,
-      assignments.filter((row) => row.podId !== pod.id),
-    );
-    const released = await this.releaseTableIfOwned({
-      tableId: pod.tableId,
-      ownerType: 'POD',
-      ownerId: pod.id,
-    });
-    if (!released) {
-      const table = await this.findTableById(pod.tableId);
-      if (table && !this.tableReservations.has(table.id)) {
-        table.status = 'free';
+      const assignments = this.assignments.get(pod.eventId) ?? [];
+      const memberIds = assignments
+        .filter((row) => row.podId === pod.id)
+        .map((row) => row.participantId);
+      const groups = this.history.get(pod.eventId) ?? [];
+      groups.push(memberIds);
+      this.history.set(pod.eventId, groups);
+      for (const assignment of assignments.filter((row) => row.podId === pod.id)) {
+        const participant = await this.findParticipantById(assignment.participantId);
+        if (!participant) {
+          continue;
+        }
+        participant.status = result.requeue === false ? 'joined' : 'ready';
+        participant.readyAt = result.requeue === false ? null : new Date();
       }
+      this.assignments.set(
+        pod.eventId,
+        assignments.filter((row) => row.podId !== pod.id),
+      );
+      const released = await this.releaseTableIfOwned({
+        tableId: pod.tableId,
+        ownerType: 'POD',
+        ownerId: pod.id,
+      });
+      if (!released) {
+        const table = await this.findTableById(pod.tableId);
+        if (table && !this.tableReservations.has(table.id)) {
+          table.status = 'free';
+        }
+      }
+      pod.status = 'completed';
+      pod.playerNames = [];
+      pod.winnerParticipantId = result.winnerParticipantId ?? null;
+      pod.durationSeconds = result.durationSeconds ?? null;
+      pod.completedAt = new Date();
+      return pod;
+    } finally {
+      this.completingPods.delete(podId);
     }
-    pod.status = 'completed';
-    pod.playerNames = [];
-    pod.winnerParticipantId = result.winnerParticipantId ?? null;
-    pod.durationSeconds = result.durationSeconds ?? null;
-    pod.completedAt = new Date();
-    return pod;
   }
 
   async cancelPod(podId: string): Promise<StoredPod> {
