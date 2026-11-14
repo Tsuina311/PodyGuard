@@ -350,11 +350,21 @@ export function JoinPage({
       ? `/host/${event.joinCode}`
       : `/e/${event.joinCode}`;
     if (participant.status === 'playing' && showTracker) {
-      rememberActiveMatch(path);
+      rememberActiveMatch(path, {
+        format:
+          event.rulesFormat === 'commander'
+            ? `${event.gameMode} · Commander`
+            : event.gameMode,
+        eventName: event.name,
+        tableLabel: participant.tableLabel,
+        players: (snapshot?.participants ?? [])
+          .filter((row) => row.tableLabel === participant.tableLabel)
+          .map((row) => row.displayName),
+      });
     } else if (participant.status !== 'playing') {
       forgetActiveMatch(path);
     }
-  }, [embeddedHost, event, participant, showTracker]);
+  }, [embeddedHost, event, participant, showTracker, snapshot]);
 
   useEffect(() => {
     embeddedHost?.onTrackerActiveChange?.(

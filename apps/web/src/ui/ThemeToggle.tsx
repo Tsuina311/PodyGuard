@@ -44,13 +44,21 @@ export function setAppTheme(theme: Theme): void {
  */
 export function ThemeToggleCorner({
   feedbackContext,
+  placement = 'fixed',
 }: {
   feedbackContext?: FeedbackContextDetails;
+  placement?: 'fixed' | 'inline';
 }) {
   const { t } = useTranslation();
   const { openFeedback } = useFeedback();
   return (
-    <div className="fixed top-[max(0.75rem,env(safe-area-inset-top))] right-[max(0.75rem,env(safe-area-inset-right))] z-50 flex items-center gap-2">
+    <div
+      className={
+        placement === 'inline'
+          ? 'flex shrink-0 items-center gap-2'
+          : 'fixed top-[max(0.75rem,env(safe-area-inset-top))] right-[max(0.75rem,env(safe-area-inset-right))] z-50 flex items-center gap-2'
+      }
+    >
       <LanguageSwitcher align="end" />
       <button
         type="button"
@@ -91,9 +99,7 @@ export function ThemeToggle() {
 
   const nextTheme = theme === 'dark' ? 'light' : 'dark';
   const switchLabel =
-    nextTheme === 'light'
-      ? t('theme.switchToLight')
-      : t('theme.switchToDark');
+    nextTheme === 'light' ? t('theme.switchToLight') : t('theme.switchToDark');
 
   return (
     <button

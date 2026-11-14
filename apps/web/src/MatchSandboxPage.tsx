@@ -49,9 +49,16 @@ export function MatchSandboxPage() {
 
   useEffect(() => {
     if (showTracker) {
-      rememberActiveMatch('/match');
+      rememberActiveMatch('/match', {
+        format:
+          config.rulesFormat === 'commander'
+            ? `${config.gameMode} · Commander`
+            : config.gameMode,
+        players: players.map((player) => player.name),
+        storageKey: trackerStorageKey(config),
+      });
     }
-  }, [showTracker]);
+  }, [showTracker, config, players]);
 
   const participant: PublicParticipant = {
     id: players[0]?.id ?? 'sandbox-1',
