@@ -31,12 +31,54 @@ test('home summarizes the actual saved game and confirms cancellation', async ({
   await page.getByPlaceholder('Player 2').fill('Bea');
   await page.getByRole('button', { name: 'Start game', exact: true }).click();
   await page.waitForURL(/#\/match$/);
+  // A hash change can precede React's commit and persistence effects. Leave
+  // only after the tracker is rendered and its resumable game has been saved.
+  await expect(
+    page.getByRole('heading', { name: 'Ready to begin' }),
+  ).toBeVisible();
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const details = JSON.parse(
+          localStorage.getItem('podyguard.active-match.details') ?? 'null',
+        );
+        return {
+          path: localStorage.getItem('podyguard.active-match'),
+          players: details?.players,
+          hasProgress: Boolean(
+            details?.storageKey && localStorage.getItem(details.storageKey),
+          ),
+        };
+      }),
+    )
+    .toEqual({ path: '/match', players: ['Ada', 'Bea'], hasProgress: true });
   await page.goto('/');
   const card = page.getByRole('region', { name: 'ongoing game' });
   await expect(card).toContainText('Ada, Bea');
   await expect(card).toContainText('duel');
   await card.getByRole('button', { name: 'Resume game' }).click();
   await page.waitForURL(/#\/match$/);
+  // A hash change can precede React's commit and persistence effects. Leave
+  // only after the tracker is rendered and its resumable game has been saved.
+  await expect(
+    page.getByRole('heading', { name: 'Ready to begin' }),
+  ).toBeVisible();
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const details = JSON.parse(
+          localStorage.getItem('podyguard.active-match.details') ?? 'null',
+        );
+        return {
+          path: localStorage.getItem('podyguard.active-match'),
+          players: details?.players,
+          hasProgress: Boolean(
+            details?.storageKey && localStorage.getItem(details.storageKey),
+          ),
+        };
+      }),
+    )
+    .toEqual({ path: '/match', players: ['Ada', 'Bea'], hasProgress: true });
   await page.goto('/');
   await card.getByRole('button', { name: 'Cancel game', exact: true }).click();
   await card.getByRole('button', { name: 'Keep game' }).click();
