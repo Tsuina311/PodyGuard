@@ -1,3 +1,5 @@
+import { gameNightRoutes } from './game-nights/routes.js';
+import { MemoryGameNightStore, PostgresGameNightStore, type GameNightStore } from './game-nights/store.js';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import rateLimit from '@fastify/rate-limit';
@@ -29,6 +31,7 @@ import { scryfallRoutes } from './routes/scryfall.js';
 import type { ScryfallClient } from './scryfall/scryfall-client.js';
 
 export type BuildAppOptions = {
+  gameNightStore?: GameNightStore;
   identity?: IdentityBoundary;
   events?: EventService;
   displays?: DisplayService;
@@ -97,6 +100,7 @@ export async function buildApp(options: BuildAppOptions = {}) {
   });
   await app.register(eventRoutes);
   await app.register(playgroupRoutes);
+  await app.register(gameNightRoutes, { store: options.gameNightStore ?? (options.events ? new MemoryGameNightStore() : new PostgresGameNightStore()) });
   await app.register(googleAuthRoutes);
   await app.register(adminRoutes);
   await app.register(displayRoutes);

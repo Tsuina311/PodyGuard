@@ -1,3 +1,4 @@
+import { GameNightPage } from './game-nights/GameNights';
 import { useEffect, useState } from 'react';
 import { Link, Navigate, Route, Routes, useMatch, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -80,6 +81,7 @@ export function App() {
         >
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/nights/:id" element={<GameNightPage />} />
             <Route path="/account" element={<AccountPage />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/playgroups/:playgroupId" element={<AccountPage />} />

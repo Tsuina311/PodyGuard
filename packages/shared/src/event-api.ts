@@ -18,6 +18,7 @@ import type { GameDurationHint } from './table-availability-hint';
 export type { GameDurationHint } from './table-availability-hint';
 
 export type PublicEvent = {
+  pregameAgreement?: import('@podyguard/shared').PregameAgreement;
   id: string;
   name: string;
   joinCode: string;

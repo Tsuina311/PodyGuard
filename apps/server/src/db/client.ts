@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { setDefaultResultOrder } from 'node:dns';
 import { neonConfig, Pool } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
@@ -16,6 +17,7 @@ type Db = ReturnType<typeof drizzle<typeof schema>>;
 
 let pool: Pool | undefined;
 let dbInstance: Db | undefined;
+const transactionContext = new AsyncLocalStorage<Db>();
 
 function getPool(): Pool {
   if (!pool) {
@@ -29,10 +31,22 @@ function getPool(): Pool {
 }
 
 export function getDb(): Db {
+  const transaction = transactionContext.getStore();
+  if (transaction) return transaction;
   if (!dbInstance) {
     dbInstance = drizzle({ client: getPool(), schema });
   }
   return dbInstance;
+}
+
+/** Run existing stores on one connection, including nested store transactions.
+ * AsyncLocalStorage isolates concurrent requests and restores the normal DB on
+ * exit. Drizzle transactions support the query/transaction operations used by
+ * our stores; the adapter stays internal to this database boundary. */
+export async function withDbTransaction<T>(work: () => Promise<T>): Promise<T> {
+  return getDb().transaction((tx) =>
+    transactionContext.run(tx as unknown as Db, work),
+  );
 }
 
 export async function checkDatabaseConnection(): Promise<boolean> {

@@ -1,3 +1,7 @@
+import { MatchPreviewPanel } from './game-nights/MatchPreviewPanel';
+import { Agreement } from './game-nights/Agreement';
+import type { MatchPreview } from '@podyguard/shared';
+import { request } from './api';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -88,6 +92,7 @@ export function HostPage() {
   const [limitedSnapshot, setLimitedSnapshot] = useState<EventSnapshot | null>(null);
   const [hostPin, setHostPin] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [preview, setPreview] = useState<MatchPreview | null>(null);
   const [matchNotice, setMatchNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -371,6 +376,21 @@ export function HostPage() {
     }
   }
 
+  async function onPreviewMatch() {
+    if (!hostToken) return;
+    setBusy(true);
+    setError(null);
+    try {
+      setPreview(await request<MatchPreview>(`/events/${code}/match-preview`, {
+        headers: { Authorization: `Bearer ${hostToken}` },
+      }));
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Could not preview pods.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function onMatch() {
     if (!hostToken) {
       return;
@@ -380,6 +400,7 @@ export function HostPage() {
     setMatchNotice(null);
     try {
       const result = await matchNow(code, hostToken);
+      setPreview(null);
       setMatchNotice(result.pods.length === 0
         ? t('host.noMatches', { defaultValue: 'No tables could be formed. Check that enough compatible players are ready and a table is free.' })
         : t('host.matchesFormed', { count: result.pods.length, defaultValue: '{{count}} table(s) formed. Start a game when everyone is seated.' }));
@@ -1369,13 +1390,18 @@ export function HostPage() {
             </p>
           ) : !event.tournament ||
             event.tournament.phase === 'in-progress' ? (
-            <Button disabled={busy} onClick={() => void onMatch()}>
-              {busy
-                ? t('common.working')
-                : event.tournament
-                  ? t('tournament.schedule')
-                  : t('host.matchNow')}
-            </Button>
+            <>
+              {!event.tournament ? (
+                <Button disabled={busy} onClick={() => void onPreviewMatch()}>Preview pods</Button>
+              ) : null}
+              <Button disabled={busy} onClick={() => void onMatch()}>
+                {busy
+                  ? t('common.working')
+                  : event.tournament
+                    ? t('tournament.schedule')
+                    : t('host.matchNow')}
+              </Button>
+            </>
           ) : null}
           {import.meta.env.DEV ? (
             <Button
@@ -1390,6 +1416,10 @@ export function HostPage() {
         </div>
       </Panel>
 
+      <Agreement agreement={event?.pregameAgreement} />
+      {preview ? (
+        <MatchPreviewPanel preview={preview} busy={busy} onConfirm={() => void onMatch()} onClose={() => setPreview(null)} />
+      ) : null}
       {matchNotice ? <p role="status" className="text-sm">{matchNotice}</p> : null}
       {error ? <p className="text-danger text-sm">{error}</p> : null}
 

@@ -6,7 +6,7 @@ test('demo account remembers friends, commanders, results and opponents after a 
   expect(response.ok()).toBe(true);
   const demo = await response.json();
   for (let visit = 0; visit < 2; visit++) {
-    const context = await browser.newContext();
+    const context = await browser.newContext({ serviceWorkers: 'block' });
     try {
       const page = await context.newPage();
       await prepareApp(page);

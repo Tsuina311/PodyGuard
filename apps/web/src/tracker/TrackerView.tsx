@@ -2209,7 +2209,7 @@ export function TrackerView({
             send({ type: 'action', action: { type: 'begin' } })
           }
           className={cx(
-            'bg-neon text-void hover:bg-neon/90 z-30 flex min-h-16 min-w-28 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full px-6 font-display text-lg font-bold shadow-[0_10px_30px_-8px_var(--color-void)] transition tablet:min-h-20 tablet:min-w-36 tablet:text-2xl',
+            'bg-action text-void hover:brightness-95 z-30 flex min-h-16 min-w-28 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full px-6 font-display text-lg font-bold shadow-[0_10px_30px_-8px_var(--color-void)] transition tablet:min-h-20 tablet:min-w-36 tablet:text-2xl',
             matchDialStackClass(),
             clockPositionClass(state.players.length),
             duelClockFaceClass(duelBoard && activeBoardLayout === 'wide' && !landscape),

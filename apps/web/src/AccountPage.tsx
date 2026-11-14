@@ -1,3 +1,4 @@
+import { GameNightsPanel } from './game-nights/GameNights';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
@@ -634,6 +635,7 @@ function PlaygroupDetailSection({
 
   return (
     <>
+      <GameNightsPanel key={overview.playgroup.id} playgroupId={overview.playgroup.id} token={token} />
       <Panel
         title={overview.playgroup.name}
         aside={`${overview.playerCount} players · ${overview.recordedGamesCount} recorded games`}

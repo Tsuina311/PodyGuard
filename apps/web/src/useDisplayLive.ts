@@ -18,6 +18,7 @@ export function useDisplayLive(
     const options = {
       path: '/socket.io',
       transports: ['websocket', 'polling'],
+      tryAllTransports: true,
     };
     const socket = remote === '' ? io(options) : io(remote, options);
 

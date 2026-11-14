@@ -1,3 +1,4 @@
+import { Agreement } from './game-nights/Agreement';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -891,6 +892,8 @@ export function JoinPage({
           {event?.joinCode ?? joinCode.toUpperCase()}
         </p>
       </header>
+
+      <Agreement agreement={event?.pregameAgreement} />
 
       {participant && token ? (
         <Panel

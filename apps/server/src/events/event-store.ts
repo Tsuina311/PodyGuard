@@ -297,6 +297,8 @@ export type UpsertStoredGameRecordInput = {
 };
 
 export type StoredEvent = {
+  gameNightId?: string | null;
+  pregameAgreement?: import('@podyguard/shared').PregameAgreement;
   id: string;
   name: string;
   joinCode: string;
@@ -452,6 +454,8 @@ export type StoredTable = {
 };
 
 export type NewStoredEvent = {
+  gameNightId?: string | null;
+  pregameAgreement?: import('@podyguard/shared').PregameAgreement;
   name: string;
   joinCode: string;
   hostCredentialHash: string;
