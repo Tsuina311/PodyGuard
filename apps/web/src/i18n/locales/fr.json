@@ -675,7 +675,14 @@
     "joinCodePlaceholder": "AB23CD",
     "join": "Rejoindre",
     "scanQr": "Scanner le QR",
-    "staleJoin": "Cet événement n'existe plus. Rejoignez avec un nouveau code ou organisez une nouvelle soirée."
+    "staleJoin": "Cet événement n'existe plus. Rejoignez avec un nouveau code ou organisez une nouvelle soirée.",
+    "eventGame": "Partie en événement",
+    "localGame": "Partie locale · enregistrée sur cet appareil",
+    "gamePlayers": "{{count}} joueurs",
+    "cancelGame": "Annuler la partie",
+    "cancelGamePrompt": "Supprimer cette partie enregistrée ? La progression sera supprimée. Aucun résultat ne sera enregistré.",
+    "keepGame": "Garder la partie",
+    "confirmCancelGame": "Supprimer la partie"
   },
   "host": {
     "desk": "Bureau hôte",
