@@ -75,7 +75,13 @@ select both locally with E2E_BROWSERS=chromium,webkit. Install
 both engines with `yarn playwright install --with-deps chromium webkit`.
 The new game-night browser flow checks creation, guest response/reload/change,
 calendar download, ownership, agreement transfer and an automated WCAG audit.
-WebKit runs the real-origin-outage recovery journey. Chromium also runs a
+Normal browser journeys block service workers so mocked identity/catalogue
+requests reach Playwright routes consistently across engines. Manually created
+guest contexts use the same policy. The two dedicated offline specs explicitly
+allow real workers; this policy does not change the deployed app. Commander
+fixture names include the project so shared memory-server data stays distinct.
+
+WebKit runs the real-origin-outage recovery journey in offline-origin.spec.ts. Chromium also runs a
 separate browser network-offline emulation test: WebKit's emulated offline reload
 can fail internally before app code executes. Both recovery tests require the
 saved life total to survive and life controls to keep working. Browser failures

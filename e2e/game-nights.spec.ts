@@ -40,7 +40,7 @@ test('friends plan a night, change an RSVP, export a calendar and start with the
     page.getByRole('heading', { name: 'Before we play' }),
   ).toBeVisible();
   const invite = page.url();
-  const guestContext = await browser.newContext();
+  const guestContext = await browser.newContext({ serviceWorkers: 'block' });
   try {
     const guest = await guestContext.newPage();
     await prepareApp(guest);

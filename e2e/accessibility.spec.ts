@@ -11,7 +11,7 @@ test('the player join screen has accessible form controls', async ({
     baseModeLabel: 'Duel',
     commanderRules: false,
   });
-  const context = await browser.newContext();
+  const context = await browser.newContext({ serviceWorkers: 'block' });
   try {
     const guest = await context.newPage();
     await prepareApp(guest);

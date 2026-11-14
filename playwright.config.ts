@@ -26,6 +26,9 @@ export default defineConfig({
   use: {
     baseURL,
     locale: 'en-US',
+    // Request-mocking journeys must not race native service-worker routing.
+    // Dedicated offline specs opt back in and exercise real workers.
+    serviceWorkers: 'block',
     actionTimeout: 15_000,
     trace: 'retain-on-failure',
     video: 'retain-on-failure',
@@ -54,7 +57,7 @@ export default defineConfig({
     {
       name: 'webkit',
       testMatch:
-        /(?:game-nights|commander-lobby|google-sign-in|quick-play|direct-play-transfer)\.spec\.ts/,
+        /(?:game-nights|commander-lobby|google-sign-in|quick-play|direct-play-transfer|offline-origin)\.spec\.ts/,
       use: { ...devices['iPhone 13'], locale: 'en-US' },
     },
   ].filter((project) => browsers.split(',').includes(project.name)),

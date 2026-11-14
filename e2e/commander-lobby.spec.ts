@@ -45,7 +45,7 @@ for (const changeBracket of [false, true]) {
   test(`one-table Commander: three friends + host${changeBracket ? ' changing B2 to B3 before ready' : ''} can match and start`, async ({ page, browser, baseURL }) => {
     test.setTimeout(120_000);
     const demo = await (await page.request.get('/test/demo')).json();
-    const groupName = `Commander history ${changeBracket ? 'changed' : 'standard'} ${test.info().repeatEachIndex}-${test.info().retry}`;
+    const groupName = `Commander history ${changeBracket ? 'changed' : 'standard'} ${test.info().project.name} ${test.info().repeatEachIndex}-${test.info().retry}`;
     const groupResponse = await page.request.post('/api/playgroups', {
       headers: { Authorization: `Bearer ${demo.token}` }, data: { name: groupName },
     });
@@ -74,6 +74,7 @@ for (const changeBracket of [false, true]) {
     try {
       for (const name of ['Ada', 'Bea', 'Cal']) {
         const context = await browser.newContext({
+          serviceWorkers: 'block',
           viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true,
         });
         const friend = await context.newPage();
