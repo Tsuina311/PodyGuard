@@ -30,6 +30,7 @@ import {
 } from './api';
 import { emptySeatCommanders } from './CommanderSeatPickers';
 import { activeMatchPath } from './active-match';
+import { OngoingGame } from './OngoingGame';
 import {
   defaultHostLimitedConfigs,
   limitedConfigsForEventCreate,
@@ -79,7 +80,7 @@ export function HomePage() {
   const navigate = useNavigate();
   const staleJoin =
     (useLocation().state as { staleJoin?: boolean } | null)?.staleJoin === true;
-  const ongoingMatch = activeMatchPath();
+  const [ongoingMatch, setOngoingMatch] = useState(activeMatchPath);
   const [tab, setTab] = useState<HomeTab>('play');
   const [formatTab, setFormatTab] = useState<FormatTab>('constructed');
   const [scannerOpen, setScannerOpen] = useState(false);
@@ -465,18 +466,22 @@ export function HomePage() {
 
   return (
     <>
-      <ThemeToggleCorner />
       <header className="mb-1">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="mb-3 flex flex-wrap items-center gap-2">
           <Brand />
+          <div className="ml-auto sm:order-3">
+            <ThemeToggleCorner placement="inline" />
+          </div>
           <Link
             to="/account"
-            className="border-muted/25 bg-hull/60 text-muted hover:border-neon/50 hover:text-neon inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold transition"
+            className="border-muted/25 bg-hull/60 text-muted hover:border-neon/50 hover:text-neon inline-flex min-h-11 min-w-0 max-w-full items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold transition sm:order-2 sm:ml-auto sm:max-w-[16rem]"
           >
-            <Users size={14} aria-hidden />
-            {accountSession
-              ? `${accountSession.account.displayName} · Playgroups`
-              : 'Host Account & Playgroups'}
+            <Users size={14} className="shrink-0" aria-hidden />
+            <span className="min-w-0 break-words">
+              {accountSession
+                ? `${accountSession.account.displayName} · Playgroups`
+                : 'Host Account & Playgroups'}
+            </span>
           </Link>
         </div>
         <h1 className="font-display text-3xl leading-[1.05] font-bold tracking-tight text-balance sm:text-4xl">
@@ -487,6 +492,8 @@ export function HomePage() {
           {t('home.taglineAfter')}
         </h1>
       </header>
+
+      <OngoingGame onChange={() => setOngoingMatch(activeMatchPath())} />
 
       <div
         role="tablist"
@@ -570,11 +577,11 @@ export function HomePage() {
               {t('home.constructed')}
             </span>
           }
-          aside={
-            ongoingMatch ? t('home.ongoingGame') : t('home.noEventNeeded')
-          }
+          aside={t('home.noEventNeeded')}
         >
-          <p className="text-muted mb-3 text-sm">{t('home.startPlayingHint')}</p>
+          <p className="text-muted mb-3 text-sm">
+            {t('home.startPlayingHint')}
+          </p>
           <CommanderRulesSwitch
             value={playCommander}
             onChange={setPlayCommanderToggle}
@@ -586,9 +593,7 @@ export function HomePage() {
             onChange={pickPlayBaseMode}
           />
           <p className="text-muted mb-3 text-xs">
-            {t(
-              modeHintKey(playResolved.gameMode, playResolved.rulesFormat),
-            )}
+            {t(modeHintKey(playResolved.gameMode, playResolved.rulesFormat))}
           </p>
           <p className="text-muted mb-2 text-xs font-medium tracking-[0.14em] uppercase">
             {t('common.players')}
@@ -659,39 +664,15 @@ export function HomePage() {
               </div>
             </div>
           ) : null}
-          {ongoingMatch ? (
-            <>
-              <Button
-                type="button"
-                variant="neon"
-                size="lg"
-                block
-                onClick={() => void navigate(ongoingMatch)}
-              >
-                {t('home.resumeGame')}
-              </Button>
-              <Button
-                type="button"
-                variant="glass"
-                size="lg"
-                block
-                className="mt-2"
-                onClick={startTracker}
-              >
-                {t('home.startNewGame')}
-              </Button>
-            </>
-          ) : (
-            <Button
-              type="button"
-              variant="neon"
-              size="lg"
-              block
-              onClick={startTracker}
-            >
-              {t('home.startGame')}
-            </Button>
-          )}
+          <Button
+            type="button"
+            variant="neon"
+            size="lg"
+            block
+            onClick={startTracker}
+          >
+            {ongoingMatch ? t('home.startNewGame') : t('home.startGame')}
+          </Button>
         </Panel>
       ) : null}
 
