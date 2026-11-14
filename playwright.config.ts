@@ -21,6 +21,7 @@ export default defineConfig({
     ['list'],
     ['html', { open: 'never' }],
     ['junit', { outputFile: 'reports/e2e.xml' }],
+    ...(process.env.CI ? [['./e2e/ci-reporter.ts'] as [string]] : []),
   ],
   use: {
     baseURL,

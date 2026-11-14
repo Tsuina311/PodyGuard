@@ -77,6 +77,8 @@ jobs:
       - run: yarn install --immutable
       - run: yarn workspace @podyguard/web build
       - run: yarn playwright install --with-deps chromium webkit
+      - name: Verify browser failure reporting
+        run: yarn test:browser-reporter
       - name: Commander, playgroups and Limited browser journeys
         run: yarn playwright test
       - name: Upload browser evidence

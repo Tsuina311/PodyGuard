@@ -45,7 +45,8 @@
     "demo": "yarn workspace @podyguard/web build && node --import tsx e2e/serve.mjs",
     "test:fast": "yarn workspace @podyguard/shared test --exclude src/rounds.property.test.ts && yarn workspace @podyguard/matching test && yarn workspace @podyguard/server test && yarn workspace @podyguard/web test",
     "test:persistence": "node --import tsx scripts/check-persistence.mjs",
-    "test:coverage": "node scripts/run-coverage.mjs"
+    "test:coverage": "node scripts/run-coverage.mjs",
+    "test:browser-reporter": "node --import tsx --test e2e/ci-reporter.check.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

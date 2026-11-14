@@ -32,6 +32,7 @@
   --color-muted: #8ba6c9;
   --color-beam: #38bdf8;
   --color-neon: #22d3ee;
+  --color-action: #22d3ee;
   --color-plasma: #6366f1;
   --color-danger: #fda4af;
   --color-warning: #fcd34d;
@@ -58,6 +59,8 @@
     --color-muted: #58708f;
     --color-beam: #0284c7;
     --color-neon: #0891b2;
+    /* Solid buttons need 4.5:1 at compact text sizes, not just large text. */
+    --color-action: #0e7490;
     --color-plasma: #4f46e5;
     --color-danger: #e11d48;
     --color-warning: #b45309;

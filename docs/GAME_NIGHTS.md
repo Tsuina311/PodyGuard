@@ -75,6 +75,13 @@ select both locally with E2E_BROWSERS=chromium,webkit. Install
 both engines with `yarn playwright install --with-deps chromium webkit`.
 The new game-night browser flow checks creation, guest response/reload/change,
 calendar download, ownership, agreement transfer and an automated WCAG audit.
+WebKit runs the real-origin-outage recovery journey. Chromium also runs a
+separate browser network-offline emulation test: WebKit's emulated offline reload
+can fail internally before app code executes. Both recovery tests require the
+saved life total to survive and life controls to keep working. Browser failures
+and flaky retries are annotated in the GitHub run summary as well as retained
+in the existing HTML/JUnit report. The quick-play accessibility audit covers
+both themes at compact and wide viewport sizes.
 Physical Safari/Android checks remain necessary for camera access, installation,
 keyboard/touch behavior, screen locking and actual Google login.
 

@@ -14,9 +14,9 @@ export async function dismissWakeIfPresent(page: Page): Promise<void> {
   }
 }
 
-export async function openHome(page: Page): Promise<void> {
+export async function openHome(page: Page, homeUrl = '/'): Promise<void> {
   await prepareApp(page);
-  await page.goto('/');
+  await page.goto(homeUrl);
   await dismissWakeIfPresent(page);
   await expect(page.getByRole('tab', { name: 'Host event' })).toBeVisible({
     timeout: 30_000,
@@ -51,9 +51,10 @@ export async function openQuickPlaySetup(
   options: {
     baseModeLabel: string;
     commanderRules: boolean;
+    homeUrl?: string;
   },
 ): Promise<void> {
-  await openHome(page);
+  await openHome(page, options.homeUrl);
   await page.getByRole('tab', { name: 'Start playing' }).click();
   await page.getByRole('tab', { name: 'Constructed' }).click();
   await pickConstructedMode(page, options);
