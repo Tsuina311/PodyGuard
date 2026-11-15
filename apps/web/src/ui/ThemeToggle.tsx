@@ -1,3 +1,5 @@
+import { Link, useLocation } from 'react-router-dom';
+import { BookOpen } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { MessageSquare, Moon, Sun } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -51,6 +53,7 @@ export function ThemeToggleCorner({
 }) {
   const { t } = useTranslation();
   const { openFeedback } = useFeedback();
+  const location = useLocation();
   return (
     <div
       className={
@@ -59,6 +62,7 @@ export function ThemeToggleCorner({
           : 'fixed top-[max(0.75rem,env(safe-area-inset-top))] right-[max(0.75rem,env(safe-area-inset-right))] z-50 flex items-center gap-2'
       }
     >
+      <Link to="/tools" state={{ returnTo: location.pathname + location.search }} aria-label="Magic Rules and card translation" title="Magic Rules and card translation" className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-muted/25 bg-hull/80 text-muted hover:text-neon"><BookOpen size={17} aria-hidden /></Link>
       <LanguageSwitcher align="end" />
       <button
         type="button"

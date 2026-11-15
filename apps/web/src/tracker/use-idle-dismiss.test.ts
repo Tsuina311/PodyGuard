@@ -2,17 +2,9 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  COMMANDER_DAMAGE_IDLE_CLOSE_MS,
   SEAT_CONTROLS_HIDE_MS,
   useIdleDismiss,
 } from './use-idle-dismiss';
-
-describe('commander / seat chrome timing', () => {
-  it('hides the damage sheet and dial chrome after the same few seconds', () => {
-    expect(COMMANDER_DAMAGE_IDLE_CLOSE_MS).toBe(4000);
-    expect(SEAT_CONTROLS_HIDE_MS).toBe(4000);
-  });
-});
 
 describe('useIdleDismiss', () => {
   beforeEach(() => {
@@ -26,12 +18,12 @@ describe('useIdleDismiss', () => {
   it('closes after the idle window when opened and left alone', () => {
     const onDismiss = vi.fn();
     renderHook(() =>
-      useIdleDismiss(true, onDismiss, COMMANDER_DAMAGE_IDLE_CLOSE_MS),
+      useIdleDismiss(true, onDismiss, SEAT_CONTROLS_HIDE_MS),
     );
 
     expect(onDismiss).not.toHaveBeenCalled();
     act(() => {
-      vi.advanceTimersByTime(COMMANDER_DAMAGE_IDLE_CLOSE_MS - 1);
+      vi.advanceTimersByTime(SEAT_CONTROLS_HIDE_MS - 1);
     });
     expect(onDismiss).not.toHaveBeenCalled();
     act(() => {
@@ -43,17 +35,17 @@ describe('useIdleDismiss', () => {
   it('restarts the idle window on each bump (damage tap)', () => {
     const onDismiss = vi.fn();
     const { result } = renderHook(() =>
-      useIdleDismiss(true, onDismiss, COMMANDER_DAMAGE_IDLE_CLOSE_MS),
+      useIdleDismiss(true, onDismiss, SEAT_CONTROLS_HIDE_MS),
     );
 
     act(() => {
-      vi.advanceTimersByTime(COMMANDER_DAMAGE_IDLE_CLOSE_MS - 200);
+      vi.advanceTimersByTime(SEAT_CONTROLS_HIDE_MS - 200);
     });
     act(() => {
       result.current();
     });
     act(() => {
-      vi.advanceTimersByTime(COMMANDER_DAMAGE_IDLE_CLOSE_MS - 1);
+      vi.advanceTimersByTime(SEAT_CONTROLS_HIDE_MS - 1);
     });
     expect(onDismiss).not.toHaveBeenCalled();
     act(() => {
@@ -66,18 +58,18 @@ describe('useIdleDismiss', () => {
     const onDismiss = vi.fn();
     const { rerender } = renderHook(
       ({ active }) =>
-        useIdleDismiss(active, onDismiss, COMMANDER_DAMAGE_IDLE_CLOSE_MS),
+        useIdleDismiss(active, onDismiss, SEAT_CONTROLS_HIDE_MS),
       { initialProps: { active: false } },
     );
 
     act(() => {
-      vi.advanceTimersByTime(COMMANDER_DAMAGE_IDLE_CLOSE_MS * 2);
+      vi.advanceTimersByTime(SEAT_CONTROLS_HIDE_MS * 2);
     });
     expect(onDismiss).not.toHaveBeenCalled();
 
     rerender({ active: true });
     act(() => {
-      vi.advanceTimersByTime(COMMANDER_DAMAGE_IDLE_CLOSE_MS);
+      vi.advanceTimersByTime(SEAT_CONTROLS_HIDE_MS);
     });
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });

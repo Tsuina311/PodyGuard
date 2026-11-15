@@ -1,3 +1,5 @@
+import { rememberRecentEvent } from '../recent-events';
+import { ThemeToggleCorner } from '../ui/ThemeToggle';
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
@@ -95,6 +97,7 @@ export function GameNightsPanel({
           ...(notes.trim() ? { notes } : {}),
         },
       });
+      rememberRecentEvent(`/nights/${night.id}`, night.name);
       setNights((previous) => [night, ...previous]);
       setDate('');
     } catch (error) {
@@ -237,6 +240,7 @@ export function GameNightPage() {
       .then(async (v) => {
         if (!active) return;
         setView(v);
+        rememberRecentEvent(`/nights/${id}`, v.night.name);
         if (token) {
           try {
             await listNights(v.night.playgroupId, token);
@@ -253,6 +257,34 @@ export function GameNightPage() {
       active = false;
     };
   }, [id, token]);
+  useEffect(() => {
+    let active = true;
+    let pending = false;
+    const check = async () => {
+      if (pending || document.visibilityState === 'hidden') return;
+      pending = true;
+      try {
+        const latest = await getNight(id);
+        if (active) setView(latest);
+      } catch {
+        // Keep the invitation and retry when the connection returns.
+      } finally {
+        pending = false;
+      }
+    };
+    const timer = window.setInterval(() => void check(), 5000);
+    const refresh = () => void check();
+    window.addEventListener('focus', refresh);
+    window.addEventListener('online', refresh);
+    document.addEventListener('visibilitychange', refresh);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+      window.removeEventListener('focus', refresh);
+      window.removeEventListener('online', refresh);
+      document.removeEventListener('visibilitychange', refresh);
+    };
+  }, [id]);
   async function act(work: () => Promise<void>) {
     setBusy(true);
     setError('');
@@ -279,6 +311,12 @@ export function GameNightPage() {
     Date.now() >= Date.parse(night.startsAt) + 24 * 3600_000;
   return (
     <Panel title={night.name}>
+      <ThemeToggleCorner />
+      {night.eventJoinCode && !night.cancelled ? <div className="mb-4 rounded-xl border border-neon/40 p-3">
+        <p className="mb-2 font-semibold">The event is live. Join your friends at the table.</p>
+        <Link className="inline-flex min-h-11 items-center rounded-xl border border-neon/40 px-4 text-neon" to={`/e/${night.eventJoinCode}`}>Join event</Link>
+        {owns ? <Link className="ml-3 inline-flex min-h-11 items-center text-neon underline" to={`/host/${night.eventJoinCode}`}>Host desk</Link> : null}
+      </div> : null}
       <p>
         {when(night)} ({night.timeZone})
       </p>
@@ -373,28 +411,6 @@ export function GameNightPage() {
           </Button>
         </form>
       )}
-      {night.eventJoinCode ? (
-        <p className="my-3">
-          <Link
-            className="text-neon underline"
-            to={`/e/${night.eventJoinCode}`}
-          >
-            Join event
-          </Link>
-          {owns ? (
-            <>
-              {' '}
-              ·{' '}
-              <Link
-                className="text-neon underline"
-                to={`/host/${night.eventJoinCode}`}
-              >
-                Host desk
-              </Link>
-            </>
-          ) : null}
-        </p>
-      ) : null}
       {owns && !closed && token ? (
         <section className="mt-5 border-t border-muted/30 pt-4">
           <h3>Host controls</h3>
@@ -412,7 +428,7 @@ export function GameNightPage() {
             onClick={() =>
               void act(async () => {
                 const result = await startNight(id, token, pin);
-                saveHostToken(result.event.joinCode, result.hostToken);
+                saveHostToken(result.event.joinCode, result.hostToken, result.event.name);
                 navigate(`/host/${result.event.joinCode}`);
               })
             }

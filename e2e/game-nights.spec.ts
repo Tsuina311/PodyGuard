@@ -74,14 +74,37 @@ test('friends plan a night, change an RSVP, export a calendar and start with the
     await expect(
       page.getByRole('heading', { name: 'Before we play' }),
     ).toBeVisible();
-    await guest.reload();
+    // The already-open invitation must update without a reload.
     await expect(
       guest.getByRole('link', { name: 'Join event', exact: true }),
     ).toBeVisible();
+    const hostUrl = page.url();
+    await page.goto('/');
+    await page.reload();
+    await page.getByRole('navigation', { name: 'Recent events and invitations' }).getByRole('link', { name: /Host desk/ }).first().click();
+    await expect(page).toHaveURL(hostUrl);
+    await page.getByRole('button', { name: 'Join as player', exact: true }).click();
+    await page.getByRole('button', { name: `Join as ${demo.account.displayName} (Host / Account)`, exact: true }).click();
+    await expect(page.getByLabel('Display name', { exact: true })).toHaveValue(demo.account.displayName);
+    await guest.goto('/');
+    await guest.reload();
+    await guest.getByRole('navigation', { name: 'Recent events and invitations' }).getByRole('link', { name: /Invitation/ }).click();
+    await expect(guest.getByRole('link', { name: 'Join event', exact: true })).toBeVisible();
     await guest.getByRole('link', { name: 'Join event', exact: true }).click();
     await expect(
       guest.getByText('Discuss infinite combos first.', { exact: true }),
     ).toBeVisible();
+    await guest.getByRole('button', { name: /^Ada Select/ }).click();
+    await expect(guest.getByRole('heading', { name: 'Welcome back, Ada' })).toBeVisible();
+    await guest.getByRole('button', { name: 'Join event', exact: true }).click();
+    await expect(guest.getByRole('button', { name: "I'm ready" })).toBeVisible();
+    const seatUrl = guest.url();
+    await guest.goto('/');
+    await guest.reload();
+    await guest.getByRole('navigation', { name: 'Recent events and invitations' }).getByRole('link', { name: /Player seat/ }).click();
+    await expect(guest).toHaveURL(seatUrl);
+    await expect(guest.getByRole('button', { name: "I'm ready" })).toBeVisible();
+
   } finally {
     await guestContext.close();
   }

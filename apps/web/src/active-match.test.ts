@@ -14,6 +14,7 @@ afterEach(() => {
 });
 it('cancels only the saved local game and discards its progress', () => {
   writeStored(key, 'saved progress');
+  writeStored(`${key}:view-session`, JSON.stringify({ id: 'invalid' }));
   writeStored('podyguard-theme', 'dark');
   rememberActiveMatch('/match', {
     format: 'Duel',
@@ -23,6 +24,7 @@ it('cancels only the saved local game and discards its progress', () => {
   expect(activeMatchDetails()?.players).toEqual(['Ada', 'Bea']);
   expect(cancelLocalMatch()).toBe(true);
   expect(readStored(key)).toBeNull();
+  expect(readStored(`${key}:view-session`)).toBeNull();
   expect(activeMatchPath()).toBeNull();
   expect(activeMatchDetails()).toBeNull();
   expect(readStored('podyguard-theme')).toBe('dark');

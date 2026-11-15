@@ -1,3 +1,5 @@
+import { useTableShare } from '../table-view/useTableShare';
+import { TableShareControls } from '../table-view/TableShareControls';
 import {
   useEffect,
   useLayoutEffect,
@@ -159,12 +161,9 @@ import {
   tabletSeatRailClass,
 } from './tracker-layout';
 import { useLandscape } from './orientation';
-import {
-  COMMANDER_DAMAGE_IDLE_CLOSE_MS,
-  SEAT_CONTROLS_HIDE_MS,
-  useIdleDismiss,
-} from './use-idle-dismiss';
+import { SEAT_CONTROLS_HIDE_MS } from './use-idle-dismiss';
 import { useWakeLock } from './wake-lock';
+import { TabletControls } from './TabletControls';
 import {
   detectAutomaticChallenges,
   detectedConfirmation,
@@ -185,6 +184,7 @@ import { LanguageSwitcher } from '../ui/LanguageSwitcher';
 import { cx } from '../ui/cx';
 
 type Props = {
+  eventContext?: { joinCode: string; token: string };
   storageKey: string;
   players: TrackerSeed[];
   /** When false, ignore stored snapshots so a reload is always a new game. */
@@ -481,6 +481,7 @@ function usePreloadedEliminatedArt(): void {
 }
 
 export function TrackerView({
+  eventContext,
   storageKey,
   players,
   persist = true,
@@ -642,7 +643,8 @@ export function TrackerView({
   const attemptedChallenges = useRef(new Set<string>());
   const landscape = useLandscape();
   const boardLive = Boolean(state.firstPlayerId);
-  useWakeLock(boardLive && !treacheryRolesOpen && !roleCheckOpen);
+  const wake = useWakeLock(true);
+  const tableShare = useTableShare(storageKey, state, eventContext);
   const duelBoard = state.players.length === 2;
   const screenClass = boardScreenClass(duelBoard ? 'flush' : 'tight');
   usePreloadedEliminatedArt();
@@ -1776,6 +1778,9 @@ export function TrackerView({
               {t('tracker.readyToBeginHint')}
             </p>
           </div>
+          <div className="mt-4">
+            <TabletControls wake={wake} />
+          </div>
         </PreGameScreen>
         {rulesSheet}
       </>
@@ -2369,7 +2374,6 @@ export function TrackerView({
                   <CommanderSheet
                     state={state}
                     player={seat}
-                    active={open}
                     disabled={Boolean(state.winnerId)}
                     dispatch={(action) => send({ type: 'action', action })}
                     onClose={closeCommanderSheet}
@@ -2448,6 +2452,12 @@ export function TrackerView({
               }}
             >
               <MatchMenu
+                deviceControls={
+                  <>
+                    <TabletControls wake={wake} />
+                    <TableShareControls share={tableShare} />
+                  </>
+                }
                 sideways={duelBoard && activeBoardLayout === 'wide' && !landscape}
                 state={state}
                 elapsed={elapsed}
@@ -3217,6 +3227,7 @@ function menuControlClass(
 }
 
 function MatchMenu({
+  deviceControls,
   state,
   elapsed,
   canUndo,
@@ -3241,6 +3252,7 @@ function MatchMenu({
   onClose,
   sideways = false,
 }: {
+  deviceControls: ReactNode;
   state: TrackerState;
   elapsed: number;
   canUndo: boolean;
@@ -3484,7 +3496,7 @@ function MatchMenu({
   }
 
   return (
-    <section className="flex h-full w-full flex-col">
+    <section className="flex h-full w-full flex-col overflow-y-auto overscroll-contain">
       <header className="mb-2 flex shrink-0 items-center justify-between gap-3">
         <h4 className="font-display truncate text-sm leading-tight font-bold">
           {t('tracker.match')}
@@ -3502,9 +3514,10 @@ function MatchMenu({
           </button>
         </div>
       </header>
+      {deviceControls}
       <div
         className={cx(
-          'grid min-h-0 flex-1 gap-2',
+          'grid min-h-[32rem] shrink-0 flex-1 gap-2',
           // A wide screen keeps the four panes in a square. A tall screen
           // gives each pane the full width, so a pair of options sits on one
           // row the way it did when the menu was horizontal.
@@ -5294,15 +5307,12 @@ function opponentGridClass(count: number): string {
 function CommanderSheet({
   state,
   player,
-  active,
   disabled,
   dispatch,
   onClose,
 }: {
   state: TrackerState;
   player: TrackerPlayer;
-  /** True while this seat's sheet is the one on top. */
-  active: boolean;
   disabled: boolean;
   dispatch: (action: TrackerAction) => void;
   onClose: () => void;
@@ -5310,11 +5320,6 @@ function CommanderSheet({
   const { t } = useTranslation();
   const opponents = commanderOpponents(state, player.id);
   const shared = teamForPlayer(state, player.id).length > 1;
-  const bumpIdle = useIdleDismiss(
-    active,
-    onClose,
-    COMMANDER_DAMAGE_IDLE_CLOSE_MS,
-  );
   return (
     <section className="flex h-full w-full flex-col">
       <header className="mb-2 flex shrink-0 items-center justify-between gap-3">
@@ -5359,7 +5364,6 @@ function CommanderSheet({
                       toId: player.id,
                       delta,
                     });
-                    bumpIdle();
                   }}
                 />
               ))}

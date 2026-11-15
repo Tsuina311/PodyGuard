@@ -184,7 +184,7 @@ export function HostPage() {
     setError(null);
     try {
       const result = await unlockHost(code, hostPin);
-      saveHostToken(result.event.joinCode, result.hostToken);
+      saveHostToken(result.event.joinCode, result.hostToken, result.event.name);
       setHostToken(result.hostToken);
       setEvent(result.event);
       await refresh();
@@ -760,6 +760,16 @@ export function HostPage() {
       ) : null}
 
       <div className={cx(tab === 'desk' ? 'contents' : 'hidden')}>
+      <Panel title={t('host.playInEvent')} aside={t('host.samePhone')}>
+        <p className="text-muted mb-3 text-sm">{t('host.playInEventHint')}</p>
+        <Button
+          variant="neon"
+          block
+          onClick={() => setTab('play')}
+        >
+          {hasPlayerSeat ? t('host.openPlayTab') : t('host.joinAsPlayer')}
+        </Button>
+      </Panel>
       {!shouldShowConstructedHostMatching(event) ? (
         <Panel title={t('host.limitedPairing')} aside="1v1">
           <p className="text-muted mb-3 text-sm">
@@ -1107,17 +1117,6 @@ export function HostPage() {
             ) : null}
           </div>
         </div>
-      </Panel>
-
-      <Panel title={t('host.playInEvent')} aside={t('host.samePhone')}>
-        <p className="text-muted mb-3 text-sm">{t('host.playInEventHint')}</p>
-        <Button
-          variant="neon"
-          block
-          onClick={() => setTab('play')}
-        >
-          {hasPlayerSeat ? t('host.openPlayTab') : t('host.joinAsPlayer')}
-        </Button>
       </Panel>
 
       {hostToken ? (

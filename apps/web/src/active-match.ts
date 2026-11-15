@@ -1,3 +1,4 @@
+import { request } from './api';
 import { loadMatchConfig, trackerStorageKey } from './match-config';
 import { readStored, removeStored, writeStored } from './device-storage';
 
@@ -33,6 +34,18 @@ export function rememberActiveMatch(
 
 export function forgetActiveMatch(path?: string): void {
   if (!path || readStored(ACTIVE_MATCH_KEY) === path) {
+    if (activeMatchPath() === '/match') {
+      const key = `${activeMatchDetails()?.storageKey ?? trackerStorageKey(loadMatchConfig())}:view-session`;
+      try {
+        const share = JSON.parse(readStored(key) ?? 'null');
+        removeStored(key);
+        if (share && /^[a-f0-9]{64}$/.test(share.id) && /^[a-f0-9]{64}$/.test(share.writeToken)) {
+          void request(`/tracker-shares/${share.id}`, {
+            method: 'DELETE', headers: { Authorization: `Bearer ${share.writeToken}` },
+          }).catch(() => undefined);
+        }
+      } catch { removeStored(key); }
+    }
     removeStored(ACTIVE_MATCH_KEY);
     removeStored(DETAILS_KEY);
   }
