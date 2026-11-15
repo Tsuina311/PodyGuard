@@ -30,6 +30,7 @@ import {
 } from './api';
 import { emptySeatCommanders } from './CommanderSeatPickers';
 import { activeMatchPath } from './active-match';
+import { RecentEvents } from './RecentEvents';
 import { OngoingGame } from './OngoingGame';
 import {
   defaultHostLimitedConfigs,
@@ -441,7 +442,7 @@ export function HomePage() {
         playgroupId: selectedPlaygroupId ?? undefined,
         showReturningPlayerSuggestions: showReturningSuggestions,
       });
-      saveHostToken(result.event.joinCode, result.hostToken);
+      saveHostToken(result.event.joinCode, result.hostToken, result.event.name);
       void navigate(`/host/${result.event.joinCode}`);
     } catch (caught) {
       setError(
@@ -494,6 +495,7 @@ export function HomePage() {
       </header>
 
       <OngoingGame onChange={() => setOngoingMatch(activeMatchPath())} />
+      <RecentEvents />
 
       <div
         role="tablist"

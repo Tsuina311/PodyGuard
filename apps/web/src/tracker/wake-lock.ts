@@ -1,67 +1,84 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-type WakeLockSentinelLike = {
+type Sentinel = {
   released: boolean;
-  release: () => Promise<void>;
-  addEventListener: (
-    type: 'release',
-    listener: () => void,
-  ) => void;
+  release(): Promise<void>;
+  addEventListener(type: 'release', listener: () => void): void;
 };
+export type WakeStatus = 'requesting' | 'active' | 'unavailable';
 
-type WakeLockNavigator = Navigator & {
-  wakeLock?: {
-    request: (type: 'screen') => Promise<WakeLockSentinelLike>;
-  };
-};
-
-/**
- * Keeps the screen on while the life tracker is open. Phones otherwise dim
- * mid-game when nobody is tapping. Re-requests after the tab becomes visible
- * again — iOS and Android drop the lock in the background.
- */
-export function useWakeLock(active: boolean): void {
+/** iPadOS may release a lock while still visible, not only on app switching. */
+export function useWakeLock(active: boolean) {
+  const [status, setStatus] = useState<WakeStatus>('requesting');
+  const retryRef = useRef<() => void>(() => undefined);
   useEffect(() => {
-    if (!active) {
-      return;
-    }
-    const wakeLock = (navigator as WakeLockNavigator).wakeLock;
-    if (!wakeLock) {
-      return;
-    }
-
-    let cancelled = false;
-    let sentinel: WakeLockSentinelLike | null = null;
-
-    async function request(): Promise<void> {
-      if (cancelled || document.visibilityState !== 'visible') {
-        return;
+    if (!active) return;
+    const api = (
+      navigator as Navigator & {
+        wakeLock?: { request(type: 'screen'): Promise<Sentinel> };
       }
+    ).wakeLock;
+    if (!api) {
+      setStatus('unavailable');
+      return;
+    }
+    let cancelled = false;
+    let pending = false;
+    let sentinel: Sentinel | null = null;
+    let timer = 0;
+    async function request() {
+      if (
+        cancelled ||
+        pending ||
+        (sentinel && !sentinel.released) ||
+        document.visibilityState !== 'visible'
+      )
+        return;
+      pending = true;
+      setStatus('requesting');
       try {
-        sentinel = await wakeLock!.request('screen');
-        sentinel.addEventListener('release', () => {
+        const lock = await api!.request('screen');
+        if (cancelled) {
+          await lock.release();
+          return;
+        }
+        sentinel = lock;
+        setStatus('active');
+        lock.addEventListener('release', () => {
+          if (sentinel !== lock) return;
           sentinel = null;
+          if (cancelled) return;
+          setStatus('unavailable');
+          window.clearTimeout(timer);
+          // One automatic retry; denial waits for a real interaction or return.
+          timer = window.setTimeout(() => void request(), 1000);
         });
       } catch {
-        // Permission, low battery, or unsupported context — leave the phone alone.
+        if (!cancelled) setStatus('unavailable');
+      } finally {
+        pending = false;
       }
     }
-
-    void request();
-
-    function onVisibility() {
-      if (document.visibilityState === 'visible') {
-        void request();
-      }
-    }
-
-    document.addEventListener('visibilitychange', onVisibility);
+    const retry = () => {
+      void request();
+    };
+    retryRef.current = retry;
+    retry();
+    document.addEventListener('visibilitychange', retry);
+    document.addEventListener('pointerup', retry);
+    window.addEventListener('pageshow', retry);
+    window.addEventListener('focus', retry);
     return () => {
       cancelled = true;
-      document.removeEventListener('visibilitychange', onVisibility);
-      if (sentinel && !sentinel.released) {
+      retryRef.current = () => undefined;
+      window.clearTimeout(timer);
+      document.removeEventListener('visibilitychange', retry);
+      document.removeEventListener('pointerup', retry);
+      window.removeEventListener('pageshow', retry);
+      window.removeEventListener('focus', retry);
+      if (sentinel && !sentinel.released)
         void sentinel.release().catch(() => undefined);
-      }
     };
   }, [active]);
+  return { status, retry: () => retryRef.current() };
 }

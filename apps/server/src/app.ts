@@ -1,3 +1,4 @@
+import { tableViewRoutes } from './table-view/routes.js';
 import { gameNightRoutes } from './game-nights/routes.js';
 import { MemoryGameNightStore, PostgresGameNightStore, type GameNightStore } from './game-nights/store.js';
 import Fastify from 'fastify';
@@ -99,6 +100,7 @@ export async function buildApp(options: BuildAppOptions = {}) {
     checkDatabase: options.checkDatabase,
   });
   await app.register(eventRoutes);
+  await app.register(tableViewRoutes);
   await app.register(playgroupRoutes);
   await app.register(gameNightRoutes, { store: options.gameNightStore ?? (options.events ? new MemoryGameNightStore() : new PostgresGameNightStore()) });
   await app.register(googleAuthRoutes);

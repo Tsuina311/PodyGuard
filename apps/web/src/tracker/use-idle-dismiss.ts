@@ -1,8 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
 
-/** Commander damage sheet closes after this idle stretch past the last tap. */
-export const COMMANDER_DAMAGE_IDLE_CLOSE_MS = 4000;
-
 /** Seat chrome from the dial hides after this if nothing else takes over. */
 export const SEAT_CONTROLS_HIDE_MS = 4000;
 

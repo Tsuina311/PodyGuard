@@ -358,3 +358,4 @@ export type {
 } from './playgroups';
 
 export * from './game-nights';
+export * from './table-view';

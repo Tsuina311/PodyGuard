@@ -1,3 +1,4 @@
+import { EventTableLink } from './table-view/EventTableLink';
 import { Agreement } from './game-nights/Agreement';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -240,9 +241,17 @@ export function JoinPage({
               })),
             );
           }
+          const restoredTable = tableForParticipant(
+            { event: loaded, participants: roster.participants, tables: tableList.tables },
+            me.participant,
+          );
+          const restoredTrackerKey = `podyguard.tracker.${loaded.joinCode}.${restoredTable?.id ?? me.participant.id}.${restoredTable?.playingStartedAt ?? 'pending'}`;
           if (
             me.participant.status === 'playing' &&
-            me.participant.trackerUsed === true
+            me.participant.trackerUsed === true &&
+            // Table-wide tracker use is not evidence that THIS phone owns it.
+            // Restore only a tracker snapshot already saved on this device.
+            readStored(restoredTrackerKey) !== null
           ) {
             setShowTracker(true);
           }
@@ -813,6 +822,7 @@ export function JoinPage({
       <>
         <TrackerView
           key={trackerKey}
+          eventContext={event && token ? { joinCode: event.joinCode, token } : undefined}
           storageKey={trackerKey}
           players={(snapshot?.participants ?? [])
             .filter((row) => row.tableLabel === participant.tableLabel)
@@ -1009,6 +1019,9 @@ export function JoinPage({
               ) : null}
               {participant.status === 'playing' ? (
                 <>
+                  {event && token ? (
+                    <EventTableLink joinCode={event.joinCode} token={token} />
+                  ) : null}
                   <p className="text-muted mb-3 text-center text-sm">
                     {participant.trackerUsed === false
                       ? t('join.playingWithoutTracker')

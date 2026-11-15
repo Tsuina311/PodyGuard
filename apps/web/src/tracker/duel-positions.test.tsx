@@ -461,3 +461,22 @@ describe('four-player positions stay off the duel path', () => {
     expect(screen.queryByRole('button', { name: 'Change layout' })).toBeNull();
   });
 });
+
+
+it('keeps commander damage open past the idle timeout until explicitly closed', async () => {
+  renderTracker({ players: POD, storageKey: 'persistent-commander-damage', gameMode: 'commander', rulesFormat: 'commander' });
+  await revealAndStart();
+  vi.useFakeTimers();
+  // The clock reveals temporary seat controls, including commander damage.
+  const dial = screen.getByTitle('Show seat controls');
+  fireEvent.click(dial);
+  expect(screen.getByTitle('Match menu')).toBeVisible();
+  act(() => { vi.advanceTimersByTime(5000); });
+  expect(screen.getByTitle('Show seat controls')).toBeVisible();
+  fireEvent.click(screen.getByTitle('Show seat controls'));
+  fireEvent.click(screen.getByRole('button', { name: 'No commander damage on Ada' }));
+  act(() => { vi.advanceTimersByTime(12_000); });
+  expect(screen.getByRole('button', { name: 'Close commander damage' })).toBeVisible();
+  fireEvent.click(screen.getByRole('button', { name: 'Close commander damage' }));
+  expect(screen.queryByRole('button', { name: 'Close commander damage' })).toBeNull();
+});

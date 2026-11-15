@@ -1,3 +1,4 @@
+import { rememberRecentEvent } from './recent-events';
 import {
   normalizeJoinCode,
   type DisplayMode,
@@ -1037,8 +1038,9 @@ const HOST_KEY = (joinCode: string) =>
 const PLAYER_KEY = (joinCode: string) =>
   `podyguard.player.${normalizeJoinCode(joinCode)}`;
 
-export function saveHostToken(joinCode: string, token: string) {
+export function saveHostToken(joinCode: string, token: string, eventName?: string) {
   writeStored(HOST_KEY(joinCode), token);
+  rememberRecentEvent(`/host/${normalizeJoinCode(joinCode)}`, eventName || normalizeJoinCode(joinCode));
 }
 
 export function loadHostToken(joinCode: string) {
@@ -1055,6 +1057,7 @@ export function savePlayerSession(
   session: { token: string; displayName: string },
 ) {
   writeStored(PLAYER_KEY(joinCode), JSON.stringify(session));
+  rememberRecentEvent(`/e/${normalizeJoinCode(joinCode)}`, normalizeJoinCode(joinCode));
 }
 
 export function loadPlayerSession(joinCode: string) {
