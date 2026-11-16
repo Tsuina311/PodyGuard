@@ -85,6 +85,11 @@ Task branches do not publish Pages. Review and merge the PR to release.
 
 ## Browser coverage
 
+- Shared-device players: [manual workflow](DEVICE_PLAYERS.md). The
+  `device-players` browser journeys use pages in one context, sharing the host
+  and account storage. They cover separate drafts, guest joining, readiness,
+  reload and closed-tab recovery, leaving a seat, and read-only companion views.
+
 - Commander: four-player joining, bracket changes, readiness, matching, starting,
   tracker life changes, undo, refresh recovery, result recording and playgroup
   history, two complete games at the same physical table with fresh trackers

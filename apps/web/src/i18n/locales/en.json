@@ -1,4 +1,11 @@
 {
+  "devicePlayers": {
+    "title": "Players on this device",
+    "current": "This tab: {{name}}",
+    "joinAnother": "Join as another person",
+    "help": "Opens a new player tab. Each tab keeps its own seat. Saved players can be reopened here on this device.",
+    "continue": "Continue as {{name}}"
+  },
   "common": {
     "home": "Home",
     "cancel": "Cancel",

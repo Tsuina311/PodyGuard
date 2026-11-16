@@ -49,7 +49,7 @@ export function OngoingGame({ onChange }: { onChange: () => void }) {
         <p className="mt-1 text-sm text-muted break-words">
           {local
             ? t('home.localGame')
-            : [details?.eventName, details?.tableLabel, path.split('/').pop()]
+            : [details?.eventName, details?.tableLabel, path.split('?')[0]?.split('/').pop()]
                 .filter(Boolean)
                 .join(' · ')}
         </p>

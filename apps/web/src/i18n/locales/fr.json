@@ -1,4 +1,11 @@
 {
+  "devicePlayers": {
+    "title": "Joueurs sur cet appareil",
+    "current": "Cet onglet : {{name}}",
+    "joinAnother": "Rejoindre avec une autre personne",
+    "help": "Ouvre un nouvel onglet joueur. Chaque onglet conserve sa place. Retrouvez ici les joueurs enregistrés sur cet appareil.",
+    "continue": "Continuer avec {{name}}"
+  },
   "common": {
     "home": "Accueil",
     "cancel": "Annuler",

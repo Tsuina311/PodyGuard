@@ -1,4 +1,11 @@
 {
+  "devicePlayers": {
+    "title": "Giocatori su questo dispositivo",
+    "current": "Questa scheda: {{name}}",
+    "joinAnother": "Partecipa come un'altra persona",
+    "help": "Apre una nuova scheda giocatore. Ogni scheda mantiene il proprio posto. Puoi riaprire qui i giocatori salvati su questo dispositivo.",
+    "continue": "Continua come {{name}}"
+  },
   "common": {
     "home": "Home",
     "cancel": "Annulla",

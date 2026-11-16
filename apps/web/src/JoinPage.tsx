@@ -1,7 +1,9 @@
 import { EventTableLink } from './table-view/EventTableLink';
 import { Agreement } from './game-nights/Agreement';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { DevicePlayers } from './DevicePlayers';
+import { createPlayerScope, playerPath, playerScope, playerStorageCode } from './player-sessions';
 import { useTranslation } from 'react-i18next';
 import {
   OFFICIAL_COMMANDER_CHALLENGES,
@@ -70,6 +72,7 @@ import {
 } from './join-diagnostics';
 import {
   enqueuePending,
+  clearPending,
   flushPending,
   isOfflineError,
   type PendingOp,
@@ -110,21 +113,39 @@ type HostShellBridge = {
   onTrackerActiveChange?: (active: boolean) => void;
 };
 
-export function JoinPage({
-  embeddedHost,
-}: {
+type JoinPageProps = {
   /** Host desk embeds Play here so the organiser can join their own event. */
   embeddedHost?: HostShellBridge;
-} = {}) {
+};
+
+export function JoinPage(props: JoinPageProps = {}) {
+  const { joinCode = '' } = useParams();
+  const [search] = useSearchParams();
+  const scope = props.embeddedHost ? '' : playerScope(search.get('seat'));
+  // Give each identity a fresh form, role dialogs and connection lifecycle.
+  return <PlayerJoinPage key={`${joinCode}:${scope}`} {...props} scope={scope} />;
+}
+
+function PlayerJoinPage({
+  embeddedHost,
+  scope,
+}: JoinPageProps & { scope: string }) {
   const { t } = useTranslation();
   const { joinCode = '' } = useParams();
+  const storageCode = playerStorageCode(joinCode, scope);
+  const seatPath = playerPath(joinCode, scope);
   const navigate = useNavigate();
+  const mounted = useRef(false);
+  useEffect(() => {
+    mounted.current = true;
+    return () => { mounted.current = false; };
+  }, []);
   const [event, setEvent] = useState<PublicEvent | null>(null);
   const [displayName, setDisplayName] = useState(
-    () => loadJoinDraft(joinCode).displayName,
+    () => loadJoinDraft(storageCode).displayName,
   );
   const [decks, setDeckRows] = useState<DeckFormRow[]>(
-    () => loadJoinDraft(joinCode).decks,
+    () => loadJoinDraft(storageCode).decks,
   );
   const [participant, setParticipant] = useState<PublicParticipant | null>(null);
   const [token, setToken] = useState<string | null>(null);
@@ -138,10 +159,10 @@ export function JoinPage({
   const [roleOpen, setRoleOpen] = useState(false);
   const [roleRevealed, setRoleRevealed] = useState(false);
   const rolePod = useRef<string | null>(null);
-  const joinDraftKey = joinDraftStorageKey(joinCode);
+  const joinDraftKey = joinDraftStorageKey(storageCode);
 
   // Returning-player / playgroup identity state
-  const [accountSession] = useState(() => loadAccountSession());
+  const [accountSession] = useState(() => scope ? null : loadAccountSession());
   const [suggestions, setSuggestions] = useState<JoinGuestSuggestion[]>([]);
   const [suggestionMode, setSuggestionMode] = useState<
     'none' | 'list' | 'search'
@@ -171,7 +192,7 @@ export function JoinPage({
     setError(null);
     setEvent(null);
     setParticipant(null);
-    const existing = loadPlayerSession(joinCode);
+    const existing = loadPlayerSession(joinCode, scope);
     recordJoinBreadcrumb('EVENT_LOOKUP_STARTED');
     void getEvent(joinCode)
       .then(async (loaded) => {
@@ -210,7 +231,8 @@ export function JoinPage({
               caught instanceof ApiError &&
               (caught.status === 401 || caught.status === 404)
             ) {
-              clearPlayerSession(loaded.joinCode);
+              clearPlayerSession(loaded.joinCode, scope);
+              clearPending(storageCode);
               return null;
             }
             throw caught;
@@ -245,7 +267,7 @@ export function JoinPage({
             { event: loaded, participants: roster.participants, tables: tableList.tables },
             me.participant,
           );
-          const restoredTrackerKey = `podyguard.tracker.${loaded.joinCode}.${restoredTable?.id ?? me.participant.id}.${restoredTable?.playingStartedAt ?? 'pending'}`;
+          const restoredTrackerKey = `podyguard.tracker.${loaded.joinCode}.${restoredTable?.id ?? me.participant.id}.${restoredTable?.playingStartedAt ?? 'pending'}${scope ? `.seat.${scope}` : ''}`;
           if (
             me.participant.status === 'playing' &&
             me.participant.trackerUsed === true &&
@@ -278,7 +300,13 @@ export function JoinPage({
     return () => {
       cancelled = true;
     };
-  }, [joinCode, navigate, t]);
+  }, [joinCode, navigate, t, scope, storageCode]);
+
+  useEffect(() => {
+    const previous = document.title;
+    document.title = `${participant?.displayName ?? event?.name ?? 'PodyGuard'} · PodyGuard`;
+    return () => { document.title = previous; };
+  }, [participant?.displayName, event?.name]);
 
   const onSnapshot = useCallback((next: EventSnapshot) => {
     setSnapshot(next);
@@ -357,7 +385,7 @@ export function JoinPage({
     }
     const path = embeddedHost
       ? `/host/${event.joinCode}`
-      : `/e/${event.joinCode}`;
+      : seatPath;
     if (participant.status === 'playing' && showTracker) {
       rememberActiveMatch(path, {
         format:
@@ -373,7 +401,7 @@ export function JoinPage({
     } else if (participant.status !== 'playing') {
       forgetActiveMatch(path);
     }
-  }, [embeddedHost, event, participant, showTracker, snapshot]);
+  }, [embeddedHost, event, participant, showTracker, snapshot, seatPath]);
 
   useEffect(() => {
     embeddedHost?.onTrackerActiveChange?.(
@@ -415,13 +443,13 @@ export function JoinPage({
       }
       await ratePod(join, auth, op.rating);
     }
-    void flushPending(join, send);
+    void flushPending(storageCode, send);
     const onOnline = () => {
-      void flushPending(join, send);
+      void flushPending(storageCode, send);
     };
     window.addEventListener('online', onOnline);
     return () => window.removeEventListener('online', onOnline);
-  }, [event, token]);
+  }, [event, token, storageCode]);
 
   useEffect(() => {
     if (
@@ -504,7 +532,7 @@ export function JoinPage({
 
   async function onJoin(submit: FormEvent) {
     submit.preventDefault();
-    if (!event || !displayName.trim()) {
+    if (busy || !event || !displayName.trim()) {
       return;
     }
     if (
@@ -528,15 +556,23 @@ export function JoinPage({
           guestProfileId: selectedGuest?.id,
           savedDeckProfileId: selectedSavedDeckId ?? undefined,
           rememberMe: event.playgroupId ? rememberMe : undefined,
-          accountToken: loadAccountToken() ?? undefined,
+          accountToken: scope ? undefined : loadAccountToken() ?? undefined,
         },
       );
       recordJoinBreadcrumb('JOIN_OK');
+      // Two fresh invitation tabs can submit before either has a saved seat.
+      // The second response must not overwrite the first tab's recovery key.
+      const joinedScope = loadPlayerSession(event.joinCode, scope) ? createPlayerScope() : scope;
       savePlayerSession(event.joinCode, {
         token: result.token,
         displayName: result.participant.displayName,
-      });
+      }, joinedScope);
       removeStored(joinDraftKey);
+      if (!mounted.current) return;
+      if (joinedScope !== scope) {
+        void navigate(playerPath(event.joinCode, joinedScope), { replace: true });
+        return;
+      }
       setToken(result.token);
       setParticipant(result.participant);
       if (result.participant.decks.length > 0) {
@@ -645,8 +681,9 @@ export function JoinPage({
    */
   function onForgetSeat() {
     const code = event?.joinCode ?? joinCode.toUpperCase();
-    clearPlayerSession(code);
-    forgetActiveMatch(`/e/${code}`);
+    clearPlayerSession(code, scope);
+    clearPending(storageCode);
+    forgetActiveMatch(seatPath);
     setToken(null);
     setParticipant(null);
   }
@@ -689,7 +726,7 @@ export function JoinPage({
       }
     } catch (caught) {
       if (isOfflineError(caught)) {
-        enqueuePending(event.joinCode, {
+        enqueuePending(storageCode, {
           type: 'tracker-choice',
           trackerUsed,
         });
@@ -736,7 +773,7 @@ export function JoinPage({
       if (!isOfflineError(caught)) {
         throw caught;
       }
-      enqueuePending(event.joinCode, {
+      enqueuePending(storageCode, {
         type: 'result',
         winnerParticipantId: winnerId,
         durationSeconds,
@@ -744,7 +781,7 @@ export function JoinPage({
     }
     setShowTracker(false);
     setAskRating(true);
-    forgetActiveMatch(`/e/${event.joinCode}`);
+    forgetActiveMatch(seatPath);
   }
 
   const limitedQueues = eventHasLimitedQueues(event ?? {});
@@ -768,7 +805,7 @@ export function JoinPage({
   const matchTable = tableForParticipant(snapshot, participant);
   // A physical table is reused throughout the evening. Each started game needs
   // its own saved tracker, while refreshes during that game keep the same key.
-  const trackerKey = `podyguard.tracker.${event?.joinCode ?? ''}.${matchTable?.id ?? participant?.id ?? ''}.${matchTable?.playingStartedAt ?? 'pending'}`;
+  const trackerKey = `podyguard.tracker.${event?.joinCode ?? ''}.${matchTable?.id ?? participant?.id ?? ''}.${matchTable?.playingStartedAt ?? 'pending'}${scope ? `.seat.${scope}` : ''}`;
   const challengeProgress = Object.fromEntries(
     (snapshot?.participants ?? []).map((row) => [
       row.id,
@@ -801,7 +838,7 @@ export function JoinPage({
       if (!isOfflineError(caught)) {
         throw caught;
       }
-      enqueuePending(event.joinCode, {
+      enqueuePending(storageCode, {
         type: 'challenge',
         challengeId,
         targetParticipantId,
@@ -822,6 +859,8 @@ export function JoinPage({
       <>
         <TrackerView
           key={trackerKey}
+          playerControls={<DevicePlayers joinCode={joinCode} scope={scope} displayName={participant.displayName} />}
+          resumePath={embeddedHost ? `/host/${event?.joinCode ?? joinCode}` : seatPath}
           eventContext={event && token ? { joinCode: event.joinCode, token } : undefined}
           storageKey={trackerKey}
           players={(snapshot?.participants ?? [])
@@ -914,6 +953,8 @@ export function JoinPage({
       </header>
 
       <Agreement agreement={event?.pregameAgreement} />
+
+      {event && <DevicePlayers joinCode={event.joinCode} scope={scope} displayName={participant?.displayName} />}
 
       {participant && token ? (
         <Panel
@@ -1150,7 +1191,7 @@ export function JoinPage({
                               setAskRating(false);
                             } catch (caught) {
                               if (isOfflineError(caught)) {
-                                enqueuePending(event.joinCode, {
+                                enqueuePending(storageCode, {
                                   type: 'pod-rating',
                                   rating,
                                 });
