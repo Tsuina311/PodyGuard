@@ -1,4 +1,12 @@
 {
+  "navigation": { "menu": "Navigation menu", "home": "Main menu", "playgroups": "My playgroups" },
+  "hostUx": {
+    "overview": "Overview", "players": "Players", "share": "Share", "settings": "Settings",
+    "views": "Host desk views", "freeTables": "{{free}}/{{total}} tables free", "start": "Start ({{count}})",
+    "findPlayer": "Find a player", "status": "Player status", "allPlayers": "All players",
+    "noPlayers": "No players match this view.",
+    "statuses": { "joined": "Not ready", "ready": "Ready", "matched": "Seated", "playing": "Playing", "paused": "Paused", "left": "Left" }
+  },
   "devicePlayers": {
     "title": "Players on this device",
     "current": "This tab: {{name}}",

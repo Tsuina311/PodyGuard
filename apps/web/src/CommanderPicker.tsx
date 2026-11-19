@@ -1,5 +1,5 @@
 import { useEffect, useId, useState } from 'react';
-import { Search, X } from 'lucide-react';
+import { Search, ArrowLeftRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { CommanderSearchProfile } from '@podyguard/shared';
 import { ApiError, listCommanderArtwork, searchCommanders } from './api';
@@ -170,9 +170,11 @@ export function CommanderPicker({
           <span className="min-w-0 flex-1 truncate text-sm font-medium">
             {value.name}
           </span>
-          <button
+          <Button
             type="button"
             aria-label={t('commanderPicker.changeCommander', { name: value.name })}
+            variant="outline"
+            size="sm"
             disabled={disabled}
             onClick={() => {
               setArtCard(null);
@@ -180,12 +182,13 @@ export function CommanderPicker({
               setResults([]);
               setQuery('');
               onChange(null);
+              window.requestAnimationFrame(() => document.getElementById(id)?.focus());
             }}
-            className="text-muted hover:text-ink flex h-8 shrink-0 items-center gap-1 rounded-lg px-2 text-xs font-semibold disabled:opacity-40"
+            className="shrink-0"
           >
             {t('commanderPicker.change')}
-            <X size={14} aria-hidden />
-          </button>
+            <ArrowLeftRight size={14} aria-hidden />
+          </Button>
         </div>
       ) : (
         <div className="relative">

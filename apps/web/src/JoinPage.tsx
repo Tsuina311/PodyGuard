@@ -942,15 +942,15 @@ function PlayerJoinPage({
           }}
         />
       ) : null}
-      <header>
-        {!embeddedHost ? <Brand className="mb-6" /> : null}
+      {!embeddedHost && <header>
+        <Brand className="mb-6" />
         <h1 className="font-display mb-2 text-3xl font-bold tracking-tight">
           {event?.name ?? t('join.joinEvent')}
         </h1>
         <p className="text-muted mb-8 font-mono text-sm tracking-[0.28em] uppercase">
           {event?.joinCode ?? joinCode.toUpperCase()}
         </p>
-      </header>
+      </header>}
 
       <Agreement agreement={event?.pregameAgreement} />
 
@@ -1416,16 +1416,17 @@ function PlayerJoinPage({
                   <p className="text-muted text-xs">
                     Registering a new deck for {selectedGuest.displayName}
                   </p>
-                  <button
+                  <Button
                     type="button"
-                    className="text-neon text-xs hover:underline"
+                    variant="outline"
+                    size="sm"
                     onClick={() => {
                       const first = savedDecks[0];
                       if (first) applySavedDeckSelection(first);
                     }}
                   >
                     ← Use saved deck
-                  </button>
+                  </Button>
                 </div>
               ) : null}
               <DeckEditor

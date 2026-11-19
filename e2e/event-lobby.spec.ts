@@ -19,7 +19,9 @@ test.describe('event lobby — join, match, tracker', () => {
       baseModeLabel: 'Duel',
       commanderRules: false,
     });
+    await page.getByRole('tab', { name: 'Settings', exact: true }).click();
     await expect(page.getByText('Pod sizes', { exact: true })).toBeVisible();
+    await page.getByRole('tab', { name: 'Overview', exact: true }).click();
     await expect(page.getByRole('button', { name: 'Match now' })).toBeVisible();
 
     const playerA = await browser.newPage();

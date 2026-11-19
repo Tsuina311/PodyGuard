@@ -1,4 +1,12 @@
 {
+  "navigation": { "menu": "Menu di navigazione", "home": "Menu principale", "playgroups": "I miei gruppi" },
+  "hostUx": {
+    "overview": "Panoramica", "players": "Giocatori", "share": "Invita", "settings": "Impostazioni",
+    "views": "Viste dell’organizzatore", "freeTables": "{{free}}/{{total}} tavoli liberi", "start": "Avvia ({{count}})",
+    "findPlayer": "Cerca un giocatore", "status": "Stato del giocatore", "allPlayers": "Tutti i giocatori",
+    "noPlayers": "Nessun giocatore in questa vista.",
+    "statuses": { "joined": "Non pronto", "ready": "Pronto", "matched": "Al tavolo", "playing": "In partita", "paused": "In pausa", "left": "Uscito" }
+  },
   "devicePlayers": {
     "title": "Giocatori su questo dispositivo",
     "current": "Questa scheda: {{name}}",
