@@ -1,3 +1,5 @@
+import { HostOverviewBar, type HostView } from './HostOverviewBar';
+import { HostPlayersPanel } from './HostPlayersPanel';
 import { MatchPreviewPanel } from './game-nights/MatchPreviewPanel';
 import { Agreement } from './game-nights/Agreement';
 import type { MatchPreview } from '@podyguard/shared';
@@ -101,6 +103,7 @@ export function HostPage() {
   const [removeArmed, setRemoveArmed] = useState<string | null>(null);
   const [cancelArmed, setCancelArmed] = useState(false);
   const [tab, setTab] = useState<HostTab>('desk');
+  const [view, setView] = useState<HostView>('overview');
   const [playTrackerActive, setPlayTrackerActive] = useState(false);
   const [displayRefreshKey, setDisplayRefreshKey] = useState(0);
   const hasPlayerSeat = Boolean(loadPlayerSession(code));
@@ -595,11 +598,6 @@ export function HostPage() {
 
   const counts = countByStatus(participants);
   const queue = queueByWait(participants);
-  const seatedPlayers = participants.filter(
-    (row) => row.status === 'matched' || row.status === 'playing',
-  );
-  const pausedPlayers = participants.filter((row) => row.status === 'paused');
-  const lobby = participants.filter((row) => row.status === 'joined');
   const readyTables = tables.filter((table) => table.podStatus === 'formed');
   const typicalGameSeconds =
     limitedSnapshot?.gameDurationHint?.typicalSeconds ??
@@ -665,804 +663,581 @@ export function HostPage() {
 
   return (
     <>
-      {!hideHostChrome ? (
-        <>
-          <ThemeToggleCorner
-            feedbackContext={{ gameMode: event.gameMode }}
-          />
-          <header>
-            <Brand className="mb-6" />
-            <h1 className="font-display mb-2 text-3xl font-bold tracking-tight">
-              {event.name}
-            </h1>
-            <div className="text-muted mb-6 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-              <span>
-                {t('host.playerCount', { count: participants.length })}
-              </span>
-              <span className="text-neon">
-                {t('host.ready', { count: counts.ready })}
-              </span>
-              <span>{t('host.matched', { count: counts.matched })}</span>
-              <span>{t('host.playing', { count: counts.playing })}</span>
-              <span>{t('host.paused', { count: counts.paused })}</span>
-              <span>
-                {t('host.ends', {
-                  date: new Date(event.expiresAt).toLocaleString(undefined, {
-                    weekday: 'short',
-                    hour: 'numeric',
-                    minute: '2-digit',
-                  }),
-                })}
-              </span>
-              <Badge tone={event.gameMode === 'treachery' ? 'dev' : 'idle'}>
-                {eventHasLimitedQueues(event)
-                  ? t('home.limited')
-                  : t(`modes.${event.gameMode}.label`)}
-              </Badge>
-              {eventHasLimitedQueues(event) ? (
-                <Badge tone="live">
-                  {event.limitedModeConfigs
-                    ?.filter((config) => config.enabled)
-                    .map((config) => LIMITED_MODE_LABELS[config.mode])
-                    .join(' · ')}
-                </Badge>
-              ) : (
-                <Badge tone={event.rulesFormat === 'normal' ? 'live' : 'idle'}>
-                  {t(`families.${event.rulesFormat}`)}
-                </Badge>
-              )}
-              {event.playgroupName && event.playgroupId ? (
-                <Link to={`/playgroups/${event.playgroupId}`}>
-                  <Badge tone="live">{event.playgroupName}</Badge>
-                </Link>
-              ) : null}
-            </div>
-          </header>
-
-          <div
-            role="tablist"
-            aria-label={t('host.shellTabs')}
-            className="border-muted/20 bg-ink/[0.03] mb-6 grid grid-cols-2 gap-1 rounded-2xl border p-1"
-          >
-            <button
-              type="button"
-              role="tab"
-              aria-selected={tab === 'desk'}
-              onClick={() => setTab('desk')}
-              className={cx(
-                'rounded-xl px-3 py-2.5 font-mono text-[0.7rem] tracking-wide uppercase transition',
-                tab === 'desk'
-                  ? 'bg-neon/15 text-neon'
-                  : 'text-muted hover:text-ink',
-              )}
-            >
-              {t('host.deskTab')}
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={tab === 'play'}
-              onClick={() => setTab('play')}
-              className={cx(
-                'rounded-xl px-3 py-2.5 font-mono text-[0.7rem] tracking-wide uppercase transition',
-                tab === 'play'
-                  ? 'bg-neon/15 text-neon'
-                  : 'text-muted hover:text-ink',
-              )}
-            >
-              {t('host.playTab')}
-              {hasPlayerSeat ? (
-                <span className="bg-neon ml-2 inline-block size-1.5 rounded-full" />
-              ) : null}
-            </button>
-          </div>
-        </>
-      ) : null}
-
+      {!hideHostChrome && <>
+        <ThemeToggleCorner feedbackContext={{ gameMode: event.gameMode }} />
+        <HostOverviewBar event={event} tab={tab} view={view}
+          onTab={next => { setTab(next); window.scrollTo({ top: 0 }); }}
+          onView={next => { setView(next); window.scrollTo({ top: 0 }); }}
+          counts={counts} players={participants.length}
+          freeTables={tables.filter(table => table.status === 'free').length} tables={tables.length}
+          readyTables={readyTables.length} busy={busy} hasPlayerSeat={hasPlayerSeat}
+          matching={!isRoundsMode && !event.tournament && !eventHasLimitedQueues(event)}
+          startAll={!isRoundsMode && !eventHasLimitedQueues(event)}
+          onPreview={() => void onPreviewMatch()} onMatch={() => void onMatch()}
+          onStart={() => void onStartAllTables()} notice={matchNotice} error={error} />
+      </>}
+      {tab === 'desk' && preview && <MatchPreviewPanel preview={preview} busy={busy}
+        onConfirm={() => void onMatch()} onClose={() => setPreview(null)} />}
       <div className={cx(tab === 'desk' ? 'contents' : 'hidden')}>
-      <Panel title={t('host.playInEvent')} aside={t('host.samePhone')}>
-        <p className="text-muted mb-3 text-sm">{t('host.playInEventHint')}</p>
-        <Button
-          variant="neon"
-          block
-          onClick={() => setTab('play')}
-        >
-          {hasPlayerSeat ? t('host.openPlayTab') : t('host.joinAsPlayer')}
-        </Button>
-      </Panel>
-      {!shouldShowConstructedHostMatching(event) ? (
-        <Panel title={t('host.limitedPairing')} aside="1v1">
-          <p className="text-muted mb-3 text-sm">
-            Players join the lobby from the QR, tap Ready, then you assign them to a table. Seats are chosen on their phones.
-          </p>
-          <ul className="space-y-2">
-            {event.limitedModeConfigs
-              ?.filter((config) => config.enabled)
-              .map((config) => {
-                const players =
-                  config.preferredCohortSize ?? config.minCohortSize;
-                const pairing =
-                  config.mode === 'PICK_TWO_DRAFT'
-                    ? 'diagonals first, then each remaining opponent'
-                    : 'Swiss 1v1';
-                return (
-                  <li
-                    key={config.mode}
-                    className="border-muted/20 rounded-xl border px-3 py-2 text-sm"
-                  >
-                    <span className="font-semibold">
-                      {LIMITED_MODE_LABELS[config.mode]}
-                    </span>
-                    <span className="text-muted mt-1 block text-xs">
-                      {players} players · {config.matchStructure} · {pairing}
-                    </span>
-                  </li>
-                );
-              })}
-          </ul>
-        </Panel>
-      ) : (
-      <Panel title={t('host.podSizes')} aside={t('host.matching')}>
-        {event.gameMode === 'commander' ? (
-          <>
-            <p className="text-muted mb-3 text-sm">
-              {t('home.targetTableSize')}
-            </p>
-            <div className="grid grid-cols-3 gap-2">
-              {[3, 4, 5].map((size) => (
-                <button
-                  key={size}
-                  type="button"
-                  className={`rounded-xl border p-2 text-sm font-semibold transition ${
-                    event.preferredPodSize === size
-                      ? 'border-neon bg-neon/10 text-neon'
-                      : 'border-muted/20 text-muted hover:border-muted/40'
-                  }`}
-                  onClick={() =>
-                    void onToggleSetting({ preferredPodSize: size })
-                  }
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
-            <div className="mt-4 grid gap-2 sm:grid-cols-2">
-              <label className="border-muted/20 hover:border-muted/40 flex cursor-pointer items-start gap-3 rounded-xl border p-3 text-sm transition">
-                <input
-                  type="checkbox"
-                  className="accent-neon mt-0.5"
-                  checked={event.allowThreePods}
-                  onChange={(change) =>
-                    void onToggleSetting({
-                      allowThreePods: change.target.checked,
-                    })
-                  }
-                />
-                <span>
-                  <span className="text-ink font-medium">
-                    {t('host.allowThreePods')}
-                  </span>
-                  <span className="text-muted mt-1 block text-xs">
-                    {t('host.allowThreePodsHint')}
-                  </span>
-                </span>
-              </label>
-              <label className="border-muted/20 hover:border-muted/40 flex cursor-pointer items-start gap-3 rounded-xl border p-3 text-sm transition">
-                <input
-                  type="checkbox"
-                  className="accent-neon mt-0.5"
-                  checked={event.allowFivePods}
-                  onChange={(change) =>
-                    void onToggleSetting({
-                      allowFivePods: change.target.checked,
-                    })
-                  }
-                />
-                <span>
-                  <span className="text-ink font-medium">
-                    {t('host.allowFivePods')}
-                  </span>
-                  <span className="text-muted mt-1 block text-xs">
-                    {t('host.allowFivePodsHint')}
-                  </span>
-                </span>
-              </label>
-            </div>
-            <p className="text-muted mt-3 text-xs">
-              {commanderMatchHint(event, t)}
-            </p>
-          </>
-        ) : event.gameMode === 'treachery' ? (
-          <>
-            <p className="text-muted mb-3 text-sm">
-              {t('host.treacheryTargetHint')}
-            </p>
-            <div className="grid grid-cols-5 gap-2">
-              {TREACHERY_POD_SIZES.map((size) => (
-                <button
-                  key={size}
-                  type="button"
-                  className={`rounded-xl border p-2 text-sm font-semibold transition ${
-                    event.preferredPodSize === size
-                      ? 'border-neon bg-neon/10 text-neon'
-                      : 'border-muted/20 text-muted hover:border-muted/40'
-                  }`}
-                  onClick={() => void onToggleSetting({ preferredPodSize: size })}
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
-            <p className="text-muted mt-3 text-xs">
-              {event.preferredPodSize >= 5
-                ? t('host.matchingPrefers', { size: event.preferredPodSize })
-                : t('host.matchingPrefersFour')}
-            </p>
-          </>
-        ) : event.gameMode === 'assassin' ? (
-          <>
-            <p className="text-muted mb-3 text-sm">
-              {t('host.assassinTargetHint')}
-            </p>
-            <div className="grid grid-cols-6 gap-2">
-              {ASSASSIN_POD_SIZES.map((size) => (
-                <button
-                  key={size}
-                  type="button"
-                  className={`rounded-xl border p-2 text-sm font-semibold transition ${
-                    event.preferredPodSize === size
-                      ? 'border-neon bg-neon/10 text-neon'
-                      : 'border-muted/20 text-muted hover:border-muted/40'
-                  }`}
-                  onClick={() =>
-                    void onToggleSetting({ preferredPodSize: size })
-                  }
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
-          </>
-        ) : event.gameMode === 'multiplayer' ? (
-          <>
-            <p className="text-muted mb-3 text-sm">
-              {t('host.multiplayerTargetHint')}
-            </p>
-            <div className="grid grid-cols-4 gap-2">
-              {[3, 4, 5, 6].map((size) => (
-                <button
-                  key={size}
-                  type="button"
-                  className={`rounded-xl border p-2 text-sm font-semibold transition ${
-                    event.preferredPodSize === size
-                      ? 'border-neon bg-neon/10 text-neon'
-                      : 'border-muted/20 text-muted hover:border-muted/40'
-                  }`}
-                  onClick={() =>
-                    void onToggleSetting({ preferredPodSize: size })
-                  }
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
-          </>
-        ) : event.gameMode === 'duel' ||
-          event.gameMode === 'duel-commander' ||
-          event.gameMode === 'brawl' ? (
-          <p className="text-muted text-sm">
-            {event.gameMode === 'duel'
-              ? t('host.duelMatchmaking')
-              : event.gameMode === 'duel-commander'
-                ? t('host.duelCommanderMatchmaking')
-                : t('host.brawlMatchmaking')}
-          </p>
-        ) : event.gameMode === 'two-headed-giant' ? (
-          <p className="text-muted text-sm">{t('host.twoHeadedMatchmaking')}</p>
-        ) : event.gameMode === 'archenemy-commander' ? (
-          <p className="text-muted text-sm">{t('host.archenemyMatchmaking')}</p>
-        ) : event.gameMode === 'emperor' ? (
-          <p className="text-muted text-sm">{t('host.emperorMatchmaking')}</p>
-        ) : (
-          <p className="text-muted text-sm">{t('host.starMatchmaking')}</p>
-        )}
-      </Panel>
-      )}
-
-      <Panel title={t('host.eventLength')} aside={t('host.joinCodeDies')}>
-        <Field
-          label={t('host.hoursFromStart')}
-          hint={t('host.hoursFromStartHint')}
-          type="number"
-          inputMode="numeric"
-          min={1}
-          max={168}
-          value={hoursDraft}
-          onChange={(change) => setHoursDraft(change.target.value)}
-          onBlur={() => {
-            const hours = Number(hoursDraft);
-            if (
-              Number.isInteger(hours) &&
-              hours >= 1 &&
-              hours <= 168 &&
-              hours !== event.lifetimeHours
-            ) {
-              void onToggleSetting({ lifetimeHours: hours });
-            } else {
-              setHoursDraft(String(event.lifetimeHours));
-            }
-          }}
-        />
-      </Panel>
-
-      {metrics ? <HostMetrics metrics={metrics} /> : null}
-
-      {hostToken &&
-      usesCommanderRules(event.gameMode, event.rulesFormat) &&
-      !eventHasLimitedQueues(event) ? (
-        <ChallengePackEditor
-          joinCode={code}
-          hostToken={hostToken}
-          event={event}
-          onEvent={setEvent}
-          onError={setError}
-        />
-      ) : null}
-
-      {event.tournament ? (
-        <TournamentPanel
-          event={event}
-          participants={participants}
-          busy={busy}
-          onStart={() => void onStartTournament()}
-          onWinner={(matchId, participantId) =>
-            void onTournamentWinner(matchId, participantId)
-          }
-          onBestOf={(matchId, bestOf) =>
-            void onTournamentBestOf(matchId, bestOf)
-          }
-        />
-      ) : null}
-
-      {hostToken && isRoundsMode ? (
-        <RoundHostPanel
-          joinCode={code}
-          hostToken={hostToken}
-          event={event}
-          participants={participants}
-          onEvent={setEvent}
-          onError={setError}
-        />
-      ) : null}
-
-      {shouldShowLimitedHostPanel(event, hostToken) && hostToken ? (
-        <LimitedHostPanel
-          joinCode={code}
-          hostToken={hostToken}
-          snapshot={{
-            event,
-            participants,
-            tables,
-            ...(limitedSnapshot?.limitedQueues
-              ? { limitedQueues: limitedSnapshot.limitedQueues }
-              : {}),
-            ...(limitedSnapshot?.limitedSessions
-              ? { limitedSessions: limitedSnapshot.limitedSessions }
-              : {}),
-          }}
-          onSnapshot={onSnapshot}
-          onSession={(session) =>
-            setLimitedSnapshot((current) => ({
-              event,
-              participants,
-              tables,
-              ...(current?.limitedQueues ? { limitedQueues: current.limitedQueues } : {}),
-              limitedSessions: [
-                ...(current?.limitedSessions ?? []).filter((row) => row.id !== session.id),
-                session,
-              ],
-            }))
-          }
-          onError={setError}
-        />
-      ) : null}
-
-      <Panel title={t('host.joinCodeTitle')} aside={t('host.share')}>
-        <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
-          {phoneJoinUrl ? <JoinQr value={phoneJoinUrl} /> : null}
-          <div className="min-w-0">
-            <p className="font-display text-neon mb-3 text-4xl font-bold tracking-[0.2em] drop-shadow-[0_0_18px_var(--color-neon)]">
-              {event.joinCode}
-            </p>
-            {joinLinkBroken ? (
-              <p className="text-warning mb-4 text-xs">
-                {t('host.publicOriginMissing')}
-              </p>
-            ) : (
-              <p className="text-muted mb-4 font-mono text-xs break-all">
-                {joinUrl}
-              </p>
-            )}
-            {unreachableFromPhones ? (
-              <p className="text-warning mb-4 text-xs">
-                {t('host.noLanAddress')}
-              </p>
-            ) : phoneJoinUrl && phoneJoinUrl !== joinUrl ? (
-              <p className="text-muted mb-4 text-xs">
-                {t('host.qrUsesLan', { url: phoneJoinUrl })}
-              </p>
+        <div id="host-panel-overview" role="tabpanel" aria-labelledby="host-view-overview"
+          className={cx(view === 'overview' ? 'grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(15rem,0.65fr)]' : 'hidden')}>
+          <div className="min-w-0 space-y-5">
+            <Agreement agreement={event.pregameAgreement} />
+            {event.tournament ? (
+              <TournamentPanel
+                event={event}
+                participants={participants}
+                busy={busy}
+                onStart={() => void onStartTournament()}
+                onWinner={(matchId, participantId) =>
+                  void onTournamentWinner(matchId, participantId)
+                }
+                onBestOf={(matchId, bestOf) =>
+                  void onTournamentBestOf(matchId, bestOf)
+                }
+              />
             ) : null}
-            <Button
-              variant="glass"
-              size="sm"
-              disabled={!joinUrl}
-              onClick={() => void onCopyLink()}
-            >
-              {copied ? t('common.copied') : t('host.copyPlayerLink')}
-            </Button>
-            {event.playgroupId ? (
-              <label className="text-muted mt-3 flex cursor-pointer items-center gap-2 text-xs">
-                <input
-                  type="checkbox"
-                  className="accent-neon"
-                  checked={event.showReturningPlayerSuggestions !== false}
-                  onChange={(e) =>
-                    void onToggleSetting({
-                      showReturningPlayerSuggestions: e.target.checked,
-                    })
-                  }
-                />
-                Show returning-player suggestions on join
-              </label>
+
+            {hostToken && isRoundsMode ? (
+              <RoundHostPanel
+                joinCode={code}
+                hostToken={hostToken}
+                event={event}
+                participants={participants}
+                onEvent={setEvent}
+                onError={setError}
+              />
             ) : null}
+
+            {shouldShowLimitedHostPanel(event, hostToken) && hostToken ? (
+              <LimitedHostPanel
+                joinCode={code}
+                hostToken={hostToken}
+                snapshot={{
+                  event,
+                  participants,
+                  tables,
+                  ...(limitedSnapshot?.limitedQueues
+                    ? { limitedQueues: limitedSnapshot.limitedQueues }
+                    : {}),
+                  ...(limitedSnapshot?.limitedSessions
+                    ? { limitedSessions: limitedSnapshot.limitedSessions }
+                    : {}),
+                }}
+                onSnapshot={onSnapshot}
+                onSession={(session) =>
+                  setLimitedSnapshot((current) => ({
+                    event,
+                    participants,
+                    tables,
+                    ...(current?.limitedQueues ? { limitedQueues: current.limitedQueues } : {}),
+                    limitedSessions: [
+                      ...(current?.limitedSessions ?? []).filter((row) => row.id !== session.id),
+                      session,
+                    ],
+                  }))
+                }
+                onError={setError}
+              />
+            ) : null}
+
+            <Panel title={t('host.tablesTitle')} aside={t('host.total', { count: tables.length })}>
+              {tables.length === 0 ? (
+                <p className="text-muted text-sm">{t('host.noTables')}</p>
+              ) : (
+                <>
+                <ul className="grid grid-cols-2 gap-3">
+                  {[...tables].sort((a, b) => Number(b.status === 'occupied') - Number(a.status === 'occupied')).map((table) => (
+                    <li
+                      key={table.id}
+                      className={
+                        table.status === 'occupied'
+                          ? 'col-span-2 border-neon/30 bg-neon/5 rounded-xl border p-3 sm:col-span-1'
+                          : 'rounded-xl border border-muted/20 bg-ink/[0.02] p-3'
+                      }
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="font-display text-sm font-semibold">
+                          {table.label}
+                        </span>
+                        <Badge tone={statusTone(table.podStatus ?? table.status)}>
+                          {table.poolId
+                            ? `${poolShortLabel(table.poolId)} · ${table.podStatus ?? table.status}`
+                            : (table.podStatus ?? table.status)}
+                        </Badge>
+                        {table.trackerUsed !== undefined ? (
+                          <Badge>
+                            {table.trackerUsed
+                              ? t('host.trackerUsed')
+                              : t('host.noTracker')}
+                          </Badge>
+                        ) : null}
+                      </div>
+                      {table.seatedNames.length > 0 && <p className="text-muted my-3 text-xs">
+                        {table.seatedNames.join(' · ')}
+                      </p>}
+                      {(() => {
+                        const hint = tableAvailabilityHint({
+                          podStatus: table.podStatus,
+                          playingStartedAt: table.playingStartedAt,
+                          typicalSeconds: typicalGameSeconds,
+                        });
+                        if (!hint?.likelyFreeSoon) {
+                          return null;
+                        }
+                        return (
+                          <p className="text-neon mb-3 text-xs">
+                            {t('host.likelyFreeSoon', {
+                              minutes: Math.max(
+                                1,
+                                Math.ceil(hint.estimatedRemainingSeconds / 60),
+                              ),
+                            })}
+                          </p>
+                        );
+                      })()}
+                      <div className="flex flex-wrap gap-2">
+                        {table.podStatus === 'formed' ? (
+                          <Button
+                            size="sm"
+                            disabled={busy}
+                            onClick={() => void onStartTable(table)}
+                          >
+                            {t('host.startGame')}
+                          </Button>
+                        ) : null}
+                        {table.podStatus === 'formed' || table.podStatus === 'playing' ? (
+                          <>
+                          {!tournamentTableIds.has(table.id) ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              disabled={busy}
+                              onClick={() => void onFinishTable(table)}
+                            >
+                              {t('host.finishTable')}
+                            </Button>
+                          ) : null}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            disabled={busy}
+                            onClick={() => void onCancelTable(table)}
+                          >
+                            {t('host.cancelPod')}
+                          </Button>
+                          </>
+                        ) : null}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+                </>
+              )}
+
+              {event.tournament?.phase === 'in-progress' && !isRoundsMode && (
+                <Button disabled={busy} onClick={() => void onMatch()}>{t('tournament.schedule')}</Button>
+              )}
+            </Panel>
+
+          </div>
+          <div className="min-w-0 space-y-5">
+            {showLobbySections && !isRoundsMode && !eventHasLimitedQueues(event) ? (
+            <Panel title={t('host.queue')} aside={t('host.ready', { count: counts.ready })}>
+              {queue.length > 0 && likelyFreeSoonCount > 0 ? (
+                <p className="text-neon mb-3 text-xs">
+                  {t('host.likelyFreeSoonCount', { count: likelyFreeSoonCount })}
+                </p>
+              ) : null}
+              {queue.length === 0 ? (
+                <p className="text-muted text-sm">{t('host.nobodyWaiting')}</p>
+              ) : (
+                <ul className="max-h-80 overflow-y-auto divide-y divide-muted/20">
+                  {queue.map((row) => (
+                    <li
+                      key={row.id}
+                      className="flex items-center justify-between gap-3 py-2.5"
+                    >
+                      <span className="flex min-w-0 items-center gap-2">
+                        <span className="truncate">{row.displayName}</span>
+                        {row.isBot ? <Badge tone="dev">{t('common.bot')}</Badge> : null}
+                        {row.flexCredits > 0 ? (
+                          <Badge>{t('host.flex', { count: row.flexCredits })}</Badge>
+                        ) : null}
+                        {(row.challengePoints ?? 0) > 0 ? (
+                          <Badge tone="live">
+                            {t('host.challengePts', {
+                              count: row.challengePoints ?? 0,
+                            })}
+                          </Badge>
+                        ) : null}
+                        {row.decks[0] ? (
+                          <Badge>
+                            {poolShortLabel(
+                              row.decks.find((deck) => deck.preference === 'preferred')
+                                ?.poolId ??
+                                row.decks[0]?.poolId ??
+                                'open',
+                            )}
+                          </Badge>
+                        ) : null}
+                      </span>
+                      <span className="flex shrink-0 items-center gap-2">
+                        <WaitTime since={row.readyAt} />
+                        {removeButton(row)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Panel>
+            ) : null}
+
           </div>
         </div>
-      </Panel>
-
-      {hostToken ? (
-        <HostDisplaysPanel
-          joinCode={code}
-          hostToken={hostToken}
-          refreshKey={displayRefreshKey}
-        />
-      ) : null}
-
-      {showLobbySections && !isRoundsMode && !eventHasLimitedQueues(event) ? (
-      <Panel title={t('host.queue')} aside={t('host.ready', { count: counts.ready })}>
-        {queue.length > 0 && likelyFreeSoonCount > 0 ? (
-          <p className="text-neon mb-3 text-xs">
-            {t('host.likelyFreeSoonCount', { count: likelyFreeSoonCount })}
-          </p>
-        ) : null}
-        {queue.length === 0 ? (
-          <p className="text-muted text-sm">{t('host.nobodyWaiting')}</p>
-        ) : (
-          <ul className="divide-y divide-white/5">
-            {queue.map((row) => (
-              <li
-                key={row.id}
-                className="flex items-center justify-between gap-3 py-2.5"
-              >
-                <span className="flex min-w-0 items-center gap-2">
-                  <span className="truncate">{row.displayName}</span>
-                  {row.isBot ? <Badge tone="dev">{t('common.bot')}</Badge> : null}
-                  {row.flexCredits > 0 ? (
-                    <Badge>{t('host.flex', { count: row.flexCredits })}</Badge>
-                  ) : null}
-                  {(row.challengePoints ?? 0) > 0 ? (
-                    <Badge tone="live">
-                      {t('host.challengePts', {
-                        count: row.challengePoints ?? 0,
-                      })}
-                    </Badge>
-                  ) : null}
-                  {row.decks[0] ? (
-                    <Badge>
-                      {poolShortLabel(
-                        row.decks.find((deck) => deck.preference === 'preferred')
-                          ?.poolId ??
-                          row.decks[0]?.poolId ??
-                          'open',
-                      )}
-                    </Badge>
-                  ) : null}
-                </span>
-                <span className="flex shrink-0 items-center gap-2">
-                  <WaitTime since={row.readyAt} />
-                  {removeButton(row)}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Panel>
-      ) : null}
-
-      {showLobbySections && !isRoundsMode && !eventHasLimitedQueues(event) && lobby.length > 0 ? (
-        <Panel title={t('host.notReady')} aside={String(lobby.length)}>
-          <ul className="divide-y divide-white/5">
-            {lobby.map((row) => (
-              <li key={row.id} className="flex items-center gap-2 py-2.5 text-sm">
-                <span className="truncate">{row.displayName}</span>
-                {(row.challengePoints ?? 0) > 0 ? (
-                  <Badge tone="live">
-                    {t('host.challengePts', {
-                      count: row.challengePoints ?? 0,
-                    })}
-                  </Badge>
-                ) : null}
-                {row.isBot ? <Badge tone="dev">{t('common.bot')}</Badge> : null}
-                <span className="ml-auto shrink-0">{removeButton(row)}</span>
-              </li>
-            ))}
-          </ul>
-        </Panel>
-      ) : null}
-
-      {showLobbySections && !eventHasLimitedQueues(event) && pausedPlayers.length > 0 ? (
-        <Panel title={t('host.pausedTitle')} aside={String(pausedPlayers.length)}>
-          <ul className="divide-y divide-white/5">
-            {pausedPlayers.map((row) => (
-              <li
-                key={row.id}
-                className="flex items-center gap-2 py-2.5 text-sm"
-              >
-                <span>{row.displayName}</span>
-                {(row.challengePoints ?? 0) > 0 ? (
-                  <Badge tone="live">
-                    {t('host.challengePts', {
-                      count: row.challengePoints ?? 0,
-                    })}
-                  </Badge>
-                ) : null}
-                <span className="ml-auto shrink-0">{removeButton(row)}</span>
-              </li>
-            ))}
-          </ul>
-        </Panel>
-      ) : null}
-
-      {seatedPlayers.length > 0 ? (
-        <Panel
-          title={t('host.seated')}
-          aside={t('host.atTables', {
-            count: counts.matched + counts.playing,
-          })}
-        >
-          <ul className="divide-y divide-white/5">
-            {seatedPlayers.map((row) => (
-              <li
-                key={row.id}
-                className="flex items-center justify-between gap-3 py-2.5"
-              >
-                <span className="truncate">{row.displayName}</span>
-                <span className="flex shrink-0 items-center gap-2">
-                  {(row.challengePoints ?? 0) > 0 ? (
-                    <Badge tone="live">
-                      {t('host.pts', { count: row.challengePoints ?? 0 })}
-                    </Badge>
-                  ) : null}
-                  {row.assignedPoolId ? (
-                    <Badge>{poolShortLabel(row.assignedPoolId)}</Badge>
-                  ) : null}
-                  <span className="text-muted font-mono text-xs">
-                    {row.tableLabel}
-                  </span>
-                  <Badge tone={statusTone(row.status)}>{row.status}</Badge>
-                </span>
-              </li>
-            ))}
-          </ul>
-        </Panel>
-      ) : null}
-
-      <Panel title={t('host.tablesTitle')} aside={t('host.total', { count: tables.length })}>
-        {tables.length === 0 ? (
-          <p className="text-muted text-sm">{t('host.noTables')}</p>
-        ) : (
-          <>
-          {isRoundsMode ? (
-            <p className="text-muted mb-5 text-sm">
-              Table starts are driven by the synchronized round (Publish → Start).
-              Rolling “start all ready” is not used here.
-            </p>
-          ) : (
-          <Button
-            block
-            size="lg"
-            className="mb-5"
-            disabled={busy || readyTables.length === 0}
-            onClick={() => void onStartAllTables()}
-          >
-            {busy
-              ? t('host.startingGames')
-              : t('host.startAllReady', { count: readyTables.length })}
-          </Button>
-          )}
-          <ul className="mb-5 grid gap-3 sm:grid-cols-2">
-            {tables.map((table) => (
-              <li
-                key={table.id}
-                className={
-                  table.status === 'occupied'
-                    ? 'border-neon/30 bg-neon/5 rounded-xl border p-3'
-                    : 'rounded-xl border border-muted/20 bg-ink/[0.02] p-3'
-                }
-              >
-                <div className="mb-1.5 flex items-center justify-between gap-2">
-                  <span className="font-display text-sm font-semibold">
-                    {table.label}
-                  </span>
-                  <Badge tone={statusTone(table.podStatus ?? table.status)}>
-                    {table.poolId
-                      ? `${poolShortLabel(table.poolId)} · ${table.podStatus ?? table.status}`
-                      : (table.podStatus ?? table.status)}
-                  </Badge>
-                  {table.trackerUsed !== undefined ? (
-                    <Badge>
-                      {table.trackerUsed
-                        ? t('host.trackerUsed')
-                        : t('host.noTracker')}
-                    </Badge>
-                  ) : null}
-                </div>
-                <p className="text-muted mb-3 text-xs">
-                  {table.seatedNames.length > 0
-                    ? table.seatedNames.join(' · ')
-                    : t('common.empty')}
-                </p>
-                {(() => {
-                  const hint = tableAvailabilityHint({
-                    podStatus: table.podStatus,
-                    playingStartedAt: table.playingStartedAt,
-                    typicalSeconds: typicalGameSeconds,
-                  });
-                  if (!hint?.likelyFreeSoon) {
-                    return null;
-                  }
-                  return (
-                    <p className="text-neon mb-3 text-xs">
-                      {t('host.likelyFreeSoon', {
-                        minutes: Math.max(
-                          1,
-                          Math.ceil(hint.estimatedRemainingSeconds / 60),
-                        ),
-                      })}
-                    </p>
-                  );
-                })()}
-                <div className="flex flex-wrap gap-2">
-                  {table.podStatus === 'formed' ? (
-                    <Button
-                      size="sm"
-                      disabled={busy}
-                      onClick={() => void onStartTable(table)}
-                    >
-                      {t('host.startGame')}
-                    </Button>
-                  ) : null}
-                  {table.podStatus === 'formed' || table.podStatus === 'playing' ? (
-                    <>
-                    {!tournamentTableIds.has(table.id) ? (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={busy}
-                        onClick={() => void onFinishTable(table)}
-                      >
-                        {t('host.finishTable')}
-                      </Button>
-                    ) : null}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      disabled={busy}
-                      onClick={() => void onCancelTable(table)}
-                    >
-                      {t('host.cancelPod')}
-                    </Button>
-                    </>
-                  ) : (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      disabled={table.status === 'occupied'}
-                      onClick={() => void onToggleTable(table)}
-                    >
-                      {table.status === 'disabled'
-                        ? t('host.enable')
-                        : t('host.disable')}
-                    </Button>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-          </>
-        )}
-
-        <div className="mb-5 flex flex-wrap gap-2.5">
-          {isRoundsMode ? (
-            <p className="text-muted text-sm">
-              Match Now is off in synchronized rounds — use Generate / Publish /
-              Start on the rounds panel above.
-            </p>
-          ) : !event.tournament ||
-            event.tournament.phase === 'in-progress' ? (
-            <>
-              {!event.tournament ? (
-                <Button disabled={busy} onClick={() => void onPreviewMatch()}>Preview pods</Button>
-              ) : null}
-              <Button disabled={busy} onClick={() => void onMatch()}>
-                {busy
-                  ? t('common.working')
-                  : event.tournament
-                    ? t('tournament.schedule')
-                    : t('host.matchNow')}
-              </Button>
-            </>
-          ) : null}
-          {import.meta.env.DEV ? (
-            <Button
-              variant="outline"
-              className="border-dashed"
-              disabled={busy}
-              onClick={() => void onFillBots()}
-            >
-              {busy ? t('common.working') : t('host.fillBots')}
-            </Button>
-          ) : null}
+        <div id="host-panel-players" role="tabpanel" aria-labelledby="host-view-players"
+          className={cx(view === 'players' ? 'contents' : 'hidden')}>
+          <HostPlayersPanel participants={participants} action={removeButton} />
         </div>
-      </Panel>
+        <div id="host-panel-share" role="tabpanel" aria-labelledby="host-view-share"
+          className={cx(view === 'share' ? 'flex flex-col gap-5' : 'hidden')}>
+          {event.playgroupId && <Link to={`/playgroups/${event.playgroupId}`} className="inline-flex min-h-11 items-center self-start rounded-xl border border-muted/30 px-4 text-neon">{event.playgroupName ?? t('navigation.playgroups')}</Link>}
+          <Panel title={t('host.joinCodeTitle')} aside={t('host.share')}>
+            <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
+              {phoneJoinUrl ? <JoinQr value={phoneJoinUrl} /> : null}
+              <div className="min-w-0">
+                <p className="font-display text-neon mb-3 text-4xl font-bold tracking-[0.2em] drop-shadow-[0_0_18px_var(--color-neon)]">
+                  {event.joinCode}
+                </p>
+                {joinLinkBroken ? (
+                  <p className="text-warning mb-4 text-xs">
+                    {t('host.publicOriginMissing')}
+                  </p>
+                ) : (
+                  <p className="text-muted mb-4 font-mono text-xs break-all">
+                    {joinUrl}
+                  </p>
+                )}
+                {unreachableFromPhones ? (
+                  <p className="text-warning mb-4 text-xs">
+                    {t('host.noLanAddress')}
+                  </p>
+                ) : phoneJoinUrl && phoneJoinUrl !== joinUrl ? (
+                  <p className="text-muted mb-4 text-xs">
+                    {t('host.qrUsesLan', { url: phoneJoinUrl })}
+                  </p>
+                ) : null}
+                <Button
+                  variant="glass"
+                  size="sm"
+                  disabled={!joinUrl}
+                  onClick={() => void onCopyLink()}
+                >
+                  {copied ? t('common.copied') : t('host.copyPlayerLink')}
+                </Button>
+                {event.playgroupId ? (
+                  <label className="text-muted mt-3 flex cursor-pointer items-center gap-2 text-xs">
+                    <input
+                      type="checkbox"
+                      className="accent-neon"
+                      checked={event.showReturningPlayerSuggestions !== false}
+                      onChange={(e) =>
+                        void onToggleSetting({
+                          showReturningPlayerSuggestions: e.target.checked,
+                        })
+                      }
+                    />
+                    Show returning-player suggestions on join
+                  </label>
+                ) : null}
+              </div>
+            </div>
+          </Panel>
 
-      <Agreement agreement={event?.pregameAgreement} />
-      {preview ? (
-        <MatchPreviewPanel preview={preview} busy={busy} onConfirm={() => void onMatch()} onClose={() => setPreview(null)} />
-      ) : null}
-      {matchNotice ? <p role="status" className="text-sm">{matchNotice}</p> : null}
-      {error ? <p className="text-danger text-sm">{error}</p> : null}
+          {hostToken ? (
+            <HostDisplaysPanel
+              joinCode={code}
+              hostToken={hostToken}
+              refreshKey={displayRefreshKey}
+            />
+          ) : null}
 
-      <Panel title={t('host.dangerZone')} aside={t('host.irreversible')}>
-        <p className="text-muted mb-3 text-sm">{t('host.cancelEventHint')}</p>
-        <Button
-          variant="danger"
-          disabled={busy}
-          onClick={() => void onCancelEvent()}
-          onBlur={() => setCancelArmed(false)}
-        >
-          {busy
-            ? t('common.working')
-            : cancelArmed
-              ? t('host.cancelEventConfirm')
-              : t('host.cancelEvent')}
-        </Button>
-      </Panel>
+          <div className="flex flex-wrap gap-3">
+            <Link className="inline-flex min-h-11 items-center rounded-xl border border-muted/30 px-4 text-neon" to="/display">{t('host.displaysPairLink')}</Link>
+            {eventHasLimitedQueues(event) && <Link className="inline-flex min-h-11 items-center rounded-xl border border-muted/30 px-4 text-neon" to={`/display/event/${code}`}>{t('host.limitedFloorDisplay')}</Link>}
+          </div>
+        </div>
+        <div id="host-panel-settings" role="tabpanel" aria-labelledby="host-view-settings"
+          className={cx(view === 'settings' ? 'flex flex-col gap-5' : 'hidden')}>
+          {!shouldShowConstructedHostMatching(event) ? (
+            <Panel title={t('host.limitedPairing')} aside="1v1">
+              <p className="text-muted mb-3 text-sm">
+                Players join the lobby from the QR, tap Ready, then you assign them to a table. Seats are chosen on their phones.
+              </p>
+              <ul className="space-y-2">
+                {event.limitedModeConfigs
+                  ?.filter((config) => config.enabled)
+                  .map((config) => {
+                    const players =
+                      config.preferredCohortSize ?? config.minCohortSize;
+                    const pairing =
+                      config.mode === 'PICK_TWO_DRAFT'
+                        ? 'diagonals first, then each remaining opponent'
+                        : 'Swiss 1v1';
+                    return (
+                      <li
+                        key={config.mode}
+                        className="border-muted/20 rounded-xl border px-3 py-2 text-sm"
+                      >
+                        <span className="font-semibold">
+                          {LIMITED_MODE_LABELS[config.mode]}
+                        </span>
+                        <span className="text-muted mt-1 block text-xs">
+                          {players} players · {config.matchStructure} · {pairing}
+                        </span>
+                      </li>
+                    );
+                  })}
+              </ul>
+            </Panel>
+          ) : (
+          <Panel title={t('host.podSizes')} aside={t('host.matching')}>
+            {event.gameMode === 'commander' ? (
+              <>
+                <p className="text-muted mb-3 text-sm">
+                  {t('home.targetTableSize')}
+                </p>
+                <div className="grid grid-cols-3 gap-2">
+                  {[3, 4, 5].map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      className={`rounded-xl border p-2 text-sm font-semibold transition ${
+                        event.preferredPodSize === size
+                          ? 'border-neon bg-neon/10 text-neon'
+                          : 'border-muted/20 text-muted hover:border-muted/40'
+                      }`}
+                      onClick={() =>
+                        void onToggleSetting({ preferredPodSize: size })
+                      }
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                  <label className="border-muted/20 hover:border-muted/40 flex cursor-pointer items-start gap-3 rounded-xl border p-3 text-sm transition">
+                    <input
+                      type="checkbox"
+                      className="accent-neon mt-0.5"
+                      checked={event.allowThreePods}
+                      onChange={(change) =>
+                        void onToggleSetting({
+                          allowThreePods: change.target.checked,
+                        })
+                      }
+                    />
+                    <span>
+                      <span className="text-ink font-medium">
+                        {t('host.allowThreePods')}
+                      </span>
+                      <span className="text-muted mt-1 block text-xs">
+                        {t('host.allowThreePodsHint')}
+                      </span>
+                    </span>
+                  </label>
+                  <label className="border-muted/20 hover:border-muted/40 flex cursor-pointer items-start gap-3 rounded-xl border p-3 text-sm transition">
+                    <input
+                      type="checkbox"
+                      className="accent-neon mt-0.5"
+                      checked={event.allowFivePods}
+                      onChange={(change) =>
+                        void onToggleSetting({
+                          allowFivePods: change.target.checked,
+                        })
+                      }
+                    />
+                    <span>
+                      <span className="text-ink font-medium">
+                        {t('host.allowFivePods')}
+                      </span>
+                      <span className="text-muted mt-1 block text-xs">
+                        {t('host.allowFivePodsHint')}
+                      </span>
+                    </span>
+                  </label>
+                </div>
+                <p className="text-muted mt-3 text-xs">
+                  {commanderMatchHint(event, t)}
+                </p>
+              </>
+            ) : event.gameMode === 'treachery' ? (
+              <>
+                <p className="text-muted mb-3 text-sm">
+                  {t('host.treacheryTargetHint')}
+                </p>
+                <div className="grid grid-cols-5 gap-2">
+                  {TREACHERY_POD_SIZES.map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      className={`rounded-xl border p-2 text-sm font-semibold transition ${
+                        event.preferredPodSize === size
+                          ? 'border-neon bg-neon/10 text-neon'
+                          : 'border-muted/20 text-muted hover:border-muted/40'
+                      }`}
+                      onClick={() => void onToggleSetting({ preferredPodSize: size })}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-muted mt-3 text-xs">
+                  {event.preferredPodSize >= 5
+                    ? t('host.matchingPrefers', { size: event.preferredPodSize })
+                    : t('host.matchingPrefersFour')}
+                </p>
+              </>
+            ) : event.gameMode === 'assassin' ? (
+              <>
+                <p className="text-muted mb-3 text-sm">
+                  {t('host.assassinTargetHint')}
+                </p>
+                <div className="grid grid-cols-6 gap-2">
+                  {ASSASSIN_POD_SIZES.map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      className={`rounded-xl border p-2 text-sm font-semibold transition ${
+                        event.preferredPodSize === size
+                          ? 'border-neon bg-neon/10 text-neon'
+                          : 'border-muted/20 text-muted hover:border-muted/40'
+                      }`}
+                      onClick={() =>
+                        void onToggleSetting({ preferredPodSize: size })
+                      }
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : event.gameMode === 'multiplayer' ? (
+              <>
+                <p className="text-muted mb-3 text-sm">
+                  {t('host.multiplayerTargetHint')}
+                </p>
+                <div className="grid grid-cols-4 gap-2">
+                  {[3, 4, 5, 6].map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      className={`rounded-xl border p-2 text-sm font-semibold transition ${
+                        event.preferredPodSize === size
+                          ? 'border-neon bg-neon/10 text-neon'
+                          : 'border-muted/20 text-muted hover:border-muted/40'
+                      }`}
+                      onClick={() =>
+                        void onToggleSetting({ preferredPodSize: size })
+                      }
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : event.gameMode === 'duel' ||
+              event.gameMode === 'duel-commander' ||
+              event.gameMode === 'brawl' ? (
+              <p className="text-muted text-sm">
+                {event.gameMode === 'duel'
+                  ? t('host.duelMatchmaking')
+                  : event.gameMode === 'duel-commander'
+                    ? t('host.duelCommanderMatchmaking')
+                    : t('host.brawlMatchmaking')}
+              </p>
+            ) : event.gameMode === 'two-headed-giant' ? (
+              <p className="text-muted text-sm">{t('host.twoHeadedMatchmaking')}</p>
+            ) : event.gameMode === 'archenemy-commander' ? (
+              <p className="text-muted text-sm">{t('host.archenemyMatchmaking')}</p>
+            ) : event.gameMode === 'emperor' ? (
+              <p className="text-muted text-sm">{t('host.emperorMatchmaking')}</p>
+            ) : (
+              <p className="text-muted text-sm">{t('host.starMatchmaking')}</p>
+            )}
+          </Panel>
+          )}
 
-      <p className="text-muted/70 text-xs">
-        <Link className="hover:text-ink" to="/">
-          {t('common.home')}
-        </Link>
-        <span className="mx-2">·</span>
-        <button
-          type="button"
-          className="hover:text-ink"
-          onClick={() => setTab('play')}
-        >
-          {t('host.playTab')}
-        </button>
-        <span className="mx-2">·</span>
-        <Link className="hover:text-ink" to="/display">
-          {t('host.displaysPairLink')}
-        </Link>
-        {eventHasLimitedQueues(event) ? (
-          <>
-            <span className="mx-2">·</span>
-            <Link className="hover:text-ink" to={`/display/event/${code}`}>
-              {t('host.limitedFloorDisplay')}
-            </Link>
-          </>
-        ) : null}
-      </p>
+          <Panel title={t('host.eventLength')} aside={t('host.joinCodeDies')}>
+            <Field
+              label={t('host.hoursFromStart')}
+              hint={t('host.hoursFromStartHint')}
+              type="number"
+              inputMode="numeric"
+              min={1}
+              max={168}
+              value={hoursDraft}
+              onChange={(change) => setHoursDraft(change.target.value)}
+              onBlur={() => {
+                const hours = Number(hoursDraft);
+                if (
+                  Number.isInteger(hours) &&
+                  hours >= 1 &&
+                  hours <= 168 &&
+                  hours !== event.lifetimeHours
+                ) {
+                  void onToggleSetting({ lifetimeHours: hours });
+                } else {
+                  setHoursDraft(String(event.lifetimeHours));
+                }
+              }}
+            />
+          </Panel>
+
+          {metrics ? <HostMetrics metrics={metrics} /> : null}
+
+          {hostToken &&
+          usesCommanderRules(event.gameMode, event.rulesFormat) &&
+          !eventHasLimitedQueues(event) ? (
+            <ChallengePackEditor
+              joinCode={code}
+              hostToken={hostToken}
+              event={event}
+              onEvent={setEvent}
+              onError={setError}
+            />
+          ) : null}
+
+          <Panel title={t('host.tablesTitle')} aside={t('host.total', { count: tables.length })}>
+            <ul className="grid gap-2 sm:grid-cols-2">
+              {tables.map(table => <li key={table.id} className="flex items-center justify-between gap-3 rounded-xl border border-muted/20 p-3">
+                <span className="min-w-0 text-sm font-semibold">{table.label}</span>
+                <Badge tone={statusTone(table.status)}>{table.status}</Badge>
+                <Button variant="outline" size="sm" disabled={busy || table.status === 'occupied'}
+                  onClick={() => void onToggleTable(table)}>
+                  {table.status === 'disabled' ? t('host.enable') : t('host.disable')}
+                </Button>
+              </li>)}
+            </ul>
+          </Panel>
+          <Panel title={t('host.dangerZone')} aside={t('host.irreversible')}>
+            <p className="text-muted mb-3 text-sm">{t('host.cancelEventHint')}</p>
+            <Button
+              variant="danger"
+              disabled={busy}
+              onClick={() => void onCancelEvent()}
+              onBlur={() => setCancelArmed(false)}
+            >
+              {busy
+                ? t('common.working')
+                : cancelArmed
+                  ? t('host.cancelEventConfirm')
+                  : t('host.cancelEvent')}
+            </Button>
+          </Panel>
+
+          {import.meta.env.DEV && <Button variant="outline" disabled={busy} onClick={() => void onFillBots()}>{t('host.fillBots')}</Button>}
+        </div>
       </div>
 
       <div className={cx(tab === 'play' ? 'contents' : 'hidden')}>

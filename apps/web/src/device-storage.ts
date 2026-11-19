@@ -14,6 +14,21 @@
 
 const memory = new Map<string, string>();
 
+/** Include fallback stores when durable storage is unavailable. */
+export function storedKeys(): string[] {
+  const keys = new Set(memory.keys());
+  for (const kind of ['local', 'session'] as const) {
+    try {
+      const storage = store(kind);
+      if (storage) for (let i = 0; i < storage.length; i += 1) {
+        const key = storage.key(i);
+        if (key) keys.add(key);
+      }
+    } catch { /* Private browsing may refuse enumeration. */ }
+  }
+  return [...keys];
+}
+
 function store(kind: 'local' | 'session'): Storage | null {
   try {
     const candidate =

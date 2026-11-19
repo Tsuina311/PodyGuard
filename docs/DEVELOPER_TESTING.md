@@ -36,6 +36,17 @@ one when debugging; it can contain previous test state.
 
 ## Isolated demo
 
+For live UX review, first build the web app, run the memory-only E2E server with
+`E2E_PORT=3001`, and run `yarn dev:web` in a second terminal. Open the Vite URL
+(normally `http://localhost:5173/`); its API/socket proxy targets port 3001 and
+web changes update live. This preview uses fictional in-memory data.
+
+Manual UX checks: open an invitation and use **Main menu**; reopen it and check
+the saved response. On a host desk, try **Overview**, **Players**, **Share**, and
+**Settings**. Scroll a long table list and confirm the live summary and primary
+actions stay visible. Filter players without changing readiness or seats. In a
+Commander picker, **Change** should be a clear button and focus the new search.
+
 Run `yarn demo`, open `http://127.0.0.1:4173/demo`, and click **Open demo account**.
 The fictional account has Ada, Bea, Cal and Dara, saved Commanders, one game,
 one winner and three losses. Browser tests use this same isolated fixture.
@@ -84,6 +95,16 @@ setting because repository YAML cannot prove dashboard configuration.
 Task branches do not publish Pages. Review and merge the PR to release.
 
 ## Browser coverage
+
+- Navigation and host UX: invitation exits preserve the saved RSVP; the navigation
+  menu closes after routing; host summary/actions stay visible while scrolling;
+  player filtering and live counts work; Commander changes have a 44px phone
+  target and focus the replacement field. Includes mobile accessibility checks.
+
+- Shared-device players: [manual workflow](DEVICE_PLAYERS.md). The
+  `device-players` browser journeys use pages in one context, sharing the host
+  and account storage. They cover separate drafts, guest joining, readiness,
+  reload and closed-tab recovery, leaving a seat, and read-only companion views.
 
 - Commander: four-player joining, bracket changes, readiness, matching, starting,
   tracker life changes, undo, refresh recovery, result recording and playgroup

@@ -7,6 +7,7 @@ import { readStored, writeStored } from '../device-storage';
 import { useFeedback } from '../feedback/FeedbackContext';
 import type { FeedbackContextDetails } from '../feedback/types';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { AppMenu } from './AppMenu';
 
 export type Theme = 'light' | 'dark';
 
@@ -63,6 +64,7 @@ export function ThemeToggleCorner({
       }
     >
       <Link to="/tools" state={{ returnTo: location.pathname + location.search }} aria-label="Magic Rules and card translation" title="Magic Rules and card translation" className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-muted/25 bg-hull/80 text-muted hover:text-neon"><BookOpen size={17} aria-hidden /></Link>
+      <AppMenu />
       <LanguageSwitcher align="end" />
       <button
         type="button"
