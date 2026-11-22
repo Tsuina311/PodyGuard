@@ -1,4 +1,15 @@
 {
+  "recentEvents": {
+    "label": "Recent events and invitations",
+    "title": "Your events & invitations",
+    "hint": "Remove a shortcut to hide it from this list and keep access to the event.",
+    "host": "Host desk",
+    "player": "Player seat",
+    "invitation": "Invitation",
+    "savedDate": "Saved {{date}}",
+    "unknownDate": "Date unavailable",
+    "removeEntry": "Remove {{entry}} from this list"
+  },
   "navigation": { "menu": "Navigation menu", "home": "Main menu", "playgroups": "My playgroups" },
   "hostUx": {
     "overview": "Overview", "players": "Players", "share": "Share", "settings": "Settings",

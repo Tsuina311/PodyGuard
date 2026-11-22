@@ -1,10 +1,11 @@
 /** @vitest-environment jsdom */
 import { afterEach, expect, it } from 'vitest';
-import { recentEvents, rememberRecentEvent } from './recent-events';
+import { recentEvents, rememberRecentEvent, removeRecentEvent } from './recent-events';
 import { removeStored, writeStored } from './device-storage';
 afterEach(() => {
   localStorage.clear();
   removeStored('podyguard.recent-events');
+  removeStored('podyguard.recent-events.removed');
 });
 it('remembers invitations and host desks across reopening without copying credentials', () => {
   rememberRecentEvent('/nights/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee', 'Friday');
@@ -35,4 +36,23 @@ it('rejects unexpected navigation paths and limits the saved list', () => {
   for (let n = 0; n < 25; n++) rememberRecentEvent(`/host/AB${n}`, 'Night');
   expect(recentEvents()).toHaveLength(20);
   expect(recentEvents().some((r) => r.name === 'Invalid')).toBe(false);
+});
+
+
+it('removes saved and recovered shortcuts without losing their sessions', () => {
+  const hostKey = 'podyguard.host.AB23CD';
+  const playerKey = 'podyguard.player.XY23AB';
+  localStorage.setItem(hostKey, 'host-token');
+  localStorage.setItem(playerKey, '{"token":"seat-token","displayName":"Ada"}');
+  rememberRecentEvent('/e/XY23AB', 'XY23AB');
+  rememberRecentEvent('/host/KEEP12', 'Keep this desk');
+
+  removeRecentEvent('/host/AB23CD');
+  removeRecentEvent('/e/XY23AB');
+  expect(recentEvents().map((row) => row.path)).toEqual(['/host/KEEP12']);
+  expect(localStorage.getItem(hostKey)).toBe('host-token');
+  expect(localStorage.getItem(playerKey)).toContain('seat-token');
+
+  rememberRecentEvent('/e/XY23AB', 'XY23AB');
+  expect(recentEvents().map((row) => row.path)).toEqual(['/e/XY23AB', '/host/KEEP12']);
 });

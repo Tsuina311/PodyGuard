@@ -1,4 +1,15 @@
 {
+  "recentEvents": {
+    "label": "Événements et invitations récents",
+    "title": "Vos événements et invitations",
+    "hint": "Retirez un raccourci de cette liste tout en conservant votre accès à l’événement.",
+    "host": "Console organisateur",
+    "player": "Place de joueur",
+    "invitation": "Invitation",
+    "savedDate": "Enregistré le {{date}}",
+    "unknownDate": "Date indisponible",
+    "removeEntry": "Retirer {{entry}} de cette liste"
+  },
   "navigation": { "menu": "Menu de navigation", "home": "Menu principal", "playgroups": "Mes groupes" },
   "hostUx": {
     "overview": "Vue d’ensemble", "players": "Joueurs", "share": "Inviter", "settings": "Réglages",
