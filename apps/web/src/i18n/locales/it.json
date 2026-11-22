@@ -1,4 +1,15 @@
 {
+  "recentEvents": {
+    "label": "Eventi e inviti recenti",
+    "title": "I tuoi eventi e inviti",
+    "hint": "Rimuovi un collegamento da questo elenco e conserva l’accesso all’evento.",
+    "host": "Postazione host",
+    "player": "Posto del giocatore",
+    "invitation": "Invito",
+    "savedDate": "Salvato il {{date}}",
+    "unknownDate": "Data non disponibile",
+    "removeEntry": "Rimuovi {{entry}} da questo elenco"
+  },
   "navigation": { "menu": "Menu di navigazione", "home": "Menu principale", "playgroups": "I miei gruppi" },
   "hostUx": {
     "overview": "Panoramica", "players": "Giocatori", "share": "Invita", "settings": "Impostazioni",

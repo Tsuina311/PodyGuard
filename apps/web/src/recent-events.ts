@@ -1,9 +1,24 @@
 import { readStored, writeStored } from './device-storage';
 export type RecentEvent = { path: string; name: string; seenAt: number };
 const KEY = 'podyguard.recent-events';
+const REMOVED_KEY = 'podyguard.recent-events.removed';
 const valid = (path: unknown): path is string =>
   typeof path === 'string' &&
   /^\/(?:host|e)\/[A-Za-z0-9-]+$|^\/nights\/[a-f0-9-]+$/i.test(path);
+function removedPaths(): string[] {
+  try {
+    const parsed: unknown = JSON.parse(readStored(REMOVED_KEY) ?? '[]');
+    return Array.isArray(parsed) ? parsed.filter(valid) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function removeRecentEvent(path: string): void {
+  if (!valid(path)) return;
+  writeStored(REMOVED_KEY, JSON.stringify([...new Set([...removedPaths(), path])]));
+}
+
 export function recentEvents(): RecentEvent[] {
   let rows: RecentEvent[] = [];
   try {
@@ -31,7 +46,12 @@ export function recentEvents(): RecentEvent[] {
   } catch {
     /* private browsing */
   }
-  return rows.sort((a, b) => b.seenAt - a.seenAt).slice(0, 20);
+  // A removed shortcut can still have a saved host credential or player seat.
+  const removed = new Set(removedPaths());
+  return rows
+    .filter((row) => !removed.has(row.path))
+    .sort((a, b) => b.seenAt - a.seenAt)
+    .slice(0, 20);
 }
 export function rememberRecentEvent(path: string, name: string) {
   if (!valid(path)) return;
@@ -44,4 +64,8 @@ export function rememberRecentEvent(path: string, name: string) {
       ].slice(0, 20),
     ),
   );
+  const removed = removedPaths();
+  if (removed.includes(path)) {
+    writeStored(REMOVED_KEY, JSON.stringify(removed.filter((entry) => entry !== path)));
+  }
 }
