@@ -4,11 +4,13 @@ import { Button } from './ui/Button';
 import { cx } from './ui/cx';
 import { eventHasLimitedQueues } from './event-mode';
 
-export type HostView = 'overview' | 'players' | 'share' | 'settings';
+const HOST_TABS = ['desk', 'play', 'overview', 'join'] as const;
+export type HostTab = (typeof HOST_TABS)[number];
+export type HostView = 'tables' | 'players' | 'settings';
 type Props = {
   event: PublicEvent;
-  tab: 'desk' | 'play';
-  onTab: (tab: 'desk' | 'play') => void;
+  tab: HostTab;
+  onTab: (tab: HostTab) => void;
   view: HostView;
   onView: (view: HostView) => void;
   counts: { ready: number; playing: number; matched: number };
@@ -36,14 +38,30 @@ export function HostOverviewBar(props: Props) {
         <h1 className="font-display truncate text-lg font-bold text-ink sm:text-2xl" title={event.name}>{event.name}</h1>
         <p className="font-mono text-xs text-muted">{event.joinCode} · {eventHasLimitedQueues(event) ? t('home.limited') : t(`modes.${event.gameMode}.label`)}{!eventHasLimitedQueues(event) && event.rulesFormat ? ` · ${t(`families.${event.rulesFormat}`)}` : ''}</p>
       </div>
-      <div role="tablist" aria-label={t('host.shellTabs')} className="flex shrink-0 gap-1 rounded-xl border border-muted/25 p-1">
-        {(['desk', 'play'] as const).map(value => <button key={value} type="button" role="tab"
-          aria-selected={tab === value} onClick={() => props.onTab(value)}
-          className={cx('min-h-10 rounded-lg px-3 text-sm font-semibold', tab === value ? 'bg-neon/15 text-neon' : 'text-muted hover:bg-ink/5')}>
-          {t(value === 'desk' ? 'host.deskTab' : 'host.playTab')}
-          {value === 'play' && props.hasPlayerSeat && <span aria-hidden className="ml-1 inline-block size-1.5 rounded-full bg-neon" />}
-        </button>)}
-      </div>
+    </div>
+    <div role="tablist" aria-label={t('host.shellTabs')} className="mt-3 grid grid-cols-4 gap-1 rounded-xl border border-muted/25 p-1"
+      onKeyDown={(event) => {
+        const index = HOST_TABS.indexOf(tab);
+        let nextIndex: number;
+        switch (event.key) {
+          case 'ArrowRight': nextIndex = (index + 1) % HOST_TABS.length; break;
+          case 'ArrowLeft': nextIndex = (index + HOST_TABS.length - 1) % HOST_TABS.length; break;
+          case 'Home': nextIndex = 0; break;
+          case 'End': nextIndex = HOST_TABS.length - 1; break;
+          default: return;
+        }
+        event.preventDefault();
+        event.currentTarget.querySelectorAll('button')[nextIndex]?.focus();
+        props.onTab(HOST_TABS[nextIndex]!);
+      }}
+    >
+      {HOST_TABS.map(value => <button key={value} type="button" role="tab"
+        id={`host-tab-${value}`} aria-controls={`host-panel-${value}`}
+        aria-selected={tab === value} tabIndex={tab === value ? 0 : -1} onClick={() => props.onTab(value)}
+        className={cx('min-h-10 rounded-lg px-1 text-xs font-semibold sm:px-3 sm:text-sm', tab === value ? 'bg-neon/15 text-neon' : 'text-muted hover:bg-ink/5')}>
+        {t(`host.${value}Tab`)}
+        {value === 'play' && props.hasPlayerSeat && <span aria-hidden className="ml-1 inline-block size-1.5 rounded-full bg-neon" />}
+      </button>)}
     </div>
     <div className="mt-3 grid grid-cols-4 gap-1 text-center text-xs sm:gap-2 sm:text-sm">
       <span className="rounded-lg bg-ink/5 px-1 py-2">{t('host.playerCount', { count: props.players })}</span>
@@ -52,12 +70,12 @@ export function HostOverviewBar(props: Props) {
       <span className="rounded-lg bg-ink/5 px-1 py-2">{t('hostUx.freeTables', { free: props.freeTables, total: props.tables })}</span>
     </div>
     {tab === 'desk' && <>
-      <div role="tablist" aria-label={t('hostUx.views')} className="mt-3 grid grid-cols-4 gap-1">
-        {(['overview', 'players', 'share', 'settings'] as const).map(value => <button key={value}
+      <div role="tablist" aria-label={t('hostUx.views')} className="mt-3 grid grid-cols-3 gap-1">
+        {(['tables', 'players', 'settings'] as const).map(value => <button key={value}
           id={`host-view-${value}`} type="button" role="tab" aria-selected={view === value}
           aria-controls={`host-panel-${value}`} onClick={() => props.onView(value)}
           className={cx('min-h-11 rounded-xl border px-1 py-2 text-xs font-semibold sm:text-sm', view === value ? 'border-neon/50 bg-neon/10 text-neon' : 'border-muted/20 text-muted hover:border-muted/40')}>
-          {t(`hostUx.${value}`)}
+          {t(value === 'tables' ? 'host.tablesTitle' : `hostUx.${value}`)}
         </button>)}
       </div>
       {(props.matching || props.startAll) && <div className="mt-3 flex flex-wrap gap-2">

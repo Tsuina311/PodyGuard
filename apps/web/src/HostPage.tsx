@@ -1,4 +1,4 @@
-import { HostOverviewBar, type HostView } from './HostOverviewBar';
+import { HostOverviewBar, type HostTab, type HostView } from './HostOverviewBar';
 import { HostPlayersPanel } from './HostPlayersPanel';
 import { MatchPreviewPanel } from './game-nights/MatchPreviewPanel';
 import { Agreement } from './game-nights/Agreement';
@@ -76,11 +76,10 @@ import { TournamentPanel } from './tournament/TournamentPanel';
 import { LimitedHostPanel } from './limited/LimitedHostPanel';
 import { RoundHostPanel } from './rounds/RoundHostPanel';
 import { HostDisplaysPanel } from './display/HostDisplaysPanel';
+import { EventDisplayContent } from './limited/LimitedDisplayPage';
 import { JoinPage } from './JoinPage';
 import { cx } from './ui/cx';
 import { LIMITED_MODE_LABELS } from './limited/limited-view';
-
-type HostTab = 'desk' | 'play';
 
 export function HostPage() {
   const { t } = useTranslation();
@@ -97,13 +96,14 @@ export function HostPage() {
   const [preview, setPreview] = useState<MatchPreview | null>(null);
   const [matchNotice, setMatchNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState('');
+  const [linkError, setLinkError] = useState<string | null>(null);
   const [metrics, setMetrics] = useState<EventMetrics | null>(null);
   const [hoursDraft, setHoursDraft] = useState('24');
   const [removeArmed, setRemoveArmed] = useState<string | null>(null);
   const [cancelArmed, setCancelArmed] = useState(false);
   const [tab, setTab] = useState<HostTab>('desk');
-  const [view, setView] = useState<HostView>('overview');
+  const [view, setView] = useState<HostView>('tables');
   const [playTrackerActive, setPlayTrackerActive] = useState(false);
   const [displayRefreshKey, setDisplayRefreshKey] = useState(0);
   const hasPlayerSeat = Boolean(loadPlayerSession(code));
@@ -569,13 +569,37 @@ export function HostPage() {
     }
   }, [joinLinkBroken, isProduction]);
 
-  async function onCopyLink() {
+  const displayPath = `/display/event/${joinCodeValue}`;
+  const displayHref = copyLinkParts?.status === 'ok'
+    ? `${copyLinkParts.origin}${copyLinkParts.pathname.replace(/\/$/, '')}/#${displayPath}`
+    : '';
+
+  async function onCopyLink(url: string) {
+    setLinkError(null);
     try {
-      await navigator.clipboard.writeText(joinUrl);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1500);
+      await navigator.clipboard.writeText(url);
+      setCopied(url);
+      window.setTimeout(
+        () => setCopied((current) => (current === url ? '' : current)),
+        1500,
+      );
     } catch {
-      setError(t('common.errors.clipboard'));
+      setLinkError(t('common.errors.clipboard'));
+    }
+  }
+
+  async function onShareLink(url: string) {
+    setLinkError(null);
+    if (!navigator.share) {
+      await onCopyLink(url);
+      return;
+    }
+    try {
+      await navigator.share({ title: event?.name, url });
+    } catch (caught) {
+      if (!(caught instanceof Error && caught.name === 'AbortError')) {
+        setLinkError(t('host.shareFailed'));
+      }
     }
   }
 
@@ -666,7 +690,7 @@ export function HostPage() {
       {!hideHostChrome && <>
         <ThemeToggleCorner feedbackContext={{ gameMode: event.gameMode }} />
         <HostOverviewBar event={event} tab={tab} view={view}
-          onTab={next => { setTab(next); window.scrollTo({ top: 0 }); }}
+          onTab={next => { setLinkError(null); setTab(next); window.scrollTo({ top: 0 }); }}
           onView={next => { setView(next); window.scrollTo({ top: 0 }); }}
           counts={counts} players={participants.length}
           freeTables={tables.filter(table => table.status === 'free').length} tables={tables.length}
@@ -678,9 +702,10 @@ export function HostPage() {
       </>}
       {tab === 'desk' && preview && <MatchPreviewPanel preview={preview} busy={busy}
         onConfirm={() => void onMatch()} onClose={() => setPreview(null)} />}
-      <div className={cx(tab === 'desk' ? 'contents' : 'hidden')}>
-        <div id="host-panel-overview" role="tabpanel" aria-labelledby="host-view-overview"
-          className={cx(view === 'overview' ? 'grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(15rem,0.65fr)]' : 'hidden')}>
+      <div id="host-panel-desk" role="tabpanel" aria-labelledby="host-tab-desk"
+        className={cx(tab === 'desk' ? 'contents' : 'hidden')}>
+        <div id="host-panel-tables" role="tabpanel" aria-labelledby="host-view-tables"
+          className={cx(view === 'tables' ? 'grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(15rem,0.65fr)]' : 'hidden')}>
           <div className="min-w-0 space-y-5">
             <Agreement agreement={event.pregameAgreement} />
             {event.tournament ? (
@@ -899,74 +924,6 @@ export function HostPage() {
           className={cx(view === 'players' ? 'contents' : 'hidden')}>
           <HostPlayersPanel participants={participants} action={removeButton} />
         </div>
-        <div id="host-panel-share" role="tabpanel" aria-labelledby="host-view-share"
-          className={cx(view === 'share' ? 'flex flex-col gap-5' : 'hidden')}>
-          {event.playgroupId && <Link to={`/playgroups/${event.playgroupId}`} className="inline-flex min-h-11 items-center self-start rounded-xl border border-muted/30 px-4 text-neon">{event.playgroupName ?? t('navigation.playgroups')}</Link>}
-          <Panel title={t('host.joinCodeTitle')} aside={t('host.share')}>
-            <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
-              {phoneJoinUrl ? <JoinQr value={phoneJoinUrl} /> : null}
-              <div className="min-w-0">
-                <p className="font-display text-neon mb-3 text-4xl font-bold tracking-[0.2em] drop-shadow-[0_0_18px_var(--color-neon)]">
-                  {event.joinCode}
-                </p>
-                {joinLinkBroken ? (
-                  <p className="text-warning mb-4 text-xs">
-                    {t('host.publicOriginMissing')}
-                  </p>
-                ) : (
-                  <p className="text-muted mb-4 font-mono text-xs break-all">
-                    {joinUrl}
-                  </p>
-                )}
-                {unreachableFromPhones ? (
-                  <p className="text-warning mb-4 text-xs">
-                    {t('host.noLanAddress')}
-                  </p>
-                ) : phoneJoinUrl && phoneJoinUrl !== joinUrl ? (
-                  <p className="text-muted mb-4 text-xs">
-                    {t('host.qrUsesLan', { url: phoneJoinUrl })}
-                  </p>
-                ) : null}
-                <Button
-                  variant="glass"
-                  size="sm"
-                  disabled={!joinUrl}
-                  onClick={() => void onCopyLink()}
-                >
-                  {copied ? t('common.copied') : t('host.copyPlayerLink')}
-                </Button>
-                {event.playgroupId ? (
-                  <label className="text-muted mt-3 flex cursor-pointer items-center gap-2 text-xs">
-                    <input
-                      type="checkbox"
-                      className="accent-neon"
-                      checked={event.showReturningPlayerSuggestions !== false}
-                      onChange={(e) =>
-                        void onToggleSetting({
-                          showReturningPlayerSuggestions: e.target.checked,
-                        })
-                      }
-                    />
-                    Show returning-player suggestions on join
-                  </label>
-                ) : null}
-              </div>
-            </div>
-          </Panel>
-
-          {hostToken ? (
-            <HostDisplaysPanel
-              joinCode={code}
-              hostToken={hostToken}
-              refreshKey={displayRefreshKey}
-            />
-          ) : null}
-
-          <div className="flex flex-wrap gap-3">
-            <Link className="inline-flex min-h-11 items-center rounded-xl border border-muted/30 px-4 text-neon" to="/display">{t('host.displaysPairLink')}</Link>
-            {eventHasLimitedQueues(event) && <Link className="inline-flex min-h-11 items-center rounded-xl border border-muted/30 px-4 text-neon" to={`/display/event/${code}`}>{t('host.limitedFloorDisplay')}</Link>}
-          </div>
-        </div>
         <div id="host-panel-settings" role="tabpanel" aria-labelledby="host-view-settings"
           className={cx(view === 'settings' ? 'flex flex-col gap-5' : 'hidden')}>
           {!shouldShowConstructedHostMatching(event) ? (
@@ -1168,6 +1125,11 @@ export function HostPage() {
           </Panel>
           )}
 
+          {event.playgroupId && (
+            <Link to={`/playgroups/${event.playgroupId}`} className="inline-flex min-h-11 items-center self-start rounded-xl border border-muted/30 px-4 text-neon">
+              {event.playgroupName ?? t('navigation.playgroups')}
+            </Link>
+          )}
           <Panel title={t('host.eventLength')} aside={t('host.joinCodeDies')}>
             <Field
               label={t('host.hoursFromStart')}
@@ -1192,6 +1154,21 @@ export function HostPage() {
                 }
               }}
             />
+            {event.playgroupId ? (
+              <label className="text-muted mt-3 flex cursor-pointer items-center gap-2 text-xs">
+                <input
+                  type="checkbox"
+                  className="accent-neon"
+                  checked={event.showReturningPlayerSuggestions !== false}
+                  onChange={(e) =>
+                    void onToggleSetting({
+                      showReturningPlayerSuggestions: e.target.checked,
+                    })
+                  }
+                />
+                Show returning-player suggestions on join
+              </label>
+            ) : null}
           </Panel>
 
           {metrics ? <HostMetrics metrics={metrics} /> : null}
@@ -1240,13 +1217,95 @@ export function HostPage() {
         </div>
       </div>
 
-      <div className={cx(tab === 'play' ? 'contents' : 'hidden')}>
+      <div
+        role="tabpanel"
+        id="host-panel-play"
+        aria-labelledby={hideHostChrome ? undefined : 'host-tab-play'}
+        aria-label={hideHostChrome ? t('host.playTab') : undefined}
+        className={cx(tab === 'play' ? 'contents' : 'hidden')}
+      >
         <JoinPage
           embeddedHost={{
             onOpenDesk: openDesk,
             onTrackerActiveChange: onPlayTrackerActiveChange,
           }}
         />
+      </div>
+
+      <div
+        role="tabpanel"
+        id="host-panel-overview"
+        aria-labelledby="host-tab-overview"
+        className={cx(tab === 'overview' ? 'contents' : 'hidden')}
+      >
+        {tab === 'overview' ? (
+          <EventDisplayContent snapshot={{ ...limitedSnapshot, event, participants, tables }} />
+        ) : null}
+        <Panel title={t('host.displayOnAnotherDevice')}>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link className="text-neon hover:underline" to={displayPath} target="_blank" rel="noopener noreferrer">
+              {t('host.openEventDisplay')}
+            </Link>
+            <Button variant="glass" size="sm" disabled={!displayHref} onClick={() => void onCopyLink(displayHref)}>
+              {copied && copied === displayHref ? t('common.copied') : t('host.copyDisplayLink')}
+            </Button>
+            <Button variant="glass" size="sm" disabled={!displayHref} onClick={() => void onShareLink(displayHref)}>
+              {t('host.shareDisplayLink')}
+            </Button>
+            <Link className="text-neon hover:underline" to="/display" target="_blank" rel="noopener noreferrer">
+              {t('host.displaysPairLink')}
+            </Link>
+          </div>
+          {tab === 'overview' && linkError ? <p role="alert" className="text-danger mt-2 text-sm">{linkError}</p> : null}
+        </Panel>
+        {hostToken ? (
+          <HostDisplaysPanel joinCode={code} hostToken={hostToken} refreshKey={displayRefreshKey} />
+        ) : null}
+      </div>
+
+      <div
+        role="tabpanel"
+        id="host-panel-join"
+        aria-labelledby="host-tab-join"
+        className={cx(tab === 'join' ? 'contents' : 'hidden')}
+      >
+        <Panel title={t('host.joinCodeTitle')} aside={t('host.share')}>
+          <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
+            {phoneJoinUrl ? <JoinQr value={phoneJoinUrl} /> : null}
+            <div className="min-w-0">
+              <p className="font-display text-neon mb-3 text-4xl font-bold tracking-[0.2em] drop-shadow-[0_0_18px_var(--color-neon)]">
+                {event.joinCode}
+              </p>
+              {joinLinkBroken ? (
+                <p className="text-warning mb-4 text-xs">
+                  {t('host.publicOriginMissing')}
+                </p>
+              ) : (
+                <a href={joinUrl} className="text-muted hover:text-ink mb-4 block font-mono text-xs break-all underline">
+                  {joinUrl}
+                </a>
+              )}
+              {unreachableFromPhones ? (
+                <p className="text-warning mb-4 text-xs">
+                  {t('host.noLanAddress')}
+                </p>
+              ) : phoneJoinUrl && phoneJoinUrl !== joinUrl ? (
+                <p className="text-muted mb-4 text-xs">
+                  {t('host.qrUsesLan', { url: phoneJoinUrl })}
+                </p>
+              ) : null}
+              <div className="flex flex-wrap gap-2">
+                <Button variant="glass" size="sm" disabled={!joinUrl} onClick={() => void onCopyLink(joinUrl)}>
+                  {copied && copied === joinUrl ? t('common.copied') : t('host.copyPlayerLink')}
+                </Button>
+                <Button variant="glass" size="sm" disabled={!joinUrl} onClick={() => void onShareLink(joinUrl)}>
+                  {t('host.sharePlayerLink')}
+                </Button>
+              </div>
+              {tab === 'join' && linkError ? <p role="alert" className="text-danger mt-2 text-sm">{linkError}</p> : null}
+            </div>
+          </div>
+        </Panel>
       </div>
     </>
   );

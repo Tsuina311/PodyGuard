@@ -42,10 +42,11 @@ For live UX review, first build the web app, run the memory-only E2E server with
 web changes update live. This preview uses fictional in-memory data.
 
 Manual UX checks: open an invitation and use **Main menu**; reopen it and check
-the saved response. On a host desk, try **Overview**, **Players**, **Share**, and
-**Settings**. Scroll a long table list and confirm the live summary and primary
-actions stay visible. Filter players without changing readiness or seats. In a
-Commander picker, **Change** should be a clear button and focus the new search.
+the saved response. On a host desk, try **Tables**, **Players**, and **Settings**.
+Use **Overview** for the event display and **Join** for invitations. Scroll a long
+table list and confirm the live summary and primary actions stay visible. Filter
+players without changing readiness or seats. In a Commander picker, **Change**
+should be a clear button and focus the new search.
 
 Run `yarn demo`, open `http://127.0.0.1:4173/demo`, and click **Open demo account**.
 The fictional account has Ada, Bea, Cal and Dara, saved Commanders, one game,

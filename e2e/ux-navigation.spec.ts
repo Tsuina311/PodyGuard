@@ -41,7 +41,7 @@ test('host overview stays visible while browsing tables, players, sharing and se
   await page.setViewportSize({ width: 390, height: 844 });
   const code = await createConstructedEvent(page, { name: 'Host UX rehearsal', baseModeLabel: 'Duel', commanderRules: false, tableCount: 16 });
   const bar = page.getByRole('region', { name: 'Overview', exact: true });
-  await expect(page.getByRole('tab', { name: 'Overview', exact: true })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('tab', { name: 'Tables', exact: true })).toHaveAttribute('aria-selected', 'true');
   await expect(page.getByRole('heading', { name: 'Pod sizes', exact: true })).not.toBeVisible();
   await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
   await expect.poll(async () => (await bar.boundingBox())?.y).toBeLessThan(80);
@@ -54,8 +54,9 @@ test('host overview stays visible while browsing tables, players, sharing and se
   await expect(bar.getByText('15/16 tables free', { exact: true })).toBeVisible();
   await settings.getByRole('button', { name: 'Enable', exact: true }).first().click();
   await expect(bar.getByText('16/16 tables free', { exact: true })).toBeVisible();
-  await bar.getByRole('tab', { name: 'Share', exact: true }).click();
+  await bar.getByRole('tab', { name: 'Join', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Copy player link', exact: true })).toBeVisible();
+  await bar.getByRole('tab', { name: 'Desk', exact: true }).click();
   await bar.getByRole('tab', { name: 'Players', exact: true }).click();
   const guest = await browser.newPage();
   try {
@@ -68,7 +69,7 @@ test('host overview stays visible while browsing tables, players, sharing and se
     await page.getByLabel('Find a player').fill('ada');
     await page.getByRole('combobox', { name: 'Player status', exact: true }).selectOption('ready');
     await expect(page.getByRole('tabpanel', { name: 'Players', exact: true }).getByText('Ada', { exact: true })).toBeVisible();
-    await bar.getByRole('tab', { name: 'Overview', exact: true }).click();
+    await bar.getByRole('tab', { name: 'Tables', exact: true }).click();
     await bar.getByRole('button', { name: 'Match now', exact: true }).click();
     await expect(bar.getByRole('status')).toContainText('No tables could be formed');
     await expect(bar.getByText('1 ready', { exact: true })).toBeVisible();
