@@ -109,6 +109,10 @@ for (const format of [
       expect((await tables.json()).tables.every((table: { status: string }) => table.status === 'free')).toBe(true);
       await host.reload();
       await expect(host.getByText('COMPLETED', { exact: true })).toHaveCount(format.count + 1);
+      await host.getByRole('tab', { name: 'Overview' }).click();
+      const overview = host.getByRole('tabpanel', { name: 'Overview' });
+      await expect(overview.getByRole('heading', { name: 'Queues' })).toBeVisible();
+      await expect(overview.getByRole('columnheader', { name: 'Points', exact: true })).toBeVisible();
     } finally { await Promise.all(players.map(player => player.close())); }
   });
 }

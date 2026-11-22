@@ -60,14 +60,24 @@ type LimitedTimingFields = {
 
 export function LimitedTimingControls({
   value,
+  playerCount,
   onChange,
 }: {
   value: LimitedTimingFields;
+  playerCount: number;
   onChange: (patch: Partial<LimitedTimingFields>) => void;
 }) {
   const { t } = useTranslation();
   return (
     <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <p className="text-muted col-span-full text-xs">
+        {t(
+          value.mode === 'PICK_TWO_DRAFT'
+            ? 'home.limitedPickTwoMatchSummary'
+            : 'home.limitedSwissMatchSummary',
+          { count: playerCount, bestOf: value.matchStructure === 'BO1' ? 1 : 3 },
+        )}
+      </p>
       <label className="text-muted text-xs">
         {t('home.limitedMatch')}
         <select
