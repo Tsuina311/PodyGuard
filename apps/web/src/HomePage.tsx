@@ -247,6 +247,7 @@ export function HomePage() {
     gameMode !== 'two-headed-giant' &&
     gameMode !== 'archenemy-commander' &&
     gameMode !== 'emperor';
+  const hostLimited = focusedHostLimitedConfig(limitedConfigs);
   const limitedEnabled = limitedConfigs.some((config) => config.enabled);
 
   function selectTab(next: HomeTab) {
@@ -712,11 +713,9 @@ export function HomePage() {
               onSelect={(mode) => updatePlayLimited({ mode })}
             />
           </fieldset>
-          <p className="text-muted mb-4 text-xs">
-            {t('home.limitedCohortHint', { count: playLimited.playerCount })}
-          </p>
           <LimitedTimingControls
             value={playLimited}
+            playerCount={playLimited.playerCount}
             onChange={(patch) => updatePlayLimited(patch)}
           />
           <Button
@@ -828,7 +827,7 @@ export function HomePage() {
             label={t('home.eventName')}
             value={name}
             onChange={(change) => setName(change.target.value)}
-            placeholder={t('home.eventNamePlaceholder')}
+            placeholder={t(`home.eventNameExamples.${gameMode}`)}
             autoComplete="off"
             required
           />
@@ -1290,7 +1289,7 @@ export function HomePage() {
             label={t('home.eventName')}
             value={name}
             onChange={(change) => setName(change.target.value)}
-            placeholder={t('home.eventNamePlaceholder')}
+            placeholder={t(`home.eventNameExamples.${hostLimited?.mode ?? 'BOOSTER_DRAFT'}`)}
             autoComplete="off"
             required
           />
@@ -1309,16 +1308,10 @@ export function HomePage() {
             <legend className="text-muted mb-2 text-sm">
               {t('home.limitedFormat')}
             </legend>
-            <p className="text-muted mb-3 text-xs">
-              {t('home.limitedHostFormatHint')}
-            </p>
             <LimitedFormatTiles
               name="hostLimitedMode"
               modes={LIMITED_MODES}
-              selected={
-                focusedHostLimitedConfig(limitedConfigs)?.mode ??
-                'BOOSTER_DRAFT'
-              }
+              selected={hostLimited?.mode ?? 'BOOSTER_DRAFT'}
               onSelect={(mode) =>
                 setLimitedConfigs((current) =>
                   selectExclusiveHostLimitedMode(current, mode),
@@ -1326,29 +1319,17 @@ export function HomePage() {
               }
             />
           </fieldset>
-          {(() => {
-            const focused = focusedHostLimitedConfig(limitedConfigs);
-            if (!focused) {
-              return null;
-            }
-            const playerCount =
-              focused.preferredCohortSize ?? focused.minCohortSize;
-            return (
-              <>
-                <p className="text-muted mb-4 text-xs">
-                  {t('home.limitedCohortHint', { count: playerCount })}
-                </p>
-                <LimitedTimingControls
-                  value={focused}
-                  onChange={(patch) =>
-                    setLimitedConfigs((current) =>
-                      patchHostLimitedConfig(current, focused.mode, patch),
-                    )
-                  }
-                />
-              </>
-            );
-          })()}
+          {hostLimited ? (
+            <LimitedTimingControls
+              value={hostLimited}
+              playerCount={hostLimited.preferredCohortSize ?? hostLimited.minCohortSize}
+              onChange={(patch) =>
+                setLimitedConfigs((current) =>
+                  patchHostLimitedConfig(current, hostLimited.mode, patch),
+                )
+              }
+            />
+          ) : null}
           <Field
             label={t('home.eventLasts')}
             hint={t('home.eventLastsHint')}
