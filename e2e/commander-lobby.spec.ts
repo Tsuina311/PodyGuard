@@ -198,8 +198,13 @@ for (const changeBracket of [false, true]) {
         await page.getByRole('button', { name: 'Seat 1', exact: true }).click();
         await page.getByRole('button', { name: 'Yes, they won', exact: true }).click();
         await page.getByRole('button', { name: 'Done & requeue', exact: true }).click();
-        const overview = await page.request.get(`/api/playgroups/${groupId}`, { headers: { Authorization: `Bearer ${demo.token}` } });
-        expect((await overview.json()).overview.recordedGamesCount).toBe(2);
+        await expect.poll(async () => {
+          const overview = await page.request.get(`/api/playgroups/${groupId}`, {
+            headers: { Authorization: `Bearer ${demo.token}` },
+          });
+          expect(overview.ok()).toBe(true);
+          return (await overview.json()).overview.recordedGamesCount;
+        }, { message: 'The playgroup records exactly two games after requeueing' }).toBe(2);
       });
       await test.step('The same playgroup returns for another event with its saved Commanders', async () => {
         const nextCode = await createConstructedEvent(page, {
