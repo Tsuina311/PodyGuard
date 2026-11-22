@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   ASSASSIN_POD_SIZES,
@@ -17,7 +17,7 @@ import {
   type TournamentFormat,
   type TreacheryPodSize,
 } from '@podyguard/shared';
-import { Play, QrCode, Radio, Users } from 'lucide-react';
+import { Play, QrCode, Radio } from 'lucide-react';
 import {
   ApiError,
   createEvent,
@@ -30,7 +30,6 @@ import {
 } from './api';
 import { emptySeatCommanders } from './CommanderSeatPickers';
 import { activeMatchPath } from './active-match';
-import { RecentEvents } from './RecentEvents';
 import { OngoingGame } from './OngoingGame';
 import {
   defaultHostLimitedConfigs,
@@ -471,20 +470,9 @@ export function HomePage() {
       <header className="mb-1">
         <div className="mb-3 flex flex-wrap items-center gap-2">
           <Brand />
-          <div className="ml-auto sm:order-3">
+          <div className="ml-auto">
             <ThemeToggleCorner placement="inline" />
           </div>
-          <Link
-            to="/account"
-            className="border-muted/25 bg-hull/60 text-muted hover:border-neon/50 hover:text-neon inline-flex min-h-11 min-w-0 max-w-full items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold transition sm:order-2 sm:ml-auto sm:max-w-[16rem]"
-          >
-            <Users size={14} className="shrink-0" aria-hidden />
-            <span className="min-w-0 break-words">
-              {accountSession
-                ? `${accountSession.account.displayName} · Playgroups`
-                : 'Host Account & Playgroups'}
-            </span>
-          </Link>
         </div>
         <h1 className="font-display text-3xl leading-[1.05] font-bold tracking-tight text-balance sm:text-4xl">
           {t('home.taglineBefore')}{' '}
@@ -494,9 +482,6 @@ export function HomePage() {
           {t('home.taglineAfter')}
         </h1>
       </header>
-
-      <OngoingGame onChange={() => setOngoingMatch(activeMatchPath())} />
-      <RecentEvents />
 
       <div
         role="tablist"
@@ -623,17 +608,9 @@ export function HomePage() {
           )}
           {playgroupOverview && playgroupOverview.guests.length > 0 ? (
             <div className="border-muted/20 bg-void/40 mb-4 rounded-xl border p-3">
-              <div className="mb-2 flex items-center justify-between gap-2">
-                <p className="text-muted text-xs font-medium tracking-wider uppercase">
-                  Recent players · {playgroupOverview.playgroup.name}
-                </p>
-                <Link
-                  to="/account"
-                  className="text-neon text-xs hover:underline"
-                >
-                  Manage
-                </Link>
-              </div>
+              <p className="text-muted mb-2 text-xs font-medium tracking-wider uppercase">
+                Recent players · {playgroupOverview.playgroup.name}
+              </p>
               <div className="flex flex-wrap gap-1.5">
                 {playgroupOverview.guests.map(({ guest, savedDecks }) => {
                   const checked = selectedLocalGuestIds.includes(guest.id);
@@ -832,14 +809,9 @@ export function HomePage() {
             required
           />
           <div className="border-muted/20 bg-void/40 mb-4 rounded-xl border p-3">
-            <div className="mb-2 flex items-center justify-between gap-2">
-              <span className="text-muted text-xs font-medium tracking-wider uppercase">
-                Playgroup
-              </span>
-              <Link to="/account" className="text-neon text-xs hover:underline">
-                {accountSession ? 'Manage playgroups' : 'Sign in for playgroups'}
-              </Link>
-            </div>
+            <p className="text-muted mb-2 text-xs font-medium tracking-wider uppercase">
+              Playgroup
+            </p>
             {playgroups.length > 0 ? (
               <div className="space-y-2.5">
                 <div className="flex flex-wrap gap-1.5">
@@ -1409,6 +1381,8 @@ export function HomePage() {
         <p className="text-muted text-sm">{t('home.staleJoin')}</p>
       ) : null}
       {error ? <p className="text-danger text-sm">{error}</p> : null}
+
+      <OngoingGame onChange={() => setOngoingMatch(activeMatchPath())} />
 
       {scannerOpen ? (
         <QrScannerDialog

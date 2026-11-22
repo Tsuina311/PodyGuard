@@ -19,6 +19,7 @@ test('an invitation has a main menu exit and retains the saved response', async 
   await expect(page.getByText('Response saved.', { exact: true })).toBeVisible();
   await page.getByRole('link', { name: 'Main menu', exact: true }).click();
   await expect(page.getByRole('tab', { name: 'Host event' })).toBeVisible();
+  await page.getByRole('button', { name: 'Navigation menu' }).click();
   await page.getByRole('navigation', { name: 'Recent events and invitations' })
     .getByRole('link', { name: /Navigation rehearsal/ }).click();
   await expect(page.getByLabel('Your name')).toHaveValue('Ada');

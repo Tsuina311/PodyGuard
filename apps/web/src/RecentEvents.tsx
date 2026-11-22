@@ -20,11 +20,11 @@ export function RecentEvents() {
   return (
     <nav
       aria-label={t('recentEvents.label')}
-      className="rounded-2xl border border-muted/20 bg-hull/65 p-4"
+      className="mt-2 border-t border-muted/20 px-1 pt-3"
     >
       <h2 className="font-semibold text-ink">{t('recentEvents.title')}</h2>
       <p className="mb-2 text-xs text-muted">{t('recentEvents.hint')}</p>
-      <ul className="grid gap-2 sm:grid-cols-2">
+      <ul className="grid gap-2">
         {rows.map((row) => {
           const type = row.path.startsWith('/host/')
             ? t('recentEvents.host')

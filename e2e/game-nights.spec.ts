@@ -81,6 +81,7 @@ test('friends plan a night, change an RSVP, export a calendar and start with the
     const hostUrl = page.url();
     await page.goto('/');
     await page.reload();
+    await page.getByRole('button', { name: 'Navigation menu' }).click();
     await page.getByRole('navigation', { name: 'Recent events and invitations' }).getByRole('link', { name: /Host desk/ }).first().click();
     await expect(page).toHaveURL(hostUrl);
     await page.getByRole('tab', { name: 'Play', exact: true }).click();
@@ -88,6 +89,7 @@ test('friends plan a night, change an RSVP, export a calendar and start with the
     await expect(page.getByLabel('Display name', { exact: true })).toHaveValue(demo.account.displayName);
     await guest.goto('/');
     await guest.reload();
+    await guest.getByRole('button', { name: 'Navigation menu' }).click();
     await guest.getByRole('navigation', { name: 'Recent events and invitations' }).getByRole('link', { name: /Invitation/ }).click();
     await expect(guest.getByRole('link', { name: 'Join event', exact: true })).toBeVisible();
     await guest.getByRole('link', { name: 'Join event', exact: true }).click();
@@ -101,6 +103,7 @@ test('friends plan a night, change an RSVP, export a calendar and start with the
     const seatUrl = guest.url();
     await guest.goto('/');
     await guest.reload();
+    await guest.getByRole('button', { name: 'Navigation menu' }).click();
     await guest.getByRole('navigation', { name: 'Recent events and invitations' }).getByRole('link', { name: /Player seat/ }).click();
     await expect(guest).toHaveURL(seatUrl);
     await expect(guest.getByRole('button', { name: "I'm ready" })).toBeVisible();
