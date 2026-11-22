@@ -16,7 +16,9 @@ test.describe('event screens — constructed vs Limited', () => {
     });
 
     await expect(page.getByText('Duel Commander').first()).toBeVisible();
+    await page.getByRole('tab', { name: 'Settings', exact: true }).click();
     await expect(page.getByText('Pod sizes', { exact: true })).toBeVisible();
+    await page.getByRole('tab', { name: 'Tables', exact: true }).click();
     await expect(page.getByText('Limited pairing', { exact: true })).toHaveCount(
       0,
     );
@@ -32,7 +34,9 @@ test.describe('event screens — constructed vs Limited', () => {
       commanderRules: false,
     });
 
+    await page.getByRole('tab', { name: 'Settings', exact: true }).click();
     await expect(page.getByText('Pod sizes', { exact: true })).toBeVisible();
+    await page.getByRole('tab', { name: 'Tables', exact: true }).click();
     await expect(page.getByText('Limited pairing', { exact: true })).toHaveCount(
       0,
     );
@@ -47,7 +51,9 @@ test.describe('event screens — constructed vs Limited', () => {
       formatLabel: 'Booster Draft',
     });
 
+    await page.getByRole('tab', { name: 'Settings', exact: true }).click();
     await expect(page.getByText('Limited pairing', { exact: true })).toBeVisible();
+    await page.getByRole('tab', { name: 'Tables', exact: true }).click();
     await expect(page.getByText('Limited event desk')).toBeVisible();
     await expect(page.getByText('Booster Draft').first()).toBeVisible();
     await expect(page.getByText('Pod sizes', { exact: true })).toHaveCount(0);
@@ -59,7 +65,9 @@ test.describe('event screens — constructed vs Limited', () => {
       formatLabel: 'Sealed',
     });
 
+    await page.getByRole('tab', { name: 'Settings', exact: true }).click();
     await expect(page.getByText('Limited pairing', { exact: true })).toBeVisible();
+    await page.getByRole('tab', { name: 'Tables', exact: true }).click();
     await expect(page.getByText('Limited event desk')).toBeVisible();
     await expect(page.getByText('Sealed').first()).toBeVisible();
     await expect(page.getByText('Pod sizes', { exact: true })).toHaveCount(0);

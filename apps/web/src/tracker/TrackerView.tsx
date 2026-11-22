@@ -217,6 +217,10 @@ type Props = {
    * Shown in the match menu so it never covers the board.
    */
   onOpenDesk?: () => void;
+  /** Saved event seats stay reachable without covering the life counters. */
+  playerControls?: ReactNode;
+  /** Only this saved event seat may be cleared when abandoning setup. */
+  resumePath?: string;
   /**
    * Event pods requeue after a called game. Local casual play just leaves home —
    * there was never a queue to return to.
@@ -491,6 +495,8 @@ export function TrackerView({
   onEditSetup,
   onQuit,
   onOpenDesk,
+  playerControls,
+  resumePath,
   requeueOnFinish = true,
   challengeProgress = {},
   onChallengeComplete,
@@ -863,7 +869,7 @@ export function TrackerView({
   /** Abandon setup and leave the tracker; drop any half-built snapshot. */
   function leaveSetup() {
     removeStored(storageKey);
-    forgetActiveMatch();
+    forgetActiveMatch(resumePath);
     onQuit();
   }
 
@@ -1780,6 +1786,7 @@ export function TrackerView({
           </div>
           <div className="mt-4">
             <TabletControls wake={wake} />
+            {playerControls}
           </div>
         </PreGameScreen>
         {rulesSheet}
@@ -2456,6 +2463,7 @@ export function TrackerView({
                   <>
                     <TabletControls wake={wake} />
                     <TableShareControls share={tableShare} />
+                    {playerControls}
                   </>
                 }
                 sideways={duelBoard && activeBoardLayout === 'wide' && !landscape}

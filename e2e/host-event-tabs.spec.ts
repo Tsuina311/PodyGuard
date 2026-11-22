@@ -52,7 +52,8 @@ test('host tabs keep event operations, device display, and player joining in the
   });
   const tabs = page.getByRole('tablist', { name: 'Host desk sections' });
   await expect(tabs.getByRole('tab')).toHaveText(['Desk', 'Play', 'Overview', 'Join']);
-  await expect(page.getByRole('tabpanel', { name: 'Desk' }).getByRole('button', { name: 'Match now' })).toBeVisible();
+  await expect(page.getByRole('tab', { name: 'Desk', exact: true })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('button', { name: 'Match now' })).toBeVisible();
 
   await tabs.getByRole('tab', { name: 'Play' }).click();
   await expect(page.getByRole('tabpanel', { name: 'Play' }).getByLabel('Display name')).toBeVisible();

@@ -83,7 +83,7 @@ test('friends plan a night, change an RSVP, export a calendar and start with the
     await page.reload();
     await page.getByRole('navigation', { name: 'Recent events and invitations' }).getByRole('link', { name: /Host desk/ }).first().click();
     await expect(page).toHaveURL(hostUrl);
-    await page.getByRole('button', { name: 'Join as player', exact: true }).click();
+    await page.getByRole('tab', { name: 'Play', exact: true }).click();
     await page.getByRole('button', { name: `Join as ${demo.account.displayName} (Host / Account)`, exact: true }).click();
     await expect(page.getByLabel('Display name', { exact: true })).toHaveValue(demo.account.displayName);
     await guest.goto('/');

@@ -1,4 +1,19 @@
 {
+  "navigation": { "menu": "Menu de navigation", "home": "Menu principal", "playgroups": "Mes groupes" },
+  "hostUx": {
+    "overview": "Vue d’ensemble", "players": "Joueurs", "share": "Inviter", "settings": "Réglages",
+    "views": "Vues de l’organisateur", "freeTables": "{{free}}/{{total}} tables libres", "start": "Lancer ({{count}})",
+    "findPlayer": "Rechercher un joueur", "status": "État du joueur", "allPlayers": "Tous les joueurs",
+    "noPlayers": "Aucun joueur dans cette vue.",
+    "statuses": { "joined": "Pas prêt", "ready": "Prêt", "matched": "À table", "playing": "En partie", "paused": "En pause", "left": "Parti" }
+  },
+  "devicePlayers": {
+    "title": "Joueurs sur cet appareil",
+    "current": "Cet onglet : {{name}}",
+    "joinAnother": "Rejoindre avec une autre personne",
+    "help": "Ouvre un nouvel onglet joueur. Chaque onglet conserve sa place. Retrouvez ici les joueurs enregistrés sur cet appareil.",
+    "continue": "Continuer avec {{name}}"
+  },
   "common": {
     "home": "Accueil",
     "cancel": "Annuler",

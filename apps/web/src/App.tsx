@@ -64,7 +64,7 @@ export function App() {
   const waking = useServerWake() && !localOnly;
   return (
     <FeedbackProvider>
-      <div className="bg-deep-space relative min-h-screen overflow-hidden">
+      <div className="bg-deep-space relative min-h-screen overflow-x-clip">
         <div
           aria-hidden
           className="bg-grid pointer-events-none absolute inset-0"

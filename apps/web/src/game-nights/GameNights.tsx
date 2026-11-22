@@ -1,4 +1,5 @@
 import { rememberRecentEvent } from '../recent-events';
+import { useTranslation } from 'react-i18next';
 import { ThemeToggleCorner } from '../ui/ThemeToggle';
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -199,6 +200,7 @@ export function GameNightsPanel({
   );
 }
 export function GameNightPage() {
+  const { t } = useTranslation();
   const { id = '' } = useParams();
   const navigate = useNavigate();
   const [view, setView] = useState<NightView | null>(null);
@@ -310,8 +312,12 @@ export function GameNightPage() {
     Boolean(night.eventJoinCode) ||
     Date.now() >= Date.parse(night.startsAt) + 24 * 3600_000;
   return (
-    <Panel title={night.name}>
+    <>
       <ThemeToggleCorner />
+    <Panel title={night.name}>
+      <Link to="/" className="mb-4 inline-flex min-h-11 items-center gap-2 rounded-xl border border-muted/30 px-4 font-semibold text-ink hover:border-neon/50">
+        <span aria-hidden>←</span>{t('navigation.home')}
+      </Link>
       {night.eventJoinCode && !night.cancelled ? <div className="mb-4 rounded-xl border border-neon/40 p-3">
         <p className="mb-2 font-semibold">The event is live. Join your friends at the table.</p>
         <Link className="inline-flex min-h-11 items-center rounded-xl border border-neon/40 px-4 text-neon" to={`/e/${night.eventJoinCode}`}>Join event</Link>
@@ -329,8 +335,10 @@ export function GameNightPage() {
       </p>
       <Agreement agreement={night.agreement} />
       <div className="my-3 flex flex-wrap gap-2">
-        <Button onClick={() => download(night)}>Add to calendar</Button>
+        <Button size="sm" variant="outline" onClick={() => download(night)}>Add to calendar</Button>
         <Button
+          size="sm"
+          variant="outline"
           onClick={() =>
             void act(async () => {
               await navigator.clipboard.writeText(window.location.href);
@@ -340,7 +348,7 @@ export function GameNightPage() {
         >
           Copy invitation
         </Button>
-        <Button disabled={busy} onClick={() => void act(refresh)}>
+        <Button size="sm" variant="glass" disabled={busy} onClick={() => void act(refresh)}>
           Refresh responses
         </Button>
       </div>
@@ -462,5 +470,6 @@ export function GameNightPage() {
         </Link>
       </p>
     </Panel>
+    </>
   );
 }

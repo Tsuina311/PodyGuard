@@ -1035,8 +1035,6 @@ export function ratePod(joinCode: string, token: string, rating: PodRating) {
 */
 const HOST_KEY = (joinCode: string) =>
   `podyguard.host.${normalizeJoinCode(joinCode)}`;
-const PLAYER_KEY = (joinCode: string) =>
-  `podyguard.player.${normalizeJoinCode(joinCode)}`;
 
 export function saveHostToken(joinCode: string, token: string, eventName?: string) {
   writeStored(HOST_KEY(joinCode), token);
@@ -1052,34 +1050,7 @@ export function clearHostToken(joinCode: string) {
   removeStored(HOST_KEY(joinCode));
 }
 
-export function savePlayerSession(
-  joinCode: string,
-  session: { token: string; displayName: string },
-) {
-  writeStored(PLAYER_KEY(joinCode), JSON.stringify(session));
-  rememberRecentEvent(`/e/${normalizeJoinCode(joinCode)}`, normalizeJoinCode(joinCode));
-}
-
-export function loadPlayerSession(joinCode: string) {
-  const raw = readStored(PLAYER_KEY(joinCode));
-  if (!raw) {
-    return null;
-  }
-  try {
-    return JSON.parse(raw) as { token: string; displayName: string };
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Forgets the seat. Only for a session the server has refused: a durable key
- * that no longer opens anything would otherwise sit in front of the join form
- * for good.
- */
-export function clearPlayerSession(joinCode: string) {
-  removeStored(PLAYER_KEY(joinCode));
-}
+export { savePlayerSession, loadPlayerSession, clearPlayerSession } from './player-sessions';
 
 const DISPLAY_TOKEN_KEY = 'podyguard.display.token';
 const DISPLAY_SESSION_KEY = 'podyguard.display.sessionId';

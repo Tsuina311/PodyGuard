@@ -25,13 +25,13 @@ const variants: Record<ButtonVariant, string> = {
     'border border-beam/40 text-ink hover:border-beam/80 hover:bg-beam/10',
   glass:
     'border border-muted/20 bg-ink/5 text-ink backdrop-blur-md hover:border-muted/35 hover:bg-ink/10',
-  ghost: 'text-muted hover:bg-ink/5 hover:text-ink',
+  ghost: 'border border-muted/25 bg-ink/[0.03] text-ink hover:border-muted/45 hover:bg-ink/10',
   danger:
     'border border-danger/50 bg-danger/10 text-danger shadow-[0_0_18px_-8px_var(--color-danger)] hover:bg-danger/20 hover:border-danger/70',
 };
 
 const sizes: Record<ButtonSize, string> = {
-  sm: 'h-8 px-3 text-xs',
+  sm: 'min-h-11 px-3 text-xs sm:min-h-8',
   md: 'h-11 px-5 text-sm',
   lg: 'h-12 px-7 text-base',
 };
