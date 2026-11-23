@@ -68,6 +68,30 @@ try {
     demo.token,
   );
   const tables = await store.listTables(event.id);
+  const { PostgresEventTrackerStore } = await import('../apps/server/src/event-tracker/store.ts');
+  const trackers = new PostgresEventTrackerStore();
+  const trackerContext = `${event.id}:persistence-check`;
+  const trackerId = randomUUID();
+  await trackers.exclusive(trackerContext, () => trackers.put({
+    context: trackerContext, id: trackerId, gameId: randomUUID(), eventId: event.id,
+    readToken: 'a'.repeat(64), ownerId: 'owner-a', ownerName: 'Ada', deviceId: randomUUID(),
+    generation: 1, revision: 0, updatedAt: Date.now(), transfer: null,
+    history: { present: { players: [{ id: 'a', life: 17 }], firstPlayerId: 'a' }, past: [{ players: [{ id: 'a', life: 20 }] }] },
+  }));
+  const ownership = await Promise.all([1, 2].map(() => trackers.exclusive(trackerContext, async () => {
+    const row = await trackers.get(trackerContext);
+    if (row.generation !== 1) return false;
+    await trackers.put({ ...row, ownerId: 'owner-b', generation: 2 });
+    return true;
+  })));
+  assert.equal(ownership.filter(Boolean).length, 1);
+  await closeDatabase();
+  const persistedTracker = await new PostgresEventTrackerStore().getById(trackerId);
+  assert.equal(persistedTracker.ownerId, 'owner-b');
+  assert.equal(persistedTracker.generation, 2);
+  assert.equal(persistedTracker.history.present.players[0].life, 17);
+  assert.equal(persistedTracker.history.past[0].players[0].life, 20);
+  console.log('PASS: event tracker ownership, state and undo survive reconnect; concurrent ownership changes serialize.');
   const ownerA = randomUUID(),
     ownerB = randomUUID();
   const claims = await Promise.allSettled(

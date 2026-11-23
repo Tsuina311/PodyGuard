@@ -10,6 +10,15 @@
     "unknownDate": "Data non disponibile",
     "removeEntry": "Rimuovi {{entry}} da questo elenco"
   },
+  "eventTracker": {
+    "trackedBy": "La partita è seguita sul dispositivo di {{name}}", "readOnly": "Modalità sola lettura",
+    "transfer": "Trasferisci su questo dispositivo", "resume": "Continua il tracciamento", "opening": "Verifica della partita condivisa…",
+    "offline": "Offline — continua a giocare. Le modifiche sono salvate su questo dispositivo e saranno sincronizzate alla riconnessione.",
+    "waiting": "In attesa che il dispositivo principale si connetta e trasferisca la partita. Nel frattempo mantiene il controllo.",
+    "confirming": "Conferma del trasferimento. Riconnettiti per verificare quale dispositivo ha il controllo prima di modificare.",
+    "moved": "Il controllo è stato trasferito su un altro dispositivo.", "stale": "In attesa del dispositivo principale · i totali potrebbero non essere aggiornati",
+    "first": "Primo giocatore", "notStarted": "Nessun tracciamento condiviso è ancora iniziato.", "retry": "Riconnetti"
+  },
   "navigation": { "menu": "Menu di navigazione", "home": "Menu principale", "playgroups": "I miei gruppi" },
   "hostUx": {
     "overview": "Panoramica", "players": "Giocatori", "share": "Invita", "settings": "Impostazioni",

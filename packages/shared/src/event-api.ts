@@ -100,6 +100,8 @@ export type PublicParticipant = {
 
 export type PublicTable = {
   id: string;
+  /** Identity of the current game; a physical table can be reused. */
+  gameId?: string;
   label: string;
   sortOrder: number;
   status: PhysicalTableStatus;

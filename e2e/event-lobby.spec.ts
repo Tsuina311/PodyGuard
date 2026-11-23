@@ -65,16 +65,16 @@ test.describe('event lobby — join, match, tracker', () => {
     await playerA.getByRole('button', { name: 'Share live tracker', exact: true }).click();
     const viewingLink = playerA.getByRole('link', { name: 'Open read-only tracker' });
     await expect(viewingLink).toBeVisible();
-    await expect(playerB.getByRole('link', { name: 'View live table', exact: true })).toBeVisible();
-    await playerB.getByRole('link', { name: 'View live table', exact: true }).click();
+    await expect(playerB.getByRole('button', { name: 'Read-only mode', exact: true })).toBeVisible();
+    await playerB.getByRole('button', { name: 'Read-only mode', exact: true }).click();
     await expect(playerB.getByLabel('Ada: 20 life', { exact: true })).toBeVisible();
     await expect(playerB.getByRole('button', { name: /Add 1 life|Remove 1 life/ })).toHaveCount(0);
     await playerA.getByRole('button', { name: 'Close match menu' }).click();
     await playerA.getByRole('button', { name: /Remove 1 life/ }).first().click();
     await expect(playerB.getByLabel('Ada: 19 life', { exact: true })).toBeVisible();
-    await playerB.goto(`/#/e/${code}`);
+    await playerB.getByRole('button', { name: 'Close', exact: true }).click();
     await expect(playerB.getByText('Match found')).toBeVisible();
-    await expect(playerB.getByRole('link', { name: 'View live table', exact: true })).toBeVisible();
+    await expect(playerB.getByRole('button', { name: 'Read-only mode', exact: true })).toBeVisible();
     await expect(playerB.getByRole('heading', { name: 'Ready to begin' })).toHaveCount(0);
 
     await playerA.close();

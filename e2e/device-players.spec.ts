@@ -83,7 +83,7 @@ test('one phone hosts and plays four independent seats, restores closed tabs, an
   await bea.reload();
   await expect(bea.getByText('This tab: Bea', { exact: true })).toBeVisible();
   await expect(bea.locator('article[data-seat-id]')).toHaveCount(0);
-  await bea.getByRole('link', { name: 'View live table', exact: true }).click();
+  await bea.getByRole('button', { name: 'Read-only mode', exact: true }).click();
   await expect(bea.getByLabel('Ada: 20 life', { exact: true })).toBeVisible();
   await expect(bea.getByRole('button', { name: /Add 1 life|Remove 1 life/ })).toHaveCount(0);
   await expect(cal.getByText('This tab: Cal', { exact: true })).toBeVisible();

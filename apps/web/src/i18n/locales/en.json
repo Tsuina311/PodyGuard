@@ -10,6 +10,15 @@
     "unknownDate": "Date unavailable",
     "removeEntry": "Remove {{entry}} from this list"
   },
+  "eventTracker": {
+    "trackedBy": "Game is tracked on {{name}}’s device", "readOnly": "Read-only mode",
+    "transfer": "Transfer to this device", "resume": "Continue tracking", "opening": "Checking the shared tracker…",
+    "offline": "Offline — keep playing. Changes are saved on this device and will sync when connected.",
+    "waiting": "Waiting for the tracking device to connect and hand over the game. It keeps control until then.",
+    "confirming": "Confirming transfer. Reconnect to check which device has control before editing.",
+    "moved": "Tracker control has moved to another device.", "stale": "Waiting for the tracking device · totals may be out of date",
+    "first": "Starting player", "notStarted": "No shared tracker has started yet.", "retry": "Reconnect"
+  },
   "navigation": { "menu": "Navigation menu", "home": "Main menu", "playgroups": "My playgroups" },
   "hostUx": {
     "overview": "Overview", "players": "Players", "share": "Share", "settings": "Settings",

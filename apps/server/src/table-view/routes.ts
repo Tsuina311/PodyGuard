@@ -1,6 +1,7 @@
 import { randomBytes, timingSafeEqual } from 'node:crypto';
 import type { FastifyPluginAsync } from 'fastify';
 import type { TableViewState } from '@podyguard/shared';
+import type { EventTrackerStore } from '../event-tracker/store.js';
 const TTL = 24 * 3600_000;
 const secret = () => randomBytes(32).toString('hex');
 const matches = (header: string | undefined, token: string) => {
@@ -71,7 +72,7 @@ function parse(value: unknown): TableViewState | null {
   };
 }
 /** Short-lived, capability-protected viewing sessions. One main device writes. */
-export const tableViewRoutes: FastifyPluginAsync = async (app) => {
+export const tableViewRoutes: FastifyPluginAsync<{ eventTrackerStore?: EventTrackerStore }> = async (app, options) => {
   const shares = new Map<
     string,
     {
@@ -98,7 +99,7 @@ export const tableViewRoutes: FastifyPluginAsync = async (app) => {
       (row) => row.label === participant.tableLabel,
     );
     if (!table?.playingStartedAt) throw new Error('No current game');
-    return `${event.id}:${table.id}:${table.playingStartedAt}`;
+    return `${event.id}:${table.id}:${table.playingStartedAt}:${table.gameId}`;
   }
   app.addHook('onRequest', async (_req, reply) => {
     reply.header('Cache-Control', 'no-store');
@@ -116,6 +117,8 @@ export const tableViewRoutes: FastifyPluginAsync = async (app) => {
         const found = [...shares.entries()].find(
           ([, row]) => row.context === context,
         );
+        const tracker = await options.eventTrackerStore?.get(context);
+        if (tracker) return { view: { id: `event-${tracker.id}`, readToken: tracker.readToken, ownerName: tracker.ownerName } };
         return {
           view: found ? { id: found[0], readToken: found[1].readToken } : null,
         };
@@ -172,6 +175,7 @@ export const tableViewRoutes: FastifyPluginAsync = async (app) => {
                   'This table already has a main tracker. Open its live viewing link instead.',
               },
             });
+        if (await options.eventTrackerStore?.get(context)) return reply.code(409).send({ error: { message: 'This table already has a shared game tracker.' } });
       }
       const id = secret();
       const readToken = secret();

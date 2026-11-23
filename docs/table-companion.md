@@ -2,13 +2,19 @@
 
 The table's main device owns the tracker. Open its match menu to request fullscreen, check screen wake status, or share a read-only viewing link/QR. Friends open that link on their phones to see public totals, commanders, commander damage, and game status, and to use Magic Rules/card lookup without editing the table.
 
-For hosted games, joined player seats discover their own table’s viewing link automatically on the event screen. The existing participant session authorizes discovery, and the link is bound to that specific table and game start; another table cannot discover it. A second main publisher for the same game is refused. Restoring another player’s phone does not create an independent tracker unless that device already has saved tracker progress.
+For hosted constructed games, the first player who opens the tracker becomes its controller. Other players at that table see “Game is tracked on [name]’s device”, with read-only and transfer options. Claims are atomic and bound to the current game ID; refreshing or opening another player’s phone cannot create a second game or choose another starting player.
+
+Transfers require a live handoff from the current controller. The requesting player waits while the controller saves pending life changes and acknowledges the request. Only then does control move; the previous device becomes read-only. Life totals, starting player, timers, counters, secret setup and the last 30 undo steps are retained. The requesting player receives private engine state only after becoming the controller. A request expires after 30 seconds if the current device cannot acknowledge it; it can be requested again.
+
+Life taps are immediate and saved locally on every change. Network updates are debounced by 400 ms, with a maximum 1.2-second wait during continuous taps. A disconnected controller keeps working, and reconnecting syncs its local changes before handing over. An offline or closed controller cannot be forcibly replaced, avoiding two independently editable games. During the handoff acknowledgement only, editing is blocked until the outcome can be confirmed; an interrupted handshake is resolved atomically before edits resume.
 
 The viewer polls about once a second. After ten seconds without a fresh main-device update (or an API error), it explicitly marks totals as potentially out of date. The main device must remain open and online for updates. Local tracking itself continues offline.
 
-Viewing sessions use the existing API server, with separate random 256-bit viewing and writing credentials. The viewing link carries only its viewing credential inside the URL fragment; requests send credentials in authorization headers. The server accepts only a small public projection, never secret roles or host/player session credentials. Viewers cannot publish, revoke, or finish games. The main device can stop sharing and revoke a link.
+Viewing links carry a random 256-bit viewing credential inside the URL fragment; requests send it in authorization headers. Viewers receive a public projection without secret roles, targets, undo history, or host/player credentials. Viewers cannot edit or finish games. Joined participants may request control through their authenticated event session.
 
-These are bounded, short-lived sessions on the current API process, not permanent match records: at most 1,000 concurrent shares, creation/update rate limits, and expiry after 24 hours without publication. A service restart or a different API instance invalidates a link; the main device offers a fresh link when it detects expiry. A durable, multi-instance implementation would need shared storage before deploying replicas.
+Hosted event trackers use the existing Postgres database (migration `0030_event_trackers`) and transactional locks. State, ownership, pending handoffs and viewing links survive an API restart and work across API instances. Viewing links expire after 24 hours without updates. Local demo/tests use an in-memory adapter.
+
+Standalone quick-play sharing keeps its existing optional, in-process sessions: at most 1,000 concurrent shares, expiry after 24 hours without publication, and replacement links after an API restart. The standalone main device can stop sharing. These sessions do not gain event ownership or transfer behavior.
 
 ## iPad checks
 

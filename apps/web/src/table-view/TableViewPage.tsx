@@ -9,12 +9,14 @@ import type { TableViewSnapshot } from '@podyguard/shared';
 import { request } from '../api';
 import { ThemeToggleCorner } from '../ui/ThemeToggle';
 import { Panel } from '../ui/Panel';
+import type { TrackerState } from '../tracker/engine';
+import { ReadOnlyTracker } from './ReadOnlyTracker';
 export function TableViewPage() {
   const { id = '' } = useParams();
   const [query] = useSearchParams();
   const token = query.get('token') ?? '';
   const location = useLocation();
-  const [snapshot, setSnapshot] = useState<TableViewSnapshot | null>(null);
+  const [snapshot, setSnapshot] = useState<(TableViewSnapshot & { ownerName?: string }) | null>(null);
   const [error, setError] = useState('');
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
@@ -26,7 +28,7 @@ export function TableViewPage() {
     async function update() {
       try {
         const next = await request<TableViewSnapshot>(
-          `/tracker-shares/${encodeURIComponent(id)}`,
+          id.startsWith('event-') ? `/event-trackers/${encodeURIComponent(id.slice(6))}/view` : `/tracker-shares/${encodeURIComponent(id)}`,
           {
             headers: { Authorization: `Bearer ${token}` },
             signal: controller.signal,
@@ -53,6 +55,9 @@ export function TableViewPage() {
   }, [id, token]);
   const stale =
     !snapshot || Boolean(error) || now - snapshot.updatedAt > 10_000;
+  if (snapshot && id.startsWith('event-')) return <ReadOnlyTracker
+    state={snapshot.state as unknown as TrackerState} ownerName={snapshot.ownerName ?? 'the main player'}
+    stale={stale} error={error} onClose={() => { window.history.back(); }} />;
   return (
     <>
       <ThemeToggleCorner />

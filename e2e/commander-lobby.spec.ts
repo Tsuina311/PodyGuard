@@ -43,7 +43,8 @@ async function joinCommander(page: Page, name: string, bracket = 'B3', saved = f
 
 for (const changeBracket of [false, true]) {
   test(`one-table Commander: three friends + host${changeBracket ? ' changing B2 to B3 before ready' : ''} can match and start`, async ({ page, browser, baseURL }) => {
-    test.setTimeout(120_000);
+    // This journey hosts two games and starts a third event across four browsers.
+    test.setTimeout(test.info().project.name === 'webkit' ? 240_000 : 120_000);
     const demo = await (await page.request.get('/test/demo')).json();
     const groupName = `Commander history ${changeBracket ? 'changed' : 'standard'} ${test.info().project.name} ${test.info().repeatEachIndex}-${test.info().retry}`;
     const groupResponse = await page.request.post('/api/playgroups', {
@@ -115,7 +116,7 @@ for (const changeBracket of [false, true]) {
       const playingTable = (await (await page.request.get(`/api/events/${code}/tables`)).json()).tables[0];
       expect(playingTable.playingStartedAt).toBeTruthy();
       await page.getByRole('tab', { name: 'Play', exact: true }).click();
-      for (const player of [...friends, page]) {
+      for (const player of [page]) {
         await expect(player.getByText('Match found', { exact: true })).toBeVisible();
         await player.getByRole('button', { name: 'Use game tracker', exact: true }).click();
         await expect(player.getByRole('heading', { name: 'Ready to begin' })).toBeVisible();
@@ -148,10 +149,12 @@ for (const changeBracket of [false, true]) {
         await page.getByRole('tab', { name: 'Play', exact: true }).click();
         await expect(page.locator('article[data-seat-id]').first().getByText('39', { exact: true })).toBeVisible();
       });
-      await test.step('Other players retain a changed tracker until the first game finishes', async () => {
-        const friendSeat = friends[0]!.locator('article[data-seat-id]').first();
-        await friendSeat.getByRole('button', { name: /^Remove 1 life/ }).click();
-        await expect(friendSeat.getByText('39', { exact: true })).toBeVisible();
+      await test.step('Other players see the same tracker without creating independent games', async () => {
+        for (const friend of friends) {
+          await friend.getByRole('button', { name: 'Read-only mode', exact: true }).click();
+          await expect(friend.getByLabel(/: 39 life$/)).toHaveCount(1);
+          await expect(friend.getByRole('button', { name: /^Remove 1 life/ })).toHaveCount(0);
+        }
       });
       await test.step('Finish a game and verify playgroup history exactly once', async () => {
         const reveal = page.getByRole('button', { name: /^Show seat controls/ });
@@ -160,7 +163,9 @@ for (const changeBracket of [false, true]) {
         await page.getByRole('button', { name: 'Game won by', exact: true }).click();
         await page.getByRole('button', { name: 'Seat 1', exact: true }).click();
         await page.getByRole('button', { name: 'Yes, they won', exact: true }).click();
+        const finished = page.waitForResponse(r => r.url().endsWith('/tracker/finish') && r.request().method() === 'POST');
         await page.getByRole('button', { name: 'Done & requeue', exact: true }).click();
+        expect((await finished).ok()).toBe(true);
         const overviewResponse = await page.request.get(`/api/playgroups/${groupId}`, { headers: { Authorization: `Bearer ${demo.token}` } });
         expect(overviewResponse.ok()).toBe(true);
         const overview = (await overviewResponse.json()).overview;
@@ -182,7 +187,7 @@ for (const changeBracket of [false, true]) {
         await page.getByRole('button', { name: 'Match now', exact: true }).click();
         await page.getByRole('button', { name: 'Start game', exact: true }).click();
         await page.getByRole('tab', { name: 'Play', exact: true }).click();
-        for (const player of [...friends, page]) {
+        for (const player of [page]) {
           await expect(player.getByText('Match found', { exact: true })).toBeVisible();
           await player.getByRole('button', { name: 'Use game tracker', exact: true }).click();
           await expect(player.getByRole('heading', { name: 'Ready to begin' })).toBeVisible();
@@ -197,7 +202,9 @@ for (const changeBracket of [false, true]) {
         await page.getByRole('button', { name: 'Game won by', exact: true }).click();
         await page.getByRole('button', { name: 'Seat 1', exact: true }).click();
         await page.getByRole('button', { name: 'Yes, they won', exact: true }).click();
+        const finished = page.waitForResponse(r => r.url().endsWith('/tracker/finish') && r.request().method() === 'POST');
         await page.getByRole('button', { name: 'Done & requeue', exact: true }).click();
+        expect((await finished).ok()).toBe(true);
         await expect.poll(async () => {
           const overview = await page.request.get(`/api/playgroups/${groupId}`, {
             headers: { Authorization: `Bearer ${demo.token}` },

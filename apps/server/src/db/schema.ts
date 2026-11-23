@@ -1019,3 +1019,19 @@ export const gameNightRsvps = pgTable('game_night_rsvps', {
   displayName: text('display_name').notNull(),
   response: text('response').$type<'yes' | 'maybe' | 'no'>().notNull(),
 }, table => [uniqueIndex('game_night_rsvp_unique').on(table.nightId, table.tokenHash)]);
+
+export const eventTrackers = pgTable('event_trackers', {
+  context: text('context').primaryKey(),
+  id: uuid('id').notNull().unique(),
+  gameId: uuid('game_id').notNull(),
+  eventId: uuid('event_id').notNull().references(() => events.id, { onDelete: 'cascade' }),
+  readToken: text('read_token').notNull(),
+  ownerId: text('owner_id').notNull(),
+  ownerName: text('owner_name').notNull(),
+  deviceId: text('device_id').notNull(),
+  generation: integer('generation').notNull(),
+  revision: integer('revision').notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
+  history: jsonb('history').$type<{ present: Record<string, unknown>; past: Record<string, unknown>[] }>().notNull(),
+  transfer: jsonb('transfer').$type<{ id: string; ownerId: string; name: string; deviceId: string; requestedAt: number }>(),
+});

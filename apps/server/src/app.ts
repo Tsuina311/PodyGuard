@@ -1,4 +1,6 @@
 import { tableViewRoutes } from './table-view/routes.js';
+import { eventTrackerRoutes } from './event-tracker/routes.js';
+import { MemoryEventTrackerStore, PostgresEventTrackerStore, type EventTrackerStore } from './event-tracker/store.js';
 import { gameNightRoutes } from './game-nights/routes.js';
 import { MemoryGameNightStore, PostgresGameNightStore, type GameNightStore } from './game-nights/store.js';
 import Fastify from 'fastify';
@@ -32,6 +34,7 @@ import { scryfallRoutes } from './routes/scryfall.js';
 import type { ScryfallClient } from './scryfall/scryfall-client.js';
 
 export type BuildAppOptions = {
+  eventTrackerStore?: EventTrackerStore;
   gameNightStore?: GameNightStore;
   identity?: IdentityBoundary;
   events?: EventService;
@@ -100,7 +103,9 @@ export async function buildApp(options: BuildAppOptions = {}) {
     checkDatabase: options.checkDatabase,
   });
   await app.register(eventRoutes);
-  await app.register(tableViewRoutes);
+  const eventTrackerStore = options.eventTrackerStore ?? (options.events ? new MemoryEventTrackerStore() : new PostgresEventTrackerStore());
+  await app.register(eventTrackerRoutes, { store: eventTrackerStore });
+  await app.register(tableViewRoutes, { eventTrackerStore });
   await app.register(playgroupRoutes);
   await app.register(gameNightRoutes, { store: options.gameNightStore ?? (options.events ? new MemoryGameNightStore() : new PostgresGameNightStore()) });
   await app.register(googleAuthRoutes);
