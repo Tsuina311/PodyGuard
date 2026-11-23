@@ -18,7 +18,7 @@ async function joinCurrent(page: Page, name: string) {
 }
 
 test('one phone hosts and plays four independent seats, restores closed tabs, and keeps one tracker', async ({ page, context }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(test.info().project.name === 'webkit' ? 180_000 : 120_000);
   await page.setViewportSize({ width: 390, height: 844 });
   const code = await createConstructedEvent(page, { name: 'One phone night', baseModeLabel: 'Multiplayer', commanderRules: false });
   const hostToken = await page.evaluate(code => localStorage.getItem(`podyguard.host.${code}`), code);
@@ -43,20 +43,29 @@ test('one phone hosts and plays four independent seats, restores closed tabs, an
   await joinCurrent(bea, 'Bea');
   expect((await joinRequest).headers().authorization).toBeUndefined();
   await joinCurrent(cal, 'Cal');
+  const reopenBea = ada.waitForEvent('popup');
+  await ada.getByRole('link', { name: 'Continue as Bea', exact: true }).click();
+  const beaAgain = await reopenBea;
+  await expect(beaAgain.getByText('This tab: Bea', { exact: true })).toBeVisible();
+  await expect(ada.getByText('This tab: Ada', { exact: true })).toBeVisible();
+  await beaAgain.close();
   const dara = await anotherPlayer(bea);
   await joinCurrent(dara, 'Dara');
   const daraUrl = dara.url();
   await dara.close();
 
-  const restored = await context.newPage();
+  const recovery = await context.newPage();
+  await recovery.setViewportSize({ width: 390, height: 844 });
+  await prepareApp(recovery);
+  await recovery.goto('/');
+  await recovery.getByRole('link', { name: 'Resume a player · 4 saved', exact: true }).click();
+  const reopened = recovery.waitForEvent('popup');
+  await recovery.getByRole('link', { name: 'Continue as Dara', exact: true }).click();
+  const restored = await reopened;
   await restored.setViewportSize({ width: 390, height: 844 });
-  await restored.goto(`/#/e/${code}`);
-  await expect(restored.getByText('This tab: Ada', { exact: true })).toBeVisible();
-  await restored.getByText('Players on this device', { exact: true }).click();
-  await restored.getByRole('link', { name: 'Continue as Dara', exact: true }).click();
   await expect(restored.getByText('This tab: Dara', { exact: true })).toBeVisible();
   expect(restored.url()).toBe(daraUrl);
-  await restored.getByText('Players on this device', { exact: true }).click();
+  await expect(recovery.getByRole('heading', { name: 'Players on this device', exact: true })).toBeVisible();
   expect(await restored.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await restored.screenshot({ path: test.info().outputPath('saved-players-phone.png') });
   for (const [player, name] of [[ada, 'Ada'], [bea, 'Bea'], [cal, 'Cal'], [restored, 'Dara']] as const) {
@@ -78,6 +87,12 @@ test('one phone hosts and plays four independent seats, restores closed tabs, an
   await ada.getByTitle('Show seat controls', { exact: true }).click();
   await ada.getByTitle('Match menu', { exact: true }).click();
   await expect(ada.getByRole('link', { name: 'Join as another person', exact: true })).toBeVisible();
+  const reopenCal = ada.waitForEvent('popup');
+  await ada.getByRole('link', { name: 'Continue as Cal', exact: true }).click();
+  const calAgain = await reopenCal;
+  await expect(calAgain.getByText('This tab: Cal', { exact: true })).toBeVisible();
+  await expect(ada.locator('article[data-seat-id]')).toHaveCount(4);
+  await calAgain.close();
   await ada.getByRole('button', { name: 'Share live tracker', exact: true }).click();
   await expect(ada.getByRole('link', { name: 'Open read-only tracker' })).toBeVisible();
   await bea.reload();
@@ -120,7 +135,6 @@ test('leaving an extra seat preserves other tabs and its old local link cannot i
   await expect(bea.getByLabel('Display name', { exact: true })).toBeVisible();
   await ada.reload();
   await expect(ada.getByText('This tab: Ada', { exact: true })).toBeVisible();
-  await ada.getByText('Players on this device', { exact: true }).click();
   await expect(ada.getByRole('link', { name: 'Continue as Bea', exact: true })).toHaveCount(0);
   // A different browser has no saved credentials for this local selector.
   const stranger = await browser.newPage();

@@ -28,6 +28,12 @@
     "statuses": { "joined": "Non pronto", "ready": "Pronto", "matched": "Al tavolo", "playing": "In partita", "paused": "In pausa", "left": "Uscito" }
   },
   "devicePlayers": {
+    "resumeCount": "Riprendi un giocatore · {{count}} salvati",
+    "all": "Tutti i giocatori salvati",
+    "recoveryHelp": "I giocatori restano salvati quando chiudi una scheda. Continua apre una nuova scheda in questo browser e mantiene aperto il giocatore attuale.",
+    "eventCode": "Evento {{code}}",
+    "newTab": "Si apre in una nuova scheda",
+    "empty": "Nessun giocatore salvato in questo browser. Partecipa a un evento per ritrovare qui il tuo giocatore.",
     "title": "Giocatori su questo dispositivo",
     "current": "Questa scheda: {{name}}",
     "joinAnother": "Partecipa come un'altra persona",

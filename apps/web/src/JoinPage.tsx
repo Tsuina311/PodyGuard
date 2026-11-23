@@ -248,6 +248,7 @@ function PlayerJoinPage({
           listTables(loaded.joinCode),
         ]);
         if (!cancelled) {
+          if (existing.eventName !== loaded.name) savePlayerSession(loaded.joinCode, { ...existing, eventName: loaded.name }, scope);
           setToken(existing.token);
           setParticipant(me.participant);
           setSnapshot({
@@ -568,6 +569,7 @@ function PlayerJoinPage({
       savePlayerSession(event.joinCode, {
         token: result.token,
         displayName: result.participant.displayName,
+        eventName: event.name,
       }, joinedScope);
       removeStored(joinDraftKey);
       if (!mounted.current) return;

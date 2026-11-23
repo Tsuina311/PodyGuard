@@ -31,6 +31,7 @@ import {
 import { emptySeatCommanders } from './CommanderSeatPickers';
 import { activeMatchPath } from './active-match';
 import { OngoingGame } from './OngoingGame';
+import { SavedPlayersShortcut } from './SavedPlayersPage';
 import {
   defaultHostLimitedConfigs,
   limitedConfigsForEventCreate,
@@ -482,6 +483,8 @@ export function HomePage() {
           {t('home.taglineAfter')}
         </h1>
       </header>
+
+      <SavedPlayersShortcut />
 
       <div
         role="tablist"

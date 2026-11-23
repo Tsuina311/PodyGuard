@@ -5,6 +5,20 @@ const REMOVED_KEY = 'podyguard.recent-events.removed';
 const valid = (path: unknown): path is string =>
   typeof path === 'string' &&
   /^\/(?:host|e)\/[A-Za-z0-9-]+$|^\/nights\/[a-f0-9-]+$/i.test(path);
+
+/** Names remain useful for player recovery even after hiding an event shortcut. */
+export function rememberedEventName(joinCode: string): string {
+  try {
+    const rows: unknown = JSON.parse(readStored(KEY) ?? '[]');
+    if (Array.isArray(rows)) {
+      const match = rows.find(row => row &&
+        [ `/e/${joinCode}`, `/host/${joinCode}` ].includes(row.path) &&
+        typeof row.name === 'string' && row.name.trim() && row.name !== joinCode);
+      if (match) return match.name;
+    }
+  } catch { /* Missing names fall back to the event code. */ }
+  return joinCode;
+}
 function removedPaths(): string[] {
   try {
     const parsed: unknown = JSON.parse(readStored(REMOVED_KEY) ?? '[]');

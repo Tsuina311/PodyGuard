@@ -3,10 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { recentEvents, removeRecentEvent } from './recent-events';
 import { Button } from './ui/Button';
+import { useSavedPlayers } from './use-saved-players';
 
 export function RecentEvents() {
   const { t, i18n } = useTranslation();
   const [rows, setRows] = useState(recentEvents);
+  const playerEvents = useSavedPlayers();
 
   useEffect(() => {
     const refresh = () => setRows(recentEvents());
@@ -34,9 +36,12 @@ export function RecentEvents() {
           const label = `${row.name} · ${type}`;
           const date = new Date(row.seenAt);
           const hasDate = row.seenAt > 0 && Number.isFinite(date.getTime());
+          const code = /^\/(?:host|e)\/([^/]+)$/.exec(row.path)?.[1];
+          const players = playerEvents.find(event => event.joinCode === code)?.players;
 
           return (
             <li key={row.path} className="flex min-w-0 items-center gap-2 rounded-xl border border-muted/25 pr-2">
+              <div className="min-w-0 flex-1">
               <Link className="flex min-h-11 min-w-0 flex-1 flex-col justify-center px-3 py-2 text-sm text-neon hover:underline" to={row.path}>
                 <span className="break-words">{label}</span>
                 <span className="text-xs text-muted">
@@ -47,6 +52,10 @@ export function RecentEvents() {
                   ) : t('recentEvents.unknownDate')}
                 </span>
               </Link>
+              {players?.length ? <Link to={`/players?event=${encodeURIComponent(code!)}`} className="mx-3 mb-2 inline-flex min-h-11 items-center rounded-lg border border-muted/25 px-2 py-1 text-sm font-semibold text-ink hover:bg-neon/10">
+                {t('devicePlayers.resumeCount', { count: players.length })}
+              </Link> : null}
+              </div>
               <Button
                 variant="glass"
                 size="sm"

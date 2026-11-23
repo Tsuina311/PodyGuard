@@ -34,6 +34,7 @@ export function AppMenu() {
     }} className="fixed right-3 top-16 z-50 max-h-[calc(100dvh-5rem)] w-80 max-w-[calc(100vw-1.5rem)] overflow-y-auto overscroll-contain rounded-2xl border border-muted/30 bg-void p-2 shadow-xl">
       <Link to="/" className={linkClass}><Home size={18} aria-hidden />{t('navigation.home')}</Link>
       <Link to="/account" className={linkClass}><Users size={18} aria-hidden />{t('navigation.playgroups')}</Link>
+      <Link to="/players" className={linkClass}><Users size={18} aria-hidden />{t('devicePlayers.title')}</Link>
       <Link to="/tools" state={{ returnTo: location.pathname + location.search }} className={linkClass}>
         <BookOpen size={18} aria-hidden />{t('tracker.magicRules.title')}
       </Link>

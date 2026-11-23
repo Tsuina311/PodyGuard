@@ -28,6 +28,12 @@
     "statuses": { "joined": "Pas prêt", "ready": "Prêt", "matched": "À table", "playing": "En partie", "paused": "En pause", "left": "Parti" }
   },
   "devicePlayers": {
+    "resumeCount": "Reprendre un joueur · {{count}} enregistrés",
+    "all": "Tous les joueurs enregistrés",
+    "recoveryHelp": "Les joueurs restent enregistrés après la fermeture d’un onglet. Continuer ouvre un nouvel onglet dans ce navigateur et garde le joueur actuel ouvert.",
+    "eventCode": "Événement {{code}}",
+    "newTab": "Ouvre un nouvel onglet",
+    "empty": "Aucun joueur enregistré dans ce navigateur. Rejoignez un événement pour retrouver votre joueur ici.",
     "title": "Joueurs sur cet appareil",
     "current": "Cet onglet : {{name}}",
     "joinAnother": "Rejoindre avec une autre personne",
