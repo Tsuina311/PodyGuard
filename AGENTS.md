@@ -1,3 +1,12 @@
+## Standing authorization
+
+These permissions apply to all PodyGuard work, including future Codex sessions in Cursor and Cloud.
+
+- The owner preauthorizes writing and running commands needed for the requested work, including builds, type checks, unit/integration tests, and Playwright. Do not ask for separate permission to run them.
+- The owner preauthorizes Git operations needed to prepare, implement, and publish work on task branches: inspect, fetch, pull, create/switch task branches, resolve conflicts while preserving unrelated work, stage, commit, and push task branches. Do not ask for per-command confirmation. Opening or updating the task's PR is also authorized.
+- For local commands and Git work, ask permission only before installing software, tools, or dependencies on the machine, or before an operation that would modify the project's main/default branch. Fetching and pulling are permitted, including for main. Keep implementation and commits on task branches; do not infer permission to change main from a general task request.
+- These instructions do not override security controls imposed by the Codex app or execution environment. If that environment requires an approval prompt, explain that it is an environment requirement rather than requesting the same project authorization again.
+
 ## Review workflow
 
 These standing instructions apply repository-wide to Codex in Cursor and Cloud.
