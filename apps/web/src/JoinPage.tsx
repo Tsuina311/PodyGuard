@@ -1,4 +1,5 @@
 import { EventTableLink } from './table-view/EventTableLink';
+import { EventTrackerSession, type TrackerIntent } from './table-view/EventTrackerSession';
 import { Agreement } from './game-nights/Agreement';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -153,6 +154,7 @@ function PlayerJoinPage({
   const [busy, setBusy] = useState(false);
   const [snapshot, setSnapshot] = useState<EventSnapshot | null>(null);
   const [showTracker, setShowTracker] = useState(false);
+  const [trackerIntent, setTrackerIntent] = useState<TrackerIntent>({ mode: 'claim' });
   const [askRating, setAskRating] = useState(false);
   const [treacheryRole, setTreacheryRole] =
     useState<TreacheryRoleAssignment | null>(null);
@@ -246,6 +248,7 @@ function PlayerJoinPage({
           listTables(loaded.joinCode),
         ]);
         if (!cancelled) {
+          if (existing.eventName !== loaded.name) savePlayerSession(loaded.joinCode, { ...existing, eventName: loaded.name }, scope);
           setToken(existing.token);
           setParticipant(me.participant);
           setSnapshot({
@@ -566,6 +569,7 @@ function PlayerJoinPage({
       savePlayerSession(event.joinCode, {
         token: result.token,
         displayName: result.participant.displayName,
+        eventName: event.name,
       }, joinedScope);
       removeStored(joinDraftKey);
       if (!mounted.current) return;
@@ -722,17 +726,19 @@ function PlayerJoinPage({
       );
       setParticipant(result.participant);
       if (trackerUsed) {
+        setTrackerIntent({ mode: 'claim' });
         setShowTracker(true);
       }
     } catch (caught) {
       if (isOfflineError(caught)) {
+        if (trackerUsed) {
+          setError(t('eventTracker.offline'));
+          return;
+        }
         enqueuePending(storageCode, {
           type: 'tracker-choice',
           trackerUsed,
         });
-        if (trackerUsed) {
-          setShowTracker(true);
-        }
         setError(t('join.offlineSaved'));
         return;
       }
@@ -757,12 +763,13 @@ function PlayerJoinPage({
   async function onTrackerFinished(
     winnerId: string,
     durationSeconds: number,
+    saved?: { participant: PublicParticipant },
   ) {
     if (!event || !token) {
       throw new Error(t('common.errors.sessionUnavailable'));
     }
     try {
-      const result = await reportGameResult(
+      const result = saved ?? await reportGameResult(
         event.joinCode,
         token,
         winnerId,
@@ -857,7 +864,14 @@ function PlayerJoinPage({
   if (participant && token && seated && participant.status === 'playing' && showTracker) {
     return (
       <>
-        <TrackerView
+        <EventTrackerSession key={`${trackerKey}:${matchTable?.gameId}:${trackerIntent.mode}:${trackerIntent.generation ?? ''}`}
+          joinCode={event!.joinCode} token={token} storageKey={trackerKey} intent={trackerIntent}
+          gameId={matchTable!.gameId!}
+          players={(snapshot?.participants ?? []).filter(row => row.tableLabel === participant.tableLabel).map(row => ({ id: row.id, name: row.displayName, commanders: row.assignedCommanders ?? [] }))}
+          gameMode={event!.gameMode} rulesFormat={event!.rulesFormat}
+          onClose={() => setShowTracker(false)}>
+        {controller => <TrackerView
+          controller={controller}
           key={trackerKey}
           playerControls={<DevicePlayers joinCode={joinCode} scope={scope} displayName={participant.displayName} />}
           resumePath={embeddedHost ? `/host/${event?.joinCode ?? joinCode}` : seatPath}
@@ -870,7 +884,7 @@ function PlayerJoinPage({
               name: row.displayName,
               commanders: row.assignedCommanders ?? [],
             }))}
-          onFinish={onTrackerFinished}
+          onFinish={async (winner, duration) => onTrackerFinished(winner, duration, await controller.finish(winner, duration))}
           onQuit={() => {
             if (embeddedHost) {
               setShowTracker(false);
@@ -910,7 +924,8 @@ function PlayerJoinPage({
               : undefined
           }
           roleCheckOpen={roleOpen && Boolean(treacheryRole)}
-        />
+        />}
+        </EventTrackerSession>
         {roleOpen && treacheryRole ? (
           <TreacheryRoleDialog
             assignment={treacheryRole}
@@ -1061,34 +1076,12 @@ function PlayerJoinPage({
               {participant.status === 'playing' ? (
                 <>
                   {event && token ? (
-                    <EventTableLink joinCode={event.joinCode} token={token} />
+                    <EventTableLink joinCode={event.joinCode} token={token} gameId={matchTable!.gameId!} storageKey={trackerKey} busy={busy}
+                      onStart={() => void onChooseTracker(true)}
+                      onView={() => { setTrackerIntent({ mode: 'view' }); setShowTracker(true); }}
+                      onTransfer={(generation, id) => { setTrackerIntent({ mode: 'transfer', generation, id }); setShowTracker(true); }}
+                      onWithout={participant.trackerUsed === undefined ? () => void onChooseTracker(false) : undefined} />
                   ) : null}
-                  <p className="text-muted mb-3 text-center text-sm">
-                    {participant.trackerUsed === false
-                      ? t('join.playingWithoutTracker')
-                      : t('join.chooseTracker')}
-                  </p>
-                  <div className="flex flex-col gap-2">
-                    <Button
-                      variant="neon"
-                      size="lg"
-                      block
-                      disabled={busy}
-                      onClick={() => void onChooseTracker(true)}
-                    >
-                      {t('join.useGameTracker')}
-                    </Button>
-                    {participant.trackerUsed === undefined ? (
-                      <Button
-                        variant="glass"
-                        block
-                        disabled={busy}
-                        onClick={() => void onChooseTracker(false)}
-                      >
-                        {t('join.playWithoutTracker')}
-                      </Button>
-                    ) : null}
-                  </div>
                 </>
               ) : (
                 <p className="text-muted text-center text-sm">

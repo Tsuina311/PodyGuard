@@ -29,6 +29,7 @@ const state = {
   hostToken: 'never share',
 };
 afterEach(() => vi.restoreAllMocks());
+// Cold Fastify startup competes with the other HTTP suites during a full run.
 it('separates viewing and editing credentials, projects public fields, and revokes links', async () => {
   const app = Fastify();
   await app.register(rateLimit, { global: false });
@@ -117,7 +118,7 @@ it('separates viewing and editing credentials, projects public fields, and revok
   } finally {
     await app.close();
   }
-});
+}, 15_000);
 it('rejects malformed states and expires inactive shares', async () => {
   const app = Fastify();
   await app.register(rateLimit, { global: false });

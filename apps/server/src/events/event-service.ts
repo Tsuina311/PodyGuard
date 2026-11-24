@@ -2515,7 +2515,7 @@ export class EventService {
   async reportGameResult(
     joinCode: string,
     participantToken: string,
-    input: { winnerParticipantId: string; durationSeconds?: number },
+    input: { winnerParticipantId: string; durationSeconds?: number; expectedGameId?: string },
   ): Promise<PublicParticipant> {
     const stored = await this.requireByJoinCode(joinCode);
     const participant = await this.requireParticipant(
@@ -2539,6 +2539,7 @@ export class EventService {
     if (!pod) {
       return this.present(participant);
     }
+    if (input.expectedGameId && pod.id !== input.expectedGameId) throw new InvalidEventInputError('This game has changed.');
     if (!pod.memberIds.includes(input.winnerParticipantId)) {
       throw new InvalidEventInputError(
         'The winner must be a player in this pod.',
@@ -4666,6 +4667,7 @@ export class EventService {
         poolIdForTable(row.id, assignments),
         trackerUsedForTable(row.id, assignments),
         playingStartedAtForTable(row.id, assignments),
+        assignments.find(assignment => assignment.tableId === row.id)?.podId,
       ),
     );
   }
@@ -5196,9 +5198,11 @@ function toPublicTable(
   poolId?: string,
   trackerUsed?: boolean,
   playingStartedAt?: string,
+  gameId?: string,
 ): PublicTable {
   return {
     id: row.id,
+    ...(gameId ? { gameId } : {}),
     label: row.label,
     sortOrder: row.sortOrder,
     status: row.status,

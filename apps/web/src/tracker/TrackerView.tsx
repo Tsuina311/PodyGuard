@@ -1,4 +1,5 @@
 import { useTableShare } from '../table-view/useTableShare';
+import type { ControllerSession } from '../table-view/EventTrackerSession';
 import { TableShareControls } from '../table-view/TableShareControls';
 import {
   useEffect,
@@ -184,6 +185,7 @@ import { LanguageSwitcher } from '../ui/LanguageSwitcher';
 import { cx } from '../ui/cx';
 
 type Props = {
+  controller?: ControllerSession;
   eventContext?: { joinCode: string; token: string };
   storageKey: string;
   players: TrackerSeed[];
@@ -485,6 +487,7 @@ function usePreloadedEliminatedArt(): void {
 }
 
 export function TrackerView({
+  controller,
   eventContext,
   storageKey,
   players,
@@ -512,7 +515,7 @@ export function TrackerView({
   const { t } = useTranslation();
   const rulesFormat = resolveRulesFormat(gameMode, rulesFormatProp);
   const initial = useMemo<TrackerHistory>(
-    () => ({
+    () => controller?.initialHistory ?? ({
       present: restore(
         storageKey,
         players,
@@ -523,12 +526,13 @@ export function TrackerView({
       ),
       past: [],
     }),
-    [storageKey, players, persist, gameMode, rulesFormat],
+    [storageKey, players, persist, gameMode, rulesFormat, controller?.initialHistory],
   );
   const [{ present: state, past }, dispatch] = useReducer(
     reduceHistory,
     initial,
   );
+  useEffect(() => { controller?.onHistory({ present: state, past }); }, [state, past, controller?.onHistory]);
   /*
     Consecutive life taps on one seat accumulate into a single flash under
     that total. Another seat's taps do not clear it. Any other tracker action
@@ -566,6 +570,7 @@ export function TrackerView({
     setLifeDeltas({});
   }
   function send(message: Msg) {
+    if (controller && !controller.canEdit()) return;
     if (message.type === 'action' && message.action.type === 'life') {
       const { playerId, delta } = message.action;
       setLifeDeltas((current) => noteSeatLifeFlash(current, playerId, delta));
@@ -650,7 +655,7 @@ export function TrackerView({
   const landscape = useLandscape();
   const boardLive = Boolean(state.firstPlayerId);
   const wake = useWakeLock(true);
-  const tableShare = useTableShare(storageKey, state, eventContext);
+  const tableShare = useTableShare(storageKey, state, eventContext, controller?.viewUrl);
   const duelBoard = state.players.length === 2;
   const screenClass = boardScreenClass(duelBoard ? 'flush' : 'tight');
   usePreloadedEliminatedArt();
@@ -826,7 +831,7 @@ export function TrackerView({
     first frame.
   */
   async function finish() {
-    if (!state.winnerId || finishing || replaying) {
+    if (!state.winnerId || finishing || replaying || (controller && !controller.canEdit())) {
       return;
     }
     setFinishing(true);
@@ -883,12 +888,13 @@ export function TrackerView({
   }, [state.dayNight]);
 
   useEffect(() => {
+    if (controller) return;
     if (!persist) {
       removeStored(storageKey);
       return;
     }
     writeStored(storageKey, JSON.stringify(state));
-  }, [state, persist, storageKey]);
+  }, [state, persist, storageKey, controller]);
   const dungeonPlayer =
     state.players.find((row) => row.id === dungeonPlayerId) ?? null;
   const commanderPlayer =
@@ -5459,8 +5465,9 @@ export type Msg =
 /*
   A short history rather than a full one: undo is there to walk back the stray
   tap that the match screen has no other way to fix, and a pod is never going to
-  reach thirty steps back to find it. It is deliberately not persisted, so a
-  reload starts the game from where it stands and not from its past.
+  reach thirty steps back to find it. Standalone games do not persist undo, so a
+  reload resumes them from where they stand. Shared event games
+  retain this history on the server so transfers preserve undo.
 */
 export const HISTORY_LIMIT = 30;
 

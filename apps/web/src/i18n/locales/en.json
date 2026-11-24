@@ -10,6 +10,15 @@
     "unknownDate": "Date unavailable",
     "removeEntry": "Remove {{entry}} from this list"
   },
+  "eventTracker": {
+    "trackedBy": "Game is tracked on {{name}}’s device", "readOnly": "Read-only mode",
+    "transfer": "Transfer to this device", "resume": "Continue tracking", "opening": "Checking the shared tracker…",
+    "offline": "Offline — keep playing. Changes are saved on this device and will sync when connected.",
+    "waiting": "Waiting for the tracking device to connect and hand over the game. It keeps control until then.",
+    "confirming": "Confirming transfer. Reconnect to check which device has control before editing.",
+    "moved": "Tracker control has moved to another device.", "stale": "Waiting for the tracking device · totals may be out of date",
+    "first": "Starting player", "notStarted": "No shared tracker has started yet.", "retry": "Reconnect"
+  },
   "navigation": { "menu": "Navigation menu", "home": "Main menu", "playgroups": "My playgroups" },
   "hostUx": {
     "overview": "Overview", "players": "Players", "share": "Share", "settings": "Settings",
@@ -19,6 +28,12 @@
     "statuses": { "joined": "Not ready", "ready": "Ready", "matched": "Seated", "playing": "Playing", "paused": "Paused", "left": "Left" }
   },
   "devicePlayers": {
+    "resumeCount": "Resume a player · {{count}} saved",
+    "all": "All saved players",
+    "recoveryHelp": "Saved players stay here after you close a tab. Continue opens a new tab in this browser, keeping your current player open.",
+    "eventCode": "Event {{code}}",
+    "newTab": "Opens in a new tab",
+    "empty": "No saved players on this browser yet. Join an event to save your player here.",
     "title": "Players on this device",
     "current": "This tab: {{name}}",
     "joinAnother": "Join as another person",

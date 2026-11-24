@@ -25,6 +25,7 @@ export function useTableShare(
   storageKey: string,
   state: TrackerState,
   eventContext?: { joinCode: string; token: string },
+  eventViewUrl?: string,
 ) {
   const key = `${storageKey}:view-session`;
   const [credentials, setCredentials] = useState<Credentials | null>(() => {
@@ -46,7 +47,7 @@ export function useTableShare(
   const latest = useRef(state);
   latest.current = state;
   useEffect(() => {
-    if (!credentials) return;
+    if (!credentials || eventViewUrl) return;
     let cancelled = false;
     let timer = 0;
     const controller = new AbortController();
@@ -82,8 +83,9 @@ export function useTableShare(
       controller.abort();
       window.clearTimeout(timer);
     };
-  }, [credentials, key]);
+  }, [credentials, key, eventViewUrl]);
   async function start() {
+    if (eventViewUrl) return;
     if (busy) return;
     setBusy(true);
     setError('');
@@ -105,6 +107,7 @@ export function useTableShare(
     }
   }
   async function stop() {
+    if (eventViewUrl) return;
     if (!credentials || busy) return;
     setBusy(true);
     setError('');
@@ -122,9 +125,10 @@ export function useTableShare(
     }
   }
   return {
-    url: credentials
+    required: Boolean(eventViewUrl),
+    url: eventViewUrl ?? (credentials
       ? `${window.location.origin}${window.location.pathname}#/watch/${credentials.id}?token=${credentials.readToken}`
-      : null,
+      : null),
     busy,
     error,
     start,

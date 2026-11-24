@@ -10,6 +10,15 @@
     "unknownDate": "Data non disponibile",
     "removeEntry": "Rimuovi {{entry}} da questo elenco"
   },
+  "eventTracker": {
+    "trackedBy": "La partita è seguita sul dispositivo di {{name}}", "readOnly": "Modalità sola lettura",
+    "transfer": "Trasferisci su questo dispositivo", "resume": "Continua il tracciamento", "opening": "Verifica della partita condivisa…",
+    "offline": "Offline — continua a giocare. Le modifiche sono salvate su questo dispositivo e saranno sincronizzate alla riconnessione.",
+    "waiting": "In attesa che il dispositivo principale si connetta e trasferisca la partita. Nel frattempo mantiene il controllo.",
+    "confirming": "Conferma del trasferimento. Riconnettiti per verificare quale dispositivo ha il controllo prima di modificare.",
+    "moved": "Il controllo è stato trasferito su un altro dispositivo.", "stale": "In attesa del dispositivo principale · i totali potrebbero non essere aggiornati",
+    "first": "Primo giocatore", "notStarted": "Nessun tracciamento condiviso è ancora iniziato.", "retry": "Riconnetti"
+  },
   "navigation": { "menu": "Menu di navigazione", "home": "Menu principale", "playgroups": "I miei gruppi" },
   "hostUx": {
     "overview": "Panoramica", "players": "Giocatori", "share": "Invita", "settings": "Impostazioni",
@@ -19,6 +28,12 @@
     "statuses": { "joined": "Non pronto", "ready": "Pronto", "matched": "Al tavolo", "playing": "In partita", "paused": "In pausa", "left": "Uscito" }
   },
   "devicePlayers": {
+    "resumeCount": "Riprendi un giocatore · {{count}} salvati",
+    "all": "Tutti i giocatori salvati",
+    "recoveryHelp": "I giocatori restano salvati quando chiudi una scheda. Continua apre una nuova scheda in questo browser e mantiene aperto il giocatore attuale.",
+    "eventCode": "Evento {{code}}",
+    "newTab": "Si apre in una nuova scheda",
+    "empty": "Nessun giocatore salvato in questo browser. Partecipa a un evento per ritrovare qui il tuo giocatore.",
     "title": "Giocatori su questo dispositivo",
     "current": "Questa scheda: {{name}}",
     "joinAnother": "Partecipa come un'altra persona",

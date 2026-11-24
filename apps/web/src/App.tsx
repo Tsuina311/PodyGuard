@@ -19,6 +19,7 @@ import {
   writeLastKeepAlivePingAt,
 } from './server-wake';
 import { HomePage } from './HomePage';
+import { SavedPlayersPage } from './SavedPlayersPage';
 import { HostPage } from './HostPage';
 import { JoinPage } from './JoinPage';
 import { AccountPage } from './AccountPage';
@@ -53,13 +54,14 @@ export function App() {
   const sandbox = useMatch('/match');
   const sandboxConfig = useMatch('/match-config');
   const tools = useMatch('/tools');
+  const savedPlayers = useMatch('/players');
   const localLimited = useMatch('/limited');
   const connectivity = useMatch('/connectivity');
   const wakeDemo = useMatch('/wake');
   const home = useMatch({ path: '/', end: true });
   // /wake is the same screen with no health timer, so the timed cover stays off.
   const localOnly = Boolean(
-    sandbox || sandboxConfig || localLimited || connectivity || wakeDemo || tools,
+    sandbox || sandboxConfig || localLimited || connectivity || wakeDemo || tools || savedPlayers,
   );
   const waking = useServerWake() && !localOnly;
   return (
@@ -84,6 +86,7 @@ export function App() {
         >
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/players" element={<SavedPlayersPage />} />
             <Route path="/tools" element={<ToolsPage />} />
             <Route path="/watch/:id" element={<TableViewPage />} />
             <Route path="/nights/:id" element={<GameNightPage />} />

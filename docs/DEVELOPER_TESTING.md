@@ -137,3 +137,10 @@ Task branches do not publish Pages. Review and merge the PR to release.
 
 These checks do not replace real-phone testing of Safari, QR scanning, screen
 locking, intermittent mobile connectivity or the actual deployed frontend/API.
+# Shared event tracker rehearsal
+
+Create a constructed event, join two people in separate tabs, ready both, then match/start as host. Start the tracker on the first player's tab. The second should show the first player's name with **Read-only mode** and **Transfer to this device**. Check that read-only life totals follow changes and expose no editing controls.
+
+Disconnect the controlling device, change life, and request transfer from the other device. The controller must remain editable and the requesting device must wait. Reconnect before the request expires (30 seconds): the latest life totals and undo history should arrive on the new controller, and the former controller should become read-only. A closed controller must be reopened online to hand over. Finish/requeue and start another game at the same table; it should start fresh.
+
+Automated browser coverage: `yarn playwright test event-tracker-transfer event-lobby device-players commander-lobby`. Database persistence coverage requires migration `0030_event_trackers` on the isolated `TEST_DATABASE_URL`, then `yarn test:persistence`.

@@ -24,7 +24,7 @@ export function TableShareControls({
         >
           Share live tracker
         </Button>
-        {share.url ? (
+        {share.url && !share.required ? (
           <Button
             variant="ghost"
             disabled={share.busy}
@@ -64,8 +64,7 @@ export function TableShareControls({
             </a>
             <p>
               Updates need this device open and online. Links expire after 24
-              hours without updates and may need replacing after a service
-              restart.
+              hours without updates{share.required ? '. Event links survive service restarts and transfers.' : ' and may need replacing after a service restart.'}
             </p>
           </div>
         </div>

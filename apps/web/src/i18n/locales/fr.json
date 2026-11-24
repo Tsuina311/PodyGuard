@@ -10,6 +10,15 @@
     "unknownDate": "Date indisponible",
     "removeEntry": "Retirer {{entry}} de cette liste"
   },
+  "eventTracker": {
+    "trackedBy": "La partie est suivie sur l’appareil de {{name}}", "readOnly": "Lecture seule",
+    "transfer": "Transférer sur cet appareil", "resume": "Continuer le suivi", "opening": "Vérification du suivi partagé…",
+    "offline": "Hors ligne — continuez à jouer. Les modifications sont enregistrées sur cet appareil et seront synchronisées à la reconnexion.",
+    "waiting": "En attente de la connexion de l’appareil principal pour transférer la partie. Il garde le contrôle entre-temps.",
+    "confirming": "Confirmation du transfert. Reconnectez-vous pour vérifier quel appareil a le contrôle avant de modifier.",
+    "moved": "Le suivi a été transféré sur un autre appareil.", "stale": "En attente de l’appareil principal · les totaux peuvent être anciens",
+    "first": "Premier joueur", "notStarted": "Aucun suivi partagé n’a encore commencé.", "retry": "Reconnecter"
+  },
   "navigation": { "menu": "Menu de navigation", "home": "Menu principal", "playgroups": "Mes groupes" },
   "hostUx": {
     "overview": "Vue d’ensemble", "players": "Joueurs", "share": "Inviter", "settings": "Réglages",
@@ -19,6 +28,12 @@
     "statuses": { "joined": "Pas prêt", "ready": "Prêt", "matched": "À table", "playing": "En partie", "paused": "En pause", "left": "Parti" }
   },
   "devicePlayers": {
+    "resumeCount": "Reprendre un joueur · {{count}} enregistrés",
+    "all": "Tous les joueurs enregistrés",
+    "recoveryHelp": "Les joueurs restent enregistrés après la fermeture d’un onglet. Continuer ouvre un nouvel onglet dans ce navigateur et garde le joueur actuel ouvert.",
+    "eventCode": "Événement {{code}}",
+    "newTab": "Ouvre un nouvel onglet",
+    "empty": "Aucun joueur enregistré dans ce navigateur. Rejoignez un événement pour retrouver votre joueur ici.",
     "title": "Joueurs sur cet appareil",
     "current": "Cet onglet : {{name}}",
     "joinAnother": "Rejoindre avec une autre personne",

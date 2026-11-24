@@ -1,8 +1,8 @@
 import { normalizeJoinCode } from '@podyguard/shared';
 import { readStored, removeStored, storedKeys, writeStored } from './device-storage';
-import { rememberRecentEvent } from './recent-events';
+import { rememberedEventName, rememberRecentEvent } from './recent-events';
 
-export type PlayerSession = { token: string; displayName: string };
+export type PlayerSession = { token: string; displayName: string; eventName?: string };
 
 export function createPlayerScope(): string {
   // randomUUID requires HTTPS; getRandomValues also works on a phone testing
@@ -38,7 +38,7 @@ function changed() {
 
 export function savePlayerSession(joinCode: string, session: PlayerSession, scope = '') {
   writeStored(key(joinCode, scope), JSON.stringify(session));
-  rememberRecentEvent(playerPath(joinCode), normalizeJoinCode(joinCode));
+  rememberRecentEvent(playerPath(joinCode), session.eventName || rememberedEventName(normalizeJoinCode(joinCode)));
   changed();
 }
 
@@ -46,7 +46,8 @@ export function loadPlayerSession(joinCode: string, scope = ''): PlayerSession |
   try {
     const value = JSON.parse(readStored(key(joinCode, scope)) ?? 'null');
     return value && typeof value.token === 'string' && value.token &&
-      typeof value.displayName === 'string' ? { token: value.token, displayName: value.displayName } : null;
+      typeof value.displayName === 'string' ? { token: value.token, displayName: value.displayName,
+        ...(typeof value.eventName === 'string' ? { eventName: value.eventName } : {}) } : null;
   } catch { return null; }
 }
 
@@ -63,4 +64,17 @@ export function listPlayerSessions(joinCode: string): Array<{ scope: string; dis
     const session = loadPlayerSession(joinCode, scope);
     return session ? [{ scope, displayName: session.displayName }] : [];
   });
+}
+
+/** Enumerate every saved seat, including events hidden from recent shortcuts. Never expose tokens. */
+export function listSavedPlayerEvents() {
+  const codes = new Set(storedKeys().flatMap(storageKey => {
+    const match = /^podyguard\.player\.([A-Za-z0-9-]+)(?:\.seat\.[a-f0-9-]{36})?$/i.exec(storageKey);
+    return match ? [normalizeJoinCode(match[1]!)] : [];
+  }));
+  return [...codes].flatMap(joinCode => {
+    const players = listPlayerSessions(joinCode);
+    const name = players.map(player => loadPlayerSession(joinCode, player.scope)?.eventName).find(Boolean) || rememberedEventName(joinCode);
+    return players.length ? [{ joinCode, name, players }] : [];
+  }).sort((a, b) => a.name.localeCompare(b.name) || a.joinCode.localeCompare(b.joinCode));
 }

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { createPlayerScope, listPlayerSessions, playerPath } from './player-sessions';
 
@@ -29,18 +28,20 @@ export function DevicePlayers({ joinCode, scope, displayName }: {
       {t('devicePlayers.joinAnother')}
     </a>
     <p className="mt-2 text-sm text-muted">{t('devicePlayers.help')}</p>
-    {players.length > 0 && <details className="mt-3">
-      <summary className="min-h-11 cursor-pointer py-2 font-semibold">{t('devicePlayers.title')}</summary>
+    {players.length > 0 && <div className="mt-3">
+      <h3 className="mb-2 font-semibold">{t('devicePlayers.title')}</h3>
       <ul className="flex flex-wrap gap-2">
         {players.map(player => <li key={player.scope}>
           {player.scope === scope && displayName ? <span aria-current="page" className="inline-flex min-h-11 items-center px-3 text-muted">
             {player.displayName}
-          </span> : <Link to={playerPath(joinCode, player.scope)}
+          </span> : <a href={`#${playerPath(joinCode, player.scope)}`} target="_blank" rel="noopener noreferrer" title={t('devicePlayers.newTab')}
             className="inline-flex min-h-11 items-center rounded-xl border border-muted/25 px-3 py-2 text-neon">
             {t('devicePlayers.continue', { name: player.displayName })}
-          </Link>}
+          </a>}
         </li>)}
       </ul>
-    </details>}
+      <a href="#/players" target="_blank" rel="noopener noreferrer" title={t('devicePlayers.newTab')}
+        className="mt-2 inline-flex min-h-11 items-center text-sm text-ink underline">{t('devicePlayers.all')}</a>
+    </div>}
   </section>;
 }

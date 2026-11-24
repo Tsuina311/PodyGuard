@@ -5,11 +5,17 @@ player tab. Enter a different name and join normally. Repeat for more players;
 the host desk remains in its own tab. This works for guests sharing a phone and
 for manually rehearsing an event without other people.
 
-Each player tab shows its name and keeps its own seat when refreshed. Under
-**Players on this device**, choose **Continue as …** to reopen a saved seat in
-the current tab. Open the invitation again, or use Home's saved event, to reach
-this list after closing tabs. Leaving one seat does not forget the others.
-During a game, these controls are in the main tracker's match menu.
+Each player tab shows its name and keeps its own seat when refreshed. Home has
+**Resume a player · N saved**, opening a recovery page grouped by event. Choose
+**Continue as …** to reopen a saved seat in a new tab while retaining the current
+tab. The navigation menu also has **Players on this device**, and saved event
+cards offer a resume action for that event. Recovery uses local credentials and
+works even when the event shortcut has been removed.
+
+On event pages the saved player links are always visible. During a game, they
+are in the main tracker's match menu. **All saved players** opens the recovery
+page. Closing a tab does not leave or forget a seat; explicitly leaving a seat
+does not forget the others. Removing an event shortcut only hides the shortcut.
 
 The original seat and host/account sessions remain compatible with earlier
 versions. Additional players join as guests; they are not automatically linked
@@ -17,10 +23,8 @@ to the device owner's account. Playgroup identity selection and remembering a
 guest still work through the normal join form.
 
 Additional tabs have separate join drafts, offline action queues and tracker
-snapshots. Opening another player does not automatically create another main
-tracker: the existing tracker/companion controls still apply. Do not operate two
-independent trackers for the same physical game. Keep using one main tracker and
-the other players' read-only table links.
+snapshots. Constructed event players share one controlled tracker; the other
+players can view read-only or request a live handoff from its current controller.
 
 The `seat` value in an extra tab's URL is a random local selector, not a token.
 It cannot recover a player on another device. Send the event's normal invitation
