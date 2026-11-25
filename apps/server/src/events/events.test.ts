@@ -1321,8 +1321,6 @@ describe('event HTTP api', () => {
         hostPin: '2468',
         tableCount: 1,
         preferredPodSize: 5,
-        allowThreePods: false,
-        allowFivePods: false,
       },
     });
     const createdBody = created.json() as {

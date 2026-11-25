@@ -365,12 +365,12 @@ export class EventService {
     const expiresAt = new Date(
       createdAt.getTime() + lifetimeHours * 60 * 60 * 1000,
     );
-    const allowFivePods = resolveAllowFivePods(
-      gameMode, preferredPodSize, input.allowFivePods ?? gameMode === 'commander',
-    );
-    const allowThreePods = resolveAllowThreePods(
-      gameMode, preferredPodSize, input.allowThreePods ?? gameMode === 'commander',
-    );
+    const allowFivePods = gameMode === 'commander'
+      ? input.allowFivePods ?? true
+      : resolveAllowFivePods(gameMode, preferredPodSize, false);
+    const allowThreePods = gameMode === 'commander'
+      ? input.allowThreePods ?? true
+      : resolveAllowThreePods(gameMode, preferredPodSize, false);
     const labels = resolveTableLabels({ count: input.tableCount }, 0);
     const hostCredentialHash = await hashHostPin(hostPin);
     let initialTournamentState: TournamentState | undefined;

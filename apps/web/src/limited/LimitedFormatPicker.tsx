@@ -77,14 +77,15 @@ export function LimitedTimingControls({
           value.mode === 'PICK_TWO_DRAFT'
             ? 'home.limitedPickTwoMatchSummary'
             : 'home.limitedSwissMatchSummary',
-          { count: playerCount },
+          { count: playerCount, bestOf: value.matchStructure === 'BO1' ? 1 : 3 },
         )}
       </p>
-      <label className="text-muted text-xs">
-        {t('home.limitedMatch')}
+      <div className="text-muted text-xs">
+        <label htmlFor={`${matchHelpId}-select`}>{t('home.limitedMatch')}</label>
         <select
           className="mt-1 w-full rounded-lg border border-muted/20 bg-hull p-2 text-ink"
           value={value.matchStructure}
+          id={`${matchHelpId}-select`}
           aria-describedby={matchHelpId}
           onChange={(event) =>
             onChange({
@@ -96,7 +97,7 @@ export function LimitedTimingControls({
           <option value="BO3">BO3</option>
         </select>
         <span id={matchHelpId} className="mt-1 block">{t(`home.limitedMatchHelp.${value.matchStructure}`)}</span>
-      </label>
+      </div>
       <label className="text-muted text-xs">
         {t('home.limitedRounds')}
         <input
