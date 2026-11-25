@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { FeedbackProvider } from '../feedback/FeedbackContext';
 import '../i18n';
+import { removeStored } from '../device-storage';
 import { TrackerView } from './TrackerView';
 
 /**
@@ -61,6 +62,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  removeStored('podyguard.tracker.face-players');
   vi.useRealTimers();
 });
 
@@ -190,6 +192,30 @@ describe('duel positions on a tall phone', () => {
     expect(has(seam(), 'left-1/2')).toBe(true);
     expect(has(seam(), 'w-0')).toBe(true);
     expect(has(seam(), 'top-1/2')).toBe(false);
+  });
+
+  it('shows the winning player by name', async () => {
+    renderTracker({ players: DUEL, storageKey: 'duel-winner' });
+    await revealAndStart();
+    tapRemove('ada', 20);
+    const loss = screen.getByRole('dialog', { name: 'Did Ada lose the game?' });
+    fireEvent.click(loss.querySelector('button')!);
+    const result = screen.getByRole('dialog', { name: 'Match result' });
+    expect(result).toHaveTextContent('Bea');
+  });
+
+  it('lets a landscape pod keep all seat faces upright', async () => {
+    setOrientation(true);
+    renderTracker({ players: POD, storageKey: 'pod-facing', gameMode: 'commander', rulesFormat: 'commander' });
+    await revealAndStart();
+    expect(board().querySelector('article .rotate-180')).not.toBeNull();
+    fireEvent.click(clock());
+    fireEvent.click(clock());
+    const control = screen.getByRole('button', { name: 'Face seats toward players' });
+    expect(control).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(control);
+    expect(control).toHaveAttribute('aria-pressed', 'false');
+    expect(board().querySelector('article .rotate-180')).toBeNull();
   });
 
   it('stacks portrait and turns only the upper seat around', async () => {

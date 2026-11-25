@@ -1,3 +1,4 @@
+import { useSavedPlayers } from './use-saved-players';
 import { HostOverviewBar, type HostTab, type HostView } from './HostOverviewBar';
 import { HostPlayersPanel } from './HostPlayersPanel';
 import { MatchPreviewPanel } from './game-nights/MatchPreviewPanel';
@@ -5,7 +6,7 @@ import { Agreement } from './game-nights/Agreement';
 import type { MatchPreview } from '@podyguard/shared';
 import { request } from './api';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type {
   EventSnapshot,
@@ -40,7 +41,6 @@ import {
   listTables,
   loadAccountToken,
   loadHostToken,
-  loadPlayerSession,
   matchNow,
   removeParticipant,
   reportTournamentResult,
@@ -102,15 +102,27 @@ export function HostPage() {
   const [hoursDraft, setHoursDraft] = useState('24');
   const [removeArmed, setRemoveArmed] = useState<string | null>(null);
   const [cancelArmed, setCancelArmed] = useState(false);
-  const [tab, setTab] = useState<HostTab>('desk');
+  const [search, setSearch] = useSearchParams();
+  const requestedTab = search.get('tab');
+  const tab: HostTab = requestedTab === 'play' || requestedTab === 'overview' || requestedTab === 'join'
+    ? requestedTab
+    : 'desk';
+  const openTab = useCallback((next: HostTab) => {
+    setLinkError(null);
+    setSearch(next === 'desk' ? {} : { tab: next }, { replace: true });
+    window.scrollTo({ top: 0 });
+  }, [setSearch]);
   const [view, setView] = useState<HostView>('tables');
   const [playTrackerActive, setPlayTrackerActive] = useState(false);
   const [displayRefreshKey, setDisplayRefreshKey] = useState(0);
-  const hasPlayerSeat = Boolean(loadPlayerSession(code));
+  const hasPlayerSeat = useSavedPlayers().some(saved =>
+    saved.joinCode === code && saved.players.some(player => player.scope === ''),
+  );
 
   const openDesk = useCallback(() => {
-    setTab('desk');
-  }, []);
+    setView('tables');
+    openTab('desk');
+  }, [openTab]);
 
   const onPlayTrackerActiveChange = useCallback((active: boolean) => {
     setPlayTrackerActive(active);
@@ -444,6 +456,7 @@ export function HostPage() {
   async function onTournamentWinner(
     matchId: string,
     winnerParticipantId: string,
+    expectedGameId: string,
   ) {
     if (!hostToken) {
       return;
@@ -456,6 +469,7 @@ export function HostPage() {
         hostToken,
         matchId,
         winnerParticipantId,
+        expectedGameId,
       );
       setEvent(result.event);
       await refresh();
@@ -555,6 +569,8 @@ export function HostPage() {
           joinCodeValue,
         )
       : '';
+
+  const invitationUrl = phoneJoinUrl || joinUrl;
 
   const unreachableFromPhones =
     typeof window !== 'undefined' &&
@@ -690,7 +706,7 @@ export function HostPage() {
       {!hideHostChrome && <>
         <ThemeToggleCorner feedbackContext={{ gameMode: event.gameMode }} />
         <HostOverviewBar event={event} tab={tab} view={view}
-          onTab={next => { setLinkError(null); setTab(next); window.scrollTo({ top: 0 }); }}
+          onTab={openTab}
           onView={next => { setView(next); window.scrollTo({ top: 0 }); }}
           counts={counts} players={participants.length}
           freeTables={tables.filter(table => table.status === 'free').length} tables={tables.length}
@@ -714,8 +730,8 @@ export function HostPage() {
                 participants={participants}
                 busy={busy}
                 onStart={() => void onStartTournament()}
-                onWinner={(matchId, participantId) =>
-                  void onTournamentWinner(matchId, participantId)
+                onWinner={(matchId, participantId, gameId) =>
+                  void onTournamentWinner(matchId, participantId, gameId)
                 }
                 onBestOf={(matchId, bestOf) =>
                   void onTournamentBestOf(matchId, bestOf)
@@ -1226,6 +1242,7 @@ export function HostPage() {
       >
         <JoinPage
           embeddedHost={{
+            active: tab === 'play',
             onOpenDesk: openDesk,
             onTrackerActiveChange: onPlayTrackerActiveChange,
           }}
@@ -1238,9 +1255,6 @@ export function HostPage() {
         aria-labelledby="host-tab-overview"
         className={cx(tab === 'overview' ? 'contents' : 'hidden')}
       >
-        {tab === 'overview' ? (
-          <EventDisplayContent snapshot={{ ...limitedSnapshot, event, participants, tables }} />
-        ) : null}
         <Panel title={t('host.displayOnAnotherDevice')}>
           <div className="flex flex-wrap items-center gap-3">
             <Link className="text-neon hover:underline" to={displayPath} target="_blank" rel="noopener noreferrer">
@@ -1258,6 +1272,9 @@ export function HostPage() {
           </div>
           {tab === 'overview' && linkError ? <p role="alert" className="text-danger mt-2 text-sm">{linkError}</p> : null}
         </Panel>
+        {tab === 'overview' ? (
+          <EventDisplayContent snapshot={{ ...limitedSnapshot, event, participants, tables }} />
+        ) : null}
         {hostToken ? (
           <HostDisplaysPanel joinCode={code} hostToken={hostToken} refreshKey={displayRefreshKey} />
         ) : null}
@@ -1295,10 +1312,10 @@ export function HostPage() {
                 </p>
               ) : null}
               <div className="flex flex-wrap gap-2">
-                <Button variant="glass" size="sm" disabled={!joinUrl} onClick={() => void onCopyLink(joinUrl)}>
-                  {copied && copied === joinUrl ? t('common.copied') : t('host.copyPlayerLink')}
+                <Button variant="glass" size="sm" disabled={!invitationUrl} onClick={() => void onCopyLink(invitationUrl)}>
+                  {copied && copied === invitationUrl ? t('common.copied') : t('host.copyPlayerLink')}
                 </Button>
-                <Button variant="glass" size="sm" disabled={!joinUrl} onClick={() => void onShareLink(joinUrl)}>
+                <Button variant="glass" size="sm" disabled={!invitationUrl} onClick={() => void onShareLink(invitationUrl)}>
                   {t('host.sharePlayerLink')}
                 </Button>
               </div>

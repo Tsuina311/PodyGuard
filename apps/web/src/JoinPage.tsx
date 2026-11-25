@@ -4,7 +4,7 @@ import { Agreement } from './game-nights/Agreement';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { DevicePlayers } from './DevicePlayers';
-import { createPlayerScope, playerPath, playerScope, playerStorageCode } from './player-sessions';
+import { createPlayerScope, listPlayerSessions, playerPath, playerScope, playerStorageCode } from './player-sessions';
 import { useTranslation } from 'react-i18next';
 import {
   OFFICIAL_COMMANDER_CHALLENGES,
@@ -38,6 +38,7 @@ import {
   loadAccountSession,
   loadAccountToken,
   loadPlayerSession,
+  loadHostToken,
   ratePod,
   reportGameResult,
   savePlayerSession,
@@ -66,6 +67,7 @@ import { shouldShowLimitedPlayerPanel } from './event-screens';
 import { TreacheryRoleDialog } from './TreacheryRoleDialog';
 import { useEventLive } from './useEventLive';
 import { forgetActiveMatch, rememberActiveMatch } from './active-match';
+import { removeRecentEvent } from './recent-events';
 import { readStored, removeStored, writeStored } from './device-storage';
 import {
   getSessionDiagnosticId,
@@ -110,6 +112,7 @@ function loadJoinDraft(joinCode: string): {
 }
 
 type HostShellBridge = {
+  active: boolean;
   onOpenDesk: () => void;
   onTrackerActiveChange?: (active: boolean) => void;
 };
@@ -134,8 +137,12 @@ function PlayerJoinPage({
   const { t } = useTranslation();
   const { joinCode = '' } = useParams();
   const storageCode = playerStorageCode(joinCode, scope);
-  const seatPath = playerPath(joinCode, scope);
   const navigate = useNavigate();
+  const seatPath = playerPath(joinCode, scope);
+  const hostPlayPath = `/host/${joinCode}?tab=play`;
+  const resumePath = embeddedHost ? hostPlayPath : seatPath;
+  const onOpenDesk = embeddedHost?.onOpenDesk ??
+    (loadHostToken(joinCode) ? () => void navigate(`/host/${joinCode}`) : undefined);
   const mounted = useRef(false);
   useEffect(() => {
     mounted.current = true;
@@ -153,7 +160,9 @@ function PlayerJoinPage({
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [snapshot, setSnapshot] = useState<EventSnapshot | null>(null);
-  const [showTracker, setShowTracker] = useState(false);
+  const [trackerGameId, setTrackerGameId] = useState<string | null>(null);
+  const matchTable = tableForParticipant(snapshot, participant);
+  const showTracker = Boolean(trackerGameId && trackerGameId === matchTable?.gameId && (embeddedHost?.active ?? true));
   const [trackerIntent, setTrackerIntent] = useState<TrackerIntent>({ mode: 'claim' });
   const [askRating, setAskRating] = useState(false);
   const [treacheryRole, setTreacheryRole] =
@@ -194,6 +203,7 @@ function PlayerJoinPage({
     setError(null);
     setEvent(null);
     setParticipant(null);
+    setToken(null);
     const existing = loadPlayerSession(joinCode, scope);
     recordJoinBreadcrumb('EVENT_LOOKUP_STARTED');
     void getEvent(joinCode)
@@ -202,8 +212,23 @@ function PlayerJoinPage({
           return;
         }
         recordJoinBreadcrumb('EVENT_LOOKUP_OK');
-        if (existing) setEvent(loaded);
-        if (!existing) {
+        const me = existing
+          ? await getMe(loaded.joinCode, existing.token).catch((caught: unknown) => {
+              if (caught instanceof ApiError && (caught.status === 401 || caught.status === 404)) return null;
+              throw caught;
+            })
+          : null;
+        if (cancelled) return;
+        if (!existing || !me || me.participant.status === 'left') {
+          if (existing) {
+            if (loadPlayerSession(joinCode, scope)?.token === existing.token) {
+              clearPlayerSession(joinCode, scope);
+              clearPending(storageCode);
+              removeRecentEvent(seatPath);
+              forgetActiveMatch(resumePath);
+            }
+            setDisplayName(existing.displayName);
+          }
           if (loaded.playgroupId && loaded.showReturningPlayerSuggestions !== false) {
             try {
               const sug = await getJoinSuggestions(loaded.joinCode);
@@ -213,34 +238,10 @@ function PlayerJoinPage({
                 setJoinStep('choose-identity');
               }
             } catch {
-              /* fall back to standard join form if suggestions fail */
+              /* Fall back to the standard join form. */
             }
           }
-          // Do not flash the new-player form while returning-player suggestions
-          // load: a late response used to replace a form someone was filling.
           if (!cancelled) setEvent(loaded);
-          return;
-        }
-        // Ready for the form in case the seat has gone, so a player who has to
-        // ask for a new one at least does not have to retype who they are.
-        setDisplayName(existing.displayName);
-        const me = await getMe(loaded.joinCode, existing.token).catch(
-          (caught: unknown) => {
-            // A seat the server no longer knows — event recycled, participant
-            // dropped — must not leave a stored key parked in front of the
-            // join form for good.
-            if (
-              caught instanceof ApiError &&
-              (caught.status === 401 || caught.status === 404)
-            ) {
-              clearPlayerSession(loaded.joinCode, scope);
-              clearPending(storageCode);
-              return null;
-            }
-            throw caught;
-          },
-        );
-        if (!me) {
           return;
         }
         const [roster, tableList] = await Promise.all([
@@ -249,6 +250,7 @@ function PlayerJoinPage({
         ]);
         if (!cancelled) {
           if (existing.eventName !== loaded.name) savePlayerSession(loaded.joinCode, { ...existing, eventName: loaded.name }, scope);
+          setEvent(loaded);
           setToken(existing.token);
           setParticipant(me.participant);
           setSnapshot({
@@ -276,9 +278,11 @@ function PlayerJoinPage({
             me.participant.trackerUsed === true &&
             // Table-wide tracker use is not evidence that THIS phone owns it.
             // Restore only a tracker snapshot already saved on this device.
-            readStored(restoredTrackerKey) !== null
+            restoredTable?.gameId &&
+            readStored(restoredTrackerKey) !== null &&
+            (readStored(`${restoredTrackerKey}:controller-game`) ?? restoredTable.gameId) === restoredTable.gameId
           ) {
-            setShowTracker(true);
+            setTrackerGameId(restoredTable.gameId);
           }
         }
       })
@@ -291,6 +295,15 @@ function PlayerJoinPage({
           caught instanceof ApiError ? caught.code : 'unknown',
         );
         if (caught instanceof ApiError && caught.status === 404) {
+          for (const saved of listPlayerSessions(joinCode)) {
+            clearPlayerSession(joinCode, saved.scope);
+            clearPending(playerStorageCode(joinCode, saved.scope));
+            const path = playerPath(joinCode, saved.scope);
+            removeRecentEvent(path);
+            forgetActiveMatch(path);
+          }
+          forgetActiveMatch(hostPlayPath);
+          removeRecentEvent(seatPath);
           void navigate('/', { replace: true, state: { staleJoin: true } });
           return;
         }
@@ -303,7 +316,7 @@ function PlayerJoinPage({
     return () => {
       cancelled = true;
     };
-  }, [joinCode, navigate, t, scope, storageCode]);
+  }, [joinCode, navigate, t, scope, storageCode, seatPath, resumePath, hostPlayPath]);
 
   useEffect(() => {
     const previous = document.title;
@@ -318,15 +331,25 @@ function PlayerJoinPage({
       if (!current) {
         return current;
       }
-      return next.participants.find((row) => row.id === current.id) ?? current;
+      return next.participants.find((row) => row.id === current.id) ?? { ...current, status: 'left' };
     });
   }, []);
+
+  useEffect(() => {
+    if (participant?.status !== 'left') return;
+    clearPlayerSession(joinCode, scope);
+    clearPending(storageCode);
+    removeRecentEvent(seatPath);
+    forgetActiveMatch(resumePath);
+    setParticipant(null);
+    setToken(null);
+  }, [participant?.status, joinCode, scope, storageCode, seatPath, resumePath]);
 
   const [liveRetryNonce, setLiveRetryNonce] = useState(0);
 
   // Tracker choice belongs to this game, not every future game at the table.
   useEffect(() => {
-    if (participant?.status !== 'playing') setShowTracker(false);
+    if (participant?.status !== 'playing') setTrackerGameId(null);
   }, [participant?.status]);
   const liveStatus = useEventLive(
     event?.joinCode,
@@ -386,9 +409,7 @@ function PlayerJoinPage({
     if (!event || !participant) {
       return;
     }
-    const path = embeddedHost
-      ? `/host/${event.joinCode}`
-      : seatPath;
+    const path = resumePath;
     if (participant.status === 'playing' && showTracker) {
       rememberActiveMatch(path, {
         format:
@@ -404,17 +425,19 @@ function PlayerJoinPage({
     } else if (participant.status !== 'playing') {
       forgetActiveMatch(path);
     }
-  }, [embeddedHost, event, participant, showTracker, snapshot, seatPath]);
+  }, [event, participant, showTracker, snapshot, resumePath]);
 
   useEffect(() => {
-    embeddedHost?.onTrackerActiveChange?.(
+    const onActiveChange = embeddedHost?.onTrackerActiveChange;
+    onActiveChange?.(
       Boolean(
         participant &&
           participant.status === 'playing' &&
           showTracker,
       ),
     );
-  }, [embeddedHost, participant, showTracker]);
+    return () => onActiveChange?.(false);
+  }, [embeddedHost?.onTrackerActiveChange, participant?.status, showTracker]);
 
   useEffect(() => {
     if (!event || !token) {
@@ -687,7 +710,7 @@ function PlayerJoinPage({
     const code = event?.joinCode ?? joinCode.toUpperCase();
     clearPlayerSession(code, scope);
     clearPending(storageCode);
-    forgetActiveMatch(seatPath);
+    forgetActiveMatch(resumePath);
     setToken(null);
     setParticipant(null);
   }
@@ -725,9 +748,9 @@ function PlayerJoinPage({
         trackerUsed,
       );
       setParticipant(result.participant);
-      if (trackerUsed) {
+      if (trackerUsed && matchTable?.gameId) {
         setTrackerIntent({ mode: 'claim' });
-        setShowTracker(true);
+        setTrackerGameId(matchTable.gameId);
       }
     } catch (caught) {
       if (isOfflineError(caught)) {
@@ -786,9 +809,9 @@ function PlayerJoinPage({
         durationSeconds,
       });
     }
-    setShowTracker(false);
+    setTrackerGameId(null);
     setAskRating(true);
-    forgetActiveMatch(seatPath);
+    forgetActiveMatch(resumePath);
   }
 
   const limitedQueues = eventHasLimitedQueues(event ?? {});
@@ -809,7 +832,6 @@ function PlayerJoinPage({
     Boolean(event) &&
     displayName.trim().length > 0 &&
     (limitedQueues || decksComplete);
-  const matchTable = tableForParticipant(snapshot, participant);
   // A physical table is reused throughout the evening. Each started game needs
   // its own saved tracker, while refreshes during that game keep the same key.
   const trackerKey = `podyguard.tracker.${event?.joinCode ?? ''}.${matchTable?.id ?? participant?.id ?? ''}.${matchTable?.playingStartedAt ?? 'pending'}${scope ? `.seat.${scope}` : ''}`;
@@ -861,20 +883,20 @@ function PlayerJoinPage({
     and the match card are pre-game context, and on a phone they push the life
     counters below the fold.
   */
-  if (participant && token && seated && participant.status === 'playing' && showTracker) {
+  if (participant && token && seated && participant.status === 'playing' && matchTable?.gameId && showTracker) {
     return (
       <>
         <EventTrackerSession key={`${trackerKey}:${matchTable?.gameId}:${trackerIntent.mode}:${trackerIntent.generation ?? ''}`}
           joinCode={event!.joinCode} token={token} storageKey={trackerKey} intent={trackerIntent}
-          gameId={matchTable!.gameId!}
+          gameId={matchTable.gameId}
           players={(snapshot?.participants ?? []).filter(row => row.tableLabel === participant.tableLabel).map(row => ({ id: row.id, name: row.displayName, commanders: row.assignedCommanders ?? [] }))}
           gameMode={event!.gameMode} rulesFormat={event!.rulesFormat}
-          onClose={() => setShowTracker(false)}>
+          onClose={() => setTrackerGameId(null)}>
         {controller => <TrackerView
           controller={controller}
           key={trackerKey}
           playerControls={<DevicePlayers joinCode={joinCode} scope={scope} displayName={participant.displayName} />}
-          resumePath={embeddedHost ? `/host/${event?.joinCode ?? joinCode}` : seatPath}
+          resumePath={resumePath}
           eventContext={event && token ? { joinCode: event.joinCode, token } : undefined}
           storageKey={trackerKey}
           players={(snapshot?.participants ?? [])
@@ -884,22 +906,20 @@ function PlayerJoinPage({
               name: row.displayName,
               commanders: row.assignedCommanders ?? [],
             }))}
+          finishLabel={event?.tournament ? t('tracker.recordGameResult') : undefined}
           onFinish={async (winner, duration) => onTrackerFinished(winner, duration, await controller.finish(winner, duration))}
           onQuit={() => {
             if (embeddedHost) {
-              setShowTracker(false);
+              setTrackerGameId(null);
               embeddedHost.onOpenDesk();
               return;
             }
             void navigate('/');
           }}
-          onOpenDesk={
-            embeddedHost
-              ? () => {
-                  embeddedHost.onOpenDesk();
-                }
-              : undefined
-          }
+          onOpenDesk={onOpenDesk && (() => {
+            setTrackerGameId(null);
+            onOpenDesk();
+          })}
           {...(commanderRules
             ? {
                 challengeProgress,
@@ -1075,11 +1095,11 @@ function PlayerJoinPage({
               ) : null}
               {participant.status === 'playing' ? (
                 <>
-                  {event && token ? (
-                    <EventTableLink joinCode={event.joinCode} token={token} gameId={matchTable!.gameId!} storageKey={trackerKey} busy={busy}
+                  {event && token && matchTable?.gameId ? (
+                    <EventTableLink joinCode={event.joinCode} token={token} gameId={matchTable.gameId} storageKey={trackerKey} busy={busy}
                       onStart={() => void onChooseTracker(true)}
-                      onView={() => { setTrackerIntent({ mode: 'view' }); setShowTracker(true); }}
-                      onTransfer={(generation, id) => { setTrackerIntent({ mode: 'transfer', generation, id }); setShowTracker(true); }}
+                      onView={() => { setTrackerIntent({ mode: 'view' }); setTrackerGameId(matchTable.gameId!); }}
+                      onTransfer={(generation, id) => { setTrackerIntent({ mode: 'transfer', generation, id }); setTrackerGameId(matchTable.gameId!); }}
                       onWithout={participant.trackerUsed === undefined ? () => void onChooseTracker(false) : undefined} />
                   ) : null}
                 </>
@@ -1542,6 +1562,7 @@ function PlayerJoinPage({
         snapshot,
       }) ? (
         <LimitedPlayerPanel
+          onOpenDesk={onOpenDesk}
           snapshot={snapshot!}
           participant={participant!}
           token={token!}

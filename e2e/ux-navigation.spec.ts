@@ -55,8 +55,13 @@ test('host overview stays visible while browsing tables, players, sharing and se
   await expect(bar.getByText('15/16 tables free', { exact: true })).toBeVisible();
   await settings.getByRole('button', { name: 'Enable', exact: true }).first().click();
   await expect(bar.getByText('16/16 tables free', { exact: true })).toBeVisible();
+  await bar.getByRole('tab', { name: 'Overview', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Share display link', exact: true })).toBeVisible();
+  await page.reload();
+  await expect(bar.getByRole('tab', { name: 'Overview', exact: true })).toHaveAttribute('aria-selected', 'true');
   await bar.getByRole('tab', { name: 'Join', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Copy player link', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Share player link', exact: true })).toBeVisible();
   await bar.getByRole('tab', { name: 'Desk', exact: true }).click();
   await bar.getByRole('tab', { name: 'Players', exact: true }).click();
   const guest = await browser.newPage();

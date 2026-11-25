@@ -86,6 +86,8 @@ export function HomePage() {
   const [formatTab, setFormatTab] = useState<FormatTab>('constructed');
   const [scannerOpen, setScannerOpen] = useState(false);
   const [name, setName] = useState('');
+  const [allowThreePods, setAllowThreePods] = useState(true);
+  const [allowFivePods, setAllowFivePods] = useState(true);
   const [hostPin, setHostPin] = useState('');
   const [tableCount, setTableCount] = useState('8');
   const [playBaseMode, setPlayBaseMode] = useState<ConstructedBaseMode>(() =>
@@ -248,6 +250,9 @@ export function HomePage() {
     gameMode !== 'archenemy-commander' &&
     gameMode !== 'emperor';
   const hostLimited = focusedHostLimitedConfig(limitedConfigs);
+  const suggestedName = t(`home.eventNameExamples.${formatTab === 'limited'
+    ? hostLimited?.mode ?? 'BOOSTER_DRAFT'
+    : gameMode}`);
   const limitedEnabled = limitedConfigs.some((config) => config.enabled);
 
   function selectTab(next: HomeTab) {
@@ -398,17 +403,11 @@ export function HomePage() {
       const rulesFormat: RulesFormat = isLimited
         ? 'commander'
         : hostResolved.rulesFormat;
-      const result = await createEvent(name, hostPin, Number(tableCount), {
+      const result = await createEvent(name.trim() || suggestedName, hostPin, Number(tableCount), {
         gameMode: createMode,
         rulesFormat,
-        allowThreePods:
-          createMode === 'multiplayer' || createMode === 'assassin'
-            ? true
-            : undefined,
-        allowFivePods:
-          createMode === 'multiplayer'
-            ? multiplayerPodSize >= 5
-            : undefined,
+        allowThreePods: !isLimited && createMode === 'commander' ? allowThreePods : undefined,
+        allowFivePods: !isLimited && createMode === 'commander' ? allowFivePods : undefined,
         preferredPodSize: isLimited ? 4 : eventPodSize,
         lifetimeHours: Number(lifetimeHours),
         operationMode: isLimited ? 'ROLLING' : operationMode,
@@ -807,9 +806,8 @@ export function HomePage() {
             label={t('home.eventName')}
             value={name}
             onChange={(change) => setName(change.target.value)}
-            placeholder={t(`home.eventNameExamples.${gameMode}`)}
+            placeholder={suggestedName}
             autoComplete="off"
-            required
           />
           <div className="border-muted/20 bg-void/40 mb-4 rounded-xl border p-3">
             <p className="text-muted mb-2 text-xs font-medium tracking-wider uppercase">
@@ -1109,6 +1107,16 @@ export function HomePage() {
                   </label>
                 ))}
               </div>
+              <div className="mt-3 flex flex-wrap gap-4 text-sm">
+                <label className="flex items-center gap-2">
+                  <input type="checkbox" checked={allowThreePods} onChange={(change) => setAllowThreePods(change.target.checked)} />
+                  {t('host.allowThreePods')}
+                </label>
+                <label className="flex items-center gap-2">
+                  <input type="checkbox" checked={allowFivePods} onChange={(change) => setAllowFivePods(change.target.checked)} />
+                  {t('host.allowFivePods')}
+                </label>
+              </div>
             </fieldset>
           ) : gameMode === 'multiplayer' ? (
             <fieldset className="mb-4">
@@ -1264,9 +1272,8 @@ export function HomePage() {
             label={t('home.eventName')}
             value={name}
             onChange={(change) => setName(change.target.value)}
-            placeholder={t(`home.eventNameExamples.${hostLimited?.mode ?? 'BOOSTER_DRAFT'}`)}
+            placeholder={suggestedName}
             autoComplete="off"
-            required
           />
           <Field
             label={t('home.tables')}

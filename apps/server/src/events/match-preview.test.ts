@@ -132,3 +132,73 @@ it('accepts only one concurrent completion and counts a rematch accurately', asy
   const preview = await service.previewMatches(event.joinCode, hostToken);
   expect(preview.pods[0]?.repeatPairs).toBe(6);
 });
+
+it('uses the selected mix of Commander table sizes from event creation', async () => {
+  const store = new MemoryEventStore();
+  const service = new EventService(store, createIdentityBoundary({ participantSessionSecret: 'preview' }));
+  const { event, hostToken } = await service.createEvent({
+    name: 'Mixed tables', hostPin: '2468', tableCount: 2,
+    preferredPodSize: 4, allowThreePods: true, allowFivePods: false,
+  });
+  expect(event).toMatchObject({ allowThreePods: true, allowFivePods: false });
+  for (let i = 0; i < 7; i += 1) {
+    const person = await store.insertParticipant({
+      eventId: event.id, displayName: `Player ${i}`, status: 'ready', readyAt: new Date(),
+    });
+    await store.replaceDecks(person.id, [{
+      participantId: person.id, name: null, poolId: 'b3', preference: 'preferred', commanders: [],
+    }]);
+  }
+  const preview = await service.previewMatches(event.joinCode, hostToken);
+  expect(preview.pods.map(pod => pod.playerNames.length).sort()).toEqual([3, 4]);
+});
+
+it('starts each continuation of a best-of-three on a fresh game and settles at two wins', async () => {
+  const service = new EventService(
+    new MemoryEventStore(),
+    createIdentityBoundary({ participantSessionSecret: 'series' }),
+  );
+  const { event, hostToken } = await service.createEvent({
+    name: 'Best of three', hostPin: '2468', tableCount: 1, gameMode: 'duel',
+    tournamentFormat: 'swiss', tournamentOptions: { defaultBestOf: 3, swissRounds: 1 },
+  });
+  const code = event.joinCode;
+  const ada = await service.joinEvent(code, 'Ada');
+  const bea = await service.joinEvent(code, 'Bea');
+  await service.setReady(code, ada.token, true);
+  await service.setReady(code, bea.token, true);
+  await service.startTournament(code, hostToken);
+  const [table] = await service.listTables(code);
+  const first = await service.startTable(code, hostToken, table!.id);
+  const participant = await service.reportGameResult(code, ada.token, {
+    winnerParticipantId: ada.participant.id, expectedGameId: first.gameId!,
+  });
+  expect(participant).toMatchObject({ status: 'playing', tableLabel: table!.label });
+  const afterFirst = await service.getSnapshot(code);
+  const second = afterFirst.tables[0]!;
+  expect(second).toMatchObject({ podStatus: 'playing' });
+  expect(second.gameId).not.toBe(first.gameId);
+  const match = afterFirst.event.tournament!.rounds[0]!.matches[0]!;
+  expect(match.seriesWins?.[ada.participant.id]).toBe(1);
+  await expect(service.reportGameResult(code, ada.token, {
+    winnerParticipantId: ada.participant.id, expectedGameId: first.gameId!,
+  })).rejects.toThrow('This game has changed');
+
+  // A host report and a tracker report use the same continuation path.
+  await service.reportTournamentResult(code, hostToken, match.id, bea.participant.id, second.gameId!);
+  await expect(service.reportTournamentResult(code, hostToken, match.id, bea.participant.id, second.gameId!))
+    .rejects.toThrow('This game has changed');
+  const [third] = await service.listTables(code);
+  expect(third).toMatchObject({ podStatus: 'playing' });
+  expect(third!.gameId).not.toBe(second.gameId);
+  await service.reportGameResult(code, ada.token, {
+    winnerParticipantId: ada.participant.id, expectedGameId: third!.gameId!,
+  });
+  const done = await service.getSnapshot(code);
+  expect(done.tables[0]?.status).toBe('free');
+  expect(done.event.tournament!.rounds[0]!.matches[0]).toMatchObject({
+    status: 'completed',
+    winnerParticipantId: ada.participant.id,
+    seriesWins: { [ada.participant.id]: 2, [bea.participant.id]: 1 },
+  });
+});
