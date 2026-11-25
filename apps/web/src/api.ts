@@ -881,13 +881,14 @@ export function reportTournamentResult(
   token: string,
   matchId: string,
   winnerParticipantId: string,
+  expectedGameId: string,
 ) {
   return request<{ event: PublicEvent }>(
     `/events/${joinCode}/tournament/matches/${matchId}/result`,
     {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ winnerParticipantId }),
+      body: JSON.stringify({ winnerParticipantId, expectedGameId }),
     },
   );
 }

@@ -78,3 +78,29 @@ test('saved-player recovery stays reachable with no saved players', async ({ pag
   await page.getByRole('link', { name: 'Main menu', exact: true }).click();
   await expect(page.getByRole('tab', { name: 'Start playing', exact: true })).toBeVisible();
 });
+
+test('discards a revoked saved seat and opens the join form', async ({ page, context }) => {
+  const code = await createConstructedEvent(page, {
+    name: 'Rejoin after removal', baseModeLabel: 'Duel', commanderRules: false,
+  });
+  const guest = await context.newPage();
+  await joinAsPlayer(guest, code, 'Ada');
+  const seatUrl = guest.url();
+  await guest.close();
+
+  await page.getByRole('tab', { name: 'Players', exact: true }).click();
+  const players = page.getByRole('tabpanel', { name: 'Players', exact: true });
+  const remove = players.getByRole('button', { name: 'Remove Ada from the event', exact: true });
+  await remove.click();
+  await remove.click();
+  await expect(remove).toHaveCount(0);
+
+  const restored = await context.newPage();
+  try {
+    await restored.goto(seatUrl);
+    await expect(restored.getByRole('button', { name: 'Join event', exact: true })).toBeVisible();
+    expect(await restored.evaluate(key => localStorage.getItem(key), `podyguard.player.${code}`)).toBeNull();
+  } finally {
+    await restored.close();
+  }
+});

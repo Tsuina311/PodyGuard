@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import type { LimitedEventModeConfig, LimitedMode } from '@podyguard/shared';
 import { useTranslation } from 'react-i18next';
 import { cx } from '../ui/cx';
@@ -68,6 +69,7 @@ export function LimitedTimingControls({
   onChange: (patch: Partial<LimitedTimingFields>) => void;
 }) {
   const { t } = useTranslation();
+  const matchHelpId = useId();
   return (
     <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
       <p className="text-muted col-span-full text-xs">
@@ -78,11 +80,13 @@ export function LimitedTimingControls({
           { count: playerCount, bestOf: value.matchStructure === 'BO1' ? 1 : 3 },
         )}
       </p>
-      <label className="text-muted text-xs">
-        {t('home.limitedMatch')}
+      <div className="text-muted text-xs">
+        <label htmlFor={`${matchHelpId}-select`}>{t('home.limitedMatch')}</label>
         <select
           className="mt-1 w-full rounded-lg border border-muted/20 bg-hull p-2 text-ink"
           value={value.matchStructure}
+          id={`${matchHelpId}-select`}
+          aria-describedby={matchHelpId}
           onChange={(event) =>
             onChange({
               matchStructure: event.target.value as 'BO1' | 'BO3',
@@ -92,7 +96,8 @@ export function LimitedTimingControls({
           <option value="BO1">BO1</option>
           <option value="BO3">BO3</option>
         </select>
-      </label>
+        <span id={matchHelpId} className="mt-1 block">{t(`home.limitedMatchHelp.${value.matchStructure}`)}</span>
+      </div>
       <label className="text-muted text-xs">
         {t('home.limitedRounds')}
         <input

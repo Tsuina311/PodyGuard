@@ -17,7 +17,7 @@ type Props = {
   participants: PublicParticipant[];
   busy: boolean;
   onStart: () => void;
-  onWinner: (matchId: string, participantId: string) => void;
+  onWinner: (matchId: string, participantId: string, gameId: string) => void;
   onBestOf?: (matchId: string, bestOf: SeriesLength) => void;
 };
 
@@ -120,7 +120,7 @@ export function TournamentPanel({
                 <div className="space-y-3">
                   {round.matches.map((match) => (
                     <MatchCard
-                      key={match.id}
+                      key={match.podId ?? match.id}
                       match={match}
                       names={names}
                       busy={busy}
@@ -190,12 +190,12 @@ function MatchCard({
   match: TournamentMatch;
   names: Map<string, string>;
   busy: boolean;
-  onWinner: (matchId: string, participantId: string) => void;
+  onWinner: (matchId: string, participantId: string, gameId: string) => void;
   onBestOf?: (matchId: string, bestOf: SeriesLength) => void;
 }) {
   const { t } = useTranslation();
   const [armedWinner, setArmedWinner] = useState<string | null>(null);
-  const canReport = match.status === 'playing';
+  const gameId = match.status === 'playing' ? match.podId : undefined;
   const canEditBestOf =
     Boolean(onBestOf) &&
     match.status === 'pending' &&
@@ -268,14 +268,14 @@ function MatchCard({
                     {seriesWins}
                   </span>
                 ) : null}
-                {canReport ? (
+                {gameId ? (
                   <Button
                     size="sm"
                     variant={armedWinner === participantId ? 'danger' : 'ghost'}
                     disabled={busy}
                     onClick={() => {
                       if (armedWinner === participantId) {
-                        onWinner(match.id, participantId);
+                        onWinner(match.id, participantId, gameId);
                         setArmedWinner(null);
                       } else {
                         setArmedWinner(participantId);

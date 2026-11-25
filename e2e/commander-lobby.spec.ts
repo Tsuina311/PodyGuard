@@ -146,7 +146,6 @@ for (const changeBracket of [false, true]) {
           return saved?.players?.find((player: { id: string; life: number }) => player.id === seatId)?.life;
         }, { key: `podyguard.tracker.${code}.${eventTables[0].id}.${playingTable.playingStartedAt}`, seatId })).toBe(39);
         await page.reload();
-        await page.getByRole('tab', { name: 'Play', exact: true }).click();
         await expect(page.locator('article[data-seat-id]').first().getByText('39', { exact: true })).toBeVisible();
       });
       await test.step('Other players see the same tracker without creating independent games', async () => {

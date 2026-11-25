@@ -783,6 +783,10 @@
     "startPlayingHint": "Open a battle screen on this device. Leave and come back without losing an unfinished game.",
     "alwaysPlayers": "Always {{count}} players in this mode.",
     "limitedCohortHint": "Always {{count}} players in the pod · every match is Swiss 1v1 (not multiplayer).",
+    "limitedMatchHelp": {
+      "BO1": "One game decides the match.",
+      "BO3": "The first player to win two games wins the match."
+    },
     "limitedSwissMatchSummary": "{{count}} players per pod · Swiss 1v1 · best of {{bestOf}}",
     "limitedPickTwoMatchSummary": "{{count}} players per pod · 1v1, diagonals first · best of {{bestOf}}",
     "resumeGame": "Resume game",
@@ -1326,7 +1330,9 @@
     "layoutWide": "Wide",
     "layoutWideHint": "Side by side, each total turned toward that player.",
     "layoutPortrait": "Portrait",
-    "layoutPortraitHint": "Stacked, both totals upright.",
+    "layoutPortraitHint": "Stacked, with each total facing its player.",
+    "recordGameResult": "Record game result",
+    "facePlayers": "Face seats toward players",
     "layoutSelected": "Selected",
     "pickLoserHint": "Tap the seat that lost.",
     "pickWinnerHint": "Tap the seat that won.",

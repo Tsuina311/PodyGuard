@@ -1,12 +1,32 @@
 /** @vitest-environment jsdom */
 import '@testing-library/jest-dom/vitest';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { EventSnapshot, PublicLimitedSession, PublicParticipant } from '@podyguard/shared';
+import { reportLimitedResult } from '../api';
+import { removeStored } from '../device-storage';
+import '../i18n';
+import { LimitedTimingControls } from './LimitedFormatPicker';
 import { LimitedHostPanel } from './LimitedHostPanel';
 import { LimitedPlayerPanel } from './LimitedPlayerPanel';
 
+vi.mock('../api', async (importOriginal) => ({
+  ...await importOriginal<typeof import('../api')>(),
+  reportLimitedResult: vi.fn(),
+}));
+vi.mock('../tracker/TrackerView', () => ({
+  TrackerView: ({ storageKey, onFinish }: { storageKey: string; onFinish: (winner: string) => Promise<void> }) => (
+    <>
+      <p>{storageKey}</p>
+      <button onClick={() => void onFinish('p1')}>Ada won the game</button>
+      <button onClick={() => void onFinish('p2')}>Bea won the game</button>
+    </>
+  ),
+}));
+
 afterEach(() => {
+  vi.clearAllMocks();
+  removeStored('podyguard.tracker.limited.DRAFT1.m1:score:p1');
   localStorage.clear();
   cleanup();
 });
@@ -100,6 +120,107 @@ function session(patch: Partial<PublicLimitedSession> = {}): PublicLimitedSessio
     ...patch,
   };
 }
+
+function bestOfThreeRound() {
+  const me = participant({ status: 'matched' });
+  const round = session({
+    status: 'ROUND_ACTIVE',
+    currentRound: 1,
+    participants: [
+      {
+        participantId: 'p1',
+        displayName: 'Ada',
+        status: 'PLAYING',
+        joinedAt: '2026-01-01T00:00:00.000Z',
+        draftSeat: 1,
+        seated: true,
+      },
+      {
+        participantId: 'p2',
+        displayName: 'Bea',
+        status: 'PLAYING',
+        joinedAt: '2026-01-01T00:00:00.000Z',
+        draftSeat: 3,
+        seated: true,
+      },
+    ],
+    rounds: [
+      {
+        id: 'r1',
+        number: 1,
+        status: 'ACTIVE',
+        matches: [
+          {
+            id: 'm1',
+            roundNumber: 1,
+            position: 1,
+            playerAId: 'p1',
+            playerBId: 'p2',
+            status: 'PLAYING',
+            bestOf: 3,
+          },
+        ],
+        createdAt: '2026-01-01T00:00:00.000Z',
+      },
+    ],
+  });
+  return { me, round };
+}
+
+it('advances the Limited tracker through a split series and reports the actual score', async () => {
+  const { me, round } = bestOfThreeRound();
+  const running = {
+    ...round,
+    timer: {
+      phase: 'ROUND' as const,
+      status: 'RUNNING' as const,
+      durationSeconds: 2400,
+      startedAt: '2026-01-01T00:00:00.000Z',
+      targetAt: '2099-01-01T00:00:00.000Z',
+    },
+  };
+  vi.mocked(reportLimitedResult).mockResolvedValue({ session: running });
+  const props = {
+    snapshot: snapshot(me, running),
+    participant: me,
+    token: 'player',
+    onSnapshot: vi.fn(),
+    onError: vi.fn(),
+  };
+  const firstVisit = render(<LimitedPlayerPanel {...props} />);
+  fireEvent.click(screen.getByRole('button', { name: 'Use life tracker' }));
+  fireEvent.click(await screen.findByRole('button', { name: 'Ada won the game' }));
+  expect(screen.getByText('Best of 3 · 1–0')).toBeVisible();
+  expect(reportLimitedResult).not.toHaveBeenCalled();
+
+  firstVisit.unmount();
+  render(<LimitedPlayerPanel {...props} />);
+  fireEvent.click(screen.getByRole('button', { name: 'Track game 2' }));
+  expect(await screen.findByText('podyguard.tracker.limited.DRAFT1.m1.game-2')).toBeVisible();
+  fireEvent.click(screen.getByRole('button', { name: 'Bea won the game' }));
+  expect(screen.getByText('Best of 3 · 1–1')).toBeVisible();
+  fireEvent.click(screen.getByRole('button', { name: 'Track game 3' }));
+  fireEvent.click(await screen.findByRole('button', { name: 'Ada won the game' }));
+  await waitFor(() => expect(props.onSnapshot).toHaveBeenCalledOnce());
+  expect(reportLimitedResult).toHaveBeenCalledExactlyOnceWith('DRAFT1', 'player', 's1', 'm1', {
+    outcome: 'PLAYER_A_WIN', playerAGameWins: 2, playerBGameWins: 1,
+  });
+});
+
+it('describes the selected Limited match length', () => {
+  const value = {
+    mode: 'SEALED' as const, matchStructure: 'BO1' as const,
+    roundMinutes: 40, deckbuildingMinutes: 25, totalRounds: 3,
+  };
+  const onChange = vi.fn();
+  const { rerender } = render(<LimitedTimingControls value={value} playerCount={4} onChange={onChange} />);
+  const select = screen.getByRole('combobox');
+  expect(select).toHaveAccessibleDescription('One game decides the match.');
+  fireEvent.change(select, { target: { value: 'BO3' } });
+  expect(onChange).toHaveBeenCalledWith({ matchStructure: 'BO3' });
+  rerender(<LimitedTimingControls value={{ ...value, matchStructure: 'BO3' }} playerCount={4} onChange={onChange} />);
+  expect(select).toHaveAccessibleDescription('The first player to win two games wins the match.');
+});
 
 describe('Limited lobby screens', () => {
   it('shows a ready button in the lobby and who is ready on the host desk', () => {
@@ -275,48 +396,7 @@ describe('Limited lobby screens', () => {
   });
 
   it('waits for the table to start the best-of clock, then lets the host pause that table', () => {
-    const me = participant({ status: 'matched' });
-    const round = session({
-      status: 'ROUND_ACTIVE',
-      currentRound: 1,
-      participants: [
-        {
-          participantId: 'p1',
-          displayName: 'Ada',
-          status: 'PLAYING',
-          joinedAt: '2026-01-01T00:00:00.000Z',
-          draftSeat: 1,
-          seated: true,
-        },
-        {
-          participantId: 'p2',
-          displayName: 'Bea',
-          status: 'PLAYING',
-          joinedAt: '2026-01-01T00:00:00.000Z',
-          draftSeat: 3,
-          seated: true,
-        },
-      ],
-      rounds: [
-        {
-          id: 'r1',
-          number: 1,
-          status: 'ACTIVE',
-          matches: [
-            {
-              id: 'm1',
-              roundNumber: 1,
-              position: 1,
-              playerAId: 'p1',
-              playerBId: 'p2',
-              status: 'PLAYING',
-              bestOf: 3,
-            },
-          ],
-          createdAt: '2026-01-01T00:00:00.000Z',
-        },
-      ],
-    });
+    const { me, round } = bestOfThreeRound();
     render(
       <LimitedPlayerPanel
         snapshot={snapshot(me, round)}

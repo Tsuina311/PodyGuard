@@ -228,6 +228,7 @@ type Props = {
    * there was never a queue to return to.
    */
   requeueOnFinish?: boolean;
+  finishLabel?: string;
   challengeProgress?: Record<
     string,
     { points: number; completedChallengeIds: string[] }
@@ -501,6 +502,7 @@ export function TrackerView({
   playerControls,
   resumePath,
   requeueOnFinish = true,
+  finishLabel: customFinishLabel,
   challengeProgress = {},
   onChallengeComplete,
   challengePack = OFFICIAL_COMMANDER_CHALLENGES,
@@ -513,6 +515,7 @@ export function TrackerView({
   dealTreachery = false,
 }: Props) {
   const { t } = useTranslation();
+  const finishLabel = customFinishLabel ?? t(requeueOnFinish ? 'tracker.doneRequeue' : 'tracker.leave');
   const rulesFormat = resolveRulesFormat(gameMode, rulesFormatProp);
   const initial = useMemo<TrackerHistory>(
     () => controller?.initialHistory ?? ({
@@ -601,6 +604,14 @@ export function TrackerView({
   const [finishing, setFinishing] = useState(false);
   const [replaying, setReplaying] = useState(false);
   const [needsRearrange, setNeedsRearrange] = useState(promptRearrange);
+  const [facePlayers, setFacePlayers] = useState(
+    () => readStored('podyguard.tracker.face-players') !== 'false',
+  );
+  function toggleSeatFacing() {
+    const next = !facePlayers;
+    setFacePlayers(next);
+    writeStored('podyguard.tracker.face-players', String(next));
+  }
   const [boardLayout, setBoardLayout] = useState<DuelBoardLayout>(() => {
     if (!persist) {
       return 'wide';
@@ -1031,7 +1042,7 @@ export function TrackerView({
 
   function podPlayerTurnClass(playerId: string): string {
     const index = state.players.findIndex(player => player.id === playerId);
-    return !duelBoard && landscape && index >= 0 && seatFacesAway(
+    return !duelBoard && facePlayers && landscape && index >= 0 && seatFacesAway(
       state.players.length, index, seatLayout,
       { archenemy: archenemyBoard, archenemyId: state.archenemyId, playerId },
     ) ? 'rotate-180' : '';
@@ -2480,7 +2491,9 @@ export function TrackerView({
                 archenemyBoard={archenemyBoard}
                 boardLayout={activeBoardLayout}
                 onBoardLayout={setBoardLayout}
-                requeueOnFinish={requeueOnFinish}
+                facePlayers={facePlayers}
+                onToggleSeatFacing={toggleSeatFacing}
+                finishLabel={finishLabel}
                 dispatch={(action) => send({ type: 'action', action })}
                 onUndo={() => {
                   send({ type: 'undo' });
@@ -2886,6 +2899,11 @@ export function TrackerView({
                 <h2 className="font-display text-lg leading-tight font-bold">
                   {t('tracker.victory')}
                 </h2>
+                <p className="mt-1 break-words text-sm font-semibold">
+                  {teamForPlayer(state, winner.id).map(seat =>
+                    players.find(player => player.id === seat.id)?.name || seat.name,
+                  ).join(' & ')}
+                </p>
                 <p className="text-muted mb-3 font-mono text-sm tabular-nums">
                   {formatClock(elapsed)}
                 </p>
@@ -3014,9 +3032,7 @@ export function TrackerView({
                       ? t('common.submitting')
                       : challengeSaving > 0
                         ? t('tracker.savingChallenges')
-                        : requeueOnFinish
-                          ? t('tracker.doneRequeue')
-                          : t('tracker.leave')}
+                        : finishLabel}
                   </Button>
                   {past.length > 0 ? (
                     <Button
@@ -3249,7 +3265,9 @@ function MatchMenu({
   archenemyBoard,
   boardLayout,
   onBoardLayout,
-  requeueOnFinish,
+  facePlayers,
+  onToggleSeatFacing,
+  finishLabel,
   dispatch,
   onUndo,
   onFinish,
@@ -3274,7 +3292,9 @@ function MatchMenu({
   archenemyBoard: boolean;
   boardLayout: DuelBoardLayout;
   onBoardLayout: (layout: DuelBoardLayout) => void;
-  requeueOnFinish: boolean;
+  facePlayers: boolean;
+  onToggleSeatFacing: () => void;
+  finishLabel: string;
   dispatch: (action: TrackerAction) => void;
   onUndo: () => void;
   onFinish: () => Promise<void>;
@@ -3648,7 +3668,7 @@ function MatchMenu({
           <div
             className={cx(
               'grid w-full gap-1.5',
-              layoutChoices.length > 1 ? 'grid-cols-2' : 'grid-cols-1',
+              'grid-cols-2',
             )}
           >
             <Button
@@ -3680,7 +3700,6 @@ function MatchMenu({
                   'h-auto min-h-9 w-full justify-start !whitespace-normal px-2 text-left leading-tight',
                   'stack',
                 )}
-                disabled={decided}
                 onClick={() => {
                   setSelectedSeatId(null);
                   setConfirmLoserId(null);
@@ -3694,7 +3713,14 @@ function MatchMenu({
                 <LayoutGrid size={14} className="shrink-0" aria-hidden />
                 {t('tracker.changeLayout')}
               </Button>
-            ) : null}
+            ) : (
+              <Button size="sm" variant="glass" aria-pressed={facePlayers}
+                className="h-auto min-h-9 justify-start !whitespace-normal px-2 text-left"
+                onClick={onToggleSeatFacing}>
+                <LayoutGrid size={14} className="shrink-0" aria-hidden />
+                {t('tracker.facePlayers')}
+              </Button>
+            )}
           </div>
         </MatchMenuPane>
 
@@ -3752,7 +3778,7 @@ function MatchMenu({
                   />
                 ))}
                 <span className="text-muted font-mono text-[0.68rem] tracking-wide uppercase">
-                  {t('tracker.victory')}
+                  {menuWinnerTeam.map(seat => seat.name).join(' & ')}
                 </span>
               </span>
               <Button
@@ -3761,9 +3787,7 @@ function MatchMenu({
                 className={menuControlClass('h-11 w-full', 'large')}
                 onClick={() => void onFinish()}
               >
-                {requeueOnFinish
-                  ? t('tracker.doneRequeue')
-                  : t('tracker.leave')}
+                {finishLabel}
               </Button>
             </div>
           ) : null}

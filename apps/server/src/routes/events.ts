@@ -197,6 +197,7 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
       };
       const body = (request.body ?? {}) as {
         winnerParticipantId?: unknown;
+        expectedGameId?: unknown;
       };
       try {
         const event = await app.events.reportTournamentResult(
@@ -206,6 +207,7 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
           typeof body.winnerParticipantId === 'string'
             ? body.winnerParticipantId
             : '',
+          typeof body.expectedGameId === 'string' ? body.expectedGameId : undefined,
         );
         await app.live.publish(normalizeJoinCode(joinCode));
         return { event };

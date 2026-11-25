@@ -5,6 +5,8 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import './i18n';
 import { JoinPage } from './JoinPage';
+import { HomePage } from './HomePage';
+import { loadPlayerSession, savePlayerSession, clearPlayerSession } from './player-sessions';
 import { AccountPage } from './AccountPage';
 import { FeedbackProvider } from './feedback/FeedbackContext';
 import { clearAccountSession, saveAccountSession } from './api';
@@ -40,6 +42,47 @@ describe('returning guest join UI and playgroup overview UI', () => {
     cleanup();
     globalThis.fetch = originalFetch;
     vi.restoreAllMocks();
+  });
+
+  it('removes a saved seat whose participant has left', async () => {
+    const event = {
+      id: 'evt-return', name: 'Friday Duel', joinCode: 'GONE12', status: 'open',
+      gameMode: 'duel', rulesFormat: 'normal',
+    };
+    savePlayerSession(event.joinCode, { displayName: 'Ada', token: 'revoked' });
+    globalThis.fetch = vi.fn(async (input: RequestInfo | URL) =>
+      Response.json(String(input).endsWith('/me')
+        ? { event, participant: { id: 'old-player', status: 'left' } }
+        : event),
+    ) as typeof fetch;
+    try {
+      render(
+        <MemoryRouter initialEntries={['/e/GONE12']}>
+          <FeedbackProvider>
+            <Routes><Route path="/e/:joinCode" element={<JoinPage />} /></Routes>
+          </FeedbackProvider>
+        </MemoryRouter>,
+      );
+      expect(await screen.findByRole('button', { name: 'Join event' })).toBeVisible();
+      expect(screen.getByLabelText('Display name')).toHaveValue('Ada');
+      expect(loadPlayerSession(event.joinCode)).toBeNull();
+    } finally {
+      clearPlayerSession(event.joinCode);
+    }
+  });
+
+  it('uses the selected format for the event-name suggestion without overwriting a typed name', async () => {
+    globalThis.fetch = vi.fn(async () => Response.json({})) as typeof fetch;
+    render(<MemoryRouter><FeedbackProvider><HomePage /></FeedbackProvider></MemoryRouter>);
+    fireEvent.click(screen.getByRole('tab', { name: 'Host event' }));
+    const name = screen.getByLabelText('Event name');
+    expect(name).toHaveAttribute('placeholder', 'Friday Commander');
+    fireEvent.change(name, { target: { value: 'Our night' } });
+    fireEvent.click(screen.getByRole('tab', { name: 'Limited' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Sealed' }));
+    const limitedName = screen.getByLabelText('Event name');
+    expect(limitedName).toHaveAttribute('placeholder', 'Friday Sealed');
+    expect(limitedName).toHaveValue('Our night');
   });
 
   it('shows returning-player suggestions on JoinPage and lets Alex join with a saved Commander', async () => {

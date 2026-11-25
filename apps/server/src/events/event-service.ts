@@ -365,16 +365,12 @@ export class EventService {
     const expiresAt = new Date(
       createdAt.getTime() + lifetimeHours * 60 * 60 * 1000,
     );
-    const allowFivePods =
-      gameMode === 'commander' ||
-      ((gameMode === 'treachery' ||
-        gameMode === 'assassin' ||
-        gameMode === 'multiplayer') &&
-        preferredPodSize >= 5);
-    const allowThreePods =
-      gameMode === 'assassin' ||
-      gameMode === 'multiplayer' ||
-      gameMode === 'commander';
+    const allowFivePods = gameMode === 'commander'
+      ? input.allowFivePods ?? true
+      : resolveAllowFivePods(gameMode, preferredPodSize, false);
+    const allowThreePods = gameMode === 'commander'
+      ? input.allowThreePods ?? true
+      : resolveAllowThreePods(gameMode, preferredPodSize, false);
     const labels = resolveTableLabels({ count: input.tableCount }, 0);
     const hostCredentialHash = await hashHostPin(hostPin);
     let initialTournamentState: TournamentState | undefined;
@@ -2217,6 +2213,7 @@ export class EventService {
     hostToken: string,
     matchId: string,
     winnerParticipantId: string,
+    expectedGameId?: string,
   ): Promise<PublicEvent> {
     const stored = await this.requireHostToken(joinCode, hostToken);
     const tournamentState = this.requireTournament(stored);
@@ -2243,6 +2240,9 @@ export class EventService {
     );
     if (!pod || pod.id !== match.podId) {
       throw new PodNotFoundError();
+    }
+    if (expectedGameId && pod.id !== expectedGameId) {
+      throw new InvalidParticipantTransitionError('This game has changed.');
     }
     const winsNeeded = Math.ceil(match.bestOf / 2);
     const seriesComplete =
@@ -2628,7 +2628,10 @@ export class EventService {
     if (!updated) {
       throw new InvalidParticipantSessionError();
     }
-    return this.present(updated);
+    const updatedSeat = pod.tournamentMatchId
+      ? (await this.store.listAssignments(stored.id)).find(row => row.participantId === updated.id)
+      : undefined;
+    return this.present(updated, updatedSeat);
   }
 
   async finishTable(
@@ -3826,12 +3829,17 @@ export class EventService {
         pod.id,
         table.id,
       );
+      const continuing = Object.values(match.seriesWins ?? {}).some(wins => wins > 0);
+      if (continuing) {
+        await this.store.startPod(pod.id);
+        tournamentState = markTournamentMatchPlaying(tournamentState, match.id);
+      }
       await this.store.updateEvent(eventId, { tournamentState });
       created.push({
         id: pod.id,
         tableLabel: pod.tableLabel,
         playerNames: pod.playerNames,
-        status: pod.status,
+        status: continuing ? 'playing' : pod.status,
         poolId: pod.poolId,
       });
     }

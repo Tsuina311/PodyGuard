@@ -117,3 +117,36 @@ test('upgrading an ongoing local event tracker preserves its life totals and sta
     await expect(starter.getByText('Starting player', { exact: true })).toBeVisible();
   } finally { await ada.close(); await bea.close(); }
 });
+
+test('a host can return from the tracker to Desk and resume the same game via Play', async ({ page, browser }) => {
+  const code = await createConstructedEvent(page, {
+    name: 'Play and host', baseModeLabel: 'Duel', commanderRules: false,
+  });
+  const hostUrl = page.url();
+  const guest = await browser.newPage();
+  try {
+    await joinAsPlayer(page, code, 'Ada');
+    await markPlayerReady(page);
+    await joinAsPlayer(guest, code, 'Bea');
+    await markPlayerReady(guest);
+    await page.goto(hostUrl);
+    await expect(page.getByText('2 ready', { exact: true }).first()).toBeVisible();
+    await page.getByRole('button', { name: 'Match now', exact: true }).click();
+    await page.getByRole('button', { name: 'Start game', exact: true }).click();
+    await page.getByRole('tab', { name: 'Play', exact: true }).click();
+    await page.getByRole('button', { name: 'Use game tracker', exact: true }).click();
+    await page.getByRole('button', { name: 'Reveal starting player', exact: true }).click();
+    await page.getByRole('button', { name: 'Start', exact: true }).click();
+    await menu(page);
+    await page.getByRole('button', { name: 'Desk', exact: true }).click();
+    await expect(page.getByRole('tab', { name: 'Desk', exact: true })).toHaveAttribute('aria-selected', 'true');
+    await expect(page.locator('article[data-seat-id]')).toHaveCount(0);
+    await page.getByRole('tab', { name: 'Play', exact: true }).click();
+    await page.getByRole('button', { name: 'Continue tracking', exact: true }).click();
+    await expect(page.locator('article[data-seat-id]')).toHaveCount(2);
+    await page.reload();
+    await expect(page.locator('article[data-seat-id]')).toHaveCount(2);
+  } finally {
+    await guest.close();
+  }
+});

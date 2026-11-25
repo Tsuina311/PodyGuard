@@ -20,6 +20,7 @@ import {
   reportLimitedResult,
   setReady,
 } from '../api';
+import { readStored, writeStored } from '../device-storage';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { Panel } from '../ui/Panel';
@@ -46,6 +47,7 @@ export function LimitedPlayerPanel({
   onSnapshot,
   onError,
   onReady,
+  onOpenDesk,
 }: {
   snapshot: EventSnapshot;
   participant: PublicParticipant;
@@ -53,6 +55,7 @@ export function LimitedPlayerPanel({
   onSnapshot: (snapshot: EventSnapshot) => void;
   onError: (error: string | null) => void;
   onReady?: (ready: boolean) => Promise<void>;
+  onOpenDesk?: () => void;
 }) {
   const enabled =
     snapshot.event.limitedModeConfigs?.filter((config) => config.enabled) ?? [];
@@ -60,13 +63,21 @@ export function LimitedPlayerPanel({
     participant.limitedQueueMode ?? enabled[0]?.mode ?? 'BOOSTER_DRAFT',
   );
   const [busy, setBusy] = useState(false);
-  const [showTracker, setShowTracker] = useState(false);
+  const [trackerMatchId, setTrackerMatchId] = useState<string | null>(null);
   const session = activeLimitedSession(snapshot, participant.id);
   const match = currentLimitedMatch(session, participant.id);
+  const trackerKey = `podyguard.tracker.limited.${snapshot.event.joinCode}.${match?.id ?? ''}`;
+  const scoreKey = `${trackerKey}:score:${participant.id}`;
+  const localScore = match?.bestOf === 3 ? readStored(scoreKey)?.match(/^([01])-([01])$/) : null;
+  const playerAGameWins = Number(localScore?.[1] ?? 0);
+  const playerBGameWins = Number(localScore?.[2] ?? 0);
+  const gameNumber = playerAGameWins + playerBGameWins + 1;
   const self = session?.participants.find(
     (row) => row.participantId === participant.id,
   );
   const tableLabel = tableName(snapshot, session);
+  const matchWinnerId = match?.outcome === 'PLAYER_A_WIN' ? match.playerAId
+    : match?.outcome === 'PLAYER_B_WIN' ? match.playerBId : undefined;
 
   async function act(action: () => Promise<void>) {
     setBusy(true);
@@ -140,9 +151,9 @@ export function LimitedPlayerPanel({
   const seatingSession = session?.status === 'SEATING' ? session : undefined;
 
   function beginPlay(tracker: boolean) {
-    if (!session) return;
+    if (!session || !match) return;
     if (session.timer) {
-      if (tracker) setShowTracker(true);
+      if (tracker) setTrackerMatchId(match.id);
       return;
     }
     void act(async () => {
@@ -152,12 +163,12 @@ export function LimitedPlayerPanel({
         session.id,
       );
       remember(result.session);
-      if (tracker) setShowTracker(true);
+      if (tracker) setTrackerMatchId(match.id);
     });
   }
 
   if (
-    showTracker &&
+    trackerMatchId === match?.id &&
     session &&
     match?.playerBId &&
     !match.outcome
@@ -173,7 +184,7 @@ export function LimitedPlayerPanel({
         ) : null}
         <Suspense fallback={null}>
           <TrackerView
-            storageKey={`podyguard.tracker.limited.${snapshot.event.joinCode}.${match.id}`}
+            storageKey={gameNumber === 1 ? trackerKey : `${trackerKey}.game-${gameNumber}`}
             players={[
               { id: participant.id, name: participant.displayName, commanders: [] },
               {
@@ -184,9 +195,28 @@ export function LimitedPlayerPanel({
             ]}
             gameMode="duel"
             rulesFormat="normal"
-            requeueOnFinish={false}
-            onFinish={async () => setShowTracker(false)}
-            onQuit={() => setShowTracker(false)}
+            finishLabel={match.bestOf === 1 ? 'Report match result' : 'Record game result'}
+            onFinish={async (winnerId) => {
+              const aWins = playerAGameWins + Number(winnerId === match.playerAId);
+              const bWins = playerBGameWins + Number(winnerId === match.playerBId);
+              const winsNeeded = Math.ceil(match.bestOf / 2);
+              if (aWins >= winsNeeded || bWins >= winsNeeded) {
+                const result = await reportLimitedResult(snapshot.event.joinCode, token, session.id, match.id, {
+                  outcome: aWins >= winsNeeded ? 'PLAYER_A_WIN' : 'PLAYER_B_WIN',
+                  playerAGameWins: aWins,
+                  playerBGameWins: bWins,
+                });
+                remember(result.session);
+              } else {
+                writeStored(scoreKey, `${aWins}-${bWins}`);
+              }
+              setTrackerMatchId(null);
+            }}
+            onQuit={() => setTrackerMatchId(null)}
+            onOpenDesk={onOpenDesk && (() => {
+              setTrackerMatchId(null);
+              onOpenDesk();
+            })}
           />
         </Suspense>
       </div>
@@ -386,8 +416,8 @@ export function LimitedPlayerPanel({
           </p>
           <p className="text-muted mb-3 text-sm">
             {match.outcome
-              ? `Result: ${match.outcome.replaceAll('_', ' ')}`
-              : `Best of ${match.bestOf}`}
+              ? `Result: ${matchWinnerId ? `${participantName(session, matchWinnerId)} wins` : match.outcome.replaceAll('_', ' ')}`
+              : `Best of ${match.bestOf}${gameNumber > 1 ? ` · ${playerAGameWins}–${playerBGameWins}` : ''}`}
           </p>
           {!match.outcome && match.playerBId ? (
             <div className="mb-3 flex flex-col gap-2">
@@ -397,7 +427,7 @@ export function LimitedPlayerPanel({
                 disabled={busy}
                 onClick={() => beginPlay(true)}
               >
-                Use life tracker
+                {gameNumber > 1 ? `Track game ${gameNumber}` : 'Use life tracker'}
               </Button>
               {session.timer ? null : (
                 <Button
