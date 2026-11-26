@@ -63,7 +63,7 @@ export function MagicRulesSheet({ onClose }: { onClose: () => void }) {
   const showingResult = result !== null;
 
   return (
-    <section className="bg-hull flex h-full min-h-0 w-full flex-col">
+    <section className="bg-hull flex h-full min-h-0 w-full flex-col overflow-hidden">
       <header className="border-muted/15 flex shrink-0 items-center justify-between gap-3 border-b px-4 py-3">
         <h4 className="font-display truncate text-sm leading-tight font-bold">
           {t('tracker.magicRules.title')}
@@ -182,7 +182,10 @@ export function MagicRulesSheet({ onClose }: { onClose: () => void }) {
       </form>
 
       <div
-        className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3"
+        className="min-h-0 flex-1 touch-pan-y touch-pinch-zoom overflow-y-auto overscroll-y-contain px-4 py-3"
+        role="region"
+        aria-label={t('tracker.magicRules.rulesTab')}
+        tabIndex={0}
         aria-live="polite"
       >
         {speech.listening ? (

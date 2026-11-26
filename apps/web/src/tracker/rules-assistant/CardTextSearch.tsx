@@ -28,7 +28,7 @@ export function CardTextSearch() {
     }
   }
 
-  return <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3">
+  return <div className="min-h-0 flex-1 touch-pan-y touch-pinch-zoom overflow-y-auto overscroll-y-contain px-4 py-3">
     <p className="text-muted mb-3 text-sm">{t('tracker.magicRules.cardsHelp')}</p>
     <form className="flex gap-2" onSubmit={event => { event.preventDefault(); if (query.trim()) void search(); }}>
       <label className="sr-only" htmlFor="magic-card-name">{t('tracker.magicRules.cardName')}</label>
