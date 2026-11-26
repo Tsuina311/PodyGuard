@@ -3,12 +3,12 @@ import type { PlaygroupOverview, PublicLimitedSession } from '@podyguard/shared'
 import { expect, test } from './fixtures';
 import { createLimitedEvent, joinAsPlayer, prepareApp } from './helpers';
 
-async function seedDraftPlaygroup(host: Page, count: number) {
+async function seedDraftPlaygroup(host: Page, count: number, name = 'Draft Night Playgroup') {
   const demo = await (await host.request.get('/test/demo')).json();
   const headers = { Authorization: `Bearer ${demo.token}` };
   const response = await host.request.post('/api/playgroups', {
     headers,
-    data: { name: 'Draft Night Playgroup' },
+    data: { name },
   });
   expect(response.ok()).toBe(true);
   const { playgroup } = await response.json();
@@ -23,8 +23,20 @@ async function seedDraftPlaygroup(host: Page, count: number) {
     localStorage.setItem('podyguard.account.session', JSON.stringify({ token, account }));
     localStorage.setItem('podyguard.account.preferredPlaygroupId', playgroupId);
   }, { token: demo.token, account: demo.account, playgroupId: playgroup.id });
-  return { id: playgroup.id as string, headers };
+  return { id: playgroup.id as string, name, headers };
 }
+
+test('a signed-in host can create Booster Draft without the preferred playgroup', async ({ page }) => {
+  await seedDraftPlaygroup(page, 1, 'Opt-out playgroup');
+  const code = await createLimitedEvent(page, {
+    name: 'Booster Draft without a playgroup',
+    formatLabel: 'Booster Draft',
+    playgroup: null,
+  });
+  const response = await page.request.get(`/api/events/${code}`);
+  expect(response.ok()).toBe(true);
+  expect(await response.json()).not.toHaveProperty('playgroupId');
+});
 
 for (const format of [
   { label: 'Booster Draft', count: 8 },
@@ -37,7 +49,11 @@ for (const format of [
     const playgroup = format.label === 'Booster Draft'
       ? await seedDraftPlaygroup(host, format.count)
       : undefined;
-    const code = await createLimitedEvent(host, { name: `E2E ${format.label} lifecycle`, formatLabel: format.label });
+    const code = await createLimitedEvent(host, {
+      name: `E2E ${format.label} lifecycle`,
+      formatLabel: format.label,
+      playgroup: playgroup?.name,
+    });
     try {
       await test.step('Players join and ready through independent browsers', async () => {
         for (let index = 0; index < format.count; index++) {

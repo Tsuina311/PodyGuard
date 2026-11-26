@@ -851,6 +851,19 @@
     "archenemyFixedSeats": "Archenemy Commander games always seat exactly four players.",
     "twoHeadedFixedSeats": "Two-Headed Giant games always seat exactly four players.",
     "eventName": "Event name",
+    "playgroup": {
+      "title": "Playgroup",
+      "hint": "Choose a playgroup to save results under its players’ profiles.",
+      "none": "No playgroup",
+      "returning": "Show returning-player suggestions on join",
+      "reuse": "Reuse last event setup",
+      "loading": "Loading your playgroups…",
+      "unavailable": "Your playgroups couldn’t load. You can still create the event without one.",
+      "empty": "You haven’t created a playgroup yet.",
+      "manage": "Manage playgroups",
+      "signedOut": "Sign in to link this event to a playgroup.",
+      "signIn": "Sign in"
+    },
     "eventNamePlaceholder": "Friday Commander",
     "eventNameExamples": {
       "commander": "Friday Commander",
