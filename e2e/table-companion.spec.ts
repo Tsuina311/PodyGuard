@@ -3,7 +3,22 @@ import { openQuickPlaySetup, prepareApp } from './helpers';
 test('a second phone follows a quick game read-only, uses tools, and sees sharing stop', async ({
   page,
   browser,
+  browserName,
 }) => {
+  await page.addInitScript(() => {
+    const wakeLock = new EventTarget();
+    Object.defineProperties(wakeLock, {
+      released: { value: false },
+      release: { value: async () => undefined },
+    });
+    Object.defineProperty(navigator, 'wakeLock', {
+      configurable: true,
+      value: { request: async () => {
+        document.documentElement.dataset.trackerWakeLock = 'requested';
+        return wakeLock;
+      } },
+    });
+  });
   await page.setViewportSize({ width: 1024, height: 768 });
   await openQuickPlaySetup(page, {
     baseModeLabel: 'Duel',
@@ -16,29 +31,12 @@ test('a second phone follows a quick game read-only, uses tools, and sees sharin
   await page.getByRole('button', { name: 'Start', exact: true }).click();
   await page.getByTitle('Show seat controls', { exact: true }).click();
   await page.getByTitle('Match menu', { exact: true }).click();
-  await expect(
-    page.getByRole('button', { name: 'Fullscreen', exact: true }),
-  ).toBeVisible();
-  await page.getByRole('button', { name: 'Fullscreen', exact: true }).click();
-  await expect
-    .poll(
-      async () =>
-        Boolean(await page.evaluate(() => document.fullscreenElement)) ||
-        (await page.getByText(/On iPad, use Safari/).isVisible()),
-    )
-    .toBe(true);
-  if (await page.evaluate(() => Boolean(document.fullscreenElement))) {
-    await page
-      .getByRole('button', { name: 'Exit fullscreen', exact: true })
-      .click();
-  } else {
-    await page.getByRole('button', { name: 'Close screen help' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-tracker-wake-lock', 'requested');
+  if (browserName === 'chromium') {
+    await expect.poll(() => page.evaluate(() => Boolean(document.fullscreenElement))).toBe(true);
   }
-  await page
-    .getByRole('button', { name: 'Keep screen awake', exact: true })
-    .click();
-  await expect(page.getByText(/On iPad, use Safari/)).toBeVisible();
-  await page.getByRole('button', { name: 'Close screen help' }).click();
+  await expect(page.getByRole('button', { name: /^(Exit )?fullscreen$/i })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Keep screen awake' })).toHaveCount(0);
   await page
     .getByRole('button', { name: 'Share live tracker', exact: true })
     .click();
