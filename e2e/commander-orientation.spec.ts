@@ -55,6 +55,10 @@ test('a four-player landscape game faces each player and keeps controls correct 
   await expect(seats.nth(1).getByText('40', { exact: true })).toBeVisible();
   await expect(seats.nth(3).getByText('40', { exact: true })).toBeVisible();
 
+  // Playwright can only resize a desktop browser window outside fullscreen.
+  await page.evaluate(async () => {
+    if (document.fullscreenElement) await document.exitFullscreen();
+  });
   await page.setViewportSize({ width: 390, height: 844 });
   await expect.poll(seatAngles).toEqual([0, 0, 0, 0]);
   await expect(seats.nth(0).getByText('39', { exact: true })).toBeVisible();

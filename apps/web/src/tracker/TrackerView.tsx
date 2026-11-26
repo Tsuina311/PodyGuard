@@ -164,7 +164,7 @@ import {
 import { useLandscape } from './orientation';
 import { SEAT_CONTROLS_HIDE_MS } from './use-idle-dismiss';
 import { useWakeLock } from './wake-lock';
-import { TabletControls } from './TabletControls';
+import { useTrackerFullscreen } from './fullscreen';
 import {
   detectAutomaticChallenges,
   detectedConfirmation,
@@ -665,7 +665,8 @@ export function TrackerView({
   const attemptedChallenges = useRef(new Set<string>());
   const landscape = useLandscape();
   const boardLive = Boolean(state.firstPlayerId);
-  const wake = useWakeLock(true);
+  useWakeLock(true);
+  useTrackerFullscreen(boardLive);
   const tableShare = useTableShare(storageKey, state, eventContext, controller?.viewUrl);
   const duelBoard = state.players.length === 2;
   const screenClass = boardScreenClass(duelBoard ? 'flush' : 'tight');
@@ -1801,10 +1802,7 @@ export function TrackerView({
               {t('tracker.readyToBeginHint')}
             </p>
           </div>
-          <div className="mt-4">
-            <TabletControls wake={wake} />
-            {playerControls}
-          </div>
+          {playerControls ? <div className="mt-4">{playerControls}</div> : null}
         </PreGameScreen>
         {rulesSheet}
       </>
@@ -2478,7 +2476,6 @@ export function TrackerView({
               <MatchMenu
                 deviceControls={
                   <>
-                    <TabletControls wake={wake} />
                     <TableShareControls share={tableShare} />
                     {playerControls}
                   </>
@@ -5158,11 +5155,15 @@ function CommanderArt({
             src={entry.artCropUri}
             alt=""
             decoding="sync"
-            className={cx('size-full min-w-0 flex-1 object-cover', entry.focus)}
+            className={cx(
+              'size-full min-w-0 flex-1 object-cover',
+              entry.focus,
+              !eliminated && 'brightness-[0.78] saturate-[1.35]',
+            )}
           />
         ))}
       </div>
-      <div className="bg-void/45 absolute inset-0" />
+      <div className={cx('absolute inset-0', eliminated ? 'bg-void/45' : 'bg-black/35')} />
     </div>
   );
 }
