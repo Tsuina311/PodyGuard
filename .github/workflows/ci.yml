@@ -32,6 +32,9 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
+      - name: Test release rules
+        run: node --test scripts/release-version.test.mjs
+
       - name: Typecheck
         run: yarn typecheck
 

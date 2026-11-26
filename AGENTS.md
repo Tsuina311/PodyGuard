@@ -19,8 +19,8 @@ These standing instructions apply repository-wide to Codex in Cursor and Cloud.
 ## Release versions
 
 - Pick one bump per PR and describe the player impact in the PR body. Patch is the default for fixes, polish, reliability, and internal changes. Propose minor for a backward-compatible capability or major when existing clients, sessions, or saved data require a change or migration.
-- The owner confirms minor and major bumps with the corresponding release label. If the release check flags changes to API contracts, saved data, or database schema, explain compatibility in the PR and request an explicit release label. The owner can confirm a compatible fix with `release:patch`.
-- Before handoff, refresh `origin/main` and set `VERSION` to exactly one increment from it using `yarn bump:patch`, `yarn bump:minor`, or `yarn bump:major`. Running the same command again with the same base is safe. Recalculate after updating a PR from a newer main. The owner uses a squash merge so the release and its version land in one commit.
+- The owner confirms minor and major bumps with the corresponding release label. Explain compatibility in the PR when changes touch API contracts, saved data, or the database schema.
+- The release workflow assigns the next version after the owner squash-merges into `main`. The release tag identifies the squash commit and supplies the version to both deployments. Leave the baseline `VERSION` file alone.
 
 ## Git preparation
 

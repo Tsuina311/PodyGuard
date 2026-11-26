@@ -10,8 +10,8 @@ import { findFreeDevPort } from '../../scripts/free-dev-port.mjs';
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 
 /**
- * Human-facing release version from the repo-root VERSION file.
- * Bump patch on ordinary commits; minor/major only for irreversible global changes.
+ * Production builds receive the version assigned to their release tag.
+ * Local builds can use the repo-root VERSION fallback.
  */
 function releaseVersion(): string {
   const fromEnv = process.env.VITE_APP_VERSION?.trim();

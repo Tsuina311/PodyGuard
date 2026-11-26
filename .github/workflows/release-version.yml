@@ -1,6 +1,8 @@
 name: Release version
 
 on:
+  push:
+    branches: [main]
   pull_request:
     branches: [main]
     types: [opened, reopened, synchronize, edited, labeled, unlabeled, ready_for_review]
@@ -9,12 +11,28 @@ permissions:
   contents: read
 
 concurrency:
-  group: release-version-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+  group: release-version-${{ github.event.pull_request.number || 'main' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   release-version:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Show the selected release bump
+        run: node scripts/check-release-version.mjs
+
+  publish:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+      issues: read
     steps:
       - uses: actions/checkout@v4
         with:
@@ -22,9 +40,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Refresh the base branch
-        run: git fetch --no-tags origin +refs/heads/main:refs/remotes/origin/main
       - name: Test release rules
         run: node --test scripts/release-version.test.mjs
-      - name: Validate the proposed release
-        run: node scripts/check-release-version.mjs
+      - name: Tag the merged releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/publish-release-versions.mjs

@@ -90,41 +90,35 @@ layer check (API, realtime polling, websocket, storage).
 
 ## Release version
 
-The app displays the root `VERSION` value. The Connectivity screen also shows
-the build commit so you can identify the exact deployment. A merge records the
-release on `main`. GitHub Pages publishes it after the Pages workflow succeeds.
-Render has a separate deployment status.
+The app displays the release assigned to its build. The Connectivity screen
+also shows the commit, so you can identify the exact deployment. After a squash
+merge to `main`, GitHub Actions increments the last release and tags the squash
+commit. Pages and Render use the tag for the commit they build. A tag records
+the assigned version. The deployment status shows when that build actually went
+live.
 
-### Prepare a release PR
-
-Choose one bump for the entire PR and explain it in the description. The same
-rules apply to changes prepared in Cursor, Codex, and GitHub.
+### Choose a release label
 
 | Bump | Use when | GitHub label |
 | --- | --- | --- |
 | Patch | Fixes, polish, reliability, or internal work | Optional `release:patch` |
 | Minor | Players or hosts gain a backward-compatible capability | `release:minor` |
-| Major | Existing clients, sessions, or saved data require a breaking change or migration | `release:major` |
+| Major | Existing clients, sessions, or saved data require a breaking change | `release:major` |
 
-Fetch and update the PR branch from `main`, then run `yarn bump:patch`,
-`yarn bump:minor`, or `yarn bump:major` and commit `VERSION`. These commands
-calculate from `origin/main`. Ordinary commits leave the version alone.
-If another PR merges first, update from `main` and recalculate the bump.
-
-The `release-version` check verifies the exact next version and fails if the
-PR is behind `main`. It also flags changes to tracked API contracts, saved-data
-code, database schema, and migrations. The owner confirms compatibility with
-one release label, including `release:patch` for compatible fixes in those areas.
+Choose the label before merging. The PR check reports the selected bump. A PR
+without a release label uses patch. If several release labels are present, the
+highest bump takes precedence. Labels added or removed after merging have no
+effect on the release. The root `VERSION` is a fallback for local builds.
 
 ### GitHub repository setup
 
 - In **Settings → General → Pull Requests**, enable squash merging and disable
   merge commits and rebase merging.
 - Create `release:patch`, `release:minor`, and `release:major` in **Issues → Labels**.
-- After the release workflow is on `main`, configure its branch protection or
-  ruleset to require PRs, the existing CI checks, and `release-version`. Enable
-  **Require branches to be up to date before merging**. This keeps two PRs
-  prepared from the same version from landing with the same release number.
+- Allow GitHub Actions to create `podyguard-v*` tags. Use the existing CI checks
+  for merge protection.
+- If your Render service uses a manually configured build command, match the
+  command in `render.yaml` so it reads the assigned release tag.
 
 ### 1. API on Render
 
