@@ -16,6 +16,12 @@ These standing instructions apply repository-wide to Codex in Cursor and Cloud.
 - Run relevant builds and tests, including Playwright, as part of the authorized work without asking for separate confirmation.
 - Discuss substantial product choices such as authentication, hosting, and external providers before implementing them. Prefer free alternatives; do not spend money, enable billing, or add paid commitments without explicit approval.
 
+## Release versions
+
+- Pick one bump per PR and describe the player impact in the PR body. Patch is the default for fixes, polish, reliability, and internal changes. Propose minor for a backward-compatible capability or major when existing clients, sessions, or saved data require a change or migration.
+- The owner confirms minor and major bumps with the corresponding release label. If the release check flags changes to API contracts, saved data, or database schema, explain compatibility in the PR and request an explicit release label. The owner can confirm a compatible fix with `release:patch`.
+- Before handoff, refresh `origin/main` and set `VERSION` to exactly one increment from it using `yarn bump:patch`, `yarn bump:minor`, or `yarn bump:major`. Running the same command again with the same base is safe. Recalculate after updating a PR from a newer main. The owner uses a squash merge so the release and its version land in one commit.
+
 ## Git preparation
 
 - Before implementation, inspect the working tree, identify the user's intended branch and the remote default branch, and fetch the latest state from origin. Start from the latest remote state of the intended branch when safe; use a task branch for new work. If no branch is specified and no existing task branch is intended, start a new task branch from the latest remote default branch.

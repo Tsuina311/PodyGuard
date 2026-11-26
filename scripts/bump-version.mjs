@@ -1,51 +1,22 @@
 #!/usr/bin/env node
-/**
- * Bumps the repo-root VERSION file (semver).
- *
- * Usage:
- *   node scripts/bump-version.mjs        # patch (default)
- *   node scripts/bump-version.mjs patch
- *   node scripts/bump-version.mjs minor
- *   node scripts/bump-version.mjs major
- *
- * Convention: bump patch on every ordinary commit. Use minor/major only for
- * irreversible global changes.
- */
-import { readFileSync, writeFileSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { nextVersion } from './release-version.mjs';
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const versionPath = resolve(root, 'VERSION');
-const kind = (process.argv[2] ?? 'patch').toLowerCase();
+const root = fileURLToPath(new URL('../', import.meta.url));
+const bump = process.argv[2] ?? 'patch';
 
-if (!['patch', 'minor', 'major'].includes(kind)) {
-  console.error(`Unknown bump kind "${kind}". Use patch, minor, or major.`);
-  process.exit(1);
+try {
+  const base = execFileSync('git', ['show', 'origin/main:VERSION'], {
+    cwd: root,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+  }).trim();
+  const version = nextVersion(base, bump);
+  writeFileSync(new URL('../VERSION', import.meta.url), `${version}\n`, 'utf8');
+  console.log(`origin/main ${base} → ${version}`);
+} catch (error) {
+  console.error(error.stderr ? 'Could not read origin/main:VERSION. Run git fetch origin main first.' : error.message);
+  process.exitCode = 1;
 }
-
-const current = readFileSync(versionPath, 'utf8').trim();
-const match = /^(\d+)\.(\d+)\.(\d+)$/.exec(current);
-if (!match) {
-  console.error(`VERSION must be semver X.Y.Z, got "${current}"`);
-  process.exit(1);
-}
-
-let major = Number(match[1]);
-let minor = Number(match[2]);
-let patch = Number(match[3]);
-
-if (kind === 'major') {
-  major += 1;
-  minor = 0;
-  patch = 0;
-} else if (kind === 'minor') {
-  minor += 1;
-  patch = 0;
-} else {
-  patch += 1;
-}
-
-const next = `${major}.${minor}.${patch}`;
-writeFileSync(versionPath, `${next}\n`, 'utf8');
-console.log(`${current} → ${next}`);

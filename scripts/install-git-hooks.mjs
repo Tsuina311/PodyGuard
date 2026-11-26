@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Compatibility entrypoint: installs Husky checks and VERSION bump hooks.
+ * Compatibility entrypoint: installs Husky checks.
  * Safe to run repeatedly; fails soft when git is unavailable.
  */
 import { spawnSync } from 'node:child_process';
@@ -34,4 +34,4 @@ if (result.status !== 0) {
   );
   process.exit(0);
 }
-console.log('Installed Husky checks and automatic version bump.');
+console.log('Installed Husky checks.');
