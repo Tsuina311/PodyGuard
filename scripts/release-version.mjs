@@ -1,23 +1,7 @@
-const releaseLabels = new Map([
-  ['release:patch', 'patch'],
-  ['release:minor', 'minor'],
-  ['release:major', 'major'],
-]);
+const releaseBumps = ['patch', 'minor', 'major'];
 
-const compatibilityPaths = new Set([
-  'apps/server/src/db/schema.ts',
-  'apps/web/src/active-match.ts',
-  'apps/web/src/device-storage.ts',
-  'apps/web/src/limited/local-limited.ts',
-  'apps/web/src/match-config.ts',
-  'apps/web/src/offline-queue.ts',
-  'apps/web/src/player-sessions.ts',
-  'packages/shared/src/display.ts',
-  'packages/shared/src/event-api.ts',
-  'packages/shared/src/event-tracker.ts',
-  'packages/shared/src/identity.ts',
-  'packages/shared/src/table-view.ts',
-]);
+export const releaseTagPrefix = 'podyguard-v';
+export const releaseBaseline = '66397c7ff7b51fcb94e3105dbe05171fe60baf15';
 
 export function nextVersion(current, bump) {
   const match = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.exec(current);
@@ -32,36 +16,33 @@ export function nextVersion(current, bump) {
   }
 }
 
-export function releasePlan({ labels, changedPaths, baseVersion, proposedVersion, draft }) {
-  const selected = labels.filter(label => releaseLabels.has(label));
-  if (selected.length > 1) {
-    throw new Error('Choose exactly one release label: release:patch, release:minor, or release:major.');
-  }
+export function releaseBump(labels) {
+  const selected = releaseBumps.filter(bump => labels.includes(`release:${bump}`));
+  return { bump: selected.at(-1) ?? 'patch', multiple: selected.length > 1 };
+}
 
-  const reviewPaths = changedPaths.filter(path =>
-    compatibilityPaths.has(path) ||
-    (path.startsWith('apps/server/drizzle/') && path.endsWith('.sql')),
-  );
-  const proposal = [...releaseLabels.values()].find(
-    bump => nextVersion(baseVersion, bump) === proposedVersion,
-  );
-  const bump = releaseLabels.get(selected[0]) ?? proposal ?? 'patch';
-  const expectedVersion = nextVersion(baseVersion, bump);
-  if (proposedVersion !== expectedVersion) {
-    throw new Error(
-      `Expected VERSION ${expectedVersion} for a ${bump} bump from ${baseVersion}, got ${proposedVersion}. ` +
-      `Run yarn bump:${bump} against the latest main and commit VERSION.`,
-    );
+export function labelsAtMerge(events) {
+  const labels = new Set();
+  for (const item of events) {
+    if (item.event === 'merged') return [...labels];
+    if (item.event === 'labeled') labels.add(item.label.name);
+    if (item.event === 'unlabeled') labels.delete(item.label.name);
   }
+  return null;
+}
 
-  const pendingLabel = selected.length === 0 && (bump !== 'patch' || reviewPaths.length > 0)
-    ? `release:${bump}`
-    : null;
-  if (pendingLabel && !draft) {
-    throw new Error([
-      `VERSION ${baseVersion} → ${proposedVersion} is valid. Add the ${pendingLabel} label after owner approval, then GitHub will rerun this check.`,
-      ...(reviewPaths.length > 0 ? ['Review compatibility for these changes:', ...reviewPaths.map(path => `- ${path}`)] : []),
-    ].join('\n'));
+export function parseReleaseTags(lines) {
+  const versions = new Map();
+  for (const line of lines.trim().split('\n')) {
+    const [commit, ref] = line.split('\t');
+    if (!ref?.startsWith(`refs/tags/${releaseTagPrefix}`)) continue;
+    const version = ref.slice(`refs/tags/${releaseTagPrefix}`.length);
+    // Also ignore peeled annotated tag lines and tags outside the version format.
+    if (!/^\d+\.\d+\.\d+$/.test(version)) continue;
+    if (versions.has(commit) && versions.get(commit) !== version) {
+      throw new Error(`Multiple release versions are tagged for ${commit}.`);
+    }
+    versions.set(commit, version);
   }
-  return { bump, pendingLabel };
+  return versions;
 }

@@ -4,7 +4,10 @@ services:
     runtime: node
     region: frankfurt
     plan: free
-    buildCommand: corepack enable && yarn install --immutable && yarn build
+    buildCommand: >-
+      corepack enable && yarn install --immutable &&
+      VITE_APP_VERSION="$(node scripts/read-release-version.mjs "$RENDER_GIT_COMMIT")" &&
+      export VITE_APP_VERSION && yarn build
     startCommand: yarn db:migrate && yarn workspace @podyguard/server start
     healthCheckPath: /health
     autoDeployTrigger: checksPass
