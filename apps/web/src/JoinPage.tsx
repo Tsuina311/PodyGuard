@@ -895,7 +895,7 @@ function PlayerJoinPage({
         {controller => <TrackerView
           controller={controller}
           key={trackerKey}
-          playerControls={<DevicePlayers joinCode={joinCode} scope={scope} displayName={participant.displayName} />}
+          playerControls={<DevicePlayers joinCode={joinCode} scope={scope} displayName={participant.displayName} onOpenDesk={embeddedHost?.onOpenDesk} />}
           resumePath={resumePath}
           eventContext={event && token ? { joinCode: event.joinCode, token } : undefined}
           storageKey={trackerKey}
@@ -989,7 +989,7 @@ function PlayerJoinPage({
 
       <Agreement agreement={event?.pregameAgreement} />
 
-      {event && <DevicePlayers joinCode={event.joinCode} scope={scope} displayName={participant?.displayName} />}
+      {event && <DevicePlayers joinCode={event.joinCode} scope={scope} displayName={participant?.displayName} onOpenDesk={embeddedHost?.onOpenDesk} />}
 
       {participant && token ? (
         <Panel

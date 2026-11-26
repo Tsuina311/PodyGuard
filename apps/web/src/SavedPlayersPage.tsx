@@ -2,6 +2,8 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { UsersRound } from 'lucide-react';
 import { normalizeJoinCode } from '@podyguard/shared';
+import { loadHostToken } from './api';
+import { DeviceHostDesk } from './DevicePlayers';
 import { playerPath } from './player-sessions';
 import { useSavedPlayers } from './use-saved-players';
 import { Panel } from './ui/Panel';
@@ -35,6 +37,7 @@ export function SavedPlayersPage() {
       <p className="mb-2 text-sm text-muted">{t('devicePlayers.eventCode', { code: event.joinCode })}</p>
       <p className="mb-3 font-semibold text-ink">{t('devicePlayers.resumeCount', { count: event.players.length })}</p>
       <ul className="flex flex-wrap gap-2">
+        {loadHostToken(event.joinCode) && <li><DeviceHostDesk joinCode={event.joinCode} /></li>}
         {event.players.map(player => <li key={player.scope}>
           <a href={`#${playerPath(event.joinCode, player.scope)}`} target="_blank" rel="noopener noreferrer"
             title={t('devicePlayers.newTab')}

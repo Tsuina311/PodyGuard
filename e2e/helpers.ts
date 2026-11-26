@@ -107,6 +107,7 @@ export async function createLimitedEvent(
   options: {
     name: string;
     formatLabel: 'Booster Draft' | 'Pick-Two Draft' | 'Sealed';
+    playgroup?: string | null;
     pin?: string;
   },
 ): Promise<string> {
@@ -114,6 +115,12 @@ export async function createLimitedEvent(
   await openHome(page);
   await page.getByRole('tab', { name: 'Host event' }).click();
   await page.getByRole('tab', { name: 'Limited' }).click();
+  if (options.playgroup !== undefined) {
+    const picker = page.getByRole('group', { name: 'Playgroup', exact: true });
+    const choice = picker.getByRole('button', { name: options.playgroup ?? 'No playgroup', exact: true });
+    await choice.click();
+    await expect(choice).toHaveAttribute('aria-pressed', 'true');
+  }
   await page
     .locator('label')
     .filter({ has: page.locator('input[name="hostLimitedMode"]') })

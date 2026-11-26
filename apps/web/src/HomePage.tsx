@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   ASSASSIN_POD_SIZES,
@@ -135,8 +135,9 @@ export function HomePage() {
   // Account & Playgroup state for authenticated hosts
   const [accountSession] = useState(() => loadAccountSession());
   const [playgroups, setPlaygroups] = useState<Playgroup[]>([]);
-  const [selectedPlaygroupId, setSelectedPlaygroupId] = useState<string | null>(
-    () => loadPreferredPlaygroupId(),
+  const [selectedPlaygroupId, setSelectedPlaygroupId] = useState<string | null>(null);
+  const [playgroupStatus, setPlaygroupStatus] = useState<'loading' | 'ready' | 'unavailable'>(
+    accountSession?.token ? 'loading' : 'ready',
   );
   const [playgroupOverview, setPlaygroupOverview] =
     useState<PlaygroupOverview | null>(null);
@@ -161,15 +162,14 @@ export function HomePage() {
           list[0]?.id ??
           null;
         setSelectedPlaygroupId(chosen);
+        setPlaygroupStatus('ready');
         if (chosen) {
-          const ov = await getPlaygroupOverview(accountSession.token, chosen);
-          if (!cancelled) {
-            setPlaygroupOverview(ov.overview);
-          }
+          const ov = await getPlaygroupOverview(accountSession.token, chosen).catch(() => null);
+          if (!cancelled) setPlaygroupOverview(ov?.overview ?? null);
         }
       })
       .catch(() => {
-        /* ignore offline or expired token on home screen */
+        if (!cancelled) setPlaygroupStatus('unavailable');
       });
     return () => {
       cancelled = true;
@@ -406,6 +406,7 @@ export function HomePage() {
 
   async function onCreate(event: FormEvent) {
     event.preventDefault();
+    if (playgroupStatus === 'loading') return;
     setError(null);
     if (formatTab === 'limited' && !limitedEnabled) {
       setError(t('home.limitedEnableOne'));
@@ -481,6 +482,86 @@ export function HomePage() {
     }
     void navigate(`/e/${code}`);
   }
+
+  const hostPlaygroupPicker = (
+    <div role="group" aria-label={t('home.playgroup.title')} className="border-muted/20 bg-void/40 mb-4 rounded-xl border p-3">
+      <p className="text-muted mb-2 text-xs font-medium tracking-wider uppercase">
+        {t('home.playgroup.title')}
+      </p>
+      {playgroupStatus === 'loading' ? (
+        <p role="status" className="text-muted text-sm">{t('home.playgroup.loading')}</p>
+      ) : playgroupStatus === 'unavailable' ? (
+        <p role="status" className="text-muted text-sm">{t('home.playgroup.unavailable')}</p>
+      ) : playgroups.length > 0 ? (
+        <div className="space-y-2.5">
+          <p className="text-muted text-sm">{t('home.playgroup.hint')}</p>
+          <div className="flex flex-wrap gap-1.5">
+            {playgroups.map((pg) => (
+              <button
+                key={pg.id}
+                type="button"
+                aria-pressed={selectedPlaygroupId === pg.id}
+                onClick={() => void onChoosePlaygroup(pg.id)}
+                className={cx(
+                  'min-h-11 rounded-xl border px-3 py-1.5 text-sm font-semibold transition',
+                  selectedPlaygroupId === pg.id
+                    ? 'border-neon bg-neon/15 text-neon'
+                    : 'border-muted/20 text-muted hover:border-muted/40',
+                )}
+              >
+                {pg.name}
+              </button>
+            ))}
+            <button
+              type="button"
+              aria-pressed={selectedPlaygroupId === null}
+              onClick={() => void onChoosePlaygroup(null)}
+              className={cx(
+                'min-h-11 rounded-xl border px-3 py-1.5 text-sm font-semibold transition',
+                selectedPlaygroupId === null
+                  ? 'border-neon bg-neon/15 text-neon'
+                  : 'border-muted/20 text-muted hover:border-muted/40',
+              )}
+            >
+              {t('home.playgroup.none')}
+            </button>
+          </div>
+          {selectedPlaygroupId ? (
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+              <label className="text-muted flex cursor-pointer items-center gap-2 text-xs">
+                <input
+                  type="checkbox"
+                  className="accent-neon"
+                  checked={showReturningSuggestions}
+                  onChange={(e) =>
+                    setShowReturningSuggestions(e.target.checked)
+                  }
+                />
+                {t('home.playgroup.returning')}
+              </label>
+              {formatTab === 'constructed' && playgroupOverview?.lastEventConfig ? (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  onClick={applyLastPlaygroupEventSetup}
+                >
+                  {t('home.playgroup.reuse')}
+                </Button>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+      ) : (
+        <p className="text-muted text-sm">
+          {accountSession ? t('home.playgroup.empty') : t('home.playgroup.signedOut')}{' '}
+          <Link to="/account" className="text-neon underline">
+            {t(accountSession ? 'home.playgroup.manage' : 'home.playgroup.signIn')}
+          </Link>
+        </p>
+      )}
+    </div>
+  );
 
   return (
     <>
@@ -828,75 +909,7 @@ export function HomePage() {
             placeholder={suggestedName}
             autoComplete="off"
           />
-          <div className="border-muted/20 bg-void/40 mb-4 rounded-xl border p-3">
-            <p className="text-muted mb-2 text-xs font-medium tracking-wider uppercase">
-              Playgroup
-            </p>
-            {playgroups.length > 0 ? (
-              <div className="space-y-2.5">
-                <div className="flex flex-wrap gap-1.5">
-                  {playgroups.map((pg) => (
-                    <button
-                      key={pg.id}
-                      type="button"
-                      onClick={() => void onChoosePlaygroup(pg.id)}
-                      className={cx(
-                        'rounded-xl border px-3 py-1.5 text-xs font-semibold transition',
-                        selectedPlaygroupId === pg.id
-                          ? 'border-neon bg-neon/15 text-neon'
-                          : 'border-muted/20 text-muted hover:border-muted/40',
-                      )}
-                    >
-                      {pg.name}
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => void onChoosePlaygroup(null)}
-                    className={cx(
-                      'rounded-xl border px-3 py-1.5 text-xs font-semibold transition',
-                      selectedPlaygroupId === null
-                        ? 'border-neon bg-neon/15 text-neon'
-                        : 'border-muted/20 text-muted hover:border-muted/40',
-                    )}
-                  >
-                    No playgroup
-                  </button>
-                </div>
-                {selectedPlaygroupId ? (
-                  <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
-                    <label className="text-muted flex cursor-pointer items-center gap-2 text-xs">
-                      <input
-                        type="checkbox"
-                        className="accent-neon"
-                        checked={showReturningSuggestions}
-                        onChange={(e) =>
-                          setShowReturningSuggestions(e.target.checked)
-                        }
-                      />
-                      Show returning-player suggestions on join
-                    </label>
-                    {playgroupOverview?.lastEventConfig ? (
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="ghost"
-                        onClick={applyLastPlaygroupEventSetup}
-                      >
-                        Reuse last event setup
-                      </Button>
-                    ) : null}
-                  </div>
-                ) : null}
-              </div>
-            ) : (
-              <p className="text-muted text-xs">
-                {accountSession
-                  ? 'No playgroup created yet. Create one in Playgroups to pre-seed friends and their Commanders.'
-                  : 'Optional: sign in to associate this event with a recurring playgroup.'}
-              </p>
-            )}
-          </div>
+          {hostPlaygroupPicker}
           <TablePlanner title={t('tablePlan.playing')}
             value={tableLayouts ?? Array.from({ length: Number(tableCount) || 1 }, () => ({ shape: 'square' as const, seats: eventPodSize }))}
             allowedSizes={tournamentFormat ? [tournamentMatchSize] : eventTablePolicy({ gameMode, preferredPodSize: eventPodSize, allowThreePods, allowFivePods }).allowedSizes}
@@ -1263,7 +1276,7 @@ export function HomePage() {
             autoComplete="off"
             required
           />
-          <Button type="submit" size="lg" block disabled={busy}>
+          <Button type="submit" size="lg" block disabled={busy || playgroupStatus === 'loading'}>
             {busy ? t('common.creating') : t('home.createEvent')}
           </Button>
         </Panel>
@@ -1288,6 +1301,7 @@ export function HomePage() {
             placeholder={suggestedName}
             autoComplete="off"
           />
+          {hostPlaygroupPicker}
           <fieldset className="mb-4">
             <legend className="text-muted mb-2 text-sm">
               {t('home.limitedFormat')}
@@ -1344,7 +1358,7 @@ export function HomePage() {
             type="submit"
             size="lg"
             block
-            disabled={busy || !limitedEnabled}
+            disabled={busy || !limitedEnabled || playgroupStatus === 'loading'}
           >
             {busy ? t('common.creating') : t('home.createEvent')}
           </Button>
