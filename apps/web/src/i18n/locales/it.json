@@ -6,6 +6,8 @@
     "playing": "Tavoli da gioco",
     "draftHint": "Un intero gruppo di draft per tavolo. I tavoli possono essere riorganizzati per giocare dopo.",
     "playHint": "Ogni sezione ospita una partita distinta. Ai giocatori vengono indicati il tavolo e la lettera della sezione.",
+    "seatBudget": "{{used}} posti di gioco utilizzati su {{total}}",
+    "tooManySeats": "Usa al massimo {{count}} posti nei tavoli da gioco.",
     "count": "Tavoli fisici",
     "editSeveral": "Modifica più tavoli",
     "selectAll": "Seleziona tutti",

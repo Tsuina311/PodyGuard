@@ -51,12 +51,20 @@ export function validateTableLayouts(value: unknown): TableLayout[] {
   });
 }
 
+export function limitedPlayingSeatBudget(playersPerPod: number, draftTableCount: number): number {
+  return playersPerPod * Math.max(1, draftTableCount);
+}
+
 export function validateLimitedTablePlan(value: unknown, players: number, hasDraft: boolean): LimitedTablePlan {
   const plan = value as LimitedTablePlan;
   const play = validateTableLayouts(plan?.play);
   const draft = hasDraft ? validateTableLayouts(plan?.draft) : [];
   if (hasDraft && draft.some(table => table.seats < players)) {
     throw new Error('Each drafting table must seat a complete draft pod.');
+  }
+  const maxSeats = limitedPlayingSeatBudget(players, draft.length);
+  if (play.reduce((sum, table) => sum + table.seats, 0) > maxSeats) {
+    throw new Error(`Provide at most ${maxSeats} seats across the playing tables.`);
   }
   if (play.reduce((sum, table) => sum + Math.floor(table.seats / 2), 0) < Math.max(1, draft.length) * Math.floor(players / 2)) {
     throw new Error('The playing tables need enough two-player spaces for a complete pod.');
@@ -67,7 +75,7 @@ export function validateLimitedTablePlan(value: unknown, players: number, hasDra
 export function defaultLimitedTablePlan(players: number, hasDraft = true): LimitedTablePlan {
   return {
     draft: hasDraft ? [{ shape: 'round', seats: players }] : [],
-    play: Array.from({ length: Math.ceil(players / 2) }, () => ({ shape: 'square', seats: 2 })),
+    play: Array.from({ length: Math.floor(players / 2) }, () => ({ shape: 'square', seats: 2 })),
   };
 }
 

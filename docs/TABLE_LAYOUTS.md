@@ -7,11 +7,13 @@ shape and seats, then apply to the selection. Hosts can configure up to 40
 physical tables.
 
 Limited uses separate drafting and playing plans. Each drafting table must fit
-a complete pod. Playing capacity must cover the duels for every planned draft
-pod. An eight-player draft can use one round table for drafting, followed by a
+a complete pod. Quick Limited uses one drafting table for its pod. Playing
+capacity must cover the duels and stay within the planned player count. An eight-player draft can use one round table for drafting, followed by a
 four-seat table and two two-seat tables for playing. Sealed has no drafting plan.
 
-Playing tables are divided into as many legal games as they can fit. Among
+Playing-table previews draw rectangular mats inside each lettered game area’s
+width. Duel mats face each other across the table. Playing tables are divided
+into as many legal games as they can fit. Among
 equivalent divisions, fill the seats and prefer the organizer's chosen game
 size. Commander with three- and four-player games enabled splits seven seats
 into four plus three. If three-player games are disabled, those spare three

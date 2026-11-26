@@ -9,11 +9,30 @@ test('phone: a quick draft uses one eight-seat table then 4 + 2 + 2 playing seat
   const draft = page.getByRole('group', { name: 'Drafting tables', exact: true });
   const play = page.getByRole('group', { name: 'Playing tables', exact: true });
   await expect(draft.getByRole('combobox', { name: 'Table 1 seats' })).toHaveValue('8');
-  await play.getByRole('spinbutton').fill('3');
+  await expect(draft.getByRole('spinbutton')).toHaveCount(0);
+  const count = play.getByRole('spinbutton');
+  await count.fill('');
+  await expect(count).toHaveValue('');
+  await count.press('3');
+  await expect(count).toHaveValue('3');
   await play.getByRole('combobox', { name: 'Table 1 seats' }).selectOption('4');
   await play.getByRole('combobox', { name: 'Table 2 shape' }).selectOption('rectangle');
   await play.getByRole('combobox', { name: 'Table 3 shape' }).selectOption('round');
   await expect(play.getByText('Part A: 2 players · Part B: 2 players')).toBeVisible();
+  await expect(play.getByText('8 of 8 playing seats used')).toBeVisible();
+  await expect(play.getByRole('combobox', { name: 'Table 1 seats' }).locator('option[value="5"]')).toBeDisabled();
+  const preview = play.getByRole('img', { name: 'Square table with 4 seats' });
+  for (const area of ['A', 'B']) {
+    const group = preview.locator(`g[data-area="${area}"]`);
+    await expect(group).toHaveText(`${area} · 2`);
+    await expect(group.locator('[data-playmat]')).toHaveCount(2);
+    const [first, second] = await group.locator('[data-playmat]').evaluateAll(mats => mats.map(mat => ({
+      x: mat.getAttribute('x'), y: mat.getAttribute('y'),
+    })));
+    expect(first!.x).toBe(second!.x);
+    expect(first!.y).not.toBe(second!.y);
+  }
+  await expect(preview.locator('line')).toHaveCount(1);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()).violations).toEqual([]);
   await page.screenshot({ path: test.info().outputPath('limited-table-planner-phone.png'), fullPage: true });
