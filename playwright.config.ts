@@ -57,7 +57,7 @@ export default defineConfig({
     {
       name: 'webkit',
       testMatch:
-        /(?:table-layouts|saved-player-recovery|event-tracker-transfer|ux-navigation|device-players|event-lobby|table-companion|home-layout|game-nights|commander-lobby|google-sign-in|quick-play|direct-play-transfer|offline-origin|dungeon-layout)\.spec\.ts/,
+        /(?:table-layouts|saved-player-recovery|event-tracker-transfer|ux-navigation|device-players|event-lobby|table-companion|home-layout|game-nights|commander-lobby|google-sign-in|quick-play|direct-play-transfer|offline-origin|portrait-tracker)\.spec\.ts/,
       use: { ...devices['iPhone 13'], locale: 'en-US' },
     },
   ].filter((project) => browsers.split(',').includes(project.name)),

@@ -1,7 +1,7 @@
-import { expect, test } from './fixtures';
+import { expect, test, type Page } from './fixtures';
 import { openQuickPlaySetup } from './helpers';
 
-test('portrait tracker centers the dungeon cards and keeps the full cards visible', async ({ page }) => {
+async function startPortraitDuel(page: Page) {
   await page.setViewportSize({ width: 390, height: 660 });
   await openQuickPlaySetup(page, { baseModeLabel: 'Duel', commanderRules: false });
   await page.getByPlaceholder('Player 1').fill('Ada');
@@ -19,8 +19,11 @@ test('portrait tracker centers the dungeon cards and keeps the full cards visibl
   await menu.getByRole('button', { name: /^Portrait/ }).click();
   await expect(page.locator('[data-board-layout="portrait"]').first()).toBeVisible();
   await menu.getByRole('button', { name: 'Close', exact: true }).click();
-  await page.getByTitle('Show seat controls', { exact: true }).click();
+}
 
+test('portrait tracker centers the dungeon cards and keeps the full cards visible', async ({ page }) => {
+  await startPortraitDuel(page);
+  await page.getByTitle('Show seat controls', { exact: true }).click();
   await page.getByRole('button', { name: /^Dungeon and initiative for Ada/ }).click();
   const dungeon = page.getByRole('dialog', { name: 'Dungeon for Ada', exact: true });
   const cards = dungeon.getByRole('img');
@@ -55,4 +58,25 @@ test('portrait tracker centers the dungeon cards and keeps the full cards visibl
   await expect(dungeon.locator('[aria-current="step"]')).toBeVisible();
   await dungeon.getByRole('button', { name: 'Close dungeon', exact: true }).click();
   await expect(dungeon).toHaveCount(0);
+});
+
+test('the portrait life keypad faces the selected player', async ({ page }) => {
+  await startPortraitDuel(page);
+  const upper = page.locator('article[data-seat-id]').nth(0);
+  const lower = page.locator('article[data-seat-id]').nth(1);
+  for (const { seat, action, player, digit, total, turned } of [
+    { seat: upper, action: 'Add', player: 'Ada', digit: '5', total: '25', turned: true },
+    { seat: lower, action: 'Remove', player: 'Bea', digit: '3', total: '17', turned: false },
+  ]) {
+    await seat.getByRole('button', { name: new RegExp(`^${action} 1 life`) }).click({ delay: 550 });
+    const keypad = page.getByRole('dialog', { name: `${action} life for ${player}`, exact: true });
+    await expect(keypad).toBeVisible();
+    const one = await keypad.getByRole('button', { name: '1', exact: true }).boundingBox();
+    const nine = await keypad.getByRole('button', { name: '9', exact: true }).boundingBox();
+    expect(one!.x > nine!.x).toBe(turned);
+    expect(one!.y > nine!.y).toBe(turned);
+    await keypad.getByRole('button', { name: digit, exact: true }).click();
+    await keypad.getByRole('button', { name: `${action} ${digit}`, exact: true }).click();
+    await expect(seat.getByText(total, { exact: true })).toBeVisible();
+  }
 });
