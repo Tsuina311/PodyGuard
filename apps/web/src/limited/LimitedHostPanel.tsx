@@ -108,9 +108,9 @@ export function LimitedHostPanel({
               <p className="text-muted mb-3 text-xs">
                 {format.hasDraftPhase
                   ? format.cardsPerPick === 2
-                    ? `Each table seats four. ${freeTables} ${freeTables === 1 ? 'table needs' : 'tables need'} ${seatsNeeded} ready players. Take two cards. Pass left, then right, then left. Diagonals play first.`
-                    : `Each table seats eight. ${freeTables} ${freeTables === 1 ? 'table needs' : 'tables need'} ${seatsNeeded} ready players. Take one card. Pass left, then right, then left. Then Swiss.`
-                  : `Each table seats four. ${freeTables} ${freeTables === 1 ? 'table needs' : 'tables need'} ${seatsNeeded} ready players. No draft. Six packs, then Swiss.`}{' '}
+                    ? `Each pod needs ${podSize} players. Take two cards. Pass left, then right, then left. Diagonals play first.`
+                    : `Each pod needs ${podSize} players. Take one card. Pass left, then right, then left. Then Swiss.`
+                  : `Each pod needs ${podSize} players. No draft. Six packs, then Swiss.`}{' '}
                 {config.matchStructure}.
               </p>
               {queue.length === 0 ? (
@@ -190,6 +190,14 @@ function LimitedSessionHostCard({
   const queued = queuedParticipants(snapshot, session.mode).filter(
     (person) => !session.participants.some((row) => row.participantId === person.id),
   );
+  const ownedTables = new Set(session.draftTableIds);
+  const draftGroups = session.status === 'FORMING' && session.mode !== 'SEALED'
+    ? limitedTableGroups(
+        snapshot.tables.map(table => ownedTables.has(table.id) ? { ...table, status: 'free' } : table),
+        true,
+        session.preferredCohortSize ?? session.minCohortSize,
+      )
+    : [];
   const activeRound = session.rounds.find((round) => round.number === session.currentRound);
   const activeParticipantCount = session.participants.filter(
     (participant) => participant.status !== 'DROPPED',
@@ -299,39 +307,30 @@ function LimitedSessionHostCard({
         <fieldset className="mb-3 rounded-lg border border-white/10 p-3">
           <legend className="text-muted px-1 text-xs">Draft tables</legend>
           <div className="flex flex-wrap gap-2">
-            {snapshot.tables.filter(table => !table.area || table.area.draft && table.area.part === 'A').map((table) => {
-              const selected = session.draftTableIds.includes(table.id);
+            {draftGroups.map(group => {
+              const selected = group.every(table => ownedTables.has(table.id));
+              const planned = group.some(table => table.area);
+              const label = [...new Set(group.map(draftTableLabel))].join(' + ');
               return (
-                <label
-                  key={table.id}
-                  className={`rounded-lg border px-2 py-1 text-xs ${
-                    selected
-                      ? 'border-neon bg-neon/10 text-neon'
-                      : 'border-muted/20 text-muted'
-                  }`}
-                >
+                <label key={group[0]!.id} className={`rounded-lg border px-2 py-1 text-xs ${
+                  selected ? 'border-neon bg-neon/10 text-neon' : 'border-muted/20 text-muted'
+                }`}>
                   <input
                     className="mr-1"
                     type="checkbox"
                     checked={selected}
-                    disabled={busy || (table.status !== 'free' && !selected)}
+                    disabled={busy}
                     onChange={() => {
-                      const tableIds = selected
-                        ? session.draftTableIds.filter(
-                            (tableId) => table.area ? snapshot.tables.find(row => row.id === tableId)?.area?.tableNumber !== table.area.tableNumber : tableId !== table.id,
-                          )
-                        : [...session.draftTableIds, table.id];
-                      void run(() =>
-                        replaceLimitedDraftTables(
-                          joinCode,
-                          hostToken,
-                          session.id,
-                          tableIds,
-                        ),
-                      );
+                      const ids = group.map(table => table.id);
+                      const tableIds = planned
+                        ? selected ? [] : ids
+                        : selected
+                          ? session.draftTableIds.filter(id => !ids.includes(id))
+                          : [...session.draftTableIds, ...ids];
+                      void run(() => replaceLimitedDraftTables(joinCode, hostToken, session.id, tableIds));
                     }}
                   />
-                  {draftTableLabel(table)}
+                  {label}
                 </label>
               );
             })}

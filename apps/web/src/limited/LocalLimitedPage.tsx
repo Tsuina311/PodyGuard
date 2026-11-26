@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import {
   draftPackDirection,
   limitedModeConfig,
+  partitionDraftTables,
   type LimitedMatchOutcome,
 } from '@podyguard/shared';
 import { Brand } from '../ui/Brand';
@@ -78,6 +79,9 @@ export function LocalLimitedPage() {
 
   const modeConfig = limitedModeConfig(session.config.mode);
   const standings = localLimitedStandings(session);
+  const draftTables = partitionDraftTables(session.config.tablePlan?.draft ?? [], session.config.playerCount).groups[0] ?? [];
+  const draftSeatLimits = draftTables.reduce<number[]>((limits, table) =>
+    [...limits, (limits.at(-1) ?? 0) + table.seats], []);
   const activeRound = session.rounds.find(
     (round) => round.number === session.currentRound,
   );
@@ -162,7 +166,14 @@ export function LocalLimitedPage() {
 
       {session.status === 'DRAFTING' ? (
         <Panel title={t('localLimited.drafting')} aside={t('localLimited.passPacks')}>
-          {session.config.tablePlan?.draft[0] && <TablePreview table={session.config.tablePlan.draft[0]} />}
+          {draftTables.length > 0 && <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,10rem),1fr))] gap-2">
+            {draftTables.map((table, index) => (
+              <div key={index} className="text-center text-xs text-muted">
+                <p>{t('tablePlan.table', { number: index + 1 })}</p>
+                <TablePreview table={table} />
+              </div>
+            ))}
+          </div>}
           <p className="text-muted mb-3 text-sm">
             {t('localLimited.draftHint', {
               packs: modeConfig.boosterPacksPerPlayer,
@@ -177,7 +188,8 @@ export function LocalLimitedPage() {
                 <li key={seat.participantId}>
                   {playerName(session, seat.participantId)}{' '}
                   <span className="text-muted">
-                    ({t('localLimited.seat', { seat: seat.seat })})
+                    {draftTables.length > 1 && `${t('tablePlan.table', { number: draftSeatLimits.findIndex(limit => seat.seat <= limit) + 1 })} · `}
+                    {t('localLimited.seat', { seat: seat.seat })}
                   </span>
                 </li>
               ))}

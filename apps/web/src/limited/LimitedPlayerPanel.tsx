@@ -29,6 +29,7 @@ import { LimitedTimerDisplay } from './LimitedTimerDisplay';
 import {
   activeLimitedSession,
   limitedSeatingDestination,
+  limitedSeatingMaps,
   currentLimitedMatch,
   LIMITED_MODE_LABELS,
   participantName,
@@ -150,6 +151,7 @@ export function LimitedPlayerPanel({
     (session ? limitedModeConfig(session.mode).preferredCohortSize ?? 4 : 4);
   const format = session?.mode ?? participant.limitedQueueMode ?? null;
   const seatingSession = session?.status === 'SEATING' ? session : undefined;
+  const seatingMaps = seatingSession ? limitedSeatingMaps(snapshot, seatingSession, seatCount) : [];
 
   function beginPlay(tracker: boolean) {
     if (!session || !match) return;
@@ -332,46 +334,41 @@ export function LimitedPlayerPanel({
 
       {seatingSession ? (
         <div className="mb-4">
-          <LimitedSeatMap
-            shape={snapshot.tables.find(table => table.id === seatingSession.draftTableIds[0])?.area?.draft?.shape}
-            seatCount={seatCount}
-            selfId={participant.id}
-            disabled={busy}
-            layout={seatingSession.seatLayout === 'long' ? 'long' : 'square'}
-            onLayout={
-              seatCount === 4
-                ? (layout) => {
-                    void act(async () => {
-                      const result = await setLimitedSeatLayout(
-                        snapshot.event.joinCode,
-                        token,
-                        seatingSession.id,
-                        layout,
-                      );
-                      remember(result.session);
-                    });
-                  }
-                : undefined
-            }
-            occupants={seatingSession.participants
-              .filter((row) => row.draftSeat && row.status !== 'DROPPED')
-              .map((row) => ({
-                participantId: row.participantId,
-                displayName: row.displayName,
-                seat: row.draftSeat!,
-              }))}
-            onPick={(seat) => {
-              void act(async () => {
-                const result = await claimLimitedSeat(
-                  snapshot.event.joinCode,
-                  token,
-                  seatingSession.id,
-                  seat,
-                );
-                remember(result.session);
-              });
-            }}
-          />
+          {(seatingMaps.length ? seatingMaps : [{ label: 'Table', shape: undefined, seats: seatCount, seatOffset: 0 }]).map(table => (
+            <LimitedSeatMap
+              key={table.label}
+              shape={table.shape}
+              tableLabel={table.label}
+              seatCount={table.seats}
+              seatOffset={table.seatOffset}
+              selfId={participant.id}
+              disabled={busy}
+              layout={seatingSession.seatLayout === 'long' ? 'long' : 'square'}
+              onLayout={
+                !table.shape && seatCount === 4
+                  ? (layout) => {
+                      void act(async () => {
+                        const result = await setLimitedSeatLayout(snapshot.event.joinCode, token, seatingSession.id, layout);
+                        remember(result.session);
+                      });
+                    }
+                  : undefined
+              }
+              occupants={seatingSession.participants
+                .filter((row) => row.draftSeat && row.status !== 'DROPPED')
+                .map((row) => ({
+                  participantId: row.participantId,
+                  displayName: row.displayName,
+                  seat: row.draftSeat!,
+                }))}
+              onPick={(seat) => {
+                void act(async () => {
+                  const result = await claimLimitedSeat(snapshot.event.joinCode, token, seatingSession.id, seat);
+                  remember(result.session);
+                });
+              }}
+            />
+          ))}
         </div>
       ) : null}
 

@@ -2,13 +2,22 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from './fixtures';
 import { openHome, prepareApp } from './helpers';
 
-test('phone: a quick draft uses one eight-seat table then 4 + 2 + 2 playing seats', async ({ page }) => {
+test('phone: a quick draft uses two four-seat tables then 4 + 2 + 2 playing seats', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await openHome(page);
   await page.getByRole('tab', { name: 'Limited', exact: true }).click();
   const draft = page.getByRole('group', { name: 'Drafting tables', exact: true });
   const play = page.getByRole('group', { name: 'Playing tables', exact: true });
   await expect(draft.getByRole('combobox', { name: 'Table 1 seats' })).toHaveValue('8');
+  const tableCount = draft.getByRole('spinbutton');
+  await tableCount.fill('');
+  await expect(tableCount).toHaveValue('');
+  await tableCount.press('2');
+  await expect(tableCount).toHaveValue('2');
+  await draft.getByRole('combobox', { name: 'Table 1 seats' }).selectOption('4');
+  await draft.getByRole('combobox', { name: 'Table 2 seats' }).selectOption('4');
+  await draft.getByRole('combobox', { name: 'Table 1 shape' }).selectOption('square');
+  await draft.getByRole('combobox', { name: 'Table 2 shape' }).selectOption('rectangle');
   await play.getByRole('spinbutton').fill('3');
   await play.getByRole('combobox', { name: 'Table 1 seats' }).selectOption('4');
   await play.getByRole('combobox', { name: 'Table 2 shape' }).selectOption('rectangle');
@@ -19,6 +28,8 @@ test('phone: a quick draft uses one eight-seat table then 4 + 2 + 2 playing seat
   await page.screenshot({ path: test.info().outputPath('limited-table-planner-phone.png'), fullPage: true });
   await page.getByRole('button', { name: 'Start limited pod', exact: true }).click();
   await page.getByRole('button', { name: 'Seat and start draft', exact: true }).click();
+  await expect(page.getByRole('img', { name: 'Square table with 4 seats', exact: true })).toBeVisible();
+  await expect(page.getByRole('img', { name: 'Rectangle table with 4 seats', exact: true })).toBeVisible();
   await page.getByRole('button', { name: /^Finish draft/ }).click();
   await page.getByRole('button', { name: 'Start round 1', exact: true }).click();
   for (const label of ['Table 1 · Part A', 'Table 1 · Part B', 'Table 2', 'Table 3']) await expect(page.getByText(label, { exact: true })).toBeVisible();

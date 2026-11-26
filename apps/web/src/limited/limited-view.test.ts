@@ -3,6 +3,7 @@ import type { EventSnapshot, PublicLimitedSession } from '@podyguard/shared';
 import {
   activeLimitedSession,
   limitedSeatingDestination,
+  limitedSeatingMaps,
   currentLimitedMatch,
   formatLimitedTimer,
   scoreForOutcome,
@@ -74,6 +75,20 @@ describe('limited view selectors', () => {
     expect(limitedSeatingDestination(split, seated, 'p1')).toBe('Table 1 · Part A');
     expect(limitedSeatingDestination(split, seated, 'p2')).toBe('Table 1 · Part B');
     expect(limitedSeatingDestination(split, { ...seated, mode: 'BOOSTER_DRAFT' })).toBe('Table 1');
+  });
+  it('deduplicates areas of a draft table and sends seats five through eight to the second physical table', () => {
+    const split = { ...snapshot, tables: [1, 1, 2].map((tableNumber, index) => ({
+      id: String(index), label: `Area ${index}`, sortOrder: index, status: 'occupied' as const, seatedNames: [],
+      area: { tableNumber, shape: 'square' as const, totalSeats: 4, seats: 2, part: 'A', parts: 2,
+        draft: { shape: tableNumber === 1 ? 'square' as const : 'rectangle' as const, seats: 4 } },
+    })) };
+    const seated = { ...session, preferredCohortSize: 8, draftTableIds: ['0', '1', '2'],
+      participants: session.participants.map((person, index) => ({ ...person, draftSeat: index === 0 ? 1 : 5 })) };
+    expect(limitedSeatingMaps(split, seated, 8)).toEqual([
+      { label: 'Table 1', shape: 'square', seats: 4, seatOffset: 0 },
+      { label: 'Table 2', shape: 'rectangle', seats: 4, seatOffset: 4 },
+    ]);
+    expect(limitedSeatingDestination(split, seated, 'p2')).toBe('Table 2');
   });
   it('selects a player session and current pairing', () => {
     expect(activeLimitedSession(snapshot, 'p1')?.id).toBe('limited-1');

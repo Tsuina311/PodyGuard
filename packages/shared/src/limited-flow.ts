@@ -312,7 +312,7 @@ export function limitedPlayerCue(input: {
   };
 }
 
-/** Ready players required before every free table can start a pod. */
+/** Ready players required before every available table group can start a pod. */
 export function limitedTablesNeeded(podSize: number, tableCount: number): number {
   if (tableCount < 1 || podSize < 1) return 0;
   return podSize * tableCount;
@@ -349,7 +349,7 @@ export function limitedHostCue(input: {
     if (tables < 1) {
       return {
         title: 'Lobby',
-        detail: `No free table is left for another pod. ${clocks}`,
+        detail: `No free table group is available for another pod. ${clocks}`,
         action: 'none',
         actionLabel: null,
       };
@@ -358,7 +358,7 @@ export function limitedHostCue(input: {
     const across =
       tables === 1
         ? `${input.ready} of ${seats} ready.`
-        : `${input.ready} of ${seats} ready for ${tables} tables.`;
+        : `${input.ready} of ${seats} ready for ${tables} pods.`;
     return {
       title: 'Lobby',
       detail: `${input.joined} in the lobby, ${across} Players show up here as soon as they join. ${clocks}`,

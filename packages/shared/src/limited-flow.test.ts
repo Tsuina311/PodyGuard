@@ -79,7 +79,7 @@ describe('Limited flow copy', () => {
       }),
     ).toMatchObject({
       action: 'none',
-      detail: expect.stringContaining('9 of 12 ready for 3 tables'),
+      detail: expect.stringContaining('9 of 12 ready for 3 pods'),
     });
     expect(
       limitedHostCue({

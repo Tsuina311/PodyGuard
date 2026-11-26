@@ -9,6 +9,22 @@ afterEach(() => {
 });
 
 describe('Limited seat map', () => {
+  it('puts mats along the square sides and keeps global seat numbers on the second table', () => {
+    const onPick = vi.fn();
+    const { rerender } = render(
+      <LimitedSeatMap shape="square" seatCount={8} selfId="p1" occupants={[]} onPick={onPick} />,
+    );
+    const edges = screen.getAllByRole('button', { name: /Seat/ }).map(button => button.dataset.edge);
+    expect(edges).toEqual(['north', 'north', 'east', 'east', 'south', 'south', 'west', 'west']);
+    rerender(<LimitedSeatMap shape="rectangle" seatCount={4} seatOffset={4} tableLabel="Table 2"
+      selfId="p1" occupants={[]} onPick={onPick} />);
+    expect(screen.getByText('Table 2')).toBeVisible();
+    expect(screen.getAllByRole('button', { name: /Seat/ }).map(button => button.dataset.edge))
+      .toEqual(['north', 'north', 'south', 'south']);
+    fireEvent.click(screen.getByRole('button', { name: /Seat 5/ }));
+    expect(onPick).toHaveBeenCalledWith(5);
+  });
+
   it('switches a pod of four to two players facing two', () => {
     const onLayout = vi.fn();
     const { rerender } = render(
