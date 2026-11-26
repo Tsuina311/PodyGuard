@@ -1,5 +1,28 @@
 import { expect, test } from './fixtures';
 import { openQuickPlaySetup, prepareApp } from './helpers';
+test.describe('touch form controls', () => {
+  test.use({ hasTouch: true, isMobile: true });
+
+  test('uses iPhone-safe font sizes before focusing Limited setup fields', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await prepareApp(page);
+    await page.route('**/api/health', route => route.fulfill({ json: { ok: true, database: 'up' } }));
+    await page.goto('/');
+    await page.getByRole('tab', { name: 'Host event' }).click();
+    await page.getByRole('tab', { name: 'Limited' }).click();
+
+    const match = page.getByRole('combobox', { name: 'Match', exact: true });
+    const minutes = page.getByRole('spinbutton', { name: 'Round minutes', exact: true });
+    for (const field of [match, minutes]) {
+      await expect(field).toHaveCSS('font-size', '16px');
+    }
+    const initialScale = await page.evaluate(() => window.visualViewport?.scale);
+    await minutes.tap();
+    await expect(minutes).toBeFocused();
+    expect(await page.evaluate(() => window.visualViewport?.scale)).toBe(initialScale);
+  });
+});
+
 test('a second phone follows a quick game read-only, uses tools, and sees sharing stop', async ({
   page,
   browser,

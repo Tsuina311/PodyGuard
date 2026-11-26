@@ -91,6 +91,16 @@
   }
 }
 
+/* iPhone Safari zooms when a focused control has text smaller than 16px.
+   Keep this outside Tailwind's layers so compact text utilities can't override it. */
+@media (any-pointer: coarse) {
+  input:not([type='checkbox'], [type='radio'], [type='range'], [type='button'], [type='submit'], [type='reset'], [type='image'], [type='color'], [type='file'], [type='hidden']),
+  textarea,
+  select {
+    font-size: max(1rem, 16px);
+  }
+}
+
 /* Ambient backdrop: scanning grid plus two nebula glows. */
 @utility bg-deep-space {
   background-image:
