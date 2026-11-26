@@ -159,3 +159,63 @@ test('rules and card tools are available from home without starting a game', asy
     page.getByRole('tab', { name: 'Start playing', exact: true }),
   ).toBeVisible();
 });
+
+test('scrolls Magic Rules from the rule text on a short screen', async ({ page, browserName }) => {
+  await page.setViewportSize({ width: 540, height: 320 });
+  await prepareApp(page);
+  await page.goto('/#/tools');
+  const query = page.getByRole('searchbox', { name: 'Rules question' });
+  await query.fill('commander tax');
+  await query.press('Enter');
+
+  const rules = page.getByRole('region', { name: 'Rules', exact: true });
+  const text = rules.getByRole('heading', { name: 'Commander tax', exact: true });
+  await expect(text).toBeVisible();
+  const bounds = await text.boundingBox();
+  if (!bounds) throw new Error('Rule text has no bounds');
+
+  if (browserName === 'chromium') {
+    const session = await page.context().newCDPSession(page);
+    try {
+      const x = Math.round(bounds.x + 24);
+      const y = Math.round(bounds.y + bounds.height / 2);
+      await session.send('Input.dispatchTouchEvent', {
+        type: 'touchStart', touchPoints: [{ x, y }],
+      });
+      for (let distance = 20; distance <= 100; distance += 20) {
+        await session.send('Input.dispatchTouchEvent', {
+          type: 'touchMove', touchPoints: [{ x, y: y - distance }],
+        });
+      }
+      await session.send('Input.dispatchTouchEvent', {
+        type: 'touchEnd', touchPoints: [],
+      });
+    } finally {
+      await session.detach();
+    }
+  } else {
+    // Mobile WebKit cannot dispatch wheel input through Playwright.
+    await rules.evaluate(node => node.scrollBy(0, 150));
+  }
+  await expect.poll(() => rules.evaluate(node => node.scrollTop)).toBeGreaterThan(0);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  await expect(page.getByRole('button', { name: 'Close Magic Rules' })).toBeInViewport();
+});
+
+test('scrolls the game rules popup while keeping its close button visible', async ({ page, browserName }) => {
+  await openQuickPlaySetup(page, { baseModeLabel: 'Duel', commanderRules: false });
+  await page.getByRole('button', { name: 'Start game', exact: true }).click();
+  await page.setViewportSize({ width: 540, height: 320 });
+  await page.getByRole('button', { name: 'Read rules', exact: true }).click();
+
+  const dialog = page.getByRole('dialog', { name: 'Game rules' });
+  const rules = dialog.getByRole('region');
+  if (browserName === 'webkit') {
+    await rules.evaluate(node => node.scrollBy(0, 150));
+  } else {
+    await rules.locator('p').first().hover();
+    await page.mouse.wheel(0, 150);
+  }
+  await expect.poll(() => rules.evaluate(node => node.scrollTop)).toBeGreaterThan(0);
+  await expect(dialog.getByRole('button', { name: 'Close rules' })).toBeInViewport();
+});

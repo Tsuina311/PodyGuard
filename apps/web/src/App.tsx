@@ -66,7 +66,10 @@ export function App() {
   const waking = useServerWake() && !localOnly;
   return (
     <FeedbackProvider>
-      <div className="bg-deep-space relative min-h-screen overflow-x-clip">
+      <div className={cx(
+        'bg-deep-space relative',
+        tools ? 'h-dvh overflow-hidden' : 'min-h-screen overflow-x-clip',
+      )}>
         <div
           aria-hidden
           className="bg-grid pointer-events-none absolute inset-0"
@@ -74,8 +77,9 @@ export function App() {
         {waking ? <ServerWakeScreen /> : null}
         <main
           className={cx(
-            'relative mx-auto flex min-h-screen w-full flex-col gap-5 px-5',
-            home ? 'justify-start py-8' : 'py-14',
+            'relative mx-auto flex w-full flex-col gap-5',
+            tools ? 'h-full min-h-0' : 'min-h-screen px-5',
+            home ? 'justify-start py-8' : !tools && 'py-14',
             publicDisplay
               ? 'max-w-7xl justify-start'
               : wide

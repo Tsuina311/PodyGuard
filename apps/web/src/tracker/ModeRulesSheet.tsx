@@ -37,7 +37,12 @@ export function ModeRulesSheet({
           <X size={17} aria-hidden />
         </button>
       </header>
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3">
+      <div
+        className="min-h-0 flex-1 touch-pan-y touch-pinch-zoom overflow-y-auto overscroll-y-contain px-4 py-3"
+        role="region"
+        aria-label={rules.title}
+        tabIndex={0}
+      >
         <p className="text-muted mb-4 text-sm">{rules.summary}</p>
         {rules.sections.map((section) => (
           <section key={section.heading} className="mb-4 last:mb-0">
