@@ -28,6 +28,7 @@ import { LimitedDeveloperTools } from './LimitedDeveloperTools';
 import { LimitedTimerDisplay } from './LimitedTimerDisplay';
 import {
   LIMITED_MODE_LABELS,
+  limitedSeatingDestination,
   participantName,
   queuedParticipants,
   scoreForOutcome,
@@ -394,8 +395,7 @@ function LimitedSessionHostCard({
       <SessionStep
         session={session}
         tableLabel={
-          draftTableLabel(snapshot.tables.find((table) => table.id === session.draftTableIds[0])) ??
-          null
+          limitedSeatingDestination(snapshot, session)
         }
       />
 
