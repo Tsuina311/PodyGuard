@@ -42,6 +42,21 @@ test('one phone hosts and plays four independent seats, restores closed tabs, an
   const joinRequest = bea.waitForRequest(r => r.url().endsWith(`/events/${code}/join`) && r.method() === 'POST');
   await joinCurrent(bea, 'Bea');
   expect((await joinRequest).headers().authorization).toBeUndefined();
+
+  const beaUrl = bea.url();
+  const profiles = bea.getByRole('region', { name: 'Players on this device', exact: true });
+  await expect(profiles.getByRole('link', { name: 'Continue as Ada', exact: true })).toBeVisible();
+  await expect(profiles.getByText('Bea', { exact: true })).toHaveAttribute('aria-current', 'page');
+  await profiles.getByRole('link', { name: 'Host desk', exact: true }).click();
+  await expect(bea.getByRole('tab', { name: 'Desk', exact: true })).toHaveAttribute('aria-selected', 'true');
+  await bea.getByRole('tab', { name: 'Play', exact: true }).click();
+  await expect(bea.getByText('This tab: Ada', { exact: true })).toBeVisible();
+  const embeddedProfiles = bea.getByRole('region', { name: 'Players on this device', exact: true });
+  await embeddedProfiles.getByRole('button', { name: 'Host desk', exact: true }).click();
+  await expect(bea.getByRole('tab', { name: 'Desk', exact: true })).toHaveAttribute('aria-selected', 'true');
+  await bea.goto(beaUrl);
+  await expect(bea.getByText('This tab: Bea', { exact: true })).toBeVisible();
+
   await joinCurrent(cal, 'Cal');
   const reopenBea = ada.waitForEvent('popup');
   await ada.getByRole('link', { name: 'Continue as Bea', exact: true }).click();
@@ -66,6 +81,7 @@ test('one phone hosts and plays four independent seats, restores closed tabs, an
   await expect(restored.getByText('This tab: Dara', { exact: true })).toBeVisible();
   expect(restored.url()).toBe(daraUrl);
   await expect(recovery.getByRole('heading', { name: 'Players on this device', exact: true })).toBeVisible();
+  await expect(recovery.getByRole('link', { name: 'Host desk', exact: true })).toHaveAttribute('href', `#/host/${code}`);
   expect(await restored.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await restored.screenshot({ path: test.info().outputPath('saved-players-phone.png') });
   for (const [player, name] of [[ada, 'Ada'], [bea, 'Bea'], [cal, 'Cal'], [restored, 'Dara']] as const) {
@@ -86,6 +102,8 @@ test('one phone hosts and plays four independent seats, restores closed tabs, an
   await ada.getByRole('button', { name: 'Start', exact: true }).click();
   await ada.getByTitle('Show seat controls', { exact: true }).click();
   await ada.getByTitle('Match menu', { exact: true }).click();
+  await expect(ada.getByRole('region', { name: 'Players on this device', exact: true })
+    .getByRole('link', { name: 'Host desk', exact: true })).toBeVisible();
   await expect(ada.getByRole('link', { name: 'Join as another person', exact: true })).toBeVisible();
   const reopenCal = ada.waitForEvent('popup');
   await ada.getByRole('link', { name: 'Continue as Cal', exact: true }).click();
@@ -143,5 +161,6 @@ test('leaving an extra seat preserves other tabs and its old local link cannot i
     await stranger.goto(localUrl);
     await expect(stranger.getByLabel('Display name', { exact: true })).toHaveValue('');
     await expect(stranger.getByText('This tab: Bea', { exact: true })).toHaveCount(0);
+    await expect(stranger.getByRole('link', { name: 'Host desk', exact: true })).toHaveCount(0);
   } finally { await stranger.close(); }
 });
