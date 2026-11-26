@@ -1028,6 +1028,7 @@ export const eventTrackers = pgTable('event_trackers', {
   gameId: uuid('game_id').notNull(),
   eventId: uuid('event_id').notNull().references(() => events.id, { onDelete: 'cascade' }),
   readToken: text('read_token').notNull(),
+  monitorShared: boolean('monitor_shared').notNull().default(false),
   ownerId: text('owner_id').notNull(),
   ownerName: text('owner_name').notNull(),
   deviceId: text('device_id').notNull(),

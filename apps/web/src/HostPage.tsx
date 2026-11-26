@@ -1262,6 +1262,7 @@ export function HostPage() {
         className={cx(tab === 'overview' ? 'contents' : 'hidden')}
       >
         <Panel title={t('host.displayOnAnotherDevice')}>
+          <p className="mb-3 text-sm">{t('eventMonitor.instructions', { code })}</p>
           <div className="flex flex-wrap items-center gap-3">
             <Link className="text-neon hover:underline" to={displayPath} target="_blank" rel="noopener noreferrer">
               {t('host.openEventDisplay')}

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { BookOpen, Home, Menu, Users } from 'lucide-react';
+import { BookOpen, Home, Menu, Monitor, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { RecentEvents } from '../RecentEvents';
 
@@ -35,6 +35,7 @@ export function AppMenu() {
       <Link to="/" className={linkClass}><Home size={18} aria-hidden />{t('navigation.home')}</Link>
       <Link to="/account" className={linkClass}><Users size={18} aria-hidden />{t('navigation.playgroups')}</Link>
       <Link to="/players" className={linkClass}><Users size={18} aria-hidden />{t('devicePlayers.title')}</Link>
+      <Link to="/display" className={linkClass}><Monitor size={18} aria-hidden />{t('eventMonitor.title')}</Link>
       <Link to="/tools" state={{ returnTo: location.pathname + location.search }} className={linkClass}>
         <BookOpen size={18} aria-hidden />{t('tracker.magicRules.title')}
       </Link>

@@ -3,9 +3,15 @@ export type EventTrackerHistory = { present: Record<string, unknown>; past: Reco
 export type EventTrackerSnapshot = {
   id: string; gameId: string; readToken: string; ownerId: string; ownerName: string;
   generation: number; revision: number; updatedAt: number; owned: boolean;
+  monitorShared?: boolean;
   history?: EventTrackerHistory;
   transfer?: { id: string; name: string };
   state: Record<string, unknown>;
+};
+
+export type EventMonitorState = {
+  games: Array<{ gameId: string; tableLabel: string }>;
+  selected: { state: Record<string, unknown>; ownerName: string; updatedAt: number } | null;
 };
 
 const object = (v: unknown): v is Record<string, unknown> => Boolean(v && typeof v === 'object' && !Array.isArray(v));

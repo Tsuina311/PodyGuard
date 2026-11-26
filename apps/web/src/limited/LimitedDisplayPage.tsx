@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import type { EventSnapshot } from '@podyguard/shared';
 import { useTranslation } from 'react-i18next';
+import { EventMonitor } from '../display/EventMonitor';
 import { eventHasLimitedQueues } from '../event-mode';
 import { countByStatus } from '../match-view';
 import { getEvent, listParticipants, listTables } from '../api';
@@ -14,6 +15,7 @@ import { LimitedTimerDisplay } from './LimitedTimerDisplay';
 import { LIMITED_MODE_LABELS, participantName } from './limited-view';
 
 export function LimitedDisplayPage() {
+  const { t } = useTranslation();
   const { joinCode = '' } = useParams();
   const code = joinCode.toUpperCase();
   const [snapshot, setSnapshot] = useState<EventSnapshot | null>(null);
@@ -51,11 +53,15 @@ export function LimitedDisplayPage() {
       </header>
 
       {error ? <p className="text-danger">{error}</p> : null}
+      {snapshot && <EventMonitor key={code} code={code} />}
       {snapshot ? <EventDisplayContent snapshot={snapshot} /> : (
         <p className="text-muted">Loading live display…</p>
       )}
 
-      <p className="text-muted text-xs"><Link className="hover:text-ink" to={`/e/${code}`}>Player page</Link></p>
+      <div className="flex gap-4 text-xs text-muted">
+        <Link className="hover:text-ink" to="/display">{t('eventMonitor.changeCode')}</Link>
+        <Link className="hover:text-ink" to={`/e/${code}`}>Player page</Link>
+      </div>
     </>
   );
 }

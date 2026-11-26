@@ -4,14 +4,15 @@ import { cx } from '../ui/cx';
 import { useWakeLock } from '../tracker/wake-lock';
 import { useTranslation } from 'react-i18next';
 
-export function ReadOnlyTracker({ state, ownerName, stale, error, onClose, onTransfer }: {
-  state: TrackerState; ownerName: string; stale?: boolean; error?: string;
+export function ReadOnlyTracker({ state, ownerName, tableLabel, stale, error, onClose, onTransfer }: {
+  state: TrackerState; ownerName: string; tableLabel?: string; stale?: boolean; error?: string;
   onClose: () => void; onTransfer?: () => void;
 }) {
   const { t } = useTranslation();
   useWakeLock(true);
   return <section aria-label={t('eventTracker.readOnly')} className="fixed inset-0 z-40 flex h-dvh flex-col gap-2 bg-void p-2 text-ink">
     <header className="shrink-0 rounded-xl border border-muted/30 bg-hull p-3">
+      {tableLabel && <h1 className="font-display text-lg font-bold">{tableLabel}</h1>}
       <p className="font-semibold">{t('eventTracker.trackedBy', { name: ownerName })}</p>
       <p role="status" className={stale ? 'text-sm text-warning' : 'text-sm text-muted'}>
         {error || (stale ? t('eventTracker.stale') : t('eventTracker.readOnly'))}

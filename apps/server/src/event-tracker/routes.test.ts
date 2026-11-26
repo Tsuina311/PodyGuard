@@ -82,6 +82,39 @@ describe('one controller for an event game', () => {
     expect(otherTable.tracker).toBeNull();
   });
 
+  it('lets a monitor with the event code follow only a published, active game', async () => {
+    const monitor = async (selected = gameId) => {
+      const response = await app.inject(`/events/${code.toLowerCase()}/monitor?gameId=${selected}`);
+      expect(response.statusCode).toBe(200);
+      return response.json();
+    };
+    const row = (await post(0, 'claim', { history: initial })).json().tracker;
+    const identity = { id: row.id, generation: row.generation };
+    const publish = { ...identity, monitorShared: true };
+    expect(await monitor()).toEqual({ games: [], selected: null });
+    expect((await post(1, 'monitor', publish)).statusCode).toBe(403);
+    expect((await post(0, 'monitor', { ...publish, monitorShared: 'true' })).statusCode).toBe(400);
+    expect((await post(0, 'monitor', publish)).statusCode).toBe(200);
+    const before = await monitor();
+    expect(before.games).toEqual([{ gameId, tableLabel: expect.any(String) }]);
+    expect(before.selected.state.players[0].life).toBe(20);
+    expect(before.selected.state.treacheryRoles).toEqual({});
+    expect(before.selected.state.assassinTargets).toEqual({});
+    expect(JSON.stringify(before)).not.toContain(row.readToken);
+
+    const updated = structuredClone(initial);
+    (updated.present.players as Array<{ life: number }>)[0]!.life = 19;
+    expect((await post(0, 'update', { ...identity, history: updated, revision: row.revision })).statusCode).toBe(200);
+    expect((await monitor()).selected.state.players[0].life).toBe(19);
+    expect((await monitor('different-game')).selected).toBeNull();
+
+    expect((await post(0, 'monitor', { ...publish, monitorShared: false })).statusCode).toBe(200);
+    expect(await monitor()).toEqual({ games: [], selected: null });
+    expect((await post(0, 'monitor', publish)).statusCode).toBe(200);
+    expect((await app.inject({ method: 'POST', url: `/events/${code}/tables/${tableId}/cancel`, headers: host })).statusCode).toBe(200);
+    expect(await monitor()).toEqual({ games: [], selected: null });
+  });
+
   it('transfers the acknowledged state and undo history, rejects old writes and concurrent transfers', async () => {
     const row = (await post(0, 'claim', { history: initial })).json().tracker;
     const updated = structuredClone(initial);
