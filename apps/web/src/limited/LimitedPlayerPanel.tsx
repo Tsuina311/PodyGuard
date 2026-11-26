@@ -490,4 +490,3 @@ export function LimitedPlayerPanel({
     </Panel>
   );
 }
-

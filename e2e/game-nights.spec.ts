@@ -31,10 +31,17 @@ test('friends plan a night, change an RSVP, export a calendar and start with the
   await page
     .getByLabel('Table preferences')
     .fill('Discuss infinite combos first.');
+  const createdInvitation = page.waitForResponse(response =>
+    response.url().endsWith(`/api/playgroups/${demo.playgroup.id}/nights`) &&
+    response.request().method() === 'POST',
+  );
   await page.getByRole('button', { name: 'Create invitation' }).click();
+  const createdResponse = await createdInvitation;
+  expect(createdResponse.ok()).toBe(true);
+  const { night } = await createdResponse.json();
   await page
     .getByRole('link', { name: 'Friends next Friday', exact: true })
-    .first()
+    .and(page.locator(`[href="#/nights/${night.id}"]`))
     .click();
   await expect(
     page.getByRole('heading', { name: 'Before we play' }),
