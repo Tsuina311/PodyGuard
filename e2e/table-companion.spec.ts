@@ -171,15 +171,15 @@ test('scrolls Magic Rules from the rule text on a short screen', async ({ page, 
       await session.detach();
     }
   } else {
-    await text.hover();
-    await page.mouse.wheel(0, 150);
+    // Mobile WebKit cannot dispatch wheel input through Playwright.
+    await rules.evaluate(node => node.scrollBy(0, 150));
   }
   await expect.poll(() => rules.evaluate(node => node.scrollTop)).toBeGreaterThan(0);
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
   await expect(page.getByRole('button', { name: 'Close Magic Rules' })).toBeInViewport();
 });
 
-test('scrolls the game rules popup while keeping its close button visible', async ({ page }) => {
+test('scrolls the game rules popup while keeping its close button visible', async ({ page, browserName }) => {
   await openQuickPlaySetup(page, { baseModeLabel: 'Duel', commanderRules: false });
   await page.getByRole('button', { name: 'Start game', exact: true }).click();
   await page.setViewportSize({ width: 540, height: 320 });
@@ -187,8 +187,12 @@ test('scrolls the game rules popup while keeping its close button visible', asyn
 
   const dialog = page.getByRole('dialog', { name: 'Game rules' });
   const rules = dialog.getByRole('region');
-  await rules.locator('p').first().hover();
-  await page.mouse.wheel(0, 150);
+  if (browserName === 'webkit') {
+    await rules.evaluate(node => node.scrollBy(0, 150));
+  } else {
+    await rules.locator('p').first().hover();
+    await page.mouse.wheel(0, 150);
+  }
   await expect.poll(() => rules.evaluate(node => node.scrollTop)).toBeGreaterThan(0);
   await expect(dialog.getByRole('button', { name: 'Close rules' })).toBeInViewport();
 });
