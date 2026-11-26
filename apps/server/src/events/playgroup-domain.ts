@@ -299,6 +299,7 @@ export async function buildPlaygroupOverview(
   ]);
 
   const publicRecords = records.map(toPublicGameRecord);
+  const limitedSessions = await findHistoryLimitedSessions(store, publicRecords);
   const byGuestId = new Map(guests.map((g) => [g.id, g.displayName]));
 
   const guestOverviews = guests.map((guest) => {
@@ -314,6 +315,7 @@ export async function buildPlaygroupOverview(
           : {}),
       },
       { byGuestId },
+      limitedSessions,
     );
     return {
       guest: toPublicGuestProfile(guest),
@@ -383,10 +385,11 @@ export async function buildAccountDashboard(
     guestProfileIds: linkedGuestIds,
   });
   const publicRecords = records.map(toPublicGameRecord);
+  const limitedSessions = await findHistoryLimitedSessions(store, publicRecords);
   const stats = deriveStatsForIdentity(publicRecords, {
     userAccountIds: [account.id],
     guestProfileIds: linkedGuestIds,
-  });
+  }, undefined, limitedSessions);
 
   // Find unlinked guests in user's own playgroups with matching displayName so user can optionally claim them
   const claimableGuests: Array<{ guest: GuestProfile; playgroupName: string }> =
@@ -414,6 +417,13 @@ export async function buildAccountDashboard(
     linkedGuests: linkedGuests.map(toPublicGuestProfile),
     claimableGuests,
   };
+}
+
+function findHistoryLimitedSessions(store: EventStore, records: readonly GameRecord[]) {
+  const matchIds = records
+    .filter((record) => record.source === 'PODYGUARD' && record.sourceType === 'LIMITED_MATCH')
+    .map((record) => record.sourceId);
+  return store.findLimitedDeckSessionsByMatch(matchIds);
 }
 
 export function normalizeSavedDeckInput(input: {

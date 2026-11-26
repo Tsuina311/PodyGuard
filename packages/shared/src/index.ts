@@ -337,6 +337,7 @@ export {
 
 export type {
   CommanderUsageStat,
+  LimitedDeckSession,
   DerivedStats,
   GameRecord,
   GameRecordParticipant,

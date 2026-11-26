@@ -16,6 +16,7 @@ import type {
   RoundEventState,
   RulesFormat,
   LimitedMatchOutcome,
+  LimitedDeckSession,
   LimitedMatchStatus,
   LimitedEventModeConfig,
   LimitedMode,
@@ -771,6 +772,9 @@ export interface EventStore {
     id: string,
   ): Promise<StoredLimitedSession | undefined>;
   listLimitedSessions(eventId: string): Promise<StoredLimitedSession[]>;
+  findLimitedDeckSessionsByMatch(
+    matchIds: readonly string[],
+  ): Promise<ReadonlyMap<string, LimitedDeckSession>>;
   replaceLimitedSessionRoster(
     id: string,
     participants: Array<{ participantId: string; draftSeat?: number }>,

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   COMMANDER_POOLS,
+  isLimitedMode,
   poolShortLabel,
   type DerivedStats,
   type GameRecord,
@@ -56,6 +57,7 @@ import { Panel } from './ui/Panel';
 import { ThemeToggleCorner } from './ui/ThemeToggle';
 import { cx } from './ui/cx';
 import { GoogleSignInButton } from './GoogleSignInButton';
+import { LIMITED_MODE_LABELS } from './limited/limited-view';
 
 const inputClass =
   'h-10 w-full rounded-lg border border-muted/20 bg-void/70 px-3 text-sm outline-none placeholder:text-muted/50 focus:border-neon/70';
@@ -1010,13 +1012,22 @@ function PlaygroupGuestCard({
             variant={expanded ? 'neon' : 'glass'}
             onClick={onToggleExpand}
           >
-            {expanded ? 'Done' : 'Commanders & Edit'}
+            {expanded ? 'Done' : 'Decks, stats & edit'}
           </Button>
         </div>
       </div>
 
       {expanded ? (
         <div className="border-muted/15 mt-4 space-y-4 border-t pt-4">
+          {stats.gamesPlayed > 0 ? (
+            <div>
+              <p className="text-muted mb-2 text-xs font-medium tracking-wider uppercase">
+                Player Stats
+              </p>
+              <StatsSummaryGrid stats={stats} />
+            </div>
+          ) : null}
+
           {/* Saved Commanders list */}
           <div>
             <div className="mb-2 flex items-center justify-between gap-2">
@@ -1123,16 +1134,6 @@ function PlaygroupGuestCard({
               </form>
             ) : null}
           </div>
-
-          {/* Player stats summary if they have played games */}
-          {stats.gamesPlayed > 0 ? (
-            <div>
-              <p className="text-muted mb-2 text-xs font-medium tracking-wider uppercase">
-                Player Stats
-              </p>
-              <StatsSummaryGrid stats={stats} />
-            </div>
-          ) : null}
 
           {/* Player management: rename, merge, delete */}
           <div className="border-muted/15 flex flex-wrap items-center justify-between gap-2 border-t pt-3">
@@ -1379,34 +1380,64 @@ function SavedDeckRowEditor({
 }
 
 function StatsSummaryGrid({ stats }: { stats: DerivedStats }) {
+  const formats = Object.keys(stats.gamesByFormat);
+  const hasLimited = formats.some(isLimitedMode);
+  const limitedOnly = hasLimited && formats.every(isLimitedMode);
+
   return (
-    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-      <div className="border-muted/20 bg-void/40 rounded-lg border p-2.5">
-        <p className="text-muted text-[11px] uppercase">Games</p>
-        <p className="font-display text-lg font-bold">{stats.gamesPlayed}</p>
+    <>
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <div className="border-muted/20 bg-void/40 rounded-lg border p-2.5">
+          <p className="text-muted text-[11px] uppercase">
+            {limitedOnly ? 'Matches' : hasLimited ? 'Games & matches' : 'Games'}
+          </p>
+          <p className="font-display text-lg font-bold">{stats.gamesPlayed}</p>
+        </div>
+        <div className="border-muted/20 bg-void/40 rounded-lg border p-2.5">
+          <p className="text-muted text-[11px] uppercase">Wins / Losses</p>
+          <p className="font-display text-lg font-bold">
+            {stats.wins}W · {stats.losses}L
+            {stats.draws > 0 ? ` · ${stats.draws}D` : ''}
+          </p>
+        </div>
+        <div className="border-muted/20 bg-void/40 rounded-lg border p-2.5">
+          <p className="text-muted text-[11px] uppercase">Win Rate</p>
+          <p className="font-display text-lg font-bold">
+            {stats.winRate !== null
+              ? `${Math.round(stats.winRate * 100)}%`
+              : '—'}
+          </p>
+        </div>
+        {!limitedOnly ? (
+          <div className="border-muted/20 bg-void/40 rounded-lg border p-2.5">
+            <p className="text-muted text-[11px] uppercase">Top Commander</p>
+            <p className="truncate text-sm font-semibold">
+              {stats.mostUsedCommanders[0]?.commanderName ?? '—'}
+            </p>
+          </div>
+        ) : null}
       </div>
-      <div className="border-muted/20 bg-void/40 rounded-lg border p-2.5">
-        <p className="text-muted text-[11px] uppercase">Wins / Losses</p>
-        <p className="font-display text-lg font-bold">
-          {stats.wins}W · {stats.losses}L
-          {stats.draws > 0 ? ` · ${stats.draws}D` : ''}
-        </p>
-      </div>
-      <div className="border-muted/20 bg-void/40 rounded-lg border p-2.5">
-        <p className="text-muted text-[11px] uppercase">Win Rate</p>
-        <p className="font-display text-lg font-bold">
-          {stats.winRate !== null
-            ? `${Math.round(stats.winRate * 100)}%`
-            : '—'}
-        </p>
-      </div>
-      <div className="border-muted/20 bg-void/40 rounded-lg border p-2.5">
-        <p className="text-muted text-[11px] uppercase">Top Commander</p>
-        <p className="truncate text-sm font-semibold">
-          {stats.mostUsedCommanders[0]?.commanderName ?? '—'}
-        </p>
-      </div>
-    </div>
+      {stats.limitedDecks?.length ? (
+        <section className="mt-4" aria-label="Limited deck stats">
+          <h4 className="text-muted mb-2 text-xs font-medium uppercase tracking-wider">
+            Limited deck stats
+          </h4>
+          <ul className="space-y-2">
+            {stats.limitedDecks.map((deck) => (
+              <li key={deck.id} className="border-muted/20 bg-void/40 rounded-lg border p-2.5">
+                <p className="text-sm font-semibold">{deck.sessionLabel}</p>
+                <p className="text-muted text-xs">
+                  {deck.eventName} · {new Date(deck.lastPlayedAt).toLocaleDateString()}
+                </p>
+                <p className="mt-1 text-xs">
+                  {deck.matches} {deck.matches === 1 ? 'match' : 'matches'} · {deck.wins}W · {deck.losses}L · {deck.draws}D
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+    </>
   );
 }
 
@@ -1417,7 +1448,7 @@ function GameHistoryList({ records }: { records: GameRecord[] }) {
         <li key={record.id} className="py-2.5">
           <div className="mb-1 flex items-center justify-between gap-2 text-xs">
             <span className="text-neon font-semibold uppercase">
-              {record.gameMode}
+              {isLimitedMode(record.gameMode) ? LIMITED_MODE_LABELS[record.gameMode] : record.gameMode}
               {record.poolId ? ` · ${poolShortLabel(record.poolId)}` : ''}
             </span>
             <span className="text-muted">
