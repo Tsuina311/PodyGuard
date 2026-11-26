@@ -111,10 +111,15 @@ Fetch and update the PR branch from `main`, then run `yarn bump:patch`,
 calculate from `origin/main`. Ordinary commits leave the version alone.
 If another PR merges first, update from `main` and recalculate the bump.
 
-The `release-version` check verifies the exact next version and fails if the
-PR is behind `main`. It also flags changes to tracked API contracts, saved-data
-code, database schema, and migrations. The owner confirms compatibility with
-one release label, including `release:patch` for compatible fixes in those areas.
+The `release-version` check shows the proposed version and any pending release
+label in the Actions summary. Draft PRs can preview their version while owner
+approval or an update from `main` is pending. Marking a PR ready reruns the
+check and requires the exact next version from current `main`.
+
+The owner applies the recommended label for a minor or major release, or for
+changes to tracked API contracts, saved-data code, database schema, or migrations.
+Use `release:patch` to confirm compatible fixes in those areas. Adding the
+label reruns the check automatically.
 
 ### GitHub repository setup
 

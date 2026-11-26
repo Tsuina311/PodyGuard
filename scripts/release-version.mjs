@@ -32,7 +32,7 @@ export function nextVersion(current, bump) {
   }
 }
 
-export function releaseBump(labels, changedPaths) {
+export function releasePlan({ labels, changedPaths, baseVersion, proposedVersion, draft }) {
   const selected = labels.filter(label => releaseLabels.has(label));
   if (selected.length > 1) {
     throw new Error('Choose exactly one release label: release:patch, release:minor, or release:major.');
@@ -42,12 +42,26 @@ export function releaseBump(labels, changedPaths) {
     compatibilityPaths.has(path) ||
     (path.startsWith('apps/server/drizzle/') && path.endsWith('.sql')),
   );
-  const bump = releaseLabels.get(selected[0]);
-  if (!bump && reviewPaths.length > 0) {
+  const proposal = [...releaseLabels.values()].find(
+    bump => nextVersion(baseVersion, bump) === proposedVersion,
+  );
+  const bump = releaseLabels.get(selected[0]) ?? proposal ?? 'patch';
+  const expectedVersion = nextVersion(baseVersion, bump);
+  if (proposedVersion !== expectedVersion) {
+    throw new Error(
+      `Expected VERSION ${expectedVersion} for a ${bump} bump from ${baseVersion}, got ${proposedVersion}. ` +
+      `Run yarn bump:${bump} against the latest main and commit VERSION.`,
+    );
+  }
+
+  const pendingLabel = selected.length === 0 && (bump !== 'patch' || reviewPaths.length > 0)
+    ? `release:${bump}`
+    : null;
+  if (pendingLabel && !draft) {
     throw new Error([
-      'Review compatibility and select release:patch, release:minor, or release:major for these changes:',
-      ...reviewPaths.map(path => `- ${path}`),
+      `VERSION ${baseVersion} → ${proposedVersion} is valid. Add the ${pendingLabel} label after owner approval, then GitHub will rerun this check.`,
+      ...(reviewPaths.length > 0 ? ['Review compatibility for these changes:', ...reviewPaths.map(path => `- ${path}`)] : []),
     ].join('\n'));
   }
-  return bump ?? 'patch';
+  return { bump, pendingLabel };
 }
