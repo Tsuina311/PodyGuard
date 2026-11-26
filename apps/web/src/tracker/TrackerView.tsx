@@ -1040,6 +1040,9 @@ export function TrackerView({
   const activeBoardLayout = layoutChoices.includes(boardLayout)
     ? boardLayout
     : 'wide';
+  const lifeEntryPlayerIndex = lifeEntry
+    ? state.players.findIndex((player) => player.id === lifeEntry.playerId)
+    : -1;
 
   function podPlayerTurnClass(playerId: string): string {
     const index = state.players.findIndex(player => player.id === playerId);
@@ -2343,11 +2346,12 @@ export function TrackerView({
         ? createPortal(
             <LifeAmountPad
               sign={lifeEntry.sign}
-              turnClass={podPlayerTurnClass(lifeEntry.playerId)}
-              playerName={
-                state.players.find((player) => player.id === lifeEntry.playerId)
-                  ?.name ?? 'player'
+              turnClass={
+                duelBoard
+                  ? duelPlayerSheetTurnClass(activeBoardLayout, lifeEntryPlayerIndex, false)
+                  : podPlayerTurnClass(lifeEntry.playerId)
               }
+              playerName={state.players[lifeEntryPlayerIndex]?.name ?? 'player'}
               onConfirm={(amount) => {
                 send({
                   type: 'action',

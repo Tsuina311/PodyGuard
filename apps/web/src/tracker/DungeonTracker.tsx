@@ -101,7 +101,7 @@ export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
   if (!progress || progress.completed) {
     return (
       <Shell initiative={initiative} onClose={onClose} onStepBack={stepBack}>
-        <div className="relative grid min-h-0 flex-1 grid-cols-2 place-items-center gap-1 landscape:grid-cols-4">
+        <div className="relative grid min-h-0 flex-1 grid-cols-2 grid-rows-2 gap-1 landscape:grid-cols-4 landscape:grid-rows-1">
           {DUNGEONS.map((dungeon) => {
             const isUndercity = dungeon.initiativeOnly;
             /*
@@ -111,60 +111,61 @@ export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
             */
             const undercityReenter = isUndercity && holdsInitiative;
             return (
-              <button
-                key={dungeon.id}
-                type="button"
-                title={
-                  isUndercity
-                    ? undercityReenter
-                      ? t('dungeon.reenterUndercity')
-                      : t('dungeon.takeAndEnterUndercity')
-                    : completedIds.has(dungeon.id)
-                      ? t('dungeon.completed', { name: dungeon.name })
-                      : t('dungeon.ventureInto', { name: dungeon.name })
-                }
-                className={cx(
-                  'border-muted/20 relative aspect-[488/680] h-auto max-h-full w-full max-w-full min-h-0 overflow-hidden rounded-lg border transition',
-                  isUndercity && !holdsInitiative
-                    ? 'hover:border-warning/70 hover:shadow-[0_0_22px_-8px_var(--color-warning)]'
-                    : 'hover:border-neon/60 hover:shadow-[0_0_22px_-8px_var(--color-neon)]',
-                  completedIds.has(dungeon.id) && 'border-amber-400/50',
-                )}
-                onClick={() => {
-                  if (isUndercity) {
-                    if (!holdsInitiative) {
-                      setConfirmInitiative(true);
+              <div key={dungeon.id} className="grid min-h-0 min-w-0 place-items-center [container-type:size]">
+                <button
+                  type="button"
+                  title={
+                    isUndercity
+                      ? undercityReenter
+                        ? t('dungeon.reenterUndercity')
+                        : t('dungeon.takeAndEnterUndercity')
+                      : completedIds.has(dungeon.id)
+                        ? t('dungeon.completed', { name: dungeon.name })
+                        : t('dungeon.ventureInto', { name: dungeon.name })
+                  }
+                  className={cx(
+                    'border-muted/20 relative aspect-[488/680] w-[min(100cqw,calc(100cqh*488/680))] overflow-hidden rounded-lg border transition',
+                    isUndercity && !holdsInitiative
+                      ? 'hover:border-warning/70 hover:shadow-[0_0_22px_-8px_var(--color-warning)]'
+                      : 'hover:border-neon/60 hover:shadow-[0_0_22px_-8px_var(--color-neon)]',
+                    completedIds.has(dungeon.id) && 'border-amber-400/50',
+                  )}
+                  onClick={() => {
+                    if (isUndercity) {
+                      if (!holdsInitiative) {
+                        setConfirmInitiative(true);
+                        return;
+                      }
+                      dispatch({
+                        type: 'enterDungeon',
+                        playerId,
+                        dungeonId: 'undercity',
+                        viaInitiative: true,
+                      });
                       return;
                     }
                     dispatch({
                       type: 'enterDungeon',
                       playerId,
-                      dungeonId: 'undercity',
-                      viaInitiative: true,
+                      dungeonId: dungeon.id,
                     });
-                    return;
-                  }
-                  dispatch({
-                    type: 'enterDungeon',
-                    playerId,
-                    dungeonId: dungeon.id,
-                  });
-                }}
-              >
-                <img
-                  src={assetUrl(dungeon.image)}
-                  alt={dungeon.name}
-                  loading="eager"
-                  decoding="async"
-                  fetchPriority="high"
-                  className="size-full object-cover"
-                />
-                {completedIds.has(dungeon.id) ? (
-                  <span className="absolute top-1.5 right-1.5 rounded-full bg-amber-400/90 px-1.5 py-0.5 font-mono text-[0.6rem] font-bold text-void">
-                    {t('dungeon.done')}
-                  </span>
-                ) : null}
-              </button>
+                  }}
+                >
+                  <img
+                    src={assetUrl(dungeon.image)}
+                    alt={dungeon.name}
+                    loading="eager"
+                    decoding="async"
+                    fetchPriority="high"
+                    className="size-full object-contain"
+                  />
+                  {completedIds.has(dungeon.id) ? (
+                    <span className="absolute top-1.5 right-1.5 rounded-full bg-amber-400/90 px-1.5 py-0.5 font-mono text-[0.6rem] font-bold text-void">
+                      {t('dungeon.done')}
+                    </span>
+                  ) : null}
+                </button>
+              </div>
             );
           })}
           {confirmOverlay}
@@ -291,11 +292,6 @@ export function DungeonTracker({ state, playerId, dispatch, onClose }: Props) {
   );
 }
 
-/*
-  The card carries its own name, its rooms and their effects, so a title bar and
-  a room list only repeat what a bigger picture already says. The controls drop
-  to a thin strip along the bottom and everything above it belongs to the map.
-*/
 function Shell({
   initiative,
   onClose,
@@ -309,14 +305,9 @@ function Shell({
 }) {
   const { t } = useTranslation();
   return (
-    <section className="flex h-full min-h-0 w-full items-stretch gap-2">
+    <section className="flex h-full min-h-0 w-full flex-col gap-2 landscape:flex-row">
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</div>
-      {/*
-        A column costs the map a button's width instead of a button's height,
-        and height is what a card turned on its side is short of. It lands on
-        the edge nearest the card's foot, within reach of the hand holding it.
-      */}
-      <div className="flex shrink-0 flex-col justify-end gap-2">
+      <div className="flex shrink-0 justify-end gap-2 landscape:flex-col">
         <ControlButton
           label={
             initiative.active
