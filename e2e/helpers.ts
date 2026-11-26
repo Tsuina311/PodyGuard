@@ -107,6 +107,7 @@ export async function createLimitedEvent(
   options: {
     name: string;
     formatLabel: 'Booster Draft' | 'Pick-Two Draft' | 'Sealed';
+    matchStructure?: 'BO1' | 'BO3';
     playgroup?: string | null;
     pin?: string;
   },
@@ -127,6 +128,9 @@ export async function createLimitedEvent(
     .filter({ hasText: new RegExp(`^${options.formatLabel}$`) })
     .click();
   await page.getByLabel('Event name').fill(options.name);
+  if (options.matchStructure) {
+    await page.getByLabel('Match', { exact: true }).selectOption(options.matchStructure);
+  }
   await page.getByLabel('Host PIN').fill(pin);
 
   // The Limited planner defaults to one draft pod and enough separate duels.

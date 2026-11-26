@@ -65,13 +65,15 @@ export function LimitedPlayerPanel({
   );
   const [busy, setBusy] = useState(false);
   const [trackerMatchId, setTrackerMatchId] = useState<string | null>(null);
+  const [gameScore, setGameScore] = useState<{ key: string; aWins: number; bWins: number } | null>(null);
   const session = activeLimitedSession(snapshot, participant.id);
   const match = currentLimitedMatch(session, participant.id);
   const trackerKey = `podyguard.tracker.limited.${snapshot.event.joinCode}.${match?.id ?? ''}`;
   const scoreKey = `${trackerKey}:score:${participant.id}`;
   const localScore = match?.bestOf === 3 ? readStored(scoreKey)?.match(/^([01])-([01])$/) : null;
-  const playerAGameWins = Number(localScore?.[1] ?? 0);
-  const playerBGameWins = Number(localScore?.[2] ?? 0);
+  const currentScore = gameScore?.key === scoreKey ? gameScore : null;
+  const playerAGameWins = currentScore?.aWins ?? Number(localScore?.[1] ?? 0);
+  const playerBGameWins = currentScore?.bWins ?? Number(localScore?.[2] ?? 0);
   const gameNumber = playerAGameWins + playerBGameWins + 1;
   const self = session?.participants.find(
     (row) => row.participantId === participant.id,
@@ -130,18 +132,33 @@ export function LimitedPlayerPanel({
       : null,
   });
 
-  function submit(outcome: Exclude<LimitedMatchOutcome, 'BYE'>) {
-    if (!session || !match) return;
-    void act(async () => {
-      const result = await reportLimitedResult(
-        snapshot.event.joinCode,
-        token,
-        session.id,
-        match.id,
-        { outcome, ...scoreForOutcome(outcome, match.bestOf) },
-      );
-      remember(result.session);
-    });
+  async function submitResult(
+    outcome: Exclude<LimitedMatchOutcome, 'BYE'>,
+    score: ReturnType<typeof scoreForOutcome>,
+  ) {
+    if (!session || !match || match.outcome) return;
+    const result = await reportLimitedResult(
+      snapshot.event.joinCode,
+      token,
+      session.id,
+      match.id,
+      { outcome, ...score },
+    );
+    remember(result.session);
+  }
+
+  async function recordGameWin(outcome: 'PLAYER_A_WIN' | 'PLAYER_B_WIN') {
+    if (!match || match.outcome) return;
+    const aWins = playerAGameWins + Number(outcome === 'PLAYER_A_WIN');
+    const bWins = playerBGameWins + Number(outcome === 'PLAYER_B_WIN');
+    const winsNeeded = Math.ceil(match.bestOf / 2);
+    if (aWins === winsNeeded || bWins === winsNeeded) {
+      await submitResult(outcome, { playerAGameWins: aWins, playerBGameWins: bWins });
+    } else {
+      writeStored(scoreKey, `${aWins}-${bWins}`);
+      setGameScore({ key: scoreKey, aWins, bWins });
+    }
+    setTrackerMatchId(null);
   }
 
   const seatCount =
@@ -197,22 +214,9 @@ export function LimitedPlayerPanel({
             gameMode="duel"
             rulesFormat="normal"
             finishLabel={match.bestOf === 1 ? 'Report match result' : 'Record game result'}
-            onFinish={async (winnerId) => {
-              const aWins = playerAGameWins + Number(winnerId === match.playerAId);
-              const bWins = playerBGameWins + Number(winnerId === match.playerBId);
-              const winsNeeded = Math.ceil(match.bestOf / 2);
-              if (aWins >= winsNeeded || bWins >= winsNeeded) {
-                const result = await reportLimitedResult(snapshot.event.joinCode, token, session.id, match.id, {
-                  outcome: aWins >= winsNeeded ? 'PLAYER_A_WIN' : 'PLAYER_B_WIN',
-                  playerAGameWins: aWins,
-                  playerBGameWins: bWins,
-                });
-                remember(result.session);
-              } else {
-                writeStored(scoreKey, `${aWins}-${bWins}`);
-              }
-              setTrackerMatchId(null);
-            }}
+            onFinish={(winnerId) =>
+              recordGameWin(winnerId === match.playerAId ? 'PLAYER_A_WIN' : 'PLAYER_B_WIN')
+            }
             onQuit={() => setTrackerMatchId(null)}
             onOpenDesk={onOpenDesk && (() => {
               setTrackerMatchId(null);
@@ -416,11 +420,17 @@ export function LimitedPlayerPanel({
             {participantName(session, match.playerAId)} vs{' '}
             {participantName(session, match.playerBId)}
           </p>
-          <p className="text-muted mb-3 text-sm">
+          <p aria-live="polite" className="text-muted mb-3 text-sm">
             {match.outcome
               ? `Result: ${matchWinnerId ? `${participantName(session, matchWinnerId)} wins` : match.outcome.replaceAll('_', ' ')}`
-              : `Best of ${match.bestOf}${gameNumber > 1 ? ` · ${playerAGameWins}–${playerBGameWins}` : ''}`}
+              : `Best of ${match.bestOf}${match.bestOf === 3 ? ` · ${playerAGameWins}–${playerBGameWins}` : ''}`}
+            {match.outcome && match.bestOf === 3 && match.playerAGameWins != null && match.playerBGameWins != null
+              ? ` · ${match.playerAGameWins}–${match.playerBGameWins}`
+              : ''}
           </p>
+          {match.outcome && session.status === 'ROUND_ACTIVE' ? (
+            <p className="text-muted text-sm">Waiting for the other matches in this round.</p>
+          ) : null}
           {!match.outcome && match.playerBId ? (
             <div className="mb-3 flex flex-col gap-2">
               <Button
@@ -452,13 +462,17 @@ export function LimitedPlayerPanel({
                     size="sm"
                     variant="glass"
                     disabled={busy}
-                    onClick={() => submit(outcome)}
+                    onClick={() => void act(() =>
+                      outcome === 'PLAYER_A_WIN' || outcome === 'PLAYER_B_WIN'
+                        ? recordGameWin(outcome)
+                        : submitResult(outcome, scoreForOutcome(outcome, match.bestOf)),
+                    )}
                   >
                     {outcome === 'PLAYER_A_WIN'
-                      ? `${participantName(session, match.playerAId)} wins`
+                      ? `${participantName(session, match.playerAId)} wins${match.bestOf === 3 ? ` game ${gameNumber}` : ''}`
                       : outcome === 'PLAYER_B_WIN'
-                        ? `${participantName(session, match.playerBId)} wins`
-                        : outcome.replaceAll('_', ' ')}
+                        ? `${participantName(session, match.playerBId)} wins${match.bestOf === 3 ? ` game ${gameNumber}` : ''}`
+                        : outcome === 'DRAW' ? 'Report match draw' : 'Report double loss'}
                   </Button>
                 ),
               )}
