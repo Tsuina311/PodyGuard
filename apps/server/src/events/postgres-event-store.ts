@@ -1295,6 +1295,25 @@ export class PostgresEventStore implements EventStore {
     return Promise.all(rows.map((row) => loadLimitedSessionRequired(row.id)));
   }
 
+  async findLimitedDeckSessionsByMatch(matchIds: readonly string[]) {
+    const ids = [...new Set(matchIds.filter(isUuid))];
+    if (ids.length === 0) return new Map();
+    const rows = await getDb()
+      .select({
+        matchId: limitedMatches.id,
+        sessionId: limitedSessions.id,
+        mode: limitedSessions.mode,
+        sessionLabel: limitedSessions.label,
+        eventName: events.name,
+      })
+      .from(limitedMatches)
+      .innerJoin(limitedRounds, eq(limitedMatches.roundId, limitedRounds.id))
+      .innerJoin(limitedSessions, eq(limitedRounds.sessionId, limitedSessions.id))
+      .innerJoin(events, eq(limitedSessions.eventId, events.id))
+      .where(inArray(limitedMatches.id, ids));
+    return new Map(rows.map(({ matchId, ...session }) => [matchId, session]));
+  }
+
   async replaceLimitedSessionRoster(
     id: string,
     input: Array<{ participantId: string; draftSeat?: number }>,

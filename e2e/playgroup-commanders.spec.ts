@@ -51,7 +51,7 @@ for (const variant of variants) {
     });
     await page.route('**/api/scryfall/artwork?**', route => route.fulfill({ json: { artwork: [] } }));
     await page.goto(`/#/playgroups/${group.id}`);
-    await page.getByRole('button', { name: 'Commanders & Edit', exact: true }).click();
+    await page.getByRole('button', { name: 'Decks, stats & edit', exact: true }).click();
     await select(page, 'Search Scryfall Commander', primary.name);
     await select(page, 'Second commander', secondary.name);
     const savedPromise = page.waitForResponse(response => response.url().endsWith(`/guests/${guest.id}/decks`) && response.request().method() === 'POST');
@@ -119,7 +119,7 @@ test('an existing saved Commander gains a partner without replacing the deck, an
   await page.route('**/api/scryfall/commanders?**', route => route.fulfill({ json: { cards: new URL(route.request().url()).searchParams.has('pairedWith') ? [secondary] : [solo] } }));
   await page.route('**/api/scryfall/artwork?**', route => route.fulfill({ json: { artwork: [] } }));
   await page.goto(`/#/playgroups/${group.id}`);
-  await page.getByRole('button', { name: 'Commanders & Edit', exact: true }).click();
+  await page.getByRole('button', { name: 'Decks, stats & edit', exact: true }).click();
   await page.getByRole('button', { name: 'Edit commanders', exact: true }).click();
   await select(page, 'Second commander', secondary.name);
   await page.getByRole('button', { name: 'Save commanders', exact: true }).click();
@@ -141,7 +141,7 @@ test('an existing saved Commander gains a partner without replacing the deck, an
 test('name-only manual entry saves and displays both Commanders', async ({ page }, info) => {
   const { group, headers } = await fixture(page, `manual ${info.retry}`);
   await page.goto(`/#/playgroups/${group.id}`);
-  await page.getByRole('button', { name: 'Commanders & Edit', exact: true }).click();
+  await page.getByRole('button', { name: 'Decks, stats & edit', exact: true }).click();
   await page.getByRole('button', { name: 'Enter Commander names manually', exact: true }).click();
   await page.getByLabel('Commander name', { exact: true }).fill('Manual Partner One');
   await page.getByRole('checkbox', { name: 'Two Commanders (Partner or similar)', exact: true }).check();

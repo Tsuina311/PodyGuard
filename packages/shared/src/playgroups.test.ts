@@ -5,6 +5,8 @@ import {
   isSavedDeckCompatibleWithEvent,
   poolIdFromBracket,
   type GameRecord,
+  type GameResultType,
+  type LimitedDeckSession,
 } from './playgroups';
 
 const baseEvent: PublicEvent = {
@@ -159,5 +161,50 @@ describe('playgroups shared domain', () => {
       },
     ]);
     expect(stats.lastPlayedAt).toBe('2026-10-17T21:00:00.000Z');
+  });
+
+  it('groups Limited results by player and session and excludes byes', () => {
+    const results: GameResultType[] = ['WIN', 'DRAW', 'LOSS', 'BYE', 'WIN'];
+    const records = results.map((resultType, index): GameRecord => ({
+      id: `record-${index}`,
+      source: 'PODYGUARD',
+      sourceType: 'LIMITED_MATCH',
+      sourceId: `match-${index}`,
+      eventId: 'event-1',
+      gameMode: 'BOOSTER_DRAFT',
+      format: 'limited',
+      createdAt: `2026-10-1${index}T20:00:00.000Z`,
+      participants: [{
+        id: `seat-${index}`,
+        gameRecordId: `record-${index}`,
+        eventParticipantId: 'player-alex',
+        guestProfileId: 'guest-alex',
+        displayNameSnapshot: 'Alex',
+        resultType,
+      }],
+    }));
+    const sessions = new Map<string, LimitedDeckSession>(
+      records.slice(0, 4).map((record, index) => {
+        const pod = index === 2 ? 2 : 1;
+        return [record.sourceId, {
+          sessionId: `pod-${pod}`,
+          mode: 'BOOSTER_DRAFT',
+          eventName: 'Friday Draft',
+          sessionLabel: `Booster Draft ${pod}`,
+        }];
+      }),
+    );
+
+    const stats = deriveStatsForIdentity(records, { guestProfileIds: ['guest-alex'] }, undefined, sessions);
+    expect(stats).toMatchObject({
+      gamesPlayed: 4,
+      wins: 2,
+      losses: 1,
+      draws: 1,
+      limitedDecks: [
+        { id: 'pod-2:player-alex', matches: 1, wins: 0, draws: 0, losses: 1 },
+        { id: 'pod-1:player-alex', matches: 2, wins: 1, draws: 1, losses: 0 },
+      ],
+    });
   });
 });

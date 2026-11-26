@@ -1,6 +1,30 @@
 import type { Page } from '@playwright/test';
+import type { PlaygroupOverview, PublicLimitedSession } from '@podyguard/shared';
 import { expect, test } from './fixtures';
-import { createLimitedEvent, joinAsPlayer } from './helpers';
+import { createLimitedEvent, joinAsPlayer, prepareApp } from './helpers';
+
+async function seedDraftPlaygroup(host: Page, count: number) {
+  const demo = await (await host.request.get('/test/demo')).json();
+  const headers = { Authorization: `Bearer ${demo.token}` };
+  const response = await host.request.post('/api/playgroups', {
+    headers,
+    data: { name: 'Draft Night Playgroup' },
+  });
+  expect(response.ok()).toBe(true);
+  const { playgroup } = await response.json();
+  for (let index = 1; index <= count; index++) {
+    const guest = await host.request.post(`/api/playgroups/${playgroup.id}/guests`, {
+      headers,
+      data: { displayName: `Player ${index}` },
+    });
+    expect(guest.ok()).toBe(true);
+  }
+  await host.addInitScript(({ token, account, playgroupId }) => {
+    localStorage.setItem('podyguard.account.session', JSON.stringify({ token, account }));
+    localStorage.setItem('podyguard.account.preferredPlaygroupId', playgroupId);
+  }, { token: demo.token, account: demo.account, playgroupId: playgroup.id });
+  return { id: playgroup.id as string, headers };
+}
 
 for (const format of [
   { label: 'Booster Draft', count: 8 },
@@ -10,13 +34,24 @@ for (const format of [
   test(`${format.label}: full physical-card event through final standings`, async ({ page: host, browser }) => {
     test.setTimeout(240_000);
     const players: Page[] = [];
+    const playgroup = format.label === 'Booster Draft'
+      ? await seedDraftPlaygroup(host, format.count)
+      : undefined;
     const code = await createLimitedEvent(host, { name: `E2E ${format.label} lifecycle`, formatLabel: format.label });
     try {
       await test.step('Players join and ready through independent browsers', async () => {
         for (let index = 0; index < format.count; index++) {
           const player = await browser.newPage();
           players.push(player);
-          await joinAsPlayer(player, code, `Player ${index + 1}`);
+          const name = `Player ${index + 1}`;
+          if (playgroup) {
+            await prepareApp(player);
+            await player.goto(`/#/e/${code}`);
+            await player.getByRole('button', { name: `${name} Select →`, exact: true }).click();
+            await player.getByRole('button', { name: 'Join event', exact: true }).click();
+          } else {
+            await joinAsPlayer(player, code, name);
+          }
           const joinLobby = player.getByRole('button', { name: 'Join the lobby', exact: true });
           if (await joinLobby.isVisible()) await joinLobby.click();
           await player.getByRole('button', { name: "I'm ready", exact: true }).click();
@@ -57,7 +92,7 @@ for (const format of [
 
       // Match identities come from the real response. Every result is submitted through a player's UI.
       // Capture each round result response to verify completion and table release without test-only mutations.
-      let session: { status: string; currentRound: number; totalRounds: number; standings: unknown[]; rounds: Array<{ number: number; matches: Array<{ id: string; outcome?: string }> }> } | undefined;
+      let session: PublicLimitedSession | undefined;
       let corrected = false;
       for (let round = 1; round <= 3; round++) {
         await test.step(`Play and report round ${round}`, async () => {
@@ -87,7 +122,7 @@ for (const format of [
               }
               // The last result automatically pairs the next round. Its result
               // buttons may already be visible, so absence is not a valid assertion.
-              if (session!.currentRound > round || session!.status === 'COMPLETED') break;
+              if ((session!.currentRound ?? 0) > round || session!.status === 'COMPLETED') break;
               await expect(wins).toHaveCount(0);
             }
           }
@@ -113,6 +148,36 @@ for (const format of [
       const overview = host.getByRole('tabpanel', { name: 'Overview' });
       await expect(overview.getByRole('heading', { name: 'Queues' })).toBeVisible();
       await expect(overview.getByRole('columnheader', { name: 'Points', exact: true })).toBeVisible();
+      if (playgroup) {
+        const response = await host.request.get(`/api/playgroups/${playgroup.id}`, { headers: playgroup.headers });
+        expect(response.ok()).toBe(true);
+        const { overview: history } = await response.json() as { overview: PlaygroupOverview };
+        expect(history.guests).toHaveLength(8);
+        const decks = history.guests.map(({ guest, savedDecks, stats }) => {
+          const standing = session!.standings.find(row => row.displayName === guest.displayName);
+          expect(standing).toBeDefined();
+          expect(savedDecks).toHaveLength(0);
+          expect(stats.mostUsedCommanders).toHaveLength(0);
+          expect(stats.limitedDecks).toHaveLength(1);
+          expect(stats.limitedDecks?.[0]).toMatchObject({
+            mode: 'BOOSTER_DRAFT',
+            eventName: 'E2E Booster Draft lifecycle',
+            matches: 3,
+            wins: standing!.matchWins,
+            losses: standing!.matchLosses,
+            draws: 0,
+          });
+          return stats.limitedDecks![0]!;
+        });
+        expect(new Set(decks.map(deck => deck.id)).size).toBe(8);
+        expect(decks.reduce((total, deck) => total + deck.wins, 0)).toBe(12);
+        expect(decks.reduce((total, deck) => total + deck.losses, 0)).toBe(12);
+        await host.goto(`/#/playgroups/${playgroup.id}`);
+        await host.getByRole('button', { name: 'Decks, stats & edit', exact: true }).first().click();
+        const deckStats = host.getByRole('region', { name: 'Limited deck stats' });
+        await expect(deckStats.getByText('Booster Draft 1', { exact: true })).toBeVisible();
+        await expect(deckStats.getByText(/3 matches · \dW · \dL · 0D/)).toBeVisible();
+      }
     } finally { await Promise.all(players.map(player => player.close())); }
   });
 }

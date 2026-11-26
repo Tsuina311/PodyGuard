@@ -877,6 +877,30 @@ export class MemoryEventStore implements EventStore {
       .sort((left, right) => left.createdAt.getTime() - right.createdAt.getTime());
   }
 
+  async findLimitedDeckSessionsByMatch(matchIds: readonly string[]) {
+    const ids = new Set(matchIds);
+    const found = new Map<string, import('@podyguard/shared').LimitedDeckSession>();
+    if (ids.size === 0) return found;
+
+    for (const session of this.limitedSessions.values()) {
+      const event = this.events.get(session.eventId);
+      if (!event) continue;
+      for (const round of session.rounds) {
+        for (const match of round.matches) {
+          if (ids.has(match.id)) {
+            found.set(match.id, {
+              sessionId: session.id,
+              mode: session.mode,
+              sessionLabel: session.label,
+              eventName: event.name,
+            });
+          }
+        }
+      }
+    }
+    return found;
+  }
+
   async replaceLimitedSessionRoster(
     id: string,
     input: Array<{ participantId: string; draftSeat?: number }>,

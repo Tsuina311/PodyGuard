@@ -1,4 +1,5 @@
 import type { CommanderSelection, PublicEvent } from './event-api';
+import type { LimitedMode } from './limited';
 import { usesCommanderRules, type GameMode, type RulesFormat } from './treachery';
 
 export const GUEST_IDENTITY_VERIFICATION_MODES = [
@@ -170,6 +171,22 @@ export type PlayedWithStat = {
   gamesTogether: number;
 };
 
+export type LimitedDeckStat = {
+  id: string;
+  mode: LimitedMode;
+  eventName: string;
+  sessionLabel: string;
+  matches: number;
+  wins: number;
+  losses: number;
+  draws: number;
+  lastPlayedAt: string;
+};
+
+export type LimitedDeckSession = Pick<LimitedDeckStat, 'mode' | 'eventName' | 'sessionLabel'> & {
+  sessionId: string;
+};
+
 export type DerivedStats = {
   gamesPlayed: number;
   wins: number;
@@ -180,6 +197,7 @@ export type DerivedStats = {
   winRate: number | null;
   gamesByFormat: Record<string, number>;
   mostUsedCommanders: CommanderUsageStat[];
+  limitedDecks?: LimitedDeckStat[];
   mostPlayedWith: PlayedWithStat[];
   lastPlayedAt: string | null;
 };
@@ -314,6 +332,7 @@ export function deriveStatsForIdentity(
     byGuestId?: ReadonlyMap<string, string>;
     byUserId?: ReadonlyMap<string, string>;
   },
+  limitedSessionsByMatch?: ReadonlyMap<string, LimitedDeckSession>,
 ): DerivedStats {
   const guestIds = new Set(target.guestProfileIds ?? []);
   const userIds = new Set(target.userAccountIds ?? []);
@@ -325,6 +344,7 @@ export function deriveStatsForIdentity(
   let completedNoWinner = 0;
   const gamesByFormat: Record<string, number> = {};
   let lastPlayedAt: string | null = null;
+  const limitedDecks = new Map<string, LimitedDeckStat>();
 
   const commanderMap = new Map<
     string,
@@ -382,7 +402,32 @@ export function deriveStatsForIdentity(
       lastPlayedAt = timestamp;
     }
 
-    const cmdName = seat.commanderNameSnapshot ?? seat.deckNameSnapshot;
+    if (record.source === 'PODYGUARD' && record.sourceType === 'LIMITED_MATCH') {
+      const session = limitedSessionsByMatch?.get(record.sourceId);
+      if (session && seat.eventParticipantId) {
+        const { sessionId, ...details } = session;
+        const id = `${sessionId}:${seat.eventParticipantId}`;
+        const stat = limitedDecks.get(id) ?? {
+          id,
+          ...details,
+          matches: 0,
+          wins: 0,
+          losses: 0,
+          draws: 0,
+          lastPlayedAt: timestamp,
+        };
+        stat.matches += 1;
+        if (seat.resultType === 'WIN') stat.wins += 1;
+        if (seat.resultType === 'LOSS') stat.losses += 1;
+        if (seat.resultType === 'DRAW') stat.draws += 1;
+        if (timestamp > stat.lastPlayedAt) stat.lastPlayedAt = timestamp;
+        limitedDecks.set(id, stat);
+      }
+    }
+
+    const cmdName = record.sourceType === 'LIMITED_MATCH'
+      ? undefined
+      : seat.commanderNameSnapshot ?? seat.deckNameSnapshot;
     if (cmdName) {
       const cmdKey =
         seat.commanderScryfallIdSnapshot?.toLowerCase() ||
@@ -478,6 +523,11 @@ export function deriveStatsForIdentity(
     winRate,
     gamesByFormat,
     mostUsedCommanders,
+    ...(limitedDecks.size > 0 ? {
+      limitedDecks: [...limitedDecks.values()].sort((a, b) =>
+        b.lastPlayedAt.localeCompare(a.lastPlayedAt) || a.id.localeCompare(b.id),
+      ),
+    } : {}),
     mostPlayedWith,
     lastPlayedAt,
   };
