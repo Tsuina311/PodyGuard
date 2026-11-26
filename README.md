@@ -88,30 +88,43 @@ still open the same join screen.
 If a phone cannot join, open `/#/connectivity` on that phone for a privacy-safe
 layer check (API, realtime polling, websocket, storage).
 
-## App version (phones)
+## Release version
 
-The player-facing release number lives in the repo-root [`VERSION`](VERSION)
-file and is shown next to **PodyGuard** on every screen that uses the brand
-(for example `v1.0.0`).
+The app displays the root `VERSION` value. The Connectivity screen also shows
+the build commit so you can identify the exact deployment. A merge records the
+release on `main`. GitHub Pages publishes it after the Pages workflow succeeds.
+Render has a separate deployment status.
 
-**Automatic bump:** every normal `git commit` runs `.githooks/pre-commit`, which
-bumps the **patch** (`1.0.0` → `1.0.1`) and includes `VERSION` in that commit.
-Husky hooks are installed on `yarn install` via `prepare`. Commits run fast
-checks before the version bump; pushes run the full unit and browser suites.
+### Prepare a release PR
 
-| Intent | How |
-|--------|-----|
-| Ordinary change | just `git commit` (auto patch) |
-| Irreversible compatible change | `VERSION_BUMP=minor git commit -m "…"` |
-| Irreversible breaking change | `VERSION_BUMP=major git commit -m "…"` |
-| Skip bump (docs-only, etc.) | `SKIP_VERSION_BUMP=1 git commit -m "…"` |
-| Manual bump without committing | `yarn bump:patch` / `bump:minor` / `bump:major` |
+Choose one bump for the entire PR and explain it in the description. The same
+rules apply to changes prepared in Cursor, Codex, and GitHub.
 
-Amend / rebase / merge commits do not bump again. If `VERSION` is already
-staged, the hook leaves it alone.
+| Bump | Use when | GitHub label |
+| --- | --- | --- |
+| Patch | Fixes, polish, reliability, or internal work | Optional `release:patch` |
+| Minor | Players or hosts gain a backward-compatible capability | `release:minor` |
+| Major | Existing clients, sessions, or saved data require a breaking change or migration | `release:major` |
 
-After Pages deploys, confirm on a phone: the brand line shows the new `vX.Y.Z`.
-Connectivity also lists **App version** and a separate **Build** git short SHA.
+Fetch and update the PR branch from `main`, then run `yarn bump:patch`,
+`yarn bump:minor`, or `yarn bump:major` and commit `VERSION`. These commands
+calculate from `origin/main`. Ordinary commits leave the version alone.
+If another PR merges first, update from `main` and recalculate the bump.
+
+The `release-version` check verifies the exact next version and fails if the
+PR is behind `main`. It also flags changes to tracked API contracts, saved-data
+code, database schema, and migrations. The owner confirms compatibility with
+one release label, including `release:patch` for compatible fixes in those areas.
+
+### GitHub repository setup
+
+- In **Settings → General → Pull Requests**, enable squash merging and disable
+  merge commits and rebase merging.
+- Create `release:patch`, `release:minor`, and `release:major` in **Issues → Labels**.
+- After the release workflow is on `main`, configure its branch protection or
+  ruleset to require PRs, the existing CI checks, and `release-version`. Enable
+  **Require branches to be up to date before merging**. This keeps two PRs
+  prepared from the same version from landing with the same release number.
 
 ### 1. API on Render
 
