@@ -8,6 +8,8 @@ import {
   pollDisplayPairing,
   saveDisplayToken,
 } from '../api';
+import { isJoinCodeFormat, normalizeJoinCode } from '@podyguard/shared';
+import { Field } from '../ui/Field';
 import { Brand } from '../ui/Brand';
 import { Button } from '../ui/Button';
 import { Panel } from '../ui/Panel';
@@ -15,6 +17,7 @@ import { Panel } from '../ui/Panel';
 export function DisplayPairPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [eventCode, setEventCode] = useState('');
   const [pairingCode, setPairingCode] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [expired, setExpired] = useState(false);
@@ -116,6 +119,18 @@ export function DisplayPairPage() {
           {t('display.pairHint')}
         </p>
       </header>
+
+      <Panel title={t('eventMonitor.title')} onSubmit={event => {
+        event.preventDefault();
+        const code = normalizeJoinCode(eventCode);
+        if (isJoinCodeFormat(code)) void navigate(`/display/event/${code}`);
+      }}>
+        <Field label={t('eventMonitor.code')} value={eventCode} autoCapitalize="characters"
+          autoComplete="off" spellCheck={false} onChange={event => setEventCode(event.target.value)} />
+        <Button type="submit" disabled={!isJoinCodeFormat(normalizeJoinCode(eventCode))}>
+          {t('eventMonitor.open')}
+        </Button>
+      </Panel>
 
       <Panel
         title={t('display.pairingCode')}

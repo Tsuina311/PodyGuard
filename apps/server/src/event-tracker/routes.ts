@@ -1,7 +1,12 @@
 import { randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
 import type { FastifyInstance, FastifyPluginAsync } from 'fastify';
-import { parseEventTrackerHistory, publicEventTrackerState, type EventTrackerSnapshot, type EventTrackerHistory } from '@podyguard/shared';
+import { isJoinCodeFormat, normalizeJoinCode, parseEventTrackerHistory, publicEventTrackerState, type EventTrackerSnapshot, type EventTrackerHistory, type EventMonitorState, type PublicTable } from '@podyguard/shared';
+import { EventNotFoundError } from '../events/event-store.js';
 import type { EventTrackerStore, TrackerRow } from './store.js';
+
+function trackerContextKey(eventId: string, table: PublicTable) {
+  return `${eventId}:${table.id}:${table.playingStartedAt}:${table.gameId}`;
+}
 
 export async function eventTrackerContext(app: FastifyInstance, code: string, authorization?: string) {
   const token = authorization?.startsWith('Bearer ') ? authorization.slice(7) : '';
@@ -10,13 +15,13 @@ export async function eventTrackerContext(app: FastifyInstance, code: string, au
   const snapshot = await app.events.getSnapshot(code);
   const table = snapshot.tables.find(row => row.label === participant.tableLabel);
   if (!table?.playingStartedAt || !table.gameId) throw new Error('No current game');
-  return { key: `${event.id}:${table.id}:${table.playingStartedAt}:${table.gameId}`, gameId: table.gameId, event, participant,
+  return { key: trackerContextKey(event.id, table), gameId: table.gameId, event, participant,
     ids: snapshot.participants.filter(p => p.tableLabel === table.label && p.status === 'playing').map(p => p.id) };
 }
 function present(row: TrackerRow, ownerId?: string, deviceId?: string): EventTrackerSnapshot {
   const owned = row.ownerId === ownerId && row.deviceId === deviceId;
   return { id: row.id, gameId: row.gameId, readToken: row.readToken, ownerId: row.ownerId, ownerName: row.ownerName,
-    generation: row.generation, revision: row.revision, updatedAt: row.updatedAt, owned,
+    generation: row.generation, revision: row.revision, updatedAt: row.updatedAt, owned, monitorShared: row.monitorShared,
     ...(row.transfer && Date.now() - row.transfer.requestedAt < 30_000 ? { transfer: { id: row.transfer.id, name: row.transfer.name } } : {}),
     state: publicEventTrackerState(row.history.present), ...(owned ? { history: row.history } : {}) };
 }
@@ -39,12 +44,41 @@ export const eventTrackerRoutes: FastifyPluginAsync<{ store: EventTrackerStore }
       return { tracker: row ? present(row, context.participant.id, req.query.device) : null };
     } catch { return reply.code(403).send({ error: { message: 'Only players in this game can open its tracker.' } }); }
   });
-  for (const operation of ['claim', 'update', 'transfer', 'handoff', 'cancel-transfer', 'heartbeat', 'finish'] as const) {
+  app.get<{ Params: { joinCode: string }; Querystring: { gameId?: string }; Reply: EventMonitorState | { error: { message: string } } }>(
+    '/events/:joinCode/monitor',
+    { config: { rateLimit: { max: 240, timeWindow: '1 minute' } } },
+    async (req, reply) => {
+      const code = normalizeJoinCode(req.params.joinCode);
+      const unavailable = () => reply.code(404).send({ error: { message: 'This event display is unavailable.' } });
+      if (!isJoinCodeFormat(code)) return unavailable();
+      try {
+        const event = await app.events.getEvent(code);
+        if (event.status === 'closed') return unavailable();
+        const tables = (await app.events.listTables(code))
+          .filter(table => table.podStatus === 'playing' && table.playingStartedAt && table.gameId);
+        const contexts = tables.map(table => trackerContextKey(event.id, table));
+        const published = new Set(await store.publishedContexts(contexts));
+        const listed = tables.filter((_, index) => published.has(contexts[index]!));
+        const selected = listed.find(table => table.gameId === req.query.gameId);
+        const row = selected ? await store.get(trackerContextKey(event.id, selected)) : undefined;
+        return {
+          games: listed.map(table => ({ gameId: table.gameId!, tableLabel: table.label })),
+          selected: row?.monitorShared ? {
+            ownerName: row.ownerName, updatedAt: row.updatedAt, state: publicEventTrackerState(row.history.present),
+          } : null,
+        };
+      } catch (error) {
+        if (error instanceof EventNotFoundError) return unavailable();
+        throw error;
+      }
+    },
+  );
+  for (const operation of ['claim', 'update', 'transfer', 'handoff', 'cancel-transfer', 'heartbeat', 'finish', 'monitor'] as const) {
     app.post<{ Params: { joinCode: string } }>(`/events/:joinCode/tracker/${operation}`, {
       bodyLimit: 2_097_152,
       config: { rateLimit: { max: operation === 'update' ? 900 : 120, timeWindow: '1 minute' } },
     }, async (req, reply) => {
-      const body = (req.body ?? {}) as { id?: unknown; gameId?: unknown; device?: unknown; generation?: unknown; revision?: unknown; history?: unknown; transferId?: unknown; winnerParticipantId?: unknown; durationSeconds?: unknown };
+      const body = (req.body ?? {}) as { id?: unknown; gameId?: unknown; device?: unknown; generation?: unknown; revision?: unknown; history?: unknown; transferId?: unknown; winnerParticipantId?: unknown; durationSeconds?: unknown; monitorShared?: unknown };
       if (!device(body.device)) return reply.code(400).send({ error: { message: 'Invalid tracker device.' } });
       let context: Awaited<ReturnType<typeof eventTrackerContext>>;
       try { context = await eventTrackerContext(app, req.params.joinCode, req.headers.authorization); }
@@ -65,7 +99,7 @@ export const eventTrackerRoutes: FastifyPluginAsync<{ store: EventTrackerStore }
             return reply.code(400).send({ error: { message: 'The tracker must match this game and its players.' } });
           row = { context: context.key, id: randomUUID(), gameId: context.gameId, eventId: context.event.id, readToken: randomBytes(32).toString('hex'),
             ownerId: context.participant.id, ownerName: context.participant.displayName, deviceId: body.device as string,
-            generation: 1, revision: 0, updatedAt: Date.now(), history, transfer: null };
+            generation: 1, revision: 0, monitorShared: false, updatedAt: Date.now(), history, transfer: null };
           await store.put(row);
         } else if (operation === 'transfer') {
           if (body.id !== row.id || body.generation !== row.generation) return reply.code(409).send({ error: { message: 'Control has already moved. Refresh before trying again.' } });
@@ -75,8 +109,14 @@ export const eventTrackerRoutes: FastifyPluginAsync<{ store: EventTrackerStore }
           row = { ...row, transfer: { id: row.transfer && Date.now() - row.transfer.requestedAt < 30_000 ? row.transfer.id : randomUUID(), ownerId: context.participant.id,
             name: context.participant.displayName, deviceId: body.device as string, requestedAt: Date.now() } };
           await store.put(row);
-        } else if (operation === 'update' || operation === 'heartbeat' || operation === 'finish' || operation === 'handoff' || operation === 'cancel-transfer') {
+        } else if (operation === 'update' || operation === 'heartbeat' || operation === 'finish' || operation === 'handoff' || operation === 'cancel-transfer' || operation === 'monitor') {
           if (body.id !== row.id || !owns() || body.generation !== row.generation) return reply.code(403).send({ error: { message: 'This game is now controlled on another device.' } });
+          if (operation === 'monitor') {
+            if (typeof body.monitorShared !== 'boolean') {
+              return reply.code(400).send({ error: { message: 'Choose whether to show this game on the monitor.' } });
+            }
+            row = { ...row, monitorShared: body.monitorShared };
+          }
           if (operation === 'cancel-transfer') {
             row = { ...row, transfer: null };
             await store.put(row);

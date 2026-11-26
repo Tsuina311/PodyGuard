@@ -1,13 +1,32 @@
 import { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '../ui/Button';
+import type { ControllerSession } from './EventTrackerSession';
 import type { useTableShare } from './useTableShare';
 export function TableShareControls({
   share,
+  monitor,
 }: {
   share: ReturnType<typeof useTableShare>;
+  monitor?: ControllerSession['monitor'];
 }) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
+  const [monitorBusy, setMonitorBusy] = useState(false);
+  const [monitorError, setMonitorError] = useState('');
+  async function toggleMonitor() {
+    if (!monitor) return;
+    setMonitorBusy(true);
+    setMonitorError('');
+    try {
+      await monitor.setShared(!monitor.shared);
+    } catch (error) {
+      setMonitorError(error instanceof Error ? error.message : t('eventMonitor.unavailable'));
+    } finally {
+      setMonitorBusy(false);
+    }
+  }
   return (
     <section
       className="mb-2 shrink-0 rounded-xl border border-muted/25 p-2"
@@ -39,6 +58,18 @@ export function TableShareControls({
           </Button>
         ) : null}
       </div>
+      {expanded && monitor ? (
+        <div className="mt-3 border-t border-muted/25 pt-3">
+          <p className="mb-2 text-sm">
+            {t('eventMonitor.instructions', { code: monitor.code })}
+          </p>
+          <Button variant="glass" size="sm" disabled={monitorBusy} onClick={() => void toggleMonitor()}>
+            {t(monitor.shared ? 'eventMonitor.stop' : 'eventMonitor.publish')}
+          </Button>
+          <p className="mt-1 text-xs text-muted">{t('eventMonitor.audience')}</p>
+          {monitorError && <p className="mt-1 text-sm text-danger" role="alert">{monitorError}</p>}
+        </div>
+      ) : null}
       {expanded && share.url ? (
         <div className="mt-2 flex max-h-52 flex-wrap gap-3 overflow-auto">
           <QRCodeSVG

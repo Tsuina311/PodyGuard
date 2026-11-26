@@ -2476,7 +2476,7 @@ export function TrackerView({
               <MatchMenu
                 deviceControls={
                   <>
-                    <TableShareControls share={tableShare} />
+                    <TableShareControls share={tableShare} monitor={controller?.monitor} />
                     {playerControls}
                   </>
                 }

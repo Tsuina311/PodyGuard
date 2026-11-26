@@ -1,4 +1,17 @@
 {
+  "eventMonitor": {
+    "title": "Event display",
+    "code": "Event code",
+    "open": "Open display",
+    "changeCode": "Enter a different event code",
+    "instructions": "On the monitor, open PodyGuard → Event display and enter {{code}}.",
+    "publish": "Show on event monitor",
+    "stop": "Remove from event monitor",
+    "audience": "When shared, anyone with the event code can watch this game.",
+    "games": "Live games",
+    "empty": "No live games are shared on this display yet.",
+    "unavailable": "The event display is unavailable."
+  },
   "tablePlan": {
     "inventory": "{{tables}} tables · {{spaces}} game spaces",
     "freeSpaces": "{{free}}/{{total}} spaces free",

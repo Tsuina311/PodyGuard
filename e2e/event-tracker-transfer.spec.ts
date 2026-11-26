@@ -150,3 +150,49 @@ test('a host can return from the tracker to Desk and resume the same game via Pl
     await guest.close();
   }
 });
+
+test('opens an explicitly shared table on a monitor with the event code', async ({ page, browser }) => {
+  const code = await createConstructedEvent(page, {
+    name: 'Monitor rehearsal', baseModeLabel: 'Duel', commanderRules: false,
+  });
+  const ada = await browser.newPage();
+  const bea = await browser.newPage();
+  const monitor = await browser.newPage();
+  try {
+    await joinAsPlayer(ada, code, 'Ada');
+    await markPlayerReady(ada);
+    await joinAsPlayer(bea, code, 'Bea');
+    await markPlayerReady(bea);
+    await expect(page.getByText('2 ready', { exact: true }).first()).toBeVisible();
+    await page.getByRole('button', { name: 'Match now', exact: true }).click();
+    await page.getByRole('button', { name: 'Start game', exact: true }).click();
+
+    await monitor.addInitScript(() => localStorage.setItem('podyguard-lang', 'en'));
+    await monitor.goto('/#/display');
+    await monitor.getByLabel('Event code', { exact: true }).fill(code.toLowerCase());
+    await monitor.getByRole('button', { name: 'Open display', exact: true }).click();
+    await expect(monitor.getByRole('heading', { name: 'Monitor rehearsal' })).toBeVisible();
+    await expect(monitor.getByText('No live games are shared on this display yet.')).toBeVisible();
+
+    await ada.getByRole('button', { name: 'Use game tracker', exact: true }).click();
+    await ada.getByRole('button', { name: 'Reveal starting player', exact: true }).click();
+    await ada.getByRole('button', { name: 'Start', exact: true }).click();
+    await menu(ada);
+    await ada.getByRole('button', { name: 'Share live tracker', exact: true }).click();
+    await expect(ada.getByText(new RegExp(code))).toBeVisible();
+    await ada.getByRole('button', { name: 'Show on event monitor', exact: true }).click();
+
+    await monitor.getByRole('button', { name: 'Table 1', exact: true }).click();
+    await expect(monitor.getByRole('heading', { name: 'Table 1' })).toBeVisible();
+    await expect(monitor.getByLabel('Ada: 20 life', { exact: true })).toBeVisible();
+    await expect(monitor.getByRole('button', { name: /Remove 1 life|Transfer to this device/ })).toHaveCount(0);
+
+    await ada.getByRole('button', { name: 'Remove from event monitor', exact: true }).click();
+    await expect(monitor.getByText('No live games are shared on this display yet.')).toBeVisible();
+    await expect(monitor.getByLabel('Ada: 20 life', { exact: true })).toHaveCount(0);
+  } finally {
+    await ada.close();
+    await bea.close();
+    await monitor.close();
+  }
+});

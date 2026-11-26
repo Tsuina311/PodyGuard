@@ -14,6 +14,7 @@ export type TrackerIntent = { mode: 'claim' | 'view' | 'transfer'; generation?: 
 export type ControllerSession = {
   initialHistory: TrackerHistory; onHistory: (history: TrackerHistory) => void;
   canEdit: () => boolean; viewUrl: string;
+  monitor: { code: string; shared: boolean; setShared: (shared: boolean) => Promise<void> };
   finish: (winnerParticipantId: string, durationSeconds: number) => Promise<{ participant: PublicParticipant }>;
 };
 type Cache = { snapshot: EventTrackerSnapshot; history: TrackerHistory; dirty: boolean; handingOff: boolean };
@@ -64,7 +65,9 @@ export function EventTrackerSession({ joinCode, token, storageKey, players, game
   function accept(next: EventTrackerSnapshot, reset = false) {
     if (!alive.current || next.gameId !== gameId) return;
     const before = current.current;
-    if (before && (next.generation < before.generation || (next.generation === before.generation && next.revision < before.revision))) return;
+    if (before && (next.generation < before.generation ||
+      (next.generation === before.generation && (next.revision < before.revision ||
+        (next.revision === before.revision && next.updatedAt < before.updatedAt))))) return;
     const changed = before && next.generation !== before.generation;
     current.current = next;
     if (reset || changed) {
@@ -240,6 +243,15 @@ export function EventTrackerSession({ joinCode, token, storageKey, players, game
     {children({ initialHistory: snapshot.history as unknown as TrackerHistory, onHistory,
       canEdit: () => Boolean(alive.current && current.current?.owned && !handingOff.current),
       viewUrl: `${window.location.origin}${window.location.pathname}#/watch/event-${snapshot.id}?token=${snapshot.readToken}`,
+      monitor: {
+        code: joinCode,
+        shared: snapshot.monitorShared === true,
+        setShared: async (monitorShared) => {
+          const row = current.current;
+          if (!alive.current || !row?.owned || handingOff.current) throw new Error(t('eventTracker.moved'));
+          accept(await post('monitor', { id: row.id, generation: row.generation, monitorShared }));
+        },
+      },
       finish: async (winnerParticipantId, durationSeconds) => {
         await flush();
         if (dirty.current || handingOff.current || !current.current?.owned) throw new Error(t('eventTracker.offline'));
