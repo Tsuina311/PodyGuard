@@ -393,8 +393,11 @@ export function HomePage() {
   function startLocalLimited() {
     setError(null);
     try {
-      createLocalLimitedSession(playLimited);
-      saveLocalLimitedConfig(playLimited);
+      const config = playLimited.tablePlan
+        ? { ...playLimited, tablePlan: { ...playLimited.tablePlan, draft: playLimited.tablePlan.draft.slice(0, 1) } }
+        : playLimited;
+      createLocalLimitedSession(config);
+      saveLocalLimitedConfig(config);
       void navigate('/limited');
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Invalid table layout.');
@@ -711,7 +714,7 @@ export function HomePage() {
             playerCount={playLimited.playerCount}
             onChange={(patch) => updatePlayLimited(patch)}
           />
-          <LimitedTablePlanner value={playLimited.tablePlan} players={playLimited.playerCount}
+          <LimitedTablePlanner singlePod value={playLimited.tablePlan} players={playLimited.playerCount}
             hasDraft={playLimited.mode !== 'SEALED'} onChange={tablePlan => updatePlayLimited({ tablePlan })} />
           <Button
             type="button"

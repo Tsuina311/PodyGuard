@@ -6,13 +6,14 @@ table's shape (square, rectangular or round) and seat count (2–16). Expand
 shape and seats, then apply to the selection. Hosts can configure up to 40
 physical tables.
 
-Limited uses separate drafting and playing plans. Drafting tables are grouped in
-order until there are enough seats for a complete pod. An eight-player draft can
-use two four-seat tables, with seats 1–4 at the first table and 5–8 at the second.
-Playing capacity must cover the duels for every complete draft pod. Sealed has
-no drafting plan.
+Limited uses separate drafting and playing plans. Each drafting table must fit
+a complete pod. Quick Limited uses one drafting table for its pod. Playing
+capacity must cover the duels and stay within the planned player count. An eight-player draft can use one round table for drafting, followed by a
+four-seat table and two two-seat tables for playing. Sealed has no drafting plan.
 
-Playing tables are divided into as many legal games as they can fit. Among
+Playing-table previews draw rectangular mats inside each lettered game area’s
+width. Duel mats face each other across the table. Playing tables are divided
+into as many legal games as they can fit. Among
 equivalent divisions, fill the seats and prefer the organizer's chosen game
 size. Commander with three- and four-player games enabled splits seven seats
 into four plus three. If three-player games are disabled, those spare three
@@ -32,10 +33,10 @@ the optional `physical_tables.area` JSON column (migration 0031). This keeps
 game IDs, tracker ownership, result reporting and stale-release fencing scoped
 to one independently bookable game area.
 
-For drafting, the server claims every area in the pod’s physical table group
-atomically through the Limited session transaction. If an area is occupied, the
-whole pod’s table group is unavailable. Moving a draft reservation moves the
-whole group.
+For drafting, the server groups areas by physical table and claims every part
+in the group atomically through the existing Limited session transaction. A
+physical table with any occupied part cannot be assigned to a draft. Moving a
+draft reservation expands the selected physical table to all its areas too.
 Draft claims are released when play starts and each duel claims its own area.
 Draft-only tables have zero playing capacity and cannot host a playing game.
 

@@ -1,13 +1,21 @@
-import type { TableShape } from '@podyguard/shared';
-import { tableDiagramSize, tableSeatGeometry } from './table-seat-geometry';
-
 export type LimitedSeatLayout = 'square' | 'long';
+
+const SQUARE: Record<number, number[][]> = {
+  4: [
+    [0, 1, 0],
+    [4, 0, 2],
+    [0, 3, 0],
+  ],
+  8: [
+    [8, 1, 2],
+    [7, 0, 3],
+    [6, 5, 4],
+  ],
+};
 
 export function LimitedSeatMap({
   shape,
   seatCount,
-  seatOffset = 0,
-  tableLabel = 'Table',
   occupants,
   selfId,
   disabled,
@@ -15,10 +23,8 @@ export function LimitedSeatMap({
   onLayout,
   onPick,
 }: {
-  shape?: TableShape;
+  shape?: import('@podyguard/shared').TableShape;
   seatCount: number;
-  seatOffset?: number;
-  tableLabel?: string;
   occupants: Array<{ participantId: string; displayName: string; seat: number }>;
   selfId: string;
   disabled?: boolean;
@@ -27,14 +33,10 @@ export function LimitedSeatMap({
   onPick: (seat: number) => void;
 }) {
   const bySeat = new Map(occupants.map((row) => [row.seat, row]));
-  const long = !shape && seatCount === 4 && layout === 'long';
-  const { table, mats } = tableSeatGeometry(shape ?? (long ? 'rectangle' : 'square'), seatCount);
-  // The original four-seat long layout numbers both rows left to right.
-  const positions = long ? [mats[0]!, mats[1]!, mats[3]!, mats[2]!] : mats;
-  const xPercent = (pixels: number) => `${pixels / tableDiagramSize.width * 100}%`;
-  const yPercent = (pixels: number) => `${pixels / tableDiagramSize.height * 100}%`;
+  const square = SQUARE[seatCount];
+  const long = seatCount === 4 && layout === 'long';
 
-  function chair(seat: number, mat: (typeof mats)[number]) {
+  function chair(seat: number) {
     const person = bySeat.get(seat);
     const mine = person?.participantId === selfId;
     return (
@@ -43,9 +45,7 @@ export function LimitedSeatMap({
         type="button"
         disabled={disabled}
         onClick={() => onPick(seat)}
-        style={{ left: xPercent(mat.x), top: yPercent(mat.y), width: xPercent(mat.width), height: yPercent(mat.height) }}
-        data-edge={mat.edge}
-        className={`absolute flex min-h-10 min-w-10 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-md border px-0.5 text-center text-xs font-semibold ${
+        className={`flex min-h-16 min-w-16 flex-col items-center justify-center rounded-xl border px-2 py-2 text-center text-xs font-semibold ${
           mine
             ? 'border-neon bg-neon/15 text-neon'
             : person
@@ -53,10 +53,10 @@ export function LimitedSeatMap({
               : 'border-dashed border-white/25 text-muted'
         }`}
       >
-        <span className="font-mono text-[0.65rem] uppercase">
+        <span className="font-mono text-[0.65rem] uppercase tracking-widest">
           Seat {seat}
         </span>
-        <span className="max-w-full truncate">
+        <span className="mt-1 max-w-20 truncate">
           {person ? person.displayName : 'Open'}
         </span>
       </button>
@@ -83,26 +83,61 @@ export function LimitedSeatMap({
           </LayoutButton>
         </div>
       ) : null}
-      {!shape && <p className="text-muted mb-3 text-center text-xs">
+      <p className="text-muted mb-3 text-center text-xs">
         {long
           ? 'Two players sit across from two. You play the person in front of you first.'
           : seatCount === 4
             ? 'One player on each side. You play the person opposite you first.'
             : 'Tap a seat. You can swap once you have a chair.'}
-      </p>}
-      <div className="relative mx-auto aspect-[360/280] w-full max-w-sm">
-        <div
-          className="absolute flex items-center justify-center border border-neon/40 bg-neon/5 px-2 text-center text-xs text-muted"
-          style={{
-            left: xPercent(table.x), top: yPercent(table.y),
-            width: xPercent(table.width), height: yPercent(table.height),
-            borderRadius: shape === 'round' ? '50%' : '0.75rem',
-          }}
-        >
-          {tableLabel}
+      </p>
+      {shape ? (
+        <div className="relative mx-auto h-80 w-full max-w-sm">
+          <div className={`absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center border border-neon/40 bg-neon/5 text-xs text-muted ${shape === 'round' ? 'size-24 rounded-full' : shape === 'rectangle' ? 'h-20 w-36 rounded-xl' : 'size-24 rounded-xl'}`}>Table</div>
+          {Array.from({ length: seatCount }, (_, index) => {
+            const angle = index * 2 * Math.PI / seatCount - Math.PI / 2;
+            return <div key={index} className="absolute -translate-x-1/2 -translate-y-1/2"
+              style={{ left: `${50 + 37 * Math.cos(angle)}%`, top: `${50 + 38 * Math.sin(angle)}%` }}>{chair(index + 1)}</div>;
+          })}
         </div>
-        {positions.map((mat, index) => chair(seatOffset + index + 1, mat))}
-      </div>
+      ) : long ? (
+        <div className="mx-auto flex w-full max-w-xs flex-col gap-2">
+          <div className="grid grid-cols-2 gap-2">{chair(1)}{chair(2)}</div>
+          <div className="border-muted/30 text-muted mx-4 flex h-8 items-center justify-center rounded-full border text-[0.65rem] uppercase tracking-widest">
+            Table
+          </div>
+          <div className="grid grid-cols-2 gap-2">{chair(3)}{chair(4)}</div>
+        </div>
+      ) : square ? (
+        <div className="mx-auto grid w-full max-w-sm gap-2">
+          {square.map((row, rowIndex) => (
+            <div
+              key={rowIndex}
+              className="grid grid-cols-3 items-center justify-items-center gap-2"
+            >
+              {row.map((seat, column) =>
+                seat === 0 ? (
+                  <div
+                    key={`${rowIndex}-${column}`}
+                    className={
+                      rowIndex === 1 && column === 1
+                        ? 'border-muted/30 text-muted flex size-16 items-center justify-center rounded-full border text-[0.65rem] uppercase tracking-widest'
+                        : 'size-16'
+                    }
+                  >
+                    {rowIndex === 1 && column === 1 ? 'Table' : null}
+                  </div>
+                ) : (
+                  chair(seat)
+                ),
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-wrap justify-center gap-2">
+          {Array.from({ length: seatCount }, (_, index) => chair(index + 1))}
+        </div>
+      )}
     </div>
   );
 }

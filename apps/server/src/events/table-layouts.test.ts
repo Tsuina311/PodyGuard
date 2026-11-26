@@ -33,8 +33,8 @@ describe('table layouts through the event API', () => {
     expect(snapshot.tables.map(table => table.label)).toEqual(['Table 1 · Part A', 'Table 1 · Part B']);
     expect(snapshot.tables.map(table => table.area?.seats)).toEqual([4, 3]);
   }, 15_000);
-  it('reserves two four-seat draft tables as one eight-player pod, then assigns four duels to a 4 + 2 + 2 playing layout', async () => {
-    const tablePlan: LimitedTablePlan = { draft: [{ shape: 'square', seats: 4 }, { shape: 'rectangle', seats: 4 }], play: [
+  it('reserves the entire draft table, then assigns four duels to a 4 + 2 + 2 playing layout', async () => {
+    const tablePlan: LimitedTablePlan = { draft: [{ shape: 'round', seats: 8 }], play: [
       { shape: 'square', seats: 4 }, { shape: 'rectangle', seats: 2 }, { shape: 'round', seats: 2 },
     ] };
     const { app, events, response, store } = await fixture({ limitedModeConfigs: [{ ...defaultLimitedEventModeConfig('BOOSTER_DRAFT'), totalRounds: 1, tablePlan }] });
@@ -50,9 +50,9 @@ describe('table layouts through the event API', () => {
     const assigned = await app.inject({ method: 'POST', url: `/events/${joinCode}/limited/assign`, headers: { authorization: `Bearer ${hostToken}` }, payload: { mode: 'BOOSTER_DRAFT' } });
     expect(assigned.statusCode, assigned.body).toBe(200);
     const session = assigned.json().session;
-    expect(session.draftTableIds).toHaveLength(3);
+    expect(session.draftTableIds).toHaveLength(2);
     const snapshot = await events.getSnapshot(joinCode);
-    expect(snapshot.tables.filter(table => table.status === 'occupied').map(table => table.area?.tableNumber)).toEqual([1, 1, 2]);
+    expect(snapshot.tables.filter(table => table.status === 'occupied').map(table => table.area?.tableNumber)).toEqual([1, 1]);
     for (let index = 0; index < players.length; index++) {
       const headers = { authorization: `Bearer ${players[index]!.token}` };
       await app.inject({ method: 'POST', url: `/events/${joinCode}/limited/sessions/${session.id}/seat`, headers, payload: { seat: index + 1 } });
@@ -64,7 +64,7 @@ describe('table layouts through the event API', () => {
     }
     // Occupy all extra playing areas. Starting a round must fail without
     // creating unassigned games or losing the original draft reservations.
-    for (const table of snapshot.tables.filter(table => table.area?.tableNumber === 3)) {
+    for (const table of snapshot.tables.filter(table => table.area?.tableNumber !== 1)) {
       await store.claimTable({ eventId: snapshot.event.id, tableId: table.id,
         ownerType: 'MANUAL_RESERVATION', ownerId: 'other-game', purpose: 'HOLD' });
     }

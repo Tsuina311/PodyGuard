@@ -1252,7 +1252,7 @@ export class EventService {
     if (ready < needed) {
       throw new InvalidParticipantTransitionError(
         `${ready} of ${needed} players are ready. ${groups.length} ${
-          groups.length === 1 ? 'pod needs' : 'pods each need'
+          groups.length === 1 ? 'table needs' : 'tables each need'
         } ${podSize}.`,
       );
     }
@@ -1739,16 +1739,12 @@ export class EventService {
       );
     }
     const tables = await this.store.listTables(event.id);
-    let expandedIds = tableIds;
-    if (tableIds.length && tables.some(table => table.area)) {
-      const owned = new Set(session.draftTableIds);
-      const available = tables.map(table => owned.has(table.id) ? { ...table, status: 'free' } : table);
-      const podSize = session.preferredCohortSize ?? session.minCohortSize;
-      const group = limitedTableGroups(available, true, podSize)
-        .find(candidate => tableIds.every(id => candidate.some(table => table.id === id)));
-      if (!group) throw new InvalidEventInputError('Choose an available group of tables for the complete draft pod.');
-      expandedIds = group.map(table => table.id);
-    }
+    const selectedNumbers = new Set(tables.filter(table => tableIds.includes(table.id) && table.area?.draft).map(table => table.area!.tableNumber));
+    const expandedIds = [...new Set([...tableIds, ...tables.filter(table => table.area && selectedNumbers.has(table.area.tableNumber)).map(table => table.id)])];
+    if (tableIds.some(id => {
+      const table = tables.find(table => table.id === id);
+      return table?.area && (!table.area.draft || table.area.draft.seats < session.participants.length);
+    })) throw new InvalidEventInputError('Choose a table that seats the complete draft pod.');
     const updated = await this.store.replaceLimitedDraftTables(
       session.id,
       expandedIds,

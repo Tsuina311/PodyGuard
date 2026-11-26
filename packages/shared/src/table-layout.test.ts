@@ -25,22 +25,18 @@ describe('physical table layouts', () => {
     tables[1]!.status = 'occupied';
     expect(limitedTableGroups(tables, true, 8)).toEqual([]);
   });
-  it('groups contiguous physical tables into complete draft pods and reserves every area together', () => {
-    const draft = [{ shape: 'square', seats: 4 }, { shape: 'rectangle', seats: 4 }, { shape: 'round', seats: 8 }] as const;
-    const play = [{ shape: 'rectangle', seats: 8 }, { shape: 'rectangle', seats: 8 }] as const;
-    expect(validateLimitedTablePlan({ draft, play }, 8, true).draft).toHaveLength(3);
-    const tables = buildTableAreas([...play], [2], 2, [...draft])
-      .map((row, index) => ({ ...row, id: String(index), status: 'free' }));
-    expect(limitedTableGroups(tables, true, 8).map(group => [...new Set(group.map(table => table.area.tableNumber))]))
-      .toEqual([[1, 2], [3]]);
-    tables[1]!.status = 'occupied';
-    expect(limitedTableGroups(tables, true, 8).map(group => group.map(table => table.area.tableNumber)))
-      .toEqual([[3]]);
-  });
   it('groups Sealed deckbuilding seats without treating every duel space as a separate cohort', () => {
     const tables = buildTableAreas(defaultLimitedTablePlan(4, false).play, [2], 2)
       .map((row, index) => ({ ...row, id: String(index), status: 'free' }));
     expect(limitedTableGroups(tables, false, 4)).toHaveLength(1);
+  });
+  it('caps playing seats across the tables at the total planned players', () => {
+    const draft = [{ shape: 'round', seats: 8 }] as const;
+    const play = [{ shape: 'square', seats: 4 }, { shape: 'rectangle', seats: 2 }, { shape: 'square', seats: 2 }] as const;
+    expect(validateLimitedTablePlan({ draft, play }, 8, true).play).toHaveLength(3);
+    expect(() => validateLimitedTablePlan({ draft, play: [...play, play[2]] }, 8, true)).toThrow('at most 8 seats');
+    expect(validateLimitedTablePlan({ draft: [...draft, ...draft], play: [...play, ...play] }, 8, true).play).toHaveLength(6);
+    expect(validateLimitedTablePlan(defaultLimitedTablePlan(5, false), 5, false).play).toHaveLength(2);
   });
   it('rejects malformed, too small and insufficient layouts', () => {
     expect(() => validateTableLayouts([{ shape: 'triangle', seats: 8 }])).toThrow();

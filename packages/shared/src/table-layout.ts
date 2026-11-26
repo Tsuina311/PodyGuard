@@ -51,32 +51,22 @@ export function validateTableLayouts(value: unknown): TableLayout[] {
   });
 }
 
-/** Group whole physical tables in order without splitting one table between draft pods. */
-export function partitionDraftTables<T extends { seats: number }>(tables: readonly T[], players: number) {
-  const groups: T[][] = [];
-  let remaining: T[] = [];
-  let seats = 0;
-  for (const table of tables) {
-    remaining.push(table);
-    seats += table.seats;
-    if (seats >= players) {
-      groups.push(remaining);
-      remaining = [];
-      seats = 0;
-    }
-  }
-  return { groups, remaining };
+export function limitedPlayingSeatBudget(playersPerPod: number, draftTableCount: number): number {
+  return playersPerPod * Math.max(1, draftTableCount);
 }
 
 export function validateLimitedTablePlan(value: unknown, players: number, hasDraft: boolean): LimitedTablePlan {
   const plan = value as LimitedTablePlan;
   const play = validateTableLayouts(plan?.play);
   const draft = hasDraft ? validateTableLayouts(plan?.draft) : [];
-  const { groups, remaining } = partitionDraftTables(draft, players);
-  if (hasDraft && (!groups.length || remaining.length)) {
-    throw new Error('Drafting tables must seat a complete draft pod together.');
+  if (hasDraft && draft.some(table => table.seats < players)) {
+    throw new Error('Each drafting table must seat a complete draft pod.');
   }
-  if (play.reduce((sum, table) => sum + Math.floor(table.seats / 2), 0) < Math.max(1, groups.length) * Math.floor(players / 2)) {
+  const maxSeats = limitedPlayingSeatBudget(players, draft.length);
+  if (play.reduce((sum, table) => sum + table.seats, 0) > maxSeats) {
+    throw new Error(`Provide at most ${maxSeats} seats across the playing tables.`);
+  }
+  if (play.reduce((sum, table) => sum + Math.floor(table.seats / 2), 0) < Math.max(1, draft.length) * Math.floor(players / 2)) {
     throw new Error('The playing tables need enough two-player spaces for a complete pod.');
   }
   return { draft, play };
@@ -85,7 +75,7 @@ export function validateLimitedTablePlan(value: unknown, players: number, hasDra
 export function defaultLimitedTablePlan(players: number, hasDraft = true): LimitedTablePlan {
   return {
     draft: hasDraft ? [{ shape: 'round', seats: players }] : [],
-    play: Array.from({ length: Math.ceil(players / 2) }, () => ({ shape: 'square', seats: 2 })),
+    play: Array.from({ length: Math.floor(players / 2) }, () => ({ shape: 'square', seats: 2 })),
   };
 }
 
@@ -152,22 +142,16 @@ export function buildTableAreas(play: TableLayout[], allowed: readonly number[],
 export function limitedTableGroups<T extends { id: string; status: string; area?: TableArea }>(tables: T[], hasDraft: boolean, players: number): T[][] {
   if (!tables.some(table => table.area)) return tables.filter(table => table.status === 'free').map(table => [table]);
   if (hasDraft) {
-    const physicalTables = new Map<number, { seats: number; areas: T[] }>();
+    const groups = new Map<string, T[]>();
     for (const table of tables) {
-      if (!table.area?.draft) continue;
-      const physical = physicalTables.get(table.area.tableNumber) ?? {
-        seats: table.area.draft.seats,
-        areas: [],
-      };
-      physical.areas.push(table);
-      physicalTables.set(table.area.tableNumber, physical);
+      if (!table.area) { groups.set(table.id, [table]); continue; }
+      if (!table.area?.draft || table.area.draft.seats < players) continue;
+      const groupKey = `physical-${table.area.tableNumber}`;
+      const group = groups.get(groupKey) ?? [];
+      group.push(table);
+      groups.set(groupKey, group);
     }
-    const ordered = [...physicalTables].sort(([left], [right]) => left - right).map(([, table]) => table);
-    const { groups } = partitionDraftTables(ordered, players);
-    return [
-      ...groups.map(group => group.flatMap(table => table.areas)),
-      ...tables.filter(table => !table.area).map(table => [table]),
-    ].filter(group => group.every(table => table.status === 'free'));
+    return [...groups.values()].filter(group => group.every(table => table.status === 'free'));
   }
   const groups: T[][] = [];
   let group: T[] = [];

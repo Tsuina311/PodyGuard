@@ -14,47 +14,24 @@ export const LIMITED_MODE_LABELS: Record<LimitedMode, string> = {
   SEALED: 'Sealed',
 };
 
-export function limitedSeatingMaps(snapshot: EventSnapshot, session: PublicLimitedSession, seatCount: number) {
-  const maps = [];
-  const seenPhysicalTables = new Set<number>();
-  let seatOffset = 0;
-  for (const id of session.draftTableIds) {
-    const table = snapshot.tables.find(row => row.id === id);
-    if (!table?.area || seatOffset >= seatCount) continue;
-    const sealed = session.mode === 'SEALED';
-    const layout = sealed
-      ? { shape: table.area.shape, seats: table.area.seats }
-      : table.area.draft;
-    if (!layout || (!sealed && seenPhysicalTables.has(table.area.tableNumber))) continue;
-    seenPhysicalTables.add(table.area.tableNumber);
-    const seats = Math.min(layout.seats, seatCount - seatOffset);
-    if (seats <= 0) continue;
-    maps.push({
-      label: sealed ? table.label : draftTableLabel(table)!,
-      shape: layout.shape,
-      seats,
-      seatOffset,
-    });
-    seatOffset += seats;
-  }
-  return maps;
-}
-
 export function limitedSeatingDestination(snapshot: EventSnapshot, session: PublicLimitedSession | undefined, participantId?: string): string | null {
   if (!session) return null;
-  const seatCount = session.preferredCohortSize ?? session.minCohortSize;
-  const maps = limitedSeatingMaps(snapshot, session, seatCount);
-  const seat = session.participants.find(person => person.participantId === participantId)?.draftSeat;
-  if (seat) {
-    const map = maps.find(row => seat > row.seatOffset && seat <= row.seatOffset + row.seats);
-    if (map) return map.label;
-  }
-  const labels = session.draftTableIds.flatMap(id => {
-    const table = snapshot.tables.find(row => row.id === id);
-    if (!table) return [];
-    return [session.mode === 'SEALED' ? table.label : draftTableLabel(table)!];
+  const tables = session.draftTableIds.flatMap(id => {
+    const table = snapshot.tables.find(table => table.id === id);
+    return table ? [table] : [];
   });
-  return [...new Set(labels)].join(' + ') || null;
+  if (session.mode === 'SEALED') {
+    const seat = session.participants.find(person => person.participantId === participantId)?.draftSeat;
+    if (seat) {
+      let remaining = seat;
+      for (const table of tables) {
+        remaining -= table.area?.seats ?? session.participants.length;
+        if (remaining <= 0) return table.label;
+      }
+    }
+    return [...new Set(tables.map(table => table.label))].join(' + ') || null;
+  }
+  return [...new Set(tables.map(draftTableLabel).filter(Boolean))].join(' + ') || null;
 }
 
 export function activeLimitedSession(
