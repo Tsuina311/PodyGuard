@@ -85,6 +85,13 @@ for (const format of [
       if (format.label !== 'Sealed') {
         await host.getByRole('button', { name: 'Start draft', exact: true }).click();
         await expect(players[0]!.getByText(format.label === 'Pick-Two Draft' ? /Take two cards each pick/ : /Take one card each pick/)).toBeVisible();
+        if (playgroup) {
+          await host.getByRole('tab', { name: 'Settings', exact: true }).click();
+          const settings = host.getByRole('tabpanel', { name: 'Settings', exact: true });
+          await expect(settings.getByRole('checkbox', { name: 'Show returning-player suggestions on join' })).toBeChecked();
+          await expect(settings.getByRole('link', { name: playgroup.name, exact: true })).toHaveCount(0);
+          await host.getByRole('tab', { name: 'Tables', exact: true }).click();
+        }
         await host.getByRole('button', { name: 'Pause timer', exact: true }).click();
         await expect(host.getByRole('button', { name: 'Resume timer', exact: true })).toBeVisible();
         await host.reload();

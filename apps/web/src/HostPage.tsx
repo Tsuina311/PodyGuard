@@ -1147,7 +1147,7 @@ export function HostPage() {
           </Panel>
           )}
 
-          {event.playgroupId && (
+          {event.playgroupId && !eventHasLimitedQueues(event) && (
             <Link to={`/playgroups/${event.playgroupId}`} className="inline-flex min-h-11 items-center self-start rounded-xl border border-muted/30 px-4 text-neon">
               {event.playgroupName ?? t('navigation.playgroups')}
             </Link>
