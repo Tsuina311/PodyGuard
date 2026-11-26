@@ -68,6 +68,16 @@ try {
     demo.token,
   );
   const tables = await store.listTables(event.id);
+  const layoutEvent = await service.createEvent({
+    name: 'Isolated physical table layout', hostPin: '2468', tableCount: 1,
+    gameMode: 'commander', allowThreePods: true, allowFivePods: false,
+    tableLayouts: [{ shape: 'rectangle', seats: 7 }],
+  }, demo.token);
+  await closeDatabase();
+  const restoredAreas = await new PostgresEventStore().listTables(layoutEvent.event.id);
+  assert.deepEqual(restoredAreas.map(table => [table.label, table.area?.tableNumber, table.area?.part, table.area?.seats]), [
+    ['Table 1 · Part A', 1, 'A', 4], ['Table 1 · Part B', 1, 'B', 3],
+  ]);
   const { PostgresEventTrackerStore } = await import('../apps/server/src/event-tracker/store.ts');
   const trackers = new PostgresEventTrackerStore();
   const trackerContext = `${event.id}:persistence-check`;

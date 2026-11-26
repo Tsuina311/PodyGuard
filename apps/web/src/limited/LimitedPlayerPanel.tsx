@@ -25,6 +25,7 @@ import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { Panel } from '../ui/Panel';
 import { LimitedSeatMap } from './LimitedSeatMap';
+import { draftTableLabel } from '@podyguard/shared';
 import { LimitedTimerDisplay } from './LimitedTimerDisplay';
 import {
   activeLimitedSession,
@@ -332,6 +333,7 @@ export function LimitedPlayerPanel({
       {seatingSession ? (
         <div className="mb-4">
           <LimitedSeatMap
+            shape={snapshot.tables.find(table => table.id === seatingSession.draftTableIds[0])?.area?.draft?.shape}
             seatCount={seatCount}
             selfId={participant.id}
             disabled={busy}
@@ -495,5 +497,5 @@ function tableName(
 ): string | null {
   const tableId = session?.draftTableIds[0];
   if (!tableId) return null;
-  return snapshot.tables.find((table) => table.id === tableId)?.label ?? null;
+  return draftTableLabel(snapshot.tables.find((table) => table.id === tableId));
 }

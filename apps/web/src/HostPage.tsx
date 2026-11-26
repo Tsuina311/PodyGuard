@@ -637,6 +637,10 @@ export function HostPage() {
   }
 
   const counts = countByStatus(participants);
+  const tableInventory = tables.some(table => table.area)
+    ? t('tablePlan.inventory', { tables: new Set(tables.map(table => table.area ? `physical-${table.area.tableNumber}` : table.id)).size,
+      spaces: tables.filter(table => !table.area || table.area.seats > 0).length })
+    : t('host.total', { count: tables.length });
   const queue = queueByWait(participants);
   const readyTables = tables.filter((table) => table.podStatus === 'formed');
   const typicalGameSeconds =
@@ -709,7 +713,9 @@ export function HostPage() {
           onTab={openTab}
           onView={next => { setView(next); window.scrollTo({ top: 0 }); }}
           counts={counts} players={participants.length}
-          freeTables={tables.filter(table => table.status === 'free').length} tables={tables.length}
+          freeTables={tables.filter(table => table.status === 'free' && (!table.area || table.area.seats > 0)).length}
+          tables={tables.filter(table => !table.area || table.area.seats > 0).length}
+          tableAreas={tables.some(table => table.area && table.area.parts > 1)}
           readyTables={readyTables.length} busy={busy} hasPlayerSeat={hasPlayerSeat}
           matching={!isRoundsMode && !event.tournament && !eventHasLimitedQueues(event)}
           startAll={!isRoundsMode && !eventHasLimitedQueues(event)}
@@ -782,7 +788,7 @@ export function HostPage() {
               />
             ) : null}
 
-            <Panel title={t('host.tablesTitle')} aside={t('host.total', { count: tables.length })}>
+            <Panel title={t('host.tablesTitle')} aside={tableInventory}>
               {tables.length === 0 ? (
                 <p className="text-muted text-sm">{t('host.noTables')}</p>
               ) : (
@@ -1201,7 +1207,7 @@ export function HostPage() {
             />
           ) : null}
 
-          <Panel title={t('host.tablesTitle')} aside={t('host.total', { count: tables.length })}>
+          <Panel title={t('host.tablesTitle')} aside={tableInventory}>
             <ul className="grid gap-2 sm:grid-cols-2">
               {tables.map(table => <li key={table.id} className="flex items-center justify-between gap-3 rounded-xl border border-muted/20 p-3">
                 <span className="min-w-0 text-sm font-semibold">{table.label}</span>

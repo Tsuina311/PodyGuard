@@ -84,7 +84,7 @@ export async function createConstructedEvent(
   if (options.playgroupName) await page.getByRole('button', { name: options.playgroupName, exact: true }).click();
   await page.getByLabel('Event name').fill(options.name);
   await page.getByLabel('Host PIN').fill(pin);
-  await page.getByRole('spinbutton', { name: /^Tables\b/ }).fill(String(options.tableCount ?? 1));
+  await page.getByRole('spinbutton', { name: 'Playing tables — Physical tables', exact: true }).fill(String(options.tableCount ?? 1));
 
   const createResponse = page.waitForResponse(
     (response) =>
@@ -122,7 +122,7 @@ export async function createLimitedEvent(
   await page.getByLabel('Event name').fill(options.name);
   await page.getByLabel('Host PIN').fill(pin);
 
-  await page.getByRole('spinbutton', { name: /^Tables\b/ }).fill('1');
+  // The Limited planner defaults to one draft pod and enough separate duels.
 
   const createResponse = page.waitForResponse(
     (response) =>

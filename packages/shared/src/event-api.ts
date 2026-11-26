@@ -99,6 +99,7 @@ export type PublicParticipant = {
 };
 
 export type PublicTable = {
+  area?: import('./table-layout').TableArea;
   id: string;
   /** Identity of the current game; a physical table can be reused. */
   gameId?: string;

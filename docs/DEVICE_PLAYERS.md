@@ -12,6 +12,13 @@ tab. The navigation menu also has **Players on this device**, and saved event
 cards offer a resume action for that event. Recovery uses local credentials and
 works even when the event shortcut has been removed.
 
+Recovery keeps players throughout active events, including waiting, drafting,
+and deckbuilding. On opening recovery or returning to the app, and once a
+minute while it remains open, the browser checks saved events with the server.
+Confirmed closed, expired, or deleted events lose their saved-player entries.
+Network failures never delete credentials. Private tracker data and unsent
+offline actions are retained separately rather than discarded by this cleanup.
+
 On event pages the saved player links are always visible. During a game, they
 are in the main tracker's match menu. **All saved players** opens the recovery
 page. Closing a tab does not leave or forget a seat; explicitly leaving a seat

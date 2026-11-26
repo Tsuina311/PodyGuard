@@ -1,5 +1,8 @@
 import {
   calculateLimitedStandings,
+  buildTableAreas,
+  defaultLimitedTablePlan,
+  validateLimitedTablePlan,
   defaultLimitedEventModeConfig,
   defaultLimitedRounds,
   deterministicDraftSeats,
@@ -29,6 +32,7 @@ const CONFIG_KEY = 'podyguard.limited.local.config';
 const SESSION_KEY = 'podyguard.limited.local.session';
 
 export type LocalLimitedConfig = {
+  tablePlan?: import('@podyguard/shared').LimitedTablePlan;
   mode: LimitedMode;
   playerCount: number;
   matchStructure: LimitedEventModeConfig['matchStructure'];
@@ -67,6 +71,7 @@ export function defaultLocalLimitedConfig(
   return {
     mode,
     playerCount,
+    tablePlan: defaultLimitedTablePlan(playerCount, mode !== 'SEALED'),
     matchStructure: defaults.matchStructure,
     totalRounds: defaults.totalRounds,
     draftMinutes: defaults.draftMinutes,
@@ -156,6 +161,7 @@ function newId(prefix: string): string {
 export function createLocalLimitedSession(
   config: LocalLimitedConfig,
 ): LocalLimitedSession {
+  if (config.tablePlan) validateLimitedTablePlan(config.tablePlan, config.playerCount, config.mode !== 'SEALED');
   validateLimitedCohortSize(config.mode, config.playerCount, {
     allowUndersizedLaunch: true,
     preferredCohortSize: config.playerCount,
@@ -328,6 +334,17 @@ export function startLocalLimitedRound(
         : { ...match, status: 'PLAYING' as const },
     ),
   };
+  const plan = session.config.tablePlan;
+  if (plan) {
+    const areas = buildTableAreas(plan.play, [2], 2);
+    let index = 0;
+    activeRound.matches = activeRound.matches.map(match => {
+      if (!match.playerBId) return match;
+      const area = areas[index++];
+      if (!area) throw new Error('Not enough playing spaces for this round.');
+      return { ...match, tableId: `local-table-${area.area.tableNumber}-${area.area.part}`, tableLabel: area.label };
+    });
+  }
   return persist({
     ...session,
     status: 'ROUND_ACTIVE',

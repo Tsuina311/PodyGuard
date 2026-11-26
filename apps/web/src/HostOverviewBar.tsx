@@ -17,6 +17,7 @@ type Props = {
   players: number;
   freeTables: number;
   tables: number;
+  tableAreas?: boolean;
   readyTables: number;
   busy: boolean;
   matching: boolean;
@@ -67,7 +68,7 @@ export function HostOverviewBar(props: Props) {
       <span className="rounded-lg bg-ink/5 px-1 py-2">{t('host.playerCount', { count: props.players })}</span>
       <span className="rounded-lg bg-neon/10 px-1 py-2 font-semibold text-neon">{t('host.ready', { count: counts.ready })}</span>
       <span className="rounded-lg bg-ink/5 px-1 py-2">{t('host.playing', { count: counts.playing })}</span>
-      <span className="rounded-lg bg-ink/5 px-1 py-2">{t('hostUx.freeTables', { free: props.freeTables, total: props.tables })}</span>
+      <span className="rounded-lg bg-ink/5 px-1 py-2">{t(props.tableAreas ? 'tablePlan.freeSpaces' : 'hostUx.freeTables', { free: props.freeTables, total: props.tables })}</span>
     </div>
     {tab === 'desk' && <>
       <div role="tablist" aria-label={t('hostUx.views')} className="mt-3 grid grid-cols-3 gap-1">

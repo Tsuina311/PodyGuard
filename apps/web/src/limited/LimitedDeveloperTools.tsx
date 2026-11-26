@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { EventSnapshot, LimitedMode, PublicLimitedSession } from '@podyguard/shared';
-import { limitedTablesNeeded } from '@podyguard/shared';
+import { limitedTableGroups, limitedTablesNeeded } from '@podyguard/shared';
 import { addLimitedFakePlayers, advanceLimitedFakes, ApiError } from '../api';
 import { useDeveloperMode } from '../developer-mode';
 import { Button } from '../ui/Button';
@@ -34,7 +34,7 @@ export function LimitedDeveloperTools({
     parsedCount >= 1 &&
     parsedCount <= 8;
   const podSize = selected.preferredCohortSize ?? selected.minCohortSize;
-  const freeTables = snapshot.tables.filter((table) => table.status === 'free').length;
+  const freeTables = limitedTableGroups(snapshot.tables, selected.mode !== 'SEALED', podSize).length;
   const seatsNeeded = limitedTablesNeeded(podSize, freeTables);
   const lobby = snapshot.participants.filter(
     (person) => person.limitedQueueMode === selected.mode,

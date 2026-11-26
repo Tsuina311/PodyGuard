@@ -234,7 +234,9 @@ export function toRoundTableInputs(
   return tables.map((table) => {
     const reservation = byTableId.get(table.id);
     let status: RoundTableInput['status'];
-    if (table.status === 'disabled') {
+    if (table.area?.seats === 0) {
+      status = 'unavailable';
+    } else if (table.status === 'disabled') {
       status = 'disabled';
     } else if (reservation) {
       const ownedByThisRound =
@@ -251,6 +253,7 @@ export function toRoundTableInputs(
     return {
       id: table.id,
       label: table.label,
+      capacity: table.area?.seats,
       status,
       zone: table.zone ?? undefined,
     };

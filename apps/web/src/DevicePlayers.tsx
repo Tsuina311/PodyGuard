@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createPlayerScope, listPlayerSessions, playerPath } from './player-sessions';
+import { useSavedPlayers } from './use-saved-players';
 
 export function DevicePlayers({ joinCode, scope, displayName }: {
   joinCode: string; scope: string; displayName?: string;
 }) {
   const { t } = useTranslation();
+  useSavedPlayers();
   const [players, setPlayers] = useState(() => listPlayerSessions(joinCode));
   const [newScope] = useState(createPlayerScope);
   useEffect(() => {

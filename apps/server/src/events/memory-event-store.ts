@@ -235,6 +235,7 @@ export class MemoryEventStore implements EventStore {
 
   async insertTable(input: NewStoredTable): Promise<StoredTable> {
     const table: StoredTable = {
+      area: input.area,
       id: randomUUID(),
       eventId: input.eventId,
       label: input.label,
@@ -280,6 +281,9 @@ export class MemoryEventStore implements EventStore {
     const table = await this.findTableById(input.tableId);
     if (!table || table.eventId !== input.eventId) {
       throw new TableNotFoundError();
+    }
+    if (table.area && input.seats.length > table.area.seats) {
+      throw new LimitedPersistenceConflictError('This game does not fit in the selected table part.');
     }
     if (table.status !== 'free' || this.tableReservations.has(table.id)) {
       throw new LimitedPersistenceConflictError(

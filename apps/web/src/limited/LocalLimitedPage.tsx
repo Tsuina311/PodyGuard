@@ -12,6 +12,7 @@ import { Field } from '../ui/Field';
 import { Panel } from '../ui/Panel';
 import { ThemeToggleCorner } from '../ui/ThemeToggle';
 import { LimitedTimerDisplay } from './LimitedTimerDisplay';
+import { TablePreview } from './TablePlanner';
 import { LIMITED_MODE_LABELS } from './limited-view';
 import {
   cancelLocalLimitedSession,
@@ -124,7 +125,7 @@ export function LocalLimitedPage() {
       ) : null}
 
       {session.status === 'FORMING' || session.status === 'SEATING' ? (
-        <Panel title={t('localLimited.roster')} aside={t('localLimited.noTables')}>
+        <Panel title={t('localLimited.roster')}>
           <p className="text-muted mb-3 text-sm">
             {t('localLimited.rosterHint')}
           </p>
@@ -161,6 +162,7 @@ export function LocalLimitedPage() {
 
       {session.status === 'DRAFTING' ? (
         <Panel title={t('localLimited.drafting')} aside={t('localLimited.passPacks')}>
+          {session.config.tablePlan?.draft[0] && <TablePreview table={session.config.tablePlan.draft[0]} />}
           <p className="text-muted mb-3 text-sm">
             {t('localLimited.draftHint', {
               packs: modeConfig.boosterPacksPerPlayer,
@@ -251,6 +253,7 @@ export function LocalLimitedPage() {
                   key={match.id}
                   className="rounded-xl border border-white/10 p-3"
                 >
+                  {match.tableLabel && <p className="mb-1 text-xs text-muted">{match.tableLabel}</p>}
                   <p className="mb-2 text-sm font-semibold">
                     {a}{' '}
                     <span className="text-muted font-normal">

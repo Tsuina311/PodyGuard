@@ -257,6 +257,7 @@ export class PostgresEventStore implements EventStore {
     const [row] = await getDb()
       .insert(physicalTables)
       .values({
+        area: input.area,
         eventId: input.eventId,
         label: input.label,
         sortOrder: input.sortOrder,
@@ -315,6 +316,9 @@ export class PostgresEventStore implements EventStore {
         .for('update');
       if (!table || table.eventId !== input.eventId) {
         throw new TableNotFoundError();
+      }
+      if (table.area && input.seats.length > table.area.seats) {
+        throw new LimitedPersistenceConflictError('This game does not fit in the selected table part.');
       }
       const [activeReservation] = await tx
         .select()
@@ -3614,6 +3618,7 @@ function mapChallengeCompletion(
 
 function mapTable(row: typeof physicalTables.$inferSelect): StoredTable {
   return {
+    ...(row.area ? { area: row.area } : {}),
     id: row.id,
     eventId: row.eventId,
     label: row.label,

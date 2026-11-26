@@ -36,6 +36,20 @@ function tables(count: number): RoundTableInput[] {
 }
 
 describe('round helpers', () => {
+  it('uses four legal three-player pods when twelve players cannot fit as three groups of four', () => {
+    const round = generatePodRound({ roundNumber: 1, roundId: 'mixed-capacity', participants: players(12),
+      tables: [4, 3, 4, 3].map((capacity, index) => ({ id: `area${index}`, label: `Area ${index}`, status: 'free' as const, capacity })),
+      preferredPodSize: 4, allowedPodSizes: [4, 3], history: { pods: [], duels: [] }, pairingBasisVersion: 1 });
+    expect(round.assignments.map(assignment => assignment.participantIds.length)).toEqual([3, 3, 3, 3]);
+  });
+  it('assigns Commander groups to fitting parts even when the smaller part sorts first', () => {
+    const round = generatePodRound({ roundNumber: 1, roundId: 'capacity', participants: players(7),
+      tables: [{ id: 'small', label: 'A', status: 'free', capacity: 3 }, { id: 'large', label: 'B', status: 'free', capacity: 4 }],
+      preferredPodSize: 4, allowedPodSizes: [4, 3], history: { pods: [], duels: [] }, pairingBasisVersion: 1 });
+    expect(round.assignments.map(assignment => [assignment.tableId, assignment.participantIds.length]).sort()).toEqual([['large', 4], ['small', 3]]);
+    const larger = round.assignments.find(assignment => assignment.participantIds.length === 4)!;
+    expect(() => moveAssignmentToTable(round, larger.id, { id: 'too-small', label: 'C', status: 'free', capacity: 3 })).toThrow('does not fit');
+  });
   it('recommends a bounded casual round count', () => {
     expect(recommendRoundCount(8)).toBe(3);
     expect(recommendRoundCount(32)).toBe(5);
