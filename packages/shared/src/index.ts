@@ -360,3 +360,4 @@ export type {
 export * from './game-nights';
 export * from './table-view';
 export * from './event-tracker';
+export * from './table-layout';

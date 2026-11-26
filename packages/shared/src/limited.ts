@@ -54,6 +54,7 @@ export type LimitedModeConfig = {
 
 /** Organizer-facing configuration for one Limited queue at a global event. */
 export type LimitedEventModeConfig = {
+  tablePlan?: import('./table-layout').LimitedTablePlan;
   mode: LimitedMode;
   enabled: boolean;
   matchStructure: LimitedMatchStructure;

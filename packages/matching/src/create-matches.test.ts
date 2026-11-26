@@ -25,6 +25,19 @@ function tables(count: number) {
 }
 
 describe('createMatches', () => {
+  it('seats twelve players as four groups of three when available parts cannot hold three groups of four', () => {
+    const people = Array.from({ length: 12 }, (_, index) => player(`p${index}`, index, []));
+    const result = createMatches(people, [4, 3, 4, 3].map((capacity, index) => ({ id: `area${index}`, capacity })));
+    expect(result.matches.map(match => match.seats.length)).toEqual([3, 3, 3, 3]);
+    expect(result.unmatchedIds).toEqual([]);
+  });
+  it('fits seven of eight waiting Commander players into parts of four and three, preserving the remaining identity', () => {
+    const people = Array.from({ length: 8 }, (_, index) => player(`p${index}`, index, []));
+    const result = createMatches(people, [{ id: 'part-b', capacity: 3 }, { id: 'part-a', capacity: 4 }]);
+    expect(result.matches.map(match => [match.tableId, match.seats.length])).toEqual([['part-a', 4], ['part-b', 3]]);
+    expect(result.unmatchedIds).toHaveLength(1);
+    expect(new Set([...result.matches.flatMap(match => match.seats.map(seat => seat.participantId)), ...result.unmatchedIds]).size).toBe(8);
+  });
   it('makes one B3 pod of 4', () => {
     const people = Array.from({ length: 4 }, (_, index) =>
       player(`p${String(index + 1)}`, index, [{ poolId: 'b3' }]),

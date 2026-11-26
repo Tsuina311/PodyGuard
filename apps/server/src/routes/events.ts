@@ -5,6 +5,8 @@ import {
   parseRulesFormat,
   isLimitedMode,
   defaultLimitedEventModeConfig,
+  validateTableLayouts,
+  validateLimitedTablePlan,
   type CommanderSelection,
   type LimitedEventModeConfig,
   type LimitedMatchOutcome,
@@ -72,6 +74,7 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
       name?: unknown;
       hostPin?: unknown;
       tableCount?: unknown;
+      tableLayouts?: unknown;
       gameMode?: unknown;
       rulesFormat?: unknown;
       allowThreePods?: unknown;
@@ -93,6 +96,7 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
           name: typeof body.name === 'string' ? body.name : '',
           hostPin: typeof body.hostPin === 'string' ? body.hostPin : '',
           tableCount: parseTableCount(body.tableCount),
+          tableLayouts: body.tableLayouts === undefined ? undefined : parseTableLayouts(body.tableLayouts),
           gameMode: parseGameMode(body.gameMode),
           rulesFormat: parseRulesFormat(body.rulesFormat),
           allowThreePods:
@@ -1846,6 +1850,9 @@ function parseLimitedModeConfigs(value: unknown): LimitedEventModeConfig[] | und
     const defaults = defaultLimitedEventModeConfig(row.mode);
     return {
       ...defaults,
+      ...(row.tablePlan === undefined ? {} : { tablePlan: parseTablePlan(row.tablePlan,
+        typeof row.preferredCohortSize === 'number' ? row.preferredCohortSize : defaults.preferredCohortSize ?? defaults.minCohortSize,
+        row.mode !== 'SEALED') }),
       enabled: row.enabled === undefined ? defaults.enabled : row.enabled === true,
       matchStructure:
         row.matchStructure === 'BO1' || row.matchStructure === 'BO3'
@@ -1885,6 +1892,16 @@ function parseLimitedModeConfigs(value: unknown): LimitedEventModeConfig[] | und
           : defaults.roundMinutes,
     };
   });
+}
+
+function parseTableLayouts(value: unknown) {
+  try { return validateTableLayouts(value); }
+  catch (error) { throw new InvalidEventInputError(error instanceof Error ? error.message : 'Invalid tables.'); }
+}
+
+function parseTablePlan(value: unknown, players: number, hasDraft: boolean) {
+  try { return validateLimitedTablePlan(value, players, hasDraft); }
+  catch (error) { throw new InvalidEventInputError(error instanceof Error ? error.message : 'Invalid table plan.'); }
 }
 
 function stringArray(value: unknown, field: string): string[] | undefined {

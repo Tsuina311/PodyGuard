@@ -1,4 +1,5 @@
 import {
+  draftTableLabel,
   limitedTimerRemainingSeconds,
   type EventSnapshot,
   type LimitedMatch,
@@ -12,6 +13,26 @@ export const LIMITED_MODE_LABELS: Record<LimitedMode, string> = {
   PICK_TWO_DRAFT: 'Pick-Two Draft',
   SEALED: 'Sealed',
 };
+
+export function limitedSeatingDestination(snapshot: EventSnapshot, session: PublicLimitedSession | undefined, participantId?: string): string | null {
+  if (!session) return null;
+  const tables = session.draftTableIds.flatMap(id => {
+    const table = snapshot.tables.find(table => table.id === id);
+    return table ? [table] : [];
+  });
+  if (session.mode === 'SEALED') {
+    const seat = session.participants.find(person => person.participantId === participantId)?.draftSeat;
+    if (seat) {
+      let remaining = seat;
+      for (const table of tables) {
+        remaining -= table.area?.seats ?? session.participants.length;
+        if (remaining <= 0) return table.label;
+      }
+    }
+    return [...new Set(tables.map(table => table.label))].join(' + ') || null;
+  }
+  return [...new Set(tables.map(draftTableLabel).filter(Boolean))].join(' + ') || null;
+}
 
 export function activeLimitedSession(
   snapshot: EventSnapshot | null,

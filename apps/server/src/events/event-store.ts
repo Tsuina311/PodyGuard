@@ -444,6 +444,7 @@ export type NewStoredDeck = {
 };
 
 export type StoredTable = {
+  area?: import('@podyguard/shared').TableArea;
   id: string;
   eventId: string;
   label: string;
@@ -503,6 +504,7 @@ export type NewStoredPod = {
 };
 
 export type NewStoredTable = {
+  area?: import('@podyguard/shared').TableArea;
   eventId: string;
   label: string;
   sortOrder: number;

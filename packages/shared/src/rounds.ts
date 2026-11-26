@@ -9,6 +9,8 @@
  * unsanctioned events. Not a WPN/EventLink/MTR replacement.
  */
 
+import { allocateTableGames } from './table-layout';
+
 export const EVENT_OPERATION_MODES = ['ROLLING', 'ROUNDS'] as const;
 export type EventOperationMode = (typeof EVENT_OPERATION_MODES)[number];
 
@@ -64,6 +66,7 @@ export const DUEL_MATCH_POINTS = {
 
 export type RoundTableInput = {
   id: string;
+  capacity?: number;
   label: string;
   status: 'free' | 'occupied' | 'disabled' | 'unavailable' | 'reserved';
   zone?: string;
@@ -493,14 +496,12 @@ export function generatePodRound(input: GeneratePodRoundInput): PublicEventRound
     throw new RoundGenerationError('Table lock conflicts prevent generation.', conflicts);
   }
 
-  const sizes = planPodSizes(
-    eligible.length,
-    input.preferredPodSize,
-    input.allowedPodSizes,
-  );
   const availableTables = input.tables
     .filter((table) => table.status === 'free' || table.status === 'reserved')
     .sort((left, right) => left.label.localeCompare(right.label) || left.id.localeCompare(right.id));
+  const sizes = availableTables.some(table => table.capacity !== undefined)
+    ? planPodSizesAtTables(eligible.length, input.preferredPodSize, input.allowedPodSizes, availableTables)
+    : planPodSizes(eligible.length, input.preferredPodSize, input.allowedPodSizes);
   if (availableTables.length < sizes.length) {
     throw new RoundGenerationError('Not enough tables for this round.', [
       {
@@ -836,6 +837,10 @@ export function moveAssignmentToTable(
   assignmentId: string,
   table: RoundTableInput,
 ): PublicEventRound {
+  const assignment = round.assignments.find(row => row.id === assignmentId);
+  if (assignment && (table.capacity ?? Infinity) < assignment.participantIds.length) {
+    throw new Error('This game does not fit in the selected table part.');
+  }
   if (table.status === 'disabled' || table.status === 'unavailable') {
     throw new Error('Table is unavailable.');
   }
@@ -1344,6 +1349,14 @@ function scorePod(
   return score;
 }
 
+function planPodSizesAtTables(count: number, preferred: number, allowed: readonly number[], tables: readonly RoundTableInput[]): number[] {
+  const result = allocateTableGames(count, tables.map(table => table.capacity ?? Math.max(...allowed)), allowed, preferred);
+  if (result.reduce((sum, size) => sum + size, 0) !== count) throw new RoundGenerationError('Not enough fitting game spaces for this round.', [{
+    code: 'INSUFFICIENT_TABLES', message: 'The available table parts cannot seat everybody in legal groups.',
+  }]);
+  return result.filter(size => size > 0).sort((a, b) => b - a);
+}
+
 function assignTablesToPods(input: {
   pods: readonly string[][];
   tables: readonly RoundTableInput[];
@@ -1359,13 +1372,14 @@ function assignTablesToPods(input: {
   const assignments: RoundAssignment[] = [];
 
   input.pods.forEach((pod, index) => {
+    const fits = (entry: RoundTableInput) => !usedTables.has(entry.id) && (entry.capacity ?? Infinity) >= pod.length;
     const locked = pod
       .map((id) => byId.get(id))
       .find((participant) => participant?.tablePreference === 'locked' && participant.lockedTableId);
     let table: RoundTableInput | undefined;
     if (locked?.lockedTableId) {
       table = input.tables.find(
-        (entry) => entry.id === locked.lockedTableId && !usedTables.has(entry.id),
+        (entry) => entry.id === locked.lockedTableId && fits(entry),
       );
       if (!table) {
         throw new RoundGenerationError('Unable to honor a hard table lock.', [
@@ -1388,10 +1402,10 @@ function assignTablesToPods(input: {
         (preferred?.preferredTableId
           ? input.tables.find(
               (entry) =>
-                entry.id === preferred.preferredTableId && !usedTables.has(entry.id),
+                entry.id === preferred.preferredTableId && fits(entry),
             )
           : undefined) ??
-        input.tables.find((entry) => !usedTables.has(entry.id));
+        [...input.tables].filter(fits).sort((a, b) => (a.capacity ?? Infinity) - (b.capacity ?? Infinity))[0];
     }
     if (!table) {
       throw new RoundGenerationError('Ran out of tables while assigning pods.');

@@ -6,7 +6,7 @@ import type {
   LimitedMode,
   PublicLimitedSession,
 } from '@podyguard/shared';
-import { limitedHostCue, limitedModeConfig, limitedTablesNeeded } from '@podyguard/shared';
+import { draftTableLabel, limitedTableGroups, limitedHostCue, limitedModeConfig, limitedTablesNeeded } from '@podyguard/shared';
 import {
   advanceLimitedPhase,
   ApiError,
@@ -28,6 +28,7 @@ import { LimitedDeveloperTools } from './LimitedDeveloperTools';
 import { LimitedTimerDisplay } from './LimitedTimerDisplay';
 import {
   LIMITED_MODE_LABELS,
+  limitedSeatingDestination,
   participantName,
   queuedParticipants,
   scoreForOutcome,
@@ -79,7 +80,7 @@ export function LimitedHostPanel({
         {configs.map((config) => {
           const queue = queuedParticipants(snapshot, config.mode);
           const podSize = config.preferredCohortSize ?? config.minCohortSize;
-          const freeTables = snapshot.tables.filter((table) => table.status === 'free').length;
+          const freeTables = limitedTableGroups(snapshot.tables, config.mode !== 'SEALED', podSize).length;
           const seatsNeeded = limitedTablesNeeded(podSize, freeTables);
           const readyCount = queue.filter((person) => person.status === 'ready').length;
           const cue = limitedHostCue({
@@ -298,7 +299,7 @@ function LimitedSessionHostCard({
         <fieldset className="mb-3 rounded-lg border border-white/10 p-3">
           <legend className="text-muted px-1 text-xs">Draft tables</legend>
           <div className="flex flex-wrap gap-2">
-            {snapshot.tables.map((table) => {
+            {snapshot.tables.filter(table => !table.area || table.area.draft && table.area.part === 'A').map((table) => {
               const selected = session.draftTableIds.includes(table.id);
               return (
                 <label
@@ -317,7 +318,7 @@ function LimitedSessionHostCard({
                     onChange={() => {
                       const tableIds = selected
                         ? session.draftTableIds.filter(
-                            (tableId) => tableId !== table.id,
+                            (tableId) => table.area ? snapshot.tables.find(row => row.id === tableId)?.area?.tableNumber !== table.area.tableNumber : tableId !== table.id,
                           )
                         : [...session.draftTableIds, table.id];
                       void run(() =>
@@ -330,7 +331,7 @@ function LimitedSessionHostCard({
                       );
                     }}
                   />
-                  {table.label}
+                  {draftTableLabel(table)}
                 </label>
               );
             })}
@@ -394,8 +395,7 @@ function LimitedSessionHostCard({
       <SessionStep
         session={session}
         tableLabel={
-          snapshot.tables.find((table) => table.id === session.draftTableIds[0])?.label ??
-          null
+          limitedSeatingDestination(snapshot, session)
         }
       />
 

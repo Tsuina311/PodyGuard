@@ -1,4 +1,8 @@
 import {
+  buildTableAreas,
+  limitedTableGroups,
+  validateTableLayouts,
+  validateLimitedTablePlan,
   parsePregameAgreement,
   challengeInPack,
   cloneOfficialPack,
@@ -213,6 +217,7 @@ export type CreateEventInput = {
   name: string;
   hostPin: string;
   tableCount: number;
+  tableLayouts?: import('@podyguard/shared').TableLayout[];
   gameMode?: GameMode;
   rulesFormat?: RulesFormat;
   allowThreePods?: boolean;
@@ -372,6 +377,22 @@ export class EventService {
       ? input.allowThreePods ?? true
       : resolveAllowThreePods(gameMode, preferredPodSize, false);
     const labels = resolveTableLabels({ count: input.tableCount }, 0);
+    const limitedPlan = limitedModeConfigs.find(config => config.enabled && config.tablePlan)?.tablePlan;
+    if (limitedPlan && limitedModeConfigs.some(config => config.enabled && config.tablePlan && JSON.stringify(config.tablePlan) !== JSON.stringify(limitedPlan))) {
+      throw new InvalidEventInputError('Enabled Limited modes must share the same physical table plan.');
+    }
+    let areas: ReturnType<typeof buildTableAreas> | undefined;
+    try {
+      const play = limitedPlan?.play ?? (input.tableLayouts ? validateTableLayouts(input.tableLayouts) : undefined);
+      if (play) {
+        const policy = limitedPlan ? { allowedSizes: [2], preferredSize: 2 }
+          : tournamentFormat ? { allowedSizes: [tournamentOptions.matchSize ?? 2], preferredSize: tournamentOptions.matchSize ?? 2 }
+          : eventMatchOptions({ gameMode, preferredPodSize, allowThreePods, allowFivePods });
+        areas = buildTableAreas(play, policy.allowedSizes!, policy.preferredSize!, limitedPlan?.draft);
+      }
+    } catch (error) {
+      throw new InvalidEventInputError(error instanceof Error ? error.message : 'Invalid table layout.');
+    }
     const hostCredentialHash = await hashHostPin(hostPin);
     let initialTournamentState: TournamentState | undefined;
     if (tournamentFormat) {
@@ -439,10 +460,11 @@ export class EventService {
       throw new JoinCodeConflictError();
     }
 
-    for (const [index, label] of labels.entries()) {
+    for (const [index, entry] of (areas ?? labels.map(label => ({ label, area: undefined }))).entries()) {
       await this.store.insertTable({
         eventId: stored.id,
-        label,
+        label: entry.label,
+        area: entry.area,
         sortOrder: index,
       });
     }
@@ -1205,41 +1227,40 @@ export class EventService {
     const event = await this.requireHostToken(joinCode, hostToken);
     const config = requireEnabledLimitedConfig(event, input.mode);
     const podSize = config.preferredCohortSize ?? config.minCohortSize;
-    let tables = (await this.store.listTables(event.id))
-      .filter((table) => table.status === PhysicalTableStatus.Free)
+    const allTables = (await this.store.listTables(event.id))
       .sort(
         (left, right) =>
           left.sortOrder - right.sortOrder || left.id.localeCompare(right.id),
       );
+    let groups = limitedTableGroups(allTables, config.mode !== 'SEALED', podSize);
     const requested = input.draftTableIds?.filter((id) => id.length > 0);
     if (requested?.length) {
-      const allowed = new Set(tables.map((table) => table.id));
-      tables = requested
-        .filter((id) => allowed.has(id))
-        .map((id) => tables.find((table) => table.id === id)!)
-        .filter(Boolean);
+      groups = groups.filter(group => group.some(table => requested.includes(table.id)));
+      if (requested.some(id => !groups.some(group => group.some(table => table.id === id)))) {
+        throw new InvalidEventInputError('A requested draft table is unavailable.');
+      }
     }
-    if (tables.length === 0) {
+    if (groups.length === 0) {
       throw new InvalidParticipantTransitionError(
         'There is no free table to assign. Free a table, then try again.',
       );
     }
-    const needed = limitedTablesNeeded(podSize, tables.length);
+    const needed = limitedTablesNeeded(podSize, groups.length);
     const ready = (await this.limitedQueue(event.id, config.mode)).filter(
       (person) => person.status === ParticipantStatus.Ready,
     ).length;
     if (ready < needed) {
       throw new InvalidParticipantTransitionError(
-        `${ready} of ${needed} players are ready. ${tables.length} ${
-          tables.length === 1 ? 'table needs' : 'tables each need'
+        `${ready} of ${needed} players are ready. ${groups.length} ${
+          groups.length === 1 ? 'table needs' : 'tables each need'
         } ${podSize}.`,
       );
     }
     let first: PublicLimitedSession | undefined;
-    for (const table of tables) {
+    for (const group of groups) {
       const created = await this.createLimitedSessionFromQueue(event, config, {
         participantCount: podSize,
-        draftTableIds: [table.id],
+        draftTableIds: group.map(table => table.id),
         automatic: false,
         readyOnly: true,
         leaveSeatsOpen: true,
@@ -1717,9 +1738,16 @@ export class EventService {
         'Sealed sessions do not use draft-table reservations.',
       );
     }
+    const tables = await this.store.listTables(event.id);
+    const selectedNumbers = new Set(tables.filter(table => tableIds.includes(table.id) && table.area?.draft).map(table => table.area!.tableNumber));
+    const expandedIds = [...new Set([...tableIds, ...tables.filter(table => table.area && selectedNumbers.has(table.area.tableNumber)).map(table => table.id)])];
+    if (tableIds.some(id => {
+      const table = tables.find(table => table.id === id);
+      return table?.area && (!table.area.draft || table.area.draft.seats < session.participants.length);
+    })) throw new InvalidEventInputError('Choose a table that seats the complete draft pod.');
     const updated = await this.store.replaceLimitedDraftTables(
       session.id,
-      tableIds,
+      expandedIds,
     );
     await this.track(event.id, 'limited_host_override');
     return toPublicLimitedSession(updated, this.now());
@@ -1924,18 +1952,25 @@ export class EventService {
       ),
       bestOf: session.matchStructure === 'BO1' ? 1 : 3,
     });
-    const draftTableIds = new Set(session.draftTableIds);
-    const tables = (await this.store.listTables(event.id))
+    const [eventTables, reservations] = await Promise.all([
+      this.store.listTables(event.id), this.store.listActiveTableReservations(event.id),
+    ]);
+    const draftTableIds = new Set(reservations.filter(reservation => reservation.ownerType === 'LIMITED_SESSION' && reservation.ownerId === session.id).map(reservation => reservation.tableId));
+    const tables = eventTables
       .filter(
         (table) =>
           table.status === PhysicalTableStatus.Free ||
           draftTableIds.has(table.id),
       )
+      .filter(table => !table.area || table.area.seats >= 2)
       .sort(
         (left, right) =>
           left.sortOrder - right.sortOrder || left.id.localeCompare(right.id),
       );
     let tableIndex = 0;
+    if (eventTables.some(table => table.area) && tables.length < paired.matches.filter(match => match.playerBId).length) {
+      throw new InvalidParticipantTransitionError('Not enough free playing spaces for this round. Free a table and try again.');
+    }
     const now = this.now();
     await this.store.createLimitedRound({
       sessionId: session.id,
@@ -3791,12 +3826,10 @@ export class EventService {
     let tournamentState = initialState;
     const created: PublicPod[] = [];
 
-    for (let index = 0; index < Math.min(pending.length, freeTables.length); index += 1) {
-      const match = pending[index];
-      const table = freeTables[index];
-      if (!match || !table) {
-        continue;
-      }
+    for (const match of pending) {
+      const index = freeTables.findIndex(table => !table.area || table.area.seats >= match.participantIds.length);
+      if (index < 0) continue;
+      const table = freeTables.splice(index, 1)[0]!;
       const treacheryRoles =
         event.gameMode === 'treachery'
           ? assignTreacheryRoles(match.participantIds)
@@ -3882,7 +3915,8 @@ export class EventService {
           preference: deck.preference,
         })),
       })),
-      freeTables.map((table) => ({ id: table.id })),
+      freeTables.filter(table => !table.area || table.area.seats > 0)
+        .map((table) => ({ id: table.id, capacity: table.area?.seats })),
       { groups: history },
       matchOptions,
     );
@@ -4803,6 +4837,8 @@ function normalizeLimitedModeConfigs(
       );
     }
     try {
+      if (config.tablePlan) validateLimitedTablePlan(config.tablePlan,
+        config.preferredCohortSize ?? config.minCohortSize, domain.hasDraftPhase);
       validateLimitedCohortSize(config.mode, config.minCohortSize, {
         allowUndersizedLaunch: true,
         preferredCohortSize: config.preferredCohortSize,
@@ -5211,6 +5247,7 @@ function toPublicTable(
   return {
     id: row.id,
     ...(gameId ? { gameId } : {}),
+    ...(row.area ? { area: row.area } : {}),
     label: row.label,
     sortOrder: row.sortOrder,
     status: row.status,

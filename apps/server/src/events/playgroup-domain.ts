@@ -330,7 +330,11 @@ export async function buildPlaygroupOverview(
       name: latestEvent.name,
       gameMode: latestEvent.gameMode,
       rulesFormat: latestEvent.rulesFormat,
-      tableCount: Math.max(1, tables.length),
+      tableCount: Math.max(1, new Set(tables.map(table => table.area ? `physical-${table.area.tableNumber}` : table.id)).size),
+      ...(tables.some(table => table.area) && !latestEvent.limitedModeConfigs.some(config => config.enabled) ? {
+        tableLayouts: [...new Map(tables.map(table => [table.area ? `physical-${table.area.tableNumber}` : table.id,
+          table.area ? { shape: table.area.shape, seats: table.area.totalSeats } : { shape: 'square' as const, seats: latestEvent.preferredPodSize }])).values()],
+      } : {}),
       preferredPodSize: latestEvent.preferredPodSize,
       allowThreePods: latestEvent.allowThreePods,
       allowFivePods: latestEvent.allowFivePods,

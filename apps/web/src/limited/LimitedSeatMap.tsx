@@ -14,6 +14,7 @@ const SQUARE: Record<number, number[][]> = {
 };
 
 export function LimitedSeatMap({
+  shape,
   seatCount,
   occupants,
   selfId,
@@ -22,6 +23,7 @@ export function LimitedSeatMap({
   onLayout,
   onPick,
 }: {
+  shape?: import('@podyguard/shared').TableShape;
   seatCount: number;
   occupants: Array<{ participantId: string; displayName: string; seat: number }>;
   selfId: string;
@@ -63,7 +65,7 @@ export function LimitedSeatMap({
 
   return (
     <div>
-      {seatCount === 4 && onLayout ? (
+      {!shape && seatCount === 4 && onLayout ? (
         <div className="mb-3 flex justify-center gap-2">
           <LayoutButton
             selected={layout !== 'long'}
@@ -88,7 +90,16 @@ export function LimitedSeatMap({
             ? 'One player on each side. You play the person opposite you first.'
             : 'Tap a seat. You can swap once you have a chair.'}
       </p>
-      {long ? (
+      {shape ? (
+        <div className="relative mx-auto h-80 w-full max-w-sm">
+          <div className={`absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center border border-neon/40 bg-neon/5 text-xs text-muted ${shape === 'round' ? 'size-24 rounded-full' : shape === 'rectangle' ? 'h-20 w-36 rounded-xl' : 'size-24 rounded-xl'}`}>Table</div>
+          {Array.from({ length: seatCount }, (_, index) => {
+            const angle = index * 2 * Math.PI / seatCount - Math.PI / 2;
+            return <div key={index} className="absolute -translate-x-1/2 -translate-y-1/2"
+              style={{ left: `${50 + 37 * Math.cos(angle)}%`, top: `${50 + 38 * Math.sin(angle)}%` }}>{chair(index + 1)}</div>;
+          })}
+        </div>
+      ) : long ? (
         <div className="mx-auto flex w-full max-w-xs flex-col gap-2">
           <div className="grid grid-cols-2 gap-2">{chair(1)}{chair(2)}</div>
           <div className="border-muted/30 text-muted mx-4 flex h-8 items-center justify-center rounded-full border text-[0.65rem] uppercase tracking-widest">

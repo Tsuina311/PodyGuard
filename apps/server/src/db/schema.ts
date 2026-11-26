@@ -317,6 +317,7 @@ export const events = pgTable('events', {
         draftMinutes?: number;
         deckbuildingMinutes: number;
         roundMinutes: number;
+        tablePlan?: import('@podyguard/shared').LimitedTablePlan;
       }>
     >()
     .notNull()
@@ -351,6 +352,7 @@ export const events = pgTable('events', {
 });
 
 export const physicalTables = pgTable('physical_tables', {
+  area: jsonb('area').$type<import('@podyguard/shared').TableArea>(),
   id: uuid('id').defaultRandom().primaryKey(),
   eventId: uuid('event_id')
     .notNull()

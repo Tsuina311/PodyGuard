@@ -16,6 +16,7 @@ export type ReadyParticipant = {
 
 export type AvailableTable = {
   id: string;
+  capacity?: number;
 };
 
 export type MatchHistory = {
@@ -110,116 +111,4 @@ export function commanderAllowedSizes(
   return [...sizes].sort((left, right) => right - left);
 }
 
-export function eventMatchOptions(input: {
-  gameMode:
-    | 'duel'
-    | 'multiplayer'
-    | 'commander'
-    | 'duel-commander'
-    | 'brawl'
-    | 'treachery'
-    | 'two-headed-giant'
-    | 'archenemy-commander'
-    | 'emperor'
-    | 'star'
-    | 'assassin';
-  allowThreePods: boolean;
-  allowFivePods: boolean;
-  preferredPodSize?: number;
-}): MatchOptions {
-  if (input.gameMode === 'duel' || input.gameMode === 'duel-commander' || input.gameMode === 'brawl') {
-    return {
-      preferredSize: 2,
-      allowedSizes: [2],
-    };
-  }
-  if (
-    input.gameMode === 'two-headed-giant' ||
-    input.gameMode === 'archenemy-commander'
-  ) {
-    return {
-      preferredSize: PREFERRED_POD_SIZE,
-      allowedSizes: [PREFERRED_POD_SIZE],
-    };
-  }
-  if (input.gameMode === 'emperor') {
-    return {
-      preferredSize: EMPEROR_POD_SIZE,
-      allowedSizes: [EMPEROR_POD_SIZE],
-    };
-  }
-  if (input.gameMode === 'star') {
-    return {
-      preferredSize: STAR_POD_SIZE,
-      allowedSizes: [STAR_POD_SIZE],
-    };
-  }
-  if (input.gameMode === 'commander') {
-    const preferredSize = Math.min(
-      FIVE_POD_SIZE,
-      Math.max(FALLBACK_POD_SIZE, input.preferredPodSize ?? PREFERRED_POD_SIZE),
-    );
-    return {
-      preferredSize,
-      allowedSizes: commanderAllowedSizes(
-        preferredSize,
-        input.allowThreePods,
-        input.allowFivePods,
-      ),
-    };
-  }
-  if (input.gameMode === 'multiplayer') {
-    const preferredSize = Math.min(
-      6,
-      Math.max(3, input.preferredPodSize ?? PREFERRED_POD_SIZE),
-    );
-    return {
-      preferredSize,
-      allowedSizes: allowedPodSizes({
-        preferredSize,
-        minSize: FALLBACK_POD_SIZE,
-        maxSize: preferredSize,
-      }),
-    };
-  }
-  if (input.gameMode === 'assassin') {
-    const preferredSize = Math.min(
-      ASSASSIN_MAX_POD_SIZE,
-      Math.max(
-        ASSASSIN_MIN_POD_SIZE,
-        input.preferredPodSize ?? 5,
-      ),
-    );
-    return {
-      preferredSize,
-      allowedSizes: allowedPodSizes({
-        preferredSize,
-        minSize: ASSASSIN_MIN_POD_SIZE,
-        maxSize: preferredSize,
-      }),
-    };
-  }
-  if (input.gameMode === 'treachery') {
-    const preferredSize = Math.min(
-      TREACHERY_MAX_POD_SIZE,
-      Math.max(TREACHERY_MIN_POD_SIZE, input.preferredPodSize ?? TREACHERY_MIN_POD_SIZE),
-    );
-    return {
-      preferredSize,
-      allowedSizes: allowedPodSizes({
-        allowThree: false,
-        preferredSize,
-        minSize: TREACHERY_MIN_POD_SIZE,
-        maxSize: preferredSize,
-      }),
-    };
-  }
-  return {
-    preferredSize: PREFERRED_POD_SIZE,
-    allowedSizes: allowedPodSizes({
-      allowThree: input.allowThreePods,
-      allowFive: input.allowFivePods,
-      minSize: 3,
-    }),
-  };
-}
+export { eventTablePolicy as eventMatchOptions } from '@podyguard/shared';

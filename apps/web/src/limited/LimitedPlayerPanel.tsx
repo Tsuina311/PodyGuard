@@ -28,6 +28,7 @@ import { LimitedSeatMap } from './LimitedSeatMap';
 import { LimitedTimerDisplay } from './LimitedTimerDisplay';
 import {
   activeLimitedSession,
+  limitedSeatingDestination,
   currentLimitedMatch,
   LIMITED_MODE_LABELS,
   participantName,
@@ -75,7 +76,7 @@ export function LimitedPlayerPanel({
   const self = session?.participants.find(
     (row) => row.participantId === participant.id,
   );
-  const tableLabel = tableName(snapshot, session);
+  const tableLabel = limitedSeatingDestination(snapshot, session, participant.id);
   const matchWinnerId = match?.outcome === 'PLAYER_A_WIN' ? match.playerAId
     : match?.outcome === 'PLAYER_B_WIN' ? match.playerBId : undefined;
 
@@ -332,6 +333,7 @@ export function LimitedPlayerPanel({
       {seatingSession ? (
         <div className="mb-4">
           <LimitedSeatMap
+            shape={snapshot.tables.find(table => table.id === seatingSession.draftTableIds[0])?.area?.draft?.shape}
             seatCount={seatCount}
             selfId={participant.id}
             disabled={busy}
@@ -487,13 +489,4 @@ export function LimitedPlayerPanel({
       ) : null}
     </Panel>
   );
-}
-
-function tableName(
-  snapshot: EventSnapshot,
-  session: PublicLimitedSession | undefined,
-): string | null {
-  const tableId = session?.draftTableIds[0];
-  if (!tableId) return null;
-  return snapshot.tables.find((table) => table.id === tableId)?.label ?? null;
 }

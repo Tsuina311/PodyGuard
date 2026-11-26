@@ -191,6 +191,7 @@ export type PlaygroupGuestOverview = {
 };
 
 export type RecentPlaygroupEventConfig = {
+  tableLayouts?: import('./table-layout').TableLayout[];
   name: string;
   gameMode: GameMode;
   rulesFormat: RulesFormat;

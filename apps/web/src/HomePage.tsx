@@ -6,6 +6,9 @@ import {
   LIMITED_MODES,
   TREACHERY_POD_SIZES,
   buildFallbackCommanderSelection,
+  defaultLimitedTablePlan,
+  eventTablePolicy,
+  type TableLayout,
   type AssassinPodSize,
   type EventOperationMode,
   type GameMode,
@@ -31,6 +34,7 @@ import {
 import { emptySeatCommanders } from './CommanderSeatPickers';
 import { activeMatchPath } from './active-match';
 import { OngoingGame } from './OngoingGame';
+import { LimitedTablePlanner, TablePlanner } from './limited/TablePlanner';
 import { SavedPlayersShortcut } from './SavedPlayersPage';
 import {
   defaultHostLimitedConfigs,
@@ -90,6 +94,7 @@ export function HomePage() {
   const [allowFivePods, setAllowFivePods] = useState(true);
   const [hostPin, setHostPin] = useState('');
   const [tableCount, setTableCount] = useState('8');
+  const [tableLayouts, setTableLayouts] = useState<TableLayout[] | null>(null);
   const [playBaseMode, setPlayBaseMode] = useState<ConstructedBaseMode>(() =>
     baseModeFromGameMode(loadMatchConfig().gameMode),
   );
@@ -191,6 +196,9 @@ export function HomePage() {
     if (!last) return;
     setName(last.name);
     setTableCount(String(last.tableCount));
+    setTableLayouts(last.tableLayouts ?? null);
+    setAllowThreePods(last.allowThreePods);
+    setAllowFivePods(last.allowFivePods);
     setLifetimeHours(String(last.lifetimeHours));
     setOperationMode(last.operationMode);
     setShowReturningSuggestions(last.showReturningPlayerSuggestions);
@@ -384,9 +392,13 @@ export function HomePage() {
 
   function startLocalLimited() {
     setError(null);
-    saveLocalLimitedConfig(playLimited);
-    createLocalLimitedSession(playLimited);
-    void navigate('/limited');
+    try {
+      createLocalLimitedSession(playLimited);
+      saveLocalLimitedConfig(playLimited);
+      void navigate('/limited');
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Invalid table layout.');
+    }
   }
 
   async function onCreate(event: FormEvent) {
@@ -404,6 +416,7 @@ export function HomePage() {
         ? 'commander'
         : hostResolved.rulesFormat;
       const result = await createEvent(name.trim() || suggestedName, hostPin, Number(tableCount), {
+        tableLayouts: isLimited ? undefined : tableLayouts ?? undefined,
         gameMode: createMode,
         rulesFormat,
         allowThreePods: !isLimited && createMode === 'commander' ? allowThreePods : undefined,
@@ -437,7 +450,8 @@ export function HomePage() {
             : undefined,
         limitedModeConfigs: limitedConfigsForEventCreate(
           isLimited,
-          limitedConfigs,
+          limitedConfigs.map(config => ({ ...config, tablePlan: config.enabled ? config.tablePlan ?? defaultLimitedTablePlan(
+            config.preferredCohortSize ?? config.minCohortSize, config.mode !== 'SEALED') : undefined })),
         ),
         playgroupId: selectedPlaygroupId ?? undefined,
         showReturningPlayerSuggestions: showReturningSuggestions,
@@ -697,6 +711,8 @@ export function HomePage() {
             playerCount={playLimited.playerCount}
             onChange={(patch) => updatePlayLimited(patch)}
           />
+          <LimitedTablePlanner value={playLimited.tablePlan} players={playLimited.playerCount}
+            hasDraft={playLimited.mode !== 'SEALED'} onChange={tablePlan => updatePlayLimited({ tablePlan })} />
           <Button
             type="button"
             variant="neon"
@@ -878,17 +894,11 @@ export function HomePage() {
               </p>
             )}
           </div>
-          <Field
-            label={t('home.tables')}
-            hint={t('home.tablesHint')}
-            value={tableCount}
-            onChange={(change) => setTableCount(change.target.value)}
-            type="number"
-            inputMode="numeric"
-            min={1}
-            max={40}
-            required
-          />
+          <TablePlanner title={t('tablePlan.playing')}
+            value={tableLayouts ?? Array.from({ length: Number(tableCount) || 1 }, () => ({ shape: 'square' as const, seats: eventPodSize }))}
+            allowedSizes={tournamentFormat ? [tournamentMatchSize] : eventTablePolicy({ gameMode, preferredPodSize: eventPodSize, allowThreePods, allowFivePods }).allowedSizes}
+            preferredSize={tournamentFormat ? tournamentMatchSize : eventPodSize}
+            onChange={tables => { setTableLayouts(tables); setTableCount(String(tables.length)); }} />
           {tournamentEligible && operationMode === 'ROLLING' ? (
             <fieldset className="mb-4">
               <legend className="text-muted mb-2 text-sm">
@@ -1275,17 +1285,6 @@ export function HomePage() {
             placeholder={suggestedName}
             autoComplete="off"
           />
-          <Field
-            label={t('home.tables')}
-            hint={t('home.tablesHint')}
-            value={tableCount}
-            onChange={(change) => setTableCount(change.target.value)}
-            type="number"
-            inputMode="numeric"
-            min={1}
-            max={40}
-            required
-          />
           <fieldset className="mb-4">
             <legend className="text-muted mb-2 text-sm">
               {t('home.limitedFormat')}
@@ -1302,6 +1301,7 @@ export function HomePage() {
             />
           </fieldset>
           {hostLimited ? (
+            <>
             <LimitedTimingControls
               value={hostLimited}
               playerCount={hostLimited.preferredCohortSize ?? hostLimited.minCohortSize}
@@ -1311,6 +1311,11 @@ export function HomePage() {
                 )
               }
             />
+            <LimitedTablePlanner value={hostLimited.tablePlan}
+              players={hostLimited.preferredCohortSize ?? hostLimited.minCohortSize}
+              hasDraft={hostLimited.mode !== 'SEALED'}
+              onChange={tablePlan => setLimitedConfigs(current => patchHostLimitedConfig(current, hostLimited.mode, { tablePlan }))} />
+            </>
           ) : null}
           <Field
             label={t('home.eventLasts')}

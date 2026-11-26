@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { EventSnapshot, PublicLimitedSession } from '@podyguard/shared';
 import {
   activeLimitedSession,
+  limitedSeatingDestination,
   currentLimitedMatch,
   formatLimitedTimer,
   scoreForOutcome,
@@ -62,6 +63,18 @@ const snapshot: EventSnapshot = {
 };
 
 describe('limited view selectors', () => {
+  it('routes Sealed players to the part containing their chosen seat and shows all destinations to the host', () => {
+    const split = { ...snapshot, tables: ['A', 'B'].map((part, index) => ({
+      id: part, label: `Table 1 · Part ${part}`, sortOrder: index, status: 'occupied' as const, seatedNames: [],
+      area: { tableNumber: 1, shape: 'square' as const, totalSeats: 4, seats: 2, part, parts: 2 },
+    })) };
+    const seated = { ...session, mode: 'SEALED' as const, draftTableIds: ['A', 'B'],
+      participants: session.participants.map((person, index) => ({ ...person, draftSeat: index === 0 ? 1 : 4 })) };
+    expect(limitedSeatingDestination(split, seated)).toBe('Table 1 · Part A + Table 1 · Part B');
+    expect(limitedSeatingDestination(split, seated, 'p1')).toBe('Table 1 · Part A');
+    expect(limitedSeatingDestination(split, seated, 'p2')).toBe('Table 1 · Part B');
+    expect(limitedSeatingDestination(split, { ...seated, mode: 'BOOSTER_DRAFT' })).toBe('Table 1');
+  });
   it('selects a player session and current pairing', () => {
     expect(activeLimitedSession(snapshot, 'p1')?.id).toBe('limited-1');
     expect(currentLimitedMatch(session, 'p1')?.id).toBe('m1');

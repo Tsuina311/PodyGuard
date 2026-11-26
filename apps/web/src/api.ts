@@ -143,6 +143,7 @@ export function createEvent(
   tableCount: number,
   options?: {
     gameMode?: GameMode;
+    tableLayouts?: import('@podyguard/shared').TableLayout[];
     rulesFormat?: 'normal' | 'commander';
     allowThreePods?: boolean;
     allowFivePods?: boolean;

@@ -1,4 +1,5 @@
 import { computeFlexDelta, flexScore } from './flex.js';
+import { allocateTableGames } from '@podyguard/shared';
 import {
   FALLBACK_POD_SIZE,
   OPEN_POOL_ID,
@@ -156,12 +157,34 @@ function evaluate(
     byPool.set(poolId, list);
   }
 
-  const pods: Array<{ poolId: string; players: ReadyParticipant[] }> = [];
+  const pods: Array<{ poolId: string; players: ReadyParticipant[]; table?: AvailableTable }> = [];
+  // Explicit game areas have fixed seat limits. Form groups against those limits
+  // before choosing players, rather than dropping oversized groups afterwards.
+  const areaTables = tables.some(table => table.capacity !== undefined)
+    ? [...tables].sort((a, b) => (b.capacity ?? Infinity) - (a.capacity ?? Infinity)) : null;
+  if (areaTables) {
+    const singlePool = byPool.size === 1 ? [...byPool.values()][0]! : undefined;
+    const planned = singlePool ? allocateTableGames(singlePool.length,
+      areaTables.map(table => table.capacity ?? Math.max(...allowedSizes)), allowedSizes, preferredSize) : undefined;
+    for (const [tableIndex, table] of areaTables.entries()) {
+      const sizes = allowedSizes.filter(size => size <= (table.capacity ?? Infinity));
+      const candidates = [...byPool].flatMap(([poolId, players]) => {
+        const size = planned ? planned[tableIndex] : choosePodSize(players.length, sizes, preferredSize);
+        return size ? [{ poolId, players: pickGroup(players.sort(byReadyAt), size, pairHistory) }] : [];
+      }).sort((a, b) => totalWait(a.players) - totalWait(b.players));
+      const chosen = candidates[0];
+      if (!chosen) continue;
+      pods.push({ ...chosen, table });
+      const ids = new Set(chosen.players.map(player => player.id));
+      byPool.set(chosen.poolId, byPool.get(chosen.poolId)!.filter(player => !ids.has(player.id)));
+    }
+  } else {
   for (const [poolId, players] of byPool) {
     pods.push(...formPods(players.sort(byReadyAt), allowedSizes, minSize, pairHistory, preferredSize).map((group) => ({
       poolId,
       players: group,
     })));
+  }
   }
 
   pods.sort((left, right) => {
@@ -175,7 +198,7 @@ function evaluate(
   const seated = new Set<string>();
   for (let index = 0; index < Math.min(pods.length, tables.length); index += 1) {
     const pod = pods[index];
-    const table = tables[index];
+    const table = areaTables ? pod?.table : tables[index];
     if (!pod || !table) {
       break;
     }
