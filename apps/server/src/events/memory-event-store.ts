@@ -26,6 +26,7 @@ import {
   type LimitedRoundPatch,
   type LimitedSessionPhasePatch,
   type FinalizeLimitedMatchResultInput,
+  type LimitedMatchProgressInput,
   type StoredAssignment,
   type StoredAuthChallenge,
   type StoredCompletedGame,
@@ -1285,6 +1286,19 @@ export class MemoryEventStore implements EventStore {
     return round;
   }
 
+  async updateLimitedMatchProgress(input: LimitedMatchProgressInput): Promise<boolean> {
+    const match = [...this.limitedSessions.values()].flatMap(s => s.rounds)
+      .flatMap(r => r.matches).find(m => m.id === input.matchId);
+    if (!match || match.status !== 'PLAYING' || match.outcome ||
+        (match.playerAGameWins ?? 0) !== input.previousA ||
+        (match.playerBGameWins ?? 0) !== input.previousB ||
+        (match.currentGameStartedAt?.getTime() ?? null) !== (input.previousStartedAt?.getTime() ?? null)) return false;
+    match.playerAGameWins = input.playerAGameWins;
+    match.playerBGameWins = input.playerBGameWins;
+    match.currentGameStartedAt = input.currentGameStartedAt;
+    return true;
+  }
+
   async finalizeLimitedMatchResult(
     input: FinalizeLimitedMatchResultInput,
   ): Promise<{
@@ -1298,6 +1312,10 @@ export class MemoryEventStore implements EventStore {
       .find((row) => row.id === input.matchId);
     if (!match) throw new Error('Limited match not found.');
     const corrected = match.outcome !== null;
+    if (!corrected && (input.outcome === 'PLAYER_A_WIN' || input.outcome === 'PLAYER_B_WIN') &&
+        (input.playerAGameWins < (match.playerAGameWins ?? 0) || input.playerBGameWins < (match.playerBGameWins ?? 0))) {
+      throw new LimitedPersistenceConflictError('The match score changed. Refresh before reporting the result.');
+    }
     if (corrected && !input.correctionReason?.trim()) {
       throw new Error('A correction reason is required to change a result.');
     }

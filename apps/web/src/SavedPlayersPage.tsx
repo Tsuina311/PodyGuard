@@ -4,7 +4,7 @@ import { UsersRound } from 'lucide-react';
 import { normalizeJoinCode } from '@podyguard/shared';
 import { loadHostToken } from './api';
 import { DeviceHostDesk } from './DevicePlayers';
-import { playerPath } from './player-sessions';
+import { playerTabLink } from './player-tabs';
 import { useSavedPlayers } from './use-saved-players';
 import { Panel } from './ui/Panel';
 import { ThemeToggleCorner } from './ui/ThemeToggle';
@@ -39,8 +39,8 @@ export function SavedPlayersPage() {
       <ul className="flex flex-wrap gap-2">
         {loadHostToken(event.joinCode) && <li><DeviceHostDesk joinCode={event.joinCode} /></li>}
         {event.players.map(player => <li key={player.scope}>
-          <a href={`#${playerPath(event.joinCode, player.scope)}`} target="_blank" rel="noopener noreferrer"
-            title={t('devicePlayers.newTab')}
+          <a {...playerTabLink(event.joinCode, player.scope)}
+            title={t('devicePlayers.continueTab')}
             className="inline-flex min-h-11 items-center rounded-xl border border-neon/40 bg-neon/5 px-3 py-2 font-semibold text-ink hover:bg-neon/10">
             {t('devicePlayers.continue', { name: player.displayName })}
           </a>

@@ -70,10 +70,16 @@
     "noPlayers": "No players match this view.",
     "statuses": { "joined": "Not ready", "ready": "Ready", "matched": "Seated", "playing": "Playing", "paused": "Paused", "left": "Left" }
   },
+  "limitedProgress": {
+    "score": "Best of {{bestOf}} · {{a}}–{{b}}",
+    "elapsed": "Game {{number}} · {{time}} elapsed",
+    "waiting": "Game {{number}} · waiting to start"
+  },
   "devicePlayers": {
     "resumeCount": "Resume a player · {{count}} saved",
     "all": "All saved players",
-    "recoveryHelp": "Saved players stay here after you close a tab. Continue opens a new tab in this browser, keeping your current player open.",
+    "recoveryHelp": "Saved players stay here after you close a tab. Continue switches to their open tab when available, or reopens their seat in a new tab.",
+    "continueTab": "Switches to this player's tab, or opens it if closed",
     "eventCode": "Event {{code}}",
     "newTab": "Opens in a new tab",
     "empty": "No saved players on this browser yet. Join an event to save your player here.",

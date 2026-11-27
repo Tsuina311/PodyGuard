@@ -1,5 +1,16 @@
 # Public Event Display / TV Mode
 
+Limited matches show their best-of score on the host Overview and public display.
+Each recorded game updates the shared score without completing the match or
+releasing its table. Starting the next game (with or without the life tracker)
+starts that game's elapsed clock; between games the display says it is waiting
+to start. The elapsed clock disappears when the match result is reported.
+Hiding timers on a paired display also hides these clocks.
+
+Migration 0033 adds the nullable `limited_matches.current_game_started_at`
+timestamp. Existing rows remain valid. Deployments must apply migrations before
+starting the updated server; the Render start command already does this.
+
 Turn a TV, projector, or cast browser tab into a live read-only operating picture of a PodyGuard event.
 
 ## Recommended setup

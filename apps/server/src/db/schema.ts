@@ -751,6 +751,7 @@ export const limitedMatches = pgTable(
     outcome: limitedMatchOutcomeEnum('outcome'),
     playerAGameWins: integer('player_a_game_wins'),
     playerBGameWins: integer('player_b_game_wins'),
+    currentGameStartedAt: timestamp('current_game_started_at', { withTimezone: true }),
     reportedAt: timestamp('reported_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()

@@ -4,6 +4,7 @@ import { Agreement } from './game-nights/Agreement';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { DevicePlayers } from './DevicePlayers';
+import { playerTabName } from './player-tabs';
 import { createPlayerScope, listPlayerSessions, playerPath, playerScope, playerStorageCode } from './player-sessions';
 import { useTranslation } from 'react-i18next';
 import {
@@ -137,6 +138,12 @@ function PlayerJoinPage({
   const { t } = useTranslation();
   const { joinCode = '' } = useParams();
   const storageCode = playerStorageCode(joinCode, scope);
+  useEffect(() => {
+    if (embeddedHost) return;
+    const name = playerTabName(joinCode, scope);
+    window.name = name;
+    return () => { if (window.name === name) window.name = ''; };
+  }, [joinCode, scope, embeddedHost]);
   const navigate = useNavigate();
   const seatPath = playerPath(joinCode, scope);
   const hostPlayPath = `/host/${joinCode}?tab=play`;

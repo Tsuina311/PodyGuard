@@ -523,6 +523,7 @@ export type StoredLimitedParticipant = {
 };
 
 export type StoredLimitedMatch = {
+  currentGameStartedAt?: Date | null;
   id: string;
   roundId: string;
   roundNumber: number;
@@ -627,6 +628,16 @@ export type LimitedRoundPatch = {
   status: LimitedRound['status'];
   startedAt?: Date;
   completedAt?: Date | null;
+};
+
+export type LimitedMatchProgressInput = {
+  matchId: string;
+  previousA: number;
+  previousB: number;
+  previousStartedAt: Date | null;
+  playerAGameWins: number;
+  playerBGameWins: number;
+  currentGameStartedAt: Date | null;
 };
 
 export type FinalizeLimitedMatchResultInput = {
@@ -806,6 +817,7 @@ export interface EventStore {
     id: string,
     patch: LimitedRoundPatch,
   ): Promise<StoredLimitedRound>;
+  updateLimitedMatchProgress(input: LimitedMatchProgressInput): Promise<boolean>;
   finalizeLimitedMatchResult(
     input: FinalizeLimitedMatchResultInput,
   ): Promise<{

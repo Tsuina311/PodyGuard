@@ -7,8 +7,10 @@ for manually rehearsing an event without other people.
 
 Each player tab shows its name and keeps its own seat when refreshed. Home has
 **Resume a player · N saved**, opening a recovery page grouped by event. Choose
-**Continue as …** to reopen a saved seat in a new tab while retaining the current
-tab. The navigation menu also has **Players on this device**, and saved event
+**Continue as …** to focus that player's existing tab without reloading it,
+or reopen the saved seat in a new tab if it is closed. Browser tab-group and
+focus policies can limit reuse, especially for independently opened tabs.
+The navigation menu also has **Players on this device**, and saved event
 cards offer a resume action for that event. Recovery uses local credentials and
 works even when the event shortcut has been removed.
 

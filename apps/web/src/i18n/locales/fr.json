@@ -57,10 +57,16 @@
     "noPlayers": "Aucun joueur dans cette vue.",
     "statuses": { "joined": "Pas prêt", "ready": "Prêt", "matched": "À table", "playing": "En partie", "paused": "En pause", "left": "Parti" }
   },
+  "limitedProgress": {
+    "score": "Au meilleur des {{bestOf}} · {{a}}–{{b}}",
+    "elapsed": "Partie {{number}} · {{time}} écoulées",
+    "waiting": "Partie {{number}} · en attente du début"
+  },
   "devicePlayers": {
     "resumeCount": "Reprendre un joueur · {{count}} enregistrés",
     "all": "Tous les joueurs enregistrés",
-    "recoveryHelp": "Les joueurs restent enregistrés après la fermeture d’un onglet. Continuer ouvre un nouvel onglet dans ce navigateur et garde le joueur actuel ouvert.",
+    "recoveryHelp": "Les joueurs restent enregistrés après la fermeture d’un onglet. Continuer revient à leur onglet ouvert si possible, ou rouvre leur place dans un nouvel onglet.",
+    "continueTab": "Revient à l’onglet de ce joueur ou l’ouvre s’il est fermé",
     "eventCode": "Événement {{code}}",
     "newTab": "Ouvre un nouvel onglet",
     "empty": "Aucun joueur enregistré dans ce navigateur. Rejoignez un événement pour retrouver votre joueur ici.",

@@ -145,10 +145,27 @@ for (const format of [
                   const opponentWin = await wins.nth(1).textContent();
                   await recordTrackedWin(player, opponentWin?.startsWith('Player 1 wins') ? 1 : 2);
                   await expect(player.getByText('Best of 3 · 0–1', { exact: true })).toBeVisible();
+                  await host.getByRole('tab', { name: 'Overview', exact: true }).click();
+                  const progress = host.getByTestId('limited-match-progress').filter({ hasText: 'Best of 3 · 0–1' });
+                  await expect(progress).toHaveCount(1);
+                  await expect(progress).toContainText('Game 2 · waiting to start');
+                  const display = await browser.newPage();
+                  await prepareApp(display);
+                  await display.goto(`/#/display/event/${code}`);
+                  const displayProgress = display.getByTestId('limited-match-progress');
+                  await expect(displayProgress.filter({ hasText: 'Best of 3 · 0–1' })).toHaveCount(1);
                   await player.reload();
                   await expect(player.getByRole('button', { name: 'Track game 2', exact: true })).toBeVisible();
                   await wins.first().click();
                   await expect(player.getByText('Best of 3 · 1–1', { exact: true })).toBeVisible();
+                  await expect(host.getByTestId('limited-match-progress').filter({ hasText: 'Best of 3 · 1–1' })).toHaveCount(1);
+                  await player.getByRole('button', { name: 'Start without life tracker', exact: true }).click();
+                  await expect(host.getByTestId('limited-match-progress').filter({ hasText: 'Best of 3 · 1–1' })).toContainText(/Game 3 · \d+:\d+ elapsed/);
+                  await expect(displayProgress.filter({ hasText: 'Best of 3 · 1–1' })).toContainText(/Game 3 · \d+:\d+ elapsed/);
+                  await host.screenshot({ path: test.info().outputPath('host-limited-progress.png'), fullPage: true });
+                  await display.screenshot({ path: test.info().outputPath('public-limited-progress.png'), fullPage: true });
+                  await display.close();
+                  await host.getByRole('tab', { name: 'Desk', exact: true }).click();
                   await expect(wins.first()).toHaveText(/wins game 3$/);
                   opponentWins = 1;
                 } else {

@@ -18,6 +18,7 @@ import {
   joinLimitedQueue,
   leaveLimitedQueue,
   reportLimitedResult,
+  reportLimitedProgress,
   setReady,
 } from '../api';
 import { readStored, writeStored } from '../device-storage';
@@ -72,8 +73,8 @@ export function LimitedPlayerPanel({
   const scoreKey = `${trackerKey}:score:${participant.id}`;
   const localScore = match?.bestOf === 3 ? readStored(scoreKey)?.match(/^([01])-([01])$/) : null;
   const currentScore = gameScore?.key === scoreKey ? gameScore : null;
-  const playerAGameWins = currentScore?.aWins ?? Number(localScore?.[1] ?? 0);
-  const playerBGameWins = currentScore?.bWins ?? Number(localScore?.[2] ?? 0);
+  const playerAGameWins = match?.playerAGameWins ?? currentScore?.aWins ?? Number(localScore?.[1] ?? 0);
+  const playerBGameWins = match?.playerBGameWins ?? currentScore?.bWins ?? Number(localScore?.[2] ?? 0);
   const gameNumber = playerAGameWins + playerBGameWins + 1;
   const self = session?.participants.find(
     (row) => row.participantId === participant.id,
@@ -155,6 +156,10 @@ export function LimitedPlayerPanel({
     if (aWins === winsNeeded || bWins === winsNeeded) {
       await submitResult(outcome, { playerAGameWins: aWins, playerBGameWins: bWins });
     } else {
+      if (!session) return;
+      const result = await reportLimitedProgress(snapshot.event.joinCode, token, session.id, match.id,
+        { playerAGameWins: aWins, playerBGameWins: bWins });
+      remember(result.session);
       writeStored(scoreKey, `${aWins}-${bWins}`);
       setGameScore({ key: scoreKey, aWins, bWins });
     }
@@ -170,16 +175,10 @@ export function LimitedPlayerPanel({
 
   function beginPlay(tracker: boolean) {
     if (!session || !match) return;
-    if (session.timer) {
-      if (tracker) setTrackerMatchId(match.id);
-      return;
-    }
     void act(async () => {
-      const result = await confirmLimitedPlay(
-        snapshot.event.joinCode,
-        token,
-        session.id,
-      );
+      if (!session.timer) await confirmLimitedPlay(snapshot.event.joinCode, token, session.id);
+      const result = await reportLimitedProgress(snapshot.event.joinCode, token, session.id, match.id,
+        { playerAGameWins, playerBGameWins, startGame: true });
       remember(result.session);
       if (tracker) setTrackerMatchId(match.id);
     });
@@ -441,7 +440,7 @@ export function LimitedPlayerPanel({
               >
                 {gameNumber > 1 ? `Track game ${gameNumber}` : 'Use life tracker'}
               </Button>
-              {session.timer ? null : (
+              {match.currentGameStartedAt ? null : (
                 <Button
                   variant="glass"
                   block
@@ -465,7 +464,8 @@ export function LimitedPlayerPanel({
                     onClick={() => void act(() =>
                       outcome === 'PLAYER_A_WIN' || outcome === 'PLAYER_B_WIN'
                         ? recordGameWin(outcome)
-                        : submitResult(outcome, scoreForOutcome(outcome, match.bestOf)),
+                        : submitResult(outcome, outcome === 'DRAW' && playerAGameWins === playerBGameWins
+                          ? { playerAGameWins, playerBGameWins } : scoreForOutcome(outcome, match.bestOf)),
                     )}
                   >
                     {outcome === 'PLAYER_A_WIN'

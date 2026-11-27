@@ -3,6 +3,7 @@ import { buildApp } from '../app.js';
 import { createIdentityBoundary } from '../identity/index.js';
 import { EventService } from './event-service.js';
 import { MemoryEventStore } from './memory-event-store.js';
+import { projectPublicDisplayState } from '../display/project-display-state.js';
 import { defaultLimitedEventModeConfig, type LimitedTablePlan } from '@podyguard/shared';
 
 const apps: Awaited<ReturnType<typeof buildApp>>[] = [];
@@ -79,6 +80,46 @@ describe('table layouts through the event API', () => {
     const reservations = await store.listActiveTableReservations(snapshot.event.id);
     expect(reservations).toHaveLength(4);
     const first = matches[0];
+    const concurrent = matches[1];
+    const concurrentUrl = `/events/${joinCode}/limited/sessions/${session.id}/matches/${concurrent.id}/progress`;
+    const competing = await Promise.all([concurrent.playerAId, concurrent.playerBId].map((id, index) => app.inject({
+      method: 'POST', url: concurrentUrl,
+      headers: { authorization: `Bearer ${players.find(player => player.id === id)!.token}` },
+      payload: { playerAGameWins: index === 0 ? 1 : 0, playerBGameWins: index === 1 ? 1 : 0 },
+    })));
+    expect(competing.filter(response => response.statusCode === 200)).toHaveLength(1);
+    expect(competing.filter(response => response.statusCode === 400 || response.statusCode === 409)).toHaveLength(1);
+    const reporterToken = players.find(player => player.id === first.playerAId)!.token;
+    const progressUrl = `/events/${joinCode}/limited/sessions/${session.id}/matches/${first.id}/progress`;
+    const progress = (token: string, payload: Record<string, unknown>) => app.inject({
+      method: 'POST', url: progressUrl, headers: { authorization: `Bearer ${token}` }, payload,
+    });
+    expect((await progress(players.find(player => player.id !== first.playerAId && player.id !== first.playerBId)!.token,
+      { playerAGameWins: 1, playerBGameWins: 0 })).statusCode).toBe(409);
+    const started = await progress(reporterToken, { playerAGameWins: 0, playerBGameWins: 0, startGame: true });
+    expect(started.statusCode, started.body).toBe(200);
+    const firstStart = started.json().session.rounds[0].matches[0].currentGameStartedAt;
+    expect(firstStart).toEqual(expect.any(String));
+    expect((await progress(reporterToken, { playerAGameWins: 0, playerBGameWins: 0, startGame: true }))
+      .json().session.rounds[0].matches[0].currentGameStartedAt).toBe(firstStart);
+    expect((await progress(reporterToken, { playerAGameWins: 1, playerBGameWins: 0 })).statusCode).toBe(200);
+    expect((await progress(reporterToken, { playerAGameWins: 1, playerBGameWins: 0 })).statusCode).toBe(200);
+    expect((await progress(reporterToken, { playerAGameWins: 0, playerBGameWins: 0 })).statusCode).toBe(400);
+    expect((await progress(reporterToken, { playerAGameWins: 2, playerBGameWins: 0 })).statusCode).toBe(400);
+    const beforeSecondGame = await events.getSnapshot(joinCode);
+    const savedMatch = beforeSecondGame.limitedSessions![0]!.rounds[0]!.matches[0]!;
+    expect(savedMatch).toMatchObject({ status: 'PLAYING', playerAGameWins: 1, playerBGameWins: 0 });
+    expect(savedMatch.currentGameStartedAt).toBeUndefined();
+    expect(await store.listActiveTableReservations(snapshot.event.id)).toHaveLength(4);
+    await progress(reporterToken, { playerAGameWins: 1, playerBGameWins: 0, startGame: true });
+    const withTimer = await events.getSnapshot(joinCode);
+    for (const showTimers of [true, false]) {
+      const display = projectPublicDisplayState({ snapshot: withTimer, pods: [], announcement: null,
+        config: { mode: 'LIMITED', showPlayerNames: true, showQueues: true, showTimers } });
+      expect(display.limitedSessions[0]!.matches[0]).toMatchObject({ bestOf: 3, playerAGameWins: 1, playerBGameWins: 0 });
+      expect(Boolean(display.limitedSessions[0]!.matches[0]!.currentGameStartedAt)).toBe(showTimers);
+      expect(display.limitedSessions[0]!.resultsReported).toBe(0);
+    }
     const result = await app.inject({ method: 'POST', url: `/events/${joinCode}/limited/sessions/${session.id}/matches/${first.id}/result`,
       headers: { authorization: `Bearer ${players.find(player => player.id === first.playerAId)!.token}` },
       payload: { outcome: 'PLAYER_A_WIN', playerAGameWins: 2, playerBGameWins: 0 } });

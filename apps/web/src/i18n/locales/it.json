@@ -57,10 +57,16 @@
     "noPlayers": "Nessun giocatore in questa vista.",
     "statuses": { "joined": "Non pronto", "ready": "Pronto", "matched": "Al tavolo", "playing": "In partita", "paused": "In pausa", "left": "Uscito" }
   },
+  "limitedProgress": {
+    "score": "Al meglio di {{bestOf}} · {{a}}–{{b}}",
+    "elapsed": "Partita {{number}} · {{time}} trascorsi",
+    "waiting": "Partita {{number}} · in attesa dell'inizio"
+  },
   "devicePlayers": {
     "resumeCount": "Riprendi un giocatore · {{count}} salvati",
     "all": "Tutti i giocatori salvati",
-    "recoveryHelp": "I giocatori restano salvati quando chiudi una scheda. Continua apre una nuova scheda in questo browser e mantiene aperto il giocatore attuale.",
+    "recoveryHelp": "I giocatori restano salvati quando chiudi una scheda. Continua passa alla loro scheda aperta, se disponibile, oppure riapre il posto in una nuova scheda.",
+    "continueTab": "Passa alla scheda di questo giocatore o la apre se è chiusa",
     "eventCode": "Evento {{code}}",
     "newTab": "Si apre in una nuova scheda",
     "empty": "Nessun giocatore salvato in questo browser. Partecipa a un evento per ritrovare qui il tuo giocatore.",
