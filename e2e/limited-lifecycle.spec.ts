@@ -1,9 +1,12 @@
+import { randomUUID } from 'node:crypto';
 import type { Page } from '@playwright/test';
 import type { PlaygroupOverview, PublicLimitedSession } from '@podyguard/shared';
 import { expect, test } from './fixtures';
 import { createLimitedEvent, joinAsPlayer, prepareApp } from './helpers';
 
-async function seedDraftPlaygroup(host: Page, count: number, name = 'Draft Night Playgroup') {
+async function seedDraftPlaygroup(host: Page, count: number, label = 'Draft Night Playgroup') {
+  // The demo account and its playgroups persist across tests and retries.
+  const name = `${label} ${randomUUID()}`;
   const demo = await (await host.request.get('/test/demo')).json();
   const headers = { Authorization: `Bearer ${demo.token}` };
   const response = await host.request.post('/api/playgroups', {
