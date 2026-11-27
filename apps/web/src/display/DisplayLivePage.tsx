@@ -18,6 +18,8 @@ import {
   loadDisplayToken,
 } from '../api';
 import { LimitedTimerDisplay } from '../limited/LimitedTimerDisplay';
+import { LimitedMatchProgress } from '../limited/LimitedMatchProgress';
+import { LimitedMatchStatus } from '../limited/LimitedMatchStatus';
 import { Brand } from '../ui/Brand';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
@@ -327,7 +329,7 @@ export function DisplayLivePage() {
           <QueuesView queues={state.queues} serverNow={serverNow} nowMs={nowMs} tick={tick} />
         ) : null}
         {viewMode === 'LIMITED' ? (
-          <LimitedView sessions={state.limitedSessions} />
+          <LimitedView sessions={state.limitedSessions} showTimers={state.config.showTimers} />
         ) : null}
       </div>
     </div>
@@ -493,7 +495,7 @@ function QueuesView({
   );
 }
 
-function LimitedView({ sessions }: { sessions: PublicDisplayLimitedSession[] }) {
+function LimitedView({ sessions, showTimers }: { sessions: PublicDisplayLimitedSession[]; showTimers: boolean }) {
   const { t } = useTranslation();
   const active = sessions.filter((row) => row.status !== 'CANCELLED');
   if (active.length === 0) {
@@ -547,8 +549,10 @@ function LimitedView({ sessions }: { sessions: PublicDisplayLimitedSession[] }) 
                     ) : null}
                   </p>
                   <p className="text-muted mt-1 text-sm">
-                    {(match.outcome ?? match.status).replaceAll('_', ' ')}
+                    <LimitedMatchStatus outcome={match.outcome} status={match.status}
+                      playerAName={match.playerAName} playerBName={match.playerBName} />
                   </p>
+                  <LimitedMatchProgress match={match} showTimer={showTimers} />
                 </div>
               ))}
             </div>

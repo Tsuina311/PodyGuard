@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
   gameNightCalendar,
+  gameNightEventType,
   parsePregameAgreement,
   type GameNight,
 } from './game-nights';
+import { defaultLimitedEventModeConfig } from './limited';
 const night: GameNight = {
   id: 'night',
   playgroupId: 'group',
@@ -18,6 +20,32 @@ const night: GameNight = {
   eventJoinCode: null,
 };
 describe('game night calendar', () => {
+  it('describes planned formats and includes invited names in the calendar safely', () => {
+    expect(gameNightEventType({})).toBe('Commander · Multiplayer');
+    for (const [gameMode, rulesFormat, expected] of [
+      ['duel', 'normal', 'Classic · Duel'],
+      ['duel-commander', undefined, 'Commander · Duel'],
+      ['commander', 'commander', 'Commander · Multiplayer'],
+      ['multiplayer', 'normal', 'Classic · Multiplayer'],
+      ['brawl', undefined, 'Commander · Brawl'],
+      ['archenemy-commander', undefined, 'Commander · Archenemy'],
+      ['two-headed-giant', 'normal', 'Classic · Two Headed Giant'],
+    ] as const) {
+      expect(gameNightEventType({ eventSetup: { tableCount: 2, gameMode, rulesFormat } })).toBe(expected);
+    }
+    const configs = ['BOOSTER_DRAFT', 'PICK_TWO_DRAFT', 'SEALED'].map(mode => ({
+      ...defaultLimitedEventModeConfig(mode as 'BOOSTER_DRAFT' | 'PICK_TWO_DRAFT' | 'SEALED'), enabled: true,
+    }));
+    expect(gameNightEventType({ eventSetup: { tableCount: 2, limitedModeConfigs: configs } }))
+      .toBe('Booster Draft + Pick-Two Draft + Sealed');
+    expect(gameNightEventType({ eventSetup: { tableCount: 1, limitedModeConfigs: configs.map(config => ({ ...config, enabled: false })) } }))
+      .toBe('Commander · Multiplayer');
+    const calendar = gameNightCalendar({ ...night, eventSetup: { tableCount: 1, gameMode: 'duel', rulesFormat: 'normal' },
+      invitees: [{ guestProfileId: 'guest', displayName: 'Gwen, the great\nBEGIN:VEVENT' }] }).replace(/\r\n /g, '');
+    expect(calendar).toContain('DESCRIPTION:Classic · Duel (Europe/Paris)');
+    expect(calendar).toContain('Invited: Gwen\\, the great\\nBEGIN:VEVENT.');
+    expect(calendar.match(/\r\nBEGIN:VEVENT/g)).toHaveLength(1);
+  });
   it('exports an absolute instant, escaped user text and CRLF lines', () => {
     const ics = gameNightCalendar(night);
     expect(ics).toContain('DTSTART:20261201T180000Z\r\n');

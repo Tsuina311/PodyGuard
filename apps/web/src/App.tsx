@@ -28,6 +28,7 @@ import { MatchConfigPage } from './MatchConfigPage';
 import { MatchSandboxPage } from './MatchSandboxPage';
 import { DisplayLivePage } from './display/DisplayLivePage';
 import { DisplayPairPage } from './display/DisplayPairPage';
+import { SendToScreenPage } from './link-transfer/SendToScreen';
 import { LimitedDisplayPage } from './limited/LimitedDisplayPage';
 import { LocalLimitedPage } from './limited/LocalLimitedPage';
 import { cx } from './ui/cx';
@@ -102,6 +103,7 @@ export function App() {
             <Route path="/connectivity" element={<ConnectivityPage />} />
             <Route path="/wake" element={<ServerWakeScreen switchable />} />
             <Route path="/display" element={<DisplayPairPage />} />
+            <Route path="/send-to-screen/:id" element={<SendToScreenPage />} />
             <Route path="/display/live" element={<DisplayLivePage />} />
             <Route
               path="/display/event/:joinCode"

@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray, isNull, like, or } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNull, like, or, sql } from 'drizzle-orm';
 import { getDb } from '../db/client.js';
 import {
   authChallenges,
@@ -57,6 +57,7 @@ import {
   type LimitedRoundPatch,
   type LimitedSessionPhasePatch,
   type FinalizeLimitedMatchResultInput,
+  type LimitedMatchProgressInput,
   type StoredAssignment,
   type StoredAuthChallenge,
   type StoredCompletedGame,
@@ -2123,6 +2124,24 @@ export class PostgresEventStore implements EventStore {
     return loadLimitedRoundRequired(id);
   }
 
+  async updateLimitedMatchProgress(input: LimitedMatchProgressInput): Promise<boolean> {
+    const rows = await getDb().update(limitedMatches).set({
+      playerAGameWins: input.playerAGameWins,
+      playerBGameWins: input.playerBGameWins,
+      currentGameStartedAt: input.currentGameStartedAt,
+      updatedAt: new Date(),
+    }).where(and(
+      eq(limitedMatches.id, input.matchId),
+      eq(limitedMatches.status, 'PLAYING'),
+      isNull(limitedMatches.outcome),
+      sql`coalesce(${limitedMatches.playerAGameWins}, 0) = ${input.previousA}`,
+      sql`coalesce(${limitedMatches.playerBGameWins}, 0) = ${input.previousB}`,
+      input.previousStartedAt ? eq(limitedMatches.currentGameStartedAt, input.previousStartedAt)
+        : isNull(limitedMatches.currentGameStartedAt),
+    )).returning({ id: limitedMatches.id });
+    return rows.length === 1;
+  }
+
   async finalizeLimitedMatchResult(
     input: FinalizeLimitedMatchResultInput,
   ): Promise<{
@@ -2147,6 +2166,10 @@ export class PostgresEventStore implements EventStore {
         throw new Error('Limited result does not match the pairing.');
       }
       const corrected = match.outcome !== null;
+      if (!corrected && (input.outcome === 'PLAYER_A_WIN' || input.outcome === 'PLAYER_B_WIN') &&
+          (input.playerAGameWins < (match.playerAGameWins ?? 0) || input.playerBGameWins < (match.playerBGameWins ?? 0))) {
+        throw new LimitedPersistenceConflictError('The match score changed. Refresh before reporting the result.');
+      }
       if (corrected && !input.correctionReason?.trim()) {
         throw new Error('A correction reason is required to change a result.');
       }
@@ -3495,6 +3518,7 @@ async function loadLimitedMatchRequired(
     outcome: row.match.outcome,
     playerAGameWins: row.match.playerAGameWins,
     playerBGameWins: row.match.playerBGameWins,
+    currentGameStartedAt: row.match.currentGameStartedAt,
     reportedAt: row.match.reportedAt,
   };
 }

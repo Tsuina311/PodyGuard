@@ -117,6 +117,10 @@ export type PublicDisplayLimitedMatch = {
   playerBName?: string;
   status: string;
   outcome?: string;
+  bestOf?: number;
+  playerAGameWins?: number;
+  playerBGameWins?: number;
+  currentGameStartedAt?: string;
 };
 
 export type PublicDisplayLimitedSession = {

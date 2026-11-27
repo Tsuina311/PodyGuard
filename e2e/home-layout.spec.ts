@@ -131,6 +131,10 @@ test('Playgroups remains reachable for a signed-in account with a long name', as
 });
 
 test('saved event shortcuts show dates and can be removed from this device’s list', async ({ page }) => {
+  // These fixtures represent active events; missing events are now pruned.
+  await page.route(/\/api\/events\/(AB23CD|XY23AB)$/, route => route.fulfill({
+    json: { status: 'open', expiresAt: new Date(Date.now() + 86_400_000).toISOString() },
+  }));
   await page.setViewportSize({ width: 320, height: 844 });
   await openHome(page);
   await page.evaluate(() => {

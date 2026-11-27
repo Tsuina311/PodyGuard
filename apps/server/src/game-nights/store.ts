@@ -3,11 +3,12 @@ import { eq, desc, sql } from 'drizzle-orm';
 import type { GameNight, GameNightInput, NightRsvp } from '@podyguard/shared';
 import { getDb, withDbTransaction } from '../db/client.js';
 import { gameNights, gameNightRsvps } from '../db/schema.js';
+export type NewGameNight = Omit<GameNightInput, 'invitedGuestIds'> & { invitees?: import('@podyguard/shared').NightInvitee[] };
 
 export interface GameNightStore {
   list(playgroupId: string): Promise<GameNight[]>;
   get(id: string): Promise<GameNight | undefined>;
-  create(playgroupId: string, input: GameNightInput): Promise<GameNight>;
+  create(playgroupId: string, input: NewGameNight): Promise<GameNight>;
   update(
     id: string,
     patch: Partial<Pick<GameNight, 'cancelled' | 'eventJoinCode'>>,
@@ -28,7 +29,7 @@ export class MemoryGameNightStore implements GameNightStore {
   async get(id: string) {
     return this.nights.get(id);
   }
-  async create(playgroupId: string, input: GameNightInput) {
+  async create(playgroupId: string, input: NewGameNight) {
     const night: GameNight = {
       ...input,
       id: randomUUID(),
@@ -72,6 +73,7 @@ export class MemoryGameNightStore implements GameNightStore {
 function present(row: typeof gameNights.$inferSelect): GameNight {
   return {
     ...row,
+    eventSetup: row.eventSetup ?? undefined,
     startsAt: row.startsAt.toISOString(),
     createdAt: row.createdAt.toISOString(),
   };
@@ -93,7 +95,7 @@ export class PostgresGameNightStore implements GameNightStore {
       .where(eq(gameNights.id, id));
     return row ? present(row) : undefined;
   }
-  async create(playgroupId: string, input: GameNightInput) {
+  async create(playgroupId: string, input: NewGameNight) {
     const [row] = await getDb()
       .insert(gameNights)
       .values({ ...input, playgroupId, startsAt: new Date(input.startsAt) })
@@ -112,21 +114,23 @@ export class PostgresGameNightStore implements GameNightStore {
     return present(row!);
   }
   async rsvps(id: string) {
-    return getDb()
+    const rows = await getDb()
       .select({
+        guestProfileId: gameNightRsvps.guestProfileId,
         displayName: gameNightRsvps.displayName,
         response: gameNightRsvps.response,
       })
       .from(gameNightRsvps)
       .where(eq(gameNightRsvps.nightId, id));
+    return rows.map(row => ({ ...row, guestProfileId: row.guestProfileId ?? undefined }));
   }
   async rsvp(id: string, tokenHash: string, response: NightRsvp) {
     await getDb()
       .insert(gameNightRsvps)
-      .values({ nightId: id, tokenHash, ...response })
+      .values({ nightId: id, tokenHash, ...response, guestProfileId: response.guestProfileId ?? null })
       .onConflictDoUpdate({
         target: [gameNightRsvps.nightId, gameNightRsvps.tokenHash],
-        set: response,
+        set: { ...response, guestProfileId: response.guestProfileId ?? null },
       });
   }
   async exclusive<T>(id: string, work: () => Promise<T>): Promise<T> {

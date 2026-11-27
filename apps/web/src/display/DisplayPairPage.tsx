@@ -13,6 +13,7 @@ import { Field } from '../ui/Field';
 import { Brand } from '../ui/Brand';
 import { Button } from '../ui/Button';
 import { Panel } from '../ui/Panel';
+import { ReceiveLinkPanel } from '../link-transfer/ReceiveLinkPanel';
 
 export function DisplayPairPage() {
   const { t } = useTranslation();
@@ -120,6 +121,7 @@ export function DisplayPairPage() {
         </p>
       </header>
 
+      <ReceiveLinkPanel />
       <Panel title={t('eventMonitor.title')} onSubmit={event => {
         event.preventDefault();
         const code = normalizeJoinCode(eventCode);

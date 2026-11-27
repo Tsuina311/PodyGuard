@@ -11,7 +11,7 @@ export function useSavedPlayers() {
       void pruneInactiveSavedPlayers().then(() => setEvents(listSavedPlayerEvents()));
     };
     const visible = () => { if (document.visibilityState === 'visible') refresh(); };
-    const names = ['storage', 'focus', 'pageshow', 'podyguard:player-sessions'];
+    const names = ['storage', 'focus', 'pageshow', 'podyguard:player-sessions', 'podyguard:recent-events'];
     names.forEach(name => window.addEventListener(name, refresh));
     document.addEventListener('visibilitychange', visible);
     refresh();

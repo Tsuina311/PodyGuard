@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -36,6 +36,9 @@ import { activeMatchPath } from './active-match';
 import { OngoingGame } from './OngoingGame';
 import { LimitedTablePlanner, TablePlanner } from './limited/TablePlanner';
 import { SavedPlayersShortcut } from './SavedPlayersPage';
+import { InvitationPlanningFields } from './game-nights/InvitationPlanningFields';
+import { createNight } from './game-nights/api';
+import { rememberRecentEvent } from './recent-events';
 import {
   defaultHostLimitedConfigs,
   limitedConfigsForEventCreate,
@@ -141,6 +144,12 @@ export function HomePage() {
   );
   const [playgroupOverview, setPlaygroupOverview] =
     useState<PlaygroupOverview | null>(null);
+  const chosenGroup = useRef<string | null>(null);
+  const [planInvitation, setPlanInvitation] = useState(false);
+  const [invitationStartsAt, setInvitationStartsAt] = useState('');
+  const [invitationLocation, setInvitationLocation] = useState('');
+  const [invitedGuestIds, setInvitedGuestIds] = useState<string[] | null>(null);
+  const effectiveInvitedIds = invitedGuestIds ?? playgroupOverview?.guests.slice(0, 100).map(row => row.guest.id) ?? [];
   const [showReturningSuggestions, setShowReturningSuggestions] =
     useState(true);
   const [selectedLocalGuestIds, setSelectedLocalGuestIds] = useState<string[]>(
@@ -162,10 +171,11 @@ export function HomePage() {
           list[0]?.id ??
           null;
         setSelectedPlaygroupId(chosen);
+        chosenGroup.current = chosen;
         setPlaygroupStatus('ready');
         if (chosen) {
           const ov = await getPlaygroupOverview(accountSession.token, chosen).catch(() => null);
-          if (!cancelled) setPlaygroupOverview(ov?.overview ?? null);
+          if (!cancelled && chosenGroup.current === chosen) setPlaygroupOverview(ov?.overview ?? null);
         }
       })
       .catch(() => {
@@ -178,6 +188,9 @@ export function HomePage() {
 
   async function onChoosePlaygroup(pgId: string | null) {
     setSelectedPlaygroupId(pgId);
+    chosenGroup.current = pgId;
+    setPlaygroupOverview(null);
+    setInvitedGuestIds(null);
     savePreferredPlaygroupId(pgId);
     if (!pgId || !accountSession?.token) {
       setPlaygroupOverview(null);
@@ -185,9 +198,9 @@ export function HomePage() {
     }
     try {
       const ov = await getPlaygroupOverview(accountSession.token, pgId);
-      setPlaygroupOverview(ov.overview);
+      if (chosenGroup.current === pgId) setPlaygroupOverview(ov.overview);
     } catch {
-      setPlaygroupOverview(null);
+      if (chosenGroup.current === pgId) setPlaygroupOverview(null);
     }
   }
 
@@ -419,7 +432,7 @@ export function HomePage() {
       const rulesFormat: RulesFormat = isLimited
         ? 'commander'
         : hostResolved.rulesFormat;
-      const result = await createEvent(name.trim() || suggestedName, hostPin, Number(tableCount), {
+      const options: NonNullable<Parameters<typeof createEvent>[3]> = {
         tableLayouts: isLimited ? undefined : tableLayouts ?? undefined,
         gameMode: createMode,
         rulesFormat,
@@ -459,14 +472,30 @@ export function HomePage() {
         ),
         playgroupId: selectedPlaygroupId ?? undefined,
         showReturningPlayerSuggestions: showReturningSuggestions,
-      });
+      };
+      if (planInvitation) {
+        if (!accountSession?.token || !selectedPlaygroupId || playgroupOverview?.playgroup.id !== selectedPlaygroupId || !effectiveInvitedIds.length) {
+          throw new Error(t('invitationPlan.chooseGroup'));
+        }
+        const { playgroupId: _groupId, accountToken: _accountToken, ...eventSetup } = options;
+        const { night } = await createNight(selectedPlaygroupId, accountSession.token, {
+          name: name.trim() || suggestedName, startsAt: new Date(invitationStartsAt).toISOString(),
+          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, location: invitationLocation.trim(),
+          seatTarget: Math.max(2, effectiveInvitedIds.length), agreement: {},
+          invitedGuestIds: effectiveInvitedIds, eventSetup: { ...eventSetup, tableCount: Number(tableCount) },
+        });
+        rememberRecentEvent(`/nights/${night.id}`, night.name);
+        void navigate(`/nights/${night.id}`);
+        return;
+      }
+      const result = await createEvent(name.trim() || suggestedName, hostPin, Number(tableCount), options);
       saveHostToken(result.event.joinCode, result.hostToken, result.event.name);
       void navigate(`/host/${result.event.joinCode}`);
     } catch (caught) {
       setError(
         caught instanceof ApiError
           ? caught.message
-          : t('common.errors.createEvent'),
+          : caught instanceof Error ? caught.message : t('common.errors.createEvent'),
       );
     } finally {
       setBusy(false);
@@ -482,6 +511,11 @@ export function HomePage() {
     }
     void navigate(`/e/${code}`);
   }
+
+  const invitationFields = <InvitationPlanningFields enabled={planInvitation} onEnabled={setPlanInvitation}
+    signedIn={Boolean(accountSession?.token)} playgroup={playgroupOverview} invitedIds={effectiveInvitedIds}
+    onInvitedIds={setInvitedGuestIds} startsAt={invitationStartsAt} onStartsAt={setInvitationStartsAt}
+    location={invitationLocation} onLocation={setInvitationLocation} />;
 
   const hostPlaygroupPicker = (
     <div role="group" aria-label={t('home.playgroup.title')} className="border-muted/20 bg-void/40 mb-4 rounded-xl border p-3">
@@ -732,7 +766,7 @@ export function HomePage() {
                         {checked ? '☑ ' : '☐ '}
                         {guest.displayName}
                       </span>
-                      {pref?.commanderName ? (
+                      {playCommander && pref?.commanderName ? (
                         <span className="text-muted/80 block text-[10px]">
                           {pref.commanderName}
                           {pref.bracket ? ` · B${pref.bracket}` : ''}
@@ -910,6 +944,7 @@ export function HomePage() {
             autoComplete="off"
           />
           {hostPlaygroupPicker}
+          {invitationFields}
           <TablePlanner title={t('tablePlan.playing')}
             value={tableLayouts ?? Array.from({ length: Number(tableCount) || 1 }, () => ({ shape: 'square' as const, seats: eventPodSize }))}
             allowedSizes={tournamentFormat ? [tournamentMatchSize] : eventTablePolicy({ gameMode, preferredPodSize: eventPodSize, allowThreePods, allowFivePods }).allowedSizes}
@@ -1267,7 +1302,7 @@ export function HomePage() {
             max={168}
             required
           />
-          <Field
+          {!planInvitation && <Field
             label={t('home.hostPin')}
             hint={t('home.hostPinHint')}
             value={hostPin}
@@ -1275,9 +1310,9 @@ export function HomePage() {
             inputMode="numeric"
             autoComplete="off"
             required
-          />
+          />}
           <Button type="submit" size="lg" block disabled={busy || playgroupStatus === 'loading'}>
-            {busy ? t('common.creating') : t('home.createEvent')}
+            {busy ? t('common.creating') : t(planInvitation ? 'invitationPlan.create' : 'home.createEvent')}
           </Button>
         </Panel>
       ) : null}
@@ -1302,6 +1337,7 @@ export function HomePage() {
             autoComplete="off"
           />
           {hostPlaygroupPicker}
+          {invitationFields}
           <fieldset className="mb-4">
             <legend className="text-muted mb-2 text-sm">
               {t('home.limitedFormat')}
@@ -1345,7 +1381,7 @@ export function HomePage() {
             max={168}
             required
           />
-          <Field
+          {!planInvitation && <Field
             label={t('home.hostPin')}
             hint={t('home.hostPinHint')}
             value={hostPin}
@@ -1353,14 +1389,14 @@ export function HomePage() {
             inputMode="numeric"
             autoComplete="off"
             required
-          />
+          />}
           <Button
             type="submit"
             size="lg"
             block
             disabled={busy || !limitedEnabled || playgroupStatus === 'loading'}
           >
-            {busy ? t('common.creating') : t('home.createEvent')}
+            {busy ? t('common.creating') : t(planInvitation ? 'invitationPlan.create' : 'home.createEvent')}
           </Button>
         </Panel>
       ) : null}

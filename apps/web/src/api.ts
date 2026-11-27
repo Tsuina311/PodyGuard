@@ -531,6 +531,15 @@ export function startLimitedRound(joinCode: string, token: string, sessionId: st
   return limitedSessionRequest(joinCode, token, sessionId, '/rounds', { method: 'POST' });
 }
 
+export function reportLimitedProgress(
+  joinCode: string, token: string, sessionId: string, matchId: string,
+  progress: { playerAGameWins: number; playerBGameWins: number; startGame?: boolean },
+) {
+  return limitedSessionRequest(joinCode, token, sessionId, `/matches/${matchId}/progress`, {
+    method: 'POST', body: JSON.stringify(progress),
+  });
+}
+
 export function reportLimitedResult(
   joinCode: string,
   token: string,

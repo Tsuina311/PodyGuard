@@ -2,6 +2,20 @@
 
 ## Host and guest flow
 
+The **Host event** tab can also plan an invitation using **Create an invitation
+for later**, for Constructed or Limited. Select the playgroup, invited players,
+date/time and location, and configure the physical tables normally. The
+invitation saves the format, table shapes/capacities, tournament or Limited
+settings, and event lifetime without storing a host PIN or creating a live
+event. The expiry timer starts only when the organizer uses **Start event**.
+
+Guests see the event type, time zone, location and invited roster, and can add
+the invitation to their calendar. They can select an invited playgroup player
+and edit **Your name** to use a nickname. That response retains the selected
+guest reference without renaming the playgroup profile or authenticating the
+guest as that person. An invitation link is still shared manually; no messages
+are sent automatically. Migration 0035 persists the plan and invitee references.
+
 Open **My playgroups**, select a group, and use **Plan the next night**. Choose
 an absolute start time in the browser's displayed time zone, a location note and
 a seat target. Add an optional pace, game length and table preferences. Share
@@ -21,8 +35,9 @@ changes and cancellation require a fresh download. Invitations stop accepting
 responses after cancellation, event start, or 24 hours after their scheduled
 start. Seat targets are planning information, not reservations or a cap on RSVPs.
 
-**Start event** creates the existing Commander event, with one physical table
-per four target seats (rounded up). Hosts can then use normal event controls.
+**Start event** restores the saved format and physical table setup. Older
+invitations without a saved setup retain the Commander default, with one
+physical table per four target seats (rounded up). Hosts can then use normal event controls.
 Attendance never joins or readies a player automatically. The agreement is copied
 into event snapshots and appears on the player lobby and host desk. It does not
 change bracket compatibility or block a player from joining.

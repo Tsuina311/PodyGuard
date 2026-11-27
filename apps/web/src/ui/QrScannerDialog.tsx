@@ -37,20 +37,33 @@ function createBarcodeDetector(): BarcodeDetectorLike | null {
 export function QrScannerDialog({
   onDetect,
   onClose,
+  parse,
+  title,
+  hint,
+  invalidCodeHint,
+  cameraErrorHint,
 }: {
   onDetect: (joinCode: string) => void;
   onClose: () => void;
+  parse?: (raw: string) => string | null;
+  title?: string;
+  hint?: string;
+  invalidCodeHint?: string;
+  cameraErrorHint?: string;
 }) {
   const { t } = useTranslation();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const onDetectRef = useRef(onDetect);
+  const parseRef = useRef(parse);
+  const [invalidScan, setInvalidScan] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [starting, setStarting] = useState(true);
 
   useEffect(() => {
     onDetectRef.current = onDetect;
-  }, [onDetect]);
+    parseRef.current = parse;
+  }, [onDetect, parse]);
 
   useEffect(() => {
     let stream: MediaStream | null = null;
@@ -60,7 +73,7 @@ export function QrScannerDialog({
 
     async function start() {
       if (!navigator.mediaDevices?.getUserMedia) {
-        setError(t('scanner.noCamera'));
+        setError(cameraErrorHint ?? t('scanner.noCamera'));
         setStarting(false);
         return;
       }
@@ -75,7 +88,7 @@ export function QrScannerDialog({
         });
       } catch {
         if (!cancelled) {
-          setError(t('scanner.permissionDenied'));
+          setError(cameraErrorHint ?? t('scanner.permissionDenied'));
           setStarting(false);
         }
         return;
@@ -91,7 +104,12 @@ export function QrScannerDialog({
         return;
       }
       video.srcObject = stream;
-      await video.play();
+      try { await video.play(); } catch {
+        for (const track of stream.getTracks()) track.stop();
+        stream = null;
+        if (!cancelled) { setError(cameraErrorHint ?? t('scanner.permissionDenied')); setStarting(false); }
+        return;
+      }
       setStarting(false);
 
       const canvas = canvasRef.current;
@@ -120,7 +138,9 @@ export function QrScannerDialog({
             raw = jsQR(image.data, width, height)?.data ?? null;
           }
         }
-        const code = raw ? joinCodeFromScan(raw) : null;
+        if (cancelled) return;
+        const code = raw ? (parseRef.current ?? joinCodeFromScan)(raw) : null;
+        if (raw && !code) setInvalidScan(true);
         if (code) {
           onDetectRef.current(code);
           return;
@@ -140,19 +160,20 @@ export function QrScannerDialog({
         }
       }
     };
-  }, [t]);
+  }, [t, cameraErrorHint]);
 
   return (
     <div
       role="dialog"
       aria-modal="true"
-      aria-label={t('scanner.ariaLabel')}
+      aria-label={title ?? t('scanner.ariaLabel')}
       className="bg-void/95 fixed inset-0 z-[80] flex flex-col p-4 pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-[max(1rem,env(safe-area-inset-top))] backdrop-blur-md"
     >
       <header className="mb-3 flex shrink-0 items-center justify-between gap-3">
         <div>
-          <h2 className="font-display text-lg font-bold">{t('scanner.title')}</h2>
-          <p className="text-muted text-xs">{t('scanner.hint')}</p>
+          <h2 className="font-display text-lg font-bold">{title ?? t('scanner.title')}</h2>
+          <p className="text-muted text-xs">{hint ?? t('scanner.hint')}</p>
+          {invalidScan && invalidCodeHint && <p role="status" className="text-warning text-xs">{invalidCodeHint}</p>}
         </div>
         <button
           type="button"

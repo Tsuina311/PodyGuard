@@ -479,6 +479,12 @@ function toPublicDisplayLimitedSession(
         : {}),
       status: match.status,
       ...(match.outcome ? { outcome: match.outcome } : {}),
+      bestOf: match.bestOf,
+      playerAGameWins: match.playerAGameWins ?? 0,
+      playerBGameWins: match.playerBGameWins ?? 0,
+      ...(config.showTimers && match.currentGameStartedAt ? {
+        currentGameStartedAt: match.currentGameStartedAt,
+      } : {}),
     })),
     resultsReported: progress.reported,
     resultsTotal: progress.total,

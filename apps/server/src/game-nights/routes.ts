@@ -3,12 +3,12 @@ import type { FastifyPluginAsync, FastifyReply } from 'fastify';
 import {
   gameNightCalendar,
   parsePregameAgreement,
-  type GameNightInput,
   type NightRsvp,
 } from '@podyguard/shared';
 import { InvalidEventInputError } from '../events/validation.js';
 import { sendEventError } from '../routes/events.js';
-import { GameNightBusyError, type GameNightStore } from './store.js';
+import { GameNightBusyError, type GameNightStore, type NewGameNight } from './store.js';
+import { parseInvitationEventSetup } from './event-setup.js';
 function sendNightError(reply: FastifyReply, error: unknown) {
   if (error instanceof GameNightBusyError)
     return reply
@@ -60,8 +60,17 @@ export const gameNightRoutes: FastifyPluginAsync<{
     '/playgroups/:playgroupId/nights',
     async (req, reply) => {
       try {
-        await host(bearer(req.headers.authorization), req.params.playgroupId);
+        const overview = await host(bearer(req.headers.authorization), req.params.playgroupId);
         const body = (req.body ?? {}) as Record<string, unknown>;
+        const invitedIds = body.invitedGuestIds ?? [];
+        if (!Array.isArray(invitedIds) || invitedIds.length > 100 || invitedIds.some(id => typeof id !== 'string' || !uuid.test(id)) || new Set(invitedIds).size !== invitedIds.length) {
+          throw new InvalidEventInputError('Choose up to 100 different players from this playgroup.');
+        }
+        const invitees = invitedIds.map(id => {
+          const person = overview.guests.find(row => row.guest.id === id)?.guest;
+          if (!person) throw new InvalidEventInputError('An invited player does not belong to this playgroup.');
+          return { guestProfileId: person.id, displayName: person.displayName };
+        });
         const startsAt = text(body.startsAt, 'start time', 40);
         if (
           !Number.isFinite(Date.parse(startsAt)) ||
@@ -89,7 +98,9 @@ export const gameNightRoutes: FastifyPluginAsync<{
         } catch (e) {
           throw new InvalidEventInputError((e as Error).message);
         }
-        const input: GameNightInput = {
+        const input: NewGameNight = {
+          eventSetup: parseInvitationEventSetup(body.eventSetup),
+          invitees,
           name: text(body.name, 'name', 80),
           startsAt: new Date(startsAt).toISOString(),
           timeZone,
@@ -162,6 +173,12 @@ export const gameNightRoutes: FastifyPluginAsync<{
                 message: 'This invitation is closed.',
               },
             });
+          if (body.guestProfileId !== undefined && body.guestProfileId !== '') {
+            if (typeof body.guestProfileId !== 'string' || !night.invitees?.some(person => person.guestProfileId === body.guestProfileId)) {
+              throw new InvalidEventInputError('Choose a player invited to this event.');
+            }
+            response.guestProfileId = body.guestProfileId;
+          }
           await store.rsvp(
             night.id,
             createHash('sha256').update(token).digest('hex'),
@@ -242,6 +259,7 @@ export const gameNightRoutes: FastifyPluginAsync<{
               gameMode: 'commander',
               rulesFormat: 'commander',
               tableCount: Math.ceil(night.seatTarget / 4),
+              ...night.eventSetup,
               playgroupId: night.playgroupId,
               gameNightId: night.id,
               pregameAgreement: night.agreement,

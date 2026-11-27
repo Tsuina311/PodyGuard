@@ -5,12 +5,14 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   gameNightCalendar,
+  gameNightEventType,
   type GameNight,
   type NightView,
   type NightRsvp,
 } from '@podyguard/shared';
 import { loadAccountToken, saveHostToken } from '../api';
 import { readStored, writeStored } from '../device-storage';
+import { createPlayerScope } from '../player-sessions';
 import { Button } from '../ui/Button';
 import { Field } from '../ui/Field';
 import { Panel } from '../ui/Panel';
@@ -206,6 +208,7 @@ export function GameNightPage() {
   const [view, setView] = useState<NightView | null>(null);
   const [name, setName] = useState('');
   const [response, setResponse] = useState<NightRsvp['response']>('yes');
+  const [guestProfileId, setGuestProfileId] = useState('');
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -223,6 +226,7 @@ export function GameNightPage() {
     setMessage('');
     setName('');
     setResponse('yes');
+    setGuestProfileId('');
     const stored = readStored(`podyguard.night.answer.${id}`);
     if (stored) {
       try {
@@ -233,6 +237,7 @@ export function GameNightPage() {
         ) {
           setName(a.displayName);
           setResponse(a.response);
+          setGuestProfileId(a.guestProfileId ?? '');
         }
       } catch {
         /* start a fresh response */
@@ -327,6 +332,14 @@ export function GameNightPage() {
         {when(night)} ({night.timeZone})
       </p>
       <p className="break-words">{night.location}</p>
+      <p className="my-2 font-semibold">{t('invitationPlan.eventType')}: {gameNightEventType(night)}</p>
+      {night.invitees?.length ? <section className="my-3">
+        <h3 className="font-semibold">{t('invitationPlan.invited')}</h3>
+        <ul className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted">
+          {night.invitees.map(person => <li key={person.guestProfileId}>{person.displayName}</li>)}
+        </ul>
+      </section> : null}
+      {owns && night.eventSetup && !night.eventJoinCode && <p className="my-2 text-sm text-muted">{t('invitationPlan.savedSetup')}</p>}
       <p>
         {responses.filter((r) => r.response === 'yes').length} Yes ·{' '}
         {responses.filter((r) => r.response === 'maybe').length} Maybe ·{' '}
@@ -380,19 +393,33 @@ export function GameNightPage() {
               const key = `podyguard.night.key.${id}`;
               let secret = readStored(key);
               if (!secret || !/^[a-zA-Z0-9_-]{32,128}$/.test(secret)) {
-                secret = crypto.randomUUID().replaceAll('-', '');
+                secret = createPlayerScope().replaceAll('-', '');
                 writeStored(key, secret);
               }
-              await rsvpNight(id, secret, { displayName: name, response });
+              const answer: NightRsvp = { displayName: name, response, ...(guestProfileId ? { guestProfileId } : {}) };
+              await rsvpNight(id, secret, answer);
               writeStored(
                 `podyguard.night.answer.${id}`,
-                JSON.stringify({ displayName: name, response }),
+                JSON.stringify(answer),
               );
               await refresh();
               setMessage('Response saved.');
             });
           }}
         >
+          {night.invitees?.length ? <label className="mb-3 block text-sm">
+            <span className="mb-1 block">{t('invitationPlan.choosePlayer')}</span>
+            <select aria-label={t('invitationPlan.choosePlayer')} className="w-full rounded-xl border border-muted/30 bg-void px-3 py-2 text-base" value={guestProfileId}
+              onChange={event => {
+                setGuestProfileId(event.target.value);
+                const selected = night.invitees?.find(person => person.guestProfileId === event.target.value);
+                if (selected) setName(selected.displayName);
+              }}>
+              <option value="">{t('invitationPlan.anotherName')}</option>
+              {night.invitees.map(person => <option key={person.guestProfileId} value={person.guestProfileId}>{person.displayName}</option>)}
+            </select>
+            <span className="mt-1 block text-xs text-muted">{t('invitationPlan.nicknameHint')}</span>
+          </label> : null}
           <Field
             label="Your name"
             required
@@ -457,8 +484,7 @@ export function GameNightPage() {
             Cancel night
           </Button>
           <p className="text-sm text-muted">
-            Starting creates a Commander event. Friends still join and mark
-            themselves ready.
+            {t('invitationPlan.startHint', { type: gameNightEventType(night) })}
           </p>
         </section>
       ) : null}

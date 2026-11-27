@@ -2008,6 +2008,42 @@ export class EventService {
     );
   }
 
+  async reportLimitedProgress(
+    joinCode: string, participantToken: string, sessionId: string, matchId: string,
+    input: { playerAGameWins: number; playerBGameWins: number; startGame?: boolean },
+  ): Promise<PublicLimitedSession> {
+    const event = await this.requireByJoinCode(joinCode);
+    const reporter = await this.requireParticipant(event.id, participantToken);
+    const session = await this.requireLimitedSession(event.id, sessionId);
+    const match = requireLimitedMatch(session, matchId);
+    if (session.status !== 'ROUND_ACTIVE' || match.status !== 'PLAYING' || match.outcome ||
+        !match.playerBId || ![match.playerAId, match.playerBId].includes(reporter.id)) {
+      throw new InvalidParticipantTransitionError('Only a paired player can update an active Limited match.');
+    }
+    const a = input?.playerAGameWins, b = input?.playerBGameWins;
+    const previousA = match.playerAGameWins ?? 0, previousB = match.playerBGameWins ?? 0;
+    const winsNeeded = Math.ceil(match.bestOf / 2);
+    if (!Number.isInteger(a) || !Number.isInteger(b) || a < previousA || b < previousB ||
+        a >= winsNeeded || b >= winsNeeded ||
+        (input.startGame !== undefined && typeof input.startGame !== 'boolean')) {
+      throw new InvalidEventInputError('Use a nondecreasing, unfinished match score. Report the final result separately.');
+    }
+    const changed = a !== previousA || b !== previousB;
+    // A game start is idempotent. A new score waits for the next game's start.
+    if (!changed && (!input.startGame || match.currentGameStartedAt)) return toPublicLimitedSession(session, this.now());
+    const updated = await this.store.updateLimitedMatchProgress({
+      matchId, previousA, previousB, previousStartedAt: match.currentGameStartedAt ?? null,
+      playerAGameWins: a, playerBGameWins: b,
+      currentGameStartedAt: input.startGame ? this.now() : null,
+    });
+    const fresh = await this.requireLimitedSession(event.id, sessionId);
+    const latest = requireLimitedMatch(fresh, matchId);
+    if (!updated && (latest.outcome || latest.playerAGameWins !== a || latest.playerBGameWins !== b)) {
+      throw new InvalidParticipantTransitionError('The match changed on another device. Refresh before reporting another game.');
+    }
+    return toPublicLimitedSession(fresh, this.now());
+  }
+
   async reportLimitedResult(
     joinCode: string,
     participantToken: string,
@@ -2041,6 +2077,10 @@ export class EventService {
       );
     }
     validateLimitedResult(match, result);
+    if ((result.outcome === 'PLAYER_A_WIN' || result.outcome === 'PLAYER_B_WIN') &&
+        (result.playerAGameWins < (match.playerAGameWins ?? 0) || result.playerBGameWins < (match.playerBGameWins ?? 0))) {
+      throw new InvalidParticipantTransitionError('The final score cannot erase an already reported game.');
+    }
     const finalized = await this.store.finalizeLimitedMatchResult({
       matchId,
       ...result,
@@ -4780,7 +4820,7 @@ function resolveAllowFivePods(
   return false;
 }
 
-function normalizeLimitedModeConfigs(
+export function normalizeLimitedModeConfigs(
   input: LimitedEventModeConfig[] | undefined,
 ): LimitedEventModeConfig[] {
   if (!input) return [];
@@ -4935,6 +4975,7 @@ function toLimitedMatch(match: StoredLimitedMatch) {
     outcome: match.outcome ?? undefined,
     playerAGameWins: match.playerAGameWins ?? undefined,
     playerBGameWins: match.playerBGameWins ?? undefined,
+    currentGameStartedAt: match.currentGameStartedAt?.toISOString(),
     reportedAt: match.reportedAt?.toISOString(),
   };
 }
@@ -5406,7 +5447,7 @@ function clampRating(value: number): PodRating {
   return 4;
 }
 
-function parseTournamentFormat(
+export function parseTournamentFormat(
   value: unknown,
 ): TournamentFormat | undefined {
   if (value === 'single-elimination' || value === 'swiss') {
@@ -5415,7 +5456,7 @@ function parseTournamentFormat(
   return undefined;
 }
 
-function parseTournamentOptions(value: unknown): TournamentOptions {
+export function parseTournamentOptions(value: unknown): TournamentOptions {
   if (!value || typeof value !== 'object') {
     return {};
   }

@@ -178,6 +178,7 @@ export type LimitedMatch = {
   outcome?: LimitedMatchOutcome;
   playerAGameWins?: number;
   playerBGameWins?: number;
+  currentGameStartedAt?: string;
   reportedAt?: string;
 };
 

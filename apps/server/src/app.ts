@@ -1,4 +1,7 @@
 import { tableViewRoutes } from './table-view/routes.js';
+import { LinkTransferService } from './link-transfer/service.js';
+import { MemoryLinkTransferStore, PostgresLinkTransferStore, type LinkTransferStore } from './link-transfer/store.js';
+import { linkTransferRoutes } from './link-transfer/routes.js';
 import { eventTrackerRoutes } from './event-tracker/routes.js';
 import { MemoryEventTrackerStore, PostgresEventTrackerStore, type EventTrackerStore } from './event-tracker/store.js';
 import { gameNightRoutes } from './game-nights/routes.js';
@@ -34,6 +37,7 @@ import { scryfallRoutes } from './routes/scryfall.js';
 import type { ScryfallClient } from './scryfall/scryfall-client.js';
 
 export type BuildAppOptions = {
+  linkTransferStore?: LinkTransferStore;
   eventTrackerStore?: EventTrackerStore;
   gameNightStore?: GameNightStore;
   identity?: IdentityBoundary;
@@ -90,6 +94,8 @@ export async function buildApp(options: BuildAppOptions = {}) {
   app.decorate('identity', identity);
   app.decorate('events', events);
   app.decorate('displays', displays);
+  app.decorate('linkTransfers', new LinkTransferService(options.linkTransferStore ??
+    (options.events ? new MemoryLinkTransferStore() : new PostgresLinkTransferStore())));
   app.decorate('live', attachLive(app));
 
   await app.register(cors, {
@@ -111,6 +117,7 @@ export async function buildApp(options: BuildAppOptions = {}) {
   await app.register(googleAuthRoutes);
   await app.register(adminRoutes);
   await app.register(displayRoutes);
+  await app.register(linkTransferRoutes);
   await app.register(feedbackRoutes, {
     service: new FeedbackService(feedbackTransport),
   });

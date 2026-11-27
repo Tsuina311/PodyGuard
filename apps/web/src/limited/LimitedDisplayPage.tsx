@@ -12,6 +12,8 @@ import { Panel } from '../ui/Panel';
 import { ThemeToggleCorner } from '../ui/ThemeToggle';
 import { useEventLive } from '../useEventLive';
 import { LimitedTimerDisplay } from './LimitedTimerDisplay';
+import { LimitedMatchProgress } from './LimitedMatchProgress';
+import { LimitedMatchStatus } from './LimitedMatchStatus';
 import { LIMITED_MODE_LABELS, participantName } from './limited-view';
 
 export function LimitedDisplayPage() {
@@ -135,7 +137,12 @@ export function EventDisplayContent({ snapshot }: { snapshot: EventSnapshot }) {
                     <p className="font-display text-lg font-semibold">
                       {participantName(session, match.playerAId)} <span className="text-muted">vs</span> {participantName(session, match.playerBId)}
                     </p>
-                    <p className="text-muted mt-1 text-sm">{match.outcome?.replaceAll('_', ' ') ?? match.status}</p>
+                    <p className="text-muted mt-1 text-sm">
+                      <LimitedMatchStatus outcome={match.outcome} status={match.status}
+                        playerAName={participantName(session, match.playerAId)}
+                        playerBName={participantName(session, match.playerBId)} />
+                    </p>
+                    <LimitedMatchProgress match={match} />
                   </div>
                 ))}
               </div>

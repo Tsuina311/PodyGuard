@@ -10,6 +10,7 @@ import { EventNotFoundError } from './events/event-store.js';
 
 export type EventLive = {
   publish(joinCode: string): Promise<void>;
+  publishTransfer(id: string): void;
 };
 
 function roomName(joinCode: string): string {
@@ -24,6 +25,7 @@ export function attachLive(app: FastifyInstance): EventLive {
   let io: Server | undefined;
 
   const live: EventLive = {
+    publishTransfer(id) { io?.to(`link-transfer:${id}`).emit('link-transfer-ready'); },
     async publish(joinCode: string) {
       if (!io) {
         return;
@@ -61,6 +63,17 @@ export function attachLive(app: FastifyInstance): EventLive {
       cors: { origin: true },
     });
     io.on('connection', (socket) => {
+      socket.on('watch-link-transfer', async (value: unknown) => {
+        if (!value || typeof value !== 'object') return;
+        const { id, receiveToken } = value as Record<string, unknown>;
+        if (typeof id !== 'string' || typeof receiveToken !== 'string') return;
+        try {
+          const state = await app.linkTransfers.receive(id, receiveToken);
+          if (!socket.connected) return;
+          socket.join(`link-transfer:${id}`);
+          if (state.status === 'ACCEPTED') socket.emit('link-transfer-ready');
+        } catch { /* Invalid or expired credentials never join a room. */ }
+      });
       socket.on('watch', async (joinCode: unknown) => {
         if (typeof joinCode !== 'string' || joinCode.trim() === '') {
           return;

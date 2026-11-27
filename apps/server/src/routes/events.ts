@@ -794,6 +794,20 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
   );
 
   app.post(
+    '/events/:joinCode/limited/sessions/:sessionId/matches/:matchId/progress',
+    async (request, reply) => {
+      const { joinCode, sessionId, matchId } = request.params as { joinCode: string; sessionId: string; matchId: string };
+      try {
+        const session = await app.events.reportLimitedProgress(normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization), sessionId, matchId,
+          request.body as { playerAGameWins: number; playerBGameWins: number; startGame?: boolean });
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return { session };
+      } catch (error) { return sendEventError(reply, error); }
+    },
+  );
+
+  app.post(
     '/events/:joinCode/limited/sessions/:sessionId/matches/:matchId/result',
     async (request, reply) => {
       const { joinCode, sessionId, matchId } = request.params as {

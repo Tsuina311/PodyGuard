@@ -12,8 +12,9 @@ export function RecentEvents() {
 
   useEffect(() => {
     const refresh = () => setRows(recentEvents());
-    window.addEventListener('storage', refresh);
-    return () => window.removeEventListener('storage', refresh);
+    const names = ['storage', 'podyguard:recent-events'];
+    names.forEach(name => window.addEventListener(name, refresh));
+    return () => names.forEach(name => window.removeEventListener(name, refresh));
   }, []);
 
   if (!rows.length) return null;

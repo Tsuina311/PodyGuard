@@ -1,8 +1,51 @@
 # Public Event Display / TV Mode
 
+Limited matches show their best-of score on the host Overview and public display.
+Each recorded game updates the shared score without completing the match or
+releasing its table. Starting the next game (with or without the life tracker)
+starts that game's elapsed clock; between games the display says it is waiting
+to start. The elapsed clock disappears when the match result is reported.
+Hiding timers on a paired display also hides these clocks.
+
+Migration 0033 adds the nullable `limited_matches.current_game_started_at`
+timestamp. Existing rows remain valid. Deployments must apply migrations before
+starting the updated server; the Render start command already does this.
+
 Turn a TV, projector, or cast browser tab into a live read-only operating picture of a PodyGuard event.
 
 ## Recommended setup
+
+### Send a link with a screen QR
+
+On the monitor, open **Event display** and choose **Show connection QR**.
+On the phone, use **Send to screen** in an event's navigation menu, or in the
+shared tracker's sharing controls, then scan the monitor's QR. A native camera
+can also open the QR's sender page, where an event code or app share link can
+be entered. Code entry remains available.
+
+The QR contains a random transfer ID and a single-use sending capability, never
+the receiving capability or a destination. The monitor keeps its separate
+receiving credential in tab-scoped session storage. Both capabilities expire
+after five minutes. Only the first valid destination is accepted, and that
+result can be read repeatedly until expiry, including after a dropped response
+or a reload of the receiving tab.
+
+Migration 0034 stores transfers in PostgreSQL. A conditional update arbitrates
+the first submission across server instances. Socket notifications reuse the
+app's real-time connection; polling while waiting covers reconnects and cases
+where the sender and receiver reach different instances. Credentials are hashed
+in storage, sent in authorization headers, and excluded from cached responses.
+
+Only allowlisted app routes and their relevant query parameters/fragments can
+be sent. Receiving a host link still requires the receiving browser's own host
+authorization. No accounts, player sessions, or login tokens are transferred.
+For a phone-only local game, enable **Share live tracker** first and send its
+existing read-only link; the device-only game URL is not transferable.
+
+The QR uses the configured public app URL in production. Camera permission and
+rear-camera behavior still need checking on physical phones over deployed HTTPS.
+The dedicated PostgreSQL persistence verifier also includes cross-connection
+submission/reconnect checks and requires a migrated `TEST_DATABASE_URL`.
 
 ```text
 Laptop / mini-PC

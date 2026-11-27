@@ -751,6 +751,7 @@ export const limitedMatches = pgTable(
     outcome: limitedMatchOutcomeEnum('outcome'),
     playerAGameWins: integer('player_a_game_wins'),
     playerBGameWins: integer('player_b_game_wins'),
+    currentGameStartedAt: timestamp('current_game_started_at', { withTimezone: true }),
     reportedAt: timestamp('reported_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
@@ -1003,6 +1004,8 @@ export const gameRecordParticipants = pgTable(
 
 
 export const gameNights = pgTable('game_nights', {
+  eventSetup: jsonb('event_setup').$type<import('@podyguard/shared').InvitationEventSetup>(),
+  invitees: jsonb('invitees').$type<import('@podyguard/shared').NightInvitee[]>().notNull().default([]),
   id: uuid('id').defaultRandom().primaryKey(),
   playgroupId: uuid('playgroup_id').notNull().references(() => playgroups.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
@@ -1016,6 +1019,7 @@ export const gameNights = pgTable('game_nights', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 }, table => [index('game_nights_playgroup_idx').on(table.playgroupId)]);
 export const gameNightRsvps = pgTable('game_night_rsvps', {
+  guestProfileId: uuid('guest_profile_id'),
   nightId: uuid('night_id').notNull().references(() => gameNights.id, { onDelete: 'cascade' }),
   tokenHash: text('token_hash').notNull(),
   displayName: text('display_name').notNull(),
@@ -1038,3 +1042,10 @@ export const eventTrackers = pgTable('event_trackers', {
   history: jsonb('history').$type<{ present: Record<string, unknown>; past: Record<string, unknown>[] }>().notNull(),
   transfer: jsonb('transfer').$type<{ id: string; ownerId: string; name: string; deviceId: string; requestedAt: number }>(),
 });
+export const linkTransfers = pgTable('link_transfers', {
+  id: uuid('id').primaryKey(),
+  sendTokenHash: text('send_token_hash').notNull(),
+  receiveTokenHash: text('receive_token_hash').notNull(),
+  destination: text('destination'),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+}, table => [index('link_transfers_expiry_idx').on(table.expiresAt)]);

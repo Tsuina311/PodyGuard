@@ -54,7 +54,7 @@ test('home recovers closed player tabs by event after removing shortcuts, withou
   for (const [name, url] of [['Ada', adaUrl], ['Bea', beaUrl], ['Bea', beaUrl]]) {
     const popup = page.waitForEvent('popup');
     const link = page.getByRole('link', { name: `Continue as ${name}`, exact: true });
-    await expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    await expect(link).toHaveAttribute('target', /^podyguard-player-/);
     await link.click();
     const restored = await popup;
     await expect(restored.getByText(`This tab: ${name}`, { exact: true })).toBeVisible();

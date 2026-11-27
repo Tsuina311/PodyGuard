@@ -1,18 +1,20 @@
 /** @vitest-environment jsdom */
 import '@testing-library/jest-dom/vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { EventSnapshot, PublicLimitedSession, PublicParticipant } from '@podyguard/shared';
-import { reportLimitedResult } from '../api';
+import { reportLimitedResult, reportLimitedProgress } from '../api';
 import { removeStored } from '../device-storage';
 import '../i18n';
 import { LimitedTimingControls } from './LimitedFormatPicker';
 import { LimitedHostPanel } from './LimitedHostPanel';
 import { LimitedPlayerPanel } from './LimitedPlayerPanel';
+import { EventDisplayContent } from './LimitedDisplayPage';
 
 vi.mock('../api', async (importOriginal) => ({
   ...await importOriginal<typeof import('../api')>(),
   reportLimitedResult: vi.fn(),
+  reportLimitedProgress: vi.fn(),
 }));
 vi.mock('../tracker/TrackerView', () => ({
   TrackerView: ({ storageKey, onFinish }: { storageKey: string; onFinish: (winner: string) => Promise<void> }) => (
@@ -25,6 +27,7 @@ vi.mock('../tracker/TrackerView', () => ({
 }));
 
 afterEach(() => {
+  vi.useRealTimers();
   vi.clearAllMocks();
   removeStored('podyguard.tracker.limited.DRAFT1.m1:score:p1');
   localStorage.clear();
@@ -180,6 +183,7 @@ it('advances the Limited tracker through a split series and reports the actual s
     },
   };
   vi.mocked(reportLimitedResult).mockResolvedValue({ session: running });
+  vi.mocked(reportLimitedProgress).mockResolvedValue({ session: running });
   const props = {
     snapshot: snapshot(me, running),
     participant: me,
@@ -190,7 +194,7 @@ it('advances the Limited tracker through a split series and reports the actual s
   const firstVisit = render(<LimitedPlayerPanel {...props} />);
   fireEvent.click(screen.getByRole('button', { name: 'Use life tracker' }));
   fireEvent.click(await screen.findByRole('button', { name: 'Ada won the game' }));
-  expect(screen.getByText('Best of 3 · 1–0')).toBeVisible();
+  expect(await screen.findByText('Best of 3 · 1–0')).toBeVisible();
   expect(reportLimitedResult).not.toHaveBeenCalled();
 
   firstVisit.unmount();
@@ -198,13 +202,54 @@ it('advances the Limited tracker through a split series and reports the actual s
   fireEvent.click(screen.getByRole('button', { name: 'Track game 2' }));
   expect(await screen.findByText('podyguard.tracker.limited.DRAFT1.m1.game-2')).toBeVisible();
   fireEvent.click(screen.getByRole('button', { name: 'Bea won the game' }));
-  expect(screen.getByText('Best of 3 · 1–1')).toBeVisible();
+  expect(await screen.findByText('Best of 3 · 1–1')).toBeVisible();
   fireEvent.click(screen.getByRole('button', { name: 'Track game 3' }));
   fireEvent.click(await screen.findByRole('button', { name: 'Ada won the game' }));
-  await waitFor(() => expect(props.onSnapshot).toHaveBeenCalledOnce());
+  await waitFor(() => expect(reportLimitedResult).toHaveBeenCalledOnce());
   expect(reportLimitedResult).toHaveBeenCalledExactlyOnceWith('DRAFT1', 'player', 's1', 'm1', {
     outcome: 'PLAYER_A_WIN', playerAGameWins: 2, playerBGameWins: 1,
   });
+});
+
+it('shows the host each game score and an elapsed clock that resets and stops at completion', () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date('2026-01-01T00:02:00Z'));
+  const { me, round } = bestOfThreeRound();
+  const match = round.rounds[0]!.matches[0]!;
+  Object.assign(match, { playerAGameWins: 1, playerBGameWins: 0, currentGameStartedAt: '2026-01-01T00:00:00Z' });
+  const view = render(<EventDisplayContent snapshot={snapshot(me, round)} />);
+  expect(screen.getByText('Best of 3 · 1–0')).toBeVisible();
+  expect(screen.getByText('Game 2 · 02:00 elapsed')).toBeVisible();
+  act(() => vi.advanceTimersByTime(1000));
+  expect(screen.getByText('Game 2 · 02:01 elapsed')).toBeVisible();
+  Object.assign(match, { playerBGameWins: 1, currentGameStartedAt: undefined });
+  view.rerender(<EventDisplayContent snapshot={snapshot(me, round)} />);
+  expect(screen.getByText('Game 3 · waiting to start')).toBeVisible();
+  Object.assign(match, { currentGameStartedAt: '2026-01-01T00:02:01Z' });
+  view.rerender(<EventDisplayContent snapshot={snapshot(me, round)} />);
+  expect(screen.getByText('Game 3 · 00:00 elapsed')).toBeVisible();
+  Object.assign(match, { outcome: 'PLAYER_A_WIN', playerAGameWins: 2, reportedAt: '2026-01-01T00:02:11Z' });
+  view.rerender(<EventDisplayContent snapshot={snapshot(me, round)} />);
+  expect(screen.getByText('Best of 3 · 2–1')).toBeVisible();
+  expect(screen.getByText('Ada wins')).toBeVisible();
+  expect(screen.queryByText(/elapsed|waiting to start/)).not.toBeInTheDocument();
+  act(() => vi.advanceTimersByTime(20_000));
+  expect(screen.queryByText(/elapsed|waiting to start/)).not.toBeInTheDocument();
+  Object.assign(match, { outcome: 'PLAYER_B_WIN', playerAGameWins: 1, playerBGameWins: 2 });
+  view.rerender(<EventDisplayContent snapshot={snapshot(me, round)} />);
+  expect(screen.getByText('Bea wins')).toBeVisible();
+  expect(screen.queryByText('Ada wins')).not.toBeInTheDocument();
+});
+
+it('preserves a tied best-of game score when reporting a match draw', async () => {
+  const { me, round } = bestOfThreeRound();
+  Object.assign(round.rounds[0]!.matches[0]!, { playerAGameWins: 1, playerBGameWins: 1 });
+  vi.mocked(reportLimitedResult).mockResolvedValue({ session: round });
+  render(<LimitedPlayerPanel snapshot={snapshot(me, round)} participant={me} token="player" onSnapshot={vi.fn()} onError={vi.fn()} />);
+  fireEvent.click(screen.getByRole('button', { name: 'Report match draw' }));
+  await waitFor(() => expect(reportLimitedResult).toHaveBeenCalledWith('DRAFT1', 'player', 's1', 'm1', {
+    outcome: 'DRAW', playerAGameWins: 1, playerBGameWins: 1,
+  }));
 });
 
 it('describes the selected Limited match length', () => {
