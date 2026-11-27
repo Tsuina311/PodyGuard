@@ -7,7 +7,7 @@ import type { TrackerState } from '../tracker/engine';
 import { Button } from '../ui/Button';
 import { Panel } from '../ui/Panel';
 
-export function EventMonitor({ code }: { code: string }) {
+export function EventMonitor({ code, hideWhenEmpty = false }: { code: string; hideWhenEmpty?: boolean }) {
   const { t } = useTranslation();
   const [gameId, setGameId] = useState<string | null>(null);
   const [snapshot, setSnapshot] = useState<EventMonitorState | null>(null);
@@ -52,6 +52,8 @@ export function EventMonitor({ code }: { code: string }) {
       tableLabel={snapshot.games.find(game => game.gameId === gameId)?.tableLabel}
       stale={failed || Date.now() - updatedAt > 10_000} onClose={() => select(null)} />;
   }
+
+  if (hideWhenEmpty && !snapshot?.games.length) return null;
 
   return <Panel title={t('eventMonitor.games')}>
     {failed && <p role="status" className="text-sm text-muted">{t('eventMonitor.unavailable')}</p>}

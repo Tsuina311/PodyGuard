@@ -22,6 +22,8 @@ export function LimitedSeatMap({
   occupants,
   selfId,
   disabled,
+  seated = false,
+  passLabel = 'Table',
   layout = 'square',
   onLayout,
   onPick,
@@ -31,6 +33,8 @@ export function LimitedSeatMap({
   occupants: Array<{ participantId: string; displayName: string; seat: number }>;
   selfId: string;
   disabled?: boolean;
+  seated?: boolean;
+  passLabel?: string;
   layout?: LimitedSeatLayout;
   onLayout?: (layout: LimitedSeatLayout) => void;
   onPick: (seat: number) => void;
@@ -56,10 +60,10 @@ export function LimitedSeatMap({
         className={cx(
           'flex min-h-16 min-w-16 flex-col items-center justify-center rounded-xl border px-2 py-2 text-center text-xs font-semibold transition-colors disabled:cursor-default',
           mine
-            ? 'border-neon bg-neon/15 text-ink ring-2 ring-neon/40'
+            ? 'border-neon bg-neon/25 text-ink ring-2 ring-neon/40'
             : person
               ? 'border-muted/35 bg-ink/5 text-muted enabled:hover:border-muted'
-              : 'border-gain/75 bg-gain/15 text-ink enabled:hover:bg-gain/25',
+              : 'border-dashed border-gain/85 bg-gain/15 text-ink enabled:hover:bg-gain/25',
         )}
       >
         <span className="font-mono text-[0.65rem] uppercase tracking-widest">
@@ -93,16 +97,12 @@ export function LimitedSeatMap({
           </LayoutButton>
         </div>
       ) : null}
-      <p className="text-muted mb-3 text-center text-xs">
-        {long
-          ? 'Two players sit across from two. You play the person in front of you first.'
-          : seatCount === 4
-            ? 'One player on each side. You play the person opposite you first.'
-            : 'Tap a seat. You can swap once you have a chair.'}
-      </p>
+      {!seated && hasSeat && (
+        <p className="text-muted mb-2 text-center text-xs">Tap another chair to swap seats.</p>
+      )}
       {shape ? (
-        <div className="relative mx-auto h-80 w-full max-w-sm">
-          <div className={`absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center border border-neon/40 bg-neon/5 text-xs text-muted ${shape === 'round' ? 'size-24 rounded-full' : shape === 'rectangle' ? 'h-20 w-36 rounded-xl' : 'size-24 rounded-xl'}`}>Table</div>
+        <div className="relative mx-auto h-64 w-full max-w-sm">
+          <div className={`absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center border border-neon/40 bg-neon/5 px-2 text-center text-xs text-muted ${shape === 'round' ? 'size-24 rounded-full' : shape === 'rectangle' ? 'h-20 w-36 rounded-xl' : 'size-24 rounded-xl'}`}>{passLabel}</div>
           {Array.from({ length: seatCount }, (_, index) => {
             const angle = index * 2 * Math.PI / seatCount - Math.PI / 2;
             return <div key={index} className="absolute -translate-x-1/2 -translate-y-1/2"
@@ -112,8 +112,8 @@ export function LimitedSeatMap({
       ) : long ? (
         <div className="mx-auto flex w-full max-w-xs flex-col gap-2">
           <div className="grid grid-cols-2 gap-2">{chair(1)}{chair(2)}</div>
-          <div className="border-muted/30 text-muted mx-4 flex h-8 items-center justify-center rounded-full border text-[0.65rem] uppercase tracking-widest">
-            Table
+          <div className="border-muted/30 text-muted mx-4 flex h-8 items-center justify-center rounded-full border text-[0.65rem] text-center">
+            {passLabel}
           </div>
           <div className="grid grid-cols-2 gap-2">{chair(3)}{chair(4)}</div>
         </div>
@@ -130,11 +130,11 @@ export function LimitedSeatMap({
                     key={`${rowIndex}-${column}`}
                     className={
                       rowIndex === 1 && column === 1
-                        ? 'border-muted/30 text-muted flex size-16 items-center justify-center rounded-full border text-[0.65rem] uppercase tracking-widest'
+                        ? 'border-muted/30 text-muted flex size-16 items-center justify-center rounded-full border px-1 text-center text-[0.65rem]'
                         : 'size-16'
                     }
                   >
-                    {rowIndex === 1 && column === 1 ? 'Table' : null}
+                    {rowIndex === 1 && column === 1 ? passLabel : null}
                   </div>
                 ) : (
                   chair(seat)
@@ -148,6 +148,11 @@ export function LimitedSeatMap({
           {Array.from({ length: seatCount }, (_, index) => chair(index + 1))}
         </div>
       )}
+      <ul aria-label="Seat status" className="text-muted mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs">
+        <li className="flex items-center gap-1"><Plus size={13} className="text-gain" aria-hidden /> Open</li>
+        <li className="flex items-center gap-1"><UserRound size={13} aria-hidden /> Taken</li>
+        <li className="flex items-center gap-1"><Check size={13} className="text-neon" aria-hidden /> You</li>
+      </ul>
     </div>
   );
 }

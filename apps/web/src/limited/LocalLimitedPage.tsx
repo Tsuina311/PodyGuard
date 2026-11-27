@@ -251,7 +251,7 @@ export function LocalLimitedPage() {
               return (
                 <div
                   key={match.id}
-                  className="rounded-xl border border-white/10 p-3"
+                  className="rounded-xl border border-ink/10 p-3"
                 >
                   {match.tableLabel && <p className="mb-1 text-xs text-muted">{match.tableLabel}</p>}
                   <p className="mb-2 text-sm font-semibold">

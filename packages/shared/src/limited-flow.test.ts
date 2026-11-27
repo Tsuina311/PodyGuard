@@ -114,7 +114,7 @@ describe('Limited flow copy', () => {
         totalRounds: 3,
       },
     });
-    expect(seating.title).toBe('You are at Table 1');
+    expect(seating.title).toBe('Pick your seat');
     expect(seating.action).toBe('seat');
 
     const sat = limitedPlayerCue({
@@ -218,7 +218,7 @@ describe('Limited flow copy', () => {
       },
     });
     expect(waiting.action).toBe('start-play');
-    expect(waiting.detail).toContain('Use the life tracker');
+    expect(waiting.detail).toBe('Round 1 of 3');
     expect(
       limitedHostCue({
         mode: 'PICK_TWO_DRAFT',

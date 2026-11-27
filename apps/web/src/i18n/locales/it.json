@@ -103,6 +103,7 @@
     "waiting": "Partita {{number}} · in attesa dell'inizio"
   },
   "devicePlayers": {
+    "switch": "Giochi come {{name}} · cambia giocatore",
     "resumeCount": "Riprendi un giocatore · {{count}} salvati",
     "all": "Tutti i giocatori salvati",
     "recoveryHelp": "I giocatori restano salvati quando chiudi una scheda. Continua passa alla loro scheda aperta, se disponibile, oppure riapre il posto in una nuova scheda.",

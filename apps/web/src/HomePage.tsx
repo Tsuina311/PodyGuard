@@ -1028,7 +1028,7 @@ export function HomePage() {
                 </label>
               </div>
               {tournamentFormat ? (
-                <div className="mt-3 space-y-3 rounded-xl border border-white/10 bg-white/[0.025] p-3">
+                <div className="mt-3 space-y-3 rounded-xl border border-ink/10 bg-ink/[0.025] p-3">
                   <fieldset>
                     <legend className="text-muted mb-2 text-xs tracking-wide uppercase">
                       {t('tournament.matchSize')}

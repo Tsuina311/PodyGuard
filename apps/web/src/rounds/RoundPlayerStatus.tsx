@@ -124,7 +124,7 @@ export function RoundPlayerStatus({
   }
 
   return (
-    <div className="mb-4 rounded-xl border border-white/10 p-4">
+    <div className="mb-4 rounded-xl border border-ink/10 p-4">
       <p className="font-display mb-1 text-base font-semibold">
         {waitingForNext ? 'Between rounds' : 'Waiting for pairings'}
       </p>

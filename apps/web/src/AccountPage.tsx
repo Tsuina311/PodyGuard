@@ -1443,7 +1443,7 @@ function StatsSummaryGrid({ stats }: { stats: DerivedStats }) {
 
 function GameHistoryList({ records }: { records: GameRecord[] }) {
   return (
-    <ul className="divide-y divide-white/5 text-sm">
+    <ul className="divide-y divide-ink/5 text-sm">
       {records.map((record) => (
         <li key={record.id} className="py-2.5">
           <div className="mb-1 flex items-center justify-between gap-2 text-xs">

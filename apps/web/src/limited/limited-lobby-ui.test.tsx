@@ -29,6 +29,7 @@ vi.mock('../tracker/TrackerView', () => ({
 afterEach(() => {
   vi.useRealTimers();
   vi.clearAllMocks();
+  vi.restoreAllMocks();
   removeStored('podyguard.tracker.limited.DRAFT1.m1:score:p1');
   localStorage.clear();
   cleanup();
@@ -246,6 +247,8 @@ it('preserves a tied best-of game score when reporting a match draw', async () =
   Object.assign(round.rounds[0]!.matches[0]!, { playerAGameWins: 1, playerBGameWins: 1 });
   vi.mocked(reportLimitedResult).mockResolvedValue({ session: round });
   render(<LimitedPlayerPanel snapshot={snapshot(me, round)} participant={me} token="player" onSnapshot={vi.fn()} onError={vi.fn()} />);
+  vi.spyOn(window, 'confirm').mockReturnValue(true);
+  fireEvent.click(screen.getByText('More results', { exact: true }));
   fireEvent.click(screen.getByRole('button', { name: 'Report match draw' }));
   await waitFor(() => expect(reportLimitedResult).toHaveBeenCalledWith('DRAFT1', 'player', 's1', 'm1', {
     outcome: 'DRAW', playerAGameWins: 1, playerBGameWins: 1,

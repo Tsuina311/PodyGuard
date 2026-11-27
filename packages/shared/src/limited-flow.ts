@@ -158,8 +158,7 @@ export function limitedPlayerCue(input: {
     if (!input.ready) {
       return {
         title: "Tap Ready when you can start",
-        detail:
-          'The host can see you in the lobby. Ready tells them you are at the table and waiting to be seated.',
+        detail: 'Ready tells the host you can start.',
         action: 'ready',
         actionLabel: "I'm ready",
       };
@@ -179,9 +178,8 @@ export function limitedPlayerCue(input: {
   if (session.status === 'SEATING') {
     if (session.seat == null) {
       return {
-        title: `You are at ${table}`,
-        detail:
-          'Tap an open seat. Names appear as people sit. After you have a seat, tap someone else at this table to swap.',
+        title: 'Pick your seat',
+        detail: `Look for ${table} and tap an open seat.`,
         action: 'seat',
         actionLabel: null,
       };
@@ -189,8 +187,7 @@ export function limitedPlayerCue(input: {
     if (!session.seated) {
       return {
         title: `Seat ${session.seat}`,
-        detail:
-          "Tap I'm seated when you are in that chair. Tap another player at this table to swap seats.",
+        detail: "Tap I'm seated once you are in that chair.",
         action: 'seated',
         actionLabel: "I'm seated",
       };
@@ -256,11 +253,11 @@ export function limitedPlayerCue(input: {
   }
 
   if (session.status === 'ROUND_ACTIVE') {
-    const roundLabel = `Round ${session.roundNumber ?? 1} of ${session.totalRounds ?? 1}.`;
+    const roundLabel = `Round ${session.roundNumber ?? 1} of ${session.totalRounds ?? 1}`;
     if (session.opponentName && session.playStarted === false) {
       return {
         title: `You play ${session.opponentName}`,
-        detail: `${roundLabel} The best-of clock for this table starts when you begin. Use the life tracker, or start without it. Once it is running it stays running in the tracker and on this screen until the host pauses this table.`,
+        detail: roundLabel,
         action: 'start-play',
         actionLabel: null,
       };
@@ -269,9 +266,7 @@ export function limitedPlayerCue(input: {
       title: session.opponentName
         ? `You play ${session.opponentName}`
         : 'You have a bye this round',
-      detail: session.opponentName
-        ? `${roundLabel} The best-of clock keeps running while you use the life tracker and while you do not. Report the result here.`
-        : `${roundLabel} You sit this one out.`,
+      detail: roundLabel,
       action: 'none',
       actionLabel: null,
     };

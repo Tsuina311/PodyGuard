@@ -62,6 +62,7 @@ for (const format of [
   test(`${format.label}: full physical-card event through final standings`, async ({ page: host, browser }) => {
     test.setTimeout(240_000);
     const players: Page[] = [];
+    let phaseDisplay: Page | undefined;
     const playgroup = format.label === 'Booster Draft'
       ? await seedDraftPlaygroup(host, format.count)
       : undefined;
@@ -74,7 +75,7 @@ for (const format of [
     try {
       await test.step('Players join and ready through independent browsers', async () => {
         for (let index = 0; index < format.count; index++) {
-          const player = await browser.newPage();
+          const player = await browser.newPage({ viewport: { width: 390, height: 844 } });
           players.push(player);
           if (playgroup && index < 2) {
             await player.addInitScript(() => localStorage.setItem('podyguard-theme', 'light'));
@@ -83,7 +84,10 @@ for (const format of [
           if (playgroup) {
             await prepareApp(player);
             await player.goto(`/#/e/${code}`);
-            if (index === 0) await expect(currentStep(player)).toHaveText('Join');
+            if (index === 0) {
+              await expect(currentStep(player)).toHaveText('Join');
+              await expect(player.getByRole('link', { name: 'Join as another person' })).toHaveCount(0);
+            }
             await player.getByRole('button', { name: `${name} Select →`, exact: true }).click();
             await player.getByRole('button', { name: 'Join event', exact: true }).click();
           } else {
@@ -91,7 +95,9 @@ for (const format of [
           }
           const joinLobby = player.getByRole('button', { name: 'Join the lobby', exact: true });
           if (await joinLobby.isVisible()) await joinLobby.click();
-          await player.getByRole('button', { name: "I'm ready", exact: true }).click();
+          const ready = player.getByRole('button', { name: "I'm ready", exact: true });
+          await expect(ready).toBeInViewport({ ratio: 1 });
+          await ready.click();
           await expect(player.getByRole('button', { name: 'Not ready yet', exact: true })).toBeVisible();
           if (index === 0) {
             await expect(currentStep(player)).toHaveText('Ready');
@@ -103,19 +109,43 @@ for (const format of [
       });
       await host.getByRole('button', { name: 'Assign to tables', exact: true }).click();
       await expect(currentStep(players[0]!)).toHaveText('Seat');
+      if (playgroup) {
+        await expect(host.getByText('8 seating', { exact: true })).toBeVisible();
+        await expect(host.getByText(/Nobody has joined yet/)).toHaveCount(0);
+        const hostDrop = host.getByRole('button', { name: 'Drop Player 1', exact: true });
+        host.once('dialog', async (dialog) => {
+          expect(dialog.message()).toContain('Drop Player 1');
+          await dialog.dismiss();
+        });
+        await hostDrop.click();
+        await expect(hostDrop).toBeVisible();
+        phaseDisplay = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+        await prepareApp(phaseDisplay);
+        await phaseDisplay.goto(`/#/display/event/${code}`);
+        await expect(phaseDisplay.getByText(/^0 \/ 8 seated · waiting for/)).toBeVisible();
+        await expect(phaseDisplay.getByRole('heading', { name: 'Queues' })).toHaveCount(0);
+        await expect(phaseDisplay.getByRole('heading', { name: 'Live games' })).toHaveCount(0);
+      }
       await expect(host.getByRole('button', { name: format.label === 'Sealed' ? 'Start deckbuilding' : 'Start draft', exact: true })).toBeDisabled();
       await test.step('Everyone chooses a seat and confirms', async () => {
         for (const [index, player] of players.entries()) {
           const open = player.getByRole('button', { name: `Seat ${index + 1} Open`, exact: true });
           if (playgroup && index === 1) {
+            await expect(player.getByRole('heading', { name: 'Pick your seat' })).toBeInViewport({ ratio: 1 });
+            await expect(player.getByText('Pack 1 passes left', { exact: true })).toBeVisible();
+            await expect(player.getByText(/^1 \/ 8 seated · waiting for/)).toBeVisible();
             await expect(player.locator('html')).toHaveAttribute('data-theme', 'light');
             const taken = player.getByRole('button', { name: 'Seat 1 Player 1', exact: true });
             await expect(taken).toBeDisabled();
             const openColor = await open.evaluate(button => getComputedStyle(button).backgroundColor);
             expect(await taken.evaluate(button => getComputedStyle(button).backgroundColor)).not.toBe(openColor);
+            expect(await open.evaluate(button => getComputedStyle(button).borderTopStyle)).toBe('dashed');
+            expect(await taken.evaluate(button => getComputedStyle(button).borderTopStyle)).toBe('solid');
           }
           await open.click();
-          await player.getByRole('button', { name: "I'm seated", exact: true }).click();
+          const seated = player.getByRole('button', { name: "I'm seated", exact: true });
+          await expect(seated).toBeInViewport({ ratio: 1 });
+          await seated.click();
         }
       });
       if (format.label !== 'Sealed') {
@@ -123,6 +153,15 @@ for (const format of [
         await expect(currentStep(players[0]!)).toHaveText('Draft');
         await expect(players[0]!.getByText(format.label === 'Pick-Two Draft' ? /Take two cards each pick/ : /Take one card each pick/)).toBeVisible();
         if (playgroup) {
+          await expect(phaseDisplay!.getByText('Draft', { exact: true })).toBeVisible();
+          const player = players[0]!;
+          await expect(player.getByRole('button', { name: 'We are done drafting', exact: true })).toBeInViewport({ ratio: 1 });
+          player.once('dialog', async (dialog) => {
+            expect(dialog.message()).toContain('You’ll be removed from the draft');
+            await dialog.dismiss();
+          });
+          await player.getByRole('button', { name: 'Leave this draft', exact: true }).click();
+          await expect(player.getByRole('button', { name: 'We are done drafting', exact: true })).toBeVisible();
           await host.getByRole('tab', { name: 'Settings', exact: true }).click();
           const settings = host.getByRole('tabpanel', { name: 'Settings', exact: true });
           await expect(settings.getByRole('checkbox', { name: 'Show returning-player suggestions on join' })).toBeChecked();
@@ -135,6 +174,11 @@ for (const format of [
         await host.getByRole('button', { name: 'Resume timer', exact: true }).click();
         for (const [index, player] of players.entries()) {
           await player.getByRole('button', { name: index === 0 ? 'We are done drafting' : 'Confirm that you are done drafting', exact: true }).click();
+          if (playgroup && index === 0) {
+            for (const surface of [player, host, phaseDisplay!]) {
+              await expect(surface.getByText(/^1 \/ 8 done · waiting for/)).toBeVisible();
+            }
+          }
         }
       } else {
         await host.getByRole('button', { name: 'Start deckbuilding', exact: true }).click();
@@ -144,12 +188,25 @@ for (const format of [
       await expect(host.getByRole('button', { name: 'Resume timer', exact: true })).toBeVisible();
       await host.getByRole('button', { name: 'Resume timer', exact: true }).click();
       await test.step('Deck readiness advances to round one', async () => {
+        if (phaseDisplay) await expect(phaseDisplay.getByText('Deckbuilding', { exact: true })).toBeVisible();
         await expect(currentStep(players[0]!)).toHaveText('Deck');
         for (const [index, player] of players.entries()) {
           if (index === 0) await player.reload();
-          await player.getByRole('button', { name: 'Deck is ready', exact: true }).click();
+          const deckReady = player.getByRole('button', { name: 'Deck is ready', exact: true });
+          await expect(deckReady).toBeInViewport({ ratio: 1 });
+          await deckReady.click();
+          if (playgroup && index === 0) {
+            for (const surface of [player, host, phaseDisplay!]) {
+              await expect(surface.getByText(/^1 \/ 8 decks ready · waiting for/)).toBeVisible();
+            }
+          }
         }
         await expect(currentStep(players[0]!)).toHaveText('Play');
+        if (phaseDisplay) {
+          await expect(phaseDisplay.getByText('Rank', { exact: true })).toHaveCount(0);
+          await phaseDisplay.getByRole('button', { name: 'Projector size', exact: true }).click();
+          await expect(phaseDisplay.getByRole('button', { name: 'Projector size', exact: true })).toHaveAttribute('aria-pressed', 'true');
+        }
       });
 
       // Match identities come from the real response. Every result is submitted through a player's UI.
@@ -159,6 +216,23 @@ for (const format of [
       for (let round = 1; round <= 3; round++) {
         await test.step(`Play and report round ${round}`, async () => {
           await players[0]!.getByRole('button', { name: 'Start without life tracker', exact: true }).click();
+          if (playgroup && round === 1) {
+            await expect(phaseDisplay!.getByText('Round 1', { exact: true }).first()).toBeVisible();
+            const player = players[0]!;
+            const resultButton = player.getByRole('button', { name: /^Player \d+ wins game 1$/ }).first();
+            await expect(resultButton).toBeInViewport({ ratio: 1 });
+            await expect(player.getByRole('button', { name: 'Report match draw', exact: true })).toBeHidden();
+            player.once('dialog', async (dialog) => {
+              expect(dialog.message()).toMatch(/Confirm result: Player \d+ wins game 1/);
+              await dialog.dismiss();
+            });
+            await resultButton.click();
+            await expect(player.getByText('Best of 3 · 0–0', { exact: true })).toBeVisible();
+            await player.getByText('Playing as Player 1 · switch player', { exact: true }).click();
+            await player.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+            await expect(player.getByRole('button', { name: 'Menu', exact: true })).not.toBeInViewport();
+            await player.getByText('Playing as Player 1 · switch player', { exact: true }).click();
+          }
           for (const player of players) {
             const wins = player.getByRole('button', { name: /^Player \d+ wins(?: game \d+)?$/ });
             // A match already reported by its opponent has no result buttons.
@@ -182,6 +256,7 @@ for (const format of [
                   await expect(displayProgress.filter({ hasText: 'Best of 3 · 0–1' })).toHaveCount(1);
                   await player.reload();
                   await expect(player.getByRole('button', { name: 'Track game 2', exact: true })).toBeVisible();
+                  player.once('dialog', dialog => dialog.accept());
                   await wins.first().click();
                   await expect(player.getByText('Best of 3 · 1–1', { exact: true })).toBeVisible();
                   await expect(host.getByTestId('limited-match-progress').filter({ hasText: 'Best of 3 · 1–1' })).toHaveCount(1);
@@ -195,12 +270,14 @@ for (const format of [
                   await expect(wins.first()).toHaveText(/wins game 3$/);
                   opponentWins = 1;
                 } else {
+                  player.once('dialog', dialog => dialog.accept());
                   await wins.first().click();
                   await expect(player.getByText('Best of 3 · 1–0', { exact: true })).toBeVisible();
                   await expect(wins.first()).toHaveText(/wins game 2$/);
                 }
               }
               const response = player.waitForResponse(response => response.url().includes('/matches/') && response.url().endsWith('/result') && response.request().method() === 'POST');
+              player.once('dialog', dialog => dialog.accept());
               await wins.first().click();
               const result = await response;
               expect(result.ok()).toBe(true);
@@ -285,6 +362,9 @@ for (const format of [
         await expect(deckStats.getByText('Booster Draft 1', { exact: true })).toBeVisible();
         await expect(deckStats.getByText(/3 matches · \dW · \dL · 0D/)).toBeVisible();
       }
-    } finally { await Promise.all(players.map(player => player.close())); }
+    } finally {
+      await phaseDisplay?.close();
+      await Promise.all(players.map(player => player.close()));
+    }
   });
 }

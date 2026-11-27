@@ -187,7 +187,7 @@ export function ConnectivityPage() {
           {rows.map((row) => (
             <li
               key={row.name}
-              className="flex items-baseline justify-between gap-3 border-b border-white/5 py-2 text-sm"
+              className="flex items-baseline justify-between gap-3 border-b border-ink/5 py-2 text-sm"
             >
               <span>{row.name}</span>
               <span className={`shrink-0 font-mono text-xs ${tone(row.state)}`}>

@@ -184,7 +184,7 @@ export function HostDisplaysPanel({
       {displays.length === 0 ? (
         <p className="text-muted mb-6 text-sm">{t('host.displaysEmpty')}</p>
       ) : (
-        <ul className="mb-6 divide-y divide-white/5">
+        <ul className="mb-6 divide-y divide-ink/5">
           {displays.map((row) => (
             <li
               key={row.id}

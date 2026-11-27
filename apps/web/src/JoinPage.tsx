@@ -62,6 +62,7 @@ import { TrackerView } from './tracker/TrackerView';
 import { commanderNames } from './scryfall';
 import { TournamentPlayerStatus } from './tournament/TournamentPlayerStatus';
 import { LimitedPlayerPanel } from './limited/LimitedPlayerPanel';
+import { activeLimitedSession } from './limited/limited-view';
 import { LimitedPlayerTimeline } from './limited/LimitedPlayerTimeline';
 import { RoundPlayerStatus } from './rounds/RoundPlayerStatus';
 import { eventHasLimitedQueues } from './event-mode';
@@ -829,6 +830,23 @@ function PlayerJoinPage({
   const isReady = participant?.status === 'ready';
   const isPaused = participant?.status === 'paused';
   const hasLeft = participant?.status === 'left';
+  const limitedSession = activeLimitedSession(snapshot, participant?.id);
+  const activeLimited = limitedSession && limitedSession.status !== 'COMPLETED';
+  const stepRef = useRef<HTMLDivElement>(null);
+  const previousPhase = useRef<string | undefined>(undefined);
+  const phase = limitedSession?.status;
+  useEffect(() => {
+    const previous = previousPhase.current;
+    previousPhase.current = phase;
+    const card = stepRef.current;
+    if (!card || !phase || previous === phase) return;
+    const { top, bottom } = card.getBoundingClientRect();
+    if (top < 0 || top >= window.innerHeight || (top > window.innerHeight / 2 && bottom > window.innerHeight)) {
+      card.scrollIntoView({ block: 'start' });
+    }
+  }, [phase]);
+  const showLimitedStep = !hasLeft && shouldShowLimitedPlayerPanel(event, { participant, token, snapshot });
+  const liveWarning = liveStatus === 'failed' || liveStatus === 'reconnecting';
   const seated = Boolean(participant?.tableLabel);
   const decksComplete =
     decks.length > 0 &&
@@ -978,35 +996,52 @@ function PlayerJoinPage({
   return (
     <>
       {!embeddedHost ? (
-        <ThemeToggleCorner
-          feedbackContext={{
-            ...(participant ? { participantStatus: participant.status } : {}),
-            ...(event ? { gameMode: event.gameMode } : {}),
-          }}
-        />
+        <div className="relative z-40 flex justify-end pt-[env(safe-area-inset-top)]">
+          <ThemeToggleCorner
+            placement="inline"
+            feedbackContext={{
+              ...(participant ? { participantStatus: participant.status } : {}),
+              ...(event ? { gameMode: event.gameMode } : {}),
+            }}
+          />
+        </div>
       ) : null}
       {!embeddedHost && <header>
-        <Brand className="mb-6" />
-        <h1 className="font-display mb-2 text-3xl font-bold tracking-tight">
+        {!limitedQueues && <Brand className="mb-6" />}
+        <h1 className={cx('font-display font-bold tracking-tight', limitedQueues ? 'text-xl' : 'mb-2 text-3xl')}>
           {event?.name ?? t('join.joinEvent')}
         </h1>
-        <p className="text-muted mb-8 font-mono text-sm tracking-[0.28em] uppercase">
+        <p className={cx('text-muted font-mono text-sm tracking-widest uppercase', !limitedQueues && 'mb-8')}>
           {event?.joinCode ?? joinCode.toUpperCase()}
         </p>
       </header>}
 
+      {event && <DevicePlayers joinCode={event.joinCode} scope={scope} displayName={participant?.displayName} onOpenDesk={embeddedHost?.onOpenDesk} compact={limitedQueues} />}
       {event && limitedQueues && <LimitedPlayerTimeline event={event} participant={participant} snapshot={snapshot} />}
+
+      {showLimitedStep && (
+        <div ref={stepRef} className={embeddedHost ? 'scroll-mt-56' : 'scroll-mt-3'}>
+          <LimitedPlayerPanel
+            key={participant!.id}
+            onOpenDesk={onOpenDesk}
+            snapshot={snapshot!}
+            participant={participant!}
+            token={token!}
+            onSnapshot={onSnapshot}
+            onError={setError}
+            onReady={onReady}
+          />
+        </div>
+      )}
 
       <Agreement agreement={event?.pregameAgreement} />
 
-      {event && <DevicePlayers joinCode={event.joinCode} scope={scope} displayName={participant?.displayName} onOpenDesk={embeddedHost?.onOpenDesk} />}
-
-      {participant && token ? (
+      {participant && token ? (!showLimitedStep || !activeLimited || liveWarning ? (
         <Panel
-          title={participant.displayName}
-          aside={<Badge tone={statusTone(participant.status)}>{participant.status}</Badge>}
+          title={showLimitedStep ? undefined : participant.displayName}
+          aside={showLimitedStep ? undefined : <Badge tone={statusTone(participant.status)}>{participant.status}</Badge>}
         >
-          {liveStatus === 'failed' || liveStatus === 'reconnecting' ? (
+          {liveWarning ? (
             <div className="border-warning/40 bg-warning/10 mb-4 rounded-xl border px-3 py-2 text-sm">
               <p className="text-warning mb-2">
                 {liveStatus === 'reconnecting'
@@ -1130,19 +1165,9 @@ function PlayerJoinPage({
               </Button>
             </div>
           ) : parseEventOperationMode(event?.operationMode) === 'ROUNDS' ? null : limitedQueues ? (
-            <>
-              <p className="text-muted mb-4 text-sm">
-                The Limited panel below is the step you are on. The host sees you as soon as you join.
-              </p>
-              <Button
-                variant="ghost"
-                block
-                disabled={busy}
-                onClick={() => void onLeave()}
-              >
-                {t('join.leaveEvent')}
-              </Button>
-            </>
+            !activeLimited && <Button variant="ghost" block disabled={busy} onClick={() => void onLeave()}>
+              {t('join.leaveEvent')}
+            </Button>
           ) : isReady ? (
             <>
               {participant.decks.length > 0 ? (
@@ -1315,7 +1340,7 @@ function PlayerJoinPage({
             <p className="text-muted text-sm">{t('join.matchingShortly')}</p>
           )}
         </Panel>
-      ) : joinStep === 'choose-identity' &&
+      ) : null) : joinStep === 'choose-identity' &&
         (suggestions.length > 0 || suggestionMode === 'search') ? (
         <Panel
           title={`Welcome to ${event?.name ?? t('join.joinEvent')}`}
@@ -1487,7 +1512,7 @@ function PlayerJoinPage({
           </div>
         </Panel>
       ) : (
-        <Panel title={t('join.takeSeat')} onSubmit={onJoin}>
+        <Panel title={t(limitedQueues ? 'join.joinEvent' : 'join.takeSeat')} onSubmit={onJoin}>
           {event?.tournament &&
           event.tournament.phase !== 'registration' ? (
             <p className="text-muted text-sm">
@@ -1565,22 +1590,6 @@ function PlayerJoinPage({
           )}
         </Panel>
       )}
-
-      {shouldShowLimitedPlayerPanel(event, {
-        participant,
-        token,
-        snapshot,
-      }) ? (
-        <LimitedPlayerPanel
-          onOpenDesk={onOpenDesk}
-          snapshot={snapshot!}
-          participant={participant!}
-          token={token!}
-          onSnapshot={onSnapshot}
-          onError={setError}
-          onReady={onReady}
-        />
-      ) : null}
 
       {error ? <p className="text-danger text-sm">{error}</p> : null}
 

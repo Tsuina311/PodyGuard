@@ -81,7 +81,7 @@ import { managedDisplayPairPath } from './display/DisplayPairPage';
 import { EventDisplayContent } from './limited/LimitedDisplayPage';
 import { JoinPage } from './JoinPage';
 import { cx } from './ui/cx';
-import { LIMITED_MODE_LABELS } from './limited/limited-view';
+import { LIMITED_MODE_LABELS, limitedSessionInProgress } from './limited/limited-view';
 
 export function HostPage() {
   const { t } = useTranslation();
@@ -627,7 +627,27 @@ export function HostPage() {
     }
   }
 
+  const inProgressSessions = (limitedSnapshot?.limitedSessions ?? []).filter(limitedSessionInProgress);
+  const limitedPhaseCounts = new Map<string, number>();
+  for (const session of inProgressSessions) {
+    const phaseLabel = {
+      FORMING: 'assigned',
+      SEATING: 'seating',
+      DRAFTING: 'drafting',
+      DECKBUILDING: 'deckbuilding',
+      ROUND_ACTIVE: 'in round',
+      BETWEEN_ROUNDS: 'between rounds',
+      COMPLETED: 'finished',
+      CANCELLED: 'cancelled',
+    }[session.status];
+    const count = session.participants.filter((person) => person.status !== 'DROPPED').length;
+    limitedPhaseCounts.set(phaseLabel, (limitedPhaseCounts.get(phaseLabel) ?? 0) + count);
+  }
+
   function removeButton(row: PublicParticipant) {
+    if (inProgressSessions.some((session) => session.participants.some(
+      (person) => person.participantId === row.id && person.status !== 'DROPPED',
+    ))) return null;
     const armed = removeArmed === row.id;
     return (
       <Button
@@ -711,6 +731,7 @@ export function HostPage() {
     );
   }
 
+  const limitedDesk = eventHasLimitedQueues(event);
   const hideHostChrome = tab === 'play' && playTrackerActive;
 
   return (
@@ -721,6 +742,7 @@ export function HostPage() {
           onTab={openTab}
           onView={next => { setView(next); window.scrollTo({ top: 0 }); }}
           counts={counts} players={participants.length}
+          limitedPhaseCounts={Array.from(limitedPhaseCounts, ([label, count]) => `${count} ${label}`)}
           freeTables={tables.filter(table => table.status === 'free' && (!table.area || table.area.seats > 0)).length}
           tables={tables.filter(table => !table.area || table.area.seats > 0).length}
           tableAreas={tables.some(table => table.area && table.area.parts > 1)}
@@ -735,8 +757,11 @@ export function HostPage() {
       <div id="host-panel-desk" role="tabpanel" aria-labelledby="host-tab-desk"
         className={cx(tab === 'desk' ? 'contents' : 'hidden')}>
         <div id="host-panel-tables" role="tabpanel" aria-labelledby="host-view-tables"
-          className={cx(view === 'tables' ? 'grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(15rem,0.65fr)]' : 'hidden')}>
-          <div className="min-w-0 space-y-5">
+          className={cx(view !== 'tables' ? 'hidden' : !limitedDesk &&
+            'grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(15rem,0.65fr)]')}>
+          <div className={cx('min-w-0', limitedDesk
+            ? 'grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(17rem,0.42fr)]'
+            : 'space-y-5')}>
             <Agreement agreement={event.pregameAgreement} />
             {event.tournament ? (
               <TournamentPanel

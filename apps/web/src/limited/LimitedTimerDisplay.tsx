@@ -5,9 +5,13 @@ import { formatLimitedTimer } from './limited-view';
 export function LimitedTimerDisplay({
   timer,
   compact = false,
+  roundNumber,
+  large = false,
 }: {
   timer: LimitedTimer | undefined;
   compact?: boolean;
+  roundNumber?: number;
+  large?: boolean;
 }) {
   const [now, setNow] = useState(() => new Date().toISOString());
 
@@ -18,15 +22,17 @@ export function LimitedTimerDisplay({
   }, [timer]);
 
   if (!timer) return null;
+  const phase = timer.phase === 'ROUND' ? (roundNumber ? `Round ${roundNumber}` : 'Round')
+    : timer.phase === 'DECKBUILDING' ? 'Deckbuilding' : 'Draft';
+  const status = timer.status === 'PAUSED' ? ' · Paused' : timer.status === 'RUNNING' ? '' : " · Time's up";
   return (
     <div className={compact ? 'text-right' : 'text-center'}>
-      <p className="text-muted text-xs tracking-[0.18em] uppercase">
-        {timer.phase === 'ROUND' ? 'Best of' : timer.phase === 'DECKBUILDING' ? 'Deckbuilding' : 'Draft'}{' '}
-        · {timer.status === 'RUNNING' ? 'Running' : timer.status === 'PAUSED' ? 'Paused' : "Time's up"}
+      <p className={large ? 'text-muted text-2xl' : 'text-muted text-xs tracking-widest uppercase'}>
+        {phase}{status}
       </p>
       <p
         className={`font-mono font-bold tabular-nums ${
-          compact ? 'text-xl' : 'text-neon text-5xl'
+          large ? 'text-neon text-6xl sm:text-8xl' : compact ? 'text-xl' : 'text-neon text-5xl'
         }`}
         aria-live="off"
       >

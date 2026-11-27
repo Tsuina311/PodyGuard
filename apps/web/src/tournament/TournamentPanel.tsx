@@ -112,7 +112,7 @@ export function TournamentPanel({
             {tournament.rounds.map((round) => (
               <section
                 key={round.number}
-                className="w-64 shrink-0 rounded-xl border border-white/10 bg-white/[0.025] p-3"
+                className="w-64 shrink-0 rounded-xl border border-ink/10 bg-ink/[0.025] p-3"
               >
                 <h3 className="text-muted mb-3 text-xs font-semibold tracking-widest uppercase">
                   {t('tournament.round', { number: round.number })}
@@ -157,7 +157,7 @@ function Standings({
     return left.losses - right.losses;
   });
   return (
-    <div className="mb-4 rounded-xl border border-white/10 bg-black/10 p-3">
+    <div className="mb-4 rounded-xl border border-ink/10 bg-black/10 p-3">
       <h3 className="text-muted mb-2 text-xs font-semibold tracking-widest uppercase">
         {t('tournament.standings')}
       </h3>
@@ -203,7 +203,7 @@ function MatchCard({
   const showSeries = match.bestOf > 1;
   const score = showSeries ? seriesScoreLine(match) : null;
   return (
-    <article className="rounded-lg border border-white/10 bg-black/10 p-2.5">
+    <article className="rounded-lg border border-ink/10 bg-black/10 p-2.5">
       <div className="mb-2 flex items-center justify-between gap-2">
         <span className="text-muted font-mono text-[10px]">
           {t('tournament.match', { number: match.position + 1 })}
