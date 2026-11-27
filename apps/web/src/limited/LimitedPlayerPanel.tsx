@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import type {
   EventSnapshot,
   LimitedMatchOutcome,
@@ -65,7 +65,7 @@ export function LimitedPlayerPanel({
     participant.limitedQueueMode ?? enabled[0]?.mode ?? 'BOOSTER_DRAFT',
   );
   const [busy, setBusy] = useState(false);
-  const [trackerMatchId, setTrackerMatchId] = useState<string | null>(null);
+  const [openTrackerKey, setOpenTrackerKey] = useState<string | null>(null);
   const [gameScore, setGameScore] = useState<{ key: string; aWins: number; bWins: number } | null>(null);
   const session = activeLimitedSession(snapshot, participant.id);
   const match = currentLimitedMatch(session, participant.id);
@@ -76,6 +76,13 @@ export function LimitedPlayerPanel({
   const playerAGameWins = match?.playerAGameWins ?? currentScore?.aWins ?? Number(localScore?.[1] ?? 0);
   const playerBGameWins = match?.playerBGameWins ?? currentScore?.bWins ?? Number(localScore?.[2] ?? 0);
   const gameNumber = playerAGameWins + playerBGameWins + 1;
+  // Older versions could write the previous board to the next game's save.
+  const gameTrackerKey = gameNumber === 1 ? trackerKey : `${trackerKey}.series.game-${gameNumber}`;
+  useEffect(() => {
+    if (openTrackerKey && (openTrackerKey !== gameTrackerKey || match?.outcome)) {
+      setOpenTrackerKey(null);
+    }
+  }, [openTrackerKey, gameTrackerKey, match?.outcome]);
   const self = session?.participants.find(
     (row) => row.participantId === participant.id,
   );
@@ -163,7 +170,7 @@ export function LimitedPlayerPanel({
       writeStored(scoreKey, `${aWins}-${bWins}`);
       setGameScore({ key: scoreKey, aWins, bWins });
     }
-    setTrackerMatchId(null);
+    setOpenTrackerKey(null);
   }
 
   const seatCount =
@@ -180,12 +187,12 @@ export function LimitedPlayerPanel({
       const result = await reportLimitedProgress(snapshot.event.joinCode, token, session.id, match.id,
         { playerAGameWins, playerBGameWins, startGame: true });
       remember(result.session);
-      if (tracker) setTrackerMatchId(match.id);
+      if (tracker) setOpenTrackerKey(gameTrackerKey);
     });
   }
 
   if (
-    trackerMatchId === match?.id &&
+    openTrackerKey === gameTrackerKey &&
     session &&
     match?.playerBId &&
     !match.outcome
@@ -201,7 +208,8 @@ export function LimitedPlayerPanel({
         ) : null}
         <Suspense fallback={null}>
           <TrackerView
-            storageKey={gameNumber === 1 ? trackerKey : `${trackerKey}.game-${gameNumber}`}
+            key={gameTrackerKey}
+            storageKey={gameTrackerKey}
             players={[
               { id: participant.id, name: participant.displayName, commanders: [] },
               {
@@ -216,9 +224,9 @@ export function LimitedPlayerPanel({
             onFinish={(winnerId) =>
               recordGameWin(winnerId === match.playerAId ? 'PLAYER_A_WIN' : 'PLAYER_B_WIN')
             }
-            onQuit={() => setTrackerMatchId(null)}
+            onQuit={() => setOpenTrackerKey(null)}
             onOpenDesk={onOpenDesk && (() => {
-              setTrackerMatchId(null);
+              setOpenTrackerKey(null);
               onOpenDesk();
             })}
           />
