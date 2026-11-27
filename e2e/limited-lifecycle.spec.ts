@@ -189,7 +189,9 @@ for (const format of [
               if (!corrected && round === 1) {
                 host.once('dialog', dialog => dialog.accept('E2E: winner entered backwards'));
                 const correction = host.waitForResponse(response => response.url().endsWith('/correct') && response.request().method() === 'POST');
-                await host.getByRole('button', { name: 'PLAYER B WIN', exact: true }).first().click();
+                const correctedMatch = session!.rounds.find(item => item.number === round)!.matches.find(match => match.id === matchId)!;
+                const winner = session!.participants.find(person => person.participantId === correctedMatch.playerBId)!.displayName;
+                await host.getByRole('button', { name: `${winner} wins`, exact: true }).first().click();
                 const correctionResponse = await correction;
                 expect(correctionResponse.ok()).toBe(true);
                 const correctedSession = (await correctionResponse.json()).session;
