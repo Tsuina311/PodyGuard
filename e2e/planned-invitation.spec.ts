@@ -6,7 +6,8 @@ test('event setup saves an invitation, calendar details and nickname RSVP, then 
   test.setTimeout(120_000);
   const demo = await (await page.request.get('/test/demo')).json();
   const headers = { Authorization: `Bearer ${demo.token}` };
-  const { playgroup } = await (await page.request.post('/api/playgroups', { headers, data: { name: 'Invitation planning group' } })).json();
+  const groupName = `Invitation planning ${test.info().project.name} ${test.info().repeatEachIndex}-${test.info().retry}`;
+  const { playgroup } = await (await page.request.post('/api/playgroups', { headers, data: { name: groupName } })).json();
   const guests = [];
   for (const displayName of ['Gwen', 'Theo']) {
     const { guest } = await (await page.request.post(`/api/playgroups/${playgroup.id}/guests`, { headers, data: { displayName } })).json();
@@ -23,7 +24,7 @@ test('event setup saves an invitation, calendar details and nickname RSVP, then 
   await page.getByRole('tab', { name: 'Host event', exact: true }).click();
   await page.getByRole('button', { name: 'Classic', exact: true }).click();
   await page.locator('label').filter({ has: page.locator('input[name="hostBaseMode"]') }).filter({ hasText: /^Duel$/ }).click();
-  await expect(page.getByRole('button', { name: 'Invitation planning group', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: groupName, exact: true })).toHaveAttribute('aria-pressed', 'true');
   await page.getByLabel('Event name', { exact: true }).fill('Classic plans');
   await page.getByRole('checkbox', { name: 'Create an invitation for later', exact: true }).check();
   await expect(page.getByLabel('Host PIN', { exact: true })).toHaveCount(0);
