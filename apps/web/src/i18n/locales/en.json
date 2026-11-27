@@ -1,4 +1,14 @@
 {
+  "limitedTimeline": {
+    "label": "Event progress",
+    "join": "Join",
+    "ready": "Ready",
+    "seat": "Seat",
+    "draft": "Draft",
+    "deck": "Deck",
+    "play": "Play",
+    "complete": "complete"
+  },
   "eventMonitor": {
     "title": "Event display",
     "code": "Event code",

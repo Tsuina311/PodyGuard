@@ -1,4 +1,14 @@
 {
+  "limitedTimeline": {
+    "label": "Progression de l’événement",
+    "join": "Rejoindre",
+    "ready": "Prêt",
+    "seat": "Place",
+    "draft": "Draft",
+    "deck": "Deck",
+    "play": "Jouer",
+    "complete": "terminé"
+  },
   "tablePlan": {
     "inventory": "{{tables}} tables · {{spaces}} espaces de jeu",
     "freeSpaces": "{{free}}/{{total}} espaces libres",

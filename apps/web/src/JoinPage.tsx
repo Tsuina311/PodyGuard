@@ -62,6 +62,7 @@ import { TrackerView } from './tracker/TrackerView';
 import { commanderNames } from './scryfall';
 import { TournamentPlayerStatus } from './tournament/TournamentPlayerStatus';
 import { LimitedPlayerPanel } from './limited/LimitedPlayerPanel';
+import { LimitedPlayerTimeline } from './limited/LimitedPlayerTimeline';
 import { RoundPlayerStatus } from './rounds/RoundPlayerStatus';
 import { eventHasLimitedQueues } from './event-mode';
 import { shouldShowLimitedPlayerPanel } from './event-screens';
@@ -993,6 +994,8 @@ function PlayerJoinPage({
           {event?.joinCode ?? joinCode.toUpperCase()}
         </p>
       </header>}
+
+      {event && limitedQueues && <LimitedPlayerTimeline event={event} participant={participant} snapshot={snapshot} />}
 
       <Agreement agreement={event?.pregameAgreement} />
 

@@ -50,6 +50,10 @@ async function recordTrackedWin(player: Page, seat: number) {
   await player.getByRole('button', { name: 'Record game result', exact: true }).click();
 }
 
+function currentStep(player: Page) {
+  return player.getByRole('list', { name: 'Event progress' }).locator('[aria-current="step"]');
+}
+
 for (const format of [
   { label: 'Booster Draft', count: 8, bestOf: 3 },
   { label: 'Pick-Two Draft', count: 4, bestOf: 3 },
@@ -79,6 +83,7 @@ for (const format of [
           if (playgroup) {
             await prepareApp(player);
             await player.goto(`/#/e/${code}`);
+            if (index === 0) await expect(currentStep(player)).toHaveText('Join');
             await player.getByRole('button', { name: `${name} Select →`, exact: true }).click();
             await player.getByRole('button', { name: 'Join event', exact: true }).click();
           } else {
@@ -88,9 +93,16 @@ for (const format of [
           if (await joinLobby.isVisible()) await joinLobby.click();
           await player.getByRole('button', { name: "I'm ready", exact: true }).click();
           await expect(player.getByRole('button', { name: 'Not ready yet', exact: true })).toBeVisible();
+          if (index === 0) {
+            await expect(currentStep(player)).toHaveText('Ready');
+            if (format.label === 'Sealed') {
+              await expect(player.getByRole('list', { name: 'Event progress' }).getByText('Draft', { exact: true })).toHaveCount(0);
+            }
+          }
         }
       });
       await host.getByRole('button', { name: 'Assign to tables', exact: true }).click();
+      await expect(currentStep(players[0]!)).toHaveText('Seat');
       await expect(host.getByRole('button', { name: format.label === 'Sealed' ? 'Start deckbuilding' : 'Start draft', exact: true })).toBeDisabled();
       await test.step('Everyone chooses a seat and confirms', async () => {
         for (const [index, player] of players.entries()) {
@@ -108,6 +120,7 @@ for (const format of [
       });
       if (format.label !== 'Sealed') {
         await host.getByRole('button', { name: 'Start draft', exact: true }).click();
+        await expect(currentStep(players[0]!)).toHaveText('Draft');
         await expect(players[0]!.getByText(format.label === 'Pick-Two Draft' ? /Take two cards each pick/ : /Take one card each pick/)).toBeVisible();
         if (playgroup) {
           await host.getByRole('tab', { name: 'Settings', exact: true }).click();
@@ -131,10 +144,12 @@ for (const format of [
       await expect(host.getByRole('button', { name: 'Resume timer', exact: true })).toBeVisible();
       await host.getByRole('button', { name: 'Resume timer', exact: true }).click();
       await test.step('Deck readiness advances to round one', async () => {
+        await expect(currentStep(players[0]!)).toHaveText('Deck');
         for (const [index, player] of players.entries()) {
           if (index === 0) await player.reload();
           await player.getByRole('button', { name: 'Deck is ready', exact: true }).click();
         }
+        await expect(currentStep(players[0]!)).toHaveText('Play');
       });
 
       // Match identities come from the real response. Every result is submitted through a player's UI.
@@ -225,6 +240,9 @@ for (const format of [
         }
       }
       expect(session!.status).toBe('COMPLETED');
+      const finishedTimeline = players[0]!.getByRole('list', { name: 'Event progress' });
+      await expect(finishedTimeline.getByText('complete', { exact: true })).toHaveCount(format.label === 'Sealed' ? 5 : 6);
+      await expect(currentStep(players[0]!)).toHaveCount(0);
       expect(corrected).toBe(true);
       expect(session!.standings).toHaveLength(format.count);
       await expect(host.getByRole('columnheader', { name: 'Points', exact: true })).toBeVisible();
