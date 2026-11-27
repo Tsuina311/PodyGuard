@@ -1,9 +1,12 @@
+import { randomUUID } from 'node:crypto';
 import type { Page } from '@playwright/test';
 import type { PlaygroupOverview, PublicLimitedSession } from '@podyguard/shared';
 import { expect, test } from './fixtures';
 import { createLimitedEvent, joinAsPlayer, prepareApp } from './helpers';
 
-async function seedDraftPlaygroup(host: Page, count: number, name = 'Draft Night Playgroup') {
+async function seedDraftPlaygroup(host: Page, count: number, label = 'Draft Night Playgroup') {
+  // The demo account and its playgroups persist across tests and retries.
+  const name = `${label} ${randomUUID()}`;
   const demo = await (await host.request.get('/test/demo')).json();
   const headers = { Authorization: `Bearer ${demo.token}` };
   const response = await host.request.post('/api/playgroups', {
@@ -112,7 +115,8 @@ for (const format of [
             const taken = player.getByRole('button', { name: 'Seat 1 Player 1', exact: true });
             await expect(taken).toBeDisabled();
             const openColor = await open.evaluate(button => getComputedStyle(button).backgroundColor);
-            expect(await taken.evaluate(button => getComputedStyle(button).backgroundColor)).not.toBe(openColor);
+            // The seat becomes disabled before its background transition finishes.
+            await expect(taken).not.toHaveCSS('background-color', openColor);
           }
           await open.click();
           await player.getByRole('button', { name: "I'm seated", exact: true }).click();
