@@ -38,10 +38,22 @@ test('a signed-in host can create Booster Draft without the preferred playgroup'
   expect(await response.json()).not.toHaveProperty('playgroupId');
 });
 
+async function recordTrackedWin(player: Page, seat: number) {
+  await player.getByRole('button', { name: 'Use life tracker', exact: true }).click();
+  await player.getByRole('button', { name: 'Reveal starting player', exact: true }).click();
+  await player.getByRole('button', { name: 'Start', exact: true }).click();
+  await player.getByTitle('Show seat controls', { exact: true }).click();
+  await player.getByTitle('Match menu', { exact: true }).click();
+  await player.getByRole('button', { name: 'Game won by', exact: true }).click();
+  await player.getByRole('button', { name: `Seat ${seat}`, exact: true }).click();
+  await player.getByRole('button', { name: 'Yes, they won', exact: true }).click();
+  await player.getByRole('button', { name: 'Record game result', exact: true }).click();
+}
+
 for (const format of [
-  { label: 'Booster Draft', count: 8 },
-  { label: 'Pick-Two Draft', count: 4 },
-  { label: 'Sealed', count: 4 },
+  { label: 'Booster Draft', count: 8, bestOf: 3 },
+  { label: 'Pick-Two Draft', count: 4, bestOf: 3 },
+  { label: 'Sealed', count: 4, bestOf: 1 },
 ] as const) {
   test(`${format.label}: full physical-card event through final standings`, async ({ page: host, browser }) => {
     test.setTimeout(240_000);
@@ -53,6 +65,7 @@ for (const format of [
       name: `E2E ${format.label} lifecycle`,
       formatLabel: format.label,
       playgroup: playgroup?.name,
+      matchStructure: format.bestOf === 3 ? 'BO3' : 'BO1',
     });
     try {
       await test.step('Players join and ready through independent browsers', async () => {
@@ -121,18 +134,41 @@ for (const format of [
         await test.step(`Play and report round ${round}`, async () => {
           await players[0]!.getByRole('button', { name: 'Start without life tracker', exact: true }).click();
           for (const player of players) {
-            const wins = player.getByRole('button', { name: /^Player \d+ wins$/ });
+            const wins = player.getByRole('button', { name: /^Player \d+ wins(?: game \d+)?$/ });
             // A match already reported by its opponent has no result buttons.
             // Wait for either the result controls or a visible result/waiting state.
             await expect.poll(async () => (await wins.count()) > 0 || (await player.getByText(/Result:|Next matches are on the way|This pod is finished/).count()) > 0).toBe(true);
             if (await wins.count()) {
+              let opponentWins = 0;
+              if (format.bestOf === 3) {
+                if (playgroup && round === 1 && player === players[0]) {
+                  const opponentWin = await wins.nth(1).textContent();
+                  await recordTrackedWin(player, opponentWin?.startsWith('Player 1 wins') ? 1 : 2);
+                  await expect(player.getByText('Best of 3 · 0–1', { exact: true })).toBeVisible();
+                  await player.reload();
+                  await expect(player.getByRole('button', { name: 'Track game 2', exact: true })).toBeVisible();
+                  await wins.first().click();
+                  await expect(player.getByText('Best of 3 · 1–1', { exact: true })).toBeVisible();
+                  await expect(wins.first()).toHaveText(/wins game 3$/);
+                  opponentWins = 1;
+                } else {
+                  await wins.first().click();
+                  await expect(player.getByText('Best of 3 · 1–0', { exact: true })).toBeVisible();
+                  await expect(wins.first()).toHaveText(/wins game 2$/);
+                }
+              }
               const response = player.waitForResponse(response => response.url().includes('/matches/') && response.url().endsWith('/result') && response.request().method() === 'POST');
               await wins.first().click();
               const result = await response;
               expect(result.ok()).toBe(true);
               session = (await result.json()).session;
               const matchId = result.url().split('/').at(-2);
-              expect(session!.rounds.find(item => item.number === round)!.matches.find(match => match.id === matchId)!.outcome).toBe('PLAYER_A_WIN');
+              expect(session!.rounds.find(item => item.number === round)!.matches.find(match => match.id === matchId)).toMatchObject({
+                outcome: 'PLAYER_A_WIN',
+                playerAGameWins: format.bestOf === 3 ? 2 : 1,
+                playerBGameWins: opponentWins,
+              });
+              if (opponentWins) await expect(player.getByText('Waiting for the other matches in this round.')).toBeVisible();
               if (!corrected && round === 1) {
                 host.once('dialog', dialog => dialog.accept('E2E: winner entered backwards'));
                 const correction = host.waitForResponse(response => response.url().endsWith('/correct') && response.request().method() === 'POST');
