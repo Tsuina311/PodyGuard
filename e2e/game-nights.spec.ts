@@ -59,8 +59,9 @@ test('friends plan a night, change an RSVP, export a calendar and start with the
     await expect(guest.getByLabel('Your name')).toHaveValue('Ada');
     await guest.getByLabel('Your response').selectOption('maybe');
     await guest.getByRole('button', { name: 'Save response' }).click();
-    await expect(guest.getByText('Ada: maybe', { exact: true })).toBeVisible();
-    await expect(guest.getByText('Ada: yes', { exact: true })).toHaveCount(0);
+    const guestResponse = guest.getByRole('region', { name: 'Who’s coming' }).getByRole('listitem').filter({ hasText: 'Ada' });
+    await expect(guestResponse.getByText('Maybe', { exact: true })).toBeVisible();
+    await expect(guestResponse.getByText('Yes', { exact: true })).toHaveCount(0);
     await expect(
       guest.getByRole('button', { name: 'Start event', exact: true }),
     ).toHaveCount(0);
@@ -72,7 +73,8 @@ test('friends plan a night, change an RSVP, export a calendar and start with the
       .analyze();
     expect(accessibility.violations).toEqual([]);
     await page.getByRole('button', { name: 'Refresh responses' }).click();
-    await expect(page.getByText('Ada: maybe', { exact: true })).toBeVisible();
+    const hostResponse = page.getByRole('region', { name: 'Who’s coming' }).getByRole('listitem').filter({ hasText: 'Ada' });
+    await expect(hostResponse.getByText('Maybe', { exact: true })).toBeVisible();
     await page.getByLabel('Host PIN', { exact: true }).fill('2468');
     await page
       .getByRole('button', { name: 'Start event', exact: true })

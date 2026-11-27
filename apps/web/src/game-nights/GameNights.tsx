@@ -1,7 +1,8 @@
 import { rememberRecentEvent } from '../recent-events';
 import { useTranslation } from 'react-i18next';
 import { ThemeToggleCorner } from '../ui/ThemeToggle';
-import { useEffect, useState, type FormEvent } from 'react';
+import { Check, Clock3, LockKeyhole, UsersRound, X } from 'lucide-react';
+import { useEffect, useId, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   gameNightCalendar,
@@ -17,6 +18,7 @@ import { Button } from '../ui/Button';
 import { Field } from '../ui/Field';
 import { Panel } from '../ui/Panel';
 import { Agreement } from './Agreement';
+import { cx } from '../ui/cx';
 import {
   cancelNight,
   createNight,
@@ -25,6 +27,72 @@ import {
   rsvpNight,
   startNight,
 } from './api';
+
+const attendanceStyles = {
+  yes: { icon: Check, className: 'border-gain/25 bg-gain/15' },
+  maybe: { icon: Clock3, className: 'border-warning/25 bg-warning/15' },
+  no: { icon: X, className: 'border-muted/25 bg-ink/5' },
+};
+
+function InvitationAttendance({ responses, seatTarget }: Pick<NightView, 'responses'> & {
+  seatTarget: number;
+}) {
+  const { t } = useTranslation();
+  const confirmed = responses.filter(row => row.response === 'yes').length;
+  const filled = Math.min(confirmed, seatTarget);
+  const full = confirmed >= seatTarget;
+
+  return (
+    <section aria-label={t('invitationPlan.attendance.title')} className="my-4 rounded-2xl border border-muted/25 bg-void/80 p-4 sm:p-5">
+      <div className="flex items-center justify-between gap-2">
+        <h3 className="flex items-center gap-2 font-display text-lg font-bold text-ink">
+          <UsersRound size={20} aria-hidden />
+          {t('invitationPlan.attendance.title')}
+        </h3>
+        {full && <span className="rounded-lg bg-gain/15 px-2.5 py-1 text-xs font-semibold text-ink">{t('invitationPlan.attendance.full')}</span>}
+      </div>
+      <p aria-live="polite" className="mt-2 text-sm text-muted">
+        <span className="font-display text-3xl font-bold tabular-nums text-ink">{confirmed}</span>{' '}
+        {t('invitationPlan.attendance.capacity', { total: seatTarget })}
+      </p>
+      <div
+        role="progressbar"
+        aria-label={t('invitationPlan.attendance.progress')}
+        aria-valuemin={0}
+        aria-valuemax={seatTarget}
+        aria-valuenow={filled}
+        className="mt-2 h-2 overflow-hidden rounded-full bg-ink/10"
+      >
+        <div className="h-full rounded-full bg-gain" style={{ width: `${filled / seatTarget * 100}%` }} />
+      </div>
+      {responses.length ? (
+        <ul className="mt-3 divide-y divide-muted/20">
+          {responses.map((row, index) => {
+            const { icon: Icon, className } = attendanceStyles[row.response];
+            return (
+              <li key={index} className="flex items-center gap-3 py-2.5">
+                <span aria-hidden className="flex size-9 shrink-0 items-center justify-center rounded-full bg-neon/15 text-sm font-bold text-ink">
+                  {Array.from(row.displayName.trim())[0]?.toLocaleUpperCase()}
+                </span>
+                <span className="min-w-0 flex-1 break-words text-sm font-semibold text-ink">{row.displayName}</span>
+                <span className={cx('inline-flex shrink-0 items-center gap-1 rounded-lg border px-2 py-1 text-xs font-semibold text-ink', className)}>
+                  <Icon size={14} aria-hidden />
+                  {t(`invitationPlan.attendance.${row.response}`)}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <p className="mt-3 text-sm text-muted">{t('invitationPlan.attendance.empty')}</p>
+      )}
+      <p className="mt-3 flex items-start gap-2 text-xs text-muted">
+        <LockKeyhole size={14} aria-hidden className="shrink-0" />
+        {t('invitationPlan.attendance.visibility')}
+      </p>
+    </section>
+  );
+}
 
 function errorText(error: unknown) {
   return error instanceof Error
@@ -203,6 +271,7 @@ export function GameNightsPanel({
 }
 export function GameNightPage() {
   const { t } = useTranslation();
+  const nameHintId = useId();
   const { id = '' } = useParams();
   const navigate = useNavigate();
   const [view, setView] = useState<NightView | null>(null);
@@ -340,12 +409,6 @@ export function GameNightPage() {
         </ul>
       </section> : null}
       {owns && night.eventSetup && !night.eventJoinCode && <p className="my-2 text-sm text-muted">{t('invitationPlan.savedSetup')}</p>}
-      <p>
-        {responses.filter((r) => r.response === 'yes').length} Yes ·{' '}
-        {responses.filter((r) => r.response === 'maybe').length} Maybe ·{' '}
-        {responses.filter((r) => r.response === 'no').length} No · Target{' '}
-        {night.seatTarget}
-      </p>
       <Agreement agreement={night.agreement} />
       <div className="my-3 flex flex-wrap gap-2">
         <Button size="sm" variant="outline" onClick={() => download(night)}>Add to calendar</Button>
@@ -365,18 +428,7 @@ export function GameNightPage() {
           Refresh responses
         </Button>
       </div>
-      <p className="text-sm text-muted">
-        Anyone with this link can view these responses. Use a first name or
-        nickname. Your response key stays on this browser so you can change your
-        answer.
-      </p>
-      <ul className="my-3">
-        {responses.map((r, index) => (
-          <li key={index}>
-            {r.displayName}: {r.response}
-          </li>
-        ))}
-      </ul>
+      <InvitationAttendance responses={responses} seatTarget={night.seatTarget} />
       {closed ? (
         <p role="status">
           {night.cancelled
@@ -420,8 +472,10 @@ export function GameNightPage() {
             </select>
             <span className="mt-1 block text-xs text-muted">{t('invitationPlan.nicknameHint')}</span>
           </label> : null}
+          <p id={nameHintId} className="mb-2 text-xs text-muted">{t('invitationPlan.attendance.nameHint')}</p>
           <Field
             label="Your name"
+            aria-describedby={nameHintId}
             required
             maxLength={24}
             value={name}

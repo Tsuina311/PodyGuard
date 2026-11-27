@@ -1,3 +1,6 @@
+import { Check, Plus, UserRound } from 'lucide-react';
+import { cx } from '../ui/cx';
+
 export type LimitedSeatLayout = 'square' | 'long';
 
 const SQUARE: Record<number, number[][]> = {
@@ -33,31 +36,38 @@ export function LimitedSeatMap({
   onPick: (seat: number) => void;
 }) {
   const bySeat = new Map(occupants.map((row) => [row.seat, row]));
+  const hasSeat = occupants.some((row) => row.participantId === selfId);
   const square = SQUARE[seatCount];
   const long = seatCount === 4 && layout === 'long';
 
   function chair(seat: number) {
     const person = bySeat.get(seat);
     const mine = person?.participantId === selfId;
+    const Icon = mine ? Check : person ? UserRound : Plus;
+    const label = person?.displayName ?? 'Open';
     return (
       <button
         key={seat}
         type="button"
-        disabled={disabled}
+        disabled={disabled || Boolean(person && !hasSeat)}
+        aria-label={`Seat ${seat} ${label}`}
+        aria-pressed={mine}
         onClick={() => onPick(seat)}
-        className={`flex min-h-16 min-w-16 flex-col items-center justify-center rounded-xl border px-2 py-2 text-center text-xs font-semibold ${
+        className={cx(
+          'flex min-h-16 min-w-16 flex-col items-center justify-center rounded-xl border px-2 py-2 text-center text-xs font-semibold transition-colors disabled:cursor-default',
           mine
-            ? 'border-neon bg-neon/15 text-neon'
+            ? 'border-neon bg-neon/15 text-ink ring-2 ring-neon/40'
             : person
-              ? 'border-white/20 bg-white/5 text-ink'
-              : 'border-dashed border-white/25 text-muted'
-        }`}
+              ? 'border-muted/35 bg-ink/5 text-muted enabled:hover:border-muted'
+              : 'border-gain/75 bg-gain/15 text-ink enabled:hover:bg-gain/25',
+        )}
       >
         <span className="font-mono text-[0.65rem] uppercase tracking-widest">
           Seat {seat}
         </span>
-        <span className="mt-1 max-w-20 truncate">
-          {person ? person.displayName : 'Open'}
+        <span className="mt-1 flex min-w-0 items-center gap-1">
+          <Icon size={13} aria-hidden className={cx('shrink-0', !person && 'text-gain')} />
+          <span className="max-w-16 truncate">{label}</span>
         </span>
       </button>
     );

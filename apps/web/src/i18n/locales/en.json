@@ -71,6 +71,18 @@
     "statuses": { "joined": "Not ready", "ready": "Ready", "matched": "Seated", "playing": "Playing", "paused": "Paused", "left": "Left" }
   },
   "invitationPlan": {
+    "attendance": {
+      "title": "Who’s coming",
+      "full": "Full",
+      "capacity": "/ {{total}} seats confirmed",
+      "progress": "Confirmed seats",
+      "yes": "Yes",
+      "maybe": "Maybe",
+      "no": "No",
+      "empty": "No responses yet.",
+      "visibility": "Anyone with the invitation link can see these responses.",
+      "nameHint": "Use a first name or nickname. You can update your answer in this browser."
+    },
     "plan": "Create an invitation for later",
     "hint": "Save this event type and table setup with your invitation. The live event and its expiry timer start only when you launch it.",
     "signIn": "Sign in and choose your playgroup to plan an invitation.",

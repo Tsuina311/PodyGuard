@@ -58,6 +58,18 @@
     "statuses": { "joined": "Pas prêt", "ready": "Prêt", "matched": "À table", "playing": "En partie", "paused": "En pause", "left": "Parti" }
   },
   "invitationPlan": {
+    "attendance": {
+      "title": "Qui vient ?",
+      "full": "Complet",
+      "capacity": "/ {{total}} places confirmées",
+      "progress": "Places confirmées",
+      "yes": "Oui",
+      "maybe": "Peut-être",
+      "no": "Non",
+      "empty": "Aucune réponse pour le moment.",
+      "visibility": "Toute personne disposant du lien d’invitation peut voir ces réponses.",
+      "nameHint": "Utilisez un prénom ou un pseudonyme. Vous pouvez modifier votre réponse dans ce navigateur."
+    },
     "plan": "Créer une invitation pour plus tard",
     "hint": "Le format et les tables sont enregistrés avec l’invitation. L’événement et sa durée de validité ne commencent qu’au lancement.",
     "signIn": "Connectez-vous et choisissez votre groupe pour préparer une invitation.",

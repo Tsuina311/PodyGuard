@@ -57,7 +57,8 @@ test('event setup saves an invitation, calendar details and nickname RSVP, then 
     await expect(guest.getByLabel('Your name', { exact: true })).toHaveValue('Gwen');
     await guest.getByLabel('Your name', { exact: true }).fill('Stargazer');
     await guest.getByRole('button', { name: 'Save response', exact: true }).click();
-    await expect(guest.getByText('Stargazer: yes', { exact: true })).toBeVisible();
+    const response = guest.getByRole('region', { name: 'Who’s coming' }).getByRole('listitem').filter({ hasText: 'Stargazer' });
+    await expect(response.getByText('Yes', { exact: true })).toBeVisible();
     await guest.reload();
     await expect(guest.getByLabel('Your name', { exact: true })).toHaveValue('Stargazer');
     await expect(guest.getByRole('combobox', { name: 'Choose your playgroup player', exact: true })).toHaveValue(guests[0].id);

@@ -72,6 +72,9 @@ for (const format of [
         for (let index = 0; index < format.count; index++) {
           const player = await browser.newPage();
           players.push(player);
+          if (playgroup && index < 2) {
+            await player.addInitScript(() => localStorage.setItem('podyguard-theme', 'light'));
+          }
           const name = `Player ${index + 1}`;
           if (playgroup) {
             await prepareApp(player);
@@ -91,7 +94,15 @@ for (const format of [
       await expect(host.getByRole('button', { name: format.label === 'Sealed' ? 'Start deckbuilding' : 'Start draft', exact: true })).toBeDisabled();
       await test.step('Everyone chooses a seat and confirms', async () => {
         for (const [index, player] of players.entries()) {
-          await player.getByRole('button', { name: `Seat ${index + 1} Open`, exact: true }).click();
+          const open = player.getByRole('button', { name: `Seat ${index + 1} Open`, exact: true });
+          if (playgroup && index === 1) {
+            await expect(player.locator('html')).toHaveAttribute('data-theme', 'light');
+            const taken = player.getByRole('button', { name: 'Seat 1 Player 1', exact: true });
+            await expect(taken).toBeDisabled();
+            const openColor = await open.evaluate(button => getComputedStyle(button).backgroundColor);
+            expect(await taken.evaluate(button => getComputedStyle(button).backgroundColor)).not.toBe(openColor);
+          }
+          await open.click();
           await player.getByRole('button', { name: "I'm seated", exact: true }).click();
         }
       });
