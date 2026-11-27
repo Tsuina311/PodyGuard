@@ -97,6 +97,11 @@ export function LimitedSeatMap({
           </LayoutButton>
         </div>
       ) : null}
+      {!seated && !shape && seatCount === 4 && (
+        <p className="text-muted mb-2 text-center text-xs">
+          {long ? 'Two players sit across from two.' : 'One player on each side.'}
+        </p>
+      )}
       {!seated && hasSeat && (
         <p className="text-muted mb-2 text-center text-xs">Tap another chair to swap seats.</p>
       )}
