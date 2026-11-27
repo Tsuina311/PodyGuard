@@ -34,6 +34,10 @@ export function limitedSeatingDestination(snapshot: EventSnapshot, session: Publ
   return [...new Set(tables.map(draftTableLabel).filter(Boolean))].join(' + ') || null;
 }
 
+export function limitedSessionInProgress(session: PublicLimitedSession): boolean {
+  return session.status !== 'COMPLETED' && session.status !== 'CANCELLED';
+}
+
 export function activeLimitedSession(
   snapshot: EventSnapshot | null,
   participantId: string | undefined,
@@ -49,8 +53,7 @@ export function activeLimitedSession(
   return (
     sessions.find(
       (session) =>
-        !['COMPLETED', 'CANCELLED'].includes(session.status) &&
-        includesParticipant(session),
+        limitedSessionInProgress(session) && includesParticipant(session),
     ) ??
     [...sessions]
       .reverse()
@@ -59,6 +62,21 @@ export function activeLimitedSession(
           session.status === 'COMPLETED' && includesParticipant(session),
       )
   );
+}
+
+export function limitedPhaseProgress(session: PublicLimitedSession): string | null {
+  const seating = session.status === 'SEATING';
+  if (!seating && session.status !== 'DRAFTING' && session.status !== 'DECKBUILDING') return null;
+
+  const active = session.participants.filter((person) => person.status !== 'DROPPED');
+  const waiting = active.filter((person) =>
+    seating ? !person.seated : !session.phaseAcks?.includes(person.participantId),
+  );
+  const label = seating ? 'seated' : session.status === 'DECKBUILDING' ? 'decks ready' : 'done';
+  const progress = `${active.length - waiting.length} / ${active.length} ${label}`;
+  return waiting.length > 0
+    ? `${progress} · waiting for ${waiting.map((person) => person.displayName).join(', ')}`
+    : progress;
 }
 
 export function currentLimitedMatch(

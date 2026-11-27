@@ -125,6 +125,7 @@
     "waiting": "Partie {{number}} · en attente du début"
   },
   "devicePlayers": {
+    "switch": "Vous jouez en tant que {{name}} · changer de joueur",
     "resumeCount": "Reprendre un joueur · {{count}} enregistrés",
     "all": "Tous les joueurs enregistrés",
     "recoveryHelp": "Les joueurs restent enregistrés après la fermeture d’un onglet. Continuer revient à leur onglet ouvert si possible, ou rouvre leur place dans un nouvel onglet.",

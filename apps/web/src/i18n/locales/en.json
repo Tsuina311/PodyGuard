@@ -141,6 +141,7 @@
     "waiting": "Game {{number}} · waiting to start"
   },
   "devicePlayers": {
+    "switch": "Playing as {{name}} · switch player",
     "resumeCount": "Resume a player · {{count}} saved",
     "all": "All saved players",
     "recoveryHelp": "Saved players stay here after you close a tab. Continue switches to their open tab when available, or reopens their seat in a new tab.",

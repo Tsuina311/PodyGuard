@@ -188,7 +188,7 @@ export function RoundHostPanel({
 
       {rounds ? (
         <div className="mb-4 grid gap-2 sm:grid-cols-3">
-          <div className="rounded-xl border border-white/10 p-3">
+          <div className="rounded-xl border border-ink/10 p-3">
             <p className="text-muted text-xs tracking-wide uppercase">Progress</p>
             <p className="font-display mt-1 text-lg font-semibold">
               {progress
@@ -196,13 +196,13 @@ export function RoundHostPanel({
                 : '—'}
             </p>
           </div>
-          <div className="rounded-xl border border-white/10 p-3">
+          <div className="rounded-xl border border-ink/10 p-3">
             <p className="text-muted text-xs tracking-wide uppercase">Night</p>
             <p className="font-display mt-1 text-lg font-semibold">
               Round {rounds.currentRoundNumber || 0} of {totalRounds}
             </p>
           </div>
-          <div className="rounded-xl border border-white/10 p-3">
+          <div className="rounded-xl border border-ink/10 p-3">
             <p className="text-muted text-xs tracking-wide uppercase">Kind</p>
             <p className="font-display mt-1 text-lg font-semibold">
               {rounds.activityKind === 'DUEL' ? '1v1' : 'Pods'}

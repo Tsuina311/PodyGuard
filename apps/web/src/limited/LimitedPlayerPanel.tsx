@@ -7,6 +7,7 @@ import type {
   PublicParticipant,
 } from '@podyguard/shared';
 import { limitedModeConfig, limitedPlayerCue } from '@podyguard/shared';
+import { ChevronDown } from 'lucide-react';
 import {
   acknowledgeLimitedPhase,
   ApiError,
@@ -30,6 +31,7 @@ import { LimitedTimerDisplay } from './LimitedTimerDisplay';
 import {
   activeLimitedSession,
   limitedSeatingDestination,
+  limitedPhaseProgress,
   currentLimitedMatch,
   LIMITED_MODE_LABELS,
   participantName,
@@ -172,6 +174,12 @@ export function LimitedPlayerPanel({
     (session ? limitedModeConfig(session.mode).preferredCohortSize ?? 4 : 4);
   const format = session?.mode ?? participant.limitedQueueMode ?? null;
   const seatingSession = session?.status === 'SEATING' ? session : undefined;
+  const phaseProgress = session && limitedPhaseProgress(session);
+  const isDraft = Boolean(session && limitedModeConfig(session.mode).hasDraftPhase);
+
+  function reportGameWin(outcome: 'PLAYER_A_WIN' | 'PLAYER_B_WIN', label: string) {
+    if (window.confirm(`Confirm result: ${label}?`)) void act(() => recordGameWin(outcome));
+  }
 
   function beginPlay(tracker: boolean) {
     if (!session || !match) return;
@@ -196,7 +204,7 @@ export function LimitedPlayerPanel({
       <div className="fixed inset-0 z-50 flex flex-col bg-void">
         {session.timer ? (
           <div className="pointer-events-none absolute inset-x-0 top-0 z-[70] px-3 pt-2">
-            <LimitedTimerDisplay timer={session.timer} compact />
+            <LimitedTimerDisplay timer={session.timer} compact roundNumber={session.currentRound} />
           </div>
         ) : null}
         <Suspense fallback={null}>
@@ -229,7 +237,8 @@ export function LimitedPlayerPanel({
 
   return (
     <Panel
-      title="Limited"
+      title={format ? LIMITED_MODE_LABELS[format] : 'Limited'}
+      className="p-4 sm:p-5"
       aside={
         session ? (
           <Badge tone={session.status === 'ROUND_ACTIVE' ? 'live' : 'idle'}>
@@ -242,17 +251,20 @@ export function LimitedPlayerPanel({
         ) : null
       }
     >
-      <div className="mb-4">
+      <div className="mb-3">
         <h3 className="font-display text-lg font-semibold">{cue.title}</h3>
-        <p className="text-muted mt-1 text-sm">{cue.detail}</p>
-        {format ? (
-          <p className="text-muted mt-2 text-xs">{LIMITED_MODE_LABELS[format]}</p>
-        ) : null}
+        <p className="text-muted mt-1 text-sm">
+          {cue.detail}
+          {session?.status === 'ROUND_ACTIVE' && match && (
+            <> · {match.tableLabel ?? tableLabel ?? 'Table'} · Best of {match.bestOf}</>
+          )}
+        </p>
+        {phaseProgress && <p role="status" className="mt-2 text-sm text-muted">{phaseProgress}</p>}
       </div>
 
       {session?.timer ? (
-        <div className="mb-4">
-          <LimitedTimerDisplay timer={session.timer} />
+        <div className="mb-3">
+          <LimitedTimerDisplay timer={session.timer} compact={session.timer.phase === 'ROUND'} roundNumber={session.currentRound} />
         </div>
       ) : null}
 
@@ -340,6 +352,8 @@ export function LimitedPlayerPanel({
             seatCount={seatCount}
             selfId={participant.id}
             disabled={busy}
+            seated={self?.seated}
+            passLabel={isDraft ? 'Pack 1 passes left' : undefined}
             layout={seatingSession.seatLayout === 'long' ? 'long' : 'square'}
             onLayout={
               seatCount === 4
@@ -411,18 +425,11 @@ export function LimitedPlayerPanel({
       ) : null}
 
       {match && session ? (
-        <div className="mt-4 rounded-xl border border-white/10 p-4">
-          <p className="text-muted mb-1 text-xs uppercase tracking-widest">
-            {match.tableLabel ?? tableLabel ?? 'Table'}
-          </p>
-          <p className="font-display mb-2 text-lg font-semibold">
-            {participantName(session, match.playerAId)} vs{' '}
-            {participantName(session, match.playerBId)}
-          </p>
+        <div className="mt-4 rounded-xl border border-ink/10 p-4">
           <p aria-live="polite" className="text-muted mb-3 text-sm">
             {match.outcome
               ? `Result: ${matchWinnerId ? `${participantName(session, matchWinnerId)} wins` : match.outcome.replaceAll('_', ' ')}`
-              : `Best of ${match.bestOf}${match.bestOf === 3 ? ` · ${playerAGameWins}–${playerBGameWins}` : ''}`}
+              : match.bestOf === 3 ? `Best of 3 · ${playerAGameWins}–${playerBGameWins}` : null}
             {match.outcome && match.bestOf === 3 && match.playerAGameWins != null && match.playerBGameWins != null
               ? ` · ${match.playerAGameWins}–${match.playerBGameWins}`
               : ''}
@@ -453,53 +460,64 @@ export function LimitedPlayerPanel({
             </div>
           ) : null}
           {!match.outcome && match.playerBId ? (
-            <div className="grid grid-cols-2 gap-2">
-              {(['PLAYER_A_WIN', 'PLAYER_B_WIN', 'DRAW', 'DOUBLE_LOSS'] as const).map(
-                (outcome) => (
-                  <Button
-                    key={outcome}
-                    size="sm"
-                    variant="glass"
-                    disabled={busy}
-                    onClick={() => void act(() =>
-                      outcome === 'PLAYER_A_WIN' || outcome === 'PLAYER_B_WIN'
-                        ? recordGameWin(outcome)
-                        : submitResult(outcome, outcome === 'DRAW' && playerAGameWins === playerBGameWins
-                          ? { playerAGameWins, playerBGameWins } : scoreForOutcome(outcome, match.bestOf)),
-                    )}
-                  >
-                    {outcome === 'PLAYER_A_WIN'
-                      ? `${participantName(session, match.playerAId)} wins${match.bestOf === 3 ? ` game ${gameNumber}` : ''}`
-                      : outcome === 'PLAYER_B_WIN'
-                        ? `${participantName(session, match.playerBId)} wins${match.bestOf === 3 ? ` game ${gameNumber}` : ''}`
-                        : outcome === 'DRAW' ? 'Report match draw' : 'Report double loss'}
-                  </Button>
-                ),
-              )}
+            <div className="border-t border-ink/10 pt-3">
+              <p className="mb-2 text-sm font-semibold">{match.bestOf === 3 ? 'Report a game winner' : 'Report the winner'}</p>
+              <div className="grid grid-cols-2 gap-2">
+                {(['PLAYER_A_WIN', 'PLAYER_B_WIN'] as const).map((outcome) => {
+                  const winnerId = outcome === 'PLAYER_A_WIN' ? match.playerAId : match.playerBId;
+                  const label = `${participantName(session, winnerId)} wins${match.bestOf === 3 ? ` game ${gameNumber}` : ''}`;
+                  return (
+                    <Button key={outcome} size="sm" variant="glass" disabled={busy} onClick={() => reportGameWin(outcome, label)}>
+                      {label}
+                    </Button>
+                  );
+                })}
+              </div>
+              <details className="group mt-2 text-sm">
+                <summary className="flex min-h-10 cursor-pointer items-center gap-1.5 text-muted underline marker:content-none [&::-webkit-details-marker]:hidden">
+                  More results
+                  <ChevronDown size={16} aria-hidden className="group-open:rotate-180" />
+                </summary>
+                <div className="grid grid-cols-2 gap-2">
+                  {(['DRAW', 'DOUBLE_LOSS'] as const).map((outcome) => {
+                    const label = outcome === 'DRAW' ? 'Report match draw' : 'Report double loss';
+                    return (
+                      <Button key={outcome} size="sm" variant="ghost" disabled={busy} onClick={() => {
+                        if (!window.confirm(`${label}?`)) return;
+                        const score = outcome === 'DRAW' && playerAGameWins === playerBGameWins
+                          ? { playerAGameWins, playerBGameWins } : scoreForOutcome(outcome, match.bestOf);
+                        void act(() => submitResult(outcome, score));
+                      }}>
+                        {label}
+                      </Button>
+                    );
+                  })}
+                </div>
+              </details>
             </div>
           ) : null}
         </div>
       ) : null}
 
       {session && !['COMPLETED', 'CANCELLED'].includes(session.status) ? (
-        <Button
-          className="mt-4"
-          variant="danger"
-          size="sm"
+        <button
+          type="button"
+          className="mt-3 min-h-11 text-sm text-muted underline hover:text-ink disabled:opacity-50"
           disabled={busy}
-          onClick={() =>
+          onClick={() => {
+            const eventLabel = isDraft ? 'draft' : 'session';
+            const consequence = match && !match.outcome && match.playerBId
+              ? ' Your current match will count as a loss.'
+              : '';
+            if (!window.confirm(`Leave this ${eventLabel}? You’ll be removed from the ${eventLabel}.${consequence}`)) return;
             void act(async () => {
-              const result = await dropLimitedParticipant(
-                snapshot.event.joinCode,
-                token,
-                session.id,
-              );
+              const result = await dropLimitedParticipant(snapshot.event.joinCode, token, session.id);
               remember(result.session);
-            })
-          }
+            });
+          }}
         >
-          Drop from session
-        </Button>
+          {isDraft ? 'Leave this draft' : 'Leave this session'}
+        </button>
       ) : null}
     </Panel>
   );

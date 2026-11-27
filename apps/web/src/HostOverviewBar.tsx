@@ -15,6 +15,7 @@ type Props = {
   onView: (view: HostView) => void;
   counts: { ready: number; playing: number; matched: number };
   players: number;
+  limitedPhaseCounts: string[];
   freeTables: number;
   tables: number;
   tableAreas?: boolean;
@@ -64,10 +65,14 @@ export function HostOverviewBar(props: Props) {
         {value === 'play' && props.hasPlayerSeat && <span aria-hidden className="ml-1 inline-block size-1.5 rounded-full bg-neon" />}
       </button>)}
     </div>
-    <div className="mt-3 grid grid-cols-4 gap-1 text-center text-xs sm:gap-2 sm:text-sm">
+    <div className="mt-3 grid grid-cols-[repeat(auto-fit,minmax(5rem,1fr))] gap-1 text-center text-xs sm:gap-2 sm:text-sm">
       <span className="rounded-lg bg-ink/5 px-1 py-2">{t('host.playerCount', { count: props.players })}</span>
-      <span className="rounded-lg bg-neon/10 px-1 py-2 font-semibold text-neon">{t('host.ready', { count: counts.ready })}</span>
-      <span className="rounded-lg bg-ink/5 px-1 py-2">{t('host.playing', { count: counts.playing })}</span>
+      {props.limitedPhaseCounts.length > 0
+        ? props.limitedPhaseCounts.map((label) => <span key={label} className="rounded-lg bg-neon/10 px-1 py-2 font-semibold text-neon">{label}</span>)
+        : <>
+          <span className="rounded-lg bg-neon/10 px-1 py-2 font-semibold text-neon">{t('host.ready', { count: counts.ready })}</span>
+          <span className="rounded-lg bg-ink/5 px-1 py-2">{t('host.playing', { count: counts.playing })}</span>
+        </>}
       <span className="rounded-lg bg-ink/5 px-1 py-2">{t(props.tableAreas ? 'tablePlan.freeSpaces' : 'hostUx.freeTables', { free: props.freeTables, total: props.tables })}</span>
     </div>
     {tab === 'desk' && <>

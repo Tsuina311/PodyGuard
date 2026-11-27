@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LayoutDashboard } from 'lucide-react';
+import { ChevronDown, LayoutDashboard } from 'lucide-react';
 import { normalizeJoinCode } from '@podyguard/shared';
 import { loadHostToken } from './api';
 import { createPlayerScope, listPlayerSessions, playerPath } from './player-sessions';
@@ -20,8 +20,8 @@ export function DeviceHostDesk({ joinCode, onOpenDesk }: {
     : <Link to={`/host/${normalizeJoinCode(joinCode)}`} className={className}>{label}</Link>;
 }
 
-export function DevicePlayers({ joinCode, scope, displayName, onOpenDesk }: {
-  joinCode: string; scope: string; displayName?: string; onOpenDesk?: () => void;
+export function DevicePlayers({ joinCode, scope, displayName, onOpenDesk, compact = false }: {
+  joinCode: string; scope: string; displayName?: string; onOpenDesk?: () => void; compact?: boolean;
 }) {
   const { t } = useTranslation();
   useSavedPlayers();
@@ -40,18 +40,21 @@ export function DevicePlayers({ joinCode, scope, displayName, onOpenDesk }: {
     };
   }, [joinCode, displayName]);
   const hasHostDesk = Boolean(onOpenDesk || loadHostToken(joinCode));
-  return <section aria-label={t('devicePlayers.title')} className="mb-5 rounded-2xl border border-muted/25 p-4">
-    {displayName && <p className="mb-2 font-semibold">{t('devicePlayers.current', { name: displayName })}</p>}
-    <a href={`#${playerPath(joinCode, newScope)}`} target={playerTabName(joinCode, newScope)}
-      onClick={event => {
-        const nextScope = createPlayerScope();
-        event.currentTarget.href = `#${playerPath(joinCode, nextScope)}`;
-        event.currentTarget.target = playerTabName(joinCode, nextScope);
-      }}
-      className="inline-flex min-h-11 items-center rounded-xl border border-neon/40 px-3 py-2 text-neon">
-      {t('devicePlayers.joinAnother')}
-    </a>
-    <p className="mt-2 text-sm text-muted">{t('devicePlayers.help')}</p>
+  if (!displayName && players.length === 0 && !hasHostDesk) return null;
+  const controls = <>
+    {!compact && displayName && <p className="mb-2 font-semibold">{t('devicePlayers.current', { name: displayName })}</p>}
+    {(displayName || players.length > 0) && <>
+      <a href={`#${playerPath(joinCode, newScope)}`} target={playerTabName(joinCode, newScope)}
+        onClick={event => {
+          const nextScope = createPlayerScope();
+          event.currentTarget.href = `#${playerPath(joinCode, nextScope)}`;
+          event.currentTarget.target = playerTabName(joinCode, nextScope);
+        }}
+        className="inline-flex min-h-11 items-center rounded-xl border border-neon/40 px-3 py-2 text-neon">
+        {t('devicePlayers.joinAnother')}
+      </a>
+      <p className="mt-2 text-sm text-muted">{t('devicePlayers.help')}</p>
+    </>}
     {(players.length > 0 || hasHostDesk) && <div className="mt-3">
       <h3 className="mb-2 font-semibold">{t('devicePlayers.title')}</h3>
       <ul className="flex flex-wrap gap-2">
@@ -68,5 +71,17 @@ export function DevicePlayers({ joinCode, scope, displayName, onOpenDesk }: {
       {players.length > 0 && <a href="#/players" target="_blank" rel="opener" title={t('devicePlayers.newTab')}
         className="mt-2 inline-flex min-h-11 items-center text-sm text-ink underline">{t('devicePlayers.all')}</a>}
     </div>}
-  </section>;
+  </>;
+  if (!compact) {
+    return <section aria-label={t('devicePlayers.title')} className="mb-5 rounded-2xl border border-muted/25 p-4">{controls}</section>;
+  }
+  return (
+    <details className="group">
+      <summary className="flex min-h-10 cursor-pointer list-none items-center gap-1.5 text-sm text-muted marker:content-none [&::-webkit-details-marker]:hidden">
+        {displayName ? t('devicePlayers.switch', { name: displayName }) : t('devicePlayers.title')}
+        <ChevronDown size={16} aria-hidden className="group-open:rotate-180" />
+      </summary>
+      <section aria-label={t('devicePlayers.title')} className="rounded-xl border border-muted/25 p-3">{controls}</section>
+    </details>
+  );
 }

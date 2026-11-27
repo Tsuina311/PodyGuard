@@ -43,6 +43,7 @@ export function App() {
   const { t } = useTranslation();
   // `/match` deliberately shares the player layout so it matches a real phone.
   const host = useMatch('/host/:joinCode');
+  const player = useMatch('/e/:joinCode');
   const displayPair = useMatch({ path: '/display', end: true });
   const displayLive = useMatch('/display/live');
   const displayEvent = useMatch('/display/event/:joinCode');
@@ -78,15 +79,12 @@ export function App() {
         {waking ? <ServerWakeScreen /> : null}
         <main
           className={cx(
-            'relative mx-auto flex w-full flex-col gap-5',
+            'relative mx-auto flex w-full flex-col',
+            player ? 'gap-3' : 'gap-5',
             tools ? 'h-full min-h-0' : 'min-h-screen px-5',
-            home ? 'justify-start py-8' : !tools && 'py-14',
-            publicDisplay
-              ? 'max-w-7xl justify-start'
-              : wide
-                ? 'max-w-4xl justify-start'
-                : 'max-w-2xl',
-            !wide && !home && 'justify-center',
+            home ? 'justify-start py-8' : player ? 'py-3' : !tools && 'py-14',
+            wide ? 'max-w-7xl justify-start' : 'max-w-2xl',
+            !wide && !home && !player && 'justify-center',
           )}
         >
           <Routes>

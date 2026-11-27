@@ -16,7 +16,7 @@ describe('Limited seat map', () => {
     const { rerender } = render(
       <LimitedSeatMap seatCount={4} selfId="p1" occupants={[occupied]} onPick={onPick} />,
     );
-    expect(screen.getByRole('button', { name: 'Seat 1 Open' })).toHaveClass('bg-gain/15');
+    expect(screen.getByRole('button', { name: 'Seat 1 Open' })).toHaveClass('bg-gain/15', 'border-dashed');
     const taken = screen.getByRole('button', { name: 'Seat 2 Dax' });
     expect(taken).toHaveClass('bg-ink/5');
     expect(taken).toBeDisabled();
@@ -26,6 +26,9 @@ describe('Limited seat map', () => {
     expect(taken).toBeEnabled();
     fireEvent.click(taken);
     expect(onPick).toHaveBeenCalledWith(2);
+
+    rerender(<LimitedSeatMap seatCount={4} selfId="p1" seated occupants={[occupied, mine]} onPick={onPick} />);
+    expect(screen.queryByText('Tap another chair to swap seats.')).not.toBeInTheDocument();
   });
 
   it('switches a pod of four to two players facing two', () => {
