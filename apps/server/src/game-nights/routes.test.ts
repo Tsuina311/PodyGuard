@@ -75,6 +75,17 @@ describe('game nights', () => {
     });
     expect(list.json().nights[0].id).toBe(night.id);
   });
+  it('rejects malformed, duplicated, oversized and foreign invitee lists', async () => {
+    const guest = await app.events.createGuestProfile(token, group, { displayName: 'Gwen' });
+    const foreignGroup = await app.events.createPlaygroup(token, { name: 'Another group' });
+    const foreign = await app.events.createGuestProfile(token, foreignGroup.id, { displayName: 'Other' });
+    for (const invitedGuestIds of ['wrong', [42], ['bad-id'], [guest.id, guest.id], Array.from({ length: 101 }, () => guest.id), [foreign.id]]) {
+      const result = await app.inject({ method: 'POST', url: `/playgroups/${group}/nights`, headers: headers(),
+        payload: { ...input(), invitedGuestIds } });
+      expect(result.statusCode, result.body).toBe(400);
+    }
+    expect(await nights.list(group)).toEqual([]);
+  });
   it('keeps a planned setup without starting an event, allows a nickname RSVP, then restores the exact tables', async () => {
     const guest = await app.events.createGuestProfile(token, group, { displayName: 'Gwen' });
     const setup = { tableCount: 2, gameMode: 'duel', rulesFormat: 'normal', lifetimeHours: 1,
