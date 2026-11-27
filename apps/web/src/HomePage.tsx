@@ -732,7 +732,7 @@ export function HomePage() {
                         {checked ? '☑ ' : '☐ '}
                         {guest.displayName}
                       </span>
-                      {pref?.commanderName ? (
+                      {playCommander && pref?.commanderName ? (
                         <span className="text-muted/80 block text-[10px]">
                           {pref.commanderName}
                           {pref.bracket ? ` · B${pref.bracket}` : ''}
