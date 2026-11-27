@@ -200,7 +200,7 @@ it('advances the Limited tracker through a split series and reports the actual s
   firstVisit.unmount();
   render(<LimitedPlayerPanel {...props} />);
   fireEvent.click(screen.getByRole('button', { name: 'Track game 2' }));
-  expect(await screen.findByText('podyguard.tracker.limited.DRAFT1.m1.game-2')).toBeVisible();
+  expect(await screen.findByText('podyguard.tracker.limited.DRAFT1.m1.series.game-2')).toBeVisible();
   fireEvent.click(screen.getByRole('button', { name: 'Bea won the game' }));
   expect(await screen.findByText('Best of 3 · 1–1')).toBeVisible();
   fireEvent.click(screen.getByRole('button', { name: 'Track game 3' }));
@@ -209,6 +209,40 @@ it('advances the Limited tracker through a split series and reports the actual s
   expect(reportLimitedResult).toHaveBeenCalledExactlyOnceWith('DRAFT1', 'player', 's1', 'm1', {
     outcome: 'PLAYER_A_WIN', playerAGameWins: 2, playerBGameWins: 1,
   });
+});
+
+it('closes an open Limited tracker when the other player reports that game', async () => {
+  const { me, round } = bestOfThreeRound();
+  const running: PublicLimitedSession = {
+    ...round,
+    timer: {
+      phase: 'ROUND',
+      status: 'RUNNING',
+      durationSeconds: 2400,
+      startedAt: '2026-01-01T00:00:00.000Z',
+      targetAt: '2099-01-01T00:00:00.000Z',
+    },
+  };
+  const [firstRound] = running.rounds;
+  const [match] = firstRound!.matches;
+  const nextGame: PublicLimitedSession = {
+    ...running,
+    rounds: [{ ...firstRound!, matches: [{ ...match!, playerAGameWins: 1, playerBGameWins: 0 }] }],
+  };
+  vi.mocked(reportLimitedProgress)
+    .mockResolvedValueOnce({ session: running })
+    .mockResolvedValueOnce({ session: nextGame });
+  const props = { participant: me, token: 'player', onSnapshot: vi.fn(), onError: vi.fn() };
+  const view = render(<LimitedPlayerPanel {...props} snapshot={snapshot(me, running)} />);
+  fireEvent.click(screen.getByRole('button', { name: 'Use life tracker' }));
+  expect(await screen.findByText('podyguard.tracker.limited.DRAFT1.m1')).toBeVisible();
+
+  view.rerender(<LimitedPlayerPanel {...props} snapshot={snapshot(me, nextGame)} />);
+  expect(screen.queryByRole('button', { name: 'Ada won the game' })).not.toBeInTheDocument();
+  expect(screen.getByText('Best of 3 · 1–0')).toBeVisible();
+  fireEvent.click(screen.getByRole('button', { name: 'Track game 2' }));
+  expect(await screen.findByText('podyguard.tracker.limited.DRAFT1.m1.series.game-2')).toBeVisible();
+  expect(reportLimitedResult).not.toHaveBeenCalled();
 });
 
 it('shows the host each game score and an elapsed clock that resets and stops at completion', () => {
