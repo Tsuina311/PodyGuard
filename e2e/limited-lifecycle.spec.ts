@@ -175,6 +175,12 @@ for (const format of [
                   const opponentWin = await wins.nth(1).textContent();
                   await recordTrackedWin(player, opponentWin?.startsWith('Player 1 wins') ? 1 : 2);
                   await expect(player.getByText('Best of 3 · 0–1', { exact: true })).toBeVisible();
+                  for (const [slot, score] of [['A', '1–0'], ['B', '0–1']] as const) {
+                    await host.getByRole('button', { name: 'Edit game scores', exact: true }).click();
+                    await host.getByRole('combobox', { name: 'Game 1 winner', exact: true }).selectOption(slot);
+                    await host.getByRole('button', { name: 'Save game scores', exact: true }).click();
+                    await expect(player.getByText(`Best of 3 · ${score}`, { exact: true })).toBeVisible();
+                  }
                   await host.getByRole('tab', { name: 'Overview', exact: true }).click();
                   const progress = host.getByTestId('limited-match-progress').filter({ hasText: 'Best of 3 · 0–1' });
                   await expect(progress).toHaveCount(1);

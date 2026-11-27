@@ -27,6 +27,7 @@ import {
   type LimitedSessionPhasePatch,
   type FinalizeLimitedMatchResultInput,
   type LimitedMatchProgressInput,
+  limitedResultIsCurrent,
   type StoredAssignment,
   type StoredAuthChallenge,
   type StoredCompletedGame,
@@ -1213,6 +1214,7 @@ export class MemoryEventStore implements EventStore {
       status: match.status ?? (match.outcome ? 'COMPLETED' : 'PENDING'),
       bestOf: match.bestOf,
       outcome: match.outcome ?? null,
+      gameWinners: null,
       playerAGameWins: match.playerAGameWins ?? null,
       playerBGameWins: match.playerBGameWins ?? null,
       reportedAt: match.reportedAt ?? (match.outcome ? now : null),
@@ -1292,10 +1294,12 @@ export class MemoryEventStore implements EventStore {
     if (!match || match.status !== 'PLAYING' || match.outcome ||
         (match.playerAGameWins ?? 0) !== input.previousA ||
         (match.playerBGameWins ?? 0) !== input.previousB ||
+        JSON.stringify(match.gameWinners) !== JSON.stringify(input.previousGameWinners) ||
         (match.currentGameStartedAt?.getTime() ?? null) !== (input.previousStartedAt?.getTime() ?? null)) return false;
     match.playerAGameWins = input.playerAGameWins;
     match.playerBGameWins = input.playerBGameWins;
     match.currentGameStartedAt = input.currentGameStartedAt;
+    match.gameWinners = input.gameWinners;
     return true;
   }
 
@@ -1311,8 +1315,12 @@ export class MemoryEventStore implements EventStore {
       .flatMap((round) => round.matches)
       .find((row) => row.id === input.matchId);
     if (!match) throw new Error('Limited match not found.');
+    if (input.expected && !limitedResultIsCurrent(match, input.expected)) {
+      throw new LimitedPersistenceConflictError('The match score changed. Refresh and try again.');
+    }
     const corrected = match.outcome !== null;
-    if (!corrected && (input.outcome === 'PLAYER_A_WIN' || input.outcome === 'PLAYER_B_WIN') &&
+    if (!corrected && !(input.expected && input.correctionReason) &&
+        (input.outcome === 'PLAYER_A_WIN' || input.outcome === 'PLAYER_B_WIN') &&
         (input.playerAGameWins < (match.playerAGameWins ?? 0) || input.playerBGameWins < (match.playerBGameWins ?? 0))) {
       throw new LimitedPersistenceConflictError('The match score changed. Refresh before reporting the result.');
     }
@@ -1326,6 +1334,8 @@ export class MemoryEventStore implements EventStore {
       id: randomUUID(),
       matchId: match.id,
       previousOutcome: match.outcome,
+      previousGameWinners: match.gameWinners,
+      gameWinners: input.gameWinners ?? null,
       previousPlayerAGameWins: match.playerAGameWins,
       previousPlayerBGameWins: match.playerBGameWins,
       outcome: input.outcome,
@@ -1336,6 +1346,7 @@ export class MemoryEventStore implements EventStore {
       createdAt: input.reportedAt ?? new Date(),
     };
     match.status = 'COMPLETED';
+    match.gameWinners = input.gameWinners ?? null;
     match.outcome = input.outcome;
     match.playerAGameWins = input.playerAGameWins;
     match.playerBGameWins = input.playerBGameWins;

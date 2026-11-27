@@ -3,7 +3,7 @@ import '@testing-library/jest-dom/vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { EventSnapshot, PublicLimitedSession, PublicParticipant } from '@podyguard/shared';
-import { reportLimitedResult, reportLimitedProgress } from '../api';
+import { correctLimitedGames, reportLimitedResult, reportLimitedProgress } from '../api';
 import { removeStored } from '../device-storage';
 import '../i18n';
 import { LimitedTimingControls } from './LimitedFormatPicker';
@@ -13,6 +13,7 @@ import { EventDisplayContent } from './LimitedDisplayPage';
 
 vi.mock('../api', async (importOriginal) => ({
   ...await importOriginal<typeof import('../api')>(),
+  correctLimitedGames: vi.fn(),
   reportLimitedResult: vi.fn(),
   reportLimitedProgress: vi.fn(),
 }));
@@ -243,6 +244,37 @@ it('closes an open Limited tracker when the other player reports that game', asy
   fireEvent.click(screen.getByRole('button', { name: 'Track game 2' }));
   expect(await screen.findByText('podyguard.tracker.limited.DRAFT1.m1.series.game-2')).toBeVisible();
   expect(reportLimitedResult).not.toHaveBeenCalled();
+});
+
+it('lets the host correct an older round game by game', async () => {
+  const { me, round } = bestOfThreeRound();
+  const earlier = round.rounds[0]!;
+  Object.assign(earlier.matches[0]!, {
+    status: 'COMPLETED', outcome: 'PLAYER_A_WIN', playerAGameWins: 2, playerBGameWins: 1,
+    gameWinners: [null, null, 'A'],
+  });
+  round.currentRound = 2;
+  round.rounds.push({ ...earlier, id: 'r2', number: 2, matches: [] });
+  vi.mocked(correctLimitedGames).mockResolvedValue({ session: round });
+  render(<LimitedHostPanel
+    joinCode="DRAFT1" hostToken="host" snapshot={snapshot(me, round)}
+    onSession={vi.fn()} onError={vi.fn()}
+  />);
+
+  fireEvent.click(screen.getByText('Previous round game scores', { exact: true }));
+  fireEvent.click(screen.getByRole('button', { name: /^Edit game scores$/ }));
+  expect(screen.getByLabelText('Game 3 winner')).toHaveValue('A');
+  fireEvent.change(screen.getByLabelText('Game 1 winner'), { target: { value: 'B' } });
+  fireEvent.change(screen.getByLabelText('Game 2 winner'), { target: { value: 'A' } });
+  fireEvent.change(screen.getByLabelText('Game 3 winner'), { target: { value: 'B' } });
+  fireEvent.change(screen.getByLabelText('Correction reason'), { target: { value: 'Confirmed at the table' } });
+  fireEvent.click(screen.getByRole('button', { name: /^Save game scores$/ }));
+  await waitFor(() => expect(correctLimitedGames).toHaveBeenCalledExactlyOnceWith('DRAFT1', 'host', 's1', 'm1', {
+    gameWinners: ['B', 'A', 'B'],
+    expectedGameWinners: [null, null, 'A'],
+    expectedOutcome: 'PLAYER_A_WIN',
+    correctionReason: 'Confirmed at the table',
+  }));
 });
 
 it('shows the host each game score and an elapsed clock that resets and stops at completion', () => {

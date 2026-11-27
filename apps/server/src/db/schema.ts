@@ -751,6 +751,7 @@ export const limitedMatches = pgTable(
     outcome: limitedMatchOutcomeEnum('outcome'),
     playerAGameWins: integer('player_a_game_wins'),
     playerBGameWins: integer('player_b_game_wins'),
+    gameWinners: jsonb('game_winners').$type<Array<'A' | 'B' | null>>(),
     currentGameStartedAt: timestamp('current_game_started_at', { withTimezone: true }),
     reportedAt: timestamp('reported_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true })
@@ -807,6 +808,8 @@ export const limitedResultAudits = pgTable('limited_result_audits', {
   previousPlayerAGameWins: integer('previous_player_a_game_wins'),
   previousPlayerBGameWins: integer('previous_player_b_game_wins'),
   outcome: limitedMatchOutcomeEnum('outcome').notNull(),
+  previousGameWinners: jsonb('previous_game_winners').$type<Array<'A' | 'B' | null>>(),
+  gameWinners: jsonb('game_winners').$type<Array<'A' | 'B' | null>>(),
   playerAGameWins: integer('player_a_game_wins').notNull(),
   playerBGameWins: integer('player_b_game_wins').notNull(),
   correctionReason: text('correction_reason'),

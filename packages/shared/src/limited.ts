@@ -163,6 +163,8 @@ export type LimitedMatchOutcome =
   | 'DOUBLE_LOSS'
   | 'BYE';
 
+export type LimitedGameWinner = 'A' | 'B';
+
 export type LimitedMatchStatus = 'PENDING' | 'PLAYING' | 'COMPLETED';
 
 export type LimitedMatch = {
@@ -178,6 +180,8 @@ export type LimitedMatch = {
   outcome?: LimitedMatchOutcome;
   playerAGameWins?: number;
   playerBGameWins?: number;
+  /** A null entry is a recorded game whose winner order is unknown. */
+  gameWinners?: Array<LimitedGameWinner | null>;
   currentGameStartedAt?: string;
   reportedAt?: string;
 };

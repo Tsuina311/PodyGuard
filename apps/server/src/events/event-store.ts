@@ -15,6 +15,7 @@ import type {
   PublicChallengeCompletion,
   RoundEventState,
   RulesFormat,
+  LimitedGameWinner,
   LimitedMatchOutcome,
   LimitedDeckSession,
   LimitedMatchStatus,
@@ -524,6 +525,7 @@ export type StoredLimitedParticipant = {
 
 export type StoredLimitedMatch = {
   currentGameStartedAt?: Date | null;
+  gameWinners: Array<LimitedGameWinner | null> | null;
   id: string;
   roundId: string;
   roundNumber: number;
@@ -635,6 +637,8 @@ export type LimitedMatchProgressInput = {
   previousA: number;
   previousB: number;
   previousStartedAt: Date | null;
+  previousGameWinners: StoredLimitedMatch['gameWinners'];
+  gameWinners: StoredLimitedMatch['gameWinners'];
   playerAGameWins: number;
   playerBGameWins: number;
   currentGameStartedAt: Date | null;
@@ -647,13 +651,27 @@ export type FinalizeLimitedMatchResultInput = {
   playerBGameWins: number;
   reportedAt?: Date;
   correctionReason?: string;
+  gameWinners?: StoredLimitedMatch['gameWinners'];
+  expected?: Pick<StoredLimitedMatch, 'outcome' | 'playerAGameWins' | 'playerBGameWins' | 'gameWinners'>;
   correctedByParticipantId?: string;
 };
+
+export function limitedResultIsCurrent(
+  current: NonNullable<FinalizeLimitedMatchResultInput['expected']>,
+  expected: NonNullable<FinalizeLimitedMatchResultInput['expected']>,
+) {
+  return current.outcome === expected.outcome &&
+    current.playerAGameWins === expected.playerAGameWins &&
+    current.playerBGameWins === expected.playerBGameWins &&
+    JSON.stringify(current.gameWinners) === JSON.stringify(expected.gameWinners);
+}
 
 export type StoredLimitedResultAudit = {
   id: string;
   matchId: string;
   previousOutcome: LimitedMatchOutcome | null;
+  previousGameWinners?: StoredLimitedMatch['gameWinners'];
+  gameWinners?: StoredLimitedMatch['gameWinners'];
   previousPlayerAGameWins: number | null;
   previousPlayerBGameWins: number | null;
   outcome: LimitedMatchOutcome;

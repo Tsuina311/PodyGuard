@@ -253,6 +253,13 @@
       "when": 1795747200000,
       "tag": "0035_planned_invitations",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1795816800000,
+      "tag": "0036_limited_game_winners",
+      "breakpoints": true
     }
   ]
 }

@@ -9,6 +9,7 @@ import {
   type EventSnapshot,
   type HostDisplaySession,
   type LimitedEventModeConfig,
+  type LimitedGameWinner,
   type LimitedMatchOutcome,
   type LimitedMode,
   type LimitedSessionStatus,
@@ -533,7 +534,7 @@ export function startLimitedRound(joinCode: string, token: string, sessionId: st
 
 export function reportLimitedProgress(
   joinCode: string, token: string, sessionId: string, matchId: string,
-  progress: { playerAGameWins: number; playerBGameWins: number; startGame?: boolean },
+  progress: { playerAGameWins: number; playerBGameWins: number; startGame?: boolean; previousGameWins?: [number, number] },
 ) {
   return limitedSessionRequest(joinCode, token, sessionId, `/matches/${matchId}/progress`, {
     method: 'POST', body: JSON.stringify(progress),
@@ -545,7 +546,7 @@ export function reportLimitedResult(
   token: string,
   sessionId: string,
   matchId: string,
-  result: LimitedResultInput,
+  result: LimitedResultInput & { previousGameWins?: [number, number] },
 ) {
   return limitedSessionRequest(
     joinCode,
@@ -570,6 +571,26 @@ export function correctLimitedResult(
     `/matches/${matchId}/correct`,
     { method: 'POST', body: JSON.stringify(result) },
   );
+}
+
+export type LimitedGameCorrection = {
+  gameWinners: LimitedGameWinner[];
+  expectedGameWinners: Array<LimitedGameWinner | null>;
+  expectedOutcome: LimitedMatchOutcome | null;
+  correctionReason: string;
+};
+
+export function correctLimitedGames(
+  joinCode: string,
+  token: string,
+  sessionId: string,
+  matchId: string,
+  correction: LimitedGameCorrection,
+) {
+  return limitedSessionRequest(joinCode, token, sessionId, `/matches/${matchId}/games/correct`, {
+    method: 'POST',
+    body: JSON.stringify(correction),
+  });
 }
 
 export function dropLimitedParticipant(
