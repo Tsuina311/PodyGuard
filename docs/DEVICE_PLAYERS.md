@@ -18,6 +18,9 @@ Recovery keeps players throughout active events, including waiting, drafting,
 and deckbuilding. On opening recovery or returning to the app, and once a
 minute while it remains open, the browser checks saved events with the server.
 Confirmed closed, expired, or deleted events lose their saved-player entries.
+Their host and player shortcuts are also hidden from the navigation list,
+including host-only events with no saved players. A confirmed event-not-found
+response when opening or unlocking a host desk hides its shortcuts immediately.
 Network failures never delete credentials. Private tracker data and unsent
 offline actions are retained separately rather than discarded by this cleanup.
 

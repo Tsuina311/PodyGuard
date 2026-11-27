@@ -1,14 +1,19 @@
 import { ApiError, getEvent } from './api';
 import { clearPlayerSession, listSavedPlayerEvents } from './player-sessions';
+import { recentEvents, removeInactiveEventShortcuts } from './recent-events';
 
 // Share checks between the home shortcut, recent events and the recovery page.
 // Failed requests never destroy identities: an offline phone must remain recoverable.
 const checked = new Map<string, number>();
 const pending = new Map<string, Promise<void>>();
 export async function pruneInactiveSavedPlayers(now = Date.now()): Promise<void> {
-  const events = listSavedPlayerEvents();
+  // Host-only devices also have event shortcuts, without any saved player seat.
+  const events = [...new Set([
+    ...listSavedPlayerEvents().map(event => event.joinCode),
+    ...recentEvents().flatMap(row => /^\/(?:host|e)\/([^/]+)$/.exec(row.path)?.[1] ?? []),
+  ])];
   for (let offset = 0; offset < events.length; offset += 4) {
-    await Promise.all(events.slice(offset, offset + 4).map(({ joinCode }) => {
+    await Promise.all(events.slice(offset, offset + 4).map(joinCode => {
       if (pending.has(joinCode)) return pending.get(joinCode);
       if (now - (checked.get(joinCode) ?? 0) < 60_000) return;
       const check = (async () => {
@@ -27,6 +32,7 @@ export async function pruneInactiveSavedPlayers(now = Date.now()): Promise<void>
           // included. Keep tracker data and unsent actions for manual recovery.
           const saved = listSavedPlayerEvents().find(event => event.joinCode === joinCode);
           saved?.players.forEach(player => clearPlayerSession(joinCode, player.scope));
+          removeInactiveEventShortcuts(joinCode);
         }
       })().finally(() => pending.delete(joinCode));
       pending.set(joinCode, check);

@@ -4820,7 +4820,7 @@ function resolveAllowFivePods(
   return false;
 }
 
-function normalizeLimitedModeConfigs(
+export function normalizeLimitedModeConfigs(
   input: LimitedEventModeConfig[] | undefined,
 ): LimitedEventModeConfig[] {
   if (!input) return [];
@@ -5447,7 +5447,7 @@ function clampRating(value: number): PodRating {
   return 4;
 }
 
-function parseTournamentFormat(
+export function parseTournamentFormat(
   value: unknown,
 ): TournamentFormat | undefined {
   if (value === 'single-elimination' || value === 'swiss') {
@@ -5456,7 +5456,7 @@ function parseTournamentFormat(
   return undefined;
 }
 
-function parseTournamentOptions(value: unknown): TournamentOptions {
+export function parseTournamentOptions(value: unknown): TournamentOptions {
   if (!value || typeof value !== 'object') {
     return {};
   }

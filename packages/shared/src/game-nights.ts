@@ -4,6 +4,8 @@ export type PregameAgreement = {
   notes?: string;
 };
 export type GameNight = {
+  eventSetup?: InvitationEventSetup;
+  invitees?: NightInvitee[];
   id: string;
   playgroupId: string;
   name: string;
@@ -19,12 +21,26 @@ export type GameNight = {
 export type GameNightInput = Pick<
   GameNight,
   'name' | 'startsAt' | 'timeZone' | 'location' | 'seatTarget' | 'agreement'
->;
+> & { eventSetup?: InvitationEventSetup; invitedGuestIds?: string[] };
 export type NightRsvp = {
+  guestProfileId?: string;
   displayName: string;
   response: 'yes' | 'maybe' | 'no';
 };
 export type NightView = { night: GameNight; responses: NightRsvp[] };
+
+export function gameNightEventType(night: Pick<GameNight, 'eventSetup'>): string {
+  const setup = night.eventSetup;
+  const limited = setup?.limitedModeConfigs?.filter(config => config.enabled);
+  if (limited?.length) return limited.map(config => ({ BOOSTER_DRAFT: 'Booster Draft', PICK_TWO_DRAFT: 'Pick-Two Draft', SEALED: 'Sealed' })[config.mode]).join(' + ');
+  const mode = setup?.gameMode ?? 'commander';
+  const commander = setup?.rulesFormat === 'commander' || (!setup?.rulesFormat && ['commander', 'duel-commander', 'brawl', 'archenemy-commander'].includes(mode));
+  const label = ['duel', 'duel-commander'].includes(mode) ? 'Duel'
+    : ['commander', 'multiplayer'].includes(mode) ? 'Multiplayer'
+      : mode === 'archenemy-commander' ? 'Archenemy'
+        : mode.split('-').map(word => word[0]!.toUpperCase() + word.slice(1)).join(' ');
+  return `${commander ? 'Commander' : 'Classic'} · ${label}`;
+}
 
 export function parsePregameAgreement(value: unknown): PregameAgreement {
   if (value == null) return {};
@@ -84,7 +100,7 @@ export function gameNightCalendar(night: GameNight): string {
     `DTSTART:${stamp(night.startsAt)}`,
     `SUMMARY:${icsText(night.name)}`,
     `LOCATION:${icsText(night.location)}`,
-    `DESCRIPTION:${icsText(`Game night (${night.timeZone}). Attendance does not mark you ready to play.`)}`,
+    `DESCRIPTION:${icsText(`${gameNightEventType(night)} (${night.timeZone}). Attendance does not mark you ready to play.${night.invitees?.length ? ` Invited: ${night.invitees.map(person => person.displayName).join(', ')}.` : ''}`)}`,
     ...(night.cancelled ? ['STATUS:CANCELLED'] : []),
     'END:VEVENT',
     'END:VCALENDAR',
@@ -128,3 +144,27 @@ export type MatchPreview = {
   readyCount: number;
   freeTableCount: number;
 };
+import type { GameMode, RulesFormat } from './treachery';
+import type { TableLayout } from './table-layout';
+import type { LimitedEventModeConfig } from './limited';
+import type { EventOperationMode } from './rounds';
+import type { TournamentFormat, TournamentOptions } from './tournament';
+
+/** Non-secret setup, retained until the organizer starts the live event. */
+export type InvitationEventSetup = {
+  tableCount: number;
+  tableLayouts?: TableLayout[];
+  gameMode?: GameMode;
+  rulesFormat?: RulesFormat;
+  allowThreePods?: boolean;
+  allowFivePods?: boolean;
+  preferredPodSize?: number;
+  lifetimeHours?: number;
+  operationMode?: EventOperationMode;
+  roundCount?: number | 'AUTO';
+  tournamentFormat?: TournamentFormat;
+  tournamentOptions?: TournamentOptions;
+  limitedModeConfigs?: LimitedEventModeConfig[];
+  showReturningPlayerSuggestions?: boolean;
+};
+export type NightInvitee = { guestProfileId: string; displayName: string };

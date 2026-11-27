@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../ui/Button';
+import { SendToScreenButton } from '../link-transfer/SendToScreen';
+import { destinationFromInput } from '../link-transfer/links';
 import type { ControllerSession } from './EventTrackerSession';
 import type { useTableShare } from './useTableShare';
 export function TableShareControls({
@@ -69,6 +71,9 @@ export function TableShareControls({
           <p className="mt-1 text-xs text-muted">{t('eventMonitor.audience')}</p>
           {monitorError && <p className="mt-1 text-sm text-danger" role="alert">{monitorError}</p>}
         </div>
+      ) : null}
+      {expanded && share.url ? (
+        <SendToScreenButton destination={destinationFromInput(share.url)} />
       ) : null}
       {expanded && share.url ? (
         <div className="mt-2 flex max-h-52 flex-wrap gap-3 overflow-auto">

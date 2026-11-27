@@ -231,9 +231,14 @@ it('shows the host each game score and an elapsed clock that resets and stops at
   Object.assign(match, { outcome: 'PLAYER_A_WIN', playerAGameWins: 2, reportedAt: '2026-01-01T00:02:11Z' });
   view.rerender(<EventDisplayContent snapshot={snapshot(me, round)} />);
   expect(screen.getByText('Best of 3 · 2–1')).toBeVisible();
+  expect(screen.getByText('Ada wins')).toBeVisible();
   expect(screen.queryByText(/elapsed|waiting to start/)).not.toBeInTheDocument();
   act(() => vi.advanceTimersByTime(20_000));
   expect(screen.queryByText(/elapsed|waiting to start/)).not.toBeInTheDocument();
+  Object.assign(match, { outcome: 'PLAYER_B_WIN', playerAGameWins: 1, playerBGameWins: 2 });
+  view.rerender(<EventDisplayContent snapshot={snapshot(me, round)} />);
+  expect(screen.getByText('Bea wins')).toBeVisible();
+  expect(screen.queryByText('Ada wins')).not.toBeInTheDocument();
 });
 
 it('preserves a tied best-of game score when reporting a match draw', async () => {

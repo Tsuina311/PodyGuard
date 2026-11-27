@@ -19,6 +19,7 @@ import {
 } from '../api';
 import { LimitedTimerDisplay } from '../limited/LimitedTimerDisplay';
 import { LimitedMatchProgress } from '../limited/LimitedMatchProgress';
+import { LimitedMatchStatus } from '../limited/LimitedMatchStatus';
 import { Brand } from '../ui/Brand';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
@@ -548,7 +549,8 @@ function LimitedView({ sessions, showTimers }: { sessions: PublicDisplayLimitedS
                     ) : null}
                   </p>
                   <p className="text-muted mt-1 text-sm">
-                    {(match.outcome ?? match.status).replaceAll('_', ' ')}
+                    <LimitedMatchStatus outcome={match.outcome} status={match.status}
+                      playerAName={match.playerAName} playerBName={match.playerBName} />
                   </p>
                   <LimitedMatchProgress match={match} showTimer={showTimers} />
                 </div>

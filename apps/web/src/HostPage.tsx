@@ -26,6 +26,7 @@ import {
   usesCommanderRules,
 } from '@podyguard/shared';
 import { countByStatus, queueByWait } from './match-view';
+import { removeInactiveEventShortcuts } from './recent-events';
 import { eventHasLimitedQueues } from './event-mode';
 import {
   shouldShowConstructedHostMatching,
@@ -175,10 +176,12 @@ export function HostPage() {
         await refresh();
         await refreshMetrics(token);
       })
-      .catch(() => {
+      .catch((caught) => {
         // The PIN form is the way back in, so drop the key the server refused
         // rather than retrying it on every visit.
-        if (loadHostToken(code) === token) {
+        const missing = caught instanceof ApiError && caught.status === 404 && caught.code === 'EVENT_NOT_FOUND';
+        if (missing) removeInactiveEventShortcuts(code);
+        if (caught instanceof ApiError && (missing || caught.status === 401 || caught.status === 403) && loadHostToken(code) === token) {
           clearHostToken(code);
         }
       });
@@ -205,6 +208,9 @@ export function HostPage() {
       await refresh();
       await refreshMetrics(result.hostToken);
     } catch (caught) {
+      if (caught instanceof ApiError && caught.status === 404 && caught.code === 'EVENT_NOT_FOUND') {
+        removeInactiveEventShortcuts(code);
+      }
       setError(
         caught instanceof ApiError
           ? caught.message
@@ -353,6 +359,7 @@ export function HostPage() {
     try {
       await cancelEvent(code, hostToken);
       clearHostToken(code);
+      removeInactiveEventShortcuts(code);
       void navigate('/', { replace: true });
     } catch (caught) {
       setCancelArmed(false);

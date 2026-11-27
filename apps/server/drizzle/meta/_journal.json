@@ -239,6 +239,20 @@
       "when": 1795740000000,
       "tag": "0033_limited_game_progress",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1795743600000,
+      "tag": "0034_link_transfers",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1795747200000,
+      "tag": "0035_planned_invitations",
+      "breakpoints": true
     }
   ]
 }

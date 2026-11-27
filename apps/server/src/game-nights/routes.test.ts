@@ -75,6 +75,41 @@ describe('game nights', () => {
     });
     expect(list.json().nights[0].id).toBe(night.id);
   });
+  it('keeps a planned setup without starting an event, allows a nickname RSVP, then restores the exact tables', async () => {
+    const guest = await app.events.createGuestProfile(token, group, { displayName: 'Gwen' });
+    const setup = { tableCount: 2, gameMode: 'duel', rulesFormat: 'normal', lifetimeHours: 1,
+      tableLayouts: [{ shape: 'rectangle', seats: 4 }, { shape: 'round', seats: 2 }],
+      hostPin: 'must-not-store-a-pin', accountToken: 'must-not-store-an-account-token' };
+    const planned = await app.inject({ method: 'POST', url: `/playgroups/${group}/nights`, headers: headers(),
+      payload: { ...input(), invitedGuestIds: [guest.id], eventSetup: setup } });
+    expect(planned.statusCode, planned.body).toBe(201);
+    const night = planned.json().night;
+    expect(night.eventJoinCode).toBeNull();
+    expect(await app.events.findGameNightEvent(group, night.id, token)).toBeUndefined();
+    expect(night.eventSetup).toMatchObject({ tableCount: 2, gameMode: 'duel', rulesFormat: 'normal', tableLayouts: setup.tableLayouts });
+    expect(planned.body).not.toContain('must-not-store');
+    expect(night.invitees).toEqual([{ guestProfileId: guest.id, displayName: 'Gwen' }]);
+    const answer = await app.inject({ method: 'POST', url: `/nights/${night.id}/rsvp`,
+      payload: { guestProfileId: guest.id, displayName: 'Stargazer', response: 'yes', rsvpToken: 'z'.repeat(32) } });
+    expect(answer.statusCode).toBe(200);
+    expect((await app.inject(`/nights/${night.id}`)).json().responses).toEqual([
+      { guestProfileId: guest.id, displayName: 'Stargazer', response: 'yes' },
+    ]);
+    expect((await app.events.getPlaygroupOverview(token, group)).guests.find(row => row.guest.id === guest.id)?.guest.displayName).toBe('Gwen');
+    const rejected = await app.inject({ method: 'POST', url: `/nights/${night.id}/rsvp`,
+      payload: { guestProfileId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', displayName: 'Other', response: 'yes', rsvpToken: 'x'.repeat(32) } });
+    expect(rejected.statusCode).toBe(400);
+    const calendar = await app.inject(`/nights/${night.id}/calendar`);
+    expect(calendar.body).toContain('Classic · Duel');
+    expect(calendar.body).toContain('LOCATION:Living room');
+    const started = await app.inject({ method: 'POST', url: `/nights/${night.id}/start`, headers: headers(), payload: { hostPin: '2468' } });
+    expect(started.statusCode, started.body).toBe(200);
+    expect(started.json().event).toMatchObject({ gameMode: 'duel', rulesFormat: 'normal', lifetimeHours: 1 });
+    const snapshot = await app.events.getSnapshot(started.json().event.joinCode);
+    expect(snapshot.tables.map(table => [table.label, table.area?.shape, table.area?.seats])).toEqual([
+      ['Table 1 · Part A', 'rectangle', 2], ['Table 1 · Part B', 'rectangle', 2], ['Table 2', 'round', 2],
+    ]);
+  });
   it('updates an RSVP by its private response key without exposing keys in the invitation', async () => {
     const night = await create();
     for (const response of ['yes', 'maybe', 'no']) {

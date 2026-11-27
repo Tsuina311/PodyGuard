@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { LimitedMatchStatus } from './LimitedMatchStatus';
 import type {
   EventSnapshot,
   LimitedMatch,
@@ -347,13 +348,18 @@ function LimitedSessionHostCard({
                 {match.tableLabel ?? `Match ${match.position}`} · {participantName(session, match.playerAId)} vs {participantName(session, match.playerBId)}
               </p>
               <p className="text-muted mb-2 text-xs">
-                {match.outcome ?? match.status} {match.outcome ? `· ${match.playerAGameWins}-${match.playerBGameWins}` : ''}
+                <LimitedMatchStatus outcome={match.outcome} status={match.status}
+                  playerAName={participantName(session, match.playerAId)}
+                  playerBName={participantName(session, match.playerBId)} />{' '}
+                {match.outcome ? `· ${match.playerAGameWins}-${match.playerBGameWins}` : ''}
               </p>
               {match.outcome && match.outcome !== 'BYE' ? (
                 <div className="flex flex-wrap gap-1">
                   {(['PLAYER_A_WIN', 'PLAYER_B_WIN', 'DRAW', 'DOUBLE_LOSS'] as const).map((outcome) => (
                     <Button key={outcome} size="sm" variant="ghost" disabled={busy} onClick={() => correct(match, outcome)}>
-                      {outcome.replaceAll('_', ' ')}
+                      <LimitedMatchStatus outcome={outcome}
+                        playerAName={participantName(session, match.playerAId)}
+                        playerBName={participantName(session, match.playerBId)} />
                     </Button>
                   ))}
                 </div>

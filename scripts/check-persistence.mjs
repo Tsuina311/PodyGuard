@@ -27,6 +27,7 @@ const identity = createIdentityBoundary({
 });
 const email = `test-${randomUUID()}@podyguard.example`;
 let demo;
+let transferSessionId;
 try {
   demo = await seedDemo(
     new EventService(new PostgresEventStore(), identity, { isDev: true }),
@@ -237,7 +238,31 @@ try {
   console.log(
     'PASS: concurrent table claims, rollback, stale release, active-event reconnect, single completion and game-night persistence.',
   );
+  const { PostgresLinkTransferStore } = await import('../apps/server/src/link-transfer/store.ts');
+  const { LinkTransferService } = await import('../apps/server/src/link-transfer/service.ts');
+  const senderA = new LinkTransferService(new PostgresLinkTransferStore());
+  const senderB = new LinkTransferService(new PostgresLinkTransferStore());
+  const transfer = await senderA.create();
+  transferSessionId = transfer.id;
+  const submissions = await Promise.all([
+    senderA.send(transfer.id, transfer.sendToken, '/tools?q=Sol%20Ring#card'),
+    senderB.send(transfer.id, transfer.sendToken, '/display/event/ABCD12'),
+  ]);
+  assert.equal(submissions.filter(result => result.accepted).length, 1);
+  await closeDatabase();
+  const receiver = new LinkTransferService(new PostgresLinkTransferStore());
+  const accepted = await receiver.receive(transfer.id, transfer.receiveToken);
+  assert.equal(accepted.destination, submissions[0].accepted ? '/tools?q=Sol%20Ring#card' : '/display/event/ABCD12');
+  assert.deepEqual(await receiver.receive(transfer.id, transfer.receiveToken), accepted);
+  assert.deepEqual(await receiver.send(transfer.id, transfer.sendToken, '/tools'), { accepted: false });
+  console.log('PASS: transfer first-writer arbitration and retained results across independent PostgreSQL connections.');
 } finally {
+  if (transferSessionId) {
+    const { getDb } = await import('../apps/server/src/db/client.ts');
+    const { linkTransfers } = await import('../apps/server/src/db/schema.ts');
+    const { eq } = await import('drizzle-orm');
+    await getDb().delete(linkTransfers).where(eq(linkTransfers.id, transferSessionId));
+  }
   const store = new PostgresEventStore();
   const account = await store.findUserAccountByEmail(email);
   if (account) {

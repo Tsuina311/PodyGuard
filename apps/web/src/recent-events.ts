@@ -1,7 +1,11 @@
 import { readStored, writeStored } from './device-storage';
+import { normalizeJoinCode } from '@podyguard/shared';
 export type RecentEvent = { path: string; name: string; seenAt: number };
 const KEY = 'podyguard.recent-events';
 const REMOVED_KEY = 'podyguard.recent-events.removed';
+function changed() {
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('podyguard:recent-events'));
+}
 const valid = (path: unknown): path is string =>
   typeof path === 'string' &&
   /^\/(?:host|e)\/[A-Za-z0-9-]+$|^\/nights\/[a-f0-9-]+$/i.test(path);
@@ -31,6 +35,18 @@ function removedPaths(): string[] {
 export function removeRecentEvent(path: string): void {
   if (!valid(path)) return;
   writeStored(REMOVED_KEY, JSON.stringify([...new Set([...removedPaths(), path])]));
+  changed();
+}
+
+/** Hide both roles, including legacy shortcuts recovered from stored credentials. */
+export function removeInactiveEventShortcuts(joinCode: string): void {
+  const code = normalizeJoinCode(joinCode);
+  const paths = new Set([`/host/${code}`, `/e/${code}`]);
+  for (const row of recentEvents()) {
+    const match = /^\/(?:host|e)\/([^/]+)$/.exec(row.path);
+    if (match && normalizeJoinCode(match[1]!) === code) paths.add(row.path);
+  }
+  paths.forEach(removeRecentEvent);
 }
 
 export function recentEvents(): RecentEvent[] {
@@ -82,4 +98,5 @@ export function rememberRecentEvent(path: string, name: string) {
   if (removed.includes(path)) {
     writeStored(REMOVED_KEY, JSON.stringify(removed.filter((entry) => entry !== path)));
   }
+  changed();
 }

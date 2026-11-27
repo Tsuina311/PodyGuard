@@ -3,7 +3,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ApiError, getEvent } from './api';
 import { pruneInactiveSavedPlayers } from './saved-player-cleanup';
 import { listSavedPlayerEvents, loadPlayerSession, savePlayerSession } from './player-sessions';
-import { removeStored, storedKeys } from './device-storage';
+import { removeStored, storedKeys, writeStored } from './device-storage';
+import { recentEvents, rememberRecentEvent } from './recent-events';
 
 vi.mock('./api', () => ({
   getEvent: vi.fn(),
@@ -12,6 +13,27 @@ vi.mock('./api', () => ({
 afterEach(() => { for (const key of storedKeys()) removeStored(key); vi.mocked(getEvent).mockReset(); });
 
 describe('saved player recovery cleanup', () => {
+  it('hides expired host-only shortcuts, including legacy recovery, while retaining active events and invitations', async () => {
+    writeStored('podyguard.host.HOSTOLD', 'old-host-token');
+    rememberRecentEvent('/host/HOSTOLD', 'Expired host event');
+    rememberRecentEvent('/e/HOSTOLD', 'Expired player shortcut');
+    rememberRecentEvent('/host/HOSTOK', 'Active host event');
+    rememberRecentEvent('/host/HOSTOFF', 'Offline host event');
+    const invitation = '/nights/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
+    rememberRecentEvent(invitation, 'Upcoming invitation');
+    vi.mocked(getEvent).mockImplementation(async code => {
+      if (code === 'HOSTOLD') throw new ApiError(404, 'EVENT_NOT_FOUND', 'Expired');
+      if (code === 'HOSTOFF') throw new Error('Offline');
+      return { status: 'open', expiresAt: new Date(Date.now() + 86400000).toISOString() } as Awaited<ReturnType<typeof getEvent>>;
+    });
+    await pruneInactiveSavedPlayers();
+    const paths = recentEvents().map(row => row.path);
+    expect(paths).not.toContain('/host/HOSTOLD');
+    expect(paths).not.toContain('/e/HOSTOLD');
+    expect(paths).toEqual(expect.arrayContaining(['/host/HOSTOK', '/host/HOSTOFF', invitation]));
+    // Re-enumerating credentials after a reload must not resurrect the shortcut.
+    expect(recentEvents().some(row => row.path.endsWith('/HOSTOLD'))).toBe(false);
+  });
   it('removes every identity in a closed, expired or missing event and keeps waiting players in active events', async () => {
     const extra = '22222222-2222-4222-8222-222222222222';
     for (const code of ['CLOSED', 'EXPIRE', 'GONE12', 'ACTIVE']) {
