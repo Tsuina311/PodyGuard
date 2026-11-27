@@ -1,10 +1,23 @@
 {
+  "limitedTimeline": {
+    "label": "Event progress",
+    "join": "Join",
+    "ready": "Ready",
+    "seat": "Seat",
+    "draft": "Draft",
+    "deck": "Deck",
+    "play": "Play",
+    "complete": "complete"
+  },
   "eventMonitor": {
     "title": "Event display",
     "code": "Event code",
     "open": "Open display",
     "changeCode": "Enter a different event code",
-    "instructions": "On the monitor, open PodyGuard → Event display and enter {{code}}.",
+    "instructions": "On the computer, open PodyGuard → Event display and enter this code.",
+    "enterInstructions": "Enter the event code shown under Overview on the host’s phone.",
+    "moreOptions": "More display options",
+    "manageDisplays": "Manage displays and announcements",
     "publish": "Show on event monitor",
     "stop": "Remove from event monitor",
     "audience": "When shared, anyone with the event code can watch this game.",
@@ -71,6 +84,18 @@
     "statuses": { "joined": "Not ready", "ready": "Ready", "matched": "Seated", "playing": "Playing", "paused": "Paused", "left": "Left" }
   },
   "invitationPlan": {
+    "attendance": {
+      "title": "Who’s coming",
+      "full": "Full",
+      "capacity": "/ {{total}} seats confirmed",
+      "progress": "Confirmed seats",
+      "yes": "Yes",
+      "maybe": "Maybe",
+      "no": "No",
+      "empty": "No responses yet.",
+      "visibility": "Anyone with the invitation link can see these responses.",
+      "nameHint": "Use a first name or nickname. You can update your answer in this browser."
+    },
     "plan": "Create an invitation for later",
     "hint": "Save this event type and table setup with your invitation. The live event and its expiry timer start only when you launch it.",
     "signIn": "Sign in and choose your playgroup to plan an invitation.",
@@ -1086,7 +1111,7 @@
     "cancelEventHint": "Ends the event for everyone, clears tables, and kills the join code.",
     "displaysTitle": "Displays",
     "displaysAside": "TV / projector",
-    "displaysHint": "On the TV open /display and enter the code here.",
+    "displaysHint": "Enter the code shown on the managed display to approve it.",
     "displaysPairingCode": "Pairing code",
     "displaysLabel": "Label (optional)",
     "displaysLabelPlaceholder": "Main floor TV",
@@ -1105,12 +1130,12 @@
     "displaysRevokeFailed": "Could not revoke that display.",
     "displaysAnnounceFailed": "Could not send the announcement.",
     "displaysCancelAnnounceFailed": "Could not cancel the announcement.",
-    "displaysPairLink": "Pair a display",
+    "displaysPairLink": "Pair a managed display",
     "limitedFloorDisplay": "Limited floor display"
   },
   "display": {
-    "pairTitle": "Public display",
-    "pairHint": "Show this code on the TV. The host approves it from the desk Displays panel.",
+    "pairTitle": "Pair a managed display",
+    "pairHint": "On the host device, open Overview → Manage displays and announcements and enter this pairing code.",
     "pairingCode": "Pairing code",
     "waiting": "waiting",
     "waitingApproval": "Waiting for approval…",

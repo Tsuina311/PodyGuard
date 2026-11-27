@@ -1,4 +1,14 @@
 {
+  "limitedTimeline": {
+    "label": "Voortgang van het evenement",
+    "join": "Deelname",
+    "ready": "Gereed",
+    "seat": "Plaats",
+    "draft": "Draft",
+    "deck": "Deck",
+    "play": "Spelen",
+    "complete": "voltooid"
+  },
   "common": {
     "home": "Home",
     "cancel": "Annuleren",

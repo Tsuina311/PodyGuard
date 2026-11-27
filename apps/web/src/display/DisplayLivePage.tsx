@@ -25,6 +25,7 @@ import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { cx } from '../ui/cx';
 import { useDisplayLive } from '../useDisplayLive';
+import { managedDisplayPairPath } from './DisplayPairPage';
 
 type ViewMode = Exclude<DisplayMode, 'AUTO'>;
 
@@ -84,7 +85,7 @@ export function DisplayLivePage() {
 
   useEffect(() => {
     if (!token && !unauthorized) {
-      navigate('/display', { replace: true });
+      navigate(managedDisplayPairPath, { replace: true });
     }
   }, [token, unauthorized, navigate]);
 
@@ -220,7 +221,7 @@ export function DisplayLivePage() {
           {t('display.unauthorizedBody')}
         </p>
         <p>
-          <Link className="text-neon hover:underline" to="/display">
+          <Link className="text-neon hover:underline" to={managedDisplayPairPath}>
             {t('display.pairAgain')}
           </Link>
         </p>
@@ -236,7 +237,7 @@ export function DisplayLivePage() {
           {loadError ?? t('display.loading')}
         </p>
         {loadError ? (
-          <Link className="text-neon hover:underline" to="/display">
+          <Link className="text-neon hover:underline" to={managedDisplayPairPath}>
             {t('display.pairAgain')}
           </Link>
         ) : null}

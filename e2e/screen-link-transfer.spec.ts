@@ -7,6 +7,7 @@ import { prepareApp } from './helpers';
 async function waitingScreen(page: Page) {
   await prepareApp(page);
   await page.goto('/#/display');
+  await page.getByText('More display options', { exact: true }).click();
   const created = page.waitForResponse(response => response.url().endsWith('/api/link-transfers') && response.request().method() === 'POST');
   await page.getByRole('button', { name: 'Show connection QR', exact: true }).click();
   const credentials = await (await created).json() as LinkTransferCredentials;
@@ -29,6 +30,28 @@ async function waitingScreen(page: Page) {
   expect(qr).not.toContain('destination');
   return { credentials, qr: qr! };
 }
+
+test('the computer opens an event display with just the event code', async ({ page: screen }) => {
+  const created = await screen.request.post('/api/events', { data: { name: 'One-code display', hostPin: '2468', tableCount: 1 } });
+  expect(created.ok()).toBe(true);
+  const { event } = await created.json();
+  const pairingRequests: string[] = [];
+  screen.on('request', request => {
+    if (request.method() === 'POST' && /\/api\/(displays\/pair|link-transfers)$/.test(request.url())) {
+      pairingRequests.push(request.url());
+    }
+  });
+  await prepareApp(screen);
+  await screen.goto('/#/display');
+  await expect(screen.getByRole('heading', { name: 'Event display', exact: true })).toBeVisible();
+  await expect(screen.getByRole('textbox')).toHaveCount(1);
+  await expect(screen.getByRole('button', { name: 'Show connection QR', exact: true })).toBeHidden();
+  await expect(screen.getByRole('link', { name: 'Pair a managed display', exact: true })).toBeHidden();
+  await screen.getByLabel('Event code', { exact: true }).fill(event.joinCode.toLowerCase());
+  await screen.getByRole('button', { name: 'Open display', exact: true }).click();
+  await expect(screen.getByRole('heading', { name: 'One-code display', exact: true })).toBeVisible();
+  expect(pairingRequests).toEqual([]);
+});
 
 async function fakeCamera(page: Page, qr: string) {
   await page.addInitScript(raw => {

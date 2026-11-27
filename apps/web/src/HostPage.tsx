@@ -77,6 +77,7 @@ import { TournamentPanel } from './tournament/TournamentPanel';
 import { LimitedHostPanel } from './limited/LimitedHostPanel';
 import { RoundHostPanel } from './rounds/RoundHostPanel';
 import { HostDisplaysPanel } from './display/HostDisplaysPanel';
+import { managedDisplayPairPath } from './display/DisplayPairPage';
 import { EventDisplayContent } from './limited/LimitedDisplayPage';
 import { JoinPage } from './JoinPage';
 import { cx } from './ui/cx';
@@ -1269,7 +1270,8 @@ export function HostPage() {
         className={cx(tab === 'overview' ? 'contents' : 'hidden')}
       >
         <Panel title={t('host.displayOnAnotherDevice')}>
-          <p className="mb-3 text-sm">{t('eventMonitor.instructions', { code })}</p>
+          <p className="text-sm">{t('eventMonitor.instructions')}</p>
+          <code className="my-3 inline-block rounded-xl border border-neon/35 bg-neon/10 px-4 py-2 text-2xl font-bold tracking-[0.2em] text-ink">{event.joinCode}</code>
           <div className="flex flex-wrap items-center gap-3">
             <Link className="text-neon hover:underline" to={displayPath} target="_blank" rel="noopener noreferrer">
               {t('host.openEventDisplay')}
@@ -1280,9 +1282,6 @@ export function HostPage() {
             <Button variant="glass" size="sm" disabled={!displayHref} onClick={() => void onShareLink(displayHref)}>
               {t('host.shareDisplayLink')}
             </Button>
-            <Link className="text-neon hover:underline" to="/display" target="_blank" rel="noopener noreferrer">
-              {t('host.displaysPairLink')}
-            </Link>
           </div>
           {tab === 'overview' && linkError ? <p role="alert" className="text-danger mt-2 text-sm">{linkError}</p> : null}
         </Panel>
@@ -1290,7 +1289,17 @@ export function HostPage() {
           <EventDisplayContent snapshot={{ ...limitedSnapshot, event, participants, tables }} />
         ) : null}
         {hostToken ? (
-          <HostDisplaysPanel joinCode={code} hostToken={hostToken} refreshKey={displayRefreshKey} />
+          <details className="rounded-2xl border border-muted/25 px-4">
+            <summary className="cursor-pointer py-3 text-sm font-semibold text-muted">
+              {t('eventMonitor.manageDisplays')}
+            </summary>
+            <Link className="mb-3 inline-flex min-h-11 items-center text-neon underline" to={managedDisplayPairPath} target="_blank" rel="noopener noreferrer">
+              {t('host.displaysPairLink')}
+            </Link>
+            <div className="pb-4">
+              <HostDisplaysPanel joinCode={code} hostToken={hostToken} refreshKey={displayRefreshKey} />
+            </div>
+          </details>
         ) : null}
       </div>
 

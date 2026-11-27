@@ -9,6 +9,25 @@ afterEach(() => {
 });
 
 describe('Limited seat map', () => {
+  it('distinguishes open, occupied, and selected seats without blocking swaps', () => {
+    const onPick = vi.fn();
+    const occupied = { participantId: 'p2', displayName: 'Dax', seat: 2 };
+    const mine = { participantId: 'p1', displayName: 'Max', seat: 3 };
+    const { rerender } = render(
+      <LimitedSeatMap seatCount={4} selfId="p1" occupants={[occupied]} onPick={onPick} />,
+    );
+    expect(screen.getByRole('button', { name: 'Seat 1 Open' })).toHaveClass('bg-gain/15');
+    const taken = screen.getByRole('button', { name: 'Seat 2 Dax' });
+    expect(taken).toHaveClass('bg-ink/5');
+    expect(taken).toBeDisabled();
+
+    rerender(<LimitedSeatMap seatCount={4} selfId="p1" occupants={[occupied, mine]} onPick={onPick} />);
+    expect(screen.getByRole('button', { name: 'Seat 3 Max', pressed: true })).toHaveClass('ring-neon/40');
+    expect(taken).toBeEnabled();
+    fireEvent.click(taken);
+    expect(onPick).toHaveBeenCalledWith(2);
+  });
+
   it('switches a pod of four to two players facing two', () => {
     const onLayout = vi.fn();
     const { rerender } = render(
