@@ -115,7 +115,8 @@ for (const format of [
             const taken = player.getByRole('button', { name: 'Seat 1 Player 1', exact: true });
             await expect(taken).toBeDisabled();
             const openColor = await open.evaluate(button => getComputedStyle(button).backgroundColor);
-            expect(await taken.evaluate(button => getComputedStyle(button).backgroundColor)).not.toBe(openColor);
+            // The seat becomes disabled before its background transition finishes.
+            await expect(taken).not.toHaveCSS('background-color', openColor);
           }
           await open.click();
           await player.getByRole('button', { name: "I'm seated", exact: true }).click();
