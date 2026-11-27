@@ -60,7 +60,13 @@ test('host tabs keep event operations, device display, and player joining in the
   await tabs.getByRole('tab', { name: 'Play' }).press('ArrowRight');
   const overview = page.getByRole('tabpanel', { name: 'Overview' });
   await expect(overview.getByRole('heading', { name: 'Tables' })).toBeVisible();
-  await expect(overview.getByRole('link', { name: 'Pair a display' })).toBeVisible();
+  await expect(overview.locator('code').filter({ hasText: code })).toBeVisible();
+  const manageDisplays = overview.getByText('Manage displays and announcements', { exact: true });
+  const managedPairing = overview.getByRole('link', { name: 'Pair a managed display', exact: true });
+  await expect(managedPairing).toBeHidden();
+  await manageDisplays.click();
+  await expect(managedPairing).toHaveAttribute('href', '#/display?managed=1');
+  await manageDisplays.click();
   await expect(page.getByRole('heading', { name: 'Join code' })).toHaveCount(0);
   const newPage = context.waitForEvent('page');
   await overview.getByRole('link', { name: 'Open event display' }).click();
@@ -83,7 +89,7 @@ test('host tabs keep event operations, device display, and player joining in the
   const join = page.getByRole('tabpanel', { name: 'Join' });
   await expect(join.getByRole('heading', { name: 'Join code' })).toBeVisible();
   await expect(join.getByText(code, { exact: true })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Pair a display' })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Pair a managed display' })).toHaveCount(0);
   const copyPlayer = join.getByRole('button', { name: 'Copy player link' });
   const sharePlayer = join.getByRole('button', { name: 'Share player link' });
   if (hasPublicOrigin) {

@@ -62,9 +62,8 @@ export function TableShareControls({
       </div>
       {expanded && monitor ? (
         <div className="mt-3 border-t border-muted/25 pt-3">
-          <p className="mb-2 text-sm">
-            {t('eventMonitor.instructions', { code: monitor.code })}
-          </p>
+          <p className="text-sm">{t('eventMonitor.instructions')}</p>
+          <code className="my-2 block font-mono text-lg font-bold tracking-widest text-ink">{monitor.code}</code>
           <Button variant="glass" size="sm" disabled={monitorBusy} onClick={() => void toggleMonitor()}>
             {t(monitor.shared ? 'eventMonitor.stop' : 'eventMonitor.publish')}
           </Button>
