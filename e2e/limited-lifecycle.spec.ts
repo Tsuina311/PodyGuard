@@ -182,6 +182,9 @@ for (const format of [
                     await expect(player.getByText(`Best of 3 · ${score}`, { exact: true })).toBeVisible();
                   }
                   await host.getByRole('tab', { name: 'Overview', exact: true }).click();
+                  const swiss = host.getByRole('region', { name: 'Swiss stage', exact: true });
+                  await expect(swiss.getByRole('heading', { name: /^Round 1/ })).toHaveAttribute('aria-current', 'step');
+                  await expect(swiss.getByText('Pairings pending', { exact: true })).toHaveCount(2);
                   const progress = host.getByTestId('limited-match-progress').filter({ hasText: 'Best of 3 · 0–1' });
                   await expect(progress).toHaveCount(1);
                   await expect(progress).toContainText('Game 2 · waiting to start');
@@ -221,6 +224,13 @@ for (const format of [
                 playerAGameWins: format.bestOf === 3 ? 2 : 1,
                 playerBGameWins: opponentWins,
               });
+              if (playgroup && round === 1) {
+                const draftSeats = new Map(session!.participants.map((person) => [person.participantId, person.draftSeat]));
+                expect(session!.rounds[0]!.matches.map((match) => [
+                  draftSeats.get(match.playerAId),
+                  draftSeats.get(match.playerBId!),
+                ])).toEqual([[1, 5], [2, 6], [3, 7], [4, 8]]);
+              }
               if (opponentWins) await expect(player.getByText('Waiting for the other matches in this round.')).toBeVisible();
               if (!corrected && round === 1) {
                 host.once('dialog', dialog => dialog.accept('E2E: winner entered backwards'));

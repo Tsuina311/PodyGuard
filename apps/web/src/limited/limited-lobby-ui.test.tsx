@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
 import '@testing-library/jest-dom/vitest';
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { EventSnapshot, PublicLimitedSession, PublicParticipant } from '@podyguard/shared';
 import { correctLimitedGames, reportLimitedResult, reportLimitedProgress } from '../api';
@@ -275,6 +275,28 @@ it('lets the host correct an older round game by game', async () => {
     expectedOutcome: 'PLAYER_A_WIN',
     correctionReason: 'Confirmed at the table',
   }));
+});
+
+it('shows entering records and follows a player across the Swiss rounds', () => {
+  const { me, round } = bestOfThreeRound();
+  const first = round.rounds[0]!;
+  const match = first.matches[0]!;
+  Object.assign(match, { status: 'COMPLETED', outcome: 'PLAYER_A_WIN', playerAGameWins: 2, playerBGameWins: 0 });
+  round.pairingPolicy = 'SWISS';
+  round.currentRound = 2;
+  round.rounds.push({
+    ...first, id: 'r2', number: 2,
+    matches: [{ ...match, id: 'm2', roundNumber: 2, status: 'PLAYING', outcome: undefined }],
+  });
+  render(<EventDisplayContent snapshot={snapshot(me, round)} />);
+  const tree = screen.getByRole('region', { name: 'Swiss stage' });
+  const rounds = within(tree).getAllByRole('listitem');
+  expect(within(rounds[0]!).getAllByText('0–0–0')).toHaveLength(2);
+  expect(within(rounds[1]!).getByText('1–0–0')).toBeVisible();
+  expect(within(rounds[1]!).getByText('0–1–0')).toBeVisible();
+  expect(within(rounds[2]!).getByText('Pairings pending')).toBeVisible();
+  fireEvent.click(within(rounds[0]!).getByRole('button', { name: /^Ada$/ }));
+  expect(within(rounds[1]!).getByRole('button', { name: /^Ada$/ })).toHaveAttribute('aria-pressed', 'true');
 });
 
 it('shows the host each game score and an elapsed clock that resets and stops at completion', () => {

@@ -114,7 +114,7 @@ export function LimitedHostPanel({
                 {format.hasDraftPhase
                   ? format.cardsPerPick === 2
                     ? `Each table seats four. ${freeTables} ${freeTables === 1 ? 'table needs' : 'tables need'} ${seatsNeeded} ready players. Take two cards. Pass left, then right, then left. Diagonals play first.`
-                    : `Each table seats eight. ${freeTables} ${freeTables === 1 ? 'table needs' : 'tables need'} ${seatsNeeded} ready players. Take one card. Pass left, then right, then left. Then Swiss.`
+                    : `Each table seats eight. ${freeTables} ${freeTables === 1 ? 'table needs' : 'tables need'} ${seatsNeeded} ready players. Take one card. Pass left, then right, then left. Round 1 pairs opposite seats, then Swiss by record.`
                   : `Each table seats four. ${freeTables} ${freeTables === 1 ? 'table needs' : 'tables need'} ${seatsNeeded} ready players. No draft. Six packs, then Swiss.`}{' '}
                 {config.matchStructure}.
               </p>
@@ -420,6 +420,7 @@ function LimitedSessionHostCard({
                 <th>Player</th>
                 <th>Record</th>
                 <th>Points</th>
+                <th title="Match wins held by defeated opponents when you played">Win strength</th>
                 <th>MW%</th>
                 <th>OMW%</th>
               </tr>
@@ -431,6 +432,7 @@ function LimitedSessionHostCard({
                   <td>{standing.displayName}</td>
                   <td>{standing.matchWins}-{standing.matchLosses}-{standing.draws}</td>
                   <td>{standing.points}</td>
+                  <td>{standing.strengthOfWins ?? 0}</td>
                   <td>{Math.round(standing.matchWinPercentage * 100)}%</td>
                   <td>{Math.round(standing.opponentMatchWinPercentage * 100)}%</td>
                 </tr>

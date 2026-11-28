@@ -291,6 +291,9 @@ describe('returning guest join UI and playgroup overview UI', () => {
           { status: 200 },
         );
       }
+      if (url.endsWith('/playgroups/pg-fri/nights')) {
+        return Response.json({ nights: [] });
+      }
       if (url.endsWith('/playgroups/pg-fri')) {
         return new Response(
           JSON.stringify({

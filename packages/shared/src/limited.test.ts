@@ -97,6 +97,36 @@ describe('Limited pairings', () => {
     expect(() => assertLimitedRoundInvariant(round)).not.toThrow();
   });
 
+  it('pairs opposite Booster Draft seats before using Swiss records', () => {
+    const participants = people(8).reverse().map((person) => ({
+      ...person, draftSeat: Number(person.participantId.slice(1)),
+    }));
+    const input = {
+      sessionId: 'across-table', mode: 'BOOSTER_DRAFT' as const, roundNumber: 1,
+      participants, previousMatches: [], bestOf: 3 as const,
+    };
+    const matches = pairLimitedRound(input).matches;
+    expect(matches.map((match) => [match.playerAId, match.playerBId])).toEqual([
+      ['p1', 'p5'], ['p2', 'p6'], ['p3', 'p7'], ['p4', 'p8'],
+    ]);
+    const swiss = pairLimitedRound({
+      ...input, roundNumber: 2,
+      previousMatches: matches.map((match) => ({ ...match, status: 'COMPLETED', outcome: 'PLAYER_A_WIN' })),
+    });
+    const firstRoundWinners = new Set(matches.map((match) => match.playerAId));
+    expect(swiss.matches.every((match) =>
+      firstRoundWinners.has(match.playerAId) === firstRoundWinners.has(match.playerBId!),
+    )).toBe(true);
+
+    const dropped = pairLimitedRound({
+      ...input,
+      participants: participants.map((person) => ({ ...person, dropped: person.participantId === 'p5' })),
+    });
+    expect(dropped.matches.map((match) => [match.playerAId, match.playerBId])).toEqual([
+      ['p2', 'p6'], ['p3', 'p7'], ['p4', 'p8'], ['p1', undefined],
+    ]);
+  });
+
   it('pairs Pick-Two from seats: diagonals, then the other two opponents', () => {
     const seated = people(4).map((person, index) => ({
       ...person,
@@ -302,6 +332,23 @@ describe('Limited standings and timers', () => {
       byes: 1,
       points: 4,
     });
+  });
+
+  it('breaks a points tie with the wins defeated opponents had entering their match', () => {
+    const standings = calculateLimitedStandings(people(8), [
+      completed('strong-win', 3, 1, 'p8', 'p7', 'PLAYER_A_WIN'),
+      completed('first-win', 1, 1, 'p1', 'p2', 'PLAYER_A_WIN'),
+      completed('opponent-win1', 1, 2, 'p7', 'p3', 'PLAYER_A_WIN'),
+      completed('opponent-win2', 2, 1, 'p7', 'p4', 'PLAYER_A_WIN'),
+      completed('weak-loss', 2, 2, 'p1', 'p5', 'PLAYER_B_WIN'),
+      completed('strong-loss', 1, 3, 'p8', 'p6', 'PLAYER_B_WIN'),
+    ]);
+    expect(standings.find((row) => row.participantId === 'p7')?.rank).toBe(1);
+    const first = standings.find((row) => row.participantId === 'p1')!;
+    const strong = standings.find((row) => row.participantId === 'p8')!;
+    expect(first).toMatchObject({ points: 3, strengthOfWins: 0 });
+    expect(strong).toMatchObject({ points: 3, strengthOfWins: 2 });
+    expect(strong.rank).toBeLessThan(first.rank);
   });
 
   it('uses match-win percentage before opponent percentage', () => {

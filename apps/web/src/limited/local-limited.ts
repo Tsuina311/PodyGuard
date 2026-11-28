@@ -319,6 +319,7 @@ export function startLocalLimitedRound(
       participantId: participant.participantId,
       displayName: participant.displayName,
       dropped: participant.status === 'DROPPED',
+      draftSeat: participant.draftSeat,
     })),
     previousMatches,
     bestOf,

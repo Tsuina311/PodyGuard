@@ -386,7 +386,7 @@ describe('Limited pairings by format', () => {
     expect(seen.size).toBe(6);
   });
 
-  it('keeps Booster Draft and Sealed on Swiss, with at least three rounds', () => {
+  it('pairs opposite Booster Draft seats in round one and plans three Limited rounds', () => {
     expect(plannedLimitedRounds('BOOSTER_DRAFT', 8)).toBe(3);
     expect(plannedLimitedRounds('SEALED', 4)).toBe(3);
     const booster = pairLimitedRound({
@@ -405,6 +405,6 @@ describe('Limited pairings by format', () => {
     const paired = booster.matches.map((match) =>
       [match.playerAId, match.playerBId].sort().join('|'),
     );
-    expect(paired.every((pair) => diagonals.has(pair))).toBe(false);
+    expect(new Set(paired)).toEqual(diagonals);
   });
 });
