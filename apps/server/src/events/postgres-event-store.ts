@@ -58,6 +58,7 @@ import {
   type LimitedSessionPhasePatch,
   type FinalizeLimitedMatchResultInput,
   type LimitedMatchProgressInput,
+  limitedResultIsCurrent,
   type StoredAssignment,
   type StoredAuthChallenge,
   type StoredCompletedGame,
@@ -2129,6 +2130,7 @@ export class PostgresEventStore implements EventStore {
       playerAGameWins: input.playerAGameWins,
       playerBGameWins: input.playerBGameWins,
       currentGameStartedAt: input.currentGameStartedAt,
+      gameWinners: input.gameWinners,
       updatedAt: new Date(),
     }).where(and(
       eq(limitedMatches.id, input.matchId),
@@ -2136,6 +2138,8 @@ export class PostgresEventStore implements EventStore {
       isNull(limitedMatches.outcome),
       sql`coalesce(${limitedMatches.playerAGameWins}, 0) = ${input.previousA}`,
       sql`coalesce(${limitedMatches.playerBGameWins}, 0) = ${input.previousB}`,
+      input.previousGameWinners === null ? isNull(limitedMatches.gameWinners)
+        : sql`${limitedMatches.gameWinners} = ${JSON.stringify(input.previousGameWinners)}::jsonb`,
       input.previousStartedAt ? eq(limitedMatches.currentGameStartedAt, input.previousStartedAt)
         : isNull(limitedMatches.currentGameStartedAt),
     )).returning({ id: limitedMatches.id });
@@ -2165,8 +2169,12 @@ export class PostgresEventStore implements EventStore {
       if ((input.outcome === 'BYE') === hasPlayerB) {
         throw new Error('Limited result does not match the pairing.');
       }
+      if (input.expected && !limitedResultIsCurrent(match, input.expected)) {
+        throw new LimitedPersistenceConflictError('The match score changed. Refresh and try again.');
+      }
       const corrected = match.outcome !== null;
-      if (!corrected && (input.outcome === 'PLAYER_A_WIN' || input.outcome === 'PLAYER_B_WIN') &&
+      if (!corrected && !(input.expected && input.correctionReason) &&
+          (input.outcome === 'PLAYER_A_WIN' || input.outcome === 'PLAYER_B_WIN') &&
           (input.playerAGameWins < (match.playerAGameWins ?? 0) || input.playerBGameWins < (match.playerBGameWins ?? 0))) {
         throw new LimitedPersistenceConflictError('The match score changed. Refresh before reporting the result.');
       }
@@ -2178,6 +2186,8 @@ export class PostgresEventStore implements EventStore {
         .values({
           matchId: match.id,
           previousOutcome: match.outcome,
+          previousGameWinners: match.gameWinners,
+          gameWinners: input.gameWinners ?? null,
           previousPlayerAGameWins: match.playerAGameWins,
           previousPlayerBGameWins: match.playerBGameWins,
           outcome: input.outcome,
@@ -2194,6 +2204,7 @@ export class PostgresEventStore implements EventStore {
         .set({
           status: 'COMPLETED',
           outcome: input.outcome,
+          gameWinners: input.gameWinners ?? null,
           playerAGameWins: input.playerAGameWins,
           playerBGameWins: input.playerBGameWins,
           reportedAt: input.reportedAt ?? new Date(),
@@ -3519,6 +3530,7 @@ async function loadLimitedMatchRequired(
     playerAGameWins: row.match.playerAGameWins,
     playerBGameWins: row.match.playerBGameWins,
     currentGameStartedAt: row.match.currentGameStartedAt,
+    gameWinners: row.match.gameWinners,
     reportedAt: row.match.reportedAt,
   };
 }
@@ -3530,6 +3542,8 @@ function mapLimitedAudit(
     id: row.id,
     matchId: row.matchId,
     previousOutcome: row.previousOutcome,
+    previousGameWinners: row.previousGameWinners,
+    gameWinners: row.gameWinners,
     previousPlayerAGameWins: row.previousPlayerAGameWins,
     previousPlayerBGameWins: row.previousPlayerBGameWins,
     outcome: row.outcome,

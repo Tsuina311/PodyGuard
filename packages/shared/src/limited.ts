@@ -163,6 +163,8 @@ export type LimitedMatchOutcome =
   | 'DOUBLE_LOSS'
   | 'BYE';
 
+export type LimitedGameWinner = 'A' | 'B';
+
 export type LimitedMatchStatus = 'PENDING' | 'PLAYING' | 'COMPLETED';
 
 export type LimitedMatch = {
@@ -178,6 +180,8 @@ export type LimitedMatch = {
   outcome?: LimitedMatchOutcome;
   playerAGameWins?: number;
   playerBGameWins?: number;
+  /** A null entry is a recorded game whose winner order is unknown. */
+  gameWinners?: Array<LimitedGameWinner | null>;
   currentGameStartedAt?: string;
   reportedAt?: string;
 };
@@ -204,6 +208,8 @@ export type LimitedStanding = {
   points: number;
   matchWinPercentage: number;
   opponentMatchWinPercentage: number;
+  /** Played match wins held by defeated opponents before those pairings. */
+  strengthOfWins?: number;
 };
 
 export type PublicLimitedSession = {
@@ -359,7 +365,7 @@ export type LimitedPairingParticipant = {
   participantId: string;
   displayName?: string;
   dropped?: boolean;
-  /** One-based chair around the table. Pick-Two pairings use this. */
+  /** One-based chair around the draft table. */
   draftSeat?: number;
 };
 
@@ -426,6 +432,20 @@ export function pairLimitedRound(input: LimitedPairingInput): LimitedRound {
     );
   }
 
+  const facingPairs: string[][] = [];
+  if (input.mode === 'BOOSTER_DRAFT' && input.roundNumber === 1) {
+    const bySeat = new Map(input.participants
+      .filter((participant) => !participant.dropped && participant.draftSeat !== undefined)
+      .map((participant) => [participant.draftSeat, participant.participantId]));
+    const halfTable = limitedModeConfig(input.mode).minCohortSize / 2;
+    for (let seat = 1; seat <= halfTable; seat += 1) {
+      const left = bySeat.get(seat);
+      const right = bySeat.get(seat + halfTable);
+      if (left && right) facingPairs.push([left, right]);
+    }
+  }
+  const pairedBySeat = new Set(facingPairs.flat());
+
   const standings = calculateLimitedStandings(
     input.participants.map((participant) => ({
       participantId: participant.participantId,
@@ -436,7 +456,7 @@ export function pairLimitedRound(input: LimitedPairingInput): LimitedRound {
     input.previousMatches,
   );
   const ranked = standings
-    .filter((standing) => activeIds.includes(standing.participantId))
+    .filter((standing) => activeIds.includes(standing.participantId) && !pairedBySeat.has(standing.participantId))
     .map((standing) => standing.participantId);
   const byeId = ranked.length % 2 === 1
     ? chooseBye(ranked, standings, input.previousMatches)
@@ -444,7 +464,7 @@ export function pairLimitedRound(input: LimitedPairingInput): LimitedRound {
   const pairedIds = ranked.filter((id) => id !== byeId);
   const pairs = optimalPairs(pairedIds, standings, input.previousMatches);
   if (byeId) pairs.push([byeId]);
-  return makeRound(input, pairs);
+  return makeRound(input, [...facingPairs, ...pairs]);
 }
 
 function chooseBye(
@@ -602,8 +622,8 @@ export function calculateLimitedStandings(
     string,
     Omit<
       LimitedStanding,
-      'rank' | 'matchWinPercentage' | 'opponentMatchWinPercentage'
-    >
+      'rank' | 'matchWinPercentage' | 'opponentMatchWinPercentage' | 'strengthOfWins'
+    > & { strengthOfWins: number }
   >();
   const opponents = new Map<string, string[]>();
   for (const participant of participants) {
@@ -616,10 +636,11 @@ export function calculateLimitedStandings(
       byes: 0,
       matchesPlayed: 0,
       points: 0,
+      strengthOfWins: 0,
     });
     opponents.set(participant.participantId, []);
   }
-  for (const match of matches) {
+  for (const match of [...matches].sort((left, right) => left.roundNumber - right.roundNumber)) {
     if (match.status !== 'COMPLETED' || !match.outcome) continue;
     const a = records.get(match.playerAId);
     if (!a) continue;
@@ -638,10 +659,12 @@ export function calculateLimitedStandings(
     opponents.get(a.participantId)?.push(b.participantId);
     opponents.get(b.participantId)?.push(a.participantId);
     if (match.outcome === 'PLAYER_A_WIN') {
+      a.strengthOfWins += b.matchWins - b.byes;
       a.matchWins += 1;
       b.matchLosses += 1;
       a.points += 3;
     } else if (match.outcome === 'PLAYER_B_WIN') {
+      b.strengthOfWins += a.matchWins - a.byes;
       b.matchWins += 1;
       a.matchLosses += 1;
       b.points += 3;
@@ -680,6 +703,7 @@ export function calculateLimitedStandings(
     .sort(
       (left, right) =>
         right.points - left.points ||
+        right.strengthOfWins - left.strengthOfWins ||
         right.matchWinPercentage - left.matchWinPercentage ||
         right.opponentMatchWinPercentage -
           left.opponentMatchWinPercentage ||

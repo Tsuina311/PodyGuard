@@ -14,6 +14,7 @@ import {
   assignLimitedTables,
   cancelLimitedSession,
   completeLimitedSession,
+  correctLimitedGames,
   correctLimitedResult,
   dropLimitedParticipant,
   launchLimitedSession,
@@ -25,6 +26,7 @@ import {
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { Panel } from '../ui/Panel';
+import { LimitedGameScores } from './LimitedGameScores';
 import { LimitedDeveloperTools } from './LimitedDeveloperTools';
 import { LimitedTimerDisplay } from './LimitedTimerDisplay';
 import {
@@ -59,8 +61,10 @@ export function LimitedHostPanel({
     try {
       const result = await action();
       onSession(result.session);
+      return true;
     } catch (caught) {
       onError(caught instanceof ApiError ? caught.message : 'Limited action failed.');
+      return false;
     } finally {
       setBusy(false);
     }
@@ -110,7 +114,7 @@ export function LimitedHostPanel({
                 {format.hasDraftPhase
                   ? format.cardsPerPick === 2
                     ? `Each table seats four. ${freeTables} ${freeTables === 1 ? 'table needs' : 'tables need'} ${seatsNeeded} ready players. Take two cards. Pass left, then right, then left. Diagonals play first.`
-                    : `Each table seats eight. ${freeTables} ${freeTables === 1 ? 'table needs' : 'tables need'} ${seatsNeeded} ready players. Take one card. Pass left, then right, then left. Then Swiss.`
+                    : `Each table seats eight. ${freeTables} ${freeTables === 1 ? 'table needs' : 'tables need'} ${seatsNeeded} ready players. Take one card. Pass left, then right, then left. Round 1 pairs opposite seats, then Swiss by record.`
                   : `Each table seats four. ${freeTables} ${freeTables === 1 ? 'table needs' : 'tables need'} ${seatsNeeded} ready players. No draft. Six packs, then Swiss.`}{' '}
                 {config.matchStructure}.
               </p>
@@ -184,7 +188,7 @@ function LimitedSessionHostCard({
   session: PublicLimitedSession;
   snapshot: EventSnapshot;
   busy: boolean;
-  run: (action: () => Promise<{ session: PublicLimitedSession }>) => Promise<void>;
+  run: (action: () => Promise<{ session: PublicLimitedSession }>) => Promise<boolean>;
   joinCode: string;
   hostToken: string;
 }) {
@@ -192,6 +196,9 @@ function LimitedSessionHostCard({
     (person) => !session.participants.some((row) => row.participantId === person.id),
   );
   const activeRound = session.rounds.find((round) => round.number === session.currentRound);
+  const earlierRounds = session.rounds.filter((round) =>
+    round.number !== session.currentRound && round.matches.some((match) => match.gameWinners?.length),
+  );
   const activeParticipantCount = session.participants.filter(
     (participant) => participant.status !== 'DROPPED',
   ).length;
@@ -353,6 +360,13 @@ function LimitedSessionHostCard({
                   playerBName={participantName(session, match.playerBId)} />{' '}
                 {match.outcome ? `· ${match.playerAGameWins}-${match.playerBGameWins}` : ''}
               </p>
+              <LimitedGameScores
+                match={match}
+                playerA={participantName(session, match.playerAId)}
+                playerB={participantName(session, match.playerBId)}
+                busy={busy}
+                onSave={(correction) => run(() => correctLimitedGames(joinCode, hostToken, session.id, match.id, correction))}
+              />
               {match.outcome && match.outcome !== 'BYE' ? (
                 <div className="flex flex-wrap gap-1">
                   {(['PLAYER_A_WIN', 'PLAYER_B_WIN', 'DRAW', 'DOUBLE_LOSS'] as const).map((outcome) => (
@@ -369,6 +383,34 @@ function LimitedSessionHostCard({
         </div>
       ) : null}
 
+      {earlierRounds.length > 0 && (
+        <details className="mb-3 rounded-lg border border-ink/15 p-3">
+          <summary className="cursor-pointer text-sm font-semibold">Previous round game scores</summary>
+          {[...earlierRounds].reverse().map((round) => (
+            <section key={round.id} className="mt-3">
+              <h4 className="mb-2 text-sm font-semibold">Round {round.number}</h4>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {round.matches.filter((match) => match.gameWinners?.length).map((match) => (
+                  <article key={match.id} className="rounded-lg border border-ink/15 p-3 text-sm">
+                    <p className="mb-2 font-medium">
+                      {participantName(session, match.playerAId)} vs {participantName(session, match.playerBId)}
+                      {' · '}{match.playerAGameWins}–{match.playerBGameWins}
+                    </p>
+                    <LimitedGameScores
+                      match={match}
+                      playerA={participantName(session, match.playerAId)}
+                      playerB={participantName(session, match.playerBId)}
+                      busy={busy}
+                      onSave={(correction) => run(() => correctLimitedGames(joinCode, hostToken, session.id, match.id, correction))}
+                    />
+                  </article>
+                ))}
+              </div>
+            </section>
+          ))}
+        </details>
+      )}
+
       {session.standings.length > 0 ? (
         <div className="mb-3 overflow-x-auto rounded-lg border border-white/10">
           <table className="w-full min-w-[28rem] text-left text-xs">
@@ -378,6 +420,7 @@ function LimitedSessionHostCard({
                 <th>Player</th>
                 <th>Record</th>
                 <th>Points</th>
+                <th title="Match wins held by defeated opponents when you played">Win strength</th>
                 <th>MW%</th>
                 <th>OMW%</th>
               </tr>
@@ -389,6 +432,7 @@ function LimitedSessionHostCard({
                   <td>{standing.displayName}</td>
                   <td>{standing.matchWins}-{standing.matchLosses}-{standing.draws}</td>
                   <td>{standing.points}</td>
+                  <td>{standing.strengthOfWins ?? 0}</td>
                   <td>{Math.round(standing.matchWinPercentage * 100)}%</td>
                   <td>{Math.round(standing.opponentMatchWinPercentage * 100)}%</td>
                 </tr>

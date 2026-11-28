@@ -98,7 +98,9 @@ export function LimitedSeatMap({
           ? 'Two players sit across from two. You play the person in front of you first.'
           : seatCount === 4
             ? 'One player on each side. You play the person opposite you first.'
-            : 'Tap a seat. You can swap once you have a chair.'}
+            : seatCount === 8
+              ? 'Pick a seat. Round 1 is against the player across from you.'
+              : 'Tap a seat. You can swap once you have a chair.'}
       </p>
       {shape ? (
         <div className="relative mx-auto h-80 w-full max-w-sm">

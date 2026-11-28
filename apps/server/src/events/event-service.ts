@@ -51,6 +51,7 @@ import {
   type EventSnapshot,
   type LimitedEventModeConfig,
   type LimitedSeatState,
+  type LimitedGameWinner,
   type LimitedMatchOutcome,
   type LimitedMode,
   type LimitedSessionStatus,
@@ -2010,7 +2011,7 @@ export class EventService {
 
   async reportLimitedProgress(
     joinCode: string, participantToken: string, sessionId: string, matchId: string,
-    input: { playerAGameWins: number; playerBGameWins: number; startGame?: boolean },
+    input: { playerAGameWins: number; playerBGameWins: number; startGame?: boolean; previousGameWins?: unknown },
   ): Promise<PublicLimitedSession> {
     const event = await this.requireByJoinCode(joinCode);
     const reporter = await this.requireParticipant(event.id, participantToken);
@@ -2029,11 +2030,14 @@ export class EventService {
       throw new InvalidEventInputError('Use a nondecreasing, unfinished match score. Report the final result separately.');
     }
     const changed = a !== previousA || b !== previousB;
+    if (changed || input.startGame) validatePreviousGameWins(match, input.previousGameWins);
     // A game start is idempotent. A new score waits for the next game's start.
     if (!changed && (!input.startGame || match.currentGameStartedAt)) return toPublicLimitedSession(session, this.now());
     const updated = await this.store.updateLimitedMatchProgress({
       matchId, previousA, previousB, previousStartedAt: match.currentGameStartedAt ?? null,
       playerAGameWins: a, playerBGameWins: b,
+      previousGameWinners: match.gameWinners,
+      gameWinners: extendLimitedGameWinners(match, { playerAGameWins: a, playerBGameWins: b }),
       currentGameStartedAt: input.startGame ? this.now() : null,
     });
     const fresh = await this.requireLimitedSession(event.id, sessionId);
@@ -2049,7 +2053,7 @@ export class EventService {
     participantToken: string,
     sessionId: string,
     matchId: string,
-    result: LimitedResultInput,
+    result: LimitedResultInput & { previousGameWins?: unknown },
   ): Promise<PublicLimitedSession> {
     const event = await this.requireByJoinCode(joinCode);
     const reporter = await this.requireParticipant(
@@ -2076,6 +2080,7 @@ export class EventService {
         'Only the host can correct a reported Limited result.',
       );
     }
+    validatePreviousGameWins(match, result.previousGameWins);
     validateLimitedResult(match, result);
     if ((result.outcome === 'PLAYER_A_WIN' || result.outcome === 'PLAYER_B_WIN') &&
         (result.playerAGameWins < (match.playerAGameWins ?? 0) || result.playerBGameWins < (match.playerBGameWins ?? 0))) {
@@ -2084,6 +2089,8 @@ export class EventService {
     const finalized = await this.store.finalizeLimitedMatchResult({
       matchId,
       ...result,
+      expected: { ...match },
+      gameWinners: extendLimitedGameWinners(match, result),
       reportedAt: this.now(),
       correctedByParticipantId: reporter.id,
     });
@@ -2117,6 +2124,10 @@ export class EventService {
       matchId,
       ...result,
       correctionReason: result.correctionReason.trim(),
+      expected: { ...match },
+      gameWinners: result.outcome === match.outcome &&
+        result.playerAGameWins === match.playerAGameWins && result.playerBGameWins === match.playerBGameWins
+        ? match.gameWinners : null,
       reportedAt: this.now(),
     });
     await recordLimitedMatchToHistory(this.store, {
@@ -2127,6 +2138,90 @@ export class EventService {
     });
     await this.track(event.id, 'limited_result_corrected');
     return this.progressLimitedRound(event.id, session.id);
+  }
+
+  async correctLimitedGames(
+    joinCode: string,
+    hostToken: string,
+    sessionId: string,
+    matchId: string,
+    input: {
+      gameWinners: unknown;
+      expectedGameWinners: unknown;
+      expectedOutcome: unknown;
+      correctionReason: unknown;
+    },
+  ): Promise<PublicLimitedSession> {
+    const event = await this.requireHostToken(joinCode, hostToken);
+    const session = await this.requireLimitedSession(event.id, sessionId);
+    const match = requireLimitedMatch(session, matchId);
+    const recorded = recordedLimitedGames(match);
+    if (match.bestOf !== 3 || !match.playerBId || match.outcome === 'BYE' ||
+        match.outcome === 'DOUBLE_LOSS' || !recorded.length) {
+      throw new InvalidEventInputError('Choose a best-of-three match with recorded games.');
+    }
+
+    const winners = input.gameWinners;
+    if (!Array.isArray(winners) || winners.length < 1 || winners.length > 3 ||
+        !winners.every((winner): winner is LimitedGameWinner => winner === 'A' || winner === 'B')) {
+      throw new InvalidEventInputError('Choose a winner for each recorded game.');
+    }
+    if (input.expectedOutcome !== match.outcome || JSON.stringify(input.expectedGameWinners) !== JSON.stringify(recorded)) {
+      throw new LimitedPersistenceConflictError('The game results changed. Close the editor and try again.');
+    }
+
+    const playerAGameWins = winners.filter((winner) => winner === 'A').length;
+    const playerBGameWins = winners.length - playerAGameWins;
+    const outcome = playerAGameWins === 2 ? 'PLAYER_A_WIN' : playerBGameWins === 2 ? 'PLAYER_B_WIN' : null;
+    if (winners.length === 3 && winners[0] === winners[1]) {
+      throw new InvalidEventInputError('A best-of-three ends after two wins. Clear Game 3 or correct the earlier winners.');
+    }
+
+    const wasReported = match.outcome !== null;
+    if (!wasReported && (session.status !== 'ROUND_ACTIVE' || session.currentRound !== match.roundNumber ||
+        match.status !== 'PLAYING' || winners.length !== recorded.length)) {
+      throw new InvalidEventInputError('Correct the games already recorded for this active match.');
+    }
+    if (!wasReported && !outcome) {
+      const updated = await this.store.updateLimitedMatchProgress({
+        matchId,
+        previousA: match.playerAGameWins ?? 0,
+        previousB: match.playerBGameWins ?? 0,
+        previousStartedAt: match.currentGameStartedAt ?? null,
+        previousGameWinners: match.gameWinners,
+        gameWinners: winners,
+        playerAGameWins,
+        playerBGameWins,
+        currentGameStartedAt: match.currentGameStartedAt ?? null,
+      });
+      if (!updated) {
+        throw new LimitedPersistenceConflictError('The game results changed. Close the editor and try again.');
+      }
+      return toPublicLimitedSession(await this.requireLimitedSession(event.id, sessionId), this.now());
+    }
+
+    const correctedOutcome = outcome ?? (match.outcome === 'DRAW' && playerAGameWins === playerBGameWins ? 'DRAW' : null);
+    const reason = typeof input.correctionReason === 'string' ? input.correctionReason.trim() : '';
+    if (!correctedOutcome || (wasReported && !reason)) {
+      throw new InvalidEventInputError('A completed match needs a final score and a correction reason.');
+    }
+    const correctionReason = reason || 'Corrected previously reported game winners';
+    const result = { outcome: correctedOutcome, playerAGameWins, playerBGameWins } as const;
+    validateLimitedResult(match, result);
+    const endedAt = match.reportedAt ?? this.now();
+    const finalized = await this.store.finalizeLimitedMatchResult({
+      matchId,
+      ...result,
+      expected: { ...match },
+      gameWinners: winners,
+      correctionReason,
+      reportedAt: this.now(),
+    });
+    await recordLimitedMatchToHistory(this.store, { event, session, match: finalized.match, endedAt });
+    await this.track(event.id, 'limited_result_corrected');
+    return wasReported
+      ? toPublicLimitedSession(await this.requireLimitedSession(event.id, sessionId), this.now())
+      : this.progressLimitedRound(event.id, sessionId);
   }
 
   async dropLimitedPlayer(
@@ -2175,6 +2270,7 @@ export class EventService {
             : 'PLAYER_A_WIN',
         playerAGameWins: activeMatch.playerAId === dropId ? 0 : wins,
         playerBGameWins: activeMatch.playerAId === dropId ? wins : 0,
+        gameWinners: [],
         correctionReason: 'Automatic forfeit after player drop',
         reportedAt: this.now(),
       });
@@ -4961,6 +5057,50 @@ function limitedQueueSummaries(
   });
 }
 
+function gameWinnersFromTotals(
+  aWins: number,
+  bWins: number,
+  outcome?: LimitedMatchOutcome | null,
+): Array<LimitedGameWinner | null> {
+  if (aWins === 0) return Array<LimitedGameWinner>(bWins).fill('B');
+  if (bWins === 0) return Array<LimitedGameWinner>(aWins).fill('A');
+  if (aWins + bWins === 3) {
+    if (outcome === 'PLAYER_A_WIN') return [null, null, 'A'];
+    if (outcome === 'PLAYER_B_WIN') return [null, null, 'B'];
+  }
+  return Array<null>(aWins + bWins).fill(null);
+}
+
+function recordedLimitedGames(match: StoredLimitedMatch): Array<LimitedGameWinner | null> {
+  return match.gameWinners ?? gameWinnersFromTotals(
+    match.playerAGameWins ?? 0, match.playerBGameWins ?? 0, match.outcome,
+  );
+}
+
+function extendLimitedGameWinners(
+  match: StoredLimitedMatch,
+  score: Pick<LimitedResultInput, 'playerAGameWins' | 'playerBGameWins'> & { outcome?: LimitedMatchOutcome },
+): StoredLimitedMatch['gameWinners'] {
+  if (match.bestOf !== 3) return null;
+
+  const addedA = score.playerAGameWins - (match.playerAGameWins ?? 0);
+  const addedB = score.playerBGameWins - (match.playerBGameWins ?? 0);
+  if (addedA < 0 || addedB < 0) {
+    return gameWinnersFromTotals(score.playerAGameWins, score.playerBGameWins, score.outcome);
+  }
+
+  const previous = recordedLimitedGames(match);
+  // If an older client submits a whole score at once, any mixed wins
+  // before the deciding game have no recoverable order.
+  if (addedA > 0 && addedB > 0 && score.outcome === 'PLAYER_A_WIN') {
+    return [...previous, ...gameWinnersFromTotals(addedA - 1, addedB), 'A'];
+  }
+  if (addedA > 0 && addedB > 0 && score.outcome === 'PLAYER_B_WIN') {
+    return [...previous, ...gameWinnersFromTotals(addedA, addedB - 1), 'B'];
+  }
+  return [...previous, ...gameWinnersFromTotals(addedA, addedB)];
+}
+
 function toLimitedMatch(match: StoredLimitedMatch) {
   return {
     id: match.id,
@@ -4975,6 +5115,7 @@ function toLimitedMatch(match: StoredLimitedMatch) {
     outcome: match.outcome ?? undefined,
     playerAGameWins: match.playerAGameWins ?? undefined,
     playerBGameWins: match.playerBGameWins ?? undefined,
+    gameWinners: match.bestOf === 3 ? recordedLimitedGames(match) : undefined,
     currentGameStartedAt: match.currentGameStartedAt?.toISOString(),
     reportedAt: match.reportedAt?.toISOString(),
   };
@@ -5095,6 +5236,16 @@ function requireLimitedMatch(
     .find((candidate) => candidate.id === matchId);
   if (!match) throw new LimitedSessionNotFoundError();
   return match;
+}
+
+function validatePreviousGameWins(match: StoredLimitedMatch, previous: unknown): void {
+  if (previous === undefined) return;
+  if (!Array.isArray(previous) || previous.length !== 2) {
+    throw new InvalidEventInputError('Include both players’ previous game-win totals.');
+  }
+  if (previous[0] !== (match.playerAGameWins ?? 0) || previous[1] !== (match.playerBGameWins ?? 0)) {
+    throw new LimitedPersistenceConflictError('The match score changed. Refresh before reporting the game.');
+  }
 }
 
 function validateLimitedResult(

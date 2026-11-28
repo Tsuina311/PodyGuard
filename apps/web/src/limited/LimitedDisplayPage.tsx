@@ -12,9 +12,8 @@ import { Panel } from '../ui/Panel';
 import { ThemeToggleCorner } from '../ui/ThemeToggle';
 import { useEventLive } from '../useEventLive';
 import { LimitedTimerDisplay } from './LimitedTimerDisplay';
-import { LimitedMatchProgress } from './LimitedMatchProgress';
-import { LimitedMatchStatus } from './LimitedMatchStatus';
-import { LIMITED_MODE_LABELS, participantName } from './limited-view';
+import { LimitedSwissRounds } from './LimitedSwissRounds';
+import { LIMITED_MODE_LABELS } from './limited-view';
 
 export function LimitedDisplayPage() {
   const { t } = useTranslation();
@@ -116,7 +115,6 @@ export function EventDisplayContent({ snapshot }: { snapshot: EventSnapshot }) {
       </Panel>
 
       {(snapshot.limitedSessions ?? []).filter((session) => session.status !== 'CANCELLED').map((session) => {
-        const round = session.rounds.find((row) => row.number === session.currentRound);
         return (
           <Panel
             key={session.id}
@@ -129,29 +127,12 @@ export function EventDisplayContent({ snapshot }: { snapshot: EventSnapshot }) {
               </p>
               <LimitedTimerDisplay timer={session.timer} />
             </div>
-            {round ? (
-              <div className="mb-5 grid gap-3 sm:grid-cols-2">
-                {round.matches.map((match) => (
-                  <div key={match.id} className="rounded-xl border border-white/10 p-4">
-                    <p className="text-muted mb-1 text-xs uppercase tracking-widest">{match.tableLabel ?? (match.outcome === 'BYE' ? 'Bye' : `Match ${match.position}`)}</p>
-                    <p className="font-display text-lg font-semibold">
-                      {participantName(session, match.playerAId)} <span className="text-muted">vs</span> {participantName(session, match.playerBId)}
-                    </p>
-                    <p className="text-muted mt-1 text-sm">
-                      <LimitedMatchStatus outcome={match.outcome} status={match.status}
-                        playerAName={participantName(session, match.playerAId)}
-                        playerBName={participantName(session, match.playerBId)} />
-                    </p>
-                    <LimitedMatchProgress match={match} />
-                  </div>
-                ))}
-              </div>
-            ) : null}
+            <LimitedSwissRounds session={session} />
             {session.standings.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[34rem] text-left text-sm">
                   <thead className="text-muted text-xs uppercase">
-                    <tr><th className="p-2">Rank</th><th>Name</th><th>Record</th><th>Points</th><th>MW%</th><th>OMW%</th></tr>
+                    <tr><th className="p-2">Rank</th><th>Name</th><th>Record</th><th>Points</th><th title="Match wins held by defeated opponents when you played">Win strength</th><th>MW%</th><th>OMW%</th></tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
                     {session.standings.map((standing) => (
@@ -160,6 +141,7 @@ export function EventDisplayContent({ snapshot }: { snapshot: EventSnapshot }) {
                         <td>{standing.displayName}</td>
                         <td>{standing.matchWins}-{standing.matchLosses}-{standing.draws}</td>
                         <td>{standing.points}</td>
+                        <td>{standing.strengthOfWins ?? 0}</td>
                         <td>{Math.round(standing.matchWinPercentage * 100)}%</td>
                         <td>{Math.round(standing.opponentMatchWinPercentage * 100)}%</td>
                       </tr>

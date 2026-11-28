@@ -38,7 +38,7 @@ describe('table layouts through the event API', () => {
     const tablePlan: LimitedTablePlan = { draft: [{ shape: 'round', seats: 8 }], play: [
       { shape: 'square', seats: 4 }, { shape: 'rectangle', seats: 2 }, { shape: 'round', seats: 2 },
     ] };
-    const { app, events, response, store } = await fixture({ limitedModeConfigs: [{ ...defaultLimitedEventModeConfig('BOOSTER_DRAFT'), totalRounds: 1, tablePlan }] });
+    const { app, events, response, store } = await fixture({ limitedModeConfigs: [{ ...defaultLimitedEventModeConfig('BOOSTER_DRAFT'), totalRounds: 2, tablePlan }] });
     expect(response.statusCode).toBe(201);
     const { event: { joinCode }, hostToken } = response.json();
     const players: { id: string; token: string }[] = [];
@@ -120,6 +120,29 @@ describe('table layouts through the event API', () => {
       expect(Boolean(display.limitedSessions[0]!.matches[0]!.currentGameStartedAt)).toBe(showTimers);
       expect(display.limitedSessions[0]!.resultsReported).toBe(0);
     }
+    const correctGames = (
+      matchId: string, payload: Record<string, unknown>, token = hostToken,
+    ) => app.inject({
+      method: 'POST',
+      url: `/events/${joinCode}/limited/sessions/${session.id}/matches/${matchId}/games/correct`,
+      headers: { authorization: `Bearer ${token}` },
+      payload,
+    });
+    const flipFirstGame = { gameWinners: ['B'], expectedGameWinners: ['A'], expectedOutcome: null };
+    expect((await correctGames(first.id, flipFirstGame, reporterToken)).statusCode).toBe(401);
+    const updated = await correctGames(first.id, flipFirstGame);
+    expect(updated.statusCode, updated.body).toBe(200);
+    expect(updated.json().session.rounds[0].matches[0]).toMatchObject({
+      playerAGameWins: 0, playerBGameWins: 1, gameWinners: ['B'],
+      currentGameStartedAt: withTimer.limitedSessions![0]!.rounds[0]!.matches[0]!.currentGameStartedAt,
+    });
+    expect((await correctGames(first.id, flipFirstGame)).statusCode).toBe(409);
+    expect((await progress(reporterToken, {
+      playerAGameWins: 1, playerBGameWins: 1, previousGameWins: [1, 0],
+    })).statusCode).toBe(409);
+    expect((await correctGames(first.id, {
+      gameWinners: ['A'], expectedGameWinners: ['B'], expectedOutcome: null,
+    })).statusCode).toBe(200);
     const result = await app.inject({ method: 'POST', url: `/events/${joinCode}/limited/sessions/${session.id}/matches/${first.id}/result`,
       headers: { authorization: `Bearer ${players.find(player => player.id === first.playerAId)!.token}` },
       payload: { outcome: 'PLAYER_A_WIN', playerAGameWins: 2, playerBGameWins: 0 } });
@@ -127,6 +150,61 @@ describe('table layouts through the event API', () => {
     const after = await events.getSnapshot(joinCode);
     expect(after.tables[0]!.status).toBe('free');
     expect(after.tables[1]!.status).toBe('occupied');
+    expect(after.limitedSessions![0]!.rounds[0]!.matches[0]!.gameWinners).toEqual(['A', 'A']);
+
+    const active = matches[2];
+    const activeToken = players.find((player) => player.id === active.playerAId)!.token;
+    for (const bWins of [0, 1]) {
+      const reported = await app.inject({
+        method: 'POST',
+        url: `/events/${joinCode}/limited/sessions/${session.id}/matches/${active.id}/progress`,
+        headers: { authorization: `Bearer ${activeToken}` },
+        payload: { playerAGameWins: 1, playerBGameWins: bWins },
+      });
+      expect(reported.statusCode, reported.body).toBe(200);
+    }
+    const clinched = await correctGames(active.id, {
+      gameWinners: ['B', 'B'], expectedGameWinners: ['A', 'B'], expectedOutcome: null,
+    });
+    expect(clinched.statusCode, clinched.body).toBe(200);
+    expect(clinched.json().session.rounds[0].matches[2]).toMatchObject({
+      outcome: 'PLAYER_B_WIN', playerAGameWins: 0, playerBGameWins: 2, gameWinners: ['B', 'B'],
+    });
+
+    for (const match of [matches[1], matches[3]]) {
+      const response = await app.inject({
+        method: 'POST',
+        url: `/events/${joinCode}/limited/sessions/${session.id}/matches/${match.id}/result`,
+        headers: { authorization: `Bearer ${players.find((player) => player.id === match.playerAId)!.token}` },
+        payload: match === matches[3]
+          ? { outcome: 'PLAYER_B_WIN', playerAGameWins: 1, playerBGameWins: 2 }
+          : { outcome: 'DOUBLE_LOSS', playerAGameWins: 0, playerBGameWins: 0 },
+      });
+      expect(response.statusCode, response.body).toBe(200);
+    }
+    const second = (await events.getSnapshot(joinCode)).limitedSessions![0]!;
+    expect(second.currentRound).toBe(2);
+    expect(second.rounds[0]!.matches[3]!.gameWinners).toEqual([null, null, 'B']);
+
+    const previousRound = await correctGames(first.id, {
+      gameWinners: ['B', 'A', 'B'],
+      expectedGameWinners: ['A', 'A'],
+      expectedOutcome: 'PLAYER_A_WIN',
+      correctionReason: 'Confirmed the three game winners at the table',
+    });
+    expect(previousRound.statusCode, previousRound.body).toBe(200);
+    const revised = previousRound.json().session;
+    expect(revised.rounds[0].matches[0]).toMatchObject({
+      outcome: 'PLAYER_B_WIN', playerAGameWins: 1, playerBGameWins: 2, gameWinners: ['B', 'A', 'B'],
+    });
+    expect(revised.standings.find((standing: { participantId: string }) => standing.participantId === first.playerBId))
+      .toMatchObject({ matchWins: 1, points: 3 });
+    expect(revised.rounds[1]).toEqual(second.rounds[1]);
+    const audits = await store.listLimitedResultAudits(snapshot.event.id);
+    expect(audits).toContainEqual(expect.objectContaining({
+      matchId: first.id, previousGameWinners: ['A', 'A'], gameWinners: ['B', 'A', 'B'],
+    }));
+    await app.close();
   });
   it('returns a useful validation error without creating invalid table inventory', async () => {
     const { response } = await fixture({ tableLayouts: [{ shape: 'square', seats: -1 }] });

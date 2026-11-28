@@ -154,6 +154,7 @@ export type {
 export type {
   DraftPod,
   DraftSeat,
+  LimitedGameWinner,
   LimitedMatch,
   LimitedMatchOutcome,
   LimitedMatchStatus,

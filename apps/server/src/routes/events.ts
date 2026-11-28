@@ -800,7 +800,7 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
       try {
         const session = await app.events.reportLimitedProgress(normalizeJoinCode(joinCode),
           bearerToken(request.headers.authorization), sessionId, matchId,
-          request.body as { playerAGameWins: number; playerBGameWins: number; startGame?: boolean });
+          request.body as { playerAGameWins: number; playerBGameWins: number; startGame?: boolean; previousGameWins?: unknown });
         await app.live.publish(normalizeJoinCode(joinCode));
         return { session };
       } catch (error) { return sendEventError(reply, error); }
@@ -821,7 +821,10 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
           bearerToken(request.headers.authorization),
           sessionId,
           matchId,
-          parseLimitedResult(request.body),
+          {
+            ...parseLimitedResult(request.body),
+            previousGameWins: (request.body as { previousGameWins?: unknown } | null)?.previousGameWins,
+          },
         );
         await app.live.publish(normalizeJoinCode(joinCode));
         return { session };
@@ -853,6 +856,32 @@ export const eventRoutes: FastifyPluginAsync = async (app) => {
                 ? body.correctionReason
                 : '',
           },
+        );
+        await app.live.publish(normalizeJoinCode(joinCode));
+        return { session };
+      } catch (error) {
+        return sendEventError(reply, error);
+      }
+    },
+  );
+
+  app.post(
+    '/events/:joinCode/limited/sessions/:sessionId/matches/:matchId/games/correct',
+    async (request, reply) => {
+      const { joinCode, sessionId, matchId } = request.params as {
+        joinCode: string;
+        sessionId: string;
+        matchId: string;
+      };
+      const { gameWinners, expectedGameWinners, expectedOutcome, correctionReason } =
+        (request.body ?? {}) as Record<string, unknown>;
+      try {
+        const session = await app.events.correctLimitedGames(
+          normalizeJoinCode(joinCode),
+          bearerToken(request.headers.authorization),
+          sessionId,
+          matchId,
+          { gameWinners, expectedGameWinners, expectedOutcome, correctionReason },
         );
         await app.live.publish(normalizeJoinCode(joinCode));
         return { session };

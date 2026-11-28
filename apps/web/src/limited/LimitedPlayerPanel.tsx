@@ -76,6 +76,8 @@ export function LimitedPlayerPanel({
   const playerAGameWins = match?.playerAGameWins ?? currentScore?.aWins ?? Number(localScore?.[1] ?? 0);
   const playerBGameWins = match?.playerBGameWins ?? currentScore?.bWins ?? Number(localScore?.[2] ?? 0);
   const gameNumber = playerAGameWins + playerBGameWins + 1;
+  const previousGameWins: [number, number] | undefined = match?.gameWinners &&
+    [match.playerAGameWins ?? 0, match.playerBGameWins ?? 0];
   // Older versions could write the previous board to the next game's save.
   const gameTrackerKey = gameNumber === 1 ? trackerKey : `${trackerKey}.series.game-${gameNumber}`;
   useEffect(() => {
@@ -150,7 +152,7 @@ export function LimitedPlayerPanel({
       token,
       session.id,
       match.id,
-      { outcome, ...score },
+      { outcome, ...score, ...(previousGameWins && { previousGameWins }) },
     );
     remember(result.session);
   }
@@ -165,7 +167,7 @@ export function LimitedPlayerPanel({
     } else {
       if (!session) return;
       const result = await reportLimitedProgress(snapshot.event.joinCode, token, session.id, match.id,
-        { playerAGameWins: aWins, playerBGameWins: bWins });
+        { playerAGameWins: aWins, playerBGameWins: bWins, previousGameWins });
       remember(result.session);
       writeStored(scoreKey, `${aWins}-${bWins}`);
       setGameScore({ key: scoreKey, aWins, bWins });
@@ -185,7 +187,7 @@ export function LimitedPlayerPanel({
     void act(async () => {
       if (!session.timer) await confirmLimitedPlay(snapshot.event.joinCode, token, session.id);
       const result = await reportLimitedProgress(snapshot.event.joinCode, token, session.id, match.id,
-        { playerAGameWins, playerBGameWins, startGame: true });
+        { playerAGameWins, playerBGameWins, startGame: true, previousGameWins });
       remember(result.session);
       if (tracker) setOpenTrackerKey(gameTrackerKey);
     });

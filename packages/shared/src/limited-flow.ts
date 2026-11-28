@@ -428,7 +428,9 @@ export function limitedHostCue(input: {
       detail:
         input.mode === 'PICK_TWO_DRAFT'
           ? 'Pick-Two plays the diagonals first, then each remaining opponent at the table. The best-of clock keeps running until you pause this table.'
-          : 'Pairings are Swiss: similar records play, and the same two players are not rematched while another pairing exists. The best-of clock keeps running until you pause this table.',
+          : input.mode === 'BOOSTER_DRAFT' && session.roundNumber === 1
+            ? 'The first round pairs opposite draft seats. Later Swiss rounds pair similar records and avoid rematches.'
+            : 'Pairings are Swiss: similar records play, and the same two players are not rematched while another pairing exists. The best-of clock keeps running until you pause this table.',
       action: 'none',
       actionLabel: null,
     };
